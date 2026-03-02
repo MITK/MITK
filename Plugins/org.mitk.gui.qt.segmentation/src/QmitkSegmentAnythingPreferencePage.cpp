@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSegmentAnythingPreferencePage.h"
+#include <ui_QmitkSegmentAnythingPreferencePage.h>
 
 #include <mitkProcessExecutor.h>
 #include <itkCommand.h>
@@ -36,9 +37,11 @@ namespace
 }
 
 QmitkSegmentAnythingPreferencePage::QmitkSegmentAnythingPreferencePage()
-  : m_Ui(new Ui::QmitkSegmentAnythingPreferencePage), m_Control(nullptr){}
+  : m_Ui(std::make_unique<Ui::QmitkSegmentAnythingPreferencePage>()), m_Control(nullptr){}
 
-QmitkSegmentAnythingPreferencePage::~QmitkSegmentAnythingPreferencePage(){}
+QmitkSegmentAnythingPreferencePage::~QmitkSegmentAnythingPreferencePage()
+{
+}
 
 void QmitkSegmentAnythingPreferencePage::Init(berry::IWorkbench::Pointer){}
 

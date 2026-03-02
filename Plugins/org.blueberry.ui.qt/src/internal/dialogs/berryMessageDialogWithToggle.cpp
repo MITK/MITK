@@ -11,16 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryMessageDialogWithToggle.h"
-#include "ui_berryMessageDialogWithToggle.h"
+#include <ui_berryMessageDialogWithToggle.h>
 
 MessageDialogWithToggle::MessageDialogWithToggle(QWidget *parent) :
   QDialog(parent),
-  ui(new Ui::MessageDialogWithToggle)
+  ui(std::make_unique<Ui::MessageDialogWithToggle>())
 {
   ui->setupUi(this);
 }
 
 MessageDialogWithToggle::~MessageDialogWithToggle()
 {
-  delete ui;
 }

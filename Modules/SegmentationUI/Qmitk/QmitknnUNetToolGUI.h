@@ -19,8 +19,8 @@ found in the LICENSE file.
 #include "QmitknnUNetWorker.h"
 #include "mitkProcessExecutor.h"
 #include "mitknnUnetTool.h"
-#include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
+
 #include <QCache>
 #include <QMessageBox>
 #include <QSettings>
@@ -29,6 +29,12 @@ found in the LICENSE file.
 #include <QmitknnUNetEnsembleLayout.h>
 #include <boost/functional/hash.hpp>
 #include <unordered_map>
+#include <memory>
+
+namespace Ui
+{
+  class QmitknnUNetToolGUIControls;
+}
 
 class nnUNetCache
 {
@@ -345,7 +351,7 @@ private:
    */
   void UpdateCacheCountOnUI();
 
-  Ui_QmitknnUNetToolGUIControls m_Controls;
+  std::unique_ptr<Ui::QmitknnUNetToolGUIControls> m_Controls;
   QmitkGPULoader m_GpuLoader;
 
   /**

@@ -19,8 +19,12 @@ found in the LICENSE file.
 const std::string ListenerViewMitk::VIEW_ID = "org.mitk.views.listenerviewmitk";
 
 ListenerViewMitk::ListenerViewMitk()
-  :  m_Controls(new Ui::ListenerViewMitkControls),
+  :  m_Controls(std::make_unique<Ui::ListenerViewMitkControls>()),
     m_Parent(nullptr)
+{
+}
+
+ListenerViewMitk::~ListenerViewMitk()
 {
 }
 

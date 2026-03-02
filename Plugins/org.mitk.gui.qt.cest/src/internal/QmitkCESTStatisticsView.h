@@ -18,14 +18,19 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <QmitkSliceNavigationListener.h>
-
-#include "ui_QmitkCESTStatisticsViewControls.h"
+#include <QmitkPlotWidget.h>
 #include <QmitkImageStatisticsCalculationRunnable.h>
 
 #include <mitkPlanarFigure.h>
 #include <mitkPointSet.h>
-
 #include <mitkIRenderWindowPartListener.h>
+
+#include <memory>
+
+namespace Ui
+{
+  class QmitkCESTStatisticsViewControls;
+}
 
 /**
   \brief QmitkCESTStatisticsView
@@ -109,7 +114,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     template <typename TPixel, unsigned int VImageDimension>
     void CopyTimesteps(itk::Image<TPixel, VImageDimension>* image);
 
-    Ui::QmitkCESTStatisticsViewControls m_Controls;
+    std::unique_ptr<Ui::QmitkCESTStatisticsViewControls> m_Controls;
     QmitkImageStatisticsCalculationRunnable* m_CalculatorJob;
     QmitkPlotWidget::DataVector m_zSpectrum;
     mitk::Image::Pointer m_ZImage;

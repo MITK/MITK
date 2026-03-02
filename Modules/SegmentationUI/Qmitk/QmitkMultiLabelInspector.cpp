@@ -41,7 +41,7 @@ found in the LICENSE file.
 #include <ui_QmitkMultiLabelInspectorControls.h>
 
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector), m_SegmentationNodeDataMTime(0), m_Completer(nullptr)
+  : QWidget(parent), m_Controls(std::make_unique<Ui::QmitkMultiLabelInspector>()), m_SegmentationNodeDataMTime(0), m_Completer(nullptr)
 {
   m_Controls->setupUi(this);
 
@@ -126,7 +126,6 @@ void QmitkMultiLabelInspector::RefreshCompleter()
 
 QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
 {
-  delete m_Controls;
 }
 
 void QmitkMultiLabelInspector::Initialize()

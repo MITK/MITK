@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QLabel>
 
 #include "berryObjectBrowserView.h"
+#include <ui_berryQtObjectBrowserView.h>
 #include "berryDebugUtil.h"
 #include "berryDebugBreakpointManager.h"
 
@@ -35,6 +36,10 @@ ObjectBrowserView::ObjectBrowserView() :
 #endif
 }
 
+ObjectBrowserView::~ObjectBrowserView()
+{
+}
+
 void ObjectBrowserView::Init(IViewSite::Pointer site, IMemento::Pointer memento)
 {
   QtViewPart::Init(site, memento);
@@ -46,15 +51,16 @@ void ObjectBrowserView::CreateQtPartControl(QWidget* parent)
 {
   if (m_Useful)
   {
-    m_Controls.setupUi(parent);
+    m_Controls = std::make_unique<Ui::QtObjectBrowserView>();
+    m_Controls->setupUi(parent);
 
-    m_ProxyModel = new QSortFilterProxyModel(m_Controls.m_TreeView);
+    m_ProxyModel = new QSortFilterProxyModel(m_Controls->m_TreeView);
     m_ObjectModel = new QtObjectTableModel(m_ProxyModel);
 
     m_ProxyModel->setSourceModel(m_ObjectModel);
-    m_Controls.m_TreeView->setModel(m_ProxyModel);
-    m_Controls.m_TreeView->setSortingEnabled(true);
-    m_Controls.m_TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_Controls->m_TreeView->setModel(m_ProxyModel);
+    m_Controls->m_TreeView->setSortingEnabled(true);
+    m_Controls->m_TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     m_ActionToggleBreakpoint.setText(QString("Toggle Breakpoint"));
     m_ActionToggleBreakpoint.setCheckable(true);
@@ -65,9 +71,9 @@ void ObjectBrowserView::CreateQtPartControl(QWidget* parent)
     toolbar->addAction("Show Breakpoints Only");
 
     connect(resetAction, SIGNAL(triggered(bool)), this, SLOT(ResetAction(bool)));
-    connect(m_Controls.m_TreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+    connect(m_Controls->m_TreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
         this, SLOT(SelectionChanged(const QItemSelection&, const QItemSelection&)));
-    connect(m_Controls.m_TreeView, SIGNAL(customContextMenuRequested(const QPoint&)),
+    connect(m_Controls->m_TreeView, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(ContextMenuRequested(const QPoint&)));
 
     // context menu actions
@@ -100,11 +106,11 @@ void ObjectBrowserView::RestoreGuiState(IMemento::Pointer memento)
       int colWidth = 0;
       if (columnWidths->GetInteger("column0", colWidth))
       {
-        m_Controls.m_TreeView->setColumnWidth(0, colWidth);
+        m_Controls->m_TreeView->setColumnWidth(0, colWidth);
       }
       if (columnWidths->GetInteger("column1", colWidth))
       {
-        m_Controls.m_TreeView->setColumnWidth(1, colWidth);
+        m_Controls->m_TreeView->setColumnWidth(1, colWidth);
       }
     }
 
@@ -117,7 +123,7 @@ void ObjectBrowserView::RestoreGuiState(IMemento::Pointer memento)
       sizes.push_back(size);
       splitter->GetInteger("second", size);
       sizes.push_back(size);
-      m_Controls.m_Splitter->setSizes(sizes);
+      m_Controls->m_Splitter->setSizes(sizes);
     }
   }
 }
@@ -133,14 +139,14 @@ void ObjectBrowserView::SelectionChanged(const QItemSelection& selected,
   QList<QModelIndex> indexes = selected.indexes();
   if (indexes.empty())
   {
-    m_Controls.m_DetailsView->clear();
+    m_Controls->m_DetailsView->clear();
     return;
   }
 
   QModelIndex index = indexes.front();
   if (!index.parent().isValid())
   {
-    m_Controls.m_DetailsView->clear();
+    m_Controls->m_DetailsView->clear();
   }
 
   QVariant data = m_ProxyModel->data(index, Qt::UserRole);
@@ -167,23 +173,23 @@ void ObjectBrowserView::SelectionChanged(const QItemSelection& selected,
         QString str;
         QDebug ss(&str);
         obj->Print(ss);
-        m_Controls.m_DetailsView->setPlainText(str);
+        m_Controls->m_DetailsView->setPlainText(str);
       }
       else
       {
-        m_Controls.m_DetailsView->setPlainText(QString("0"));
+        m_Controls->m_DetailsView->setPlainText(QString("0"));
       }
     }
     else
     {
-      m_Controls.m_DetailsView->setPlainText(QString("0"));
+      m_Controls->m_DetailsView->setPlainText(QString("0"));
     }
   }
 }
 
 void ObjectBrowserView::ContextMenuRequested(const QPoint& p)
 {
-  QModelIndex index = m_Controls.m_TreeView->selectionModel()->currentIndex();
+  QModelIndex index = m_Controls->m_TreeView->selectionModel()->currentIndex();
   if (index.isValid())
   {
     QVariant data = m_ProxyModel->data(index, Qt::UserRole);
@@ -194,13 +200,13 @@ void ObjectBrowserView::ContextMenuRequested(const QPoint& p)
     if (item->type == ObjectItem::CLASS)
       return;
 
-    m_ContextMenu.exec(m_Controls.m_TreeView->mapToGlobal(p));
+    m_ContextMenu.exec(m_Controls->m_TreeView->mapToGlobal(p));
   }
 }
 
 void ObjectBrowserView::ToggleBreakpoint(bool checked)
 {
-  QModelIndex index = m_Controls.m_TreeView->selectionModel()->currentIndex();
+  QModelIndex index = m_Controls->m_TreeView->selectionModel()->currentIndex();
   if (index.isValid())
   {
     QVariant data = m_ProxyModel->data(index, Qt::UserRole);
@@ -232,7 +238,7 @@ void ObjectBrowserView::SetFocus()
 {
   if (m_Useful)
   {
-    m_Controls.m_TreeView->setFocus();
+    m_Controls->m_TreeView->setFocus();
   }
 }
 
@@ -242,10 +248,10 @@ void ObjectBrowserView::SaveState(IMemento::Pointer memento)
     return;
 
   IMemento::Pointer cols = memento->CreateChild("columnWidths");
-  cols->PutInteger("column0", m_Controls.m_TreeView->columnWidth(0));
-  cols->PutInteger("column1", m_Controls.m_TreeView->columnWidth(1));
+  cols->PutInteger("column0", m_Controls->m_TreeView->columnWidth(0));
+  cols->PutInteger("column1", m_Controls->m_TreeView->columnWidth(1));
 
-  QList<int> sizes(m_Controls.m_Splitter->sizes());
+  QList<int> sizes(m_Controls->m_Splitter->sizes());
   IMemento::Pointer splitter = memento->CreateChild("splitter");
   splitter->PutInteger("first", sizes[0]);
   splitter->PutInteger("second", sizes[1]);
@@ -254,7 +260,7 @@ void ObjectBrowserView::SaveState(IMemento::Pointer memento)
   // which in turn unregisters the object listener. Otherwise, we get
   // notifications of deleted objects during workbench shutdown which
   // leads to segmentation faults
-  m_Controls.m_TreeView->deleteLater();
+  m_Controls->m_TreeView->deleteLater();
 }
 
 } //namespace berry

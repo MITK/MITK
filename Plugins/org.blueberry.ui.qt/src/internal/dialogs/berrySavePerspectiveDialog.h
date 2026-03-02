@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berrySmartPointer.h>
 
 #include <QDialog>
+#include <memory>
 
 class QItemSelection;
 class QSortFilterProxyModel;
@@ -56,7 +57,7 @@ private:
 
   void UpdateButtons();
 
-  Ui::SavePerspectiveDialog* ui;
+  std::unique_ptr<Ui::SavePerspectiveDialog> ui;
   PerspectiveListModel* model;
   QSortFilterProxyModel* proxyModel;
 

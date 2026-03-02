@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 #include <mitkPointSet.h>
+#include <memory>
 
 namespace Ui
 {
@@ -76,7 +77,7 @@ protected:
   mitk::DataNode::Pointer m_Axis2Node;
   mitk::DataNode::Pointer m_Axis3Node;
 
-  Ui::PCAExampleControls *m_Controls;
+  std::unique_ptr<Ui::PCAExampleControls> m_Controls;
 };
 
 #endif // PCAExample_h

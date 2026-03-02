@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
+#include <ui_QmitkMxNMultiWidgetEditorPreferencePage.h>
 #include <QmitkMxNMultiWidgetEditor.h>
 
 #include <mitkCoreServices.h>
@@ -27,6 +28,7 @@ namespace
 }
 
 QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
+  : m_Ui(std::make_unique<Ui::QmitkMxNMultiWidgetEditorPreferencePage>())
 {
   // nothing here
 }
@@ -45,10 +47,10 @@ void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
 
-  m_Ui.setupUi(m_MainControl);
+  m_Ui->setupUi(m_MainControl);
 
-  connect(m_Ui.m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
-  connect(m_Ui.m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));
+  connect(m_Ui->m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
+  connect(m_Ui->m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));
 
   Update();
 }
@@ -62,12 +64,12 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
 {
   auto* prefs = GetPreferences();
 
-  prefs->PutBool("Show level/window widget", m_Ui.m_ShowLevelWindowWidget->isChecked());
-  prefs->PutBool("PACS like mouse interaction", m_Ui.m_PACSLikeMouseMode->isChecked());
-  prefs->PutInt("Render window widget colormap", m_Ui.m_ColormapComboBox->currentIndex());
-  prefs->PutBool("Render window individual decorations", m_Ui.m_IndividualDecorations->isChecked());
+  prefs->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
+  prefs->PutInt("Render window widget colormap", m_Ui->m_ColormapComboBox->currentIndex());
+  prefs->PutBool("Render window individual decorations", m_Ui->m_IndividualDecorations->isChecked());
 
-  prefs->PutInt("crosshair gap size", m_Ui.m_CrosshairGapSize->value());
+  prefs->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
 
   return true;
 }
@@ -81,15 +83,15 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 {
   auto* prefs = GetPreferences();
 
-  m_Ui.m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
-  m_Ui.m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
+  m_Ui->m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
+  m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
 
   int colormap = prefs->GetInt("Render window widget colormap", 0);
-  m_Ui.m_ColormapComboBox->setCurrentIndex(colormap);
+  m_Ui->m_ColormapComboBox->setCurrentIndex(colormap);
 
-  m_Ui.m_IndividualDecorations->setChecked(prefs->GetBool("Render window individual decorations", false));
+  m_Ui->m_IndividualDecorations->setChecked(prefs->GetBool("Render window individual decorations", false));
 
-  m_Ui.m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
+  m_Ui->m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
 }
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()

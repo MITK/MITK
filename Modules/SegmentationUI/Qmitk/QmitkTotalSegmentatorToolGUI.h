@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <QMutex>
 #include <QMessageBox>
+#include <memory>
 
 namespace Ui
 {
@@ -88,7 +89,7 @@ protected:
   void DownloadStatusWorker(const bool isDownloading);
 
   QMutex m_Mutex;
-  Ui::QmitkTotalSegmentatorToolGUIControls* m_Controls;
+  std::unique_ptr<Ui::QmitkTotalSegmentatorToolGUIControls> m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   mitk::IPreferences* m_Preferences;

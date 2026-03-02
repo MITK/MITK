@@ -24,9 +24,12 @@ found in the LICENSE file.
 #include <QWidget>
 
 #include <MitkMatchPointRegistrationUIExports.h>
+#include <memory>
 
-#include "ui_QmitkRegistrationManipulationWidget.h"
-
+namespace Ui
+{
+  class QmitkRegistrationManipulationWidget;
+}
 
 /*!
 \brief QmitkMatchPointRegistrationManipulator
@@ -35,7 +38,7 @@ found in the LICENSE file.
 
 \ingroup ${plugin_target}_internal
 */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : public QWidget, private Ui::QmitkRegistrationManipulationWidget
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : public QWidget
 {
   Q_OBJECT
 
@@ -107,6 +110,8 @@ private:
   void UpdateTransform(bool updateRotation = false);
 
   void ConfigureTransformCenter();
+
+  std::unique_ptr<Ui::QmitkRegistrationManipulationWidget> m_Controls;
 
   MAPRegistrationType::Pointer m_PreRegistration;
 

@@ -29,7 +29,7 @@ const std::string QmitkSurfaceUtilities::VIEW_ID = "org.mitk.views.qmitksurfaceu
 
 QmitkSurfaceUtilities::QmitkSurfaceUtilities()
   : QmitkAbstractView(),
-    m_Controls(new Ui::QmitkSurfaceUtilitiesControls)
+    m_Controls(std::make_unique<Ui::QmitkSurfaceUtilitiesControls>())
 {
 }
 

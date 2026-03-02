@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "ModelFitInspectorView.h"
+#include <ui_ModelFitInspectorViewControls.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -44,6 +45,7 @@ const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 10;
 const std::string DEFAULT_X_AXIS = "Time [s]";
 
 ModelFitInspectorView::ModelFitInspectorView() :
+  m_Controls(std::make_unique<Ui::ModelFitInspectorViewControls>()),
   m_renderWindowPart(nullptr),
   m_internalUpdateFlag(false),
   m_currentFit(nullptr),
@@ -51,7 +53,6 @@ ModelFitInspectorView::ModelFitInspectorView() :
   m_currentModelProviderService(nullptr),
   m_currentSelectedTimeStep(0),
   m_currentSelectedNode(nullptr)
-
 {
   m_currentSelectedPosition.Fill(0.0);
   m_modelfitList.clear();
@@ -80,89 +81,89 @@ void ModelFitInspectorView::RenderWindowPartDeactivated(
 
 void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
   m_SelectionServiceConnector->AddPostSelectionListener(this->GetSite()->GetWorkbenchWindow()->GetSelectionService());
 
-  m_Controls.inputNodeSelector->SetDataStorage(GetDataStorage());
-  m_Controls.inputNodeSelector->SetEmptyInfo(QString("Please select input data to be viewed."));
-  m_Controls.inputNodeSelector->SetInvalidInfo(QString("<b><font color=\"red\">No input data is selected</font></b>"));
-  m_Controls.inputNodeSelector->SetPopUpTitel(QString("Choose 3D+t input data that should be viewed!"));
-  m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.inputNodeSelector->SetSelectOnlyVisibleNodes(true);
-  m_Controls.groupSettings->setVisible(false);
+  m_Controls->inputNodeSelector->SetDataStorage(GetDataStorage());
+  m_Controls->inputNodeSelector->SetEmptyInfo(QString("Please select input data to be viewed."));
+  m_Controls->inputNodeSelector->SetInvalidInfo(QString("<b><font color=\"red\">No input data is selected</font></b>"));
+  m_Controls->inputNodeSelector->SetPopUpTitel(QString("Choose 3D+t input data that should be viewed!"));
+  m_Controls->inputNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->inputNodeSelector->SetSelectOnlyVisibleNodes(true);
+  m_Controls->groupSettings->setVisible(false);
 
   auto predicate = mitk::NodePredicateFunction::New([](const mitk::DataNode *node) {
     bool isModelFitNode = node->GetData() && node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNotNull();
     return isModelFitNode || (node && node->GetData() && node->GetData()->GetTimeSteps() > 1);
   });
 
-  m_Controls.inputNodeSelector->SetNodePredicate(predicate);
+  m_Controls->inputNodeSelector->SetNodePredicate(predicate);
 
-  connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.inputNodeSelector, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
-  connect(m_Controls.inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ModelFitInspectorView::OnInputChanged);
+  connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls->inputNodeSelector, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  connect(m_Controls->inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &ModelFitInspectorView::OnInputChanged);
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 
-  connect(m_Controls.cmbFit, SIGNAL(currentIndexChanged(int)), this,
+  connect(m_Controls->cmbFit, SIGNAL(currentIndexChanged(int)), this,
           SLOT(OnFitSelectionChanged(int)));
 
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), m_Controls.sbFixMin,
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), m_Controls->sbFixMin,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), m_Controls.sbFixMax,
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), m_Controls->sbFixMax,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), m_Controls.labelFixMin,
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), m_Controls->labelFixMin,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), m_Controls.labelFixMax,
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), m_Controls->labelFixMax,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), m_Controls.btnScaleToData,
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), m_Controls->btnScaleToData,
           SLOT(setEnabled(bool)));
 
-  connect(m_Controls.radioScaleFixed, SIGNAL(toggled(bool)), this, SLOT(OnScaleFixedYChecked(bool)));
+  connect(m_Controls->radioScaleFixed, SIGNAL(toggled(bool)), this, SLOT(OnScaleFixedYChecked(bool)));
 
-  connect(m_Controls.btnScaleToData, SIGNAL(clicked()), this, SLOT(OnScaleToDataYClicked()));
-  connect(m_Controls.sbFixMax, SIGNAL(valueChanged(double)), this,
+  connect(m_Controls->btnScaleToData, SIGNAL(clicked()), this, SLOT(OnScaleToDataYClicked()));
+  connect(m_Controls->sbFixMax, SIGNAL(valueChanged(double)), this,
           SLOT(OnFixedScalingYChanged(double)));
-  connect(m_Controls.sbFixMin, SIGNAL(valueChanged(double)), this,
+  connect(m_Controls->sbFixMin, SIGNAL(valueChanged(double)), this,
           SLOT(OnFixedScalingYChanged(double)));
 
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls.sbFixMin_x,
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls->sbFixMin_x,
     SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls.sbFixMax_x,
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls->sbFixMax_x,
     SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls.labelFixMin_x,
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls->labelFixMin_x,
     SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls.labelFixMax_x,
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls->labelFixMax_x,
     SLOT(setEnabled(bool)));
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls.btnScaleToData_x,
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), m_Controls->btnScaleToData_x,
     SLOT(setEnabled(bool)));
 
-  connect(m_Controls.radioScaleFixed_x, SIGNAL(toggled(bool)), this, SLOT(OnScaleFixedXChecked(bool)));
+  connect(m_Controls->radioScaleFixed_x, SIGNAL(toggled(bool)), this, SLOT(OnScaleFixedXChecked(bool)));
 
-  connect(m_Controls.btnScaleToData_x, SIGNAL(clicked()), this, SLOT(OnScaleToDataXClicked()));
-  connect(m_Controls.sbFixMax_x, SIGNAL(valueChanged(double)), this,
+  connect(m_Controls->btnScaleToData_x, SIGNAL(clicked()), this, SLOT(OnScaleToDataXClicked()));
+  connect(m_Controls->sbFixMax_x, SIGNAL(valueChanged(double)), this,
     SLOT(OnFixedScalingXChanged(double)));
-  connect(m_Controls.sbFixMin_x, SIGNAL(valueChanged(double)), this,
+  connect(m_Controls->sbFixMin_x, SIGNAL(valueChanged(double)), this,
     SLOT(OnFixedScalingXChanged(double)));
 
-  connect(m_Controls.btnFullPlot, SIGNAL(clicked(bool)), this, SLOT(OnFullPlotClicked(bool)));
+  connect(m_Controls->btnFullPlot, SIGNAL(clicked(bool)), this, SLOT(OnFullPlotClicked(bool)));
 
   this->EnsureBookmarkPointSet();
-  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode);
+  m_Controls->inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode);
 
-  connect(m_Controls.inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
+  connect(m_Controls->inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
 
   // For some reason this needs to be called to set the plot widget's minimum width to an
   // acceptable level (since Qwt 6).
   // Otherwise it tries to keep both axes equal in length, resulting in a minimum width of
   // 400-500px which is way too much.
-  m_Controls.widgetPlot->GetPlot()->updateAxes();
+  m_Controls->widgetPlot->GetPlot()->updateAxes();
 
-  m_Controls.cmbFit->clear();
+  m_Controls->cmbFit->clear();
 
-  m_ErrorOverlay = new QmitkSimpleTextOverlayWidget(m_Controls.widgetPlot);
+  m_ErrorOverlay = new QmitkSimpleTextOverlayWidget(m_Controls->widgetPlot);
   m_ErrorOverlay->setVisible(false);
   m_ErrorOverlay->setOpacity(180);
   m_ErrorOverlay->SetOverlayText(QStringLiteral());
@@ -181,32 +182,32 @@ void ModelFitInspectorView::NodeRemoved(const mitk::DataNode* node)
   if (node == this->m_currentSelectedNode)
   {
     QmitkSingleNodeSelectionWidget::NodeList emptylist;
-    this->m_Controls.inputNodeSelector->SetCurrentSelection(emptylist);
+    this->m_Controls->inputNodeSelector->SetCurrentSelection(emptylist);
   }
 }
 
 void ModelFitInspectorView::OnScaleFixedYChecked(bool checked)
 {
-  m_Controls.widgetPlot->GetPlot()->setAxisAutoScale(QwtPlot::yLeft, !checked);
+  m_Controls->widgetPlot->GetPlot()->setAxisAutoScale(QwtPlot::yLeft, !checked);
 
   if (checked)
   {
     OnScaleToDataYClicked();
   }
 
-  m_Controls.widgetPlot->GetPlot()->replot();
+  m_Controls->widgetPlot->GetPlot()->replot();
 };
 
 void ModelFitInspectorView::OnScaleFixedXChecked(bool checked)
 {
-  m_Controls.widgetPlot->GetPlot()->setAxisAutoScale(QwtPlot::xBottom, !checked);
+  m_Controls->widgetPlot->GetPlot()->setAxisAutoScale(QwtPlot::xBottom, !checked);
 
   if (checked)
   {
     OnScaleToDataXClicked();
   }
 
-  m_Controls.widgetPlot->GetPlot()->replot();
+  m_Controls->widgetPlot->GetPlot()->replot();
 };
 
 void ModelFitInspectorView::OnScaleToDataYClicked()
@@ -216,8 +217,8 @@ void ModelFitInspectorView::OnScaleToDataYClicked()
   auto min = minmax.first - std::abs(minmax.first) * 0.01;
   auto max = minmax.second + std::abs(minmax.second) * 0.01;
 
-  m_Controls.sbFixMin->setValue(min);
-  m_Controls.sbFixMax->setValue(max);
+  m_Controls->sbFixMin->setValue(min);
+  m_Controls->sbFixMax->setValue(max);
 };
 
 void ModelFitInspectorView::OnScaleToDataXClicked()
@@ -227,36 +228,36 @@ void ModelFitInspectorView::OnScaleToDataXClicked()
   auto min = minmax.first - std::abs(minmax.first) * 0.01;
   auto max = minmax.second + std::abs(minmax.second) * 0.01;
 
-  m_Controls.sbFixMin_x->setValue(min);
-  m_Controls.sbFixMax_x->setValue(max);
+  m_Controls->sbFixMin_x->setValue(min);
+  m_Controls->sbFixMax_x->setValue(max);
 };
 
 void ModelFitInspectorView::OnFixedScalingYChanged(double /*value*/)
 {
-  m_Controls.widgetPlot->GetPlot()->setAxisScale(QwtPlot::yLeft, m_Controls.sbFixMin->value(),
-      m_Controls.sbFixMax->value());
-  m_Controls.widgetPlot->GetPlot()->replot();
+  m_Controls->widgetPlot->GetPlot()->setAxisScale(QwtPlot::yLeft, m_Controls->sbFixMin->value(),
+      m_Controls->sbFixMax->value());
+  m_Controls->widgetPlot->GetPlot()->replot();
 };
 
 void ModelFitInspectorView::OnFixedScalingXChanged(double /*value*/)
 {
-  m_Controls.widgetPlot->GetPlot()->setAxisScale(QwtPlot::xBottom, m_Controls.sbFixMin_x->value(),
-    m_Controls.sbFixMax_x->value());
-  m_Controls.widgetPlot->GetPlot()->replot();
+  m_Controls->widgetPlot->GetPlot()->setAxisScale(QwtPlot::xBottom, m_Controls->sbFixMin_x->value(),
+    m_Controls->sbFixMax_x->value());
+  m_Controls->widgetPlot->GetPlot()->replot();
 };
 
 void ModelFitInspectorView::OnFullPlotClicked(bool checked)
 {
-  m_Controls.tabWidget->setVisible(!checked);
+  m_Controls->tabWidget->setVisible(!checked);
 };
 
 int ModelFitInspectorView::ActualizeFitSelectionWidget()
 {
   mitk::modelFit::ModelFitInfo::UIDType selectedFitUD = "";
   bool isModelFitNode = false;
-  if (this->m_Controls.inputNodeSelector->GetSelectedNode().IsNotNull())
+  if (this->m_Controls->inputNodeSelector->GetSelectedNode().IsNotNull())
   {
-    isModelFitNode = this->m_Controls.inputNodeSelector->GetSelectedNode()->GetData()->GetPropertyList()->GetStringProperty(
+    isModelFitNode = this->m_Controls->inputNodeSelector->GetSelectedNode()->GetData()->GetPropertyList()->GetStringProperty(
       mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
   }
 
@@ -266,7 +267,7 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
     this->m_currentSelectedNode, storage);
 
   this->m_modelfitList.clear();
-  this->m_Controls.cmbFit->clear();
+  this->m_Controls->cmbFit->clear();
 
   for (const auto & fitUID : fitUIDs)
   {
@@ -287,7 +288,7 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
       }
       nameStrm << " (" << info->modelName << ")";
       QVariant data(info->uid.c_str());
-      m_Controls.cmbFit->addItem(QString::fromStdString(nameStrm.str()), data);
+      m_Controls->cmbFit->addItem(QString::fromStdString(nameStrm.str()), data);
     }
     else
     {
@@ -308,7 +309,7 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
   {
     //model was selected, thus select this one in combobox
     QVariant data(selectedFitUD.c_str());
-    cmbIndex = m_Controls.cmbFit->findData(data);
+    cmbIndex = m_Controls->cmbFit->findData(data);
 
     if (cmbIndex == -1)
     {
@@ -318,7 +319,7 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
     }
   };
 
-  m_Controls.cmbFit->setCurrentIndex(cmbIndex);
+  m_Controls->cmbFit->setCurrentIndex(cmbIndex);
 
   return cmbIndex;
 }
@@ -361,7 +362,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
         m_currentFit = nullptr;
         m_currentFitTime.Modified();
         OnSliceChanged();
-        m_Controls.plotDataWidget->SetXName(DEFAULT_X_AXIS);
+        m_Controls->plotDataWidget->SetXName(DEFAULT_X_AXIS);
       }
       else
       {
@@ -378,7 +379,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
       this->m_currentSelectedNode = nullptr;
       this->m_currentFit = nullptr;
       this->m_modelfitList.clear();
-      this->m_Controls.cmbFit->clear();
+      this->m_Controls->cmbFit->clear();
       m_internalUpdateFlag = false;
 
       m_selectedNodeTime.Modified();
@@ -386,7 +387,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
       RefreshPlotData();
       RenderPlot();
 
-      m_Controls.fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
+      m_Controls->fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
     }
   }
 
@@ -493,11 +494,11 @@ void ModelFitInspectorView::OnSliceChanged()
 {
   ValidateAndSetCurrentPosition();
 
-  m_Controls.widgetPlot->setEnabled(m_validSelectedPosition);
+  m_Controls->widgetPlot->setEnabled(m_validSelectedPosition);
 
   if (m_currentSelectedNode.IsNotNull())
   {
-    m_Controls.inspectionPositionWidget->SetCurrentPosition(m_currentSelectedPosition);
+    m_Controls->inspectionPositionWidget->SetCurrentPosition(m_currentSelectedPosition);
 
     if (RefreshPlotData())
     {
@@ -528,9 +529,9 @@ void ModelFitInspectorView::OnFitSelectionChanged(int index)
     std::string uid = "";
 
 
-    if (m_Controls.cmbFit->count() > index)
+    if (m_Controls->cmbFit->count() > index)
     {
-      uid = m_Controls.cmbFit->itemData(index).toString().toStdString();
+      uid = m_Controls->cmbFit->itemData(index).toString().toStdString();
     }
 
     mitk::modelFit::ModelFitInfo::ConstPointer newFit = nullptr;
@@ -562,7 +563,7 @@ void ModelFitInspectorView::OnFitSelectionChanged(int index)
       {
         name += " [" + m_currentFit->xAxisUnit + "]";
       }
-      m_Controls.plotDataWidget->SetXName(name);
+      m_Controls->plotDataWidget->SetXName(name);
 
       OnSliceChanged();
     }
@@ -691,23 +692,23 @@ void ModelFitInspectorView::RenderFitInfo()
 
     if (m_currentFit.IsNull())
     {
-        m_Controls.lFitType->setText("");
-        m_Controls.lFitUID->setText("");
-        m_Controls.lModelName->setText("");
-        m_Controls.lModelType->setText("");
+        m_Controls->lFitType->setText("");
+        m_Controls->lFitUID->setText("");
+        m_Controls->lModelName->setText("");
+        m_Controls->lModelType->setText("");
     }
     else
     {
-        m_Controls.lFitType->setText(QString::fromStdString(m_currentFit->fitType));
-        m_Controls.lFitUID->setText(QString::fromStdString(m_currentFit->uid));
-        m_Controls.lModelName->setText(QString::fromStdString(m_currentFit->modelName));
-        m_Controls.lModelType->setText(QString::fromStdString(m_currentFit->modelType));
+        m_Controls->lFitType->setText(QString::fromStdString(m_currentFit->fitType));
+        m_Controls->lFitUID->setText(QString::fromStdString(m_currentFit->uid));
+        m_Controls->lModelName->setText(QString::fromStdString(m_currentFit->modelName));
+        m_Controls->lModelType->setText(QString::fromStdString(m_currentFit->modelType));
     }
 
     // print results
     std::stringstream infoOutput;
 
-  m_Controls.fitParametersWidget->setVisible(false);
+  m_Controls->fitParametersWidget->setVisible(false);
 
     if (m_currentFit.IsNull())
     {
@@ -720,20 +721,20 @@ void ModelFitInspectorView::RenderFitInfo()
     }
     else
     {
-        m_Controls.fitParametersWidget->setVisible(true);
-    m_Controls.fitParametersWidget->setFits({ m_currentFit });
+        m_Controls->fitParametersWidget->setVisible(true);
+    m_Controls->fitParametersWidget->setFits({ m_currentFit });
 
-    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks);
-    m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
+    m_Controls->fitParametersWidget->setPositionBookmarks(m_PositionBookmarks);
+    m_Controls->fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
     }
 
     // configure data table
-    m_Controls.tableInputData->clearContents();
+    m_Controls->tableInputData->clearContents();
 
     if (m_currentFit.IsNotNull())
     {
-        m_Controls.groupSettings->setVisible(false);
-        m_Controls.tableInputData->setRowCount(m_PlotCurves.staticPlots->size());
+        m_Controls->groupSettings->setVisible(false);
+        m_Controls->tableInputData->setRowCount(m_PlotCurves.staticPlots->size());
 
         unsigned int rowIndex = 0;
 
@@ -754,16 +755,16 @@ void ModelFitInspectorView::RenderFitInfo()
             }
 
             QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
-            m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
+            m_Controls->tableInputData->setItem(rowIndex, 0, newItem);
             newItem = new QTableWidgetItem();
             newItem->setBackground(dataColor);
 
 
-            m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
+            m_Controls->tableInputData->setItem(rowIndex, 1, newItem);
         }
     }
 
-    m_Controls.lInfo->setText(QString::fromStdString(infoOutput.str()));
+    m_Controls->lInfo->setText(QString::fromStdString(infoOutput.str()));
 }
 
 void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString, const QColor&legendTextColor)
@@ -773,18 +774,18 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
   if (sampleCurve)
   {
     std::string name = mitk::MODEL_FIT_PLOT_SAMPLE_NAME() + posString;
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(name.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, sampleCurve->GetValues());
-    m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
+    unsigned int curveId = m_Controls->widgetPlot->InsertCurve(name.c_str());
+    m_Controls->widgetPlot->SetCurveData(curveId, sampleCurve->GetValues());
+    m_Controls->widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
 
     // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
     // (QwtPlotCurve deletes it on destruction and assignment).
     QwtSymbol* dataSymbol = new QwtSymbol(QwtSymbol::Diamond, sampleColor, sampleColor, QSize(8, 8));
-    m_Controls.widgetPlot->SetCurveSymbol(curveId, dataSymbol);
+    m_Controls->widgetPlot->SetCurveSymbol(curveId, dataSymbol);
 
     // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
     // gets unnecessarily complicated.
-    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
+    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls->widgetPlot->
       GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
     measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
     measurementCurve->setLegendIconSize(QSize(8, 8));
@@ -803,16 +804,16 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
     QPen pen;
     pen.setColor(signalColor);
     pen.setWidth(2);
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(name.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, signalCurve->GetValues());
-    m_Controls.widgetPlot->SetCurvePen(curveId, pen);
+    unsigned int curveId = m_Controls->widgetPlot->InsertCurve(name.c_str());
+    m_Controls->widgetPlot->SetCurveData(curveId, signalCurve->GetValues());
+    m_Controls->widgetPlot->SetCurvePen(curveId, pen);
 
     // Manually set the legend attribute to use the symbol as the legend icon and alter its
     // size. Otherwise it would revert to default which is drawing a square which is the color
     // of the curve's pen, so in this case none which defaults to black.
     // Unfortunately, QmitkPlotWidget offers no way to set the legend attribute and icon size so
     // this looks a bit hacky.
-    QwtPlotCurve* fitCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->GetPlot()->
+    QwtPlotCurve* fitCurve = dynamic_cast<QwtPlotCurve*>(m_Controls->widgetPlot->GetPlot()->
       itemList(QwtPlotItem::Rtti_PlotCurve).back());
     fitCurve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
     QwtText legendText = fitCurve->title();
@@ -825,7 +826,7 @@ void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection*
 
 void ModelFitInspectorView::RenderPlot()
 {
-  m_Controls.widgetPlot->Clear();
+  m_Controls->widgetPlot->Clear();
   m_ErrorOverlay->setVisible(m_RefreshPlotDataErrorOccured);
 
   if (m_RefreshPlotDataErrorOccured)
@@ -862,9 +863,9 @@ void ModelFitInspectorView::RenderPlot()
     }
   }
 
-  m_Controls.widgetPlot->SetAxisTitle(QwtPlot::xBottom, xAxis.c_str());
-  m_Controls.widgetPlot->SetAxisTitle(QwtPlot::yLeft, yAxis.c_str());
-  m_Controls.widgetPlot->SetPlotTitle(plotTitle.c_str());
+  m_Controls->widgetPlot->SetAxisTitle(QwtPlot::xBottom, xAxis.c_str());
+  m_Controls->widgetPlot->SetAxisTitle(QwtPlot::yLeft, yAxis.c_str());
+  m_Controls->widgetPlot->SetPlotTitle(plotTitle.c_str());
 
   // Draw static curves
   unsigned int colorIndex = 0;
@@ -873,8 +874,8 @@ void ModelFitInspectorView::RenderPlot()
         pos != m_PlotCurves.staticPlots->end(); ++pos)
   {
     QColor dataColor;
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, pos->second->GetValues());
+    unsigned int curveId = m_Controls->widgetPlot->InsertCurve(pos->first.c_str());
+    m_Controls->widgetPlot->SetCurveData(curveId, pos->second->GetValues());
 
     if (pos->first == "ROI")
     {
@@ -882,25 +883,25 @@ void ModelFitInspectorView::RenderPlot()
       QPen pen;
       pen.setColor(dataColor);
       pen.setStyle(Qt::SolidLine);
-      m_Controls.widgetPlot->SetCurvePen(curveId, pen);
+      m_Controls->widgetPlot->SetCurvePen(curveId, pen);
     }
     else
     {
       //Use HSV schema of QColor to calculate a different color depending on the
       //number of already existing curves.
       dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
-      m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
+      m_Controls->widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
     }
 
     // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
     // (QwtPlotCurve deletes it on destruction and assignment).
     QwtSymbol* dataSymbol = new QwtSymbol(QwtSymbol::Triangle, dataColor, dataColor,
                                           QSize(8, 8));
-    m_Controls.widgetPlot->SetCurveSymbol(curveId, dataSymbol);
+    m_Controls->widgetPlot->SetCurveSymbol(curveId, dataSymbol);
 
     // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
     // gets unnecessarily complicated.
-    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
+    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls->widgetPlot->
                                       GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
     measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
     measurementCurve->setLegendIconSize(QSize(8, 8));
@@ -924,11 +925,11 @@ void ModelFitInspectorView::RenderPlot()
   legend->setFrameShape(QFrame::Box);
   legend->setFrameShadow(QFrame::Sunken);
   legend->setLineWidth(1);
-  m_Controls.widgetPlot->SetLegend(legend, QwtPlot::BottomLegend);
+  m_Controls->widgetPlot->SetLegend(legend, QwtPlot::BottomLegend);
 
 
-  m_Controls.widgetPlot->Replot();
-  m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+  m_Controls->widgetPlot->Replot();
+  m_Controls->plotDataWidget->SetPlotData(&m_PlotCurves);
 }
 
 void ModelFitInspectorView::EnsureBookmarkPointSet()

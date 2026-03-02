@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkConfirmSegmentationDialog.h"
-#include "ui_QmitkConfirmSegmentationDialog.h"
+#include <ui_QmitkConfirmSegmentationDialog.h>
 
 QmitkConfirmSegmentationDialog::QmitkConfirmSegmentationDialog(QWidget *parent)
-  : QDialog(parent), m_Controls(new Ui::QmitkConfirmSegmentationDialog)
+  : QDialog(parent), m_Controls(std::make_unique<Ui::QmitkConfirmSegmentationDialog>())
 {
   m_Controls->setupUi(this);
 
@@ -25,7 +25,6 @@ QmitkConfirmSegmentationDialog::QmitkConfirmSegmentationDialog(QWidget *parent)
 
 QmitkConfirmSegmentationDialog::~QmitkConfirmSegmentationDialog()
 {
-  delete m_Controls;
 }
 
 void QmitkConfirmSegmentationDialog::OnOverwriteExistingSegmentation()

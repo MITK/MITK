@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <memory>
 
 namespace Ui
 {
@@ -61,6 +62,6 @@ protected:
   /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
   itk::Matrix<double, 3, 3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
 
-  Ui::QmitkSurfaceUtilitiesControls* m_Controls;
+  std::unique_ptr<Ui::QmitkSurfaceUtilitiesControls> m_Controls;
 };
 #endif

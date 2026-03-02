@@ -14,12 +14,20 @@ found in the LICENSE file.
 #define QmitkMonaiLabelToolGUI_h
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
-#include "ui_QmitkMonaiLabelToolGUIControls.h"
+
 #include <MitkSegmentationUIExports.h>
-#include <QMessageBox>
+
 #include <mitkIPreferences.h>
 #include <mitkMonaiLabelTool.h>
+
+#include <QMessageBox>
 #include <QMap>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkMonaiLabelToolGUIControls;
+}
 
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabelToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -83,7 +91,7 @@ protected:
 
 private:
   mitk::IPreferences *m_Preferences;
-  Ui_QmitkMonaiLabelToolGUIControls m_Controls;
+  std::unique_ptr<Ui::QmitkMonaiLabelToolGUIControls> m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
   int m_Dimension;

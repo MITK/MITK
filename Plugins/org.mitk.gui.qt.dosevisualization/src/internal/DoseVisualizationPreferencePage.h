@@ -16,10 +16,10 @@ found in the LICENSE file.
 
 #include "berryIQtPreferencePage.h"
 
-#include "ui_DoseVisualizationPreferencePageControls.h"
-
 #include <mitkIsoDoseLevelCollections.h>
 #include "mitkDoseVisPreferenceHelper.h"
+
+#include <memory>
 
 /*forward declarations*/
 class QmitkIsoDoseLevelSetModel;
@@ -28,6 +28,12 @@ class QmitkDoseValueDelegate;
 class QmitkDoseVisualStyleDelegate;
 
 class QWidget;
+class QListWidgetItem;
+
+namespace Ui
+{
+  class DoseVisualizationPreferencePageControls;
+}
 
 /**
 * \class DoseVisualizationPreferencePage
@@ -98,7 +104,7 @@ protected:
   mitk::IsoDoseLevelSet* GetSelectedIsoLevelSet();
 
   QWidget                 *m_MainControl;
-  Ui::DoseVisualizationPreferencePageControls* m_Controls;
+  std::unique_ptr<Ui::DoseVisualizationPreferencePageControls> m_Controls;
 
   typedef mitk::PresetMapType PresetMapType;
   PresetMapType m_Presets;

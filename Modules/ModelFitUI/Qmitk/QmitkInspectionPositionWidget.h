@@ -19,9 +19,13 @@ found in the LICENSE file.
 
 #include "MitkModelFitUIExports.h"
 
-#include "ui_QmitkInspectionPositionWidget.h"
 #include <QWidget>
+#include <memory>
 
+namespace Ui
+{
+  class QmitkInspectionPositionWidget;
+}
 
 class QmitkFitParameterModel;
 
@@ -58,11 +62,8 @@ Q_SIGNALS:
   void PositionBookmarksChanged();
 
 protected:
-
+  std::unique_ptr<Ui::QmitkInspectionPositionWidget> m_Controls;
   mitk::Point3D m_CurrentPosition;
-
-  Ui::QmitkInspectionPositionWidget m_Controls;
-
 };
 
 #endif

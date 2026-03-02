@@ -23,6 +23,8 @@ found in the LICENSE file.
 #include <ctkXnatSubject.h>
 
 // Qt
+#include <QBoxLayout>
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>

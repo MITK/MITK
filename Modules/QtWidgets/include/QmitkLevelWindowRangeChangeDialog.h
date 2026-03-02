@@ -15,17 +15,22 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkLevelWindowRangeChange.h"
-
 #include <QDialog>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkLevelWindowRangeChange;
+}
 
 /// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowRangeChangeDialog : public QDialog, public Ui::QmitkLevelWindowRangeChange
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowRangeChangeDialog : public QDialog
 {
   Q_OBJECT
 
 public:
   QmitkLevelWindowRangeChangeDialog(QWidget *parent = nullptr, Qt::WindowFlags f = {});
+  ~QmitkLevelWindowRangeChangeDialog() override;
 
   double getLowerLimit();
 
@@ -38,6 +43,9 @@ public:
 protected slots:
 
   void inputValidator();
+
+private:
+  std::unique_ptr<Ui::QmitkLevelWindowRangeChange> m_Controls;
 };
 
 #endif

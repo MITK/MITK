@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -67,7 +68,7 @@ private:
 
   void StoreToDataStorage(mitk::Image* image, const std::string& name, mitk::DataNode* parent);
 
-  Ui::QmitkExtractFromMultiLabelSegmentationWidgetControls* m_Controls;
+  std::unique_ptr<Ui::QmitkExtractFromMultiLabelSegmentationWidgetControls> m_Controls;
 };
 
 #endif

@@ -15,22 +15,27 @@ found in the LICENSE file.
 
 #include <MitkMatchPointRegistrationUIExports.h>
 
-#include "ui_QmitkRegEvalSettingsWidget.h"
 #include <QWidget>
 
 #include <mitkDataNode.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkRegEvalSettingsWidget;
+}
 
 /**
  * \class QmitkRegEvalSettingsWidget
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegEvalSettingsWidget : public QWidget,
-                                                                       private Ui::QmitkRegEvalSettingsWidget
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegEvalSettingsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkRegEvalSettingsWidget(QWidget *parent = nullptr);
+  ~QmitkRegEvalSettingsWidget() override;
 
   /**
    * Configures the passed settings according to the current state of the
@@ -58,6 +63,9 @@ protected Q_SLOTS:
   void OnSpinCheckerChanged(int);
   void OnWipeStyleChanged();
   void OnContourStyleChanged();
+
+protected:
+  std::unique_ptr<Ui::QmitkRegEvalSettingsWidget> m_Controls;
 
 private:
   mitk::DataNode::Pointer m_selectedEvalNode;

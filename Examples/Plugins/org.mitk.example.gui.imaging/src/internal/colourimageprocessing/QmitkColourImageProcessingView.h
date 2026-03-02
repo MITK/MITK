@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 #include <mitkWeakPointer.h>
+#include <memory>
 
 namespace Ui
 {
@@ -30,6 +31,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkColourImageProcessingView();
+  ~QmitkColourImageProcessingView() override;
 
 private:
   void SetFocus() override;
@@ -47,7 +49,7 @@ private slots:
   void OnChangeColor();
 
 private:
-  Ui::QmitkColourImageProcessingViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkColourImageProcessingViewControls> m_Controls;
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode2;

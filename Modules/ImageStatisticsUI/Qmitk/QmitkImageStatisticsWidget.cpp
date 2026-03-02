@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent)
   : QWidget(parent),
-    m_Controls(new Ui::QmitkImageStatisticsControls)
+    m_Controls(std::make_unique<Ui::QmitkImageStatisticsControls>())
 {
   m_Controls->setupUi(this);
   m_imageStatisticsModel = new QmitkImageStatisticsTreeModel(parent);
@@ -37,6 +37,10 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent)
           &QTreeView::expandAll);
   connect(m_Controls->checkBoxIgnoreZeroValuedVoxel, &QCheckBox::stateChanged,
       this, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged);
+}
+
+QmitkImageStatisticsWidget::~QmitkImageStatisticsWidget()
+{
 }
 
 void QmitkImageStatisticsWidget::SetDataStorage(mitk::DataStorage* newDataStorage)

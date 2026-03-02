@@ -15,9 +15,13 @@ found in the LICENSE file.
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 
-#include "ui_QmitkGrowCutToolWidgetControls.h"
-
 #include <MitkSegmentationUIExports.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkGrowCutToolWidgetControls;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -59,7 +63,7 @@ protected:
 
   void EnableWidgets(bool enabled) override;
 
-  Ui_QmitkGrowCutToolWidgetControls m_Controls;
+  std::unique_ptr<Ui::QmitkGrowCutToolWidgetControls> m_Controls;
 
   bool m_FirstPreviewComputation = false;
 };

@@ -42,31 +42,39 @@ found in the LICENSE file.
 #include <QErrorMessage>
 #include <QThreadPool>
 
+#include <ui_QmitkMatchPointMapper.h>
+
 const std::string QmitkMatchPointMapper::VIEW_ID = "org.mitk.views.matchpoint.mapper";
 
 QmitkMatchPointMapper::QmitkMatchPointMapper()
-    : m_Parent(nullptr), m_preparedForBinaryInput(false)
+    : m_Controls(std::make_unique<Ui::MatchPointMapperControls>()),
+      m_Parent(nullptr),
+      m_preparedForBinaryInput(false)
+{
+}
+
+QmitkMatchPointMapper::~QmitkMatchPointMapper()
 {
 }
 
 void QmitkMatchPointMapper::SetFocus()
 {
-    //m_Controls.buttonPerformImageProcessing->setFocus();
+    //m_Controls->buttonPerformImageProcessing->setFocus();
 }
 
 void QmitkMatchPointMapper::CreateConnections()
 {
-    connect(m_Controls.registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnRegNodeSelectionChanged);
-    connect(m_Controls.inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnInputNodeSelectionChanged);
-    connect(m_Controls.referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnReferenceNodeSelectionChanged);
+    connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnRegNodeSelectionChanged);
+    connect(m_Controls->inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnInputNodeSelectionChanged);
+    connect(m_Controls->referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnReferenceNodeSelectionChanged);
 
-    connect(m_Controls.m_cbManualRef, SIGNAL(clicked()), this, SLOT(OnManualRefChecked()));
-    connect(m_Controls.m_cbLinkFactors, SIGNAL(clicked()), this, SLOT(OnLinkSampleFactorChecked()));
+    connect(m_Controls->m_cbManualRef, SIGNAL(clicked()), this, SLOT(OnManualRefChecked()));
+    connect(m_Controls->m_cbLinkFactors, SIGNAL(clicked()), this, SLOT(OnLinkSampleFactorChecked()));
 
-    connect(m_Controls.m_sbXFactor, SIGNAL(valueChanged(double)), this, SLOT(OnXFactorChanged(double)));
+    connect(m_Controls->m_sbXFactor, SIGNAL(valueChanged(double)), this, SLOT(OnXFactorChanged(double)));
 
-    connect(m_Controls.m_pbMap, SIGNAL(clicked()), this, SLOT(OnMapBtnPushed()));
-    connect(m_Controls.m_pbRefine, SIGNAL(clicked()), this, SLOT(OnRefineBtnPushed()));
+    connect(m_Controls->m_pbMap, SIGNAL(clicked()), this, SLOT(OnMapBtnPushed()));
+    connect(m_Controls->m_pbRefine, SIGNAL(clicked()), this, SLOT(OnRefineBtnPushed()));
 }
 
 void QmitkMatchPointMapper::Error(QString msg)
@@ -74,40 +82,40 @@ void QmitkMatchPointMapper::Error(QString msg)
     mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
     MITK_ERROR << msg.toStdString().c_str();
 
-    m_Controls.m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
+    m_Controls->m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
 }
 
 void QmitkMatchPointMapper::CreateQtPartControl(QWidget* parent)
 {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls.setupUi(parent);
+    m_Controls->setupUi(parent);
 
     m_Parent = parent;
 
-    this->m_Controls.registrationNodeSelector->SetDataStorage(this->GetDataStorage());
-    this->m_Controls.registrationNodeSelector->SetSelectionIsOptional(true);
-    this->m_Controls.inputNodeSelector->SetDataStorage(this->GetDataStorage());
-    this->m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
-    this->m_Controls.referenceNodeSelector->SetDataStorage(this->GetDataStorage());
-    this->m_Controls.referenceNodeSelector->SetSelectionIsOptional(false);
+    this->m_Controls->registrationNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls->registrationNodeSelector->SetSelectionIsOptional(true);
+    this->m_Controls->inputNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls->inputNodeSelector->SetSelectionIsOptional(false);
+    this->m_Controls->referenceNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls->referenceNodeSelector->SetSelectionIsOptional(false);
 
-    this->m_Controls.registrationNodeSelector->SetInvalidInfo("Select valid registration.");
-    this->m_Controls.registrationNodeSelector->SetEmptyInfo("Assuming identity mapping. Select registration to change.");
-    this->m_Controls.registrationNodeSelector->SetPopUpTitel("Select registration.");
-    this->m_Controls.registrationNodeSelector->SetPopUpHint("Select a registration object that should be used for the mapping of the input data. If no registration is selected, identity will be assumed for the mapping.");
+    this->m_Controls->registrationNodeSelector->SetInvalidInfo("Select valid registration.");
+    this->m_Controls->registrationNodeSelector->SetEmptyInfo("Assuming identity mapping. Select registration to change.");
+    this->m_Controls->registrationNodeSelector->SetPopUpTitel("Select registration.");
+    this->m_Controls->registrationNodeSelector->SetPopUpHint("Select a registration object that should be used for the mapping of the input data. If no registration is selected, identity will be assumed for the mapping.");
 
-    this->m_Controls.inputNodeSelector->SetInvalidInfo("Select input data.");
-    this->m_Controls.inputNodeSelector->SetPopUpTitel("Select input data.");
-    this->m_Controls.inputNodeSelector->SetPopUpHint("Select the input data for the mapping. (Images or point sets are supported so far).");
-    this->m_Controls.referenceNodeSelector->SetInvalidInfo("Select the reference image.");
-    this->m_Controls.referenceNodeSelector->SetPopUpTitel("Select the reference image.");
-    this->m_Controls.referenceNodeSelector->SetPopUpHint("Select the reference image that specifies the target geometry the input should be mapped into.");
+    this->m_Controls->inputNodeSelector->SetInvalidInfo("Select input data.");
+    this->m_Controls->inputNodeSelector->SetPopUpTitel("Select input data.");
+    this->m_Controls->inputNodeSelector->SetPopUpHint("Select the input data for the mapping. (Images or point sets are supported so far).");
+    this->m_Controls->referenceNodeSelector->SetInvalidInfo("Select the reference image.");
+    this->m_Controls->referenceNodeSelector->SetPopUpTitel("Select the reference image.");
+    this->m_Controls->referenceNodeSelector->SetPopUpHint("Select the reference image that specifies the target geometry the input should be mapped into.");
 
     this->ConfigureRegNodePredicate();
     this->ConfigureNodePredicates();
 
     // show first page
-    m_Controls.m_tabs->setCurrentIndex(0);
+    m_Controls->m_tabs->setCurrentIndex(0);
 
     this->CreateConnections();
     this->CheckInputs();
@@ -183,7 +191,7 @@ mitk::DataNode::Pointer QmitkMatchPointMapper::GetAutoRefNodeByReg()
         spResult = this->m_spSelectedInputNode;
         if (this->m_spSelectedRefNode != spResult)
         {
-          m_Controls.m_teLog->append(
+          m_Controls->m_teLog->append(
             QStringLiteral("<font color='gray'><i>Cannot determine reference automatically. Use input image as reference.</i></font>"));
         }
     }
@@ -227,7 +235,7 @@ void QmitkMatchPointMapper::ConfigureRegNodePredicate(const mitk::DataNode* inpu
     nodePredicate = mitk::NodePredicateAnd::New(nodePredicate, hasCorrectDim).GetPointer();
   }
 
-  this->m_Controls.registrationNodeSelector->SetNodePredicate(nodePredicate);
+  this->m_Controls->registrationNodeSelector->SetNodePredicate(nodePredicate);
 }
 
 std::function<bool(const mitk::DataNode *)> GenerateDimCheckLambda(unsigned int dim)
@@ -287,17 +295,17 @@ void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
 
     }
   }
-  this->m_Controls.inputNodeSelector->SetNodePredicate(inputPredicate);
-  this->m_Controls.referenceNodeSelector->SetNodePredicate(refPredicate);
+  this->m_Controls->inputNodeSelector->SetNodePredicate(inputPredicate);
+  this->m_Controls->referenceNodeSelector->SetNodePredicate(refPredicate);
 }
 
 void QmitkMatchPointMapper::CheckInputs()
 {
-    this->m_spSelectedRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
-    this->m_spSelectedInputNode = this->m_Controls.inputNodeSelector->GetSelectedNode();
-    this->m_spSelectedRefNode = this->m_Controls.referenceNodeSelector->GetSelectedNode();
+    this->m_spSelectedRegNode = this->m_Controls->registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedInputNode = this->m_Controls->inputNodeSelector->GetSelectedNode();
+    this->m_spSelectedRefNode = this->m_Controls->referenceNodeSelector->GetSelectedNode();
 
-    if (!(m_Controls.m_cbManualRef->isChecked()))
+    if (!(m_Controls->m_cbManualRef->isChecked()))
     {
         auto autoRefNode = this->GetAutoRefNodeByReg();
         if (this->m_spSelectedRefNode != autoRefNode)
@@ -309,14 +317,14 @@ void QmitkMatchPointMapper::CheckInputs()
           {
             selection.append(this->m_spSelectedRefNode);
           }
-          this->m_Controls.referenceNodeSelector->SetCurrentSelection(selection);
+          this->m_Controls->referenceNodeSelector->SetCurrentSelection(selection);
         }
     }
 
     if (this->m_spSelectedRefNode.IsNotNull() && this->m_spSelectedRefNode->GetData()
         && this->m_spSelectedRefNode->GetData()->GetTimeSteps() > 1)
     {
-        m_Controls.m_teLog->append(
+        m_Controls->m_teLog->append(
           QStringLiteral("<font color='gray'><i>Selected reference image has multiple time steps. Only geometry of time step 1 is used as reference.</i></font>"));
     }
 }
@@ -326,41 +334,41 @@ void QmitkMatchPointMapper::ConfigureMappingControls()
     bool validInput = m_spSelectedInputNode.IsNotNull();
     bool validRef = m_spSelectedRefNode.IsNotNull();
 
-    this->m_Controls.referenceNodeSelector->setEnabled(this->m_Controls.m_cbManualRef->isChecked());
-    this->m_Controls.m_pbMap->setEnabled(validInput  && validRef);
-    this->m_Controls.m_pbRefine->setEnabled(validInput && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
+    this->m_Controls->referenceNodeSelector->setEnabled(this->m_Controls->m_cbManualRef->isChecked());
+    this->m_Controls->m_pbMap->setEnabled(validInput  && validRef);
+    this->m_Controls->m_pbRefine->setEnabled(validInput && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
 
     if (validInput)
     {
       if (m_spSelectedRegNode.IsNotNull())
       {
-        this->m_Controls.m_leMappedName->setText(tr("mapped_") + QString::fromStdString(m_spSelectedInputNode->GetName())
+        this->m_Controls->m_leMappedName->setText(tr("mapped_") + QString::fromStdString(m_spSelectedInputNode->GetName())
           + tr("_by_") + QString::fromStdString(m_spSelectedRegNode->GetName()));
       }
       else
       {
-        this->m_Controls.m_leMappedName->setText(tr("resampled_") + QString::fromStdString(m_spSelectedInputNode->GetName()));
+        this->m_Controls->m_leMappedName->setText(tr("resampled_") + QString::fromStdString(m_spSelectedInputNode->GetName()));
       }
     }
     else
     {
-        this->m_Controls.m_leMappedName->setText(tr("mappedData"));
+        this->m_Controls->m_leMappedName->setText(tr("mappedData"));
     }
 
     if (this->IsBinaryInput() != this->m_preparedForBinaryInput)
     {
         if (this->IsBinaryInput())
         {
-            m_Controls.m_teLog->append(
+            m_Controls->m_teLog->append(
               QStringLiteral("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neighbour; padding value: 0)</i></font>"));
 
-            this->m_Controls.m_comboInterpolator->setCurrentIndex(0);
-            this->m_Controls.m_sbErrorValue->setValue(0);
-            this->m_Controls.m_sbPaddingValue->setValue(0);
+            this->m_Controls->m_comboInterpolator->setCurrentIndex(0);
+            this->m_Controls->m_sbErrorValue->setValue(0);
+            this->m_Controls->m_sbPaddingValue->setValue(0);
         }
         else
         {
-            this->m_Controls.m_comboInterpolator->setCurrentIndex(1);
+            this->m_Controls->m_comboInterpolator->setCurrentIndex(1);
         }
 
         this->m_preparedForBinaryInput = this->IsBinaryInput();
@@ -414,13 +422,13 @@ void QmitkMatchPointMapper::OnManualRefChecked()
 
 void QmitkMatchPointMapper::OnLinkSampleFactorChecked()
 {
-    this->m_Controls.m_sbYFactor->setEnabled(!(this->m_Controls.m_cbLinkFactors->isChecked()));
-    this->m_Controls.m_sbZFactor->setEnabled(!(this->m_Controls.m_cbLinkFactors->isChecked()));
+    this->m_Controls->m_sbYFactor->setEnabled(!(this->m_Controls->m_cbLinkFactors->isChecked()));
+    this->m_Controls->m_sbZFactor->setEnabled(!(this->m_Controls->m_cbLinkFactors->isChecked()));
 
-    if (m_Controls.m_cbLinkFactors->isChecked())
+    if (m_Controls->m_cbLinkFactors->isChecked())
     {
-        this->m_Controls.m_sbYFactor->setValue(this->m_Controls.m_sbXFactor->value());
-        this->m_Controls.m_sbZFactor->setValue(this->m_Controls.m_sbXFactor->value());
+        this->m_Controls->m_sbYFactor->setValue(this->m_Controls->m_sbXFactor->value());
+        this->m_Controls->m_sbZFactor->setValue(this->m_Controls->m_sbXFactor->value());
     }
 }
 
@@ -437,9 +445,9 @@ void QmitkMatchPointMapper::OnRefineBtnPushed()
 
 void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
 {
-    if (m_Controls.m_checkClearLog->checkState() == Qt::Checked)
+    if (m_Controls->m_checkClearLog->checkState() == Qt::Checked)
     {
-        this->m_Controls.m_teLog->clear();
+        this->m_Controls->m_teLog->clear();
     }
 
     /////////////////////////
@@ -457,7 +465,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         pJob->m_spRegNode = mitk::DataNode::New();
         pJob->m_spRegNode->SetData(mitk::GenerateIdentityRegistration3D().GetPointer());
         pJob->m_spRegNode->SetName("Auto_Generated_Identity_Transform");
-        m_Controls.m_teLog->append(
+        m_Controls->m_teLog->append(
           QStringLiteral("<font color='gray'><i>No registration selected. Performing mapping with identity transform</i></font>"));
     }
 
@@ -466,23 +474,23 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         pJob->m_spRefGeometry = m_spSelectedRefNode->GetData()->GetGeometry()->Clone().GetPointer();
 
         //check for super/sub sampling
-        if (m_Controls.m_groupActivateSampling->isChecked())
+        if (m_Controls->m_groupActivateSampling->isChecked())
         {
           pJob->m_spRefGeometry = mitk::ImageMappingHelper::GenerateSuperSampledGeometry(pJob->m_spRefGeometry,
-            m_Controls.m_sbXFactor->value(),
-            m_Controls.m_sbYFactor->value(),
-            m_Controls.m_sbZFactor->value());
+            m_Controls->m_sbXFactor->value(),
+            m_Controls->m_sbYFactor->value(),
+            m_Controls->m_sbZFactor->value());
         }
     }
 
-    pJob->m_MappedName = m_Controls.m_leMappedName->text().toStdString();
-    pJob->m_allowUndefPixels = m_Controls.m_groupAllowUndefPixels->isChecked();
-    pJob->m_paddingValue = m_Controls.m_sbPaddingValue->value();
-    pJob->m_allowUnregPixels = m_Controls.m_groupAllowUnregPixels->isChecked();
-    pJob->m_errorValue = m_Controls.m_sbErrorValue->value();
-    pJob->m_InterpolatorLabel = m_Controls.m_comboInterpolator->currentText().toStdString();
+    pJob->m_MappedName = m_Controls->m_leMappedName->text().toStdString();
+    pJob->m_allowUndefPixels = m_Controls->m_groupAllowUndefPixels->isChecked();
+    pJob->m_paddingValue = m_Controls->m_sbPaddingValue->value();
+    pJob->m_allowUnregPixels = m_Controls->m_groupAllowUnregPixels->isChecked();
+    pJob->m_errorValue = m_Controls->m_sbErrorValue->value();
+    pJob->m_InterpolatorLabel = m_Controls->m_comboInterpolator->currentText().toStdString();
 
-    switch (m_Controls.m_comboInterpolator->currentIndex())
+    switch (m_Controls->m_comboInterpolator->currentIndex())
     {
     case 0:
         pJob->m_InterpolatorType = mitk::ImageMappingInterpolator::NearestNeighbor;
@@ -511,8 +519,8 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         Qt::BlockingQueuedConnection);
     connect(pJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnMappingInfo(QString)));
 
-    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Started mapping job. Name: ") +
-        m_Controls.m_leMappedName->text() + QStringLiteral("</font></b>"));
+    m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Started mapping job. Name: ") +
+        m_Controls->m_leMappedName->text() + QStringLiteral("</font></b>"));
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pJob);
@@ -528,7 +536,7 @@ void QmitkMatchPointMapper::OnMapJobError(QString err)
 void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
 {
-    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
+    m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
         QString::fromStdString(job->m_MappedName) + QStringLiteral("</font></b>"));
 
     mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
@@ -547,14 +555,14 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
 
 void QmitkMatchPointMapper::OnMappingInfo(QString info)
 {
-    m_Controls.m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
+    m_Controls->m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
 }
 
 void QmitkMatchPointMapper::OnXFactorChanged(double d)
 {
-    if (m_Controls.m_cbLinkFactors->isChecked())
+    if (m_Controls->m_cbLinkFactors->isChecked())
     {
-        this->m_Controls.m_sbYFactor->setValue(d);
-        this->m_Controls.m_sbZFactor->setValue(d);
+        this->m_Controls->m_sbYFactor->setValue(d);
+        this->m_Controls->m_sbZFactor->setValue(d);
     }
 }

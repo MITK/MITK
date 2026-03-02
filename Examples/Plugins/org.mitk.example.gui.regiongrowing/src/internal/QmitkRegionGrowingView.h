@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "mitkIRenderWindowPartListener.h"
 #include "mitkPointSet.h"
 #include <itkImage.h>
+#include <memory>
 
 class QmitkPointListWidget;
 //! [includes]
@@ -48,6 +49,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkRegionGrowingView();
+  ~QmitkRegionGrowingView() override;
 
 protected slots:
 
@@ -67,7 +69,7 @@ protected:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
   //! [render-window-part-listener]
 
-  Ui::QmitkRegionGrowingViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkRegionGrowingViewControls> m_Controls;
 
 private:
   //! [itkimageprocessing]

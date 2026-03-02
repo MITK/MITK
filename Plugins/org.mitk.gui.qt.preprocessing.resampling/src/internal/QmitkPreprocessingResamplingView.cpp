@@ -73,7 +73,6 @@ typedef itk::BSplineInterpolateImageFunction<ImageType, double>                 
 
 QmitkPreprocessingResampling::QmitkPreprocessingResampling()
 : QmitkAbstractView(),
-  m_Controls(nullptr),
   m_SelectedImageNode(nullptr),
   m_TimeStepperAdapter(nullptr)
 {
@@ -87,7 +86,7 @@ void QmitkPreprocessingResampling::CreateQtPartControl(QWidget *parent)
 {
   if (m_Controls == nullptr)
   {
-    m_Controls = new Ui::QmitkPreprocessingResamplingViewControls;
+    m_Controls = std::make_unique<Ui::QmitkPreprocessingResamplingViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
 

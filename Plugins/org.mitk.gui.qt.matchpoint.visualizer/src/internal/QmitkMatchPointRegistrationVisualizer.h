@@ -25,8 +25,12 @@ found in the LICENSE file.
 
 #include "mitkMAPRegistrationWrapper.h"
 
-#include "ui_QmitkMatchPointRegistrationVisualizer.h"
+#include <memory>
 
+namespace Ui
+{
+  class MatchPointRegVisControls;
+}
 
 /*!
   \brief QmitkMatchPointRegistrationVisualizer
@@ -50,7 +54,8 @@ public:
      */
     berryObjectMacro(QmitkMatchPointRegistrationVisualizer);
 
-        QmitkMatchPointRegistrationVisualizer();
+    QmitkMatchPointRegistrationVisualizer();
+    ~QmitkMatchPointRegistrationVisualizer() override;
 
     void CreateQtPartControl(QWidget* parent) override;
 
@@ -81,7 +86,7 @@ protected:
 
     void ActualizeRegInfo(mitk::MAPRegistrationWrapper* currentReg);
 
-    Ui::MatchPointRegVisControls* m_Controls;
+    std::unique_ptr<Ui::MatchPointRegVisControls> m_Controls;
 
 private:
     QWidget* m_Parent;

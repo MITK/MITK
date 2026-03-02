@@ -15,9 +15,13 @@ found in the LICENSE file.
 #include <mapConvert.h>
 #include <mapMetaPropertyAccessor.h>
 
-QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *parent) : QWidget(parent)
+#include <ui_QmitkAlgorithmSettingsConfig.h>
+
+QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *parent)
+  : QWidget(parent),
+    m_Controls(std::make_unique<Ui::QmitkAlgorithmSettingsConfig>())
 {
-  this->setupUi(this);
+  m_Controls->setupUi(this);
 
   m_AlgorithmModel = new QmitkMAPAlgorithmModel(this);
   m_ProxyModel = new QSortFilterProxyModel(this);
@@ -27,16 +31,16 @@ QmitkAlgorithmSettingsConfig::QmitkAlgorithmSettingsConfig(QWidget *parent) : QW
   m_ProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
   m_ProxyModel->setDynamicSortFilter(true);
 
-  this->m_AlgoPropertiesView->setModel(m_ProxyModel);
-  this->m_AlgoPropertiesView->setSortingEnabled(true);
-  this->m_AlgoPropertiesView->setAlternatingRowColors(true);
-  this->m_AlgoPropertiesView->setSelectionMode(QAbstractItemView::SingleSelection);
-  this->m_AlgoPropertiesView->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_Controls->m_AlgoPropertiesView->setModel(m_ProxyModel);
+  m_Controls->m_AlgoPropertiesView->setSortingEnabled(true);
+  m_Controls->m_AlgoPropertiesView->setAlternatingRowColors(true);
+  m_Controls->m_AlgoPropertiesView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls->m_AlgoPropertiesView->setSelectionBehavior(QAbstractItemView::SelectItems);
 }
 
-void setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg);
-
-map::algorithm::RegistrationAlgorithmBase *getAlgorithm();
+QmitkAlgorithmSettingsConfig::~QmitkAlgorithmSettingsConfig()
+{
+}
 
 void QmitkAlgorithmSettingsConfig::setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg)
 {
@@ -45,8 +49,8 @@ void QmitkAlgorithmSettingsConfig::setAlgorithm(map::algorithm::RegistrationAlgo
     this->m_currentAlg = alg;
     this->m_AlgorithmModel->SetAlgorithm(this->m_currentAlg);
 
-    this->m_AlgoPropertiesView->setWindowModified(true);
-    this->m_AlgoPropertiesView->update();
+    m_Controls->m_AlgoPropertiesView->setWindowModified(true);
+    m_Controls->m_AlgoPropertiesView->update();
   }
 }
 

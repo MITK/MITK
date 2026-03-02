@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLevelWindowManager.h>
 
 #include <QWidget>
+#include <memory>
 
 // Forward declarations
 namespace Ui
@@ -43,7 +44,7 @@ protected:
 
 private:
   // GUI controls of this plugin
-  Ui::QmitkLevelWindow* ui;
+  std::unique_ptr<Ui::QmitkLevelWindow> ui;
 
 };
 #endif

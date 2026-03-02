@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "berryPerspectiveListModel.h"
 #include "internal/berryPerspectiveRegistry.h"
 
-#include "ui_berrySavePerspectiveDialog.h"
+#include <ui_berrySavePerspectiveDialog.h>
 
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
@@ -25,7 +25,7 @@ namespace berry {
 
 SavePerspectiveDialog::SavePerspectiveDialog(PerspectiveRegistry& perspReg, QWidget *parent)
   : QDialog(parent)
-  , ui(new Ui::SavePerspectiveDialog)
+  , ui(std::make_unique<Ui::SavePerspectiveDialog>())
   , model(new PerspectiveListModel(perspReg, true, this))
   , proxyModel(new QSortFilterProxyModel(this))
   , perspReg(perspReg)
@@ -49,7 +49,6 @@ SavePerspectiveDialog::SavePerspectiveDialog(PerspectiveRegistry& perspReg, QWid
 
 SavePerspectiveDialog::~SavePerspectiveDialog()
 {
-  delete ui;
 }
 
 void SavePerspectiveDialog::SetInitialSelection(const SmartPointer<IPerspectiveDescriptor>& initialSelection)

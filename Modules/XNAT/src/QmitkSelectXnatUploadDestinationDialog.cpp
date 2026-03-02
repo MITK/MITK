@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSelectXnatUploadDestinationDialog.h"
-#include "ui_QmitkSelectXnatUploadDestinationDialog.h"
+#include <ui_QmitkSelectXnatUploadDestinationDialog.h>
 
 #include <ctkXnatObject.h>
 #include <ctkXnatResource.h>
@@ -30,7 +30,7 @@ QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(c
     m_Url(""),
     m_ResourceName(""),
     m_CreateNewFolder(false),
-    ui(new Ui::QmitkSelectXnatUploadDestinationDialog)
+    ui(std::make_unique<Ui::QmitkSelectXnatUploadDestinationDialog>())
 {
   ui->setupUi(this);
 
@@ -70,7 +70,6 @@ QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(c
 
 QmitkSelectXnatUploadDestinationDialog::~QmitkSelectXnatUploadDestinationDialog()
 {
-  delete ui;
 }
 
 void QmitkSelectXnatUploadDestinationDialog::OnCancel()

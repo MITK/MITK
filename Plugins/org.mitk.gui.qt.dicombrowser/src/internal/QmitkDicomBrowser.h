@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <berryIPartListener.h>
 #include <berryQtEditorPart.h>
+#include <memory>
 
 namespace Ui
 {
@@ -57,7 +58,7 @@ private:
   void OnIndexingComplete();
   void OnViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);
 
-  Ui::QmitkDicomBrowser* m_Ui;
+  std::unique_ptr<Ui::QmitkDicomBrowser> m_Ui;
 };
 
 #endif

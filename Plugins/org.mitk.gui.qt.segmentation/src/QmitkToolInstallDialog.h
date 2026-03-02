@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkToolInstallDialog_h
 
 #include <QDialog>
+#include <memory>
 
 class QCloseEvent;
 class QPlainTextEdit;
@@ -50,7 +51,7 @@ private:
   static QPlainTextEdit *s_ConsoleOutput;
 
   bool m_IsInstalling = false;
-  Ui::QmitkToolInstallDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkToolInstallDialog> m_Ui;
 };
 
 #endif

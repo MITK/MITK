@@ -19,10 +19,11 @@ found in the LICENSE file.
 
 //mitk
 #include <mitkIntensityProfile.h>
+#include <memory>
 
 namespace Ui
 {
-	class QmitkIntensityProfileControls;
+  class QmitkIntensityProfileControls;
 };
 
 /**
@@ -31,38 +32,39 @@ namespace Ui
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkIntensityProfileVisualizationWidget : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	QmitkIntensityProfileVisualizationWidget(QWidget* parent = nullptr);
+  QmitkIntensityProfileVisualizationWidget(QWidget* parent = nullptr);
+  ~QmitkIntensityProfileVisualizationWidget() override;
 
-	void SetIntensityProfile(mitk::IntensityProfile::ConstPointer intensityProfile, const std::string& dataLabel);
-	/** \brief Clears the intensity profile and disables all GUI elements. */
-	void Reset();
+  void SetIntensityProfile(mitk::IntensityProfile::ConstPointer intensityProfile, const std::string& dataLabel);
+  /** \brief Clears the intensity profile and disables all GUI elements. */
+  void Reset();
 
   void SetTheme(QmitkChartWidget::ColorTheme style);
 
 private:
 
-	void CreateConnections();
+  void CreateConnections();
 
-	void SetGUIElementsEnabled(bool enabled);
+  void SetGUIElementsEnabled(bool enabled);
 
-	std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
+  std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
 
-	/** \brief  Saves the intensity profile to the clipboard. */
-	void OnClipboardButtonClicked();
-	/** \brief Shows / Hides the subchart. */
-	void OnShowSubchartCheckBoxChanged();
+  /** \brief  Saves the intensity profile to the clipboard. */
+  void OnClipboardButtonClicked();
+  /** \brief Shows / Hides the subchart. */
+  void OnShowSubchartCheckBoxChanged();
 
   void OnPageSuccessfullyLoaded();
 
 private:
 
-	Ui::QmitkIntensityProfileControls *m_Controls;
+  std::unique_ptr<Ui::QmitkIntensityProfileControls> m_Controls;
   QmitkChartWidget::ColorTheme m_ChartStyle = QmitkChartWidget::ColorTheme::darkstyle;
 
-	std::vector<double> m_IntensityProfileList;
+  std::vector<double> m_IntensityProfileList;
 };
 
 #endif

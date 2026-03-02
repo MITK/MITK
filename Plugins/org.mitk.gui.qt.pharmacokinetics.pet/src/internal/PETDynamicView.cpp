@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "PETDynamicView.h"
+#include <ui_PETDynamicViewControls.h>
 
 #include "mitkWorkbenchUtil.h"
 
@@ -76,106 +77,106 @@ inline double convertToDouble(const std::string& data)
 
 void PETDynamicView::SetFocus()
 {
-  m_Controls.btnModelling->setFocus();
+  m_Controls->btnModelling->setFocus();
 }
 
 void PETDynamicView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
-  m_Controls.btnModelling->setEnabled(false);
+  m_Controls->btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
-  m_Controls.labelMaskInfo->hide();
+  m_Controls->labelMaskInfo->hide();
 
-  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls->timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
-  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
-  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
-
-
-  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnImageNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnMaskNodeSelectionChanged);
+  m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls->maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
 
 
-  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
+  connect(m_Controls->timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnImageNodeSelectionChanged);
+  connect(m_Controls->maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::OnMaskNodeSelectionChanged);
 
-  connect(m_Controls.AIFImageNodeSelector,
+
+  connect(m_Controls->AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
+
+  connect(m_Controls->AIFImageNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &PETDynamicView::UpdateGUIControls);
 
 
-  connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
+  connect(m_Controls->btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
-  connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
-  connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
+  connect(m_Controls->radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
   //AIF setting
-  m_Controls.groupAIF->hide();
-  m_Controls.btnAIFFile->setEnabled(false);
-  m_Controls.btnAIFFile->setVisible(false);
-  m_Controls.aifFilePath->setEnabled(false);
-  m_Controls.aifFilePath->setVisible(false);
-  m_Controls.aifFilePath->setText("Please select AIF file.");
-  m_Controls.radioAIFImage->setChecked(true);
-  m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
-  m_Controls.AIFMaskNodeSelector->setVisible(true);
-  m_Controls.AIFMaskNodeSelector->setEnabled(true);
-  m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.AIFImageNodeSelector->setEnabled(false);
-  m_Controls.AIFImageNodeSelector->setVisible(false);
-  m_Controls.HCLSpinBox->setValue(0.0);
+  m_Controls->groupAIF->hide();
+  m_Controls->btnAIFFile->setEnabled(false);
+  m_Controls->btnAIFFile->setVisible(false);
+  m_Controls->aifFilePath->setEnabled(false);
+  m_Controls->aifFilePath->setVisible(false);
+  m_Controls->aifFilePath->setText("Please select AIF file.");
+  m_Controls->radioAIFImage->setChecked(true);
+  m_Controls->AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->AIFMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate());
+  m_Controls->AIFMaskNodeSelector->setVisible(true);
+  m_Controls->AIFMaskNodeSelector->setEnabled(true);
+  m_Controls->AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->AIFImageNodeSelector->setEnabled(false);
+  m_Controls->AIFImageNodeSelector->setVisible(false);
+  m_Controls->HCLSpinBox->setValue(0.0);
 
-  m_Controls.checkDedicatedAIFImage->setEnabled(true);
+  m_Controls->checkDedicatedAIFImage->setEnabled(true);
 
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->labelAIFMask, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->checkDedicatedAIFImage, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->checkDedicatedAIFImage, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->aifFilePath, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->aifFilePath, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
 
-  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo, SLOT(setVisible(bool)));
+  connect(m_Controls->checkMaskInfo, SIGNAL(toggled(bool)), m_Controls->labelMaskInfo, SLOT(setVisible(bool)));
 
   //Model fit configuration
-  m_Controls.groupBox_FitConfiguration->hide();
+  m_Controls->groupBox_FitConfiguration->hide();
 
-  m_Controls.checkBox_Constraints->setEnabled(false);
-  m_Controls.constraintManager->setEnabled(false);
-  m_Controls.initialValuesManager->setEnabled(false);
-  m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
+  m_Controls->checkBox_Constraints->setEnabled(false);
+  m_Controls->constraintManager->setEnabled(false);
+  m_Controls->initialValuesManager->setEnabled(false);
+  m_Controls->initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this,
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), this,
           SLOT(UpdateGUIControls()));
-  connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
 
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)),
-          m_Controls.initialValuesManager,
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)),
+          m_Controls->initialValuesManager,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager,
           SLOT(setEnabled(bool)));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager,
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager,
           SLOT(setVisible(bool)));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
-  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 
@@ -183,10 +184,10 @@ void PETDynamicView::CreateQtPartControl(QWidget* parent)
 
 void PETDynamicView::UpdateGUIControls()
 {
-  m_Controls.lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
-  m_Controls.lineFitName->setEnabled(!m_FittingInProgress);
+  m_Controls->lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
+  m_Controls->lineFitName->setEnabled(!m_FittingInProgress);
 
-  m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
+  m_Controls->checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
    bool is1TCMFactory = dynamic_cast<mitk::OneTissueCompartmentModelFactory*>
                         (m_selectedModelFactory.GetPointer()) != nullptr;
@@ -199,21 +200,21 @@ void PETDynamicView::UpdateGUIControls()
                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
-  m_Controls.groupAIF->setVisible(is1TCMFactory || isExt1TCMFactory || isFDGCMFactory || is2TCMFactory);
+  m_Controls->groupAIF->setVisible(is1TCMFactory || isExt1TCMFactory || isFDGCMFactory || is2TCMFactory);
 
-  m_Controls.AIFImageNodeSelector->setVisible(!m_Controls.radioAIFFile->isChecked());
-  m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
+  m_Controls->AIFImageNodeSelector->setVisible(!m_Controls->radioAIFFile->isChecked());
+  m_Controls->AIFImageNodeSelector->setVisible(m_Controls->radioAIFImage->isChecked() && m_Controls->checkDedicatedAIFImage->isChecked());
 
-  m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
+  m_Controls->groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
-  m_Controls.groupBox->setEnabled(!m_FittingInProgress);
-  m_Controls.comboModel->setEnabled(!m_FittingInProgress);
-  m_Controls.groupAIF->setEnabled(!m_FittingInProgress);
-  m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox->setEnabled(!m_FittingInProgress);
+  m_Controls->comboModel->setEnabled(!m_FittingInProgress);
+  m_Controls->groupAIF->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 
-  m_Controls.radioROIbased->setEnabled(m_selectedMask.IsNotNull());
+  m_Controls->radioROIbased->setEnabled(m_selectedMask.IsNotNull());
 
-  m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
+  m_Controls->btnModelling->setEnabled(m_selectedImage.IsNotNull()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 }
 
@@ -242,7 +243,7 @@ void PETDynamicView::OnModellSet(int index)
     this->m_modelConstraints = dynamic_cast<mitk::SimpleBarrierConstraintChecker*>
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
-    m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
+    m_Controls->initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
         m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
@@ -250,11 +251,11 @@ void PETDynamicView::OnModellSet(int index)
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints,
+    m_Controls->constraintManager->setChecker(this->m_modelConstraints,
         this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
   }
 
-  m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
+  m_Controls->checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
 
   UpdateGUIControls();
@@ -262,10 +263,10 @@ void PETDynamicView::OnModellSet(int index)
 
 std::string PETDynamicView::GetFitName() const
 {
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  std::string fitName = m_Controls->lineFitName->text().toStdString();
   if (fitName.empty())
   {
-    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+    fitName = m_Controls->lineFitName->placeholderText().toStdString();
   }
   return fitName;
 }
@@ -279,7 +280,7 @@ std::string PETDynamicView::GetDefaultFitName() const
         defaultName = this->m_selectedModelFactory->GetClassID();
     }
 
-    if (this->m_Controls.radioPixelBased->isChecked())
+    if (this->m_Controls->radioPixelBased->isChecked())
     {
         defaultName += "_pixel";
     }
@@ -315,7 +316,7 @@ void PETDynamicView::OnModellingButtonClicked()
 
     if (isOTCFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::OneTissueCompartmentModelParameterizer>(fitSession, generator);
       }
@@ -327,7 +328,7 @@ void PETDynamicView::OnModellingButtonClicked()
 
     else if (isextOTCFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::ExtendedOneTissueCompartmentModelParameterizer>(fitSession, generator);
       }
@@ -338,7 +339,7 @@ void PETDynamicView::OnModellingButtonClicked()
     }
     else if (isFDGFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::TwoTissueCompartmentFDGModelParameterizer>(fitSession, generator);
       }
@@ -351,7 +352,7 @@ void PETDynamicView::OnModellingButtonClicked()
 
     else if (isTTCFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateModelFit_PixelBased<mitk::TwoTissueCompartmentModelParameterizer>(fitSession, generator);
       }
@@ -396,27 +397,27 @@ void PETDynamicView::OnModellingButtonClicked()
 void PETDynamicView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
 
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    this->m_selectedNode = m_Controls->timeSeriesNodeSelector->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
 
     if (m_selectedImage)
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
     }
     else
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
     }
   }
   else
   {
     this->m_selectedNode = nullptr;
     this->m_selectedImage = nullptr;
-    this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+    this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
 
@@ -429,9 +430,9 @@ void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*
   m_selectedMaskNode = nullptr;
   m_selectedMask = nullptr;
 
-  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->maskNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    this->m_selectedMaskNode = m_Controls->maskNodeSelector->GetSelectedNode();
     auto selectedLabelSetMask = dynamic_cast<mitk::MultiLabelSegmentation*>(m_selectedMaskNode->GetData());
 
     if (selectedLabelSetMask != nullptr)
@@ -448,7 +449,7 @@ void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
-        m_Controls.maskNodeSelector->GetSelectedNode()->GetName();
+        m_Controls->maskNodeSelector->GetSelectedNode()->GetName();
       this->m_selectedMask = SelectImageByTimeStep(m_selectedMask, 0);
 
     }
@@ -456,7 +457,7 @@ void PETDynamicView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*
 
   if (m_selectedMask.IsNull())
   {
-    this->m_Controls.radioPixelBased->setChecked(true);
+    this->m_Controls->radioPixelBased->setChecked(true);
   }
 
   UpdateGUIControls();
@@ -485,17 +486,17 @@ bool PETDynamicView::CheckModelSettings() const
 
     if (isOTCFactory || isextOTCFactory || isFDGFactory || isTTCFactory)
     {
-        if (this->m_Controls.radioAIFImage->isChecked())
+        if (this->m_Controls->radioAIFImage->isChecked())
         {
-          ok = ok && m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
+          ok = ok && m_Controls->AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
 
-          if (this->m_Controls.checkDedicatedAIFImage->isChecked())
+          if (this->m_Controls->checkDedicatedAIFImage->isChecked())
           {
-            ok = ok && m_Controls.AIFImageNodeSelector->GetSelectedNode().IsNotNull();
+            ok = ok && m_Controls->AIFImageNodeSelector->GetSelectedNode().IsNotNull();
 
           }
         }
-        else if (this->m_Controls.radioAIFFile->isChecked())
+        else if (this->m_Controls->radioAIFFile->isChecked())
         {
           ok = ok && (this->AIFinputGrid.size() != 0) && (this->AIFinputFunction.size() != 0);
         }
@@ -511,11 +512,11 @@ bool PETDynamicView::CheckModelSettings() const
       ok = false;
     }
 
-    if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+    if (this->m_Controls->checkBox_StartParameters->isChecked() && !this->m_Controls->initialValuesManager->hasValidInitialValues())
     {
       std::string warning = "Warning. Invalid start parameters. At least one parameter as an invalid image setting as source.";
       MITK_ERROR << warning;
-      m_Controls.infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
+      m_Controls->infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
 
       ok = false;
     };
@@ -531,10 +532,10 @@ bool PETDynamicView::CheckModelSettings() const
 void PETDynamicView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.checkBox_StartParameters->isChecked())
+  if (m_Controls->checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
-    mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls.initialValuesManager->getInitialParametrizationDelegate();
+    mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls->initialValuesManager->getInitialParametrizationDelegate();
     parameterizer->SetInitialParameterizationDelegate(paramDelegate);
   }
 }
@@ -701,7 +702,9 @@ void PETDynamicView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
   threadPool->start(pJob);
 }
 
-PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
+PETDynamicView::PETDynamicView()
+  : m_Controls(std::make_unique<Ui::PETDynamicViewControls>()),
+    m_FittingInProgress(false)
 {
   m_selectedImage = nullptr;
   m_selectedMask = nullptr;
@@ -729,9 +732,13 @@ PETDynamicView::PETDynamicView() : m_FittingInProgress(false)
 
 }
 
+PETDynamicView::~PETDynamicView()
+{
+}
+
 void PETDynamicView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("Fitting finished"));
+  this->m_Controls->infoBox->append(QString("Fitting finished"));
   this->m_FittingInProgress = false;
 };
 
@@ -739,7 +746,7 @@ void PETDynamicView::OnJobError(QString err)
 {
   MITK_ERROR << err.toStdString().c_str();
 
-  m_Controls.infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
+  m_Controls->infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
 
 };
 
@@ -755,27 +762,27 @@ void PETDynamicView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNode
 void PETDynamicView::OnJobProgress(double progress)
 {
   QString report = QString("Progress. ") + QString::number(progress);
-  this->m_Controls.infoBox->append(report);
+  this->m_Controls->infoBox->append(report);
 };
 
 void PETDynamicView::OnJobStatusChanged(QString info)
 {
-  this->m_Controls.infoBox->append(info);
+  this->m_Controls->infoBox->append(info);
 }
 
 
 void PETDynamicView::InitModelComboBox() const
 {
-  this->m_Controls.comboModel->clear();
-  this->m_Controls.comboModel->addItem(tr("No model selected"));
+  this->m_Controls->comboModel->clear();
+  this->m_Controls->comboModel->addItem(tr("No model selected"));
 
   for (ModelFactoryStackType::const_iterator pos = m_FactoryStack.begin();
        pos != m_FactoryStack.end(); ++pos)
   {
-    this->m_Controls.comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
+    this->m_Controls->comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
   }
 
-  this->m_Controls.comboModel->setCurrentIndex(0);
+  this->m_Controls->comboModel->setCurrentIndex(0);
 };
 
 mitk::ModelFitFunctorBase::Pointer PETDynamicView::CreateDefaultFitFunctor(
@@ -798,7 +805,7 @@ mitk::ModelFitFunctorBase::Pointer PETDynamicView::CreateDefaultFitFunctor(
 
 
 
-  if (m_Controls.checkBox_Constraints->isChecked())
+  if (m_Controls->checkBox_Constraints->isChecked())
   {
     fitFunctor->SetConstraintChecker(m_modelConstraints);
   }
@@ -816,7 +823,7 @@ mitk::ModelFitFunctorBase::Pointer PETDynamicView::CreateDefaultFitFunctor(
 void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& aif,
                              mitk::AIFBasedModelBase::AterialInputFunctionType& aifTimeGrid)
 {
-  if (this->m_Controls.radioAIFFile->isChecked())
+  if (this->m_Controls->radioAIFFile->isChecked())
   {
     aif.clear();
     aifTimeGrid.clear();
@@ -843,7 +850,7 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
       *gridPos = *pos;
     }
   }
-  else if (this->m_Controls.radioAIFImage->isChecked())
+  else if (this->m_Controls->radioAIFImage->isChecked())
   {
     aif.clear();
     aifTimeGrid.clear();
@@ -852,10 +859,10 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
       mitk::AterialInputFunctionGenerator::New();
 
     //Hematocrit level
-    aifGenerator->SetHCL(this->m_Controls.HCLSpinBox->value());
+    aifGenerator->SetHCL(this->m_Controls->HCLSpinBox->value());
 
     //mask settings
-    this->m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
+    this->m_selectedAIFMaskNode = m_Controls->AIFMaskNodeSelector->GetSelectedNode();
     this->m_selectedAIFMask = dynamic_cast<mitk::Image*>(this->m_selectedAIFMaskNode->GetData());
 
     if (this->m_selectedAIFMask->GetTimeSteps() > 1)
@@ -877,9 +884,9 @@ void PETDynamicView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& a
     }
 
     //image settings
-    if (this->m_Controls.checkDedicatedAIFImage->isChecked())
+    if (this->m_Controls->checkDedicatedAIFImage->isChecked())
     {
-      this->m_selectedAIFImageNode = m_Controls.AIFImageNodeSelector->GetSelectedNode();
+      this->m_selectedAIFImageNode = m_Controls->AIFImageNodeSelector->GetSelectedNode();
       this->m_selectedAIFImage = dynamic_cast<mitk::Image*>(this->m_selectedAIFImageNode->GetData());
     }
     else
@@ -916,7 +923,7 @@ void PETDynamicView::LoadAIFfromFile()
     return;
   }
 
-  m_Controls.aifFilePath->setText(fileName);
+  m_Controls->aifFilePath->setText(fileName);
 
   std::string m_aifFilePath = fileName.toStdString();
   //Read Input
@@ -928,7 +935,7 @@ void PETDynamicView::LoadAIFfromFile()
 
   if (!in1.is_open())
   {
-    this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    this->m_Controls->infoBox->append(QString("Could not open AIF File!"));
     return;
   }
 
@@ -942,7 +949,7 @@ void PETDynamicView::LoadAIFfromFile()
 
     if (vec1.size() < 2)
     {
-      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      this->m_Controls->infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
       this->AIFinputGrid.clear();
       this->AIFinputFunction.clear();
       return;
@@ -952,6 +959,6 @@ void PETDynamicView::LoadAIFfromFile()
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
   }
   in1.close();
-  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
+  this->m_Controls->infoBox->append(QString("AIF File successfully loaded!"));
 
 }

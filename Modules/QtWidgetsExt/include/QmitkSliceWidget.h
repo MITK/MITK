@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define QmitkSliceWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
-#include "ui_QmitkSliceWidget.h"
 
 #include "QmitkRenderWindow.h"
 #include "mitkDataStorage.h"
@@ -23,13 +22,20 @@ found in the LICENSE file.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkStandaloneDataStorage.h"
 #include <QWidget>
+#include <memory>
 
-class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
+namespace Ui
+{
+  class QmitkSliceWidgetUi;
+}
+
+class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkSliceWidget(QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = {});
+  ~QmitkSliceWidget() override;
 
   mitk::VtkPropRenderer *GetRenderer();
 
@@ -80,6 +86,7 @@ protected:
   mitk::AnatomicalPlane m_View;
 
 private:
+  std::unique_ptr<Ui::QmitkSliceWidgetUi> m_Controls;
   bool popUpEnabled;
   mitk::VtkPropRenderer::Pointer m_Renderer;
   mitk::SlicedGeometry3D::Pointer m_SlicedGeometry;

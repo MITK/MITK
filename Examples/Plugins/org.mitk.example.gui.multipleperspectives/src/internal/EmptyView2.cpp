@@ -16,7 +16,7 @@ found in the LICENSE file.
 const std::string EmptyView2::VIEW_ID = "org.mitk.views.emptyview2";
 
 EmptyView2::EmptyView2()
-  : m_Controls(new Ui::EmptyView2Controls),
+  : m_Controls(std::make_unique<Ui::EmptyView2Controls>()),
     m_Parent(nullptr)
 {
 }

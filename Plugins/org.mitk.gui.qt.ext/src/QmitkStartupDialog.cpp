@@ -144,7 +144,7 @@ private:
 
 QmitkStartupDialog::QmitkStartupDialog(QWidget* parent)
   : QDialog(parent),
-    m_Ui(new Ui::QmitkStartupDialog)
+    m_Ui(std::make_unique<Ui::QmitkStartupDialog>())
 {
   m_Ui->setupUi(this);
 
@@ -155,7 +155,6 @@ QmitkStartupDialog::QmitkStartupDialog(QWidget* parent)
 
 QmitkStartupDialog::~QmitkStartupDialog()
 {
-  delete m_Ui;
 }
 
 bool QmitkStartupDialog::UsePreset() const

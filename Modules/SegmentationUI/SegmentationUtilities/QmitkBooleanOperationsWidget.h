@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QWidget>
 
 #include <MitkSegmentationUIExports.h>
+#include <memory>
 
 namespace Ui
 {
@@ -52,7 +53,7 @@ private:
   void SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const;
 
 
-  Ui::QmitkBooleanOperationsWidgetControls* m_Controls;
+  std::unique_ptr<Ui::QmitkBooleanOperationsWidgetControls> m_Controls;
 };
 
 #endif

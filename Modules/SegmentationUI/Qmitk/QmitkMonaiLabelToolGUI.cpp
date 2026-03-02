@@ -12,12 +12,16 @@ found in the LICENSE file.
 
 #include "QmitkMonaiLabelToolGUI.h"
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+
+#include <QmitkStyleManager.h>
+
 #include <QIcon>
 #include <QMessageBox>
 #include <QUrl>
-#include <QmitkStyleManager.h>
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
+
+#include <ui_QmitkMonaiLabelToolGUIControls.h>
 
 namespace
 {
@@ -52,6 +56,7 @@ namespace
 
 QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI(int dimension)
   : QmitkMultiLabelSegWithPreviewToolGUIBase(),
+    m_Controls(std::make_unique<Ui::QmitkMonaiLabelToolGUIControls>()),
     m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc),
     m_Dimension(dimension)
 {
@@ -74,6 +79,7 @@ QmitkMonaiLabelToolGUI::~QmitkMonaiLabelToolGUI()
   m_Preferences->OnPropertyChanged -=
     mitk::MessageDelegate1<QmitkMonaiLabelToolGUI, const mitk::IPreferences::ChangeEvent &>(
       this, &QmitkMonaiLabelToolGUI::OnPreferenceChangedEvent);
+
 }
 
 void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -86,17 +92,17 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
-  m_Controls.setupUi(wrapperWidget);
+  m_Controls->setupUi(wrapperWidget);
 
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
-  connect(m_Controls.fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
-  connect(m_Controls.modelBox,
+  connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  connect(m_Controls->fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
+  connect(m_Controls->modelBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnModelChanged(m_Controls.modelBox->itemText(index)); });
+          [=](int index) { OnModelChanged(m_Controls->modelBox->itemText(index)); });
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
-  m_Controls.fetchUrl->setIcon(refreshIcon);
-  m_Controls.previewButton->setEnabled(false);
+  m_Controls->fetchUrl->setIcon(refreshIcon);
+  m_Controls->previewButton->setEnabled(false);
   Superclass::InitializeUI(mainLayout);
 }
 
@@ -124,7 +130,7 @@ void QmitkMonaiLabelToolGUI::StatusMessageListener(const bool status)
 void QmitkMonaiLabelToolGUI::DisplayWidgets(bool enabled)
 {
   Superclass::DisplayTransferWidgets(enabled);
-  m_Controls.previewButton->setVisible(enabled);
+  m_Controls->previewButton->setVisible(enabled);
 }
 
 void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
@@ -134,21 +140,21 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
   {
     return;
   }
-  m_Controls.labelListLabel->clear();
+  m_Controls->labelListLabel->clear();
   mitk::MonaiModelInfo model = tool->GetModelInfoFromName(modelName.toStdString());
   if (model.IsInteractive())
   {
     this->WriteStatusMessage("Interactive model selected. Please press SHIFT + click on the render windows.\n");
-    m_Controls.previewButton->setEnabled(false);
+    m_Controls->previewButton->setEnabled(false);
     this->DisplayWidgets(false);
   }
   else
   {
     this->WriteStatusMessage("Auto-segmentation model selected. Please click on Preview.\n");
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
     this->DisplayWidgets(true);
   }
-  auto selectedModel = m_Controls.modelBox->currentText().toStdString();
+  auto selectedModel = m_Controls->modelBox->currentText().toStdString();
   for (const auto &modelObject : tool->GetInfoParameters()->models)
   {
     if (modelObject.name == selectedModel)
@@ -166,7 +172,7 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
       {
         supportedLabels << QString::fromStdString(label.first);
       }
-      m_Controls.labelListLabel->setText(supportedLabels.join(QStringLiteral(", ")));
+      m_Controls->labelListLabel->setText(supportedLabels.join(QStringLiteral(", ")));
       break;
     }
   }
@@ -176,8 +182,8 @@ void QmitkMonaiLabelToolGUI::OnModelChanged(const QString &modelName)
 
 void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
 {
-  m_Controls.previewButton->setEnabled(false);
-  m_Controls.labelListLabel->clear();
+  m_Controls->previewButton->setEnabled(false);
+  m_Controls->labelListLabel->clear();
   auto reply = QMessageBox::question(this, "Confirm", ::CONFIRM_QUESTION_TEXT, QMessageBox::Yes | QMessageBox::No);
   if (reply == QMessageBox::No)
   {
@@ -189,7 +195,7 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
   {
     return;
   }
-  QString urlString = m_Controls.urlBox->text();
+  QString urlString = m_Controls->urlBox->text();
   QUrl url(urlString);
   if (url.isValid() && !url.isLocalFile() && !url.hasFragment() && !url.hasQuery()) // sanity check
   {
@@ -205,8 +211,8 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
     }
     catch (const mitk::Exception &e)
     {
-      m_Controls.appBox->clear();
-      m_Controls.modelBox->clear();
+      m_Controls->appBox->clear();
+      m_Controls->modelBox->clear();
       MITK_ERROR << e.GetDescription();
       this->WriteErrorMessage(e.GetDescription());
     }
@@ -227,7 +233,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
     return;
   }
   tool->ClearPicks(); // clear any interactive segmentation from before
-  auto selectedModel = m_Controls.modelBox->currentText().toStdString();
+  auto selectedModel = m_Controls->modelBox->currentText().toStdString();
   for (const auto &modelObject : tool->GetInfoParameters()->models)
   {
     if (modelObject.name == selectedModel)
@@ -251,14 +257,14 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
              << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
     return;
   }
   catch (...)
   {
     std::string errorMsg = "Unknown error occurred while generating MONAI Label segmentation.";
     this->ShowErrorMessage(errorMsg);
-    m_Controls.previewButton->setEnabled(true);
+    m_Controls->previewButton->setEnabled(true);
     return;
   }
 }
@@ -270,8 +276,8 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
   {
     return;
   }
-  m_Controls.appBox->clear();
-  m_Controls.labelListLabel->clear();
+  m_Controls->appBox->clear();
+  m_Controls->labelListLabel->clear();
   if (nullptr != tool->GetInfoParameters())
   {
     QString appName = QString::fromStdString(tool->GetInfoParameters()->name);
@@ -279,15 +285,15 @@ void QmitkMonaiLabelToolGUI::PopulateUI(bool allowAllModels)
     auto interactiveModels = tool->GetInteractiveSegmentationModels(m_Dimension);
     autoModels.insert(autoModels.end(), interactiveModels.begin(), interactiveModels.end());
     this->WriteStatusMessage(appName);
-    m_Controls.appBox->addItem(appName);
+    m_Controls->appBox->addItem(appName);
     this->PopulateModelBox(appName, autoModels, allowAllModels);
-    m_Controls.modelBox->setCurrentIndex(-1);
+    m_Controls->modelBox->setCurrentIndex(-1);
   }
 }
 
 void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk::MonaiModelInfo> models, bool allowAllModels)
 {
-  m_Controls.modelBox->clear();
+  m_Controls->modelBox->clear();
   for (const auto &model : models)
   {
     QString modelName = QString::fromStdString(model.name);
@@ -297,13 +303,13 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk:
       {
         continue;
       }
-      m_Controls.modelBox->addItem(modelName);
+      m_Controls->modelBox->addItem(modelName);
     }
     else
     {
       if (::WHITELISTED_MODELS.contains(modelName))
       {
-        m_Controls.modelBox->addItem(modelName);
+        m_Controls->modelBox->addItem(modelName);
       }
     }
   }
@@ -311,15 +317,15 @@ void QmitkMonaiLabelToolGUI::PopulateModelBox(QString appName, std::vector<mitk:
 
 void QmitkMonaiLabelToolGUI::WriteStatusMessage(const QString &message)
 {
-  m_Controls.responseNote->setText(message);
-  m_Controls.responseNote->setStyleSheet("font-weight: bold; color: white");
+  m_Controls->responseNote->setText(message);
+  m_Controls->responseNote->setStyleSheet("font-weight: bold; color: white");
   qApp->processEvents();
 }
 
 void QmitkMonaiLabelToolGUI::WriteErrorMessage(const QString &message)
 {
-  m_Controls.responseNote->setText(message);
-  m_Controls.responseNote->setStyleSheet("font-weight: bold; color: red");
+  m_Controls->responseNote->setText(message);
+  m_Controls->responseNote->setStyleSheet("font-weight: bold; color: red");
   qApp->processEvents();
 }
 

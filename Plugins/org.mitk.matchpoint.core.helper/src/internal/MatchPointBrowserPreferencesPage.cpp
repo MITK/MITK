@@ -72,9 +72,9 @@ void MatchPointBrowserPreferencesPage::CreateQtControl(QWidget* parent)
   m_MainControl = new QWidget(parent);
 
   m_AlgDirectories = new QmitkDirectoryListWidget(m_MainControl);
-  m_AlgDirectories->m_Label->setText("Select directories to scan:");
+  m_AlgDirectories->setText("Select directories to scan:");
   m_AlgFiles = new QmitkFileListWidget(m_MainControl);
-  m_AlgFiles->m_Label->setText("Select additional executables:");
+  m_AlgFiles->setText("Select additional executables:");
   m_DebugOutput = new QCheckBox(m_MainControl);
 
   m_LoadFromAutoLoadPathDir = new QCheckBox(m_MainControl);

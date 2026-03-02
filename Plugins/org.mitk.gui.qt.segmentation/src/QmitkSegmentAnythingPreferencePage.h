@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <QmitknnUNetGPU.h>
 #include <QString>
 #include <QStandardPaths>
-#include <ui_QmitkSegmentAnythingPreferencePage.h>
 #include <QDir>
 #include <QMessageBox>
 #include <QmitkSegmentAnythingToolInstaller.h>
+#include <memory>
 
 namespace Ui
 {
@@ -89,7 +89,7 @@ private:
    */
   void ShowErrorMessage(const QString &, QMessageBox::Icon = QMessageBox::Critical);
 
-  Ui::QmitkSegmentAnythingPreferencePage* m_Ui;
+  std::unique_ptr<Ui::QmitkSegmentAnythingPreferencePage> m_Ui;
   QmitkSAMToolInstaller m_Installer;
   QWidget* m_Control;
   QmitkGPULoader m_GpuLoader;

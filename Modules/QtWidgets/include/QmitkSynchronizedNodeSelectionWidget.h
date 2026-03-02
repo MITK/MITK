@@ -15,14 +15,18 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkSynchronizedNodeSelectionWidget.h"
-
 // mitk core
 #include <mitkBaseRenderer.h>
 
 // qt widgets module
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkRenderWindowDataNodeTableModel.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkSynchronizedNodeSelectionWidget;
+}
 
 /*
 * @brief The 'QmitkSynchronizedNodeSelectionWidget' implements the 'QmitkAbstractNodeSelectionWidget'
@@ -97,7 +101,7 @@ private:
   bool IsParentNodeSelected(const mitk::DataNode* dataNode) const;
   void DeselectNode(mitk::DataNode* dataNode);
 
-  Ui::QmitkSynchronizedNodeSelectionWidget m_Controls;
+  std::unique_ptr<Ui::QmitkSynchronizedNodeSelectionWidget> m_Controls;
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
   std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;

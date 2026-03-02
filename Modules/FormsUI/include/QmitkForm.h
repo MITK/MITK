@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <MitkFormsUIExports.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -60,7 +61,7 @@ private:
   void OnClearButtonClicked();
   void OnSubmitAnotherButtonClicked();
 
-  Ui::QmitkForm* m_Ui;
+  std::unique_ptr<Ui::QmitkForm> m_Ui;
   mitk::Forms::Form* m_Form;
   fs::path m_ResponsesPath;
   bool m_HasBeenSubmitted;

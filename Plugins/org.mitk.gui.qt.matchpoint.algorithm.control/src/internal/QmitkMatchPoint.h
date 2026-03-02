@@ -17,8 +17,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkMatchPointControls.h"
-
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
 
@@ -31,9 +29,15 @@ found in the LICENSE file.
 #include <mapStoppableAlgorithmInterface.h>
 
 #include <mitkMAPRegistrationWrapper.h>
+#include <memory>
 
 class QmitkRegistrationJob;
 class QmitkMappingJob;
+
+namespace Ui
+{
+  class MatchPointAdvancedControls;
+}
 
 /*!
 \brief MatchPoint
@@ -191,7 +195,7 @@ private:
   bool m_ValidInputs;
   bool m_Working;
 
-  Ui::MatchPointAdvancedControls m_Controls;
+  std::unique_ptr<Ui::MatchPointAdvancedControls> m_Controls;
 };
 
 #endif

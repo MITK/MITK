@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkConfirmSegmentationDialog_h
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui
 {
@@ -46,7 +47,7 @@ protected slots:
   void OnCancelSegmentation();
 
 private:
-  Ui::QmitkConfirmSegmentationDialog *m_Controls;
+  std::unique_ptr<Ui::QmitkConfirmSegmentationDialog> m_Controls;
 };
 
 #endif

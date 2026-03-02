@@ -14,26 +14,30 @@ found in the LICENSE file.
 #define QmitkTransferFunctionWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
-#include "ui_QmitkTransferFunctionWidget.h"
 
 #include <mitkCommon.h>
 
 #include <QWidget>
 
 #include <mitkDataNode.h>
+#include <mitkSimpleHistogram.h>
 #include <mitkTransferFunctionProperty.h>
 
 #include <QPushButton>
 #include <QSlider>
-
-#include <QmitkTransferFunctionWidget.h>
+#include <memory>
 
 namespace mitk
 {
   class BaseRenderer;
 }
 
-class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
+namespace Ui
+{
+  class QmitkTransferFunctionWidget;
+}
+
+class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget
 {
   Q_OBJECT
 
@@ -69,8 +73,8 @@ public slots:
   void OnSpanChanged(double lower, double upper);
 
 protected:
+  std::unique_ptr<Ui::QmitkTransferFunctionWidget> m_Controls;
   mitk::TransferFunctionProperty::Pointer tfpToChange;
-
   mitk::SimpleHistogramCache histogramCache;
 };
 

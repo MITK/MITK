@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QSettings>
+#include <QLayout>
+#include <QApplication>
 
 #include <ctkPluginException.h>
 #include <service/event/ctkEventAdmin.h>

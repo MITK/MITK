@@ -19,9 +19,13 @@ found in the LICENSE file.
 
 #include <itkCommand.h>
 
-#include "ui_QmitkCESTNormalizeViewControls.h"
-
 #include <mitkNodePredicateBase.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkCESTNormalizeViewControls;
+}
 
 /*!
 *	@brief Test Plugin for SUV calculations of PET images
@@ -36,6 +40,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkCESTNormalizeView();
+  ~QmitkCESTNormalizeView() override;
 
 protected slots:
 
@@ -66,7 +71,7 @@ protected:
   // Variables
 
   /*! @brief The view's UI controls */
-  Ui::QmitkCESTNormalizeViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkCESTNormalizeViewControls> m_Controls;
 
   mitk::NodePredicateBase::Pointer m_IsCESTImagePredicate;
 };

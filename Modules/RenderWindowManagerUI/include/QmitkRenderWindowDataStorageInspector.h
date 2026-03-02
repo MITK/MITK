@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
-#include "ui_QmitkRenderWindowDataStorageInspector.h"
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
@@ -24,6 +23,9 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkAbstractDataStorageInspector.h>
+#include <memory>
+
+namespace Ui { class QmitkRenderWindowDataStorageInspector; }
 
 /**
 * The 'QmitkRenderWindowDataStorageInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
@@ -38,6 +40,7 @@ class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowDataStorageInspector : p
 public:
 
   QmitkRenderWindowDataStorageInspector(QWidget* parent = nullptr);
+  ~QmitkRenderWindowDataStorageInspector() override;
 
   // override from 'QmitkAbstractDataStorageInspector'
   /**
@@ -78,7 +81,7 @@ private:
   void Initialize() override;
   void SetUpConnections();
 
-  Ui::QmitkRenderWindowDataStorageInspector m_Controls;
+  std::unique_ptr<Ui::QmitkRenderWindowDataStorageInspector> m_Controls;
 
   std::unique_ptr<QmitkRenderWindowDataStorageTreeModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

@@ -41,7 +41,7 @@ using Self = QmitknnInteractiveInstallDialog;
 
 QmitknnInteractiveInstallDialog::QmitknnInteractiveInstallDialog(QWidget* parent)
   : QDialog(parent),
-    m_Ui(new Ui::QmitknnInteractiveInstallDialog),
+    m_Ui(std::make_unique<Ui::QmitknnInteractiveInstallDialog>()),
     m_Process(new QProcess(this)),
     m_InstallStep(InstallStep::Upgrade_Pip)
 {

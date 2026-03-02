@@ -13,12 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkMxNMultiWidgetEditorPreferencePage_h
 #define QmitkMxNMultiWidgetEditorPreferencePage_h
 
-#include "ui_QmitkMxNMultiWidgetEditorPreferencePage.h"
-
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
 #include <QPushButton>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkMxNMultiWidgetEditorPreferencePage;
+}
 
 class QmitkMxNMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -51,7 +55,7 @@ protected:
 
 private:
 
-  Ui::QmitkMxNMultiWidgetEditorPreferencePage m_Ui;
+  std::unique_ptr<Ui::QmitkMxNMultiWidgetEditorPreferencePage> m_Ui;
   QWidget* m_MainControl;
 
 };

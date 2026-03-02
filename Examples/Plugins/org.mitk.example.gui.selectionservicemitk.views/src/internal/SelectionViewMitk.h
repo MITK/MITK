@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 // QMitk includes
 #include <QmitkAbstractView.h>
+#include <memory>
 
 namespace Ui
 {
@@ -37,6 +38,7 @@ public:
   static const std::string VIEW_ID;
 
   SelectionViewMitk();
+  ~SelectionViewMitk() override;
 
 protected:
   void CreateQtPartControl(QWidget *parent) override;
@@ -51,7 +53,7 @@ private:
   QItemSelectionModel *GetDataNodeSelectionModel() const override;
   //! [MITK Selection Provider method]
 
-  Ui::SelectionViewMitkControls *m_Controls;
+  std::unique_ptr<Ui::SelectionViewMitkControls> m_Controls;
 
   QWidget *m_Parent;
 };

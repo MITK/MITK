@@ -12,18 +12,20 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageFavoriteNodesInspector.h>
 
-#include "QmitkDataStorageDefaultListModel.h"
+#include <QmitkDataStorageDefaultListModel.h>
 
-#include "mitkNodePredicateAnd.h"
+#include <mitkNodePredicateAnd.h>
 
-#include "QPushButton"
-#include "QmitkStyleManager.h"
+#include <QPushButton>
+#include <QmitkStyleManager.h>
+
+#include <ui_QmitkDataStorageListInspector.h>
 
 QmitkDataStorageFavoriteNodesInspector::QmitkDataStorageFavoriteNodesInspector(QWidget* parent/* = nullptr*/)
   : QmitkDataStorageListInspector(parent)
 {
   auto favoriteNodesButton = new QPushButton(parent);
-  QmitkDataStorageListInspector::m_Controls.verticalLayout->addWidget(favoriteNodesButton, 0, Qt::AlignRight);
+  QmitkDataStorageListInspector::m_Controls->verticalLayout->addWidget(favoriteNodesButton, 0, Qt::AlignRight);
 
   favoriteNodesButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_remove.svg")));
   favoriteNodesButton->setIconSize(QSize(24, 24));

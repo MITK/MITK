@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "QmitkPropertyItemModel.h"
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
+#include <ui_QmitkPropertyTreeView.h>
 #include <berryQtStyleManager.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
@@ -68,14 +69,14 @@ QmitkPropertyTreeView::~QmitkPropertyTreeView()
 
 void QmitkPropertyTreeView::SetFocus()
 {
-  m_Controls.filterLineEdit->setFocus();
+  m_Controls->filterLineEdit->setFocus();
 }
 
 void QmitkPropertyTreeView::ResetRenderWindowComboBox()
 {
-  m_Controls.propertyListComboBox->clear();
-  m_Controls.propertyListComboBox->addItem("Data node: common");
-  m_Controls.propertyListComboBox->addItem("Base data");
+  m_Controls->propertyListComboBox->clear();
+  m_Controls->propertyListComboBox->addItem("Data node: common");
+  m_Controls->propertyListComboBox->addItem("Base data");
 }
 
 void QmitkPropertyTreeView::UpdateRenderWindowComboBox(mitk::IRenderWindowPart* renderWindowPart)
@@ -86,7 +87,7 @@ void QmitkPropertyTreeView::UpdateRenderWindowComboBox(mitk::IRenderWindowPart* 
 
   for (auto renderWindowName : renderWindows.keys())
   {
-    m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindowName);
+    m_Controls->propertyListComboBox->insertItem(m_Controls->propertyListComboBox->count() - 1, QString("Data node: ") + renderWindowName);
   }
 }
 
@@ -107,9 +108,10 @@ void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls = std::make_unique<Ui::QmitkPropertyTreeView>();
+  m_Controls->setupUi(parent);
 
-  m_Controls.propertyListComboBox->addItem("Data node: common");
+  m_Controls->propertyListComboBox->addItem("Data node: common");
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
   if (renderWindowPart != nullptr)
@@ -118,17 +120,17 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
     for(const auto& renderWindow : renderWindows.keys())
     {
-      m_Controls.propertyListComboBox->addItem(QString("Data node: ") + renderWindow);
+      m_Controls->propertyListComboBox->addItem(QString("Data node: ") + renderWindow);
     }
   }
 
-  m_Controls.propertyListComboBox->addItem("Base data");
+  m_Controls->propertyListComboBox->addItem("Base data");
 
-  m_Controls.newButton->setEnabled(false);
+  m_Controls->newButton->setEnabled(false);
 
   this->HideAllIcons();
 
-  m_ProxyModel = new QmitkPropertyItemSortFilterProxyModel(m_Controls.treeView);
+  m_ProxyModel = new QmitkPropertyItemSortFilterProxyModel(m_Controls->treeView);
   m_Model = new QmitkPropertyItemModel(m_ProxyModel);
 
   m_ProxyModel->setSourceModel(m_Model);
@@ -136,46 +138,46 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_ProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
   m_ProxyModel->setDynamicSortFilter(true);
 
-  m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
+  m_Delegate = new QmitkPropertyItemDelegate(m_Controls->treeView);
 
-  m_Controls.singleSlot->SetDataStorage(GetDataStorage());
-  m_Controls.singleSlot->SetSelectionIsOptional(true);
-  m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
-  m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
+  m_Controls->singleSlot->SetDataStorage(GetDataStorage());
+  m_Controls->singleSlot->SetSelectionIsOptional(true);
+  m_Controls->singleSlot->SetEmptyInfo(QString("Please select a data node"));
+  m_Controls->singleSlot->SetPopUpTitel(QString("Select data node"));
 
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
   SetAsSelectionListener(true);
 
-  m_Controls.filterLineEdit->setClearButtonEnabled(true);
+  m_Controls->filterLineEdit->setClearButtonEnabled(true);
 
-  m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
-  m_Controls.treeView->setModel(m_ProxyModel);
-  m_Controls.treeView->setColumnWidth(0, 160);
-  m_Controls.treeView->sortByColumn(0, Qt::AscendingOrder);
-  m_Controls.treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_Controls.treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
+  m_Controls->treeView->setItemDelegateForColumn(1, m_Delegate);
+  m_Controls->treeView->setModel(m_ProxyModel);
+  m_Controls->treeView->setColumnWidth(0, 160);
+  m_Controls->treeView->sortByColumn(0, Qt::AscendingOrder);
+  m_Controls->treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls->treeView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls->treeView->setEditTriggers(QAbstractItemView::SelectedClicked | QAbstractItemView::DoubleClicked);
 
   const int ICON_SIZE = 32;
 
   auto icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tags.svg"));
-  m_Controls.tagsLabel->setPixmap(icon.pixmap(ICON_SIZE));
+  m_Controls->tagsLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
   icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/tag.svg"));
-  m_Controls.tagLabel->setPixmap(icon.pixmap(ICON_SIZE));
+  m_Controls->tagLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
   icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
-  m_Controls.saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
+  m_Controls->saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
-  connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+  connect(m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkPropertyTreeView::OnCurrentSelectionChanged);
-  connect(m_Controls.filterLineEdit, &QLineEdit::textChanged,
+  connect(m_Controls->filterLineEdit, &QLineEdit::textChanged,
     this, &QmitkPropertyTreeView::OnFilterTextChanged);
-  connect(m_Controls.propertyListComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+  connect(m_Controls->propertyListComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
     this, &QmitkPropertyTreeView::OnPropertyListChanged);
-  connect(m_Controls.newButton, &QPushButton::clicked,
+  connect(m_Controls->newButton, &QPushButton::clicked,
     this, &QmitkPropertyTreeView::OnAddNewProperty);
-  connect(m_Controls.treeView->selectionModel(), &QItemSelectionModel::currentRowChanged,
+  connect(m_Controls->treeView->selectionModel(), &QItemSelectionModel::currentRowChanged,
     this, &QmitkPropertyTreeView::OnCurrentRowChanged);
   connect(m_Model, &QmitkPropertyItemModel::modelReset,
     this, &QmitkPropertyTreeView::OnModelReset);
@@ -184,7 +186,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   auto currentSelection = GetInitialSelection(selection);
 
   if (!currentSelection.isEmpty())
-    m_Controls.singleSlot->SetCurrentSelection(currentSelection);
+    m_Controls->singleSlot->SetCurrentSelection(currentSelection);
 }
 
 void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
@@ -192,12 +194,12 @@ void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)
   if (checked)
   {
     m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
-    connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+    connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
   else
   {
     m_SelectionServiceConnector->RemovePostSelectionListener();
-    disconnect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+    disconnect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
 }
 
@@ -234,7 +236,7 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
     m_Model->SetPropertyList(nullptr);
     m_Delegate->SetPropertyList(nullptr);
 
-    m_Controls.newButton->setEnabled(false);
+    m_Controls->newButton->setEnabled(false);
 
     return;
   }
@@ -242,7 +244,7 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
   // node is selected, create tree with node properties
   m_SelectedNode = nodes.front();
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
-  if (m_Renderer == nullptr && m_Controls.propertyListComboBox->currentText() == "Base data")
+  if (m_Renderer == nullptr && m_Controls->propertyListComboBox->currentText() == "Base data")
   {
     propertyList = m_SelectedNode->GetData() != nullptr
       ? m_SelectedNode->GetData()->GetPropertyList()
@@ -262,15 +264,15 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
   m_Model->SetPropertyList(propertyList, selectionClassName);
   m_Delegate->SetPropertyList(propertyList);
 
-  m_Controls.newButton->setEnabled(true);
-  m_Controls.treeView->expandAll();
+  m_Controls->newButton->setEnabled(true);
+  m_Controls->treeView->expandAll();
 }
 
 void QmitkPropertyTreeView::HideAllIcons()
 {
-  m_Controls.tagLabel->hide();
-  m_Controls.tagsLabel->hide();
-  m_Controls.saveLabel->hide();
+  m_Controls->tagLabel->hide();
+  m_Controls->tagsLabel->hide();
+  m_Controls->saveLabel->hide();
 }
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
@@ -337,19 +339,19 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
         if (!description.isEmpty())
           customizedDescription += "<p>" + description + "</p>";
 
-        m_Controls.tagsLabel->setVisible(!aliases.empty() && aliases.size() > 1);
-        m_Controls.tagLabel->setVisible(!aliases.empty() && aliases.size() == 1);
-        m_Controls.saveLabel->setVisible(isPersistent);
+        m_Controls->tagsLabel->setVisible(!aliases.empty() && aliases.size() > 1);
+        m_Controls->tagLabel->setVisible(!aliases.empty() && aliases.size() == 1);
+        m_Controls->saveLabel->setVisible(isPersistent);
 
-        m_Controls.descriptionLabel->setText(customizedDescription);
-        m_Controls.descriptionLabel->show();
+        m_Controls->descriptionLabel->setText(customizedDescription);
+        m_Controls->descriptionLabel->show();
 
         return;
       }
     }
   }
 
-  m_Controls.descriptionLabel->hide();
+  m_Controls->descriptionLabel->hide();
   this->HideAllIcons();
 }
 
@@ -358,7 +360,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
   if (index == -1)
     return;
 
-  QString renderer = m_Controls.propertyListComboBox->itemText(index);
+  QString renderer = m_Controls->propertyListComboBox->itemText(index);
 
   if (renderer.startsWith("Data node: "))
     renderer = QString::fromStdString(renderer.toStdString().substr(11));
@@ -383,7 +385,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
-  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
+  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls->propertyListComboBox->currentText() != "Base data"
     ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer)
     : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
 
@@ -394,12 +396,12 @@ void QmitkPropertyTreeView::OnAddNewProperty()
 void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
 {
   m_ProxyModel->setFilterWildcard(filter);
-  m_Controls.treeView->expandAll();
+  m_Controls->treeView->expandAll();
 }
 
 void QmitkPropertyTreeView::OnModelReset()
 {
-  m_Controls.treeView->expandAll();
-  m_Controls.descriptionLabel->hide();
+  m_Controls->treeView->expandAll();
+  m_Controls->descriptionLabel->hide();
   this->HideAllIcons();
 }

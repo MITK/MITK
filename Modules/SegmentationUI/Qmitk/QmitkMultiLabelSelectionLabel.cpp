@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 QmitkMultiLabelSelectionLabel::QmitkMultiLabelSelectionLabel(QWidget* parent/* = nullptr*/)
   : QWidget(parent),
-  m_Controls(new Ui::QmitkMultiLabelSelectionLabel),
+  m_Controls(std::make_unique<Ui::QmitkMultiLabelSelectionLabel>()),
   m_SegmentationNodeDataMTime(0)
 {
   m_Controls->setupUi(this);

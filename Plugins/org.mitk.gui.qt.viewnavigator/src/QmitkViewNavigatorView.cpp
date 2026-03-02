@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include <ui_QmitkViewNavigatorView.h>
 
 QmitkViewNavigatorView::QmitkViewNavigatorView()
-  : m_Ui(new Ui::QmitkViewNavigatorView),
+  : m_Ui(std::make_unique<Ui::QmitkViewNavigatorView>()),
     m_Model(nullptr),
     m_ProxyModel(nullptr)
 {

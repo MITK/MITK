@@ -62,7 +62,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(
   Mode mode,
   QWidget* parent)
   : QDialog(parent),
-  m_Ui(new Ui::QmitkNewSegmentationDialog),
+  m_Ui(std::make_unique<Ui::QmitkNewSegmentationDialog>()),
   m_Mode(mode),
   m_EnforceSuggestions(false),
   m_TotalSuggestions(0),

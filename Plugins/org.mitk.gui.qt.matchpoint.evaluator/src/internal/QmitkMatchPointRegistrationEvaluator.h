@@ -18,7 +18,12 @@ found in the LICENSE file.
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
 
-#include "ui_QmitkMatchPointRegistrationEvaluator.h"
+#include <memory>
+
+namespace Ui
+{
+  class MatchPointRegistrationEvaluatorControls;
+}
 
 /*!
 \brief QmitkMatchPointRegistrationEvaluator
@@ -67,7 +72,7 @@ protected:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  Ui::MatchPointRegistrationEvaluatorControls m_Controls;
+  std::unique_ptr<Ui::MatchPointRegistrationEvaluatorControls> m_Controls;
 
 private:
   QWidget *m_Parent;

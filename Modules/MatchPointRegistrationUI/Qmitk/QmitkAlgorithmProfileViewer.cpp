@@ -15,9 +15,17 @@ found in the LICENSE file.
 #include <mapAlgorithmProfileHelper.h>
 #include <mapConvert.h>
 
-QmitkAlgorithmProfileViewer::QmitkAlgorithmProfileViewer(QWidget *parent) : QWidget(parent)
+#include <ui_QmitkAlgorithmProfileViewer.h>
+
+QmitkAlgorithmProfileViewer::QmitkAlgorithmProfileViewer(QWidget *parent)
+  : QWidget(parent),
+    m_Controls(std::make_unique<Ui::QmitkAlgorithmProfileViewer>())
 {
-  this->setupUi(this);
+  m_Controls->setupUi(this);
+}
+
+QmitkAlgorithmProfileViewer::~QmitkAlgorithmProfileViewer()
+{
 }
 
 void QmitkAlgorithmProfileViewer::OnInfoChanged(const map::deployment::DLLInfo *newInfo)
@@ -64,7 +72,7 @@ void QmitkAlgorithmProfileViewer::updateInfo(const map::deployment::DLLInfo *new
 {
   if (!newInfo)
   {
-    this->m_teAlgorithmDetails->clear();
+    m_Controls->m_teAlgorithmDetails->clear();
   }
   else
   {
@@ -159,7 +167,7 @@ void QmitkAlgorithmProfileViewer::updateInfo(const map::deployment::DLLInfo *new
     descriptionString << "</table>";
 
     // update the info label
-    this->m_teAlgorithmDetails->clear();
-    this->m_teAlgorithmDetails->insertHtml(QString::fromStdString(descriptionString.str()));
+    m_Controls->m_teAlgorithmDetails->clear();
+    m_Controls->m_teAlgorithmDetails->insertHtml(QString::fromStdString(descriptionString.str()));
   }
 }

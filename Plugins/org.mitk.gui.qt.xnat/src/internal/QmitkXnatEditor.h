@@ -19,12 +19,16 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkXnatEditorControls.h"
-
 #include "ctkXnatListModel.h"
+
 #include "ctkXnatSession.h"
 
 #include "mitkXnatSessionTracker.h"
+
+namespace Ui
+{
+  class QmitkXnatEditorControls;
+}
 
 /*!
 \brief QmitkXnatEditor
@@ -94,7 +98,7 @@ protected:
 
   virtual void SetFocus() override;
 
-  Ui::QmitkXnatEditorControls m_Controls;
+  Ui::QmitkXnatEditorControls* m_Controls;
 
 private:
 

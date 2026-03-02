@@ -15,9 +15,13 @@ found in the LICENSE file.
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 
-#include "ui_QmitkOtsuToolWidgetControls.h"
-
 #include <MitkSegmentationUIExports.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkOtsuToolWidgetControls;
+}
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -49,14 +53,14 @@ private slots:
 
 protected:
   QmitkOtsuTool3DGUI();
-  ~QmitkOtsuTool3DGUI() = default;
+  ~QmitkOtsuTool3DGUI();
 
   void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
 
-  Ui_QmitkOtsuToolWidgetControls m_Controls;
+  std::unique_ptr<Ui::QmitkOtsuToolWidgetControls> m_Controls;
 
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkXNATExports.h>
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui
 {
@@ -53,7 +54,7 @@ private:
   QString m_Url;
   QString m_ResourceName;
   bool m_CreateNewFolder;
-  Ui::QmitkSelectXnatUploadDestinationDialog *ui;
+  std::unique_ptr<Ui::QmitkSelectXnatUploadDestinationDialog> ui;
 };
 
 #endif

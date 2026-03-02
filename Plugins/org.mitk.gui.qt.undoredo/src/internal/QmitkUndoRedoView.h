@@ -10,7 +10,10 @@
 #include <QStandardItemModel>
 
 // UI includes
-#include "ui_QmitkUndoRedoView.h"
+namespace Ui
+{
+  class QmitkUndoRedoViewControls;
+}
 
 namespace mitk
 {

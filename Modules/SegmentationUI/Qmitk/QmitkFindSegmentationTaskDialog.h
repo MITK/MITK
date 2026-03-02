@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QDialog>
 #include <mitkSegmentationTaskList.h>
+#include <memory>
 
 class QTableWidgetItem;
 
@@ -56,7 +57,7 @@ private:
   bool ContainsName(int row) const;
   bool HasStatus(int row) const;
 
-  Ui::QmitkFindSegmentationTaskDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkFindSegmentationTaskDialog> m_Ui;
   mitk::SegmentationTaskList::ConstPointer m_TaskList;
   std::optional<size_t> m_SelectedTask;
 };

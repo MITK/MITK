@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -65,7 +66,7 @@ private:
 
   mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI() const;
 
-  Ui::QmitkMorphologicalOperationsWidgetControls* m_Controls;
+  std::unique_ptr<Ui::QmitkMorphologicalOperationsWidgetControls> m_Controls;
 };
 
 #endif

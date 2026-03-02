@@ -171,7 +171,7 @@ QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry(const 
 QmitkConvertToMultiLabelSegmentationWidget::QmitkConvertToMultiLabelSegmentationWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent), m_DataStorage(dataStorage)
 {
-  m_Controls = new Ui::QmitkConvertToMultiLabelSegmentationWidgetControls;
+  m_Controls = std::make_unique<Ui::QmitkConvertToMultiLabelSegmentationWidgetControls>();
   m_Controls->setupUi(this);
 
   m_Controls->inputNodesSelector->SetDataStorage(dataStorage);

@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 #include <QmitkSingleNodeSelectionWidget.h>
+#include <memory>
 
 namespace Ui
 {
@@ -42,7 +43,7 @@ private slots:
 private:
   void EnableWidgets(bool enable);
 
-  Ui::QmitkRemeshingViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkRemeshingViewControls> m_Controls;
   int m_MaxNumberOfVertices;
 };
 

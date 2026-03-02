@@ -16,8 +16,14 @@ found in the LICENSE file.
 #include <berrySmartPointer.h>
 
 #include <QDialog>
+#include <QItemSelection>
 
-#include "ui_berryQtShowViewDialog.h"
+#include <memory>
+
+namespace Ui
+{
+  class QtShowViewDialog_;
+}
 
 namespace berry {
 
@@ -34,6 +40,7 @@ public:
 
   QtShowViewDialog(const IWorkbenchWindow* window, IViewRegistry* registry,
                    QWidget* parent = nullptr, Qt::WindowFlags f = {});
+  ~QtShowViewDialog() override;
 
   QList<QString> GetSelection() const;
 
@@ -59,9 +66,9 @@ private:
 
   const IWorkbenchWindow* m_Window;
   IViewRegistry* m_ViewReg;
-  Ui::QtShowViewDialog_ m_UserInterface;
   ViewFilterProxyModel* m_FilterModel;
   QList<QPersistentModelIndex> m_ExpandedCategories;
+  std::unique_ptr<Ui::QtShowViewDialog_> m_UserInterface;
 };
 
 }

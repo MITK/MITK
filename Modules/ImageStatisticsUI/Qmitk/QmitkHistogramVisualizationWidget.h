@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <itkHistogram.h>
 
 #include <QmitkChartWidget.h>
+#include <memory>
 
 namespace Ui
 {
@@ -34,6 +35,8 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkHistogramVisualizationWidget : public QW
 
 public:
   QmitkHistogramVisualizationWidget(QWidget *parent = nullptr);
+  ~QmitkHistogramVisualizationWidget() override;
+
   /** \brief Draws the histogram and enables the GUI elements. */
   void SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string &dataLabel);
   /** \brief Clears the histogram and disables all GUI elements. */
@@ -74,7 +77,7 @@ private:
 	void OnMinValueSpinBoxValueChanged();
 
 private:
-  Ui::QmitkHistogramVisualizationControls *m_Controls;
+  std::unique_ptr<Ui::QmitkHistogramVisualizationControls> m_Controls;
   const unsigned int m_DefaultNBins = 100;
   const unsigned int m_MinNBins = 10;
   const unsigned int m_MaxNBins = 10000;

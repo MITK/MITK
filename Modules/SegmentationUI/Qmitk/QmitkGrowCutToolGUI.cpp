@@ -22,16 +22,22 @@ found in the LICENSE file.
 #include <QRadioButton>
 #include <QMessageBox>
 
+#include <ui_QmitkGrowCutToolWidgetControls.h>
+
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkGrowCutToolGUI, "")
 
-QmitkGrowCutToolGUI::QmitkGrowCutToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
+QmitkGrowCutToolGUI::QmitkGrowCutToolGUI()
+  : QmitkMultiLabelSegWithPreviewToolGUIBase(),
+    m_Controls(std::make_unique<Ui::QmitkGrowCutToolWidgetControls>())
 {
   auto enableConfirmSegBtnFnc = [this](bool enabled) { return enabled && m_FirstPreviewComputation; };
 
   m_EnableConfirmSegBtnFnc = enableConfirmSegBtnFnc;
 }
 
-QmitkGrowCutToolGUI::~QmitkGrowCutToolGUI() {}
+QmitkGrowCutToolGUI::~QmitkGrowCutToolGUI()
+{
+}
 
 void QmitkGrowCutToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
@@ -44,7 +50,7 @@ void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
-  m_Controls.setupUi(wrapperWidget);
+  m_Controls->setupUi(wrapperWidget);
 
   this->OnAdvancedSettingsButtonToggled(false);
 
@@ -60,21 +66,21 @@ void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
   };
 
   auto previewAvailable = isPreviewAvailable();
-  m_Controls.m_previewButton->setEnabled(previewAvailable);
-  m_Controls.m_warningLabel->setVisible(!previewAvailable);
+  m_Controls->m_previewButton->setEnabled(previewAvailable);
+  m_Controls->m_warningLabel->setVisible(!previewAvailable);
 
-  connect(m_Controls.m_previewButton, &QPushButton::clicked, this, &QmitkGrowCutToolGUI::OnPreviewBtnClicked);
-  connect(m_Controls.m_advancedSettingsButton,
+  connect(m_Controls->m_previewButton, &QPushButton::clicked, this, &QmitkGrowCutToolGUI::OnPreviewBtnClicked);
+  connect(m_Controls->m_advancedSettingsButton,
           &ctkExpandButton::toggled,
           this,
           &QmitkGrowCutToolGUI::OnAdvancedSettingsButtonToggled);
 
-  connect(m_Controls.m_distancePenaltyDoubleSpinBox,
+  connect(m_Controls->m_distancePenaltyDoubleSpinBox,
           qOverload<double>(&QDoubleSpinBox::valueChanged),
           this,
           &QmitkGrowCutToolGUI::SetValueOfDistancePenaltySlider);
 
-  connect(m_Controls.m_distancePenaltySlider,
+  connect(m_Controls->m_distancePenaltySlider,
           &QSlider::valueChanged,
           this,
           &QmitkGrowCutToolGUI::SetValueOfDistancePenaltyDoubleSpinBox);
@@ -84,29 +90,29 @@ void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 void QmitkGrowCutToolGUI::SetValueOfDistancePenaltySlider(double val)
 {
-  m_Controls.m_distancePenaltySlider->setValue(val * 100);
+  m_Controls->m_distancePenaltySlider->setValue(val * 100);
 }
 
 void QmitkGrowCutToolGUI::SetValueOfDistancePenaltyDoubleSpinBox(int val)
 {
-  m_Controls.m_distancePenaltyDoubleSpinBox->setValue((static_cast<double>(val) / 100));
+  m_Controls->m_distancePenaltyDoubleSpinBox->setValue((static_cast<double>(val) / 100));
 }
 
 void QmitkGrowCutToolGUI::OnAdvancedSettingsButtonToggled(bool toggled)
 {
-  m_Controls.m_distancePenaltyLabel->setVisible(toggled);
-  m_Controls.m_distancePenaltyDoubleSpinBox->setVisible(toggled);
-  m_Controls.m_distancePenaltySlider->setVisible(toggled);
+  m_Controls->m_distancePenaltyLabel->setVisible(toggled);
+  m_Controls->m_distancePenaltyDoubleSpinBox->setVisible(toggled);
+  m_Controls->m_distancePenaltySlider->setVisible(toggled);
 
   double distancePenaltyMinium = 0.0;
   double distancePenaltyMaximum = 1.0;
 
-  m_Controls.m_distancePenaltyDoubleSpinBox->setMinimum(distancePenaltyMinium);
-  m_Controls.m_distancePenaltyDoubleSpinBox->setMaximum(distancePenaltyMaximum);
-  m_Controls.m_distancePenaltySlider->setMinimum(distancePenaltyMinium);
-  m_Controls.m_distancePenaltySlider->setMaximum(distancePenaltyMaximum * 100);
+  m_Controls->m_distancePenaltyDoubleSpinBox->setMinimum(distancePenaltyMinium);
+  m_Controls->m_distancePenaltyDoubleSpinBox->setMaximum(distancePenaltyMaximum);
+  m_Controls->m_distancePenaltySlider->setMinimum(distancePenaltyMinium);
+  m_Controls->m_distancePenaltySlider->setMaximum(distancePenaltyMaximum * 100);
 
-  m_Controls.m_distancePenaltyDoubleSpinBox->setSingleStep(0.01);
+  m_Controls->m_distancePenaltyDoubleSpinBox->setSingleStep(0.01);
 }
 
 void QmitkGrowCutToolGUI::OnPreviewBtnClicked()
@@ -116,7 +122,7 @@ void QmitkGrowCutToolGUI::OnPreviewBtnClicked()
   {
     try
     {
-      tool->SetDistancePenalty(m_Controls.m_distancePenaltyDoubleSpinBox->value());
+      tool->SetDistancePenalty(m_Controls->m_distancePenaltyDoubleSpinBox->value());
 
       tool->UpdatePreview();
     }
@@ -144,7 +150,7 @@ void QmitkGrowCutToolGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
 
-  m_Controls.m_distancePenaltyLabel->setEnabled(enabled);
-  m_Controls.m_distancePenaltyDoubleSpinBox->setEnabled(enabled);
-  m_Controls.m_distancePenaltySlider->setEnabled(enabled);
+  m_Controls->m_distancePenaltyLabel->setEnabled(enabled);
+  m_Controls->m_distancePenaltyDoubleSpinBox->setEnabled(enabled);
+  m_Controls->m_distancePenaltySlider->setEnabled(enabled);
 }

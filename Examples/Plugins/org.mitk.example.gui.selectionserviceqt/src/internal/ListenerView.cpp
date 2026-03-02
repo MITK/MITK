@@ -27,7 +27,7 @@ const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
   : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged)),
-    m_Controls(new Ui::ListenerViewControls),
+    m_Controls(std::make_unique<Ui::ListenerViewControls>()),
     m_Parent(nullptr)
 {
 }

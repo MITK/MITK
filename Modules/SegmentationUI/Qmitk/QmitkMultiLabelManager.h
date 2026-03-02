@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkLabelSuggestionHelper.h>
 
 #include <QWidget>
+#include <memory>
 
 class QCompleter;
 class QShortcut;
@@ -179,7 +180,7 @@ private:
   void OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType labelValue);
   void OnGroupEvent(mitk::MultiLabelSegmentation::GroupIndexType groupIndex);
 
-  Ui::QmitkMultiLabelManagerControls* m_Controls;
+  std::unique_ptr<Ui::QmitkMultiLabelManagerControls> m_Controls;
 
   QStringList m_OrganColors;
 

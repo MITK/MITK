@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkToolGUI.h>
 #include <MitkSegmentationUIExports.h>
+#include <memory>
 
 namespace mitk
 {
@@ -60,7 +61,7 @@ protected:
   QmitkEditableContourToolGUIBase();
   ~QmitkEditableContourToolGUIBase() override;
 
-  Ui::QmitkEditableContourToolGUIControls* m_Controls;
+  std::unique_ptr<Ui::QmitkEditableContourToolGUIControls> m_Controls;
   itk::SmartPointer<mitk::EditableContourTool> m_NewTool;
 };
 

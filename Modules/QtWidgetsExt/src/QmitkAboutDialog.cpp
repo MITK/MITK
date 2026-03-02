@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkAboutDialog.h"
+#include <ui_QmitkAboutDialogGUI.h>
 #include "QmitkModulesDialog.h"
 #include <QPushButton>
 #include <QRegularExpression>
@@ -53,17 +54,18 @@ namespace
 
 QmitkAboutDialog::QmitkAboutDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
-  m_GUI.setupUi(this);
+  m_GUI = std::make_unique<Ui::QmitkAboutDialog>();
+  m_GUI->setupUi(this);
 
-  m_GUI.m_RevisionLabel->setText(CreateRevisionLabelText());
-  m_GUI.m_ToolkitVersionsLabel->setText(CreateToolkitVersionsLabelText());
-  m_GUI.m_AboutLabel->setText(MatchDocumentationToReleaseVersion(m_GUI.m_AboutLabel->text()));
+  m_GUI->m_RevisionLabel->setText(CreateRevisionLabelText());
+  m_GUI->m_ToolkitVersionsLabel->setText(CreateToolkitVersionsLabelText());
+  m_GUI->m_AboutLabel->setText(MatchDocumentationToReleaseVersion(m_GUI->m_AboutLabel->text()));
 
   auto* btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
-  m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
+  m_GUI->m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
 
   connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
-  connect(m_GUI.m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(m_GUI->m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 QmitkAboutDialog::~QmitkAboutDialog()
@@ -78,30 +80,30 @@ void QmitkAboutDialog::ShowModules()
 
 QString QmitkAboutDialog::GetAboutText() const
 {
-  return m_GUI.m_AboutLabel->text();
+  return m_GUI->m_AboutLabel->text();
 }
 
 QString QmitkAboutDialog::GetCaptionText() const
 {
-  return m_GUI.m_CaptionLabel->text();
+  return m_GUI->m_CaptionLabel->text();
 }
 
 QString QmitkAboutDialog::GetRevisionText() const
 {
-  return m_GUI.m_RevisionLabel->text();
+  return m_GUI->m_RevisionLabel->text();
 }
 
 void QmitkAboutDialog::SetAboutText(const QString &text)
 {
-  m_GUI.m_AboutLabel->setText(text);
+  m_GUI->m_AboutLabel->setText(text);
 }
 
 void QmitkAboutDialog::SetCaptionText(const QString &text)
 {
-  m_GUI.m_CaptionLabel->setText(text);
+  m_GUI->m_CaptionLabel->setText(text);
 }
 
 void QmitkAboutDialog::SetRevisionText(const QString &text)
 {
-  m_GUI.m_RevisionLabel->setText(text);
+  m_GUI->m_RevisionLabel->setText(text);
 }

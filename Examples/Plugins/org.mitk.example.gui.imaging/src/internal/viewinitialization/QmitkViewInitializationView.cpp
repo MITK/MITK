@@ -26,7 +26,7 @@ found in the LICENSE file.
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
-QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(nullptr)
+QmitkViewInitializationView::QmitkViewInitializationView()
 {
   m_CommandTag = 0;
 }
@@ -40,7 +40,7 @@ void QmitkViewInitializationView::CreateQtPartControl(QWidget *parent)
   if (!m_Controls)
   {
     // create GUI widgets
-    m_Controls = new Ui::QmitkViewInitializationViewControls;
+    m_Controls = std::make_unique<Ui::QmitkViewInitializationViewControls>();
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }

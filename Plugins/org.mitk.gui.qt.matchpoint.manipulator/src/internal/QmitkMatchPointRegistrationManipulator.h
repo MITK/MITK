@@ -19,8 +19,13 @@ found in the LICENSE file.
 #include <QmitkSliceNavigationListener.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include <itkEuler3DTransform.h>
-#include "ui_QmitkMatchPointRegistrationManipulator.h"
 
+#include <memory>
+
+namespace Ui
+{
+  class MatchPointRegistrationManipulatorControls;
+}
 
 class QmitkMappingJob;
 
@@ -82,7 +87,7 @@ protected:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  Ui::MatchPointRegistrationManipulatorControls m_Controls;
+  std::unique_ptr<Ui::MatchPointRegistrationManipulatorControls> m_Controls;
 
 private:
   QWidget *m_Parent;

@@ -19,9 +19,13 @@ found in the LICENSE file.
 
 #include "MitkModelFitUIExports.h"
 
-#include "ui_QmitkFitParameterWidget.h"
 #include <QWidget>
+#include <memory>
 
+namespace Ui
+{
+  class QmitkFitParameterWidget;
+}
 
 class QmitkFitParameterModel;
 
@@ -66,7 +70,7 @@ protected:
 
   QmitkFitParameterModel * m_InternalModel;
 
-  Ui::QmitkFitParameterWidget m_Controls;
+  std::unique_ptr<Ui::QmitkFitParameterWidget> m_Controls;
 
 };
 

@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent, Qt::WindowFlags flags)
   : QDialog(parent, flags),
-    m_Ui(new Ui::QmitkNodeDetailsDialog)
+    m_Ui(std::make_unique<Ui::QmitkNodeDetailsDialog>())
 {
   QList<mitk::DataNode::ConstPointer> constNodes;
 
@@ -32,7 +32,7 @@ QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Point
 
 QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::ConstPointer>& nodes, QWidget* parent, Qt::WindowFlags flags)
   : QDialog(parent, flags),
-    m_Ui(new Ui::QmitkNodeDetailsDialog)
+    m_Ui(std::make_unique<Ui::QmitkNodeDetailsDialog>())
 {
   this->InitWidgets(nodes);
 }
@@ -40,7 +40,6 @@ QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Const
 QmitkNodeDetailsDialog::~QmitkNodeDetailsDialog()
 {
   disconnect(m_Ui->dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
-  delete m_Ui;
 }
 
 void QmitkNodeDetailsDialog::InitWidgets(const QList<mitk::DataNode::ConstPointer>& nodes)

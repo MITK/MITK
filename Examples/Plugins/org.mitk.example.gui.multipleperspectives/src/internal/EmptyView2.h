@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 // berry includes
 #include <berryQtViewPart.h>
+#include <memory>
 
 namespace Ui
 {
@@ -38,7 +39,7 @@ protected:
   void SetFocus() override;
 
 private:
-  Ui::EmptyView2Controls *m_Controls;
+  std::unique_ptr<Ui::EmptyView2Controls> m_Controls;
 
   QWidget *m_Parent;
 };

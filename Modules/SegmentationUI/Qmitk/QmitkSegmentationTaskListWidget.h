@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <QWidget>
 
 #include <optional>
+#include <memory>
 
 class QFileSystemWatcher;
 
@@ -89,7 +90,7 @@ private:
   void OnStoreButtonClicked();
   void OnAcceptButtonClicked();
 
-  Ui::QmitkSegmentationTaskListWidget* m_Ui;
+  std::unique_ptr<Ui::QmitkSegmentationTaskListWidget> m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;
   mitk::DataStorage* m_DataStorage;
   mitk::SegmentationTaskList::Pointer m_TaskList;

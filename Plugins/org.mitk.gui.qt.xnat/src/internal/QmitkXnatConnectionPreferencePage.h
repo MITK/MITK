@@ -15,11 +15,15 @@ found in the LICENSE file.
 #define QmitkXnatConnectionPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
-
-#include "ui_QmitkXnatConnectionPreferencePageControls.h"
+#include <memory>
 
 class QWidget;
 class QLineEdit;
+
+namespace Ui
+{
+  class QmitkXnatConnectionPreferencePageControls;
+}
 
 struct QmitkXnatConnectionPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -28,6 +32,7 @@ struct QmitkXnatConnectionPreferencePage : public QObject, public berry::IQtPref
 
 public:
   QmitkXnatConnectionPreferencePage();
+  ~QmitkXnatConnectionPreferencePage();
 
   void Init(berry::IWorkbench::Pointer workbench) override;
 
@@ -50,21 +55,21 @@ public:
   ///
   void Update() override;
 
-  protected slots:
-    virtual void UrlChanged();
-    virtual void DownloadPathChanged();
+protected slots:
+  virtual void UrlChanged();
+  virtual void DownloadPathChanged();
   void OnDownloadPathButtonClicked();
 
-    ///
-    /// Toggles the Connection in the Service Registry from opened to closed or the other way around.
-    ///
-    virtual void TestConnection();
+  ///
+  /// Toggles the Connection in the Service Registry from opened to closed or the other way around.
+  ///
+  virtual void TestConnection();
 
   virtual void onUseNetworkProxy(bool);
 
 protected:
 
-  Ui::QmitkXnatConnectionPreferencePageControls m_Controls;
+  std::unique_ptr<Ui::QmitkXnatConnectionPreferencePageControls> m_Controls;
 
   QWidget* m_Control;
 

@@ -27,14 +27,13 @@ namespace
 }
 
 QmitkStartupPreferencePage::QmitkStartupPreferencePage()
-  : m_Ui(new Ui::QmitkStartupPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkStartupPreferencePage>()),
     m_Control(nullptr)
 {
 }
 
 QmitkStartupPreferencePage::~QmitkStartupPreferencePage()
 {
-  delete m_Ui;
 }
 
 void QmitkStartupPreferencePage::CreateQtControl(QWidget* parent)

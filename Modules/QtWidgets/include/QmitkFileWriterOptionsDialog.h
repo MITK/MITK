@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui
 {
@@ -37,7 +38,7 @@ public:
   void accept() override;
 
 private:
-  Ui::QmitkFileWriterOptionsDialog *ui;
+  std::unique_ptr<Ui::QmitkFileWriterOptionsDialog> ui;
   mitk::IOUtil::SaveInfo &m_SaveInfo;
   std::vector<mitk::FileWriterSelector::Item> m_WriterItems;
 };

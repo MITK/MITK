@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -35,14 +36,15 @@ private Q_SLOTS:
 Q_SIGNALS:
   void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
-
 public:
   explicit QmitkAutomatedLayoutWidget(QWidget* parent = nullptr);
+  ~QmitkAutomatedLayoutWidget() override;
+
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 private:
 
-  Ui::QmitkAutomatedLayoutWidget* m_Controls;
+  std::unique_ptr<Ui::QmitkAutomatedLayoutWidget> m_Controls;
   mitk::DataStorage::Pointer m_DataStorage;
 };
 

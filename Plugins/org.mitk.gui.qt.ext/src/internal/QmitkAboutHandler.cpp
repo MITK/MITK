@@ -14,9 +14,11 @@ found in the LICENSE file.
 
 #include <QmitkAboutDialog.h>
 
+#include <QApplication>
+
 berry::Object::Pointer QmitkAboutHandler::Execute(const berry::SmartPointer<const berry::ExecutionEvent>& /*event*/)
 {
-  auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), {});
+  auto aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), {});
   aboutDialog->open();
   return berry::Object::Pointer();
 }

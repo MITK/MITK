@@ -14,8 +14,14 @@ found in the LICENSE file.
 #define QmitkChartExampleView_h
 
 #include <QmitkAbstractView.h>
+#include <QmitkChartWidget.h>
 
-#include "ui_QmitkChartExampleViewControls.h"
+#include <memory>
+
+namespace Ui
+{
+  class QmitkChartExampleViewControls;
+}
 
 /**
   \brief Basic example for use of module mitkChart
@@ -31,6 +37,9 @@ class QmitkChartExampleView : public QmitkAbstractView
 
 public:
   static const std::string VIEW_ID;
+
+  QmitkChartExampleView();
+  ~QmitkChartExampleView() override;
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
@@ -78,7 +87,7 @@ private:
   std::vector<std::string> ConvertToStringVector(const QString& data, QChar delimiter = ';') const;
 
   unsigned int countForUID = 0;
-  Ui::QmitkChartExampleViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkChartExampleViewControls> m_Controls;
 };
 
 #endif

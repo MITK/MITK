@@ -17,7 +17,10 @@ found in the LICENSE file.
 
 #include <QWidget>
 
-#include "ui_QmitkSurfaceStampWidgetGUIControls.h"
+namespace Ui
+{
+  class QmitkSurfaceStampWidgetGUIControls;
+}
 
 namespace mitk
 {
@@ -52,7 +55,7 @@ private:
 
   mitk::DataStorage *m_DataStorage;
 
-  Ui::QmitkSurfaceStampWidgetGUIControls m_Controls;
+  Ui::QmitkSurfaceStampWidgetGUIControls* m_Controls;
 };
 
 #endif

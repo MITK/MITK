@@ -27,7 +27,7 @@ found in the LICENSE file.
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_Ui(new Ui::QmitkImageNavigatorView),
+  : m_Ui(std::make_unique<Ui::QmitkImageNavigatorView>()),
     m_TimeStepperAdapter(nullptr),
     m_RenderWindowPart(nullptr),
     m_Parent(nullptr)

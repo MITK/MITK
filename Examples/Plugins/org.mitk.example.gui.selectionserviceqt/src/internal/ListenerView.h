@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 #include <berryQtViewPart.h>
+#include <memory>
 
 namespace Ui
 {
@@ -75,7 +76,7 @@ private:
 
   friend struct berry::SelectionChangedAdapter<ListenerView>;
 
-  Ui::ListenerViewControls *m_Controls;
+  std::unique_ptr<Ui::ListenerViewControls> m_Controls;
 
   QWidget *m_Parent;
 };

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui
 {
@@ -40,7 +41,7 @@ private:
   bool eventFilter(QObject* obj, QEvent* event) override;
   void InitWidgets(const QList<mitk::DataNode::ConstPointer>& nodes);
 
-  Ui::QmitkNodeDetailsDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkNodeDetailsDialog> m_Ui;
 };
 
 #endif

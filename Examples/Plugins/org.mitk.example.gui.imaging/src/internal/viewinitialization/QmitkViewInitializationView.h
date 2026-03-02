@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #include "vtkRenderWindow.h"
 #include <string>
+#include <memory>
 
 namespace Ui
 {
@@ -61,7 +62,7 @@ private slots:
   virtual void OnResetAll();
 
 private:
-  Ui::QmitkViewInitializationViewControls *m_Controls;
+  std::unique_ptr<Ui::QmitkViewInitializationViewControls> m_Controls;
 
   unsigned long m_CommandTag;
 };

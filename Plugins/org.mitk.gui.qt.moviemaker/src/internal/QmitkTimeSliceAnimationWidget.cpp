@@ -32,7 +32,7 @@ namespace
 
 QmitkTimeSliceAnimationWidget::QmitkTimeSliceAnimationWidget(QWidget* parent)
   : QmitkAnimationWidget(parent),
-    m_Ui(new Ui::QmitkTimeSliceAnimationWidget)
+    m_Ui(std::make_unique<Ui::QmitkTimeSliceAnimationWidget>())
 {
   m_Ui->setupUi(this);
 

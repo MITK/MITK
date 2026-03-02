@@ -14,13 +14,15 @@ found in the LICENSE file.
 #define QmitkXnatSubjectWidget_h
 
 #include <MitkXNATExports.h>
-#include <ui_QmitkXnatSubjectWidgetControls.h>
 
 // Qt
 #include <QWidget>
+#include <memory>
 
 // CTK XNAT Core
 class ctkXnatSubject;
+
+namespace Ui { class QmitkXnatSubjectWidgetControls; }
 
 class MITKXNAT_EXPORT QmitkXnatSubjectWidget : public QWidget
 {
@@ -41,7 +43,7 @@ public:
   ctkXnatSubject *GetSubject() const;
 
 protected:
-  Ui::QmitkXnatSubjectWidgetControls m_Controls;
+  std::unique_ptr<Ui::QmitkXnatSubjectWidgetControls> m_Controls;
 
 private:
   void Init();

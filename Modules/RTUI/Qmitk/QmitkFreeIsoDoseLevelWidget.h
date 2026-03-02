@@ -16,21 +16,27 @@ found in the LICENSE file.
 
 #include "MitkRTUIExports.h"
 
-#include "ui_QmitkFreeIsoDoseLevelWidget.h"
 #include <QWidget>
 
 #include "mitkIsoDoseLevel.h"
+#include <memory>
+
+namespace Ui
+{
+  class QmitkFreeIsoDoseLevelWidget;
+}
 
 /**
 * \class QmitkFreeIsoDoseLevelWidget
 * \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
 */
-class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::QmitkFreeIsoDoseLevelWidget
+class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   explicit QmitkFreeIsoDoseLevelWidget(QWidget* parent=nullptr);
+  ~QmitkFreeIsoDoseLevelWidget() override;
 
   mitk::DoseValueAbs getReferenceDose() const;
   mitk::IsoDoseLevel* getIsoDoseLevel() const;
@@ -65,6 +71,7 @@ protected:
   void update();
   void updateValue(mitk::DoseValueRel newDose);
 
+  std::unique_ptr<Ui::QmitkFreeIsoDoseLevelWidget> m_Controls;
   mitk::DoseValueAbs m_ReferenceDose;
   mitk::IsoDoseLevel::Pointer m_IsoDoseLevel;
   bool m_InternalUpdate;

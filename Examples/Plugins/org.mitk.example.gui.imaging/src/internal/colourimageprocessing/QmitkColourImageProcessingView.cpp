@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkColourImageProcessingView.h"
 
-#include "ui_QmitkColourImageProcessingViewControls.h"
+#include <ui_QmitkColourImageProcessingViewControls.h>
 
 #include "mitkColourImageProcessor.h"
 #include "mitkDataNodeObject.h"
@@ -33,11 +33,15 @@ found in the LICENSE file.
 
 const std::string QmitkColourImageProcessingView::VIEW_ID = "org.mitk.views.colourimageprocessing";
 
-QmitkColourImageProcessingView::QmitkColourImageProcessingView() : m_Controls(nullptr)
+QmitkColourImageProcessingView::QmitkColourImageProcessingView()
 {
   m_Color[0] = 255;
   m_Color[1] = 0;
   m_Color[2] = 0;
+}
+
+QmitkColourImageProcessingView::~QmitkColourImageProcessingView()
+{
 }
 
 void QmitkColourImageProcessingView::SetFocus()
@@ -49,7 +53,7 @@ void QmitkColourImageProcessingView::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
   {
-    m_Controls = new Ui::QmitkColourImageProcessingViewControls;
+    m_Controls = std::make_unique<Ui::QmitkColourImageProcessingViewControls>();
     m_Controls->setupUi(parent);
 
     connect(m_Controls->m_ConvertImageToRGBA, SIGNAL(clicked(bool)), this, SLOT(OnConvertToRGBAImage()));

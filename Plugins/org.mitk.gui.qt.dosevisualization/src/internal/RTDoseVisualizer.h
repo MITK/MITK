@@ -18,8 +18,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_RTDoseVisualizerControls.h"
-
 #include <mitkIsoDoseLevelCollections.h>
 
 #include <mitkImage.h>
@@ -37,6 +35,7 @@ found in the LICENSE file.
 #include <vtkContourFilter.h>
 
 #include <mitkIRenderWindowPart.h>
+#include <memory>
 
 /*forward declarations*/
 class QmitkIsoDoseLevelSetModel;
@@ -44,6 +43,11 @@ class QmitkDoseColorDelegate;
 class QmitkDoseValueDelegate;
 class QmitkDoseVisualStyleDelegate;
 class ctkEvent;
+
+namespace Ui
+{
+  class RTDoseVisualizerControls;
+}
 
 /**
 \brief RTDoseVisualizer
@@ -138,7 +142,7 @@ protected:
 
   void NodeChanged(const mitk::DataNode *node) override;
 
-  Ui::RTDoseVisualizerControls m_Controls;
+  std::unique_ptr<Ui::RTDoseVisualizerControls> m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
   unsigned int m_freeIsoValuesCount;
 

@@ -18,7 +18,7 @@ found in the LICENSE file.
 const std::string QmitkSegmentationTaskListView::VIEW_ID = "org.mitk.views.segmentationtasklist";
 
 QmitkSegmentationTaskListView::QmitkSegmentationTaskListView()
-  : m_Ui(new Ui::QmitkSegmentationTaskListView)
+  : m_Ui(std::make_unique<Ui::QmitkSegmentationTaskListView>())
 {
   berry::PlatformUI::GetWorkbench()->AddWorkbenchListener(this);
 }

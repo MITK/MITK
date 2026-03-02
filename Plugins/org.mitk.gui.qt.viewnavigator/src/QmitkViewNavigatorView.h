@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <berryIPartListener.h>
 #include <QmitkAbstractView.h>
+#include <memory>
 
 class QmitkViewModel;
 class QmitkViewProxyModel;
@@ -54,7 +55,7 @@ private:
   void OnFilterTextChanged(const QString& filter);
   void OnItemDoubleClicked(const QModelIndex& index);
 
-  Ui::QmitkViewNavigatorView* m_Ui;
+  std::unique_ptr<Ui::QmitkViewNavigatorView> m_Ui;
   QmitkViewModel* m_Model;
   QmitkViewProxyModel* m_ProxyModel;
 };

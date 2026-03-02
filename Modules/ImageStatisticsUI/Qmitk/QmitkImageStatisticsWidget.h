@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 
 #include <QWidget>
+#include <memory>
 
 class QSortFilterProxyModel;
 class QmitkImageStatisticsTreeModel;
@@ -33,6 +34,7 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 
 public:
   QmitkImageStatisticsWidget(QWidget *parent = nullptr);
+  ~QmitkImageStatisticsWidget() override;
 
   /**Documentation
   Set the data storage the model should fetch its statistic objects from.
@@ -64,7 +66,7 @@ private:
   /** \brief  Saves the image statistics to the clipboard */
   void OnClipboardButtonClicked();
 
-  Ui::QmitkImageStatisticsControls *m_Controls;
+  std::unique_ptr<Ui::QmitkImageStatisticsControls> m_Controls;
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
 };

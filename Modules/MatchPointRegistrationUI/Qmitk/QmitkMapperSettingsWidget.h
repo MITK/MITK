@@ -15,22 +15,27 @@ found in the LICENSE file.
 
 #include <MitkMatchPointRegistrationUIExports.h>
 
-#include "ui_QmitkMapperSettingsWidget.h"
 #include <QWidget>
+#include <memory>
 
 struct QmitkMappingJobSettings;
+
+namespace Ui
+{
+  class QmitkMapperSettingsWidget;
+}
 
 /**
  * \class QmitkMapperSettingsWidget
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapperSettingsWidget : public QWidget,
-                                                                      private Ui::QmitkMapperSettingsWidget
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapperSettingsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkMapperSettingsWidget(QWidget *parent = nullptr);
+  ~QmitkMapperSettingsWidget() override;
 
   /**
    * Configures the passed settings according to the current state of the
@@ -58,6 +63,7 @@ protected Q_SLOTS:
   void OnXFactorChanged(double d);
 
 protected:
+  std::unique_ptr<Ui::QmitkMapperSettingsWidget> m_Controls;
   bool m_MaskMode;
   bool m_allowSampling;
 };

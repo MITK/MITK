@@ -23,7 +23,7 @@ found in the LICENSE file.
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLabelSelectionToolGUI, "")
 
 QmitkLabelSelectionToolGUI::QmitkLabelSelectionToolGUI() : QmitkToolGUI(),
-  m_Controls(new Ui::QmitkLabelSelectionToolGUIControls),
+  m_Controls(std::make_unique<Ui::QmitkLabelSelectionToolGUIControls>()),
   m_FloatingPopup(std::make_unique<QmitkFloatingTextPopup>())
 {
   m_Controls->setupUi(this);
@@ -65,6 +65,7 @@ QmitkLabelSelectionToolGUI::~QmitkLabelSelectionToolGUI()
     m_LabelSelectionTool->IndicatedLabelsChanged -=
       mitk::MessageDelegate<QmitkLabelSelectionToolGUI>(this, &QmitkLabelSelectionToolGUI::OnIndicatedLabelsChanged);
   }
+
 }
 
 void QmitkLabelSelectionToolGUI::OnNewToolAssociated(mitk::Tool *tool)

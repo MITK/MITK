@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // itk
 #include "itksys/SystemTools.hxx"
+#include <ui_QmitkCESTStatisticsViewControls.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
 
@@ -106,6 +107,7 @@ namespace
 const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.cest.statistics";
 
 QmitkCESTStatisticsView::QmitkCESTStatisticsView(QObject * /*parent*/, const char * /*name*/)
+  : m_Controls(std::make_unique<Ui::QmitkCESTStatisticsViewControls>())
 {
   this->m_CalculatorJob = new QmitkImageStatisticsCalculationRunnable();
 
@@ -125,36 +127,36 @@ QmitkCESTStatisticsView::~QmitkCESTStatisticsView()
 
 void QmitkCESTStatisticsView::SetFocus()
 {
-  m_Controls.threeDimToFourDimPushButton->setFocus();
+  m_Controls->threeDimToFourDimPushButton->setFocus();
 }
 
 void QmitkCESTStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
   connect(
-    m_Controls.threeDimToFourDimPushButton, SIGNAL(clicked()), this, SLOT(OnThreeDimToFourDimPushButtonClicked()));
+    m_Controls->threeDimToFourDimPushButton, SIGNAL(clicked()), this, SLOT(OnThreeDimToFourDimPushButtonClicked()));
   connect((QObject *)this->m_CalculatorJob,
           SIGNAL(ResultsAvailable()),
           this,
           SLOT(OnThreadedStatisticsCalculationEnds()),
           Qt::QueuedConnection);
-  connect((QObject *)(this->m_Controls.fixedRangeCheckBox),
+  connect((QObject *)(this->m_Controls->fixedRangeCheckBox),
           SIGNAL(toggled(bool)),
           (QObject *)this,
           SLOT(OnFixedRangeCheckBoxToggled(bool)));
-  connect((QObject *)(this->m_Controls.fixedRangeLowerDoubleSpinBox),
+  connect((QObject *)(this->m_Controls->fixedRangeLowerDoubleSpinBox),
           SIGNAL(editingFinished()),
           (QObject *)this,
           SLOT(OnFixedRangeDoubleSpinBoxChanged()));
-  connect((QObject *)(this->m_Controls.fixedRangeUpperDoubleSpinBox),
+  connect((QObject *)(this->m_Controls->fixedRangeUpperDoubleSpinBox),
           SIGNAL(editingFinished()),
           (QObject *)this,
           SLOT(OnFixedRangeDoubleSpinBoxChanged()));
 
-  m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+  m_Controls->threeDimToFourDimPushButton->setEnabled(false);
 
-  m_Controls.widget_statistics->SetDataStorage(this->GetDataStorage());
+  m_Controls->widget_statistics->SetDataStorage(this->GetDataStorage());
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
@@ -177,8 +179,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
   {
     std::stringstream message;
     message << "<font color='red'>Please select an image.</font>";
-    m_Controls.labelWarning->setText(message.str().c_str());
-    m_Controls.labelWarning->show();
+    m_Controls->labelWarning->setText(message.str().c_str());
+    m_Controls->labelWarning->show();
 
     this->Clear();
     return;
@@ -195,7 +197,7 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
 
     if (dynamic_cast<mitk::Image *>(node->GetData()) != nullptr)
     {
-      m_Controls.labelWarning->setVisible(false);
+      m_Controls->labelWarning->setVisible(false);
 
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
         node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
@@ -205,19 +207,19 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
       if (zSpectrumSet)
       {
         m_ZImage = dynamic_cast<mitk::Image *>(node->GetData());
-        m_Controls.widget_statistics->SetImageNodes({node.GetPointer()});
+        m_Controls->widget_statistics->SetImageNodes({node.GetPointer()});
       }
       else
       {
         m_MaskImage = dynamic_cast<mitk::Image *>(node->GetData());
-        m_Controls.widget_statistics->SetMaskNodes({node.GetPointer()});
+        m_Controls->widget_statistics->SetMaskNodes({node.GetPointer()});
       }
     }
 
     if (dynamic_cast<mitk::PlanarFigure *>(node->GetData()) != nullptr)
     {
       m_MaskPlanarFigure = dynamic_cast<mitk::PlanarFigure *>(node->GetData());
-      m_Controls.widget_statistics->SetMaskNodes({node.GetPointer()});
+      m_Controls->widget_statistics->SetMaskNodes({node.GetPointer()});
     }
 
     if (dynamic_cast<mitk::PointSet *>(node->GetData()) != nullptr)
@@ -231,16 +233,16 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
   {
     if (dynamic_cast<mitk::Image *>(nodes.front()->GetData()))
     {
-      m_Controls.threeDimToFourDimPushButton->setDisabled(atLeastOneWasCESTImage);
+      m_Controls->threeDimToFourDimPushButton->setDisabled(atLeastOneWasCESTImage);
     }
     else
     {
-      m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+      m_Controls->threeDimToFourDimPushButton->setEnabled(false);
 
       std::stringstream message;
       message << "<font color='red'>The selected node is not an image.</font>";
-      m_Controls.labelWarning->setText(message.str().c_str());
-      m_Controls.labelWarning->show();
+      m_Controls->labelWarning->setText(message.str().c_str());
+      m_Controls->labelWarning->show();
     }
     this->Clear();
     return;
@@ -253,14 +255,14 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
     return;
   }
 
-  m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+  m_Controls->threeDimToFourDimPushButton->setEnabled(false);
 
   if (!atLeastOneWasCESTImage)
   {
     std::stringstream message;
     message << "<font color='red'>None of the selected data nodes contains required CEST meta information</font>";
-    m_Controls.labelWarning->setText(message.str().c_str());
-    m_Controls.labelWarning->show();
+    m_Controls->labelWarning->setText(message.str().c_str());
+    m_Controls->labelWarning->show();
     this->Clear();
     return;
   }
@@ -276,8 +278,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
     {
       std::stringstream message;
       message << "<font color='red'>The selected images have different geometries.</font>";
-      m_Controls.labelWarning->setText(message.str().c_str());
-      m_Controls.labelWarning->show();
+      m_Controls->labelWarning->setText(message.str().c_str());
+      m_Controls->labelWarning->show();
       this->Clear();
       return;
     }
@@ -298,8 +300,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
     this->m_CalculatorJob->Initialize(m_ZImage.GetPointer(), maskData);
     std::stringstream message;
     message << "<font color='red'>Calculating statistics...</font>";
-    m_Controls.labelWarning->setText(message.str().c_str());
-    m_Controls.labelWarning->show();
+    m_Controls->labelWarning->setText(message.str().c_str());
+    m_Controls->labelWarning->show();
 
     try
     {
@@ -310,16 +312,16 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
     {
       std::stringstream message;
       message << "<font color='red'>" << e.GetDescription() << "</font>";
-      m_Controls.labelWarning->setText(message.str().c_str());
-      m_Controls.labelWarning->show();
+      m_Controls->labelWarning->setText(message.str().c_str());
+      m_Controls->labelWarning->show();
     }
     catch (const std::runtime_error &e)
     {
       // In case of exception, print error message on GUI
       std::stringstream message;
       message << "<font color='red'>" << e.what() << "</font>";
-      m_Controls.labelWarning->setText(message.str().c_str());
-      m_Controls.labelWarning->show();
+      m_Controls->labelWarning->setText(message.str().c_str());
+      m_Controls->labelWarning->show();
     }
     catch (const std::exception &e)
     {
@@ -327,8 +329,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
       // In case of exception, print error message on GUI
       std::stringstream message;
       message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
-      m_Controls.labelWarning->setText(message.str().c_str());
-      m_Controls.labelWarning->show();
+      m_Controls->labelWarning->setText(message.str().c_str());
+      m_Controls->labelWarning->show();
     }
 
     while (this->m_CalculatorJob->IsRunning()) // wait until thread has finished
@@ -352,8 +354,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer 
 
 void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
 {
-  this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
-  this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
+  this->m_Controls->m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
+  this->m_Controls->m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
 
   if (this->m_CalculatorJob->GetComputationSuccessFlag())
   {
@@ -392,68 +394,68 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
     RemoveMZeros(xValues, means, stdevs);
     ::SortVectors(xValues, std::less<qreal>(), xValues, means, stdevs);
 
-    unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve("Spectrum");
-    this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, means, stdevs, stdevs);
-    this->m_Controls.m_DataViewWidget->SetErrorPen(curveId, QPen(Qt::blue));
+    unsigned int curveId = this->m_Controls->m_DataViewWidget->InsertCurve("Spectrum");
+    this->m_Controls->m_DataViewWidget->SetCurveData(curveId, xValues, means, stdevs, stdevs);
+    this->m_Controls->m_DataViewWidget->SetErrorPen(curveId, QPen(Qt::blue));
     QwtSymbol *blueSymbol = new QwtSymbol(QwtSymbol::Rect, QColor(Qt::blue), QColor(Qt::blue), QSize(8, 8));
-    this->m_Controls.m_DataViewWidget->SetCurveSymbol(curveId, blueSymbol);
-    this->m_Controls.m_DataViewWidget->SetLegendAttribute(curveId, QwtPlotCurve::LegendShowSymbol);
+    this->m_Controls->m_DataViewWidget->SetCurveSymbol(curveId, blueSymbol);
+    this->m_Controls->m_DataViewWidget->SetLegendAttribute(curveId, QwtPlotCurve::LegendShowSymbol);
 
     QwtLegend *legend = new QwtLegend();
     legend->setFrameShape(QFrame::Box);
     legend->setFrameShadow(QFrame::Sunken);
     legend->setLineWidth(1);
-    this->m_Controls.m_DataViewWidget->SetLegend(legend, QwtPlot::BottomLegend);
+    this->m_Controls->m_DataViewWidget->SetLegend(legend, QwtPlot::BottomLegend);
 
-    m_Controls.m_DataViewWidget->GetPlot()
+    m_Controls->m_DataViewWidget->GetPlot()
       ->axisScaleEngine(QwtPlot::Axis::xBottom)
       ->setAttributes(QwtScaleEngine::Inverted);
 
-    this->m_Controls.m_DataViewWidget->Replot();
-    m_Controls.labelWarning->setVisible(false);
+    this->m_Controls->m_DataViewWidget->Replot();
+    m_Controls->labelWarning->setVisible(false);
 
-    m_Controls.m_StatisticsGroupBox->setEnabled(true);
-    m_Controls.m_StatisticsGroupBox->setEnabled(true);
+    m_Controls->m_StatisticsGroupBox->setEnabled(true);
+    m_Controls->m_StatisticsGroupBox->setEnabled(true);
 
-    if (this->m_Controls.fixedRangeCheckBox->isChecked())
+    if (this->m_Controls->fixedRangeCheckBox->isChecked())
     {
-      this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
-      this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(
+      this->m_Controls->m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+      this->m_Controls->m_DataViewWidget->GetPlot()->setAxisScale(
         2,
-        this->m_Controls.fixedRangeLowerDoubleSpinBox->value(),
-        this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+        this->m_Controls->fixedRangeLowerDoubleSpinBox->value(),
+        this->m_Controls->fixedRangeUpperDoubleSpinBox->value());
     }
     else
     {
-      this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
+      this->m_Controls->m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
     }
   }
   else
   {
-    m_Controls.labelWarning->setText(m_CalculatorJob->GetLastErrorMessage().c_str());
-    m_Controls.labelWarning->setVisible(true);
+    m_Controls->labelWarning->setText(m_CalculatorJob->GetLastErrorMessage().c_str());
+    m_Controls->labelWarning->setVisible(true);
     this->Clear();
   }
 }
 
 void QmitkCESTStatisticsView::OnFixedRangeDoubleSpinBoxChanged()
 {
-  if (this->m_Controls.fixedRangeCheckBox->isChecked())
+  if (this->m_Controls->fixedRangeCheckBox->isChecked())
   {
-    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
-    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(2,
-                                                               this->m_Controls.fixedRangeLowerDoubleSpinBox->value(),
-                                                               this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+    this->m_Controls->m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+    this->m_Controls->m_DataViewWidget->GetPlot()->setAxisScale(2,
+                                                               this->m_Controls->fixedRangeLowerDoubleSpinBox->value(),
+                                                               this->m_Controls->fixedRangeUpperDoubleSpinBox->value());
   }
 
-  this->m_Controls.m_DataViewWidget->Replot();
+  this->m_Controls->m_DataViewWidget->Replot();
 }
 
 template <typename TPixel, unsigned int VImageDimension>
 void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension> *image)
 {
-  this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
-  this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
+  this->m_Controls->m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
+  this->m_Controls->m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
 
   QmitkPlotWidget::DataVector::size_type numberOfSpectra = this->m_zSpectrum.size();
   mitk::PointSet::Pointer internalPointset;
@@ -474,8 +476,8 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension> *
 
   if (!this->DataSanityCheck())
   {
-    m_Controls.labelWarning->setText("Data can not be plotted, internally inconsistent.");
-    m_Controls.labelWarning->show();
+    m_Controls->labelWarning->setText("Data can not be plotted, internally inconsistent.");
+    m_Controls->labelWarning->show();
     return;
   }
 
@@ -527,44 +529,44 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension> *
     RemoveMZeros(xValues, values);
     ::SortVectors(xValues, std::less<qreal>(), xValues, values);
 
-    unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve(name.str().c_str());
-    this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, values);
-    this->m_Controls.m_DataViewWidget->SetCurvePen(curveId, QPen(color));
+    unsigned int curveId = this->m_Controls->m_DataViewWidget->InsertCurve(name.str().c_str());
+    this->m_Controls->m_DataViewWidget->SetCurveData(curveId, xValues, values);
+    this->m_Controls->m_DataViewWidget->SetCurvePen(curveId, QPen(color));
     QwtSymbol *symbol = new QwtSymbol(QwtSymbol::Rect, color, color, QSize(8, 8));
-    this->m_Controls.m_DataViewWidget->SetCurveSymbol(curveId, symbol);
-    this->m_Controls.m_DataViewWidget->SetLegendAttribute(curveId, QwtPlotCurve::LegendShowSymbol);
+    this->m_Controls->m_DataViewWidget->SetCurveSymbol(curveId, symbol);
+    this->m_Controls->m_DataViewWidget->SetLegendAttribute(curveId, QwtPlotCurve::LegendShowSymbol);
   }
 
-  if (this->m_Controls.fixedRangeCheckBox->isChecked())
+  if (this->m_Controls->fixedRangeCheckBox->isChecked())
   {
-    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
-    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(2,
-                                                               this->m_Controls.fixedRangeLowerDoubleSpinBox->value(),
-                                                               this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+    this->m_Controls->m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+    this->m_Controls->m_DataViewWidget->GetPlot()->setAxisScale(2,
+                                                               this->m_Controls->fixedRangeLowerDoubleSpinBox->value(),
+                                                               this->m_Controls->fixedRangeUpperDoubleSpinBox->value());
   }
   else
   {
-    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
+    this->m_Controls->m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
   }
 
   QwtLegend *legend = new QwtLegend();
   legend->setFrameShape(QFrame::Box);
   legend->setFrameShadow(QFrame::Sunken);
   legend->setLineWidth(1);
-  this->m_Controls.m_DataViewWidget->SetLegend(legend, QwtPlot::BottomLegend);
+  this->m_Controls->m_DataViewWidget->SetLegend(legend, QwtPlot::BottomLegend);
 
-  m_Controls.m_DataViewWidget->GetPlot()
+  m_Controls->m_DataViewWidget->GetPlot()
     ->axisScaleEngine(QwtPlot::Axis::xBottom)
     ->setAttributes(QwtScaleEngine::Inverted);
 
-  this->m_Controls.m_DataViewWidget->Replot();
-  m_Controls.labelWarning->setVisible(false);
+  this->m_Controls->m_DataViewWidget->Replot();
+  m_Controls->labelWarning->setVisible(false);
 }
 
 void QmitkCESTStatisticsView::OnFixedRangeCheckBoxToggled(bool state)
 {
-  this->m_Controls.fixedRangeLowerDoubleSpinBox->setEnabled(state);
-  this->m_Controls.fixedRangeUpperDoubleSpinBox->setEnabled(state);
+  this->m_Controls->fixedRangeLowerDoubleSpinBox->setEnabled(state);
+  this->m_Controls->fixedRangeUpperDoubleSpinBox->setEnabled(state);
 }
 
 void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector &xValues, QmitkPlotWidget::DataVector &yValues)
@@ -750,10 +752,10 @@ void QmitkCESTStatisticsView::Clear()
   this->m_MaskImage = nullptr;
   this->m_MaskPlanarFigure = nullptr;
   this->m_PointSet = nullptr;
-  this->m_Controls.m_DataViewWidget->Clear();
-  this->m_Controls.m_StatisticsGroupBox->setEnabled(false);
-  this->m_Controls.widget_statistics->SetImageNodes({});
-  this->m_Controls.widget_statistics->SetMaskNodes({});
+  this->m_Controls->m_DataViewWidget->Clear();
+  this->m_Controls->m_StatisticsGroupBox->setEnabled(false);
+  this->m_Controls->widget_statistics->SetImageNodes({});
+  this->m_Controls->widget_statistics->SetMaskNodes({});
 }
 
 void QmitkCESTStatisticsView::OnSliceChanged()
@@ -788,7 +790,7 @@ void QmitkCESTStatisticsView::OnSliceChanged()
 
     if (dynamic_cast<mitk::Image *>(node->GetData()) != nullptr)
     {
-      m_Controls.labelWarning->setVisible(false);
+      m_Controls->labelWarning->setVisible(false);
       bool zSpectrumSet = SetZSpectrum(dynamic_cast<mitk::StringProperty *>(
         node->GetData()->GetProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str()).GetPointer()));
 
@@ -806,7 +808,7 @@ void QmitkCESTStatisticsView::OnSliceChanged()
       return;
     }
 
-    this->m_Controls.m_DataViewWidget->Clear();
+    this->m_Controls->m_DataViewWidget->Clear();
 
     AccessFixedDimensionByItk(m_ZImage, PlotPointSet, 4);
   }

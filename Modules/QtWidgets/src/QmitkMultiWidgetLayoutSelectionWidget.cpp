@@ -22,9 +22,13 @@ found in the LICENSE file.
 
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
-  , ui(new Ui::QmitkMultiWidgetLayoutSelectionWidget)
+  , ui(std::make_unique<Ui::QmitkMultiWidgetLayoutSelectionWidget>())
 {
-  Init();
+  this->Init();
+}
+
+QmitkMultiWidgetLayoutSelectionWidget::~QmitkMultiWidgetLayoutSelectionWidget()
+{
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::Init()

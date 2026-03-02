@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QMessageBox>
+#include <ui_PerfusionCurveDescriptionParameterViewControls.h>
 #include <QThreadPool>
 
 #include "mitkWorkbenchUtil.h"
@@ -41,30 +42,30 @@ const std::string PerfusionCurveDescriptionParameterView::VIEW_ID =
 
 void PerfusionCurveDescriptionParameterView::SetFocus()
 {
-  m_Controls.btnCalculateParameters->setFocus();
+  m_Controls->btnCalculateParameters->setFocus();
 }
 
 void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
-  m_Controls.btnCalculateParameters->setEnabled(false);
+  m_Controls->setupUi(parent);
+  m_Controls->btnCalculateParameters->setEnabled(false);
 
 
-  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls->timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  connect(m_Controls.timeSeriesNodeSelector,
+  connect(m_Controls->timeSeriesNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this,
     &PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged);
 
-  connect(m_Controls.btnCalculateParameters, SIGNAL(clicked()), this,
+  connect(m_Controls->btnCalculateParameters, SIGNAL(clicked()), this,
           SLOT(OnCalculateParametersButtonClicked()));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
 
   InitParameterList();
 }
@@ -74,12 +75,12 @@ void PerfusionCurveDescriptionParameterView::CreateQtPartControl(QWidget* parent
 void PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged( const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
 
-  m_Controls.btnCalculateParameters->setEnabled(false);
+  m_Controls->btnCalculateParameters->setEnabled(false);
 
 
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    this->m_selectedNode = m_Controls->timeSeriesNodeSelector->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   }
   else
@@ -91,7 +92,7 @@ void PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged( const QList
 
   if (m_selectedImage.IsNotNull())
   {
-      m_Controls.btnCalculateParameters->setEnabled(true);
+      m_Controls->btnCalculateParameters->setEnabled(true);
   }
   else if (m_selectedNode.IsNotNull())
   {
@@ -104,6 +105,7 @@ void PerfusionCurveDescriptionParameterView::OnNodeSelectionChanged( const QList
 }
 
 PerfusionCurveDescriptionParameterView::PerfusionCurveDescriptionParameterView()
+  : m_Controls(std::make_unique<Ui::PerfusionCurveDescriptionParameterViewControls>())
 {
   m_selectedNode = nullptr;
   m_selectedImage = nullptr;
@@ -119,6 +121,10 @@ PerfusionCurveDescriptionParameterView::PerfusionCurveDescriptionParameterView()
 
 
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
+}
+
+PerfusionCurveDescriptionParameterView::~PerfusionCurveDescriptionParameterView()
+{
 }
 
 void PerfusionCurveDescriptionParameterView::InitParameterList()
@@ -141,7 +147,7 @@ void PerfusionCurveDescriptionParameterView::InitParameterList()
        ++pos)
   {
     QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(pos->first),
-        this->m_Controls.parameterlist);
+        this->m_Controls->parameterlist);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Unchecked);
   }
@@ -152,9 +158,9 @@ const
 {
   functor->SetGrid(mitk::ExtractTimeGrid(m_selectedImage));
 
-  for (int pos = 0; pos < this->m_Controls.parameterlist->count(); ++pos)
+  for (int pos = 0; pos < this->m_Controls->parameterlist->count(); ++pos)
   {
-    QListWidgetItem* item = this->m_Controls.parameterlist->item(pos);
+    QListWidgetItem* item = this->m_Controls->parameterlist->item(pos);
     mitk::CurveDescriptionParameterBase::Pointer parameterFunction = m_ParameterMap.at(
           item->text().toStdString());
 
@@ -202,13 +208,13 @@ void PerfusionCurveDescriptionParameterView::OnCalculateParametersButtonClicked(
 
 void PerfusionCurveDescriptionParameterView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("Fitting finished"));
+  this->m_Controls->infoBox->append(QString("Fitting finished"));
 };
 
 void PerfusionCurveDescriptionParameterView::OnJobError(QString err)
 {
   MITK_ERROR << err.toStdString().c_str();
-  m_Controls.infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
+  m_Controls->infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
 };
 
 void PerfusionCurveDescriptionParameterView::OnJobResultsAreAvailable(
@@ -222,14 +228,14 @@ void PerfusionCurveDescriptionParameterView::OnJobResultsAreAvailable(
 
 void PerfusionCurveDescriptionParameterView::OnJobProgress(double progress)
 {
-  this->m_Controls.progressBar->setValue(100 * progress);
+  this->m_Controls->progressBar->setValue(100 * progress);
   QString report = QString("Progress. ") + QString::number(progress);
-  this->m_Controls.infoBox->append(report);
+  this->m_Controls->infoBox->append(report);
 };
 
 void PerfusionCurveDescriptionParameterView::OnJobStatusChanged(QString info)
 {
-  this->m_Controls.infoBox->append(info);
+  this->m_Controls->infoBox->append(info);
   MITK_INFO << info.toStdString().c_str();
 }
 

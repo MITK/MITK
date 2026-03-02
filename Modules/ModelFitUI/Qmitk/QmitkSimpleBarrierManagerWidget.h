@@ -16,7 +16,6 @@ found in the LICENSE file.
 
 #include "MitkModelFitUIExports.h"
 
-#include "ui_QmitkSimpleBarrierManagerWidget.h"
 #include <QWidget>
 
 #include "mitkSimpleBarrierConstraintChecker.h"
@@ -25,6 +24,11 @@ found in the LICENSE file.
 class QmitkSimpleBarrierParametersDelegate;
 class QmitkSimpleBarrierTypeDelegate;
 class QmitkSimpleBarrierModel;
+
+namespace Ui
+{
+  class QmitkSimpleBarrierManagerWidget;
+}
 
 /**
 * \class QmitkSimpleBarrierManagerWidget
@@ -73,7 +77,7 @@ protected:
 
   bool m_InternalUpdate;
 
-  Ui::QmitkSimpleBarrierManagerWidget m_Controls;
+  Ui::QmitkSimpleBarrierManagerWidget* m_Controls;
 
 };
 

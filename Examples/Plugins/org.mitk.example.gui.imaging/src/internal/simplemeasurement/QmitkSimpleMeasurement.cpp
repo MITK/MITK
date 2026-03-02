@@ -45,6 +45,7 @@ QmitkSimpleMeasurement::~QmitkSimpleMeasurement()
   {
     m_SelectedPointSetNode->SetDataInteractor(nullptr);
   }
+
 }
 
 void QmitkSimpleMeasurement::Activated()
@@ -149,7 +150,7 @@ void QmitkSimpleMeasurement::CreateQtPartControl(QWidget *parent)
   m_CreatedAngles = std::vector<mitk::DataNode::Pointer>();
   m_CreatedPaths = std::vector<mitk::DataNode::Pointer>();
 
-  m_Controls = new Ui::QmitkSimpleMeasurementControls;
+  m_Controls = std::make_unique<Ui::QmitkSimpleMeasurementControls>();
   m_Controls->setupUi(parent);
 
   connect(

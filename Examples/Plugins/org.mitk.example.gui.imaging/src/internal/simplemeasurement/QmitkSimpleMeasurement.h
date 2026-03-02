@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #include "mitkDataNode.h"
 #include "mitkPointSetDataInteractor.h"
+#include <memory>
 
 namespace Ui
 {
@@ -67,7 +68,7 @@ private:
   /**
    * controls containing sliders for scrolling through the slices
    */
-  Ui::QmitkSimpleMeasurementControls *m_Controls;
+  std::unique_ptr<Ui::QmitkSimpleMeasurementControls> m_Controls;
 
   /*
    * Interactor for performing the simplemeasurements.

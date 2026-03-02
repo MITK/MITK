@@ -56,11 +56,18 @@ found in the LICENSE file.
 #include <mapConvert.h>
 #include <mapDeploymentDLLAccess.h>
 
+#include <ui_QmitkMatchPointFrameCorrectionControls.h>
+
 const std::string QmitkMatchPointFrameCorrection::VIEW_ID =
   "org.mitk.views.matchpoint.algorithm.framereg";
 
 QmitkMatchPointFrameCorrection::QmitkMatchPointFrameCorrection()
-  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr), m_CanLoadAlgorithm(false), m_Working(false)
+  : m_Controls(std::make_unique<Ui::MatchPointFrameCorrectionControls>()),
+    m_Parent(nullptr),
+    m_LoadedDLLHandle(nullptr),
+    m_LoadedAlgorithm(nullptr),
+    m_CanLoadAlgorithm(false),
+    m_Working(false)
 {
   m_spSelectedTargetData = nullptr;
 }
@@ -74,6 +81,7 @@ QmitkMatchPointFrameCorrection::~QmitkMatchPointFrameCorrection()
   {
     s->RemoveSelectionListener(m_AlgorithmSelectionListener.data());
   }
+
 }
 
 void QmitkMatchPointFrameCorrection::SetFocus()
@@ -82,27 +90,27 @@ void QmitkMatchPointFrameCorrection::SetFocus()
 
 void QmitkMatchPointFrameCorrection::CreateConnections()
 {
-  connect(m_Controls.imageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
+  connect(m_Controls->imageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
+  connect(m_Controls->maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
 
   // ------
   // Tab 1 - Shared library loading interface
   // ------
 
-  connect(m_Controls.m_pbLoadSelected, SIGNAL(clicked()), this, SLOT(OnLoadAlgorithmButtonPushed()));
+  connect(m_Controls->m_pbLoadSelected, SIGNAL(clicked()), this, SLOT(OnLoadAlgorithmButtonPushed()));
 
   // -----
   // Tab 2 - Execution
   // -----
-  connect(m_Controls.m_pbStartReg, SIGNAL(clicked()), this, SLOT(OnStartRegBtnPushed()));
-  connect(m_Controls.m_pbSaveLog, SIGNAL(clicked()), this, SLOT(OnSaveLogBtnPushed()));
+  connect(m_Controls->m_pbStartReg, SIGNAL(clicked()), this, SLOT(OnStartRegBtnPushed()));
+  connect(m_Controls->m_pbSaveLog, SIGNAL(clicked()), this, SLOT(OnSaveLogBtnPushed()));
 
   // -----
   // Tab 4 - Frames
   // -----
-  connect(m_Controls.m_btnFrameSelAll, SIGNAL(clicked()), this, SLOT(OnFramesSelectAllPushed()));
-  connect(m_Controls.m_btnFrameDeSelAll, SIGNAL(clicked()), this, SLOT(OnFramesDeSelectAllPushed()));
-  connect(m_Controls.m_btnFrameInvert, SIGNAL(clicked()), this, SLOT(OnFramesInvertPushed()));
+  connect(m_Controls->m_btnFrameSelAll, SIGNAL(clicked()), this, SLOT(OnFramesSelectAllPushed()));
+  connect(m_Controls->m_btnFrameDeSelAll, SIGNAL(clicked()), this, SLOT(OnFramesDeSelectAllPushed()));
+  connect(m_Controls->m_btnFrameInvert, SIGNAL(clicked()), this, SLOT(OnFramesInvertPushed()));
 
 }
 
@@ -122,9 +130,9 @@ void QmitkMatchPointFrameCorrection::OnSelectedAlgorithmChanged()
     return;
   }
 
-  m_Controls.m_teAlgorithmDetails->updateInfo(currentItemInfo);
+  m_Controls->m_teAlgorithmDetails->updateInfo(currentItemInfo);
 
-  m_Controls.m_lbSelectedAlgorithm->setText(QString::fromStdString(
+  m_Controls->m_lbSelectedAlgorithm->setText(QString::fromStdString(
         currentItemInfo->getAlgorithmUID().getName()));
 
   // enable loading
@@ -156,14 +164,14 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
   this->m_LoadedAlgorithm = tempAlgorithm;
   this->m_LoadedDLLHandle = tempDLLHandle;
 
-  this->m_Controls.m_AlgoConfigurator->setAlgorithm(m_LoadedAlgorithm);
+  this->m_Controls->m_AlgoConfigurator->setAlgorithm(m_LoadedAlgorithm);
 
   this->AdaptFolderGUIElements();
   this->ConfigureNodeSelectorPredicates();
   this->CheckInputs();
   this->ConfigureRegistrationControls();
   this->ConfigureProgressInfos();
-  this->m_Controls.m_tabs->setCurrentIndex(1);
+  this->m_Controls->m_tabs->setCurrentIndex(1);
 }
 
 void QmitkMatchPointFrameCorrection::Error(QString msg)
@@ -171,38 +179,38 @@ void QmitkMatchPointFrameCorrection::Error(QString msg)
   mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
   MITK_ERROR << msg.toStdString().c_str();
 
-  m_Controls.m_teLog->append(QString("<font color='red'><b>") + msg + QString("</b></font>"));
+  m_Controls->m_teLog->append(QString("<font color='red'><b>") + msg + QString("</b></font>"));
 }
 
 void QmitkMatchPointFrameCorrection::AdaptFolderGUIElements()
 {
-  m_Controls.m_pbLoadSelected->setEnabled(m_CanLoadAlgorithm);
+  m_Controls->m_pbLoadSelected->setEnabled(m_CanLoadAlgorithm);
 }
 
 void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
 {
 
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
   m_Parent = parent;
 
-  this->m_Controls.imageNodeSelector->SetDataStorage(this->GetDataStorage());
-  this->m_Controls.imageNodeSelector->SetSelectionIsOptional(false);
-  this->m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
-  this->m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
+  this->m_Controls->imageNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls->imageNodeSelector->SetSelectionIsOptional(false);
+  this->m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
 
-  this->m_Controls.imageNodeSelector->SetInvalidInfo("Select dynamic image.");
-  this->m_Controls.imageNodeSelector->SetPopUpTitel("Select dynamic image.");
-  this->m_Controls.imageNodeSelector->SetPopUpHint("Select a dynamic image (time resolved) that should be frame corrected.");
-  this->m_Controls.maskNodeSelector->SetInvalidInfo("Select target mask.");
-  this->m_Controls.maskNodeSelector->SetPopUpTitel("Select target mask.");
-  this->m_Controls.maskNodeSelector->SetPopUpHint("Select a target mask (mask of the target/first frame).");
+  this->m_Controls->imageNodeSelector->SetInvalidInfo("Select dynamic image.");
+  this->m_Controls->imageNodeSelector->SetPopUpTitel("Select dynamic image.");
+  this->m_Controls->imageNodeSelector->SetPopUpHint("Select a dynamic image (time resolved) that should be frame corrected.");
+  this->m_Controls->maskNodeSelector->SetInvalidInfo("Select target mask.");
+  this->m_Controls->maskNodeSelector->SetPopUpTitel("Select target mask.");
+  this->m_Controls->maskNodeSelector->SetPopUpHint("Select a target mask (mask of the target/first frame).");
 
-  m_Controls.maskLabelSelector->SetHighlightingActivated(true);
+  m_Controls->maskLabelSelector->SetHighlightingActivated(true);
 
-  m_Controls.m_tabs->setCurrentIndex(0);
+  m_Controls->m_tabs->setCurrentIndex(0);
 
-  m_Controls.m_mapperSettings->AllowSampling(false);
+  m_Controls->m_mapperSettings->AllowSampling(false);
 
   m_AlgorithmSelectionListener.reset(new
                                      berry::SelectionChangedAdapter<QmitkMatchPointFrameCorrection>(this,
@@ -230,14 +238,14 @@ void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
   auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
   mitk::NodePredicateDimension::Pointer imageDimensionPredicate = mitk::NodePredicateDimension::New(4);
 
-  m_Controls.imageNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
-  m_Controls.maskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->imageNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->maskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
 
-  m_Controls.imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
+  m_Controls->imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
 
   auto maskPredicate = (m_spSelectedTargetData.IsNull()) ? mitk::GetMultiLabelSegmentationPredicate() : mitk::GetMultiLabelSegmentationPredicate(m_spSelectedTargetData->GetGeometry());
 
-  m_Controls.maskNodeSelector->SetNodePredicate(maskPredicate);
+  m_Controls->maskNodeSelector->SetNodePredicate(maskPredicate);
 }
 
 void QmitkMatchPointFrameCorrection::CheckInputs()
@@ -251,21 +259,21 @@ void QmitkMatchPointFrameCorrection::CheckInputs()
 
   if (m_LoadedAlgorithm.IsNull())
   {
-    m_Controls.m_lbLoadedAlgorithmName->setText(
+    m_Controls->m_lbLoadedAlgorithmName->setText(
       QStringLiteral("<font color='red'>No algorithm selected!</font>"));
   }
   else
   {
-    m_spSelectedTargetNode = m_Controls.imageNodeSelector->GetSelectedNode();
+    m_spSelectedTargetNode = m_Controls->imageNodeSelector->GetSelectedNode();
     if (m_spSelectedTargetNode.IsNotNull())
     {
       m_spSelectedTargetData = m_spSelectedTargetNode->GetData();
     }
 
-    if (m_Controls.maskNodeSelector->GetSelectedNode() != m_spSelectedTargetMaskNode)
+    if (m_Controls->maskNodeSelector->GetSelectedNode() != m_spSelectedTargetMaskNode)
     {
-      m_Controls.maskLabelSelector->SetMultiLabelNode(m_Controls.maskNodeSelector->GetSelectedNode());
-      m_spSelectedTargetMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+      m_Controls->maskLabelSelector->SetMultiLabelNode(m_Controls->maskNodeSelector->GetSelectedNode());
+      m_spSelectedTargetMaskNode = m_Controls->maskNodeSelector->GetSelectedNode();
     }
   }
 
@@ -323,53 +331,53 @@ std::string QmitkMatchPointFrameCorrection::GetDefaultJobName() const
 
 void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
 {
-  m_Controls.m_tabSelection->setEnabled(!m_Working);
-  m_Controls.m_leRegJobName->setEnabled(!m_Working);
+  m_Controls->m_tabSelection->setEnabled(!m_Working);
+  m_Controls->m_leRegJobName->setEnabled(!m_Working);
 
-  m_Controls.m_pbStartReg->setEnabled(false);
+  m_Controls->m_pbStartReg->setEnabled(false);
 
-  m_Controls.imageNodeSelector->setEnabled(!m_Working);
-  m_Controls.maskNodeSelector->setEnabled(!m_Working);
+  m_Controls->imageNodeSelector->setEnabled(!m_Working);
+  m_Controls->maskNodeSelector->setEnabled(!m_Working);
 
-  m_Controls.maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull());
+  m_Controls->maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull());
 
   if (m_LoadedAlgorithm.IsNotNull())
   {
-    m_Controls.m_tabSettings->setEnabled(!m_Working);
-    m_Controls.m_tabExclusion->setEnabled(!m_Working);
-    m_Controls.m_tabExecution->setEnabled(true);
-    m_Controls.m_pbStartReg->setEnabled(m_spSelectedTargetNode.IsNotNull() && !m_Working);
-    m_Controls.m_leRegJobName->setEnabled(!m_Working);
+    m_Controls->m_tabSettings->setEnabled(!m_Working);
+    m_Controls->m_tabExclusion->setEnabled(!m_Working);
+    m_Controls->m_tabExecution->setEnabled(true);
+    m_Controls->m_pbStartReg->setEnabled(m_spSelectedTargetNode.IsNotNull() && !m_Working);
+    m_Controls->m_leRegJobName->setEnabled(!m_Working);
 
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
     const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
                                        (m_LoadedAlgorithm.GetPointer());
 
-    m_Controls.maskNodeSelector->setVisible(pMaskReg != nullptr);
-    m_Controls.maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull() && pMaskReg != nullptr);
-    m_Controls.label_TargetMask->setVisible(pMaskReg != nullptr);
+    m_Controls->maskNodeSelector->setVisible(pMaskReg != nullptr);
+    m_Controls->maskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull() && pMaskReg != nullptr);
+    m_Controls->label_TargetMask->setVisible(pMaskReg != nullptr);
     if (!pMaskReg)
     {
-      m_Controls.maskNodeSelector->SetCurrentSelection(QmitkSingleNodeSelectionWidget::NodeList());
+      m_Controls->maskNodeSelector->SetCurrentSelection(QmitkSingleNodeSelectionWidget::NodeList());
     }
 
-    this->m_Controls.m_lbLoadedAlgorithmName->setText(
+    this->m_Controls->m_lbLoadedAlgorithmName->setText(
       QString::fromStdString(m_LoadedAlgorithm->getUID()->toStr()));
   }
   else
   {
-    m_Controls.m_tabSettings->setEnabled(false);
-    m_Controls.m_tabExclusion->setEnabled(false);
-    m_Controls.m_tabExecution->setEnabled(false);
-    this->m_Controls.m_lbLoadedAlgorithmName->setText(
+    m_Controls->m_tabSettings->setEnabled(false);
+    m_Controls->m_tabExclusion->setEnabled(false);
+    m_Controls->m_tabExecution->setEnabled(false);
+    this->m_Controls->m_lbLoadedAlgorithmName->setText(
       QStringLiteral("<font color='red'>no algorithm loaded!</font>"));
-    m_Controls.maskNodeSelector->setVisible(false);
-    m_Controls.label_TargetMask->setVisible(false);
+    m_Controls->maskNodeSelector->setVisible(false);
+    m_Controls->label_TargetMask->setVisible(false);
   }
 
   if (!m_Working)
   {
-    this->m_Controls.m_leRegJobName->setText(QString::fromStdString(this->GetDefaultJobName()));
+    this->m_Controls->m_leRegJobName->setText(QString::fromStdString(this->GetDefaultJobName()));
   }
 }
 
@@ -380,8 +388,8 @@ void QmitkMatchPointFrameCorrection::ConfigureProgressInfos()
   const IMultiResAlgorithm* pMultiRes = dynamic_cast<const IMultiResAlgorithm*>
                                         (m_LoadedAlgorithm.GetPointer());
 
-  m_Controls.m_progBarIteration->setVisible(pIterative);
-  m_Controls.m_lbProgBarIteration->setVisible(pIterative);
+  m_Controls->m_progBarIteration->setVisible(pIterative);
+  m_Controls->m_lbProgBarIteration->setVisible(pIterative);
 
 
   if (pIterative)
@@ -391,34 +399,34 @@ void QmitkMatchPointFrameCorrection::ConfigureProgressInfos()
     if (!pIterative->hasMaxIterationCount())
     {
       format = "%v";
-      m_Controls.m_progBarIteration->setMaximum(0);
+      m_Controls->m_progBarIteration->setMaximum(0);
     }
     else
     {
-      m_Controls.m_progBarIteration->setMaximum(pIterative->getMaxIterations());
+      m_Controls->m_progBarIteration->setMaximum(pIterative->getMaxIterations());
     }
 
-    m_Controls.m_progBarIteration->setFormat(format);
+    m_Controls->m_progBarIteration->setFormat(format);
   }
 
   if (pMultiRes)
   {
-    m_Controls.m_progBarLevel->setMaximum(pMultiRes->getResolutionLevels());
+    m_Controls->m_progBarLevel->setMaximum(pMultiRes->getResolutionLevels());
 
   }
   else
   {
-    m_Controls.m_progBarLevel->setMaximum(1);
+    m_Controls->m_progBarLevel->setMaximum(1);
   }
 
-  m_Controls.m_progBarIteration->reset();
-  m_Controls.m_progBarLevel->reset();
-  m_Controls.m_progBarFrame->reset();
+  m_Controls->m_progBarIteration->reset();
+  m_Controls->m_progBarLevel->reset();
+  m_Controls->m_progBarFrame->reset();
 }
 
 void QmitkMatchPointFrameCorrection::ConfigureFrameList()
 {
-  m_Controls.m_listFrames->clear();
+  m_Controls->m_listFrames->clear();
 
   if (m_spSelectedTargetData.IsNotNull())
   {
@@ -429,7 +437,7 @@ void QmitkMatchPointFrameCorrection::ConfigureFrameList()
       QString lable = "Timepoint #" + QString::number(i) + QString(" (") + QString::number(
                         tg->GetMinimumTimePoint(i)) + QString(" ms - " + QString::number(tg->GetMaximumTimePoint(
                               i)) + QString(" ms)"));
-      QListWidgetItem* item = new QListWidgetItem(lable, m_Controls.m_listFrames);
+      QListWidgetItem* item = new QListWidgetItem(lable, m_Controls->m_listFrames);
       item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
       item->setCheckState(Qt::Checked);
     }
@@ -438,27 +446,27 @@ void QmitkMatchPointFrameCorrection::ConfigureFrameList()
 
 void QmitkMatchPointFrameCorrection::OnFramesSelectAllPushed()
 {
-  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls->m_listFrames->count(); row++)
   {
-    QListWidgetItem* item = m_Controls.m_listFrames->item(row);
+    QListWidgetItem* item = m_Controls->m_listFrames->item(row);
     item->setCheckState(Qt::Checked);
   }
 };
 
 void QmitkMatchPointFrameCorrection::OnFramesDeSelectAllPushed()
 {
-  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls->m_listFrames->count(); row++)
   {
-    QListWidgetItem* item = m_Controls.m_listFrames->item(row);
+    QListWidgetItem* item = m_Controls->m_listFrames->item(row);
     item->setCheckState(Qt::Unchecked);
   }
 };
 
 void QmitkMatchPointFrameCorrection::OnFramesInvertPushed()
 {
-  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls->m_listFrames->count(); row++)
   {
-    QListWidgetItem* item = m_Controls.m_listFrames->item(row);
+    QListWidgetItem* item = m_Controls->m_listFrames->item(row);
 
     if (item->checkState() == Qt::Unchecked)
     {
@@ -476,9 +484,9 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
 {
   mitk::TimeFramesRegistrationHelper::IgnoreListType result;
 
-  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls->m_listFrames->count(); row++)
   {
-    QListWidgetItem* item = m_Controls.m_listFrames->item(row);
+    QListWidgetItem* item = m_Controls->m_listFrames->item(row);
 
     if (item->checkState() == Qt::Unchecked)
     {
@@ -508,14 +516,14 @@ void QmitkMatchPointFrameCorrection::OnStartRegBtnPushed()
   //configure GUI
   this->ConfigureProgressInfos();
 
-  m_Controls.m_progBarIteration->reset();
-  m_Controls.m_progBarLevel->reset();
+  m_Controls->m_progBarIteration->reset();
+  m_Controls->m_progBarLevel->reset();
 
   this->ConfigureRegistrationControls();
 
-  if (m_Controls.m_checkClearLog->checkState() == Qt::Checked)
+  if (m_Controls->m_checkClearLog->checkState() == Qt::Checked)
   {
-    this->m_Controls.m_teLog->clear();
+    this->m_Controls->m_teLog->clear();
   }
 
 
@@ -528,16 +536,16 @@ void QmitkMatchPointFrameCorrection::OnStartRegBtnPushed()
   pJob->m_TargetDataUID = mitk::EnsureUID(this->m_spSelectedTargetNode->GetData());
   pJob->m_IgnoreList = this->GenerateIgnoreList();
 
-  auto targetMask = m_Controls.maskLabelSelector->CreateSelectedLabelMask();
+  auto targetMask = m_Controls->maskLabelSelector->CreateSelectedLabelMask();
   if (targetMask.IsNotNull())
   {
     pJob->m_spTargetMask = mitk::SelectImageByTimeStep(targetMask, 0);
-    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData()) + "#" + std::to_string(m_Controls.maskLabelSelector->GetSelectedLabels().front());
+    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData()) + "#" + std::to_string(m_Controls->maskLabelSelector->GetSelectedLabels().front());
   }
 
-  pJob->m_MappedName = m_Controls.m_leRegJobName->text().toStdString();
+  pJob->m_MappedName = m_Controls->m_leRegJobName->text().toStdString();
 
-  m_Controls.m_mapperSettings->ConfigureJobSettings(pJob);
+  m_Controls->m_mapperSettings->ConfigureJobSettings(pJob);
 
   connect(pJob, SIGNAL(Error(QString)), this, SLOT(OnRegJobError(QString)));
   connect(pJob, SIGNAL(Finished()), this, SLOT(OnRegJobFinished()));
@@ -586,7 +594,7 @@ void QmitkMatchPointFrameCorrection::OnSaveLogBtnPushed()
                   << fileName.toStdString();
     }
 
-    file << this->m_Controls.m_teLog->toPlainText().toStdString() << std::endl;
+    file << this->m_Controls->m_teLog->toPlainText().toStdString() << std::endl;
 
     file.close();
   }
@@ -615,7 +623,7 @@ void QmitkMatchPointFrameCorrection::OnRegJobFinished()
 void QmitkMatchPointFrameCorrection::OnMapResultIsAvailable(mitk::Image::Pointer spMappedData,
     const QmitkFramesRegistrationJob* job)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Corrected image stored. Name: ") +
+  m_Controls->m_teLog->append(QString("<b><font color='blue'>Corrected image stored. Name: ") +
                              QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
   mitk::DataNode::Pointer spResultNode = mitk::generateMappedResultNode(job->m_MappedName,
@@ -639,10 +647,10 @@ void QmitkMatchPointFrameCorrection::OnAlgorithmIterated(QString info, bool hasI
 {
   if (hasIterationCount)
   {
-    m_Controls.m_progBarIteration->setValue(currentIteration);
+    m_Controls->m_progBarIteration->setValue(currentIteration);
   }
 
-  m_Controls.m_teLog->append(info);
+  m_Controls->m_teLog->append(info);
 };
 
 void QmitkMatchPointFrameCorrection::OnLevelChanged(QString info, bool hasLevelCount,
@@ -650,38 +658,38 @@ void QmitkMatchPointFrameCorrection::OnLevelChanged(QString info, bool hasLevelC
 {
   if (hasLevelCount)
   {
-    m_Controls.m_progBarLevel->setValue(currentLevel);
+    m_Controls->m_progBarLevel->setValue(currentLevel);
   }
 
-  m_Controls.m_teLog->append(QString("<b><font color='green'>") + info + QString("</font></b>"));
+  m_Controls->m_teLog->append(QString("<b><font color='green'>") + info + QString("</font></b>"));
 };
 
 void QmitkMatchPointFrameCorrection::OnAlgorithmStatusChanged(QString info)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
+  m_Controls->m_teLog->append(QString("<b><font color='blue'>") + info + QString(" </font></b>"));
 };
 
 void QmitkMatchPointFrameCorrection::OnAlgorithmInfo(QString info)
 {
-  m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
+  m_Controls->m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameProcessed(double progress)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame processed...</font></b>"));
-  m_Controls.m_progBarFrame->setValue(100 * progress);
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Frame processed...</font></b>"));
+  m_Controls->m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameRegistered(double progress)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame registered...</font></b>"));
-  m_Controls.m_progBarFrame->setValue(100 * progress);
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Frame registered...</font></b>"));
+  m_Controls->m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameMapped(double progress)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame mapped...</font></b>"));
-  m_Controls.m_progBarFrame->setValue(100 * progress);
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Frame mapped...</font></b>"));
+  m_Controls->m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnAlgorithmSelectionChanged(const

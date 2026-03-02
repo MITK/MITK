@@ -13,14 +13,18 @@ found in the LICENSE file.
 #ifndef BERRYHELPTOPICCHOOSER_H
 #define BERRYHELPTOPICCHOOSER_H
 
-#include <ui_berryHelpTopicChooser.h>
-
 #include <QList>
 #include <QMap>
 #include <QString>
 #include <QUrl>
 
 #include <QDialog>
+#include <memory>
+
+namespace Ui
+{
+  class HelpTopicChooser;
+}
 
 namespace berry {
 
@@ -31,11 +35,12 @@ class HelpTopicChooser : public QDialog
 public:
   HelpTopicChooser(QWidget *parent, const QString &keyword,
                    const QMap<QString, QUrl> &links);
+  ~HelpTopicChooser() override;
 
   QUrl link() const;
 
 private:
-  Ui::HelpTopicChooser ui;
+  std::unique_ptr<Ui::HelpTopicChooser> ui;
   QList<QUrl> m_links;
 };
 

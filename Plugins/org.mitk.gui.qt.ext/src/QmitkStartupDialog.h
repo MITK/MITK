@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QDialog>
+#include <memory>
 
 class QItemSelection;
 
@@ -42,5 +43,5 @@ private:
   void OnSelectedPresetChanged(const QItemSelection& selected, const QItemSelection& deselected);
   void OnFinished(int result);
 
-  Ui::QmitkStartupDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkStartupDialog> m_Ui;
 };

@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <QDialog>
 #include <QProcess>
+#include <memory>
 
 class QShowEvent;
 
@@ -48,7 +49,7 @@ protected:
   void AutoScrollToBottom();
 
 private:
-  Ui::QmitknnInteractiveInstallDialog* m_Ui;
+  std::unique_ptr<Ui::QmitknnInteractiveInstallDialog> m_Ui;
   QProcess* m_Process;
   InstallStep m_InstallStep;
 };

@@ -15,16 +15,20 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <ui_QmitkMultiNodeSelectionWidget.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkSimpleTextOverlayWidget.h>
+#include <memory>
 
 class QmitkAbstractDataStorageModel;
+
+namespace Ui
+{
+  class QmitkMultiNodeSelectionWidget;
+}
 
 /**
 * @class QmitkMultiNodeSelectionWidget
@@ -36,6 +40,7 @@ class MITKQTWIDGETS_EXPORT QmitkMultiNodeSelectionWidget : public QmitkAbstractN
 
 public:
   explicit QmitkMultiNodeSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkMultiNodeSelectionWidget() override;
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
@@ -79,7 +84,7 @@ protected:
   SelectionCheckFunctionType m_CheckFunction;
   mutable std::string m_CheckResponse;
 
-  Ui_QmitkMultiNodeSelectionWidget m_Controls;
+  std::unique_ptr<Ui::QmitkMultiNodeSelectionWidget> m_Controls;
 };
 
 #endif

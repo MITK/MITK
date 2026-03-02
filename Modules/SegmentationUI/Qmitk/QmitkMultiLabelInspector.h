@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <QItemSelectionModel>
+#include <memory>
 
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
@@ -257,7 +258,7 @@ protected:
   QStyledItemDelegate* m_ColorItemDelegate;
   QStyledItemDelegate* m_VisibilityItemDelegate;
 
-  Ui::QmitkMultiLabelInspector* m_Controls;
+  std::unique_ptr<Ui::QmitkMultiLabelInspector> m_Controls;
 
   LabelValueVectorType GetSelectedLabelsFromSelectionModel() const;
   void UpdateSelectionModel(const LabelValueVectorType& selectedLabels);

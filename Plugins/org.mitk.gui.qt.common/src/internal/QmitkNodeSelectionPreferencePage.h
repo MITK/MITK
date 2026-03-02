@@ -18,9 +18,14 @@ found in the LICENSE file.
 
 #include "mitkDataStorageInspectorGenerator.h"
 
-#include "ui_QmitkNodeSelectionPreferencePage.h"
+#include <memory>
 
 class QWidget;
+
+namespace Ui
+{
+  class QmitkNodeSelectionPreferencePage;
+};
 
 /**
 * \class QmitkNodeSelectionPreferencePage
@@ -76,11 +81,10 @@ protected slots:
 
 protected:
 
-  QWidget                 *m_MainControl;
-  Ui::QmitkNodeSelectionPreferencePage* m_Controls;
+  QWidget* m_MainControl;
+  std::unique_ptr<Ui::QmitkNodeSelectionPreferencePage> m_Controls;
 
   mitk::DataStorageInspectorGenerator::ProviderMapType m_Providers;
-
 };
 
 #endif

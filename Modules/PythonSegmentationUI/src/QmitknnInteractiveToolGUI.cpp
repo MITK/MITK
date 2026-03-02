@@ -108,7 +108,7 @@ namespace
 
 QmitknnInteractiveToolGUI::QmitknnInteractiveToolGUI()
   : QmitkSegWithPreviewToolGUIBase(false, false),
-    m_Ui(new Ui::QmitknnInteractiveToolGUI),
+    m_Ui(std::make_unique<Ui::QmitknnInteractiveToolGUI>()),
     m_PromptTypeButtonGroup(new QButtonGroup(this)),
     m_PromptType(PromptType::Positive)
 {
@@ -130,6 +130,7 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 
   this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)

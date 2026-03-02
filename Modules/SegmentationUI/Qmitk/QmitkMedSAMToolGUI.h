@@ -15,9 +15,14 @@ found in the LICENSE file.
 
 #include "QmitkSegmentAnythingToolGUI.h"
 #include <MitkSegmentationUIExports.h>
-#include "ui_QmitkMedSAMGUIControls.h"
 #include <mitkIPreferences.h>
 #include "QmitknnUNetGPU.h"
+#include <memory>
+
+namespace Ui
+{
+  class QmitkMedSAMGUIControls;
+}
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -86,7 +91,7 @@ public:
 
 protected:
   QmitkMedSAMToolGUI();
-  ~QmitkMedSAMToolGUI();
+  ~QmitkMedSAMToolGUI() override;
 
   void InitializeUI(QBoxLayout *mainLayout) override;
   
@@ -114,7 +119,7 @@ protected slots:
 private:
   mitk::IPreferences *m_Preferences;
   QmitkGPULoader m_GpuLoader;
-  Ui_QmitkMedSAMGUIControls m_Controls;
+  std::unique_ptr<Ui::QmitkMedSAMGUIControls> m_Controls;
   bool m_FirstPreviewComputation = true;
   const std::string WARNING_SAM_NOT_FOUND =
     "MedSAM is not detected in the selected python environment. Please reinstall MedSAM.";

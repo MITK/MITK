@@ -49,7 +49,7 @@ namespace
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent), m_DataStorage(dataStorage)
 {
-  m_Controls = new Ui::QmitkImageMaskingWidgetControls;
+  m_Controls = std::make_unique<Ui::QmitkImageMaskingWidgetControls>();
   m_Controls->setupUi(this);
 
   m_Controls->imageNodeSelector->SetDataStorage(dataStorage);

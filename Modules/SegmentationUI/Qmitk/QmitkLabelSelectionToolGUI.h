@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "QmitkToolGUI.h"
 #include <MitkSegmentationUIExports.h>
+#include <memory>
 
 namespace mitk
 {
@@ -56,7 +57,7 @@ protected:
 
   bool eventFilter(QObject* object, QEvent* event) override;
 
-  Ui::QmitkLabelSelectionToolGUIControls* m_Controls;
+  std::unique_ptr<Ui::QmitkLabelSelectionToolGUIControls> m_Controls;
   itk::SmartPointer<mitk::LabelSelectionTool> m_LabelSelectionTool;
   std::unique_ptr<QmitkFloatingTextPopup> m_FloatingPopup;
 

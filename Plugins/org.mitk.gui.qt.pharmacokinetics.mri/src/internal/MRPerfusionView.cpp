@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "MRPerfusionView.h"
+#include <ui_MRPerfusionViewControls.h>
 
 #include "boost/tokenizer.hpp"
 #include "boost/math/constants/constants.hpp"
@@ -85,152 +86,152 @@ inline double convertToDouble(const std::string& data)
 
 void MRPerfusionView::SetFocus()
 {
-  m_Controls.btnModelling->setFocus();
+  m_Controls->btnModelling->setFocus();
 }
 
 void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
-  m_Controls.btnModelling->setEnabled(false);
+  m_Controls->btnModelling->setEnabled(false);
 
   this->InitModelComboBox();
-  m_Controls.labelMaskInfo->hide();
+  m_Controls->labelMaskInfo->hide();
 
-  m_Controls.timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.timeSeriesNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
+  m_Controls->timeSeriesNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->timeSeriesNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->timeSeriesNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->timeSeriesNodeSelector->SetInvalidInfo("Please select time series.");
 
-  m_Controls.maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
-  m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
-  m_Controls.maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
+  m_Controls->maskNodeSelector->SetNodePredicate(this->m_IsMaskPredicate);
+  m_Controls->maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->maskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls->maskNodeSelector->SetEmptyInfo("Please select (optional) mask.");
 
-  m_Controls.maskLabelSelector->hide();
-  m_Controls.maskLabelSelector->SetHighlightingActivated(true);
+  m_Controls->maskLabelSelector->hide();
+  m_Controls->maskLabelSelector->SetHighlightingActivated(true);
 
-  connect(m_Controls.btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
+  connect(m_Controls->btnModelling, SIGNAL(clicked()), this, SLOT(OnModellingButtonClicked()));
 
-  connect(m_Controls.comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
-  connect(m_Controls.radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->comboModel, SIGNAL(currentIndexChanged(int)), this, SLOT(OnModellSet(int)));
+  connect(m_Controls->radioPixelBased, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.checkMaskInfo, SIGNAL(toggled(bool)), m_Controls.labelMaskInfo,
+  connect(m_Controls->checkMaskInfo, SIGNAL(toggled(bool)), m_Controls->labelMaskInfo,
     SLOT(setVisible(bool)));
 
 
-  connect(m_Controls.timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnImageNodeSelectionChanged);
-  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnMaskNodeSelectionChanged);
-  connect(m_Controls.AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnAIFMaskNodeSelectionChanged);
+  connect(m_Controls->timeSeriesNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnImageNodeSelectionChanged);
+  connect(m_Controls->maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnMaskNodeSelectionChanged);
+  connect(m_Controls->AIFMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &MRPerfusionView::OnAIFMaskNodeSelectionChanged);
 
-  connect(m_Controls.AIFImageNodeSelector,
+  connect(m_Controls->AIFImageNodeSelector,
     &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this,
     &MRPerfusionView::UpdateGUIControls);
 
   //AIF setting
-  m_Controls.groupAIF->hide();
-  m_Controls.btnAIFFile->setEnabled(false);
-  m_Controls.btnAIFFile->setVisible(false);
-  m_Controls.aifFilePath->setEnabled(false);
-  m_Controls.aifFilePath->setVisible(false);
-  m_Controls.aifFilePath->setText("Please select AIF file.");
-  m_Controls.radioAIFImage->setChecked(true);
-  m_Controls.AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
-  m_Controls.AIFMaskNodeSelector->setVisible(true);
-  m_Controls.AIFMaskNodeSelector->setEnabled(true);
-  m_Controls.AIFMaskLabelSelector->hide();
-  m_Controls.AIFMaskLabelSelector->SetHighlightingActivated(true);
-  m_Controls.AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
-  m_Controls.AIFImageNodeSelector->setEnabled(false);
-  m_Controls.AIFImageNodeSelector->setVisible(false);
+  m_Controls->groupAIF->hide();
+  m_Controls->btnAIFFile->setEnabled(false);
+  m_Controls->btnAIFFile->setVisible(false);
+  m_Controls->aifFilePath->setEnabled(false);
+  m_Controls->aifFilePath->setVisible(false);
+  m_Controls->aifFilePath->setText("Please select AIF file.");
+  m_Controls->radioAIFImage->setChecked(true);
+  m_Controls->AIFMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->AIFMaskNodeSelector->SetNodePredicate(m_IsMaskPredicate);
+  m_Controls->AIFMaskNodeSelector->setVisible(true);
+  m_Controls->AIFMaskNodeSelector->setEnabled(true);
+  m_Controls->AIFMaskLabelSelector->hide();
+  m_Controls->AIFMaskLabelSelector->SetHighlightingActivated(true);
+  m_Controls->AIFImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->AIFImageNodeSelector->SetNodePredicate(this->m_isValidTimeSeriesImagePredicate);
+  m_Controls->AIFImageNodeSelector->setEnabled(false);
+  m_Controls->AIFImageNodeSelector->setVisible(false);
 
-  m_Controls.checkDedicatedAIFImage->setEnabled(true);
+  m_Controls->checkDedicatedAIFImage->setEnabled(true);
 
-  m_Controls.HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
+  m_Controls->HCLSpinBox->setValue(mitk::AterialInputFunctionGenerator::DEFAULT_HEMATOCRIT_LEVEL);
 
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskNodeSelector, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFMaskLabelSelector, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.labelAIFMask, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFImage, SIGNAL(toggled(bool)), m_Controls.checkDedicatedAIFImage, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls.AIFImageNodeSelector, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.btnAIFFile, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), m_Controls.aifFilePath, SLOT(setVisible(bool)));
-  connect(m_Controls.radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskLabelSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFMaskLabelSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->labelAIFMask, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->checkDedicatedAIFImage, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFImage, SIGNAL(toggled(bool)), m_Controls->checkDedicatedAIFImage, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkDedicatedAIFImage, SIGNAL(toggled(bool)), m_Controls->AIFImageNodeSelector, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->btnAIFFile, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->aifFilePath, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), m_Controls->aifFilePath, SLOT(setVisible(bool)));
+  connect(m_Controls->radioAIFFile, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->btnAIFFile, SIGNAL(clicked()), this, SLOT(LoadAIFfromFile()));
 
   //Brix setting
-  m_Controls.groupDescBrix->hide();
-  connect(m_Controls.injectiontime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+  m_Controls->groupDescBrix->hide();
+  connect(m_Controls->injectiontime, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
 
 
   //Model fit configuration
-  m_Controls.groupBox_FitConfiguration->hide();
+  m_Controls->groupBox_FitConfiguration->hide();
 
-  m_Controls.initialValuesManager->setEnabled(false);
-  m_Controls.initialValuesManager->setDataStorage(this->GetDataStorage());
+  m_Controls->initialValuesManager->setEnabled(false);
+  m_Controls->initialValuesManager->setDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->initialValuesManager, SIGNAL(initialValuesChanged(void)), this, SLOT(UpdateGUIControls()));
 
 
-  connect(m_Controls.checkBox_StartParameters, SIGNAL(toggled(bool)), m_Controls.initialValuesManager, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setEnabled(bool)));
-  connect(m_Controls.checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls.constraintManager, SLOT(setVisible(bool)));
+  connect(m_Controls->checkBox_StartParameters, SIGNAL(toggled(bool)), m_Controls->initialValuesManager, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager, SLOT(setEnabled(bool)));
+  connect(m_Controls->checkBox_Constraints, SIGNAL(toggled(bool)), m_Controls->constraintManager, SLOT(setVisible(bool)));
 
   //Concentration
-  m_Controls.groupConcentration->hide();
-  m_Controls.groupBoxEnhancement->hide();
-  m_Controls.radioButtonNoConversion->setChecked(true);
-  m_Controls.groupBox_T1MapviaVFA->hide();
-  m_Controls.factorSpinBox->setValue(1.0);
+  m_Controls->groupConcentration->hide();
+  m_Controls->groupBoxEnhancement->hide();
+  m_Controls->radioButtonNoConversion->setChecked(true);
+  m_Controls->groupBox_T1MapviaVFA->hide();
+  m_Controls->factorSpinBox->setValue(1.0);
 
-  m_Controls.spinBox_baselineStartTimeStep->setValue(0);
-  m_Controls.spinBox_baselineEndTimeStep->setValue(0);
-  m_Controls.spinBox_baselineEndTimeStep->setMinimum(0);
-  m_Controls.spinBox_baselineStartTimeStep->setMinimum(0);
-  m_Controls.groupBox_baselineRangeSelection->hide();
-
-
+  m_Controls->spinBox_baselineStartTimeStep->setValue(0);
+  m_Controls->spinBox_baselineEndTimeStep->setValue(0);
+  m_Controls->spinBox_baselineEndTimeStep->setMinimum(0);
+  m_Controls->spinBox_baselineStartTimeStep->setMinimum(0);
+  m_Controls->groupBox_baselineRangeSelection->hide();
 
 
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBoxEnhancement, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
 
-  connect(m_Controls.factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
-  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
-  connect(m_Controls.TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->radioButton_relativeEnchancement, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls->groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls->radioButton_absoluteEnhancement, SIGNAL(toggled(bool)), m_Controls->groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
+  connect(m_Controls->radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls->groupBoxEnhancement, SLOT(setVisible(bool)));
+  connect(m_Controls->radioButton_relativeEnchancement, SIGNAL(toggled(bool)), m_Controls->groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
 
-  m_Controls.PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
-  m_Controls.PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
-  m_Controls.PDWImageNodeSelector->setEnabled(false);
+  connect(m_Controls->factorSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->spinBox_baselineStartTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->spinBox_baselineEndTimeStep, SIGNAL(valueChanged(int)), this, SLOT(UpdateGUIControls()));
 
-  connect(m_Controls.radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls.PDWImageNodeSelector, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls->groupBox_T1MapviaVFA, SLOT(setVisible(bool)));
+  connect(m_Controls->radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls->groupBox_baselineRangeSelection, SLOT(setVisible(bool)));
+  connect(m_Controls->radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->FlipangleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->RelaxivitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->TRSpinBox, SIGNAL(valueChanged(double)), this, SLOT(UpdateGUIControls()));
+
+  m_Controls->PDWImageNodeSelector->SetNodePredicate(m_isValidPDWImagePredicate);
+  m_Controls->PDWImageNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->PDWImageNodeSelector->SetInvalidInfo("Please select PDW Image.");
+  m_Controls->PDWImageNodeSelector->setEnabled(false);
+
+  connect(m_Controls->radioButtonUsingT1viaVFA, SIGNAL(toggled(bool)), m_Controls->PDWImageNodeSelector, SLOT(setEnabled(bool)));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
-  m_Controls.timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
-  m_Controls.AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->timeSeriesNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->AIFMaskNodeSelector->SetAutoSelectNewNodes(true);
 
   UpdateGUIControls();
 }
@@ -240,13 +241,13 @@ void MRPerfusionView::CreateQtPartControl(QWidget* parent)
 
 void MRPerfusionView::UpdateGUIControls()
 {
-  m_Controls.lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
-  m_Controls.lineFitName->setEnabled(!m_FittingInProgress);
+  m_Controls->lineFitName->setPlaceholderText(QString::fromStdString(this->GetDefaultFitName()));
+  m_Controls->lineFitName->setEnabled(!m_FittingInProgress);
 
-  m_Controls.maskLabelSelector->setVisible(m_selectedMaskNode.IsNotNull());
-  m_Controls.AIFMaskLabelSelector->setVisible(m_selectedAIFMaskNode.IsNotNull());
+  m_Controls->maskLabelSelector->setVisible(m_selectedMaskNode.IsNotNull());
+  m_Controls->AIFMaskLabelSelector->setVisible(m_selectedAIFMaskNode.IsNotNull());
 
-  m_Controls.checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
+  m_Controls->checkBox_Constraints->setEnabled(m_modelConstraints.IsNotNull());
 
   bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
                            (m_selectedModelFactory.GetPointer()) != nullptr;
@@ -258,38 +259,38 @@ void MRPerfusionView::UpdateGUIControls()
                        (m_selectedModelFactory.GetPointer()) != nullptr;
 
 
-  m_Controls.groupAIF->setVisible(isToftsFactory || is2CXMFactory);
-  m_Controls.groupDescBrix->setVisible(isDescBrixFactory);
+  m_Controls->groupAIF->setVisible(isToftsFactory || is2CXMFactory);
+  m_Controls->groupDescBrix->setVisible(isDescBrixFactory);
   if (isDescBrixFactory)
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(0, false);
+    m_Controls->toolboxConfiguration->setItemEnabled(0, false);
   }
   else
   {
-    m_Controls.toolboxConfiguration->setItemEnabled(0, true);
+    m_Controls->toolboxConfiguration->setItemEnabled(0, true);
   }
-  m_Controls.groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
-  m_Controls.AIFImageNodeSelector->setVisible(m_Controls.radioAIFImage->isChecked() && m_Controls.checkDedicatedAIFImage->isChecked());
+  m_Controls->groupConcentration->setVisible(isToftsFactory || is2CXMFactory );
+  m_Controls->AIFImageNodeSelector->setVisible(m_Controls->radioAIFImage->isChecked() && m_Controls->checkDedicatedAIFImage->isChecked());
 
-  m_Controls.groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
+  m_Controls->groupBox_FitConfiguration->setVisible(m_selectedModelFactory);
 
-  m_Controls.groupBox->setEnabled(!m_FittingInProgress);
-  m_Controls.comboModel->setEnabled(!m_FittingInProgress);
-  m_Controls.groupAIF->setEnabled(!m_FittingInProgress);
-  m_Controls.groupDescBrix->setEnabled(!m_FittingInProgress);
-  m_Controls.groupConcentration->setEnabled(!m_FittingInProgress);
-  m_Controls.groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox->setEnabled(!m_FittingInProgress);
+  m_Controls->comboModel->setEnabled(!m_FittingInProgress);
+  m_Controls->groupAIF->setEnabled(!m_FittingInProgress);
+  m_Controls->groupDescBrix->setEnabled(!m_FittingInProgress);
+  m_Controls->groupConcentration->setEnabled(!m_FittingInProgress);
+  m_Controls->groupBox_FitConfiguration->setEnabled(!m_FittingInProgress);
 
 
-  m_Controls.radioROIbased->setEnabled(m_selectedMaskNode);
+  m_Controls->radioROIbased->setEnabled(m_selectedMaskNode);
 
-  m_Controls.btnModelling->setEnabled(m_selectedImage.IsNotNull()
-                                      && (m_selectedMaskNode.IsNull() || (m_selectedMaskNode.IsNotNull() && !m_Controls.maskLabelSelector->GetSelectedLabels().empty()))
+  m_Controls->btnModelling->setEnabled(m_selectedImage.IsNotNull()
+                                      && (m_selectedMaskNode.IsNull() || (m_selectedMaskNode.IsNotNull() && !m_Controls->maskLabelSelector->GetSelectedLabels().empty()))
                                       && m_selectedModelFactory.IsNotNull()
                                       && !m_FittingInProgress && CheckModelSettings());
 
-  m_Controls.spinBox_baselineStartTimeStep->setEnabled( m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
-  m_Controls.spinBox_baselineEndTimeStep->setEnabled(m_Controls.radioButton_absoluteEnhancement->isChecked() || m_Controls.radioButton_relativeEnchancement->isChecked() || m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  m_Controls->spinBox_baselineStartTimeStep->setEnabled( m_Controls->radioButton_absoluteEnhancement->isChecked() || m_Controls->radioButton_relativeEnchancement->isChecked() || m_Controls->radioButtonUsingT1viaVFA->isChecked());
+  m_Controls->spinBox_baselineEndTimeStep->setEnabled(m_Controls->radioButton_absoluteEnhancement->isChecked() || m_Controls->radioButton_relativeEnchancement->isChecked() || m_Controls->radioButtonUsingT1viaVFA->isChecked());
 
 
 }
@@ -315,7 +316,7 @@ void MRPerfusionView::OnModellSet(int index)
     this->m_modelConstraints = dynamic_cast<mitk::SimpleBarrierConstraintChecker*>
                                (m_selectedModelFactory->CreateDefaultConstraints().GetPointer());
 
-    m_Controls.initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
+    m_Controls->initialValuesManager->setInitialValues(m_selectedModelFactory->GetParameterNames(),
         m_selectedModelFactory->GetDefaultInitialParameterization(), m_selectedModelFactory->GetParameterUnits());
 
     if (this->m_modelConstraints.IsNull())
@@ -323,7 +324,7 @@ void MRPerfusionView::OnModellSet(int index)
       this->m_modelConstraints = mitk::SimpleBarrierConstraintChecker::New();
     }
 
-    m_Controls.constraintManager->setChecker(this->m_modelConstraints,
+    m_Controls->constraintManager->setChecker(this->m_modelConstraints,
         this->m_selectedModelFactory->GetParameterNames(), this->m_selectedModelFactory->GetParameterUnits());
 
   }
@@ -333,10 +334,10 @@ void MRPerfusionView::OnModellSet(int index)
 
 std::string MRPerfusionView::GetFitName() const
 {
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  std::string fitName = m_Controls->lineFitName->text().toStdString();
   if (fitName.empty())
   {
-    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+    fitName = m_Controls->lineFitName->placeholderText().toStdString();
   }
   return fitName;
 }
@@ -350,7 +351,7 @@ std::string MRPerfusionView::GetDefaultFitName() const
         defaultName = this->m_selectedModelFactory->GetClassID();
     }
 
-    if (this->m_Controls.radioPixelBased->isChecked())
+    if (this->m_Controls->radioPixelBased->isChecked())
     {
         defaultName += "_pixel";
     }
@@ -370,7 +371,7 @@ void MRPerfusionView::OnModellingButtonClicked()
     m_HasGeneratedNewInput = false;
     m_HasGeneratedNewInputAIF = false;
 
-    m_ImageMask = m_Controls.maskLabelSelector->CreateSelectedLabelMask();
+    m_ImageMask = m_Controls->maskLabelSelector->CreateSelectedLabelMask();
 
     mitk::ParameterFitImageGeneratorBase::Pointer generator = nullptr;
     mitk::modelFit::ModelFitInfo::Pointer fitSession = nullptr;
@@ -386,7 +387,7 @@ void MRPerfusionView::OnModellingButtonClicked()
 
     if (isDescBrixFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateDescriptiveBrixModel_PixelBased(fitSession, generator);
       }
@@ -397,7 +398,7 @@ void MRPerfusionView::OnModellingButtonClicked()
     }
     else if (isStanToftsFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateAIFbasedModelFit_PixelBased<mitk::StandardToftsModelParameterizer>(fitSession, generator);
       }
@@ -408,7 +409,7 @@ void MRPerfusionView::OnModellingButtonClicked()
     }
     else if (isExtToftsFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateAIFbasedModelFit_PixelBased<mitk::ExtendedToftsModelParameterizer>(fitSession, generator);
       }
@@ -419,7 +420,7 @@ void MRPerfusionView::OnModellingButtonClicked()
     }
     else if (is2CXMFactory)
     {
-      if (this->m_Controls.radioPixelBased->isChecked())
+      if (this->m_Controls->radioPixelBased->isChecked())
       {
         GenerateAIFbasedModelFit_PixelBased<mitk::TwoCompartmentExchangeModelParameterizer>(fitSession, generator);
       }
@@ -464,33 +465,33 @@ void MRPerfusionView::OnModellingButtonClicked()
 void MRPerfusionView::OnImageNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/)
 {
 
-  if (m_Controls.timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->timeSeriesNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedNode = m_Controls.timeSeriesNodeSelector->GetSelectedNode();
+    this->m_selectedNode = m_Controls->timeSeriesNodeSelector->GetSelectedNode();
     m_selectedImage = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
 
     if (m_selectedImage)
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(m_selectedImage->GetGeometry());
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(m_selectedImage->GetGeometry()));
     }
     else
     {
-      this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
-      m_Controls.maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
+      this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
+      m_Controls->maskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(nullptr));
     }
   }
   else
   {
     this->m_selectedNode = nullptr;
     this->m_selectedImage = nullptr;
-    this->m_Controls.initialValuesManager->setReferenceImageGeometry(nullptr);
+    this->m_Controls->initialValuesManager->setReferenceImageGeometry(nullptr);
   }
 
   if (this->m_selectedImage.IsNotNull())
   {
-    m_Controls.spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
-    m_Controls.spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+    m_Controls->spinBox_baselineStartTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
+    m_Controls->spinBox_baselineEndTimeStep->setMaximum((this->m_selectedImage->GetDimension(3)) - 1);
   }
 
   UpdateGUIControls();
@@ -501,13 +502,13 @@ void MRPerfusionView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/
 {
   m_selectedMaskNode = nullptr;
 
-  if (m_Controls.maskNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->maskNodeSelector->GetSelectedNode().IsNotNull())
   {
-    this->m_selectedMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    this->m_selectedMaskNode = m_Controls->maskNodeSelector->GetSelectedNode();
 
-    m_Controls.maskLabelSelector->SetMultiLabelNode(m_selectedMaskNode);
+    m_Controls->maskLabelSelector->SetMultiLabelNode(m_selectedMaskNode);
 
-    if (m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
+    if (m_Controls->maskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
     {
       MITK_INFO <<
         "Selected mask has multiple timesteps. Only use first timestep to mask model fit. Mask name: " <<
@@ -517,7 +518,7 @@ void MRPerfusionView::OnMaskNodeSelectionChanged(QList<mitk::DataNode::Pointer>/
 
   if (m_selectedMaskNode.IsNull())
   {
-    this->m_Controls.radioPixelBased->setChecked(true);
+    this->m_Controls->radioPixelBased->setChecked(true);
   }
 
   UpdateGUIControls();
@@ -527,13 +528,13 @@ void MRPerfusionView::OnAIFMaskNodeSelectionChanged(QList<mitk::DataNode::Pointe
 {
   m_selectedAIFMaskNode = nullptr;
 
-  if (m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull())
+  if (m_Controls->AIFMaskNodeSelector->GetSelectedNode().IsNotNull())
   {
-    m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
+    m_selectedAIFMaskNode = m_Controls->AIFMaskNodeSelector->GetSelectedNode();
 
-    m_Controls.AIFMaskLabelSelector->SetMultiLabelNode(m_selectedAIFMaskNode);
+    m_Controls->AIFMaskLabelSelector->SetMultiLabelNode(m_selectedAIFMaskNode);
 
-    if (m_Controls.AIFMaskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
+    if (m_Controls->AIFMaskLabelSelector->GetMultiLabelSegmentation()->GetTimeSteps() > 1)
     {
       MITK_INFO <<
         "Selected AIF mask has multiple timesteps. Only use first timestep to mask model fit. AIF mask name: " <<
@@ -563,21 +564,21 @@ bool MRPerfusionView::CheckModelSettings() const
     if (isDescBrixFactory)
     {
       //if all static parameters for this model are set, exit with true, Otherwise exit with false
-      ok = m_Controls.injectiontime->value() > 0;
+      ok = m_Controls->injectiontime->value() > 0;
     }
     else if (isToftsFactory || is2CXMFactory)
     {
-      if (this->m_Controls.radioAIFImage->isChecked())
+      if (this->m_Controls->radioAIFImage->isChecked())
       {
-        ok = ok && m_Controls.AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
-        ok = ok && m_Controls.AIFMaskLabelSelector->GetSelectedLabels().size() == 1;
+        ok = ok && m_Controls->AIFMaskNodeSelector->GetSelectedNode().IsNotNull();
+        ok = ok && m_Controls->AIFMaskLabelSelector->GetSelectedLabels().size() == 1;
 
-        if (this->m_Controls.checkDedicatedAIFImage->isChecked())
+        if (this->m_Controls->checkDedicatedAIFImage->isChecked())
         {
-          ok = ok && m_Controls.AIFImageNodeSelector->GetSelectedNode().IsNotNull();
+          ok = ok && m_Controls->AIFImageNodeSelector->GetSelectedNode().IsNotNull();
         }
       }
-      else if (this->m_Controls.radioAIFFile->isChecked())
+      else if (this->m_Controls->radioAIFFile->isChecked())
       {
         ok = ok && (this->AIFinputGrid.size() != 0) && (this->AIFinputFunction.size() != 0);
       }
@@ -586,21 +587,21 @@ bool MRPerfusionView::CheckModelSettings() const
         ok = false;
       }
 
-      if (this->m_Controls.radioButton_absoluteEnhancement->isChecked()
-               || this->m_Controls.radioButton_relativeEnchancement->isChecked() )
+      if (this->m_Controls->radioButton_absoluteEnhancement->isChecked()
+               || this->m_Controls->radioButton_relativeEnchancement->isChecked() )
       {
-        ok = ok && (m_Controls.factorSpinBox->value() > 0);
+        ok = ok && (m_Controls->factorSpinBox->value() > 0);
         ok = ok && CheckBaselineSelectionSettings();
       }
-      else if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked() )
+      else if (this->m_Controls->radioButtonUsingT1viaVFA->isChecked() )
       {
-        ok = ok && (m_Controls.FlipangleSpinBox->value() > 0);
-        ok = ok && (m_Controls.TRSpinBox->value() > 0);
-        ok = ok && (m_Controls.RelaxivitySpinBox->value() > 0);
-        ok = ok && (m_Controls.PDWImageNodeSelector->GetSelectedNode().IsNotNull());
+        ok = ok && (m_Controls->FlipangleSpinBox->value() > 0);
+        ok = ok && (m_Controls->TRSpinBox->value() > 0);
+        ok = ok && (m_Controls->RelaxivitySpinBox->value() > 0);
+        ok = ok && (m_Controls->PDWImageNodeSelector->GetSelectedNode().IsNotNull());
         ok = ok && CheckBaselineSelectionSettings();
       }
-      else if (this->m_Controls.radioButtonNoConversion->isChecked())
+      else if (this->m_Controls->radioButtonNoConversion->isChecked())
       {
         ok = ok && true;
       }
@@ -616,11 +617,11 @@ bool MRPerfusionView::CheckModelSettings() const
       ok = false;
     }
 
-    if (this->m_Controls.checkBox_StartParameters->isChecked() && !this->m_Controls.initialValuesManager->hasValidInitialValues())
+    if (this->m_Controls->checkBox_StartParameters->isChecked() && !this->m_Controls->initialValuesManager->hasValidInitialValues())
     {
       std::string warning = "Warning. Invalid start parameters. At least one parameter as an invalid image setting as source.";
       MITK_ERROR << warning;
-      m_Controls.infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
+      m_Controls->infoBox->append(QString("<font color='red'><b>") + QString::fromStdString(warning) + QString("</b></font>"));
 
       ok = false;
     };
@@ -635,16 +636,16 @@ bool MRPerfusionView::CheckModelSettings() const
 
 bool MRPerfusionView::CheckBaselineSelectionSettings() const
 {
-  return m_Controls.spinBox_baselineStartTimeStep->value() <= m_Controls.spinBox_baselineEndTimeStep->value();
+  return m_Controls->spinBox_baselineStartTimeStep->value() <= m_Controls->spinBox_baselineEndTimeStep->value();
 }
 
 void MRPerfusionView::ConfigureInitialParametersOfParameterizer(mitk::ModelParameterizerBase*
     parameterizer) const
 {
-  if (m_Controls.checkBox_StartParameters->isChecked())
+  if (m_Controls->checkBox_StartParameters->isChecked())
   {
     //use user defined initial parameters
-    mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls.initialValuesManager->getInitialParametrizationDelegate();
+    mitk::InitialParameterizationDelegateBase::Pointer paramDelegate = m_Controls->initialValuesManager->getInitialParametrizationDelegate();
     parameterizer->SetInitialParameterizationDelegate(paramDelegate);
   }
 }
@@ -659,7 +660,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
     mitk::DescriptivePharmacokineticBrixModelParameterizer::New();
 
   //Model configuration (static parameters) can be done now
-  modelParameterizer->SetTau(m_Controls.injectiontime->value());
+  modelParameterizer->SetTau(m_Controls->injectiontime->value());
 
   mitk::ImageTimeSelector::Pointer imageTimeSelector =	mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(this->m_selectedImage);
@@ -682,7 +683,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
   if (m_selectedMaskNode.IsNotNull())
   {
     fitGenerator->SetMask(mitk::SelectImageByTimeStep(m_ImageMask,0));
-    roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
+    roiUID = m_Controls->maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
   }
 
   fitGenerator->SetDynamicImage(m_selectedImage);
@@ -721,7 +722,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
   mitk::MaskedDynamicImageStatisticsGenerator::ResultType roiSignal = signalGenerator->GetMean();
 
   //Model configuration (static parameters) can be done now
-  modelParameterizer->SetTau(m_Controls.injectiontime->value());
+  modelParameterizer->SetTau(m_Controls->injectiontime->value());
   modelParameterizer->SetBaseValue(roiSignal[0]);
   this->ConfigureInitialParametersOfParameterizer(modelParameterizer);
 
@@ -737,7 +738,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
+  std::string roiUID = m_Controls->maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -785,7 +786,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
   if (m_selectedMaskNode.IsNotNull())
   {
     fitGenerator->SetMask(mitk::SelectImageByTimeStep(m_ImageMask, 0));
-    roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
+    roiUID = m_Controls->maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
   }
 
   fitGenerator->SetDynamicImage(this->m_inputImage);
@@ -859,7 +860,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   generator = fitGenerator.GetPointer();
 
-  std::string roiUID = m_Controls.maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
+  std::string roiUID = m_Controls->maskLabelSelector->GetMultiLabelSegmentation()->GetUID();
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
@@ -891,7 +892,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
                             mitk::ParameterFitImageGeneratorBase* generator)
 {
-  this->m_Controls.infoBox->append(QString("<font color='green'>" + QString("Fitting Data Set . . .") + QString ("</font>")));
+  this->m_Controls->infoBox->append(QString("<font color='green'>" + QString("Fitting Data Set . . .") + QString ("</font>")));
 
 
   /////////////////////////
@@ -924,7 +925,11 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
   threadPool->start(pJob);
 }
 
-MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedNewInput(false), m_HasGeneratedNewInputAIF(false)
+MRPerfusionView::MRPerfusionView()
+  : m_Controls(std::make_unique<Ui::MRPerfusionViewControls>()),
+    m_FittingInProgress(false),
+    m_HasGeneratedNewInput(false),
+    m_HasGeneratedNewInputAIF(false)
 {
   m_selectedImage = nullptr;
   m_ImageMask = nullptr;
@@ -965,9 +970,13 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false), m_HasGeneratedN
   this->m_isValidTimeSeriesImagePredicate = mitk::NodePredicateAnd::New(isDynamicData, isImage, isNoMask);
 }
 
+MRPerfusionView::~MRPerfusionView()
+{
+}
+
 void MRPerfusionView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("Fitting finished."));
+  this->m_Controls->infoBox->append(QString("Fitting finished."));
   this->m_FittingInProgress = false;
   this->UpdateGUIControls();
 };
@@ -976,7 +985,7 @@ void MRPerfusionView::OnJobError(QString err)
 {
   MITK_ERROR << err.toStdString().c_str();
 
-  m_Controls.infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
+  m_Controls->infoBox->append(QString("<font color='red'><b>") + err + QString("</b></font>"));
 };
 
 void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNodeVectorType results,
@@ -997,27 +1006,27 @@ void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNod
 void MRPerfusionView::OnJobProgress(double progress)
 {
   QString report = QString("Progress. ") + QString::number(progress);
-  this->m_Controls.infoBox->append(report);
+  this->m_Controls->infoBox->append(report);
 };
 
 void MRPerfusionView::OnJobStatusChanged(QString info)
 {
-  this->m_Controls.infoBox->append(info);
+  this->m_Controls->infoBox->append(info);
 }
 
 
 void MRPerfusionView::InitModelComboBox() const
 {
-  this->m_Controls.comboModel->clear();
-  this->m_Controls.comboModel->addItem(tr("No model selected"));
+  this->m_Controls->comboModel->clear();
+  this->m_Controls->comboModel->addItem(tr("No model selected"));
 
   for (ModelFactoryStackType::const_iterator pos = m_FactoryStack.begin();
        pos != m_FactoryStack.end(); ++pos)
   {
-    this->m_Controls.comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
+    this->m_Controls->comboModel->addItem(QString::fromStdString((*pos)->GetClassID()));
   }
 
-  this->m_Controls.comboModel->setCurrentIndex(0);
+  this->m_Controls->comboModel->setCurrentIndex(0);
 };
 
 mitk::DataNode::Pointer MRPerfusionView::GenerateConcentrationNode(mitk::Image* image,
@@ -1044,7 +1053,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
   mitk::ConcentrationCurveGenerator::Pointer concentrationGen =
     mitk::ConcentrationCurveGenerator::New();
 
-  if (m_Controls.checkDedicatedAIFImage->isChecked() && AIFMode)
+  if (m_Controls->checkDedicatedAIFImage->isChecked() && AIFMode)
   {
     concentrationGen->SetDynamicImage(this->m_selectedAIFImage);
   }
@@ -1053,30 +1062,30 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
     concentrationGen->SetDynamicImage(this->m_selectedImage);
   }
 
-  concentrationGen->SetAbsoluteSignalEnhancement(m_Controls.radioButton_absoluteEnhancement->isChecked());
-  concentrationGen->SetRelativeSignalEnhancement(m_Controls.radioButton_relativeEnchancement->isChecked());
-  concentrationGen->SetUsingT1Map(m_Controls.radioButtonUsingT1viaVFA->isChecked());
+  concentrationGen->SetAbsoluteSignalEnhancement(m_Controls->radioButton_absoluteEnhancement->isChecked());
+  concentrationGen->SetRelativeSignalEnhancement(m_Controls->radioButton_relativeEnchancement->isChecked());
+  concentrationGen->SetUsingT1Map(m_Controls->radioButtonUsingT1viaVFA->isChecked());
 
 
-  if (this->m_Controls.radioButtonUsingT1viaVFA->isChecked())
+  if (this->m_Controls->radioButtonUsingT1viaVFA->isChecked())
   {
-      concentrationGen->SetRepetitionTime(m_Controls.TRSpinBox->value());
-      concentrationGen->SetRelaxivity(m_Controls.RelaxivitySpinBox->value());
-      concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls.PDWImageNodeSelector->GetSelectedNode()->GetData()));
-      concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
-      concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
+      concentrationGen->SetRepetitionTime(m_Controls->TRSpinBox->value());
+      concentrationGen->SetRelaxivity(m_Controls->RelaxivitySpinBox->value());
+      concentrationGen->SetPDWImage(dynamic_cast<mitk::Image*>(m_Controls->PDWImageNodeSelector->GetSelectedNode()->GetData()));
+      concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
+      concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
       //Convert Flipangle from degree to radiant
-      double alpha = m_Controls.FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
+      double alpha = m_Controls->FlipangleSpinBox->value()/360*2* boost::math::constants::pi<double>();
       concentrationGen->SetFlipAngle(alpha);
-      double alphaPDW = m_Controls.FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
+      double alphaPDW = m_Controls->FlipanglePDWSpinBox->value() / 360 * 2 * boost::math::constants::pi<double>();
       concentrationGen->SetFlipAnglePDW(alphaPDW);
 
   }
   else
   {
-    concentrationGen->SetFactor(m_Controls.factorSpinBox->value());
-    concentrationGen->SetBaselineStartTimeStep(m_Controls.spinBox_baselineStartTimeStep->value());
-    concentrationGen->SetBaselineEndTimeStep(m_Controls.spinBox_baselineEndTimeStep->value());
+    concentrationGen->SetFactor(m_Controls->factorSpinBox->value());
+    concentrationGen->SetBaselineStartTimeStep(m_Controls->spinBox_baselineStartTimeStep->value());
+    concentrationGen->SetBaselineEndTimeStep(m_Controls->spinBox_baselineEndTimeStep->value());
   }
 
 
@@ -1088,7 +1097,7 @@ mitk::Image::Pointer MRPerfusionView::ConvertConcentrationImage(bool AIFMode)
 void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& aif,
                              mitk::AIFBasedModelBase::AterialInputFunctionType& aifTimeGrid)
 {
-  if (this->m_Controls.radioAIFFile->isChecked())
+  if (this->m_Controls->radioAIFFile->isChecked())
   {
     aif.clear();
     aifTimeGrid.clear();
@@ -1115,7 +1124,7 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
       *gridPos = *pos;
     }
   }
-  else if (this->m_Controls.radioAIFImage->isChecked())
+  else if (this->m_Controls->radioAIFImage->isChecked())
   {
     aif.clear();
     aifTimeGrid.clear();
@@ -1124,11 +1133,11 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
       mitk::AterialInputFunctionGenerator::New();
 
     //Hematocrit level
-    aifGenerator->SetHCL(this->m_Controls.HCLSpinBox->value());
+    aifGenerator->SetHCL(this->m_Controls->HCLSpinBox->value());
 
     //mask settings
-    this->m_selectedAIFMaskNode = m_Controls.AIFMaskNodeSelector->GetSelectedNode();
-    this->m_AIFMask = m_Controls.AIFMaskLabelSelector->CreateSelectedLabelMask();
+    this->m_selectedAIFMaskNode = m_Controls->AIFMaskNodeSelector->GetSelectedNode();
+    this->m_AIFMask = m_Controls->AIFMaskLabelSelector->CreateSelectedLabelMask();
 
     if (this->m_AIFMask.IsNotNull())
     {
@@ -1143,9 +1152,9 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
     }
 
     //image settings
-    if (this->m_Controls.checkDedicatedAIFImage->isChecked())
+    if (this->m_Controls->checkDedicatedAIFImage->isChecked())
     {
-      this->m_selectedAIFImageNode = m_Controls.AIFImageNodeSelector->GetSelectedNode();
+      this->m_selectedAIFImageNode = m_Controls->AIFImageNodeSelector->GetSelectedNode();
       this->m_selectedAIFImage = dynamic_cast<mitk::Image*>(this->m_selectedAIFImageNode->GetData());
     }
     else
@@ -1182,7 +1191,7 @@ void MRPerfusionView::LoadAIFfromFile()
     return;
   }
 
-  m_Controls.aifFilePath->setText(fileName);
+  m_Controls->aifFilePath->setText(fileName);
 
   std::string m_aifFilePath = fileName.toStdString();
   //Read Input
@@ -1194,7 +1203,7 @@ void MRPerfusionView::LoadAIFfromFile()
 
   if (!in1.is_open())
   {
-    this->m_Controls.infoBox->append(QString("Could not open AIF File!"));
+    this->m_Controls->infoBox->append(QString("Could not open AIF File!"));
     return;
   }
 
@@ -1208,7 +1217,7 @@ void MRPerfusionView::LoadAIFfromFile()
 
     if (vec1.size() < 2)
     {
-      this->m_Controls.infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
+      this->m_Controls->infoBox->append(QString("Invalid content in AIF File: %1").arg(QString::fromStdString(line1)));
       this->AIFinputGrid.clear();
       this->AIFinputFunction.clear();
       return;
@@ -1218,7 +1227,7 @@ void MRPerfusionView::LoadAIFfromFile()
     this->AIFinputFunction.push_back(convertToDouble(vec1[1]));
   }
   in1.close();
-  this->m_Controls.infoBox->append(QString("AIF File successfully loaded!"));
+  this->m_Controls->infoBox->append(QString("AIF File successfully loaded!"));
 }
 
 void MRPerfusionView::PrepareConcentrationImage()
@@ -1227,7 +1236,7 @@ void MRPerfusionView::PrepareConcentrationImage()
   mitk::DataNode::Pointer concentrationNode = this->m_selectedNode;
   m_HasGeneratedNewInput = false;
 
-  if (!this->m_Controls.radioButtonNoConversion->isChecked())
+  if (!this->m_Controls->radioButtonNoConversion->isChecked())
   {
     concentrationImage = this->ConvertConcentrationImage(false);
     concentrationNode = GenerateConcentrationNode(concentrationImage, "Concentration");
@@ -1244,15 +1253,15 @@ void MRPerfusionView::PrepareAIFConcentrationImage()
   mitk::DataNode::Pointer concentrationNode = this->m_selectedNode;
   m_HasGeneratedNewInputAIF = false;
 
-  if (this->m_Controls.checkDedicatedAIFImage->isChecked())
+  if (this->m_Controls->checkDedicatedAIFImage->isChecked())
   {
     concentrationImage = this->m_selectedAIFImage;
     concentrationNode = this->m_selectedAIFImageNode;
   }
 
-  if (!this->m_Controls.radioButtonNoConversion->isChecked())
+  if (!this->m_Controls->radioButtonNoConversion->isChecked())
   {
-    if (!this->m_Controls.checkDedicatedAIFImage->isChecked())
+    if (!this->m_Controls->checkDedicatedAIFImage->isChecked())
     {
       if (m_inputImage.IsNull())
       {
@@ -1288,7 +1297,7 @@ mitk::ModelFitFunctorBase::Pointer MRPerfusionView::CreateDefaultFitFunctor(
     mitk::NormalizedSumOfSquaredDifferencesFitCostFunction::New();
   fitFunctor->RegisterEvaluationParameter("Chi^2", chi2);
 
-  if (m_Controls.checkBox_Constraints->isChecked())
+  if (m_Controls->checkBox_Constraints->isChecked())
   {
     fitFunctor->SetConstraintChecker(m_modelConstraints);
   }
@@ -1300,7 +1309,7 @@ mitk::ModelFitFunctorBase::Pointer MRPerfusionView::CreateDefaultFitFunctor(
   scales.Fill(1.0);
   fitFunctor->SetScales(scales);
 
-  fitFunctor->SetDebugParameterMaps(m_Controls.checkDebug->isChecked());
+  fitFunctor->SetDebugParameterMaps(m_Controls->checkDebug->isChecked());
 
   return fitFunctor.GetPointer();
 }

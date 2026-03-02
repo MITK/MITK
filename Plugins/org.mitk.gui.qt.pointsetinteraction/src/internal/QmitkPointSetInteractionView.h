@@ -13,13 +13,18 @@ found in the LICENSE file.
 #ifndef QmitkPointSetInteractionView_h
 #define QmitkPointSetInteractionView_h
 
-#include "ui_QmitkPointSetInteractionViewControls.h"
-
 #include <mitkDataNode.h>
 #include <mitkIRenderWindowPartListener.h>
 
 #include <QmitkAbstractView.h>
 #include <QmitkSingleNodeSelectionWidget.h>
+
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPointSetInteractionViewControls;
+}
 
 class QmitkPointSetInteractionView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -46,7 +51,7 @@ private:
 
   void CreateQtPartControl(QWidget *parent) override;
 
-  Ui::QmitkPointSetInteractionViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkPointSetInteractionViewControls> m_Controls;
 
 };
 

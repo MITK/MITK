@@ -31,7 +31,7 @@ found in the LICENSE file.
 
 QmitkMultiLabelSelectionWidget::QmitkMultiLabelSelectionWidget(QWidget* parent/* = nullptr*/)
   : QWidget(parent),
-  m_Controls(new Ui::QmitkMultiLabelSelectionWidget),
+  m_Controls(std::make_unique<Ui::QmitkMultiLabelSelectionWidget>()),
   m_Popup(new QmitkMultiLabelInspectorPopup(this))
 {
   m_Controls->setupUi(this);

@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 #include <QScopedPointer>
+#include <memory>
 
 namespace Ui
 {
@@ -64,7 +65,7 @@ private slots:
 
 private:
   QWidget* m_Control;
-  QScopedPointer<Ui::QmitkRestApiPreferencesControls> m_Ui;
+  std::unique_ptr<Ui::QmitkRestApiPreferencesControls> m_Ui;
 };
 
 #endif

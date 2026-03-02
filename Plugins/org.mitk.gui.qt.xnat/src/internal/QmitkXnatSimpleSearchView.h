@@ -18,13 +18,17 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include "QmitkXnatTreeBrowserView.h"
 
-#include "ui_QmitkXnatSimpleSearchViewControls.h"
-
 // ctkXnatCore
+
 #include "ctkXnatSession.h"
 
 // ctkXnatWidget
 #include "ctkXnatTreeModel.h"
+
+namespace Ui
+{
+  class QmitkXnatSimpleSearchViewControls;
+}
 
 /*!
 \brief QmitkXnatSimpleSearchView
@@ -66,7 +70,7 @@ protected:
 
   virtual void SetFocus();
 
-  Ui::QmitkXnatSimpleSearchViewControls m_Controls;
+  Ui::QmitkXnatSimpleSearchViewControls* m_Controls;
 
 private:
 

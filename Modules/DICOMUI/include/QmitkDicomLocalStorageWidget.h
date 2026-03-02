@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkDICOMUIExports.h>
 #include <QWidget>
+#include <memory>
 
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
@@ -87,7 +88,7 @@ private:
 
   QSharedPointer<ctkDICOMDatabase> m_LocalDatabase;
   std::unique_ptr<ctkDICOMIndexer> m_LocalIndexer;
-  Ui::QmitkDicomLocalStorageWidget *m_Ui;
+  std::unique_ptr<Ui::QmitkDicomLocalStorageWidget> m_Ui;
 };
 
 #endif

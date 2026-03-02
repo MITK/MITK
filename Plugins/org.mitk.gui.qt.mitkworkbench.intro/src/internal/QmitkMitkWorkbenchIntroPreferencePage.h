@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkMitkWorkbenchIntroPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
+#include <memory>
 
 namespace Ui
 {
@@ -37,7 +38,7 @@ public:
   void Update() override;
 
 private:
-  Ui::QmitkMitkWorkbenchIntroPreferencePage* m_Ui;
+  std::unique_ptr<Ui::QmitkMitkWorkbenchIntroPreferencePage> m_Ui;
   QWidget* m_Control;
 };
 

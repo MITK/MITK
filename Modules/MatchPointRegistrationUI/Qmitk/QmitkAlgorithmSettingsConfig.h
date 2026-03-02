@@ -21,20 +21,24 @@ found in the LICENSE file.
 #include <QmitkMAPAlgorithmModel.h>
 
 #include <MitkMatchPointRegistrationUIExports.h>
+#include <memory>
 
-#include "ui_QmitkAlgorithmSettingsConfig.h"
+namespace Ui
+{
+  class QmitkAlgorithmSettingsConfig;
+}
 
 /**
  * \class QmitkAlgorithmSettingsConfig
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmSettingsConfig : public QWidget,
-                                                                         private Ui::QmitkAlgorithmSettingsConfig
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmSettingsConfig : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkAlgorithmSettingsConfig(QWidget *parent = nullptr);
+  ~QmitkAlgorithmSettingsConfig() override;
 
   /**
    * \brief Changes the current algorithm and updates widget accordingly.
@@ -45,6 +49,8 @@ public:
   map::algorithm::RegistrationAlgorithmBase *getAlgorithm();
 
 protected:
+  std::unique_ptr<Ui::QmitkAlgorithmSettingsConfig> m_Controls;
+
   /** Pointer to the algorithm that should be configured */
   map::algorithm::RegistrationAlgorithmBase::Pointer m_currentAlg;
 

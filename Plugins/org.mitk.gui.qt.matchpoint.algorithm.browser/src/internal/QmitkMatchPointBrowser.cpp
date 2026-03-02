@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_algorithm_browser_Activator.h"
+#include <ui_QmitkMatchPointBrowserControls.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -44,7 +45,10 @@ found in the LICENSE file.
 const std::string QmitkMatchPointBrowser::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 
 QmitkMatchPointBrowser::QmitkMatchPointBrowser()
-    : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr)
+    : m_Controls(std::make_unique<Ui::MatchPointBrowserControls>()),
+      m_Parent(nullptr),
+      m_LoadedDLLHandle(nullptr),
+      m_LoadedAlgorithm(nullptr)
 {
 }
 
@@ -59,11 +63,11 @@ void QmitkMatchPointBrowser::OnPreferencesChanged(const mitk::IPreferences* /*pr
 
 void QmitkMatchPointBrowser::CreateConnections()
 {
-    connect(m_Controls.m_pbSearchFolder, SIGNAL(clicked()), this, SLOT(OnSearchFolderButtonPushed()));
-    connect(m_Controls.m_algoTreeView, SIGNAL(clicked(const QModelIndex&)), this,
+    connect(m_Controls->m_pbSearchFolder, SIGNAL(clicked()), this, SLOT(OnSearchFolderButtonPushed()));
+    connect(m_Controls->m_algoTreeView, SIGNAL(clicked(const QModelIndex&)), this,
         SLOT(OnAlgoListSelectionChanged(const QModelIndex&)));
-    connect(m_Controls.pbClearSearch, SIGNAL(clicked()), m_Controls.lineSearch, SLOT(clear()));
-    connect(m_Controls.lineSearch, SIGNAL(textChanged(const QString&)), this,
+    connect(m_Controls->pbClearSearch, SIGNAL(clicked()), m_Controls->lineSearch, SLOT(clear()));
+    connect(m_Controls->lineSearch, SIGNAL(textChanged(const QString&)), this,
         SLOT(OnSearchChanged(const QString&)));
 }
 
@@ -97,11 +101,11 @@ void QmitkMatchPointBrowser::OnSearchFolderButtonPushed()
         m_DLLInfoList = browser->getLibraryInfos();
     }
 
-    m_Controls.groupWarning->setVisible(m_DLLInfoList.empty());
-    m_Controls.groupList->setVisible(!m_DLLInfoList.empty());
+    m_Controls->groupWarning->setVisible(m_DLLInfoList.empty());
+    m_Controls->groupList->setVisible(!m_DLLInfoList.empty());
 
     m_algModel->SetAlgorithms(m_DLLInfoList);
-    m_Controls.lineSearch->clear();
+    m_Controls->lineSearch->clear();
 }
 
 void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index)
@@ -119,7 +123,7 @@ void QmitkMatchPointBrowser::OnAlgoListSelectionChanged(const QModelIndex& index
         }
     }
 
-    m_Controls.m_teAlgorithmDetails->updateInfo(currentItemInfo);
+    m_Controls->m_teAlgorithmDetails->updateInfo(currentItemInfo);
 
     if (currentItemInfo)
     {
@@ -158,7 +162,7 @@ void QmitkMatchPointBrowser::OnValidDeploymentEvent(const ::itk::Object *, const
 void QmitkMatchPointBrowser::CreateQtPartControl(QWidget* parent)
 {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls.setupUi(parent);
+    m_Controls->setupUi(parent);
     m_Parent = parent;
 
     m_algModel = new QmitkAlgorithmListModel(parent);
@@ -171,12 +175,12 @@ void QmitkMatchPointBrowser::CreateQtPartControl(QWidget* parent)
     m_filterProxy->setSourceModel(m_algModel);
     m_filterProxy->setDynamicSortFilter(true);
     m_filterProxy->setFilterKeyColumn(-1);
-    m_Controls.m_algoTreeView->setModel(m_filterProxy);
-    m_Controls.m_algoTreeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_Controls->m_algoTreeView->setModel(m_filterProxy);
+    m_Controls->m_algoTreeView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    m_Controls.m_algoTreeView->header()->setStretchLastSection(false);
-    m_Controls.m_algoTreeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    m_Controls.m_algoTreeView->setColumnHidden(3, true);
+    m_Controls->m_algoTreeView->header()->setStretchLastSection(false);
+    m_Controls->m_algoTreeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    m_Controls->m_algoTreeView->setColumnHidden(3, true);
 
     this->CreateConnections();
 }

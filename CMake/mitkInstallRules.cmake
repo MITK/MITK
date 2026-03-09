@@ -102,17 +102,6 @@ if(MITK_USE_Python3)
     LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
 endif()
 
-# Install MatchPoint binaries that are not auto-detected
-
-if(MITK_USE_MatchPoint)
-  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
-    DESTINATION bin
-    FILES_MATCHING PATTERN "MapUtilities*")
-  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
-    DESTINATION bin
-    FILES_MATCHING PATTERN "MapAlgorithms*")
-endif()
-
 #-----------------------------------------------------------------------------
 # Resolve and install ALL runtime dependencies in one pass.
 #

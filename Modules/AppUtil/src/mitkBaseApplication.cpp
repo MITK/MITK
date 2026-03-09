@@ -160,6 +160,9 @@ namespace
     if (arg.startsWith('@'))
     {
       const auto filePath = arg.mid(1).toStdString();
+      if (filePath.empty())
+        mitkThrow() << "Cannot open preferences " << kind << " file. \"@\" indicates file reference, but has no file path following.";
+
       std::ifstream file(filePath);
 
       if (!file.is_open())
@@ -998,7 +1001,8 @@ namespace mitk
     options.addOption(fullscreenOption);
 
     Poco::Util::Option preferencesOverrideOption(ARG_PREFERENCES_OVERRIDE.toStdString(), "",
-      "temporarily override preferences for this session; use @<file> to read XML content from a file");
+      "temporarily override preferences for this session; use @<file> to read XML content from a file;"
+      "nodes referenced in the XML must already exist (use --MITK.preferences-patch to create them first)");
     preferencesOverrideOption.argument("<xml-or-@file>")
       .repeatable(true)
       .callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handlePreferencesOverrideOption));

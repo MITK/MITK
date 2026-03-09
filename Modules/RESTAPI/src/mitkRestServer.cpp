@@ -107,6 +107,7 @@ namespace
            path == "/api/v1/info" ||
            path == "/api/v1/" ||
            path == "/api/v1/docs" ||
+           path == "/api/v1/docs/" ||
            path == "/api/v1/docs/swagger-ui.css" ||
            path == "/api/v1/docs/swagger-ui-bundle.js" ||
            path == "/api/v1/openapi.json";
@@ -873,7 +874,16 @@ void RestServer::RegisterRoutes()
     });
 
   // Documentation endpoints (Swagger UI and OpenAPI spec)
+  // Redirect /docs to /docs/ so relative URLs in the HTML resolve correctly
+  // regardless of any reverse-proxy prefix (proxy-agnostic relative redirect).
   m_Server->Get(apiBase + "/docs",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      res.status = 302;
+      res.set_header("Location", "docs/");
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/docs/",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_docs(req, res);
       this->RecordRequest(req.path, req.method, res.status, req.remote_addr);

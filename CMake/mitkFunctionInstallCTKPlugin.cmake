@@ -37,12 +37,14 @@ function(mitkFunctionInstallCTKPlugin)
                 CONFIGURATIONS Release)
         if(LINUX)
           if(_target_filename_debug)
-            install(CODE "file(RPATH_REMOVE
-                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")")
+            install(CODE "file(RPATH_SET
+                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\"
+                               NEW_RPATH \"\$ORIGIN/..\")")
           endif()
           if(_target_filename_release)
-            install(CODE "file(RPATH_REMOVE
-                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\")")
+            install(CODE "file(RPATH_SET
+                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\"
+                               NEW_RPATH \"\$ORIGIN/..\")")
           endif()
         endif()
       else()

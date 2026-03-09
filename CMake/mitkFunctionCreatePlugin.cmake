@@ -293,6 +293,10 @@ function(mitk_create_plugin)
       endforeach(bundle_name)
     endif(NOT MACOSX_BUNDLE_NAMES)
 
+    if(LINUX)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+    endif()
+
     foreach(install_subdir ${install_directories})
 
       mitkFunctionInstallCTKPlugin(TARGETS ${PLUGIN_TARGET}

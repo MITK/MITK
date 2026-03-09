@@ -1152,6 +1152,14 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
+# RPATH settings for installed targets
+#-----------------------------------------------------------------------------
+
+if(LINUX)
+  set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/plugins")
+endif()
+
+#-----------------------------------------------------------------------------
 # Add subdirectories
 #-----------------------------------------------------------------------------
 

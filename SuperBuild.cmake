@@ -116,21 +116,17 @@ set(CMAKE_REQUIRED_FLAGS "-Wl,-rpath")
 mitkFunctionCheckCompilerFlags(${CMAKE_REQUIRED_FLAGS} _has_rpath_flag)
 set(CMAKE_REQUIRED_FLAGS ${_cmake_required_flags_orig})
 
-set(_install_rpath_linkflag )
-if(_has_rpath_flag)
-  if(APPLE)
-    set(_install_rpath_linkflag "-Wl,-rpath,@loader_path/../lib")
-  else()
-    set(_install_rpath_linkflag "-Wl,-rpath='$ORIGIN/../lib'")
-  endif()
-endif()
-
 set(_install_rpath)
 if(APPLE)
   set(_install_rpath "@loader_path/../lib")
 elseif(UNIX)
-  # this work for libraries as well as executables
-  set(_install_rpath "\$ORIGIN/../lib")
+  set(_install_rpath "\$ORIGIN:\$ORIGIN/../lib")
+  if(Qt6_DIR)
+    # External projects that link Qt (e.g. VTK) need the Qt library path in
+    # their RPATH so that transitive Qt dependencies can be resolved at runtime
+    # in the build tree.
+    set(_install_rpath "${_install_rpath}:${Qt6_DIR}/../..")
+  endif()
 endif()
 
 set(ep_common_args

@@ -544,14 +544,14 @@ function(mitk_create_module)
       # Install shared library modules into the package and register them
       # with the runtime dependency set for transitive dependency resolution.
       # Executables are handled by mitk_create_executable() / BB app function.
-      if(NOT MODULE_EXECUTABLE)
+      if(NOT MODULE_EXECUTABLE AND NOT MODULE_FORCE_STATIC)
         if(MODULE_AUTOLOAD_WITH)
           install(TARGETS ${MODULE_TARGET}
             RUNTIME_DEPENDENCY_SET mitk_deps
             RUNTIME DESTINATION bin/${MODULE_AUTOLOAD_WITH}
             LIBRARY DESTINATION bin/${MODULE_AUTOLOAD_WITH})
           if(LINUX)
-            install(CODE "file(RPATH_REMOVE FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${MODULE_AUTOLOAD_WITH}/$<TARGET_FILE_NAME:${MODULE_TARGET}>\")")
+            set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
           endif()
         else()
           install(TARGETS ${MODULE_TARGET}

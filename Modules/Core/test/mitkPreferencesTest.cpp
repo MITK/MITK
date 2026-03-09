@@ -45,6 +45,27 @@ class mitkPreferencesTestSuite : public mitk::TestFixture
   MITK_TEST(RemoveOverrideNoOpDoesNotFireEvents);
   MITK_TEST(FlushDoesNotPersistOverrides);
 
+  MITK_TEST(ApplyOverrides_SingleNodeSingleProperty);
+  MITK_TEST(ApplyOverrides_SingleNodeMultipleProperties);
+  MITK_TEST(ApplyOverrides_NestedNodes);
+  MITK_TEST(ApplyOverrides_DoNotPersist);
+  MITK_TEST(ApplyOverrides_OverrideExistingValue);
+  MITK_TEST(ApplyOverrides_OverrideNewKey);
+  MITK_TEST(ApplyOverrides_MultipleCallsLastWins);
+  MITK_TEST(ApplyOverrides_MalformedXML);
+  MITK_TEST(ApplyOverrides_NullPreferences);
+  MITK_TEST(ApplyOverrides_NoRootElement);
+  MITK_TEST(ApplyOverrides_EmptyXML);
+  MITK_TEST(ApplyOverrides_RootLevelProperties);
+
+  MITK_TEST(ApplyPatches_CreatesNewNode);
+  MITK_TEST(ApplyPatches_CreatesNestedNodes);
+  MITK_TEST(ApplyPatches_UpdatesExistingValue);
+  MITK_TEST(ApplyPatches_DoesNotSetOverride);
+  MITK_TEST(ApplyPatches_PersistsToDisk);
+  MITK_TEST(ApplyPatches_MalformedXML);
+  MITK_TEST(ApplyPatches_NullPreferences);
+
   CPPUNIT_TEST_SUITE_END();
 
   int m_NumberOfOnChangedEvents = 0;
@@ -506,6 +527,319 @@ public:
     preferences = preferencesService->GetSystemPreferences();
     CPPUNIT_ASSERT_EQUAL(std::string("persistent"), preferences->Get("key", ""));
     CPPUNIT_ASSERT_EQUAL(false, preferences->IsOverridden("key"));
+  }
+
+  void ApplyOverrides_SingleNodeSingleProperty()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("/org.mitk.test")->Put("color", "red");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"color\" value=\"blue\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("blue"), node->Get("color", ""));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("color"));
+  }
+
+  void ApplyOverrides_SingleNodeMultipleProperties()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("org.mitk.test");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"a\" value=\"1\"/>"
+      "    <property name=\"b\" value=\"2\"/>"
+      "    <property name=\"c\" value=\"3\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), node->Get("a", ""));
+    CPPUNIT_ASSERT_EQUAL(std::string("2"), node->Get("b", ""));
+    CPPUNIT_ASSERT_EQUAL(std::string("3"), node->Get("c", ""));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("a"));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("b"));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("c"));
+  }
+
+  void ApplyOverrides_NestedNodes()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("org.mitk.views/editor");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.views\">"
+      "    <preferences name=\"editor\">"
+      "      <property name=\"font\" value=\"mono\"/>"
+      "    </preferences>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.views/editor");
+    CPPUNIT_ASSERT_EQUAL(std::string("mono"), node->Get("font", ""));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("font"));
+  }
+
+  void ApplyOverrides_DoNotPersist()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto* prefs = preferencesService->GetSystemPreferences();
+
+    prefs->Node("/org.mitk.test")->Put("color", "red");
+    prefs->Flush();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"color\" value=\"blue\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+    CPPUNIT_ASSERT_EQUAL(std::string("blue"), prefs->Node("/org.mitk.test")->Get("color", ""));
+
+    // Flush again — overrides must not be written to disk
+    prefs->Flush();
+
+    preferencesService->UninitializeStorage(false);
+    preferencesService->InitializeStorage(m_PreferencesFilename);
+
+    auto* reloadedNode = preferencesService->GetSystemPreferences()->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("red"), reloadedNode->Get("color", ""));
+    CPPUNIT_ASSERT_EQUAL(false, reloadedNode->IsOverridden("color"));
+  }
+
+  void ApplyOverrides_OverrideExistingValue()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("/org.mitk.test")->Put("size", "10");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"size\" value=\"99\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("99"), node->Get("size", ""));
+
+    node->RemoveOverride("size");
+    CPPUNIT_ASSERT_EQUAL(std::string("10"), node->Get("size", ""));
+  }
+
+  void ApplyOverrides_OverrideNewKey()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("org.mitk.test");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"newkey\" value=\"value\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("value"), node->Get("newkey", "default"));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("newkey"));
+
+    node->RemoveOverride("newkey");
+    CPPUNIT_ASSERT_EQUAL(std::string("default"), node->Get("newkey", "default"));
+  }
+
+  void ApplyOverrides_MultipleCallsLastWins()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("org.mitk.test");
+
+    const std::string xml1 =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"color\" value=\"blue\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    const std::string xml2 =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"color\" value=\"green\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml1, prefs);
+    mitk::ApplyPreferencesOverrides(xml2, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("green"), node->Get("color", ""));
+    CPPUNIT_ASSERT_EQUAL(true, node->IsOverridden("color"));
+  }
+
+  void ApplyOverrides_MalformedXML()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    CPPUNIT_ASSERT_THROW(mitk::ApplyPreferencesOverrides("this is not xml", prefs), mitk::Exception);
+  }
+
+  void ApplyOverrides_NullPreferences()
+  {
+    CPPUNIT_ASSERT_THROW(
+      mitk::ApplyPreferencesOverrides("<preferences name=\"\"/>", nullptr),
+      mitk::Exception);
+  }
+
+  void ApplyOverrides_NoRootElement()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    CPPUNIT_ASSERT_THROW(mitk::ApplyPreferencesOverrides("<?xml version=\"1.0\"?>", prefs), mitk::Exception);
+  }
+
+  void ApplyOverrides_EmptyXML()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    CPPUNIT_ASSERT_NO_THROW(mitk::ApplyPreferencesOverrides("<preferences name=\"\"/>", prefs));
+    CPPUNIT_ASSERT_EQUAL(true, prefs->ChildrenNames().empty());
+  }
+
+  void ApplyOverrides_RootLevelProperties()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <property name=\"globalSetting\" value=\"on\"/>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesOverrides(xml, prefs);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("on"), prefs->Get("globalSetting", ""));
+    CPPUNIT_ASSERT_EQUAL(true, prefs->IsOverridden("globalSetting"));
+  }
+  void ApplyPatches_CreatesNewNode()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.new\">"
+      "    <property name=\"key\" value=\"patched\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesPatches(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.new");
+    CPPUNIT_ASSERT_EQUAL(std::string("patched"), node->Get("key", ""));
+    CPPUNIT_ASSERT_EQUAL(false, node->IsOverridden("key"));
+  }
+
+  void ApplyPatches_CreatesNestedNodes()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.views\">"
+      "    <preferences name=\"editor\">"
+      "      <property name=\"font\" value=\"mono\"/>"
+      "    </preferences>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesPatches(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.views/editor");
+    CPPUNIT_ASSERT_EQUAL(std::string("mono"), node->Get("font", ""));
+  }
+
+  void ApplyPatches_UpdatesExistingValue()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    prefs->Node("org.mitk.test")->Put("color", "red");
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"color\" value=\"blue\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesPatches(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("blue"), node->Get("color", ""));
+    CPPUNIT_ASSERT_EQUAL(false, node->IsOverridden("color"));
+  }
+
+  void ApplyPatches_DoesNotSetOverride()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"key\" value=\"value\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesPatches(xml, prefs);
+
+    auto* node = prefs->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(false, node->IsOverridden("key"));
+  }
+
+  void ApplyPatches_PersistsToDisk()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    auto* prefs = preferencesService->GetSystemPreferences();
+
+    const std::string xml =
+      "<preferences name=\"\">"
+      "  <preferences name=\"org.mitk.test\">"
+      "    <property name=\"persistent\" value=\"yes\"/>"
+      "  </preferences>"
+      "</preferences>";
+
+    mitk::ApplyPreferencesPatches(xml, prefs);
+    prefs->Flush();
+
+    preferencesService->UninitializeStorage(false);
+    preferencesService->InitializeStorage(m_PreferencesFilename);
+
+    auto* node = preferencesService->GetSystemPreferences()->Node("/org.mitk.test");
+    CPPUNIT_ASSERT_EQUAL(std::string("yes"), node->Get("persistent", ""));
+    CPPUNIT_ASSERT_EQUAL(false, node->IsOverridden("persistent"));
+  }
+
+  void ApplyPatches_MalformedXML()
+  {
+    auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+    CPPUNIT_ASSERT_THROW(mitk::ApplyPreferencesPatches("this is not xml", prefs), mitk::Exception);
+  }
+
+  void ApplyPatches_NullPreferences()
+  {
+    CPPUNIT_ASSERT_THROW(
+      mitk::ApplyPreferencesPatches("<preferences name=\"\"/>", nullptr),
+      mitk::Exception);
   }
 };
 

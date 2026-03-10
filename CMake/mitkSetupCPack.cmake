@@ -52,8 +52,11 @@ set(CPACK_RESOURCE_FILE_LICENSE "${MITK_SOURCE_DIR}/LICENSE")
 
 string(REPLACE "/" "_" CPACK_PACKAGE_VERSION_MAJOR "${MITK_REVISION_DESC}")
 
-# tell cpack to strip all debug symbols from all files
-set(CPACK_STRIP_FILES ON)
+# Do not strip files during packaging. CppMicroServices embeds resources
+# as ZIP archives appended to shared library files (APPEND mode). The
+# strip command rewrites ELF binaries and discards all data beyond the
+# ELF structure, destroying these appended resources.
+set(CPACK_STRIP_FILES OFF)
 
 # set version
 if(NOT CPACK_PACKAGE_VERSION_MAJOR)

@@ -1,42 +1,4 @@
 #
-# MITK specific cross platform install macro
-#
-# Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)
-#
-macro(MITK_INSTALL_TARGETS)
-  cmake_parse_arguments(_install "GLOB_PLUGINS" "" "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" ${ARGN})
-  list(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
-
-  foreach(_target ${_install_EXECUTABLES})
-    get_target_property(_is_bundle ${_target} MACOSX_BUNDLE)
-
-    if(APPLE)
-      if(_is_bundle)
-        install(TARGETS ${_target}
-          RUNTIME_DEPENDENCY_SET mitk_deps
-          BUNDLE DESTINATION .)
-      else()
-        if(NOT MACOSX_BUNDLE_NAMES)
-          install(TARGETS ${_target}
-            RUNTIME_DEPENDENCY_SET mitk_deps
-            RUNTIME DESTINATION bin)
-        else()
-          foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
-            install(TARGETS ${_target}
-              RUNTIME_DEPENDENCY_SET mitk_deps
-              RUNTIME DESTINATION ${bundle_name}.app/Contents/MacOS/)
-          endforeach()
-        endif()
-      endif()
-    else()
-      install(TARGETS ${_target}
-        RUNTIME_DEPENDENCY_SET mitk_deps
-        RUNTIME DESTINATION bin)
-    endif()
-  endforeach()
-endmacro()
-
-#
 # Deploy Qt runtime dependencies for a target.
 #
 # This installs Qt plugins, shared libraries, qt.conf, and platform-specific
@@ -44,7 +6,7 @@ endmacro()
 # AFTER runtime dependencies have been deployed, so that windeployqt can trace
 # transitive Qt dependencies from MITK DLLs already present in bin/.
 #
-function(_mitk_deploy_qt _target)
+function(mitkFunctionDeployQt _target)
   get_target_property(_is_bundle ${_target} MACOSX_BUNDLE)
 
   if(APPLE AND _is_bundle)

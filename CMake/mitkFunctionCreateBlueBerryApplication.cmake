@@ -16,7 +16,6 @@
 #! \param EXCLUDE_PLUGINS (optional) A list of plug-ins which should not be used. Mainly
 #!        useful if PLUGINS was not used.
 #! \param LINK_LIBRARIES A list of libraries to be linked with the executable.
-#! \param LIBRARY_DIRS A list of directories to pass through to MITK_INSTALL_TARGETS
 #! \param NO_PROVISIONING (option) Do not create provisioning files.
 #! \param NO_INSTALL (option) Do not install this executable
 #!
@@ -31,7 +30,7 @@
 #!
 function(mitkFunctionCreateBlueBerryApplication)
 
-cmake_parse_arguments(_APP "NO_PROVISIONING;NO_INSTALL" "NAME;DESCRIPTION;ID;COPYRIGHT" "SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" ${ARGN})
+cmake_parse_arguments(_APP "NO_PROVISIONING;NO_INSTALL" "NAME;DESCRIPTION;ID;COPYRIGHT" "SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -211,20 +210,22 @@ if(NOT _APP_NO_INSTALL)
   # This installs all third-party CTK plug-ins
   mitkFunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
 
-  if(COMMAND BlueBerryApplicationInstallHook)
-    set(_real_app_plugins ${_APP_PLUGINS})
-    if(_APP_EXCLUDE_PLUGINS)
-      list(REMOVE_ITEM _real_app_plugins ${_APP_EXCLUDE_PLUGINS})
-    endif()
-    BlueBerryApplicationInstallHook(APP_NAME ${_APP_NAME} PLUGINS ${_real_app_plugins})
+  # Install executable and wrapper scripts. Qt deployment stays in
+  # mitkInstallRules.cmake (must run after dependency resolution).
+  install(TARGETS ${_APP_NAME}
+    RUNTIME_DEPENDENCY_SET mitk_deps
+    RUNTIME DESTINATION bin
+    BUNDLE DESTINATION .)
+
+  if(LINUX)
+    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME "${_APP_NAME}.sh")
+  elseif(WIN32)
+    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledWin32App.bat" DESTINATION "." RENAME "${_APP_NAME}.bat")
   endif()
 
-  # The executable, wrapper scripts, and Qt deployment are handled centrally
-  # by mitkInstallRules.cmake via MITK_EXECUTABLE_TARGETS.
-
   if(NOT _APP_NO_PROVISIONING)
-    # Install the provisioning file
-    mitkFunctionInstallProvisioningFiles(${_prov_file})
+    get_filename_component(_prov_file_name "${_prov_file}" NAME)
+    install(FILES "${_prov_file}.install" DESTINATION bin RENAME "${_prov_file_name}")
   endif()
 
   # Tell cpack the executables that you want in the start menu as links

@@ -622,9 +622,7 @@ include(mitkFunctionCreateProvisioningFile)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
-include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionInstallCTKPlugin)
-include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallThirdPartyCTKPlugins)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionUseModules)
@@ -637,8 +635,7 @@ include(mitkMacroCreateModuleTests)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-include(mitkMacroInstall)
-include(mitkMacroInstallTargets)
+include(mitkFunctionDeployQt)
 include(mitkMacroMultiplexPicType)
 
 #-----------------------------------------------------------------------------
@@ -772,9 +769,10 @@ if(OpenSSL_FOUND AND WIN32)
       configure_file("${MITK_OPENSSL_CRYPTO_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
     endforeach()
 
-    MITK_INSTALL(FILES
+    install(FILES
       "${MITK_OPENSSL_SSL_DLL}"
       "${MITK_OPENSSL_CRYPTO_DLL}"
+      DESTINATION bin
     )
   endif()
 endif()
@@ -1523,11 +1521,6 @@ foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
   endif()
 endforeach()
 
-# Additional installation rules - included here (after Applications) so that all
-# installable targets are registered in MITK_EXECUTABLE_TARGETS and MITK_MODULE_TARGETS.
-# Must come before Examples to avoid installing example executables.
-include(mitkInstallRules)
-
 #-----------------------------------------------------------------------------
 # MITK Examples
 #-----------------------------------------------------------------------------
@@ -1537,6 +1530,10 @@ if(MITK_BUILD_EXAMPLES)
   # might do a find_package(MITK REQUIRED).
   add_subdirectory(Examples)
 endif()
+
+# Final installation rules: resolve runtime dependencies and deploy Qt.
+# Must come after all targets have been created (Modules, Plugins, Applications, Examples).
+include(mitkInstallRules)
 
 #-----------------------------------------------------------------------------
 # Print configuration summary

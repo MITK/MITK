@@ -111,6 +111,26 @@ macro(mitk_create_executable)
           NAME ${MODULE_TARGET}
         )
     endif()
+
+    # Install executable and wrapper scripts
+    if(NOT EXEC_NO_INSTALL)
+      install(TARGETS ${EXECUTABLE_TARGET}
+        RUNTIME_DEPENDENCY_SET mitk_deps
+        RUNTIME DESTINATION bin)
+
+      if(CMDAPP_NAME)
+        set(_source "RunInstalledCmdLineApp")
+        set(_destination "apps")
+      else()
+        set(_source "RunInstalledApp")
+        set(_destination ".")
+      endif()
+      if(LINUX)
+        install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/${_source}.sh" DESTINATION "${_destination}" RENAME "${EXECUTABLE_TARGET}.sh")
+      elseif(WIN32)
+        install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/${_source}.bat" DESTINATION "${_destination}" RENAME "${EXECUTABLE_TARGET}.bat")
+      endif()
+    endif()
   endif()
 
 endmacro()

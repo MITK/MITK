@@ -541,6 +541,26 @@ function(mitk_create_module)
         usFunctionEmbedResources(TARGET ${MODULE_TARGET})
       endif()
 
+      # Install shared library modules into the package and register them
+      # with the runtime dependency set for transitive dependency resolution.
+      # Executables are handled by mitk_create_executable() / BB app function.
+      if(NOT MODULE_EXECUTABLE)
+        if(MODULE_AUTOLOAD_WITH)
+          install(TARGETS ${MODULE_TARGET}
+            RUNTIME_DEPENDENCY_SET mitk_deps
+            RUNTIME DESTINATION bin/${MODULE_AUTOLOAD_WITH}
+            LIBRARY DESTINATION bin/${MODULE_AUTOLOAD_WITH})
+          if(LINUX)
+            install(CODE "file(RPATH_REMOVE FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${MODULE_AUTOLOAD_WITH}/$<TARGET_FILE_NAME:${MODULE_TARGET}>\")")
+          endif()
+        else()
+          install(TARGETS ${MODULE_TARGET}
+            RUNTIME_DEPENDENCY_SET mitk_deps
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION bin)
+        endif()
+      endif()
+
       if(MODULE_DEPRECATED_SINCE)
         set_property(TARGET ${MODULE_TARGET} PROPERTY MITK_MODULE_DEPRECATED_SINCE ${MODULE_DEPRECATED_SINCE})
       endif()

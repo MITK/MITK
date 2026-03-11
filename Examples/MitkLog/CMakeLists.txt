@@ -1,3 +1,3 @@
 project(MitkLogExample)
 
-mitk_create_executable(LogExample DEPENDS MitkCore)
+mitk_create_executable(LogExample DEPENDS MitkCore NO_INSTALL)

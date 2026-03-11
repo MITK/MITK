@@ -308,8 +308,8 @@ function(mitk_create_plugin)
       endif()
     endforeach()
 
-    # The MITK_AUTOLOAD_TARGETS property is used in the mitkFunctionInstallAutoLoadModules
-    # macro which expects a list of plug-in targets.
+    # The MITK_AUTOLOAD_TARGETS property tracks auto-load modules associated
+    # with this plug-in target.
     if (_autoload_targets)
       list(REMOVE_DUPLICATES _autoload_targets)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES MITK_AUTOLOAD_TARGETS "${_autoload_targets}")

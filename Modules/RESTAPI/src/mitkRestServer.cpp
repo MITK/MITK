@@ -137,11 +137,23 @@ RestServer::~RestServer()
 
 bool RestServer::Start()
 {
-  std::lock_guard<std::mutex> lock(m_Mutex);
+  std::unique_lock<std::mutex> lock(m_Mutex);
 
   if (m_Running)
   {
     return true;  // Already running
+  }
+
+  // Join any stale server thread from a previous failed start.
+  // When listen() fails asynchronously the thread exits but m_ServerThread is never
+  // joined. Destroying a joinable std::thread is undefined behaviour (terminate or
+  // resource_deadlock_would_occur on MSVC), so we must join it before proceeding.
+  if (m_ServerThread)
+  {
+    std::unique_ptr<std::thread> staleThread = std::move(m_ServerThread);
+    lock.unlock();
+    staleThread->join();
+    lock.lock();
   }
 
   m_RequestLog.clear();
@@ -206,6 +218,18 @@ bool RestServer::Start()
     // Apply payload size limit
     m_Server->set_payload_max_length(
       static_cast<size_t>(m_PendingConfig.maxPayloadSizeMB) * 1024 * 1024);
+
+    // Bind to the port synchronously so failures (port already in use, permission
+    // denied) are detected here and reported before the server thread is launched.
+    // listen_after_bind() is called from ServerThreadFunc once the thread starts.
+    if (!m_Server->bind_to_port(m_PendingConfig.host, m_PendingConfig.port))
+    {
+      m_LastError = "Port " + std::to_string(m_PendingConfig.port) +
+                    " on " + SanitizeForLog(m_PendingConfig.host) +
+                    " is already in use or cannot be bound";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
 
     // Setup temp directory for data serialization
     if (!this->SetupTempDirectory())
@@ -950,34 +974,25 @@ void RestServer::RegisterRoutes()
 
 void RestServer::ServerThreadFunc()
 {
-  std::string host;
-  int port;
-
-  {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    // m_RunningConfig is guaranteed to have a value here because Start() sets it
-    // before launching this thread
-    host = m_RunningConfig->host;
-    port = m_RunningConfig->port;
-  }
-
-  // This blocks until server is stopped (either via stop() or error)
-  bool result = m_Server->listen(host, port);
+  // The port is already bound via bind_to_port() in Start(). This call blocks
+  // until the server is stopped (via Stop()) or an unexpected error occurs.
+  const bool result = m_Server->listen_after_bind();
 
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    // Check if this was an unexpected failure (not triggered by Stop())
-    // m_Running being true here means Stop() hasn't been called yet
+    // Check if this was an unexpected failure (not triggered by Stop()).
+    // m_Running being true here means Stop() has not been called yet.
     if (!result && m_Running)
     {
-      // listen() failed to start or returned unexpectedly
-      m_LastError = "Server failed to listen on " + SanitizeForLog(host) + ":" + std::to_string(port);
+      const std::string host = m_RunningConfig ? m_RunningConfig->host : "?";
+      const int port = m_RunningConfig ? m_RunningConfig->port : 0;
+      m_LastError = "Server stopped unexpectedly on " + SanitizeForLog(host) + ":" + std::to_string(port);
       MITK_ERROR << *m_LastError;
     }
 
-    // Server is no longer running regardless of how listen() returned
-    // This ensures IsRunning() returns the correct state
+    // Server is no longer running regardless of how listen_after_bind() returned.
+    // This ensures IsRunning() returns the correct state.
     m_Running = false;
     m_RunningConfig = std::nullopt;
   }

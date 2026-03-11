@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkRenderingController.h"
 #include "mitkDataStorageBridge.h"
+#include "mitkRenderWindowBridge.h"
 
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
@@ -48,11 +49,34 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(MultiNodeReinitSecondUidUnknownReturns404);
   MITK_TEST(MultiNodeReinitSecondNodeNoDataReturns422);
 
+  // GET /rendering/selected-position tests
+  MITK_TEST(GetSelectedPositionWithoutBridgeReturns503);
+  MITK_TEST(GetSelectedPositionWithGetterReturns200);
+  MITK_TEST(PutSelectedPositionWithoutBridgeReturns503);
+  MITK_TEST(PutSelectedPositionWithSetterReturns204);
+  MITK_TEST(PutSelectedPositionMissingPositionFieldReturns400);
+  MITK_TEST(PutSelectedPositionWrongArrayLengthReturns400);
+  MITK_TEST(PutSelectedPositionInvalidJsonReturns400);
+
+  // GET/PUT /rendering/selected-time tests
+  MITK_TEST(GetSelectedTimeReturns200WithTimestepAndBoundsFields);
+  MITK_TEST(PutSelectedTimeWithTimepointMsReturns204);
+  MITK_TEST(PutSelectedTimeWithTimestepReturns204);
+  MITK_TEST(PutSelectedTimeWithBothFieldsReturns400);
+  MITK_TEST(PutSelectedTimeWithNeitherFieldReturns400);
+  MITK_TEST(PutSelectedTimeWithInvalidTypeReturns400);
+
+  // GET /rendering/screenshot tests
+  MITK_TEST(GetScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetScreenshotWithInvalidFormatReturns400);
+  MITK_TEST(GetScreenshotWithNonPositiveWidthReturns400);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
   std::unique_ptr<mitk::DataStorageBridge> m_Bridge;
+  std::unique_ptr<mitk::RenderWindowBridge> m_RenderWindowBridge;
   std::unique_ptr<mitk::RenderingController> m_Controller;
 
   httplib::Request MakeRequest(const std::string& path = "",
@@ -81,13 +105,16 @@ public:
     m_DataStorage = mitk::StandaloneDataStorage::New();
     m_Bridge = std::make_unique<mitk::DataStorageBridge>();
     m_Bridge->SetDataStorage(m_DataStorage);
+    m_RenderWindowBridge = std::make_unique<mitk::RenderWindowBridge>();
     m_Controller = std::make_unique<mitk::RenderingController>(*m_Bridge);
+    m_Controller->SetRenderWindowBridge(m_RenderWindowBridge.get());
     // No dispatcher: headless mode — tasks execute directly on the calling thread.
   }
 
   void tearDown() override
   {
     m_Controller.reset();
+    m_RenderWindowBridge.reset();
     m_Bridge->SetDataStorage(nullptr);
     m_Bridge.reset();
     m_DataStorage = nullptr;
@@ -331,6 +358,249 @@ public:
     CPPUNIT_ASSERT_EQUAL(422, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("NO_DATA"), json["error"]["code"].get<std::string>());
+  }
+  // ===== GET /rendering/selected-position =====
+
+  void GetSelectedPositionWithoutBridgeReturns503()
+  {
+    m_Controller->SetRenderWindowBridge(nullptr);
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
+    httplib::Response res;
+
+    m_Controller->HandleGET_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSelectedPositionWithGetterReturns200()
+  {
+    mitk::Point3D expectedPos;
+    expectedPos[0] = 1.0; expectedPos[1] = 2.0; expectedPos[2] = 3.0;
+    m_RenderWindowBridge->SetPositionGetter([expectedPos]() { return expectedPos; });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
+    httplib::Response res;
+
+    m_Controller->HandleGET_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("position"));
+    CPPUNIT_ASSERT(json["position"].is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(3), json["position"].size());
+    CPPUNIT_ASSERT(json.contains("bounds"));
+    CPPUNIT_ASSERT(json["bounds"].contains("min"));
+    CPPUNIT_ASSERT(json["bounds"].contains("max"));
+  }
+
+  void PutSelectedPositionWithoutBridgeReturns503()
+  {
+    m_Controller->SetRenderWindowBridge(nullptr);
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
+                                       R"({"position": [1.0, 2.0, 3.0]})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSelectedPositionWithSetterReturns204()
+  {
+    mitk::Point3D capturedPos;
+    capturedPos.Fill(0.0);
+    m_RenderWindowBridge->SetPositionSetter(
+      [&capturedPos](const mitk::Point3D& pos) { capturedPos = pos; });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
+                                       R"({"position": [1.0, 2.0, 3.0]})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, capturedPos[0], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, capturedPos[1], 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, capturedPos[2], 1e-6);
+  }
+
+  void PutSelectedPositionMissingPositionFieldReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position", "{}");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutSelectedPositionWrongArrayLengthReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
+                                       R"({"position": [1.0, 2.0]})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutSelectedPositionInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position", "not-json");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  // ===== GET/PUT /rendering/selected-time =====
+
+  void GetSelectedTimeReturns200WithTimestepAndBoundsFields()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time");
+    httplib::Response res;
+
+    m_Controller->HandleGET_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("timepoint_ms"));
+    CPPUNIT_ASSERT(json.contains("timestep"));
+    CPPUNIT_ASSERT(json.contains("bounds"));
+    CPPUNIT_ASSERT(json["bounds"].contains("min_timepoint_ms"));
+    CPPUNIT_ASSERT(json["bounds"].contains("max_timepoint_ms"));
+    CPPUNIT_ASSERT(json["bounds"].contains("steps"));
+  }
+
+  void PutSelectedTimeWithTimepointMsReturns204()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time",
+                                       R"({"timepoint_ms": 0.0})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+  }
+
+  void PutSelectedTimeWithTimestepReturns204()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time",
+                                       R"({"timestep": 0})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+  }
+
+  void PutSelectedTimeWithBothFieldsReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time",
+                                       R"({"timepoint_ms": 0.0, "timestep": 0})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutSelectedTimeWithNeitherFieldReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time", "{}");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void PutSelectedTimeWithInvalidTypeReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-time",
+                                       R"({"timestep": "zero"})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedTime(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  // ===== GET /rendering/screenshot =====
+
+  void GetScreenshotWithoutProviderReturns503()
+  {
+    // No provider is set in setUp — bridge has no provider.
+    const auto req = this->MakeRequest("/api/v1/rendering/screenshot");
+    httplib::Response res;
+
+    m_Controller->HandleGET_screenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetScreenshotWithInvalidFormatReturns400()
+  {
+    m_RenderWindowBridge->SetScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) {
+        return std::vector<unsigned char>{};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/screenshot";
+    req.params.emplace("format", "bmp");
+    httplib::Response res;
+
+    m_Controller->HandleGET_screenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void GetScreenshotWithNonPositiveWidthReturns400()
+  {
+    m_RenderWindowBridge->SetScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) {
+        return std::vector<unsigned char>{};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/screenshot";
+    req.params.emplace("width", "0");
+    req.params.emplace("height", "100");
+    httplib::Response res;
+
+    m_Controller->HandleGET_screenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
   }
 };
 

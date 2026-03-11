@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkRestServerConfig.h>
 #include <mitkDataStorage.h>
 
+namespace mitk { class RenderWindowBridge; }
+
 #include <string>
 #include <optional>
 #include <vector>
@@ -115,6 +117,20 @@ namespace mitk
      * @return The running configuration, or std::nullopt if server is not running.
      */
     virtual std::optional<RestServerConfig> GetRunningConfig() const = 0;
+
+    // Render-window integration
+
+    /**
+     * @brief Return the server-owned RenderWindowBridge.
+     *
+     * The bridge is owned by the server. UI-layer plugins (e.g. the Qt workbench
+     * plugin) configure it by setting callbacks for screenshot capture and
+     * crosshair position access. Callbacks must be cleared before the objects
+     * they reference are destroyed.
+     *
+     * @return Pointer to the bridge. Never null.
+     */
+    virtual RenderWindowBridge* GetRenderWindowBridge() = 0;
 
     // DataStorage connection
 

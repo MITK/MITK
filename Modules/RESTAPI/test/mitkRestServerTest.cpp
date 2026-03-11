@@ -21,6 +21,95 @@ found in the LICENSE file.
 #include <thread>
 #include <chrono>
 
+// Platform socket headers for PortOccupier
+#ifdef _WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <sys/socket.h>
+#  include <netinet/in.h>
+#  include <arpa/inet.h>
+#  include <unistd.h>
+#endif
+
+/**
+ * @brief RAII helper that binds and listens on a TCP port to block other processes.
+ *
+ * On Windows, SO_EXCLUSIVEADDRUSE is set so that even sockets with SO_REUSEADDR
+ * (as used by httplib internally) cannot bind to the same port.
+ * On POSIX, omitting SO_REUSEADDR is sufficient to block re-binding while a
+ * socket is actively listening.
+ *
+ * Winsock is assumed to be already initialised by httplib (via its static
+ * WSAStartup helper) before any test runs.
+ */
+class PortOccupier
+{
+public:
+  explicit PortOccupier(int port)
+  {
+#ifdef _WIN32
+    m_Socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (m_Socket == INVALID_SOCKET)
+      return;
+
+    // Prevent httplib's SO_REUSEADDR socket from binding to the same address:port.
+    BOOL excl = TRUE;
+    ::setsockopt(m_Socket, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+                 reinterpret_cast<const char*>(&excl), sizeof(excl));
+#else
+    m_Socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (m_Socket < 0)
+    {
+      m_Socket = kInvalid;
+      return;
+    }
+    // Intentionally do NOT set SO_REUSEADDR: an active listening socket
+    // blocks further bind() calls from other sockets on POSIX.
+#endif
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    addr.sin_port = htons(static_cast<uint16_t>(port));
+
+    if (::bind(m_Socket, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) != 0 ||
+        ::listen(m_Socket, 1) != 0)
+    {
+      this->Close();
+    }
+  }
+
+  ~PortOccupier() { this->Close(); }
+
+  PortOccupier(const PortOccupier&) = delete;
+  PortOccupier& operator=(const PortOccupier&) = delete;
+
+  bool IsOccupied() const { return m_Socket != kInvalid; }
+
+  void Close()
+  {
+    if (m_Socket == kInvalid)
+      return;
+#ifdef _WIN32
+    ::closesocket(m_Socket);
+    m_Socket = INVALID_SOCKET;
+#else
+    ::close(m_Socket);
+    m_Socket = kInvalid;
+#endif
+  }
+
+private:
+#ifdef _WIN32
+  static constexpr SOCKET kInvalid = INVALID_SOCKET;
+  SOCKET m_Socket = INVALID_SOCKET;
+#else
+  static constexpr int kInvalid = -1;
+  int m_Socket = -1;
+#endif
+};
+
 class mitkRestServerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkRestServerTestSuite);
@@ -31,6 +120,9 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   MITK_TEST(PendingVsRunningConfig);
   MITK_TEST(HandlesDataStorageConnection);
   MITK_TEST(DisabledConfigPreventsStart);
+  // Port conflict tests
+  MITK_TEST(PortAlreadyInUseReturnsFalse);
+  MITK_TEST(CanRestartOnDifferentPortAfterPortConflict);
   // Request logging tests
   MITK_TEST(LogLimitDefaultsToUnlimited);
   MITK_TEST(LogLimitCanBeSet);
@@ -219,6 +311,56 @@ public:
     CPPUNIT_ASSERT(!started);
     CPPUNIT_ASSERT(!m_Server->IsRunning());
     CPPUNIT_ASSERT(m_Server->GetLastError().has_value());
+  }
+
+  // ===== Port conflict tests =====
+
+  void PortAlreadyInUseReturnsFalse()
+  {
+    // Occupy port 18100 with a raw socket. SO_EXCLUSIVEADDRUSE (Windows) prevents
+    // httplib's SO_REUSEADDR socket from binding to the same address:port.
+    PortOccupier occupier(18100);
+    CPPUNIT_ASSERT_MESSAGE("PortOccupier must successfully bind port 18100", occupier.IsOccupied());
+
+    mitk::RestServerConfig config;
+    config.port = 18100;
+    config.enabled = true;
+    m_Server->SetConfig(config);
+
+    const bool started = m_Server->Start();
+
+    CPPUNIT_ASSERT_MESSAGE("Start() must return false when port is already in use", !started);
+    CPPUNIT_ASSERT_MESSAGE("IsRunning() must be false after failed start", !m_Server->IsRunning());
+    CPPUNIT_ASSERT_MESSAGE("GetLastError() must be set after failed start", m_Server->GetLastError().has_value());
+  }
+
+  void CanRestartOnDifferentPortAfterPortConflict()
+  {
+    // Occupy port 18101 with a raw socket.
+    {
+      PortOccupier occupier(18101);
+      CPPUNIT_ASSERT_MESSAGE("PortOccupier must successfully bind port 18101", occupier.IsOccupied());
+
+      mitk::RestServerConfig config;
+      config.port = 18101;
+      config.enabled = true;
+      m_Server->SetConfig(config);
+      CPPUNIT_ASSERT(!m_Server->Start());
+      // occupier goes out of scope here, releasing the port
+    }
+
+    // Retry on a now-free port. Must not crash and must succeed.
+    mitk::RestServerConfig config;
+    config.port = 18102;
+    config.enabled = true;
+    m_Server->SetConfig(config);
+    const bool started = m_Server->Start();
+
+    CPPUNIT_ASSERT_MESSAGE("Start() must succeed on a free port after a previous port conflict", started);
+    CPPUNIT_ASSERT(m_Server->IsRunning());
+
+    m_Server->Stop();
+    CPPUNIT_ASSERT(!m_Server->IsRunning());
   }
 
   // ===== Request logging tests =====

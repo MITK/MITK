@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkDataStorageController.h"
 #include "mitkSwaggerController.h"
 #include "mitkRenderingController.h"
+#include "mitkRenderWindowBridge.h"
 #include "mitkErrorResponse.h"
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
@@ -125,6 +126,7 @@ namespace
 
 RestServer::RestServer()
   : m_Bridge(std::make_unique<DataStorageBridge>())
+  , m_RenderWindowBridge(std::make_unique<RenderWindowBridge>())
 {
 }
 
@@ -219,6 +221,7 @@ bool RestServer::Start()
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
     m_RenderingController = std::make_unique<RenderingController>(*m_Bridge);
+    m_RenderingController->SetRenderWindowBridge(m_RenderWindowBridge.get());
     this->SyncDispatcherToController();
 
     // Pass file access config to controllers
@@ -361,6 +364,7 @@ void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Dispatcher = dispatcher;
   m_Bridge->SetDispatcher(dispatcher);
+  m_RenderWindowBridge->SetDispatcher(dispatcher);
   this->SyncDispatcherToController();
 }
 
@@ -368,6 +372,12 @@ void RestServer::SyncDispatcherToController()
 {
   if (m_RenderingController)
     m_RenderingController->SetDispatcher(m_Dispatcher.Lock());
+}
+
+RenderWindowBridge* RestServer::GetRenderWindowBridge()
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return m_RenderWindowBridge.get();
 }
 
 DataStorage::Pointer RestServer::GetDataStorage() const
@@ -871,6 +881,36 @@ void RestServer::RegisterRoutes()
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandlePOST_reinit(req, res);
       this->RecordRequest(req.path, "POST", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_selectedPosition(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_selectedPosition(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/selected-time",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_selectedTime(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/selected-time",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_selectedTime(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_screenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
   // Documentation endpoints (Swagger UI and OpenAPI spec)

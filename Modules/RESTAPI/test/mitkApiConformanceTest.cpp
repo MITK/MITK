@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkDataStorageController.h"
 #include "mitkHealthController.h"
 #include "mitkRenderingController.h"
+#include "mitkRenderWindowBridge.h"
 #include "mitkDataStorageBridge.h"
 #include "mitkErrorResponse.h"
 #include <mitkStandaloneDataStorage.h>
@@ -124,6 +125,7 @@ private:
   std::unique_ptr<mitk::DataStorageBridge> m_Bridge;
   std::unique_ptr<mitk::DataStorageController> m_Controller;
   std::unique_ptr<mitk::HealthController> m_HealthController;
+  std::unique_ptr<mitk::RenderWindowBridge> m_RenderWindowBridge;
   std::unique_ptr<mitk::RenderingController> m_RenderingController;
 
   nlohmann::json m_Spec;
@@ -276,6 +278,26 @@ private:
     m_EndpointRegistry[{"/rendering/reinit", "post"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandlePOST_reinit(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/selected-position", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_selectedPosition(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/selected-position", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_selectedPosition(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/selected-time", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_selectedTime(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/selected-time", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_selectedTime(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_screenshot(req, res);
       };
   }
 
@@ -436,7 +458,8 @@ private:
       mitk::ErrorResponse::CODE_ACCESS_DENIED,
       mitk::ErrorResponse::CODE_UNAUTHORIZED,
       mitk::ErrorResponse::CODE_RATE_LIMIT_EXCEEDED,
-      mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED
+      mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED,
+      mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_AVAILABLE
     };
   }
 
@@ -473,7 +496,9 @@ public:
     m_Bridge->SetDataStorage(m_DataStorage);
     m_Controller = std::make_unique<mitk::DataStorageController>(*m_Bridge);
     m_HealthController = std::make_unique<mitk::HealthController>(*m_Bridge);
+    m_RenderWindowBridge = std::make_unique<mitk::RenderWindowBridge>();
     m_RenderingController = std::make_unique<mitk::RenderingController>(*m_Bridge);
+    m_RenderingController->SetRenderWindowBridge(m_RenderWindowBridge.get());
 
     m_Spec = this->LoadOpenAPISpec();
 
@@ -485,6 +510,7 @@ public:
     m_EndpointRegistry.clear();
     m_Spec = nullptr;
     m_RenderingController.reset();
+    m_RenderWindowBridge.reset();
     m_HealthController.reset();
     m_Controller.reset();
     m_Bridge->SetDataStorage(nullptr);

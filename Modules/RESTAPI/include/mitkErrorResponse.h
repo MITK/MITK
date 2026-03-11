@@ -54,6 +54,7 @@ namespace mitk
     static constexpr const char* CODE_UNAUTHORIZED = "UNAUTHORIZED";
     static constexpr const char* CODE_RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED";
     static constexpr const char* CODE_FILE_ACCESS_DENIED = "FILE_ACCESS_DENIED";
+    static constexpr const char* CODE_RENDER_WINDOW_NOT_AVAILABLE = "RENDER_WINDOW_NOT_AVAILABLE";
 
     /**
      * @brief Create an RFC 7807 error response.
@@ -273,6 +274,17 @@ namespace mitk
      * @return JSON error response with status 403
      */
     static Json FileAccessDenied(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Render window not available" error response.
+     *
+     * Used when the screenshot provider is not connected (headless mode or
+     * Qt plugin not loaded).
+     *
+     * @param instance Request path
+     * @return JSON error response with status 503
+     */
+    static Json RenderWindowNotAvailable(const std::string& instance = "");
   };
 }
 

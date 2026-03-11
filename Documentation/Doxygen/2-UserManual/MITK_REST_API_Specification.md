@@ -1654,6 +1654,165 @@ Content-Type: application/json
 | 422 | `RENDERING_ERROR` | An unexpected error occurred in the rendering framework |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
 
+#### GET /api/v1/rendering/selected-position
+
+Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
+
+Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "position": [10.0, 20.0, 30.0],
+  "bounds": {
+    "min": [-50.0, -50.0, -50.0],
+    "max": [50.0, 50.0, 50.0]
+  }
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 500 | `INTERNAL_ERROR` | Unexpected error reading crosshair or geometry state |
+
+---
+
+#### PUT /api/v1/rendering/selected-position
+
+Moves the crosshair to the given 3D world position via `IRenderWindowPart::SetSelectedPosition()` on the StdMultiWidgetEditor, which updates all synchronized views.
+
+Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).
+
+**Request body (required, `application/json`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `position` | array of number (length 3) | New crosshair position in world coordinates |
+
+**Example:**
+```http
+PUT /api/v1/rendering/selected-position
+Content-Type: application/json
+
+{"position": [10.0, 20.0, 30.0]}
+```
+
+**Response: 204 No Content**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Body missing, not valid JSON, `position` field absent, or not an array of exactly 3 numbers |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 500 | `INTERNAL_ERROR` | Unexpected error setting crosshair position |
+
+---
+
+#### GET /api/v1/rendering/selected-time
+
+Returns the current time step and time point from the global `TimeNavigationController`, together with the time bounds.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "timepoint_ms": 1500.0,
+  "timestep": 3,
+  "bounds": {
+    "min_timepoint_ms": 0.0,
+    "max_timepoint_ms": 4500.0,
+    "steps": 10
+  }
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 500 | `INTERNAL_ERROR` | Unexpected error reading time navigation state |
+
+---
+
+#### PUT /api/v1/rendering/selected-time
+
+Sets the active time step or time point in the global `TimeNavigationController`. Exactly one of `timepoint_ms` or `timestep` must be present.
+
+**Request body (required, `application/json`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `timepoint_ms` | number | Target time point in milliseconds |
+| `timestep` | integer (>= 0) | Target time step index (zero-based) |
+
+Provide exactly one of the two fields — providing both or neither is an error.
+
+**Example (by time point):**
+```http
+PUT /api/v1/rendering/selected-time
+Content-Type: application/json
+
+{"timepoint_ms": 1500.0}
+```
+
+**Example (by time step):**
+```http
+PUT /api/v1/rendering/selected-time
+Content-Type: application/json
+
+{"timestep": 3}
+```
+
+**Response: 204 No Content**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Body missing, not valid JSON, both fields present, neither field present, wrong type, or negative timestep |
+| 422 | `RENDERING_ERROR` | Unexpected rendering framework error |
+
+---
+
+#### GET /api/v1/rendering/screenshot
+
+Captures a screenshot of the active application window. Requires the Qt workbench plugin to be running and the screenshot provider to be connected.
+
+**Query parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `format` | string | `"png"` | Image encoding: `"png"` or `"jpeg"` |
+| `width` | integer | (native) | Output width in pixels; must be positive |
+| `height` | integer | (native) | Output height in pixels; must be positive |
+
+`width` and `height` must always be provided together.
+
+**Example (native resolution PNG):**
+```http
+GET /api/v1/rendering/screenshot
+```
+
+**Example (scaled JPEG):**
+```http
+GET /api/v1/rendering/screenshot?format=jpeg&width=1280&height=720
+```
+
+**Response: 200** with binary body (`Content-Type: image/png` or `image/jpeg`)
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Invalid `format` value, non-positive or non-integer `width`/`height`, or only one of `width`/`height` provided |
+| 500 | `INTERNAL_ERROR` | Screenshot capture failed |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No screenshot provider connected (headless mode or Qt plugin not loaded) |
+
 ---
 
 ## 9. Error Handling
@@ -1685,12 +1844,14 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 400 | `INVALID_REQUEST` | Malformed request body or parameters |
 | 400 | `INVALID_PROPERTY_VALUE` | Property value validation failed |
 | 400 | `PROPERTY_PROTECTED` | Cannot modify/delete protected property |
-| 401 | `AUTHENTICATION_REQUIRED` | Missing or invalid authentication |
-| 403 | `FORBIDDEN` | Authenticated but not authorized |
+| 401 | `UNAUTHORIZED` | Missing or invalid authentication |
+| 403 | `ACCESS_DENIED` | Client IP not permitted to access the server |
+| 403 | `FILE_ACCESS_DENIED` | Requested file path is outside the allowed directories |
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
+| 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
 | 409 | `NAME_CONFLICT` | Node name conflict in same parent |
 | 413 | `PAYLOAD_TOO_LARGE` | Request body exceeds size limit |
@@ -1698,10 +1859,11 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
 | 422 | `NO_GEOMETRY` | Node data has no usable time geometry |
-| 429 | `RATE_LIMITED` | Too many requests |
+| 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Unexpected server error |
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | Qt workbench plugin not loaded or StdMultiWidgetEditor not open |
 | 503 | `SERVICE_UNAVAILABLE` | Server temporarily unavailable |
 
 ### 9.3 Validation Errors

@@ -6,6 +6,7 @@ set(H_FILES
   include/mitkNodeUidMapper.h
   include/mitkNodeQueryParams.h
   include/mitkErrorResponse.h
+  include/mitkRenderWindowBridge.h
 )
 
 set(CPP_FILES
@@ -18,6 +19,7 @@ set(CPP_FILES
   mitkDataStorageController.cpp
   mitkSwaggerController.cpp
   mitkRenderingController.cpp
+  mitkRenderWindowBridge.cpp
 )
 
 set(RESOURCE_FILES

@@ -229,6 +229,7 @@ namespace mitk
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode) const;
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue) const;
     DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const DataNode* segNode, MultiLabelSegmentation::LabelValueType labelValue, TimeStepType timeStep) const;
+    DataStorage::SetOfObjects::ConstPointer GetPlaneGeometryNodeFromDataStorage(const mitk::MultiLabelSegmentation* seg) const;
 
     /**
      * Adds Contours from the active Label to the interpolation pipeline

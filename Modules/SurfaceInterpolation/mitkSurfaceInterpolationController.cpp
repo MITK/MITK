@@ -19,9 +19,10 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
-#include <mitkNodePredicateDataUID.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkStringProperty.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkReduceContourSetFilter.h>
@@ -94,25 +95,18 @@ void mitk::SurfaceInterpolationController::AddNewContours(const std::vector<Cont
 
 mitk::DataNode* GetSegmentationImageNodeInternal(mitk::DataStorage* ds, const mitk::MultiLabelSegmentation* seg)
 {
-  if (nullptr == ds) return nullptr;
-  if (nullptr == seg) return nullptr;
+  if (nullptr == ds || nullptr == seg) return nullptr;
 
-  mitk::DataNode* segmentationNode = nullptr;
-  mitk::NodePredicateDataUID::Pointer dataUIDPredicate = mitk::NodePredicateDataUID::New(seg->GetUID());
-  auto dataNodeObjects = ds->GetSubset(dataUIDPredicate);
+  auto predicate = mitk::NodePredicateData::New(const_cast<mitk::MultiLabelSegmentation*>(seg));
+  auto nodes = ds->GetSubset(predicate);
 
-  if (dataNodeObjects->Size() != 0)
+  if (nodes->empty())
   {
-    for (auto it = dataNodeObjects->Begin(); it != dataNodeObjects->End(); ++it)
-    {
-      segmentationNode = it->Value();
-    }
+    MITK_DEBUG << "Unable to find the node in datastorage of the passed segmentation. Segmentation: " << seg;
+    return nullptr;
   }
-  else
-  {
-    MITK_ERROR << "Unable to find the labelSetImage with the desired UID.";
-  }
-  return segmentationNode;
+
+  return nodes->Begin()->Value();
 }
 
 mitk::DataNode* mitk::SurfaceInterpolationController::GetSegmentationImageNode() const
@@ -165,6 +159,32 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationControll
   if (m_DataStorage.IsNotNull()) result = m_DataStorage->GetDerivations(segNode, isContourPlaneGeometry);
   return result;
 }
+mitk::DataStorage::SetOfObjects::ConstPointer
+mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(
+    const mitk::MultiLabelSegmentation* seg) const
+{
+  if (m_DataStorage.IsNull() || nullptr == seg)
+    return DataStorage::SetOfObjects::New();
+
+  // Primary: pointer-based node lookup, then node hierarchy.
+  // Covers the normal live-session path and is needed to support
+  // scene persistence (hierarchy preserved).
+  auto segNode = GetSegmentationImageNodeInternal(this->m_DataStorage, seg);
+
+  if (segNode != nullptr)
+    return this->GetPlaneGeometryNodeFromDataStorage(segNode);
+
+  // Fallback: data was exchanged on the node -> seg pointer no longer matches any node.
+  // Search directly by the RuntimeUID stamped on the plane nodes at creation.
+  auto isContourPlaneGeometry = mitk::NodePredicateProperty::New(
+      "isContourPlaneGeometry", mitk::BoolProperty::New(true));
+  auto hasRuntimeUID = mitk::NodePredicateProperty::New(
+      "segmentationRuntimeUID",
+      mitk::StringProperty::New(seg->GetRuntimeUID()));
+  return m_DataStorage->GetSubset(
+      mitk::NodePredicateAnd::New(isContourPlaneGeometry, hasRuntimeUID));
+}
+
 void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo) const
 {
   auto selectedSegmentation = m_SelectedSegmentation.Lock();
@@ -234,6 +254,8 @@ void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(con
       contourPlaneGeometryDataNode->SetProperty("name", mitk::StringProperty::New(contourName) );
       contourPlaneGeometryDataNode->SetProperty("labelID", mitk::UShortProperty::New(contourInfo.LabelValue));
       contourPlaneGeometryDataNode->SetProperty("timeStep", mitk::IntProperty::New(contourInfo.TimeStep));
+      contourPlaneGeometryDataNode->SetProperty("segmentationRuntimeUID",
+          mitk::StringProperty::New(selectedSegmentation->GetRuntimeUID()));
 
       contourPlaneGeometryDataNode->SetData(planeGeometryData);
 
@@ -694,7 +716,7 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(const mitk
       cpiMap.erase(segmentationImage);
       if (m_DataStorage.IsNotNull())
       {
-        auto nodes = this->GetPlaneGeometryNodeFromDataStorage(GetSegmentationImageNodeInternal(this->m_DataStorage, segmentationImage));
+        auto nodes = this->GetPlaneGeometryNodeFromDataStorage(segmentationImage);
         this->m_DataStorage->Remove(nodes);
       }
     }
@@ -787,13 +809,22 @@ void mitk::SurfaceInterpolationController::RemoveContours(const MultiLabelSegmen
 }
 
 
-void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller,
-                                                                 const itk::EventObject & /*event*/)
+void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object* caller,
+                                                                 const itk::EventObject& /*event*/)
 {
-  auto tempImage = dynamic_cast<mitk::MultiLabelSegmentation *>(const_cast<itk::Object *>(caller));
-  if (tempImage)
+  try
   {
-    this->RemoveInterpolationSession(tempImage);
+    const auto* seg = dynamic_cast<const mitk::MultiLabelSegmentation*>(caller);
+    if (seg != nullptr)
+      this->RemoveInterpolationSession(seg);
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "SurfaceInterpolationController::OnSegmentationDeleted: " << e.what();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "SurfaceInterpolationController::OnSegmentationDeleted: unknown exception.";
   }
 }
 

@@ -63,6 +63,20 @@ namespace mitk
      */
     virtual UIDType GetUID() const;
 
+    /**
+     * \brief Get the runtime-unique ID of this object instance.
+     *
+     * Unlike GetUID(), this ID is never persisted and never manipulated by readers.
+     * Guaranteed unique for every distinct in-memory instance, derived from the
+     * object's memory address at construction time.
+     *
+     * Thread-safe: written once in the constructor, read-only thereafter.
+     *
+     * @remark Do not rely on this value after a move operation — the moved-to
+     * object inherits the original address, which is the documented behaviour.
+     */
+    UIDType GetRuntimeUID() const noexcept;
+
   protected:
     virtual void SetUID(const UIDType& uid);
 

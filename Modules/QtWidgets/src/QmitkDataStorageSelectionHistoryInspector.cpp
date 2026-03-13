@@ -11,17 +11,19 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <ui_QmitkDataStorageSelectionHistoryInspector.h>
 
 #include "QmitkDataStorageHistoryModel.h"
 
 QmitkDataStorageSelectionHistoryInspector::QmitkDataStorageSelectionHistoryInspector(QWidget* parent/* = nullptr*/)
   : QmitkAbstractDataStorageInspector(parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkDataStorageSelectionHistoryInspector>();
+  m_Controls->setupUi(this);
 
-  m_Controls.view->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  m_Controls.view->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.view->setAlternatingRowColors(true);
+  m_Controls->view->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_Controls->view->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls->view->setAlternatingRowColors(true);
 
   m_Overlay = new QmitkSimpleTextOverlayWidget(this);
   m_Overlay->setVisible(false);
@@ -29,17 +31,21 @@ QmitkDataStorageSelectionHistoryInspector::QmitkDataStorageSelectionHistoryInspe
 
   m_StorageModel = new QmitkDataStorageHistoryModel(this);
 
-  m_Controls.view->setModel(m_StorageModel);
+  m_Controls->view->setModel(m_StorageModel);
+}
+
+QmitkDataStorageSelectionHistoryInspector::~QmitkDataStorageSelectionHistoryInspector()
+{
 }
 
 QAbstractItemView* QmitkDataStorageSelectionHistoryInspector::GetView()
 {
-  return m_Controls.view;
+  return m_Controls->view;
 }
 
 const QAbstractItemView* QmitkDataStorageSelectionHistoryInspector::GetView() const
 {
-  return m_Controls.view;
+  return m_Controls->view;
 }
 
 void QmitkDataStorageSelectionHistoryInspector::Initialize()
@@ -47,19 +53,19 @@ void QmitkDataStorageSelectionHistoryInspector::Initialize()
   m_StorageModel->SetDataStorage(m_DataStorage.Lock());
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
-  m_Connector->SetView(m_Controls.view);
+  m_Connector->SetView(m_Controls->view);
 
   m_Overlay->setVisible(m_StorageModel->rowCount() == 0);
 }
 
 void QmitkDataStorageSelectionHistoryInspector::SetSelectionMode(SelectionMode mode)
 {
-  m_Controls.view->setSelectionMode(mode);
+  m_Controls->view->setSelectionMode(mode);
 }
 
 QmitkDataStorageSelectionHistoryInspector::SelectionMode QmitkDataStorageSelectionHistoryInspector::GetSelectionMode() const
 {
-  return m_Controls.view->selectionMode();
+  return m_Controls->view->selectionMode();
 }
 
 void QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(mitk::DataNode* node)

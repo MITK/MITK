@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkSingleNodeSelectionWidget.h"
 
+#include <ui_QmitkSingleNodeSelectionWidget.h>
+
 #include <mitkNodePredicateFunction.h>
 #include <mitkNodePredicateAnd.h>
 
@@ -25,17 +27,22 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
   , m_AutoSelectNodes(false)
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkSingleNodeSelectionWidget>();
+  m_Controls->setupUi(this);
 
-  m_Controls.btnSelect->installEventFilter(this);
-  m_Controls.btnSelect->setVisible(true);
-  m_Controls.btnClear->setVisible(false);
+  m_Controls->btnSelect->installEventFilter(this);
+  m_Controls->btnSelect->setVisible(true);
+  m_Controls->btnClear->setVisible(false);
 
-  m_Controls.btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
+  m_Controls->btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   this->UpdateInfo();
 
-  connect(m_Controls.btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
+  connect(m_Controls->btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
+}
+
+QmitkSingleNodeSelectionWidget::~QmitkSingleNodeSelectionWidget()
+{
 }
 
 void QmitkSingleNodeSelectionWidget::ReviseSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection)
@@ -83,7 +90,7 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::GetSelectedNode() const
 
 bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (obj == m_Controls.btnSelect)
+  if (obj == m_Controls->btnSelect)
   {
     if (ev->type() == QEvent::MouseButtonRelease)
     {
@@ -127,14 +134,14 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
   dialog->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
   dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_Controls.btnSelect->setChecked(true);
+  m_Controls->btnSelect->setChecked(true);
 
   if (dialog->exec())
   {
     this->HandleChangeOfInternalSelection(dialog->GetSelectedNodes());
   }
 
-  m_Controls.btnSelect->setChecked(false);
+  m_Controls->btnSelect->setChecked(false);
 
   delete dialog;
 }
@@ -145,21 +152,21 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   {
     if (m_IsOptional)
     {
-      m_Controls.btnSelect->SetNodeInfo(m_EmptyInfo);
+      m_Controls->btnSelect->SetNodeInfo(m_EmptyInfo);
     }
     else
     {
-      m_Controls.btnSelect->SetNodeInfo(m_InvalidInfo);
+      m_Controls->btnSelect->SetNodeInfo(m_InvalidInfo);
     }
-    m_Controls.btnSelect->SetSelectionIsOptional(m_IsOptional);
-    m_Controls.btnClear->setVisible(false);
+    m_Controls->btnSelect->SetSelectionIsOptional(m_IsOptional);
+    m_Controls->btnClear->setVisible(false);
   }
   else
   {
-    m_Controls.btnClear->setVisible(m_IsOptional);
+    m_Controls->btnClear->setVisible(m_IsOptional);
   }
 
-  m_Controls.btnSelect->SetSelectedNode(this->GetSelectedNode());
+  m_Controls->btnSelect->SetSelectedNode(this->GetSelectedNode());
 }
 
 void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)

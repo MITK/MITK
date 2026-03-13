@@ -26,7 +26,7 @@ using Self = QmitkForm;
 
 QmitkForm::QmitkForm(QWidget* parent)
   : QWidget(parent),
-    m_Ui(new Ui::QmitkForm),
+    m_Ui(std::make_unique<Ui::QmitkForm>()),
     m_Form(nullptr),
     m_HasBeenSubmitted(false)
 {

@@ -15,9 +15,7 @@ found in the LICENSE file.
 
 #include <MitkXNATExports.h>
 
-// Qt
 #include <QDialog>
-#include <QWidget>
 
 class ctkXnatObject;
 

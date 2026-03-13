@@ -17,23 +17,27 @@ found in the LICENSE file.
 #include "QmitkSimpleBarrierParametersDelegate.h"
 #include "QmitkSimpleBarrierTypeDelegate.h"
 
-QmitkSimpleBarrierManagerWidget::QmitkSimpleBarrierManagerWidget(QWidget*): m_InternalUpdate(false)
+#include <ui_QmitkSimpleBarrierManagerWidget.h>
+
+QmitkSimpleBarrierManagerWidget::QmitkSimpleBarrierManagerWidget(QWidget*)
+  : m_InternalUpdate(false),
+    m_Controls(std::make_unique<Ui::QmitkSimpleBarrierManagerWidget>())
 {
-  this->m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
 
   m_InternalModel = new QmitkSimpleBarrierModel(this);
   m_TypeDelegate = new QmitkSimpleBarrierTypeDelegate(this);
   m_ParametersDelegate = new QmitkSimpleBarrierParametersDelegate(this);
 
-  this->m_Controls.constraintsView->setModel(m_InternalModel);
-  this->m_Controls.constraintsView->setItemDelegateForColumn(0, m_ParametersDelegate);
-  this->m_Controls.constraintsView->setItemDelegateForColumn(1, m_TypeDelegate);
-  this->m_Controls.constraintsView->setItemDelegateForColumn(4, m_ParametersDelegate);
-  this->m_Controls.constraintsView->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls->constraintsView->setModel(m_InternalModel);
+  m_Controls->constraintsView->setItemDelegateForColumn(0, m_ParametersDelegate);
+  m_Controls->constraintsView->setItemDelegateForColumn(1, m_TypeDelegate);
+  m_Controls->constraintsView->setItemDelegateForColumn(4, m_ParametersDelegate);
+  m_Controls->constraintsView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  connect(this->m_Controls.btnAdd, SIGNAL(clicked(bool)), this, SLOT(OnAddConstraint(bool)));
-  connect(this->m_Controls.btnDel, SIGNAL(clicked(bool)), this, SLOT(OnDelConstraint(bool)));
-  connect(m_Controls.constraintsView, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+  connect(m_Controls->btnAdd, SIGNAL(clicked(bool)), this, SLOT(OnAddConstraint(bool)));
+  connect(m_Controls->btnDel, SIGNAL(clicked(bool)), this, SLOT(OnDelConstraint(bool)));
+  connect(m_Controls->constraintsView, SIGNAL(customContextMenuRequested(const QPoint&)), this,
           SLOT(OnShowContextMenuIsoSet(const QPoint&)));
 
   this->update();
@@ -58,9 +62,9 @@ void QmitkSimpleBarrierManagerWidget::setChecker(mitk::SimpleBarrierConstraintCh
 
 void QmitkSimpleBarrierManagerWidget::OnShowContextMenuIsoSet(const QPoint& pos)
 {
-  QPoint globalPos = m_Controls.constraintsView->viewport()->mapToGlobal(pos);
+  QPoint globalPos = m_Controls->constraintsView->viewport()->mapToGlobal(pos);
 
-  QModelIndex selectedIndex = m_Controls.constraintsView->currentIndex();
+  QModelIndex selectedIndex = m_Controls->constraintsView->currentIndex();
 
   QMenu viewMenu;
   QAction* addLevelAct = viewMenu.addAction("Add new constraint");
@@ -86,11 +90,11 @@ void QmitkSimpleBarrierManagerWidget::OnAddConstraint(bool)
 
 void QmitkSimpleBarrierManagerWidget::OnDelConstraint(bool)
 {
-  QModelIndex selectedIndex = m_Controls.constraintsView->currentIndex();
+  QModelIndex selectedIndex = m_Controls->constraintsView->currentIndex();
 
   if (!selectedIndex.isValid())
   {
-    selectedIndex = m_Controls.constraintsView->indexAt(QPoint(1, 1));
+    selectedIndex = m_Controls->constraintsView->indexAt(QPoint(1, 1));
   }
 
   this->m_InternalModel->deleteConstraint(selectedIndex);

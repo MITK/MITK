@@ -15,10 +15,13 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <QSortFilterProxyModel>
-
-#include "ui_berryQtLogView.h"
-
 #include "berryQtPlatformLogModel.h"
+#include <memory>
+
+namespace Ui
+{
+  class QtLogViewClass;
+}
 
 namespace berry {
 
@@ -33,7 +36,7 @@ public:
     QSortFilterProxyModel *filterModel;
 
 private:
-    Ui::QtLogViewClass ui;
+    std::unique_ptr<Ui::QtLogViewClass> ui;
 
     void showEvent ( QShowEvent * event ) override;
 

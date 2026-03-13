@@ -23,11 +23,16 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
+#include <ui_QmitkSurfaceStampWidgetGUIControls.h>
+
 QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /*name*/)
-  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr)
+  : QWidget(parent),
+    m_ToolManager(nullptr),
+    m_DataStorage(nullptr),
+    m_Controls(std::make_unique<Ui::QmitkSurfaceStampWidgetGUIControls>())
 {
-  m_Controls.setupUi(this);
-  m_Controls.m_InformationWidget->hide();
+  m_Controls->setupUi(this);
+  m_Controls->m_InformationWidget->hide();
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   m_ToolManager->ActivateTool(-1);
@@ -36,11 +41,11 @@ QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateDataType::New("Surface"));
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
-  m_Controls.m_cbSurfaceNodeSelector->SetPredicate(m_SurfacePredicate);
+  m_Controls->m_cbSurfaceNodeSelector->SetPredicate(m_SurfacePredicate);
 
-  connect(m_Controls.m_pbStamp, SIGNAL(clicked()), this, SLOT(OnStamp()));
-  connect(m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
-  m_Controls.m_InformationWidget->hide();
+  connect(m_Controls->m_pbStamp, SIGNAL(clicked()), this, SLOT(OnStamp()));
+  connect(m_Controls->m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
+  m_Controls->m_InformationWidget->hide();
 }
 
 QmitkSurfaceStampWidget::~QmitkSurfaceStampWidget()
@@ -50,12 +55,12 @@ QmitkSurfaceStampWidget::~QmitkSurfaceStampWidget()
 void QmitkSurfaceStampWidget::SetDataStorage(mitk::DataStorage *storage)
 {
   m_DataStorage = storage;
-  m_Controls.m_cbSurfaceNodeSelector->SetDataStorage(m_DataStorage);
+  m_Controls->m_cbSurfaceNodeSelector->SetDataStorage(m_DataStorage);
 }
 
 void QmitkSurfaceStampWidget::OnStamp()
 {
-  mitk::DataNode *surfaceNode = m_Controls.m_cbSurfaceNodeSelector->GetSelectedNode();
+  mitk::DataNode *surfaceNode = m_Controls->m_cbSurfaceNodeSelector->GetSelectedNode();
 
   if (!surfaceNode)
   {
@@ -96,7 +101,7 @@ void QmitkSurfaceStampWidget::OnStamp()
 
   try
   {
-    //    workingImage->SurfaceStamp( surface, m_Controls.m_chkOverwrite->isChecked() );
+    //    workingImage->SurfaceStamp( surface, m_Controls->m_chkOverwrite->isChecked() );
   }
   catch (mitk::Exception &e)
   {
@@ -115,7 +120,7 @@ void QmitkSurfaceStampWidget::OnStamp()
 void QmitkSurfaceStampWidget::OnShowInformation(bool on)
 {
   if (on)
-    m_Controls.m_InformationWidget->show();
+    m_Controls->m_InformationWidget->show();
   else
-    m_Controls.m_InformationWidget->hide();
+    m_Controls->m_InformationWidget->hide();
 }

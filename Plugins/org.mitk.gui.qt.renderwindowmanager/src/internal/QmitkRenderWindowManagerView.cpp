@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // render window manager plugin
 #include "QmitkRenderWindowManagerView.h"
+#include <ui_QmitkRenderWindowManagerControls.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -26,6 +27,15 @@ found in the LICENSE file.
 #include <QmitkAbstractMultiWidgetEditor.h>
 
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
+
+QmitkRenderWindowManagerView::QmitkRenderWindowManagerView()
+  : m_Controls(std::make_unique<Ui::QmitkRenderWindowManagerControls>())
+{
+}
+
+QmitkRenderWindowManagerView::~QmitkRenderWindowManagerView()
+{
+}
 
 void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
@@ -73,13 +83,13 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 {
   m_Parent = parent;
   // create GUI widgets
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // add custom render window manager UI widget to the 'renderWindowManagerTab'
   m_RenderWindowInspector = new QmitkRenderWindowDataStorageInspector(parent);
   m_RenderWindowInspector->SetDataStorage(GetDataStorage());
   m_RenderWindowInspector->setObjectName(QStringLiteral("m_RenderWindowManipulatorWidget"));
-  m_Controls.verticalLayout->addWidget(m_RenderWindowInspector);
+  m_Controls->verticalLayout->addWidget(m_RenderWindowInspector);
 
   // data node context menu and menu actions
   m_InspectorView = m_RenderWindowInspector->GetView();
@@ -88,8 +98,8 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   // connect objects
-  connect(m_Controls.comboBoxRenderWindowSelection, &QComboBox::currentIndexChanged, [this](int index) {
-    OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(index));
+  connect(m_Controls->comboBoxRenderWindowSelection, &QComboBox::currentIndexChanged, [this](int index) {
+    OnRenderWindowSelectionChanged(m_Controls->comboBoxRenderWindowSelection->itemText(index));
   });
   connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested,
           m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
@@ -114,7 +124,7 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
   QStringList rendererNames;
-  m_Controls.comboBoxRenderWindowSelection->clear();
+  m_Controls->comboBoxRenderWindowSelection->clear();
   mitk::BaseRenderer* baseRenderer = nullptr;
   for (const auto& renderWindow : renderWindows.values())
   {
@@ -128,7 +138,7 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
 
   m_RenderWindowInspector->SetControlledRenderer(controlledRenderer);
   rendererNames.sort();
-  m_Controls.comboBoxRenderWindowSelection->addItems(rendererNames);
+  m_Controls->comboBoxRenderWindowSelection->addItems(rendererNames);
 }
 
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString& renderWindowId)
@@ -158,7 +168,7 @@ void QmitkRenderWindowManagerView::RenderWindowChanged()
     auto activeRenderWindowWidget = abstractMultiWidget->GetActiveRenderWindowWidget();
     if (nullptr != activeRenderWindowWidget)
     {
-      m_Controls.comboBoxRenderWindowSelection->setCurrentText(activeRenderWindowWidget->GetWidgetName());
+      m_Controls->comboBoxRenderWindowSelection->setCurrentText(activeRenderWindowWidget->GetWidgetName());
     }
   }
 }

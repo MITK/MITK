@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkPETSUVCalculationView.h"
+#include <ui_QmitkPETSUVCalculationViewControls.h>
 
 #include "itkIndexedUnaryFunctorImageFilter.h"
 #include "mitkITKImageImport.h"
@@ -39,29 +40,29 @@ const std::string PROPERTY_NAME_DICOM_PET_RADIOACTIVITYUNITS = "dicom.pet.Radioa
 
 void QmitkPETSUVCalculationView::SetFocus()
 {
-  m_Controls.btnCalculateSUV->setFocus();
+  m_Controls->btnCalculateSUV->setFocus();
 }
 
 void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
 {
   m_ParentWidget = parent;
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
-  connect(m_Controls.btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
-  connect(m_Controls.btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
+  connect(m_Controls->btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
+  connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
 
-  connect(m_Controls.halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
+  connect(m_Controls->halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
 
-  connect(m_Controls.activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
+  connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
 
-  connect(m_Controls.weightSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBodyWeightChanged(int)));
+  connect(m_Controls->weightSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnBodyWeightChanged(int)));
 
-  connect(m_Controls.timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
+  connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
 
-  connect(m_Controls.radioTimeUser, SIGNAL(toggled(bool)), m_Controls.timeSpinBox, SLOT(setEnabled(bool)));
+  connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
 
-  m_Controls.radioTimeAuto->setChecked(true);
-  m_Controls.timeSpinBox->setEnabled(false);
+  m_Controls->radioTimeAuto->setChecked(true);
+  m_Controls->timeSpinBox->setEnabled(false);
 
   this->UpdateWidgets();
 }
@@ -248,7 +249,7 @@ mitk::Image::Pointer QmitkPETSUVCalculationView::CalcSUV(mitk::Image *inputImage
     functor.SetHalfLife(m_halfLife);
     functor.SetInjectedActivity(m_injectedActivity);
 
-    if (this->m_Controls.radioTimeAuto->isChecked())
+    if (this->m_Controls->radioTimeAuto->isChecked())
     {
       const auto &sliceIter = m_autoDecayTime.find(i);
       if (sliceIter == m_autoDecayTime.cend())
@@ -303,14 +304,14 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
   {
     this->m_internalUpdate = true;
 
-    m_Controls.activitySpinBox->setValue(this->m_injectedActivity / 1000.0); // widget is [kBq], internal is [Bq]
+    m_Controls->activitySpinBox->setValue(this->m_injectedActivity / 1000.0); // widget is [kBq], internal is [Bq]
 
-    m_Controls.weightSpinBox->setValue(this->m_bodyweight);
+    m_Controls->weightSpinBox->setValue(this->m_bodyweight);
 
-    m_Controls.timeInfo->clear();
-    if (m_Controls.radioTimeUser->isChecked())
+    m_Controls->timeInfo->clear();
+    if (m_Controls->radioTimeUser->isChecked())
     {
-      m_Controls.timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
+      m_Controls->timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
     }
     else
     {
@@ -327,17 +328,17 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
           }
         }
 
-        m_Controls.timeInfo->setText(QString::fromStdString(stream.str()));
+        m_Controls->timeInfo->setText(QString::fromStdString(stream.str()));
       }
     }
 
-    m_Controls.halflifeSpinBox->setValue(this->m_halfLife / 60.0); // widget is [min], internal is [sec]
+    m_Controls->halflifeSpinBox->setValue(this->m_halfLife / 60.0); // widget is [min], internal is [sec]
 
-    m_Controls.labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
+    m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
 
     bool valid = m_selectedNode.IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
                  (m_userDecayTime != 0 || m_validAutoTime) && m_halfLife != 0;
-    m_Controls.btnCalculateSUV->setEnabled(valid);
+    m_Controls->btnCalculateSUV->setEnabled(valid);
 
     this->m_internalUpdate = false;
   }
@@ -346,7 +347,7 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
 void QmitkPETSUVCalculationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                     const QList<mitk::DataNode::Pointer> & /*nodes*/)
 {
-  m_Controls.btnCalculateSUV->setEnabled(false);
+  m_Controls->btnCalculateSUV->setEnabled(false);
   mitk::DataNode *newNode = NULL;
 
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
@@ -372,7 +373,7 @@ void QmitkPETSUVCalculationView::OnSelectionChanged(berry::IWorkbenchPart::Point
     this->m_DefinedNuclide.clear();
     this->m_halfLife = 0;
 
-    if (this->m_selectedNode && this->m_Controls.checkAuto->isChecked())
+    if (this->m_selectedNode && this->m_Controls->checkAuto->isChecked())
     {
       auto activities = mitk::GetRadionuclideTotalDose(newNode->GetData());
       if (activities.empty())
@@ -415,7 +416,7 @@ void QmitkPETSUVCalculationView::OnSelectionChanged(berry::IWorkbenchPart::Point
         this->m_halfLife = halflifes[0];
       }
 
-      if (this->m_Controls.radioTimeAuto->isChecked())
+      if (this->m_Controls->radioTimeAuto->isChecked())
       {
         try
         {
@@ -445,7 +446,8 @@ void QmitkPETSUVCalculationView::GenerateHalfLifeMap()
 }
 
 QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
-  : m_injectedActivity(0),
+  : m_Controls(std::make_unique<Ui::QmitkPETSUVCalculationViewControls>()),
+    m_injectedActivity(0),
     m_bodyweight(0),
     m_userDecayTime(0),
     m_validAutoTime(false),
@@ -453,4 +455,8 @@ QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
     m_internalUpdate(false)
 {
   GenerateHalfLifeMap();
+}
+
+QmitkPETSUVCalculationView::~QmitkPETSUVCalculationView()
+{
 }

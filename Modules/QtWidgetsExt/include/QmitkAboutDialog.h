@@ -14,7 +14,14 @@ found in the LICENSE file.
 #define QmitkAboutDialog_h
 
 #include "MitkQtWidgetsExtExports.h"
-#include <ui_QmitkAboutDialogGUI.h>
+
+#include <QDialog>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkAboutDialog;
+}
 
 class MITKQTWIDGETSEXT_EXPORT QmitkAboutDialog : public QDialog
 {
@@ -36,7 +43,7 @@ protected slots:
   void ShowModules();
 
 private:
-  Ui::QmitkAboutDialog m_GUI;
+  std::unique_ptr<Ui::QmitkAboutDialog> m_GUI;
 };
 
 #endif

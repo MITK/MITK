@@ -65,6 +65,8 @@ found in the LICENSE file.
   #include <mitkPythonSegmentationUI.h>
 #endif
 
+#include <ui_QmitkSegmentationViewControls.h>
+
 namespace
 {
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
@@ -85,7 +87,6 @@ const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation"
 
 QmitkSegmentationView::QmitkSegmentationView()
   : m_Parent(nullptr)
-  , m_Controls(nullptr)
   , m_RenderWindowPart(nullptr)
   , m_ToolManager(nullptr)
   , m_ReferenceNode(nullptr)
@@ -152,7 +153,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
   m_ToolManager->ActiveWorkingLabelChanged -=
     mitk::MessageDelegate<Self>(this, &Self::OnActiveWorkingLabelSelectionChanged);
 
-  delete m_Controls;
 }
 
 /**********************************************************************/
@@ -546,7 +546,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
    m_Parent = parent;
 
-   m_Controls = new Ui::QmitkSegmentationViewControls;
+   m_Controls = std::make_unique<Ui::QmitkSegmentationViewControls>();
    m_Controls->setupUi(parent);
 
    // setup overlay widget to show a warning message with a button

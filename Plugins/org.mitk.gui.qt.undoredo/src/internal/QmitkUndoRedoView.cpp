@@ -17,7 +17,7 @@
 #include <QInputDialog>
 #include <QmitkStyleManager.h>
 
-
+#include <ui_QmitkUndoRedoView.h>
 
 namespace
 {
@@ -42,7 +42,7 @@ namespace
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
 
 QmitkUndoRedoView::QmitkUndoRedoView()
-  : m_Controls(new Ui::QmitkUndoRedoViewControls()), m_UndoRedoModel(nullptr)
+  : m_Controls(std::make_unique<Ui::QmitkUndoRedoViewControls>()), m_UndoRedoModel(nullptr)
 {
   m_UndoController.reset(new mitk::UndoController(mitk::UndoController::VERBOSE_LIMITEDLINEARUNDO));
 }

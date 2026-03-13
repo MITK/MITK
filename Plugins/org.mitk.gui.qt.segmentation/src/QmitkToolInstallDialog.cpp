@@ -26,7 +26,7 @@ QObject* QmitkToolInstallDialog::GetConsoleOutput()
 QmitkToolInstallDialog::QmitkToolInstallDialog(QWidget* parent, QString toolName)
   : QDialog(parent),
     m_IsInstalling(true),
-    m_Ui(new Ui::QmitkToolInstallDialog)
+    m_Ui(std::make_unique<Ui::QmitkToolInstallDialog>())
 {
   m_Ui->setupUi(this);
   m_Ui->statusLabel->setText("Installing " + toolName + ". This might take a few minutes...");

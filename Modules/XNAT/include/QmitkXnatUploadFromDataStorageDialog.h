@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include "MitkXNATExports.h"
 #include <mitkDataNode.h>
+#include <memory>
 
 namespace Ui
 {
@@ -49,7 +50,7 @@ protected slots:
   void OnDataSelected(const mitk::DataNode *);
 
 private:
-  Ui::QmitkXnatUploadFromDataStorageDialog *ui;
+  std::unique_ptr<Ui::QmitkXnatUploadFromDataStorageDialog> ui;
 
   mitk::DataNode::Pointer m_SelectedNode;
 };

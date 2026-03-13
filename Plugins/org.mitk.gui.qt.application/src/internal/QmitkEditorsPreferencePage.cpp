@@ -28,7 +28,7 @@ namespace
 
 QmitkEditorsPreferencePage::QmitkEditorsPreferencePage()
   : m_Control(nullptr),
-    m_Ui(new Ui::QmitkEditorsPreferencePage)
+    m_Ui(std::make_unique<Ui::QmitkEditorsPreferencePage>())
 {
 }
 

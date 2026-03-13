@@ -13,8 +13,13 @@ found in the LICENSE file.
 #ifndef QmitkDirectoryListWidget_h
 #define QmitkDirectoryListWidget_h
 
-#include "ui_QmitkPathListWidget.h"
 #include <QWidget>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPathListWidget;
+}
 
 /**
  * \class QmitkDirectoryListWidget
@@ -22,12 +27,15 @@ found in the LICENSE file.
  * and provide simple directory access for readable, executable directories.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  */
-class QmitkDirectoryListWidget : public QWidget, public Ui::QmitkPathListWidget
+class QmitkDirectoryListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkDirectoryListWidget(QWidget* parent=nullptr);
+  ~QmitkDirectoryListWidget() override;
+
+  void setText(const QString& text);
 
   /**
    * \brief Get all directory entries.
@@ -49,6 +57,9 @@ Q_SIGNALS:
 private Q_SLOTS:
 
   void OnPathsChanged(const QStringList&, const QStringList&);
+
+protected:
+  std::unique_ptr<Ui::QmitkPathListWidget> m_Controls;
 };
 
 #endif

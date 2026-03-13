@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkImageStatisticsContainer.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <mitkPropertyRelations.h>
+#include <memory>
 
 class QmitkImageStatisticsDataGenerator;
 class QmitkDataGenerationJobBase;
@@ -82,7 +83,7 @@ protected:
   void OnSelectedTimePointChanged(const mitk::TimePointType& newTimePoint);
 
   // member variable
-  Ui::QmitkImageStatisticsViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkImageStatisticsViewControls> m_Controls;
 
 private:
   QmitkNodeSelectionDialog::SelectionCheckFunctionType CheckForSameGeometry() const;

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkRestApiView_h
 #define QmitkRestApiView_h
 
-#include "ui_QmitkRestApiViewControls.h"
-
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
 #include <mitkIRestServerService.h>
@@ -24,6 +22,11 @@ found in the LICENSE file.
 #include <QTimer>
 #include <cstdint>
 #include <memory>
+
+namespace Ui
+{
+  class QmitkRestApiViewControls;
+}
 
 /**
  * @brief View for monitoring and controlling the REST API server.
@@ -69,7 +72,7 @@ private:
   void SetupNodeInspectors();
   mitk::IRestServerService* GetRestServerService() const;
 
-  Ui::QmitkRestApiViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkRestApiViewControls> m_Controls;
   std::unique_ptr<us::ServiceTracker<mitk::IRestServerService>> m_ServiceTracker;
   QTimer* m_StatusTimer;
   uint64_t m_LastLogVersion{0};

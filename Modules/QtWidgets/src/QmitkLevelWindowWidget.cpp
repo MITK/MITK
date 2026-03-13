@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <ui_QmitkLevelWindowWidget.h>
 
 QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags f)
-  : QWidget(parent, f), ui(new Ui::QmitkLevelWindow)
+  : QWidget(parent, f), ui(std::make_unique<Ui::QmitkLevelWindow>())
 {
   ui->setupUi(this);
 
@@ -27,7 +27,6 @@ QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget *parent, Qt::WindowFlags 
 
 QmitkLevelWindowWidget::~QmitkLevelWindowWidget()
 {
-     delete ui;
 }
 
 void QmitkLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)

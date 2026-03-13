@@ -15,13 +15,15 @@ found in the LICENSE file.
 
 // XNATUI
 #include <MitkXNATExports.h>
-#include <ui_QmitkXnatProjectWidgetControls.h>
 
 // Qt
 #include <QWidget>
+#include <memory>
 
 // CTK XNAT Core
 class ctkXnatProject;
+
+namespace Ui { class QmitkXnatProjectWidgetControls; }
 
 class MITKXNAT_EXPORT QmitkXnatProjectWidget : public QWidget
 {
@@ -42,7 +44,7 @@ public:
   ctkXnatProject *GetProject() const;
 
 protected:
-  Ui::QmitkXnatProjectWidgetControls m_Controls;
+  std::unique_ptr<Ui::QmitkXnatProjectWidgetControls> m_Controls;
 
 private:
   void Init();

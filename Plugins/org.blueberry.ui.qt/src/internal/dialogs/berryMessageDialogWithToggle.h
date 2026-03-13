@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define BERRYMESSAGEDIALOGWITHTOGGLE_H
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui {
 class MessageDialogWithToggle;
@@ -28,7 +29,7 @@ public:
   ~MessageDialogWithToggle();
 
 private:
-  Ui::MessageDialogWithToggle *ui;
+  std::unique_ptr<Ui::MessageDialogWithToggle> ui;
 };
 
 #endif // BERRYMESSAGEDIALOGWITHTOGGLE_H

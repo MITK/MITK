@@ -130,7 +130,7 @@ const std::string QmitkBasicImageProcessing::VIEW_ID = "org.mitk.views.basicimag
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
   : QmitkAbstractView()
-  , m_Controls(new Ui::QmitkBasicImageProcessingViewControls)
+  , m_Controls(std::make_unique<Ui::QmitkBasicImageProcessingViewControls>())
   , m_TimeStepperAdapter(nullptr)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -145,7 +145,6 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
-
 }
 
 void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)

@@ -14,10 +14,13 @@ found in the LICENSE file.
 #define QmitkImageCropperView_h
 
 #include <QmitkAbstractView.h>
-
 #include <mitkBoundingShapeInteractor.h>
+#include <memory>
 
-#include "ui_QmitkImageCropperViewControls.h"
+namespace Ui
+{
+  class QmitkImageCropperViewControls;
+}
 
 class QmitkImageCropperView : public QmitkAbstractView
 {
@@ -84,7 +87,7 @@ private:
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;
 
-  Ui::QmitkImageCropperViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkImageCropperViewControls> m_Controls;
 };
 
 #endif

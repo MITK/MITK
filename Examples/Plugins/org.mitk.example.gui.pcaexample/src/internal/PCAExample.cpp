@@ -48,7 +48,7 @@ void PCAExample::CreateQtPartControl(QWidget *parent)
 }
 
 PCAExample::PCAExample()
-  : m_Controls(new Ui::PCAExampleControls)
+  : m_Controls(std::make_unique<Ui::PCAExampleControls>())
 {
 }
 
@@ -61,6 +61,7 @@ PCAExample::~PCAExample()
   this->GetDataStorage()->Remove(m_Axis1Node);
   this->GetDataStorage()->Remove(m_Axis2Node);
   this->GetDataStorage()->Remove(m_Axis3Node);
+
 }
 
 void PCAExample::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,

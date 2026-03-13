@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_properties_Activator.h"
 #include "QmitkAddNewPropertyDialog.h"
+#include <ui_QmitkAddNewPropertyDialog.h>
 #include <mitkProperties.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkCoreServices.h>
@@ -39,26 +40,27 @@ QmitkAddNewPropertyDialog::~QmitkAddNewPropertyDialog()
 
 void QmitkAddNewPropertyDialog::Initialize()
 {
-  m_Controls.setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkAddNewPropertyDialog>();
+  m_Controls->setupUi(this);
 
   QStringList types;
   types << "bool" << "double" << "float" << "int" << "string";
 
-  m_Controls.typeComboBox->addItems(types);
+  m_Controls->typeComboBox->addItems(types);
 
-  m_Controls.persistentLabel->setVisible(m_BaseData.IsNotNull());
-  m_Controls.persistentCheckBox->setVisible(m_BaseData.IsNotNull());
+  m_Controls->persistentLabel->setVisible(m_BaseData.IsNotNull());
+  m_Controls->persistentCheckBox->setVisible(m_BaseData.IsNotNull());
 
-  connect(m_Controls.typeComboBox, &QComboBox::currentIndexChanged, this, &QmitkAddNewPropertyDialog::ShowAdequateValueWidget);
-  connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
-  connect(m_Controls.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(m_Controls->typeComboBox, &QComboBox::currentIndexChanged, this, &QmitkAddNewPropertyDialog::ShowAdequateValueWidget);
+  connect(m_Controls->addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
+  connect(m_Controls->cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   this->ShowAdequateValueWidget(0);
 }
 
 void QmitkAddNewPropertyDialog::AddNewProperty()
 {
-  if (m_Controls.nameLineEdit->text().isEmpty())
+  if (m_Controls->nameLineEdit->text().isEmpty())
   {
     QMessageBox::critical(this, "No name specified", "Enter a property name.");
     return;
@@ -66,25 +68,25 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
 
   if (!this->ValidateValue())
   {
-    QMessageBox::critical(this, "Invalid value", "Enter a valid " + m_Controls.typeComboBox->currentText() + " value.");
+    QMessageBox::critical(this, "Invalid value", "Enter a valid " + m_Controls->typeComboBox->currentText() + " value.");
     return;
   }
 
   if (m_BaseData.IsNotNull())
   {
     mitk::BaseProperty::Pointer property = this->CreateProperty();
-    m_BaseData->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), property);
+    m_BaseData->SetProperty(m_Controls->nameLineEdit->text().toLatin1(), property);
 
-    if (m_Controls.persistentCheckBox->isChecked())
+    if (m_Controls->persistentCheckBox->isChecked())
     {
       mitk::CoreServicePointer<mitk::IPropertyPersistence> propertyPersistence(mitk::CoreServices::GetPropertyPersistence());
-      auto info = mitk::PropertyPersistenceInfo::New(m_Controls.nameLineEdit->text().toStdString());
+      auto info = mitk::PropertyPersistenceInfo::New(m_Controls->nameLineEdit->text().toStdString());
       propertyPersistence->AddInfo(info);
     }
   }
   else
   {
-    m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
+    m_DataNode->SetProperty(m_Controls->nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
   }
 
   this->accept();
@@ -92,27 +94,27 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
 
 mitk::BaseProperty::Pointer QmitkAddNewPropertyDialog::CreateProperty() const
 {
-  QString type = m_Controls.typeComboBox->currentText();
+  QString type = m_Controls->typeComboBox->currentText();
 
   if (type == "bool")
   {
-    return mitk::BoolProperty::New(m_Controls.valueCheckBox->isChecked()).GetPointer();
+    return mitk::BoolProperty::New(m_Controls->valueCheckBox->isChecked()).GetPointer();
   }
   else if (type == "double")
   {
-    return mitk::DoubleProperty::New(m_Controls.valueLineEdit->text().toDouble()).GetPointer();
+    return mitk::DoubleProperty::New(m_Controls->valueLineEdit->text().toDouble()).GetPointer();
   }
   else if (type == "float")
   {
-    return mitk::FloatProperty::New(m_Controls.valueLineEdit->text().toFloat()).GetPointer();
+    return mitk::FloatProperty::New(m_Controls->valueLineEdit->text().toFloat()).GetPointer();
   }
   else if (type == "int")
   {
-    return mitk::IntProperty::New(m_Controls.valueLineEdit->text().toInt()).GetPointer();
+    return mitk::IntProperty::New(m_Controls->valueLineEdit->text().toInt()).GetPointer();
   }
   else if (type == "string")
   {
-    return mitk::StringProperty::New(m_Controls.valueLineEdit->text().toStdString()).GetPointer();
+    return mitk::StringProperty::New(m_Controls->valueLineEdit->text().toStdString()).GetPointer();
   }
   else
   {
@@ -124,7 +126,7 @@ mitk::BaseProperty::Pointer QmitkAddNewPropertyDialog::CreateProperty() const
 
 bool QmitkAddNewPropertyDialog::ValidateValue()
 {
-  QString type = m_Controls.typeComboBox->currentText();
+  QString type = m_Controls->typeComboBox->currentText();
 
   if (type == "bool")
   {
@@ -133,21 +135,21 @@ bool QmitkAddNewPropertyDialog::ValidateValue()
   else if (type == "double")
   {
     bool ok = false;
-    m_Controls.valueLineEdit->text().toDouble(&ok);
+    m_Controls->valueLineEdit->text().toDouble(&ok);
 
     return ok;
   }
   else if (type == "float")
   {
     bool ok = false;
-    m_Controls.valueLineEdit->text().toFloat(&ok);
+    m_Controls->valueLineEdit->text().toFloat(&ok);
 
     return ok;
   }
   else if (type == "int")
   {
     bool ok = false;
-    m_Controls.valueLineEdit->text().toInt(&ok);
+    m_Controls->valueLineEdit->text().toInt(&ok);
 
     return ok;
   }
@@ -166,35 +168,35 @@ bool QmitkAddNewPropertyDialog::ValidateValue()
 void QmitkAddNewPropertyDialog::ShowAdequateValueWidget(int index)
 {
 
-  const auto type = m_Controls.typeComboBox->itemText(index);
-  m_Controls.valueLineEdit->clear();
-  m_Controls.valueLineEdit->hide();
+  const auto type = m_Controls->typeComboBox->itemText(index);
+  m_Controls->valueLineEdit->clear();
+  m_Controls->valueLineEdit->hide();
 
-  m_Controls.valueCheckBox->setChecked(false);
-  m_Controls.valueCheckBox->hide();
+  m_Controls->valueCheckBox->setChecked(false);
+  m_Controls->valueCheckBox->hide();
 
   if (type == "bool")
   {
-    m_Controls.valueCheckBox->show();
+    m_Controls->valueCheckBox->show();
   }
   else if (type == "double")
   {
-    m_Controls.valueLineEdit->setText("0");
-    m_Controls.valueLineEdit->show();
+    m_Controls->valueLineEdit->setText("0");
+    m_Controls->valueLineEdit->show();
   }
   else if (type == "float")
   {
-    m_Controls.valueLineEdit->setText("0");
-    m_Controls.valueLineEdit->show();
+    m_Controls->valueLineEdit->setText("0");
+    m_Controls->valueLineEdit->show();
   }
   else if (type == "int")
   {
-    m_Controls.valueLineEdit->setText("0");
-    m_Controls.valueLineEdit->show();
+    m_Controls->valueLineEdit->setText("0");
+    m_Controls->valueLineEdit->show();
   }
   else if (type == "string")
   {
-    m_Controls.valueLineEdit->show();
+    m_Controls->valueLineEdit->show();
   }
   else
   {

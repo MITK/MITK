@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   : QmitkToolGUI(),
-    m_Controls(new Ui::QmitkEditableContourToolGUIControls)
+    m_Controls(std::make_unique<Ui::QmitkEditableContourToolGUIControls>())
 {
   m_Controls->setupUi(this);
 

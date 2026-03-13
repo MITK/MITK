@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <QEventLoop>
 #include <QStringList>
+#include <memory>
 
 namespace Ui
 {
@@ -40,7 +41,7 @@ private:
   Q_SLOT void selectionChanged(int row);
 
 private:
-  Ui::BlueBerryExampleLauncherDialog *ui;
+  std::unique_ptr<Ui::BlueBerryExampleLauncherDialog> ui;
   QStringList provisioningFiles;
   QList<QString> descriptions;
   QEventLoop eventLoop;

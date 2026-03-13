@@ -27,7 +27,7 @@ namespace
 }
 
 QmitknnInteractivePreferencePage::QmitknnInteractivePreferencePage()
-  : m_Ui(new Ui::QmitknnInteractivePreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitknnInteractivePreferencePage>()),
     m_Control(nullptr)
 {
 }

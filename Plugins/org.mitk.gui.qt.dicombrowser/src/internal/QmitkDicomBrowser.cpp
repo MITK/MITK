@@ -159,7 +159,7 @@ namespace
 const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
 
 QmitkDicomBrowser::QmitkDicomBrowser()
-  : m_Ui(new Ui::QmitkDicomBrowser)
+  : m_Ui(std::make_unique<Ui::QmitkDicomBrowser>())
 {
 }
 
@@ -174,6 +174,7 @@ QmitkDicomBrowser::~QmitkDicomBrowser()
 
   if (queryTagCacheFile.exists())
     queryTagCacheFile.remove();
+
 }
 
 void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent)

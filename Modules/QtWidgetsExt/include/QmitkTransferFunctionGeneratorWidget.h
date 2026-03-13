@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define QmitkTransferFunctionGeneratorWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
-#include "ui_QmitkTransferFunctionGeneratorWidget.h"
 
 #include <mitkCommon.h>
 
@@ -22,9 +21,14 @@ found in the LICENSE file.
 
 #include <mitkDataNode.h>
 #include <mitkTransferFunctionProperty.h>
+#include <memory>
 
-class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget,
-                                                                     public Ui::QmitkTransferFunctionGeneratorWidget
+namespace Ui
+{
+  class QmitkTransferFunctionGeneratorWidget;
+}
+
+class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget
 {
   Q_OBJECT
 
@@ -58,6 +62,7 @@ protected slots:
   void OnPreset(int mode);
 
 protected:
+  std::unique_ptr<Ui::QmitkTransferFunctionGeneratorWidget> m_Controls;
   mitk::TransferFunctionProperty::Pointer tfpToChange;
 
   double histoMinimum;

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkPropertyTreeView_h
 #define QmitkPropertyTreeView_h
 
-#include <ui_QmitkPropertyTreeView.h>
-
 // mitk core module
 #include <mitkCoreServices.h>
 #include <mitkDataNode.h>
@@ -25,6 +23,12 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 #include "QmitkSelectionServiceConnector.h"
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPropertyTreeView;
+}
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
@@ -85,7 +89,7 @@ private:
   mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
   mitk::CoreServicePointer<mitk::IPropertyDescriptions> m_PropertyDescriptions;
   mitk::CoreServicePointer<mitk::IPropertyPersistence> m_PropertyPersistence;
-  Ui::QmitkPropertyTreeView m_Controls;
+  std::unique_ptr<Ui::QmitkPropertyTreeView> m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;
   QmitkPropertyItemDelegate* m_Delegate;

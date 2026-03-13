@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkXnatUploadFromDataStorageDialog.h"
-#include "ui_QmitkXnatUploadFromDataStorageDialog.h"
+#include <ui_QmitkXnatUploadFromDataStorageDialog.h>
 
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateAnd.h>
@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 
 QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidget *parent)
-  : QDialog(parent), ui(new Ui::QmitkXnatUploadFromDataStorageDialog), m_SelectedNode(nullptr)
+  : QDialog(parent), ui(std::make_unique<Ui::QmitkXnatUploadFromDataStorageDialog>()), m_SelectedNode(nullptr)
 {
   ui->setupUi(this);
 
@@ -50,7 +50,6 @@ QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidg
 
 QmitkXnatUploadFromDataStorageDialog::~QmitkXnatUploadFromDataStorageDialog()
 {
-  delete ui;
 }
 
 void QmitkXnatUploadFromDataStorageDialog::SetDataStorage(mitk::DataStorage *ds)

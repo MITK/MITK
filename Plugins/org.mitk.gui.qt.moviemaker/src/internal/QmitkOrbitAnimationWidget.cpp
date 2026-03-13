@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 QmitkOrbitAnimationWidget::QmitkOrbitAnimationWidget(QWidget* parent)
   : QmitkAnimationWidget(parent),
-    m_Ui(new Ui::QmitkOrbitAnimationWidget)
+    m_Ui(std::make_unique<Ui::QmitkOrbitAnimationWidget>())
 {
   m_Ui->setupUi(this);
 

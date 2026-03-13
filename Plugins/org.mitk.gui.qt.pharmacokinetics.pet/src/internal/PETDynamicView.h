@@ -13,20 +13,27 @@ found in the LICENSE file.
 #ifndef PETDynamicView_h
 #define PETDynamicView_h
 
+#include <mitkModelBase.h>
+#include <mitkModelFitResultHelper.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
+#include <mitkAIFBasedModelBase.h>
+#include <mitkNodePredicateBase.h>
+
+#include <QmitkAbstractView.h>
+#include <QmitkParameterFitBackgroundJob.h>
+
+#include <itkCommand.h>
+
 #include <QString>
 
-#include "QmitkAbstractView.h"
+#include <memory>
 
-#include "itkCommand.h"
-
-#include "ui_PETDynamicViewControls.h"
-#include "mitkModelBase.h"
-#include "QmitkParameterFitBackgroundJob.h"
-#include "mitkModelFitResultHelper.h"
-#include "mitkModelFactoryBase.h"
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
-#include "mitkAIFBasedModelBase.h"
+namespace Ui
+{
+  class PETDynamicViewControls;
+}
 
 /*!
 *	@brief Test Plugin for SUV calculations of PET images
@@ -41,6 +48,7 @@ public:
   static const std::string VIEW_ID;
 
   PETDynamicView();
+  ~PETDynamicView() override;
 
 protected slots:
 
@@ -109,7 +117,7 @@ protected:
 
 
   /*! @brief The view's UI controls */
-  Ui::PETDynamicViewControls m_Controls;
+  std::unique_ptr<Ui::PETDynamicViewControls> m_Controls;
 
   mitk::DataNode::Pointer m_selectedNode;
   mitk::DataNode::Pointer m_selectedMaskNode;

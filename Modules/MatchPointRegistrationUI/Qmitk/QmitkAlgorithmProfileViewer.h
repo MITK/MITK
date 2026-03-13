@@ -17,20 +17,25 @@ found in the LICENSE file.
 
 #include <MitkMatchPointRegistrationUIExports.h>
 
-#include "ui_QmitkAlgorithmProfileViewer.h"
 #include <QWidget>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkAlgorithmProfileViewer;
+}
 
 /**
  * \class QmitkAlgorithmProfileViewer
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmProfileViewer : public QWidget,
-                                                                        private Ui::QmitkAlgorithmProfileViewer
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmProfileViewer : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkAlgorithmProfileViewer(QWidget *parent = nullptr);
+  ~QmitkAlgorithmProfileViewer() override;
 
   /**
    * \brief Updates the widget according to the new info.
@@ -45,6 +50,9 @@ public Q_SLOTS:
     * \brief Slot that can be used to trigger updateInfo();
     */
   void OnInfoChanged(const map::deployment::DLLInfo *newInfo);
+
+protected:
+  std::unique_ptr<Ui::QmitkAlgorithmProfileViewer> m_Controls;
 };
 
 #endif

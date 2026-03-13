@@ -50,7 +50,6 @@ found in the LICENSE file.
 
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
   : QmitkAbstractView(),
-    m_Controls(nullptr),
     m_BackgroundColor(QColor(0,0,0)),
     m_SelectedNode(nullptr)
 {
@@ -370,7 +369,7 @@ void QmitkScreenshotMaker::CreateQtPartControl(QWidget *parent)
   if (!m_Controls)
   {
     m_Parent = parent;
-    m_Controls = new Ui::QmitkScreenshotMakerControls;
+    m_Controls = std::make_unique<Ui::QmitkScreenshotMakerControls>();
     m_Controls->setupUi(parent);
 
     auto renderWindowPart = this->GetRenderWindowPart();

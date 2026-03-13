@@ -19,11 +19,16 @@ found in the LICENSE file.
 
 #include <itkCommand.h>
 
-#include "ui_FitGeneratorDemoView.h"
 #include <mitkModelBase.h>
 #include <mitkModelFactoryBase.h>
 #include <QmitkParameterFitBackgroundJob.h>
 #include <mitkModelFitResultHelper.h>
+#include <memory>
+
+namespace Ui
+{
+  class FitGeneratorDemoViewControls;
+}
 
 /*!
 *	@brief Test Plugin for generation of model parameter images
@@ -38,6 +43,7 @@ public:
   static const std::string VIEW_ID;
 
   FitGeneratorDemoView();
+  ~FitGeneratorDemoView() override;
 
   protected slots:
 
@@ -72,7 +78,7 @@ protected:
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  Ui::FitGeneratorDemoViewControls m_Controls;
+  std::unique_ptr<Ui::FitGeneratorDemoViewControls> m_Controls;
 
   mitk::DataNode::Pointer m_selectedNode;
   mitk::Image::Pointer m_selectedImage;

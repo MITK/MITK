@@ -11,38 +11,39 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkLevelWindowPresetDefinitionDialog.h"
+#include <ui_QmitkLevelWindowPresetDefinition.h>
 
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QTableWidgetItem>
 
 QmitkLevelWindowPresetDefinitionDialog::QmitkLevelWindowPresetDefinitionDialog(QWidget *parent, Qt::WindowFlags f)
-  : QDialog(parent, f), m_TableModel(nullptr), m_SortModel(this)
+  : QDialog(parent, f), m_Controls(std::make_unique<Ui::QmitkLevelWindowPresetDefinition>()), m_TableModel(nullptr), m_SortModel(this)
 {
-  this->setupUi(this);
+  m_Controls->setupUi(this);
 
-  QObject::connect(addButton, SIGNAL(clicked()), this, SLOT(addPreset()));
-  QObject::connect(removeButton, SIGNAL(clicked()), this, SLOT(removePreset()));
-  QObject::connect(changeButton, SIGNAL(clicked()), this, SLOT(changePreset()));
+  QObject::connect(m_Controls->addButton, SIGNAL(clicked()), this, SLOT(addPreset()));
+  QObject::connect(m_Controls->removeButton, SIGNAL(clicked()), this, SLOT(removePreset()));
+  QObject::connect(m_Controls->changeButton, SIGNAL(clicked()), this, SLOT(changePreset()));
 
-  QObject::connect(presetView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortPresets(int)));
+  QObject::connect(m_Controls->presetView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(sortPresets(int)));
 
-  presetView->verticalHeader()->setVisible(false);
-  presetView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+  m_Controls->presetView->verticalHeader()->setVisible(false);
+  m_Controls->presetView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
-  presetView->setModel(&m_SortModel);
+  m_Controls->presetView->setModel(&m_SortModel);
 }
 
 QmitkLevelWindowPresetDefinitionDialog::~QmitkLevelWindowPresetDefinitionDialog()
 {
-  delete m_TableModel;
+delete m_TableModel;
 }
 
 void QmitkLevelWindowPresetDefinitionDialog::sortPresets(int index)
 {
   static Qt::SortOrder order[3] = {Qt::AscendingOrder};
 
-  presetView->sortByColumn(index, order[index]);
+  m_Controls->presetView->sortByColumn(index, order[index]);
   if (order[index] == Qt::AscendingOrder)
     order[index] = Qt::DescendingOrder;
   else
@@ -65,16 +66,16 @@ void QmitkLevelWindowPresetDefinitionDialog::showEvent(QShowEvent *event)
 
 void QmitkLevelWindowPresetDefinitionDialog::resizeColumns()
 {
-  int width = presetView->viewport()->size().width() - presetView->columnWidth(1) - presetView->columnWidth(2);
+  int width = m_Controls->presetView->viewport()->size().width() - m_Controls->presetView->columnWidth(1) - m_Controls->presetView->columnWidth(2);
   if (width < 50)
     width = 50;
 
-  presetView->setColumnWidth(0, width);
+  m_Controls->presetView->setColumnWidth(0, width);
 }
 
 void QmitkLevelWindowPresetDefinitionDialog::addPreset()
 {
-  std::string name(presetnameLineEdit->text().toStdString());
+  std::string name(m_Controls->presetnameLineEdit->text().toStdString());
   if (m_TableModel->contains(name))
   {
     QMessageBox::critical(this,
@@ -82,7 +83,7 @@ void QmitkLevelWindowPresetDefinitionDialog::addPreset()
                           "Presetname already exists.\n"
                           "You have to enter another one.");
   }
-  else if (presetnameLineEdit->text() == "")
+  else if (m_Controls->presetnameLineEdit->text() == "")
   {
     QMessageBox::critical(this,
                           "Preset definition",
@@ -91,13 +92,13 @@ void QmitkLevelWindowPresetDefinitionDialog::addPreset()
   }
   else
   {
-    m_TableModel->addPreset(name, levelSpinBox->value(), windowSpinBox->value());
+    m_TableModel->addPreset(name, m_Controls->levelSpinBox->value(), m_Controls->windowSpinBox->value());
   }
 }
 
 void QmitkLevelWindowPresetDefinitionDialog::removePreset()
 {
-  QModelIndex index(m_SortModel.mapToSource(presetView->selectionModel()->currentIndex()));
+  QModelIndex index(m_SortModel.mapToSource(m_Controls->presetView->selectionModel()->currentIndex()));
 
   if (!index.isValid())
     return;
@@ -107,12 +108,12 @@ void QmitkLevelWindowPresetDefinitionDialog::removePreset()
 
 void QmitkLevelWindowPresetDefinitionDialog::changePreset()
 {
-  QModelIndex index(m_SortModel.mapToSource(presetView->selectionModel()->currentIndex()));
+  QModelIndex index(m_SortModel.mapToSource(m_Controls->presetView->selectionModel()->currentIndex()));
 
   if (!index.isValid())
     return;
 
-  std::string name(presetnameLineEdit->text().toStdString());
+  std::string name(m_Controls->presetnameLineEdit->text().toStdString());
   if (name == "")
   {
     QMessageBox::critical(this,
@@ -130,7 +131,7 @@ void QmitkLevelWindowPresetDefinitionDialog::changePreset()
   }
   else
   {
-    m_TableModel->changePreset(index.row(), name, levelSpinBox->value(), windowSpinBox->value());
+    m_TableModel->changePreset(index.row(), name, m_Controls->levelSpinBox->value(), m_Controls->windowSpinBox->value());
   }
 }
 
@@ -139,22 +140,22 @@ void QmitkLevelWindowPresetDefinitionDialog::setPresets(std::map<std::string, do
                                                         QString initLevel,
                                                         QString initWindow)
 {
-  levelSpinBox->setValue(initLevel.toInt());
-  windowSpinBox->setValue(initWindow.toInt());
+  m_Controls->levelSpinBox->setValue(initLevel.toInt());
+  m_Controls->windowSpinBox->setValue(initWindow.toInt());
 
   delete m_TableModel;
   m_TableModel = new PresetTableModel(level, window, this);
 
   m_SortModel.setSourceModel(m_TableModel);
 
-  QObject::connect(presetView->selectionModel(),
+  QObject::connect(m_Controls->presetView->selectionModel(),
                    SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
                    this,
                    SLOT(ListViewSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
   this->sortPresets(0);
 
-  presetView->resizeColumnsToContents();
+  m_Controls->presetView->resizeColumnsToContents();
 }
 
 std::map<std::string, double> QmitkLevelWindowPresetDefinitionDialog::getLevelPresets()
@@ -177,17 +178,17 @@ void QmitkLevelWindowPresetDefinitionDialog::ListViewSelectionChanged(const QIte
   QModelIndexList indexes(selected.indexes());
   if (indexes.empty())
   {
-    presetnameLineEdit->setText("");
-    levelSpinBox->setValue(0);
-    windowSpinBox->setValue(0);
+    m_Controls->presetnameLineEdit->setText("");
+    m_Controls->levelSpinBox->setValue(0);
+    m_Controls->windowSpinBox->setValue(0);
   }
   else
   {
     // use the sorted index to get the entry
     PresetTableModel::Entry entry(m_TableModel->getPreset((m_SortModel.mapToSource(indexes.first()))));
-    presetnameLineEdit->setText(QString(entry.name.c_str()));
-    levelSpinBox->setValue((int)entry.level);
-    windowSpinBox->setValue((int)entry.window);
+    m_Controls->presetnameLineEdit->setText(QString(entry.name.c_str()));
+    m_Controls->levelSpinBox->setValue((int)entry.level);
+    m_Controls->windowSpinBox->setValue((int)entry.window);
   }
 }
 

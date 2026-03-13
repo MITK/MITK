@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <memory>
 
 namespace mitk
 {
@@ -65,7 +66,7 @@ private:
   void ShowTimeStep(bool show);
 
   QmitkSliceNavigationListener m_SliceNavigationListener;
-  Ui::QmitkPixelValueView* m_Ui;
+  std::unique_ptr<Ui::QmitkPixelValueView> m_Ui;
 };
 
 #endif

@@ -13,12 +13,19 @@ found in the LICENSE file.
 #ifndef ConcentrationCurveConverterView_h
 #define ConcentrationCurveConverterView_h
 
-#include <QString>
+#include <mitkImage.h>
+#include <mitkNodePredicateBase.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_ConcentrationCurveConverterViewControls.h"
 
-#include <mitkImage.h>
+#include <QString>
+
+#include <memory>
+
+namespace Ui
+{
+  class ConcentrationCurveConverterViewControls;
+}
 
 /*!
  *	@brief Test Plugin for SUV calculations of PET images
@@ -36,6 +43,7 @@ public:
 	static const std::string VIEW_ID;
 
   ConcentrationCurveConverterView();
+  ~ConcentrationCurveConverterView() override;
 
 protected slots:
 
@@ -74,7 +82,7 @@ protected:
 	// Variables
 
 	/*! @brief The view's UI controls */
-    Ui::ConcentrationCurveConverterViewControls m_Controls;
+    std::unique_ptr<Ui::ConcentrationCurveConverterViewControls> m_Controls;
 
     mitk::DataNode::Pointer m_selectedNode;
     mitk::Image::Pointer m_selectedImage;

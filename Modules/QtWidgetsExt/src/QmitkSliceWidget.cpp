@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSliceWidget.h"
+#include <ui_QmitkSliceWidget.h>
 #include "QmitkStepperAdapter.h"
 #include "mitkCameraController.h"
 #include "mitkImage.h"
@@ -22,7 +23,8 @@ found in the LICENSE file.
 
 QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::WindowFlags f) : QWidget(parent, f)
 {
-  this->setupUi(this);
+  m_Controls = std::make_unique<Ui::QmitkSliceWidgetUi>();
+  m_Controls->setupUi(this);
 
   if (name != nullptr)
     this->setObjectName(name);
@@ -38,7 +40,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   m_SlicedGeometry = nullptr;
   m_View = mitk::AnatomicalPlane::Axial;
 
-  QHBoxLayout *hlayout = new QHBoxLayout(container);
+  QHBoxLayout *hlayout = new QHBoxLayout(m_Controls->container);
   hlayout->setContentsMargins({});
 
   // create widget
@@ -47,13 +49,17 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
     composedName += this->objectName();
   else
     composedName += "QmitkGLWidget";
-  m_RenderWindow = new QmitkRenderWindow(container, composedName);
+  m_RenderWindow = new QmitkRenderWindow(m_Controls->container, composedName);
   m_Renderer = m_RenderWindow->GetRenderer();
   hlayout->addWidget(m_RenderWindow);
 
-  new QmitkStepperAdapter(sliceNavigationWidget, m_RenderWindow->GetSliceNavigationController()->GetStepper());
+  new QmitkStepperAdapter(m_Controls->sliceNavigationWidget, m_RenderWindow->GetSliceNavigationController()->GetStepper());
 
   SetLevelWindowEnabled(true);
+}
+
+QmitkSliceWidget::~QmitkSliceWidget()
+{
 }
 
 mitk::VtkPropRenderer *QmitkSliceWidget::GetRenderer()
@@ -63,7 +69,7 @@ mitk::VtkPropRenderer *QmitkSliceWidget::GetRenderer()
 
 QFrame *QmitkSliceWidget::GetSelectionFrame()
 {
-  return SelectionFrame;
+  return m_Controls->SelectionFrame;
 }
 
 void QmitkSliceWidget::SetDataStorage(mitk::StandaloneDataStorage::Pointer storage)
@@ -186,16 +192,16 @@ void QmitkSliceWidget::mousePressEvent(QMouseEvent *e)
 
 void QmitkSliceWidget::wheelEvent(QWheelEvent *e)
 {
-  int val = sliceNavigationWidget->GetPos();
+  int val = m_Controls->sliceNavigationWidget->GetPos();
 
   if (e->angleDelta().y() > 0)
   {
-    sliceNavigationWidget->SetPos(val + 1);
+    m_Controls->sliceNavigationWidget->SetPos(val + 1);
   }
   else
   {
     if (val > 0)
-      sliceNavigationWidget->SetPos(val - 1);
+      m_Controls->sliceNavigationWidget->SetPos(val - 1);
   }
 }
 
@@ -222,27 +228,27 @@ void QmitkSliceWidget::setPopUpEnabled(bool b)
 
 QmitkSliceNavigationWidget* QmitkSliceWidget::GetSliceNavigationWidget()
 {
-  return sliceNavigationWidget;
+  return m_Controls->sliceNavigationWidget;
 }
 
 void QmitkSliceWidget::SetLevelWindowEnabled(bool enable)
 {
-  levelWindow->setEnabled(enable);
+  m_Controls->levelWindow->setEnabled(enable);
   if (!enable)
   {
-    levelWindow->setMinimumWidth(0);
-    levelWindow->setMaximumWidth(0);
+    m_Controls->levelWindow->setMinimumWidth(0);
+    m_Controls->levelWindow->setMaximumWidth(0);
   }
   else
   {
-    levelWindow->setMinimumWidth(28);
-    levelWindow->setMaximumWidth(28);
+    m_Controls->levelWindow->setMinimumWidth(28);
+    m_Controls->levelWindow->setMaximumWidth(28);
   }
 }
 
 bool QmitkSliceWidget::IsLevelWindowEnabled()
 {
-  return levelWindow->isEnabled();
+  return m_Controls->levelWindow->isEnabled();
 }
 
 QmitkRenderWindow *QmitkSliceWidget::GetRenderWindow()

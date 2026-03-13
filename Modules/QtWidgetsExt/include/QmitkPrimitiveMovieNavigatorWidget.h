@@ -13,10 +13,18 @@ found in the LICENSE file.
 #ifndef QmitkPrimitiveMovieNavigatorWidget_h
 #define QmitkPrimitiveMovieNavigatorWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
+
+#include <mitkStepper.h>
+
 #include <QTimer>
 #include <QWidget>
-#include <ui_QmitkPrimitiveMovieNavigatorWidget.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPrimitiveMovieNavigator;
+}
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget
 {
@@ -37,7 +45,7 @@ public slots:
   virtual void setTimerInterval(int timerIntervalInMS);
 
 protected:
-  Ui::QmitkPrimitiveMovieNavigator m_Controls;
+  std::unique_ptr<Ui::QmitkPrimitiveMovieNavigator> m_Controls;
   mitk::Stepper::Pointer m_Stepper;
   bool m_InRefetch;
   QTimer *m_Timer;

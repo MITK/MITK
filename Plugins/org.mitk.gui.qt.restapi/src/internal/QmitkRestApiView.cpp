@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkRestApiView.h"
+#include <ui_QmitkRestApiViewControls.h>
 
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
@@ -28,7 +29,8 @@ found in the LICENSE file.
 const std::string QmitkRestApiView::VIEW_ID = "org.mitk.views.restapi";
 
 QmitkRestApiView::QmitkRestApiView()
-  : m_StatusTimer(nullptr)
+  : m_Controls(std::make_unique<Ui::QmitkRestApiViewControls>()),
+    m_StatusTimer(nullptr)
 {
 }
 
@@ -49,7 +51,7 @@ QmitkRestApiView::~QmitkRestApiView()
 
 void QmitkRestApiView::SetFocus()
 {
-  m_Controls.m_StartStopButton->setFocus();
+  m_Controls->m_StartStopButton->setFocus();
 }
 
 void QmitkRestApiView::Activated()
@@ -73,7 +75,7 @@ void QmitkRestApiView::Hidden()
 
 void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   // Setup service tracker for the REST API service
   auto* restModule = us::ModuleRegistry::GetModule("MitkRESTAPI");
@@ -91,16 +93,16 @@ void QmitkRestApiView::CreateQtPartControl(QWidget* parent)
   this->SetupNodeInspectors();
 
   // Connect signals
-  connect(m_Controls.m_StartStopButton, &QPushButton::clicked, this, &QmitkRestApiView::OnStartStopClicked);
-  connect(m_Controls.m_RefreshButton, &QPushButton::clicked, this, &QmitkRestApiView::OnRefreshStatus);
-  connect(m_Controls.m_CopyUrlButton, &QPushButton::clicked, this, &QmitkRestApiView::OnCopyUrlClicked);
-  connect(m_Controls.m_ClearLogButton, &QPushButton::clicked, this, &QmitkRestApiView::OnClearLogClicked);
+  connect(m_Controls->m_StartStopButton, &QPushButton::clicked, this, &QmitkRestApiView::OnStartStopClicked);
+  connect(m_Controls->m_RefreshButton, &QPushButton::clicked, this, &QmitkRestApiView::OnRefreshStatus);
+  connect(m_Controls->m_CopyUrlButton, &QPushButton::clicked, this, &QmitkRestApiView::OnCopyUrlClicked);
+  connect(m_Controls->m_ClearLogButton, &QPushButton::clicked, this, &QmitkRestApiView::OnClearLogClicked);
 
   // Setup request log table
-  m_Controls.m_RequestLogTable->horizontalHeader()->setStretchLastSection(true);
-  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-  m_Controls.m_RequestLogTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+  m_Controls->m_RequestLogTable->horizontalHeader()->setStretchLastSection(true);
+  m_Controls->m_RequestLogTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  m_Controls->m_RequestLogTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  m_Controls->m_RequestLogTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
   // Setup status timer (started/stopped via Visible()/Hidden())
   m_StatusTimer = new QTimer(this);
@@ -112,18 +114,18 @@ void QmitkRestApiView::SetupNodeInspectors()
   auto dataStorage = this->GetDataStorage();
 
   // Setup inspector for queried nodes (have restapi.uid property)
-  m_Controls.m_QueriedNodesInspector->SetDataStorage(dataStorage);
+  m_Controls->m_QueriedNodesInspector->SetDataStorage(dataStorage);
 
   // Create predicate for nodes with restapi.uid property
   auto queriedPredicate = mitk::NodePredicateProperty::New("restapi.uid");
-  m_Controls.m_QueriedNodesInspector->SetNodePredicate(queriedPredicate);
+  m_Controls->m_QueriedNodesInspector->SetNodePredicate(queriedPredicate);
 
   // Setup inspector for modified nodes (have restapi.modified property)
-  m_Controls.m_ModifiedNodesInspector->SetDataStorage(dataStorage);
+  m_Controls->m_ModifiedNodesInspector->SetDataStorage(dataStorage);
 
   // Create predicate for nodes with restapi.modified property set to true
   auto modifiedPredicate = mitk::NodePredicateProperty::New("restapi.modified");
-  m_Controls.m_ModifiedNodesInspector->SetNodePredicate(modifiedPredicate);
+  m_Controls->m_ModifiedNodesInspector->SetNodePredicate(modifiedPredicate);
 }
 
 mitk::IRestServerService* QmitkRestApiView::GetRestServerService() const
@@ -141,7 +143,7 @@ void QmitkRestApiView::OnStartStopClicked()
   auto* service = this->GetRestServerService();
   if (service == nullptr)
   {
-    m_Controls.m_StatusLabel->setText("REST API service not available");
+    m_Controls->m_StatusLabel->setText("REST API service not available");
     return;
   }
 
@@ -154,7 +156,7 @@ void QmitkRestApiView::OnStartStopClicked()
     if (!service->Start())
     {
       auto error = service->GetLastError();
-      m_Controls.m_StatusLabel->setText(QString("Failed to start: %1")
+      m_Controls->m_StatusLabel->setText(QString("Failed to start: %1")
         .arg(error ? QString::fromStdString(*error) : "Unknown error"));
       return;
     }
@@ -174,53 +176,53 @@ void QmitkRestApiView::UpdateServerStatus()
 
   if (service == nullptr)
   {
-    m_Controls.m_StatusIndicator->setStyleSheet("background-color: gray; border-radius: 8px;");
-    m_Controls.m_StatusLabel->setText("REST API service not available");
-    m_Controls.m_StartStopButton->setEnabled(false);
-    m_Controls.m_ServerUrlLabel->setText("-");
-    m_Controls.m_HostPortLabel->setText("-");
-    m_Controls.m_UptimeLabel->setText("-");
-    m_Controls.m_AccessModeLabel->setText("-");
-    m_Controls.m_AuthStatusLabel->setText("-");
-    m_Controls.m_FileAccessLabel->setText("-");
-    m_Controls.m_ClientIPsLabel->setText("-");
-    m_Controls.m_LastEndpointLabel->setText("-");
-    m_Controls.m_LastResponseCodeLabel->setText("-");
+    m_Controls->m_StatusIndicator->setStyleSheet("background-color: gray; border-radius: 8px;");
+    m_Controls->m_StatusLabel->setText("REST API service not available");
+    m_Controls->m_StartStopButton->setEnabled(false);
+    m_Controls->m_ServerUrlLabel->setText("-");
+    m_Controls->m_HostPortLabel->setText("-");
+    m_Controls->m_UptimeLabel->setText("-");
+    m_Controls->m_AccessModeLabel->setText("-");
+    m_Controls->m_AuthStatusLabel->setText("-");
+    m_Controls->m_FileAccessLabel->setText("-");
+    m_Controls->m_ClientIPsLabel->setText("-");
+    m_Controls->m_LastEndpointLabel->setText("-");
+    m_Controls->m_LastResponseCodeLabel->setText("-");
     return;
   }
 
-  m_Controls.m_StartStopButton->setEnabled(true);
+  m_Controls->m_StartStopButton->setEnabled(true);
 
   if (service->IsRunning())
   {
     // Green indicator for running
-    m_Controls.m_StatusIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 8px;");
-    m_Controls.m_StatusLabel->setText("Running");
-    m_Controls.m_StartStopButton->setText("Stop Server");
+    m_Controls->m_StatusIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 8px;");
+    m_Controls->m_StatusLabel->setText("Running");
+    m_Controls->m_StartStopButton->setText("Stop Server");
 
     auto url = service->GetServerUrl();
     if (url)
     {
-      m_Controls.m_ServerUrlLabel->setText(QString::fromStdString(*url));
+      m_Controls->m_ServerUrlLabel->setText(QString::fromStdString(*url));
     }
     else
     {
-      m_Controls.m_ServerUrlLabel->setText("-");
+      m_Controls->m_ServerUrlLabel->setText("-");
     }
   }
   else
   {
     // Red indicator for stopped
-    m_Controls.m_StatusIndicator->setStyleSheet("background-color: #F44336; border-radius: 8px;");
-    m_Controls.m_StatusLabel->setText("Stopped");
-    m_Controls.m_StartStopButton->setText("Start Server");
-    m_Controls.m_ServerUrlLabel->setText("-");
+    m_Controls->m_StatusIndicator->setStyleSheet("background-color: #F44336; border-radius: 8px;");
+    m_Controls->m_StatusLabel->setText("Stopped");
+    m_Controls->m_StartStopButton->setText("Start Server");
+    m_Controls->m_ServerUrlLabel->setText("-");
 
     // Check for error
     auto error = service->GetLastError();
     if (error)
     {
-      m_Controls.m_StatusLabel->setText(QString("Stopped (Error: %1)").arg(QString::fromStdString(*error)));
+      m_Controls->m_StatusLabel->setText(QString("Stopped (Error: %1)").arg(QString::fromStdString(*error)));
     }
   }
 
@@ -231,7 +233,7 @@ void QmitkRestApiView::UpdateServerStatus()
     config = service->GetPendingConfig();
   }
 
-  m_Controls.m_HostPortLabel->setText(QString("%1:%2")
+  m_Controls->m_HostPortLabel->setText(QString("%1:%2")
     .arg(QString::fromStdString(config->host))
     .arg(config->port));
 
@@ -246,48 +248,48 @@ void QmitkRestApiView::UpdateServerStatus()
 
     if (hours > 0)
     {
-      m_Controls.m_UptimeLabel->setText(QString("%1h %2m %3s")
+      m_Controls->m_UptimeLabel->setText(QString("%1h %2m %3s")
         .arg(hours).arg(minutes).arg(secs));
     }
     else if (minutes > 0)
     {
-      m_Controls.m_UptimeLabel->setText(QString("%1m %2s")
+      m_Controls->m_UptimeLabel->setText(QString("%1m %2s")
         .arg(minutes).arg(secs));
     }
     else
     {
-      m_Controls.m_UptimeLabel->setText(QString("%1s").arg(secs));
+      m_Controls->m_UptimeLabel->setText(QString("%1s").arg(secs));
     }
   }
   else
   {
-    m_Controls.m_UptimeLabel->setText("-");
+    m_Controls->m_UptimeLabel->setText("-");
   }
 
   // Update security status labels from config
   switch (config->clientAccessMode)
   {
     case mitk::ClientAccessMode::LocalhostOnly:
-      m_Controls.m_AccessModeLabel->setText("Localhost only");
+      m_Controls->m_AccessModeLabel->setText("Localhost only");
       break;
     case mitk::ClientAccessMode::AllowAll:
-      m_Controls.m_AccessModeLabel->setText("Allow all");
+      m_Controls->m_AccessModeLabel->setText("Allow all");
       break;
     case mitk::ClientAccessMode::Whitelist:
-      m_Controls.m_AccessModeLabel->setText(
+      m_Controls->m_AccessModeLabel->setText(
         QString("Whitelist (%1 IPs)").arg(config->allowedClientIPs.size()));
       break;
   }
 
-  m_Controls.m_AuthStatusLabel->setText(config->requireAuth ? "Enabled" : "Disabled");
+  m_Controls->m_AuthStatusLabel->setText(config->requireAuth ? "Enabled" : "Disabled");
 
   switch (config->fileAccessMode)
   {
     case mitk::FileAccessMode::Unrestricted:
-      m_Controls.m_FileAccessLabel->setText("Unrestricted");
+      m_Controls->m_FileAccessLabel->setText("Unrestricted");
       break;
     case mitk::FileAccessMode::AllowedDirectories:
-      m_Controls.m_FileAccessLabel->setText(
+      m_Controls->m_FileAccessLabel->setText(
         QString("Restricted (%1 dirs)").arg(config->allowedFileDirectories.size()));
       break;
   }
@@ -296,7 +298,7 @@ void QmitkRestApiView::UpdateServerStatus()
   auto clientIPs = service->GetClientIPs();
   if (clientIPs.empty())
   {
-    m_Controls.m_ClientIPsLabel->setText("No clients connected yet");
+    m_Controls->m_ClientIPsLabel->setText("No clients connected yet");
   }
   else
   {
@@ -305,22 +307,22 @@ void QmitkRestApiView::UpdateServerStatus()
     {
       ipList.append(QString::fromStdString(ip));
     }
-    m_Controls.m_ClientIPsLabel->setText(ipList.join(", "));
+    m_Controls->m_ClientIPsLabel->setText(ipList.join(", "));
   }
 
   // Update last request info
   auto lastRequest = service->GetLastRequestInfo();
   if (lastRequest)
   {
-    m_Controls.m_LastEndpointLabel->setText(QString("%1 %2")
+    m_Controls->m_LastEndpointLabel->setText(QString("%1 %2")
       .arg(QString::fromStdString(lastRequest->method))
       .arg(QString::fromStdString(lastRequest->endpoint)));
-    m_Controls.m_LastResponseCodeLabel->setText(QString::number(lastRequest->responseCode));
+    m_Controls->m_LastResponseCodeLabel->setText(QString::number(lastRequest->responseCode));
   }
   else
   {
-    m_Controls.m_LastEndpointLabel->setText("-");
-    m_Controls.m_LastResponseCodeLabel->setText("-");
+    m_Controls->m_LastEndpointLabel->setText("-");
+    m_Controls->m_LastResponseCodeLabel->setText("-");
   }
 
   // Update request log table
@@ -329,7 +331,7 @@ void QmitkRestApiView::UpdateServerStatus()
 
 void QmitkRestApiView::OnCopyUrlClicked()
 {
-  auto urlText = m_Controls.m_ServerUrlLabel->text();
+  auto urlText = m_Controls->m_ServerUrlLabel->text();
   if (!urlText.isEmpty() && urlText != "-")
   {
     QApplication::clipboard()->setText(urlText);
@@ -351,7 +353,7 @@ void QmitkRestApiView::UpdateRequestLogTable()
   auto* service = this->GetRestServerService();
   if (service == nullptr)
   {
-    m_Controls.m_RequestLogTable->setRowCount(0);
+    m_Controls->m_RequestLogTable->setRowCount(0);
     m_LastLogVersion = 0;
     return;
   }
@@ -366,7 +368,7 @@ void QmitkRestApiView::UpdateRequestLogTable()
   auto requestLog = service->GetRequestLog();
   const int newRowCount = static_cast<int>(requestLog.size());
 
-  m_Controls.m_RequestLogTable->setRowCount(newRowCount);
+  m_Controls->m_RequestLogTable->setRowCount(newRowCount);
 
   // Populate table (oldest first, most recent at bottom)
   for (int i = 0; i < newRowCount; ++i)
@@ -392,15 +394,15 @@ void QmitkRestApiView::UpdateRequestLogTable()
       responseItem->setData(Qt::BackgroundRole, QColor("#F44336")); // Red for server errors
     }
 
-    m_Controls.m_RequestLogTable->setItem(i, 0, ipItem);
-    m_Controls.m_RequestLogTable->setItem(i, 1, responseItem);
-    m_Controls.m_RequestLogTable->setItem(i, 2, methodItem);
-    m_Controls.m_RequestLogTable->setItem(i, 3, endpointItem);
+    m_Controls->m_RequestLogTable->setItem(i, 0, ipItem);
+    m_Controls->m_RequestLogTable->setItem(i, 1, responseItem);
+    m_Controls->m_RequestLogTable->setItem(i, 2, methodItem);
+    m_Controls->m_RequestLogTable->setItem(i, 3, endpointItem);
   }
 
   // Scroll to bottom to show most recent entries
   if (newRowCount > 0)
   {
-    m_Controls.m_RequestLogTable->scrollToBottom();
+    m_Controls->m_RequestLogTable->scrollToBottom();
   }
 }

@@ -15,9 +15,14 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
+#include <ui_QmitkOtsuToolWidgetControls.h>
+
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
+  : QmitkMultiLabelSegWithPreviewToolGUIBase(),
+    m_Controls(std::make_unique<Ui::QmitkOtsuToolWidgetControls>()),
+    m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   auto enableMLSelectedDelegate = [this](bool enabled)
   {
@@ -34,6 +39,10 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
+QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
+{
+}
+
 void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
   Superclass::ConnectNewTool(newTool);
@@ -46,11 +55,11 @@ void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
 {
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
-  m_Controls.setupUi(wrapperWidget);
+  m_Controls->setupUi(wrapperWidget);
 
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
-  connect(m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));
-  connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
+  connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  connect(m_Controls->m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));
+  connect(m_Controls->advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
 
   this->OnAdvancedSettingsButtonToggled(false);
 
@@ -60,24 +69,24 @@ void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
 void QmitkOtsuTool3DGUI::OnRegionSpinboxChanged(int numberOfRegions)
 {
   // we have to change to minimum number of histogram bins accordingly
-  int curBinValue = m_Controls.m_BinsSpinBox->value();
+  int curBinValue = m_Controls->m_BinsSpinBox->value();
   if (curBinValue < numberOfRegions)
-    m_Controls.m_BinsSpinBox->setValue(numberOfRegions);
+    m_Controls->m_BinsSpinBox->setValue(numberOfRegions);
 }
 
 void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
 {
-  m_Controls.m_ValleyCheckbox->setVisible(toggled);
-  m_Controls.binLabel->setVisible(toggled);
-  m_Controls.m_BinsSpinBox->setVisible(toggled);
+  m_Controls->m_ValleyCheckbox->setVisible(toggled);
+  m_Controls->binLabel->setVisible(toggled);
+  m_Controls->m_BinsSpinBox->setVisible(toggled);
 
   auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
   if (toggled && nullptr != tool)
   {
     int max = tool->GetMaxNumberOfBins();
-    if (max >= m_Controls.m_BinsSpinBox->minimum())
+    if (max >= m_Controls->m_BinsSpinBox->minimum())
     {
-      m_Controls.m_BinsSpinBox->setMaximum(max);
+      m_Controls->m_BinsSpinBox->setMaximum(max);
     }
   }
 }
@@ -88,9 +97,9 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
   if (nullptr != tool)
   {
     if (!m_FirstPreviewComputation &&
-      (tool->GetNumberOfRegions() == static_cast<unsigned int>(m_Controls.m_Spinbox->value()) &&
-      tool->GetUseValley() == m_Controls.m_ValleyCheckbox->isChecked() &&
-      tool->GetNumberOfBins() == static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value())))
+      (tool->GetNumberOfRegions() == static_cast<unsigned int>(m_Controls->m_Spinbox->value()) &&
+      tool->GetUseValley() == m_Controls->m_ValleyCheckbox->isChecked() &&
+      tool->GetNumberOfBins() == static_cast<unsigned int>(m_Controls->m_BinsSpinBox->value())))
       return;
 
     m_FirstPreviewComputation = false;
@@ -103,16 +112,16 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
                                                 "The otsu segmentation computation may take several minutes depending "
                                                 "on the number of Regions you selected. Proceed anyway?",
                                                 QMessageBox::Ok | QMessageBox::Cancel);
-      if (m_Controls.m_Spinbox->value() >= 5)
+      if (m_Controls->m_Spinbox->value() >= 5)
       {
         proceed = messageBox->exec();
         if (proceed != QMessageBox::Ok)
           return;
       }
 
-      tool->SetNumberOfRegions(static_cast<unsigned int>(m_Controls.m_Spinbox->value()));
-      tool->SetUseValley(m_Controls.m_ValleyCheckbox->isChecked());
-      tool->SetNumberOfBins(static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value()));
+      tool->SetNumberOfRegions(static_cast<unsigned int>(m_Controls->m_Spinbox->value()));
+      tool->SetUseValley(m_Controls->m_ValleyCheckbox->isChecked());
+      tool->SetNumberOfBins(static_cast<unsigned int>(m_Controls->m_BinsSpinBox->value()));
 
       tool->UpdatePreview();
     }
@@ -148,8 +157,8 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
 void QmitkOtsuTool3DGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
-  m_Controls.m_ValleyCheckbox->setEnabled(enabled);
-  m_Controls.binLabel->setEnabled(enabled);
-  m_Controls.m_BinsSpinBox->setEnabled(enabled);
-  m_Controls.previewButton->setEnabled(enabled);
+  m_Controls->m_ValleyCheckbox->setEnabled(enabled);
+  m_Controls->binLabel->setEnabled(enabled);
+  m_Controls->m_BinsSpinBox->setEnabled(enabled);
+  m_Controls->previewButton->setEnabled(enabled);
 }

@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <QColor>
 #include <QDialog>
 #include <QString>
+#include <memory>
 
 namespace Ui
 {
@@ -84,7 +85,7 @@ private:
   bool TryPreselectMatchingSuggestion(const QString& name);
   bool GetAutoFilter() const;
 
-  Ui::QmitkNewSegmentationDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkNewSegmentationDialog> m_Ui;
 
   Mode m_Mode;
   bool m_EnforceSuggestions;

@@ -20,8 +20,12 @@ found in the LICENSE file.
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview";
 
 MinimalView::MinimalView()
-  : m_Controls(new Ui::MinimalViewControls),
+  : m_Controls(std::make_unique<Ui::MinimalViewControls>()),
     m_Parent(nullptr)
+{
+}
+
+MinimalView::~MinimalView()
 {
 }
 

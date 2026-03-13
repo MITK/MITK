@@ -31,7 +31,7 @@ namespace
 }
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
-  : m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkStdMultiWidgetEditorPreferencePage>()),
     m_Control(nullptr)
 {
 }

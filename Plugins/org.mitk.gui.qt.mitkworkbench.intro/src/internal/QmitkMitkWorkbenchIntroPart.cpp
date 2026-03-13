@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMitkWorkbenchIntroPart.h"
+#include <ui_QmitkWelcomeScreenViewControls.h>
 #include "QmitkMitkWorkbenchIntroPlugin.h"
 
 #include <berryIPerspectiveDescriptor.h>
@@ -119,7 +120,7 @@ namespace
 }
 
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
-  : m_Controls(nullptr),
+  :
     m_Impl(new Impl)
 {
   auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
@@ -155,7 +156,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
   if (!m_Controls)
   {
     // create GUI widgets
-    m_Controls = new Ui::QmitkWelcomeScreenViewControls;
+    m_Controls = std::make_unique<Ui::QmitkWelcomeScreenViewControls>();
     m_Controls->setupUi(parent);
 
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview

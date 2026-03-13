@@ -13,6 +13,7 @@ found in the LICENSE file.
 
 // Blueberry
 #include <berryISelectionService.h>
+#include <ui_QmitkAICPRegistrationViewControls.h>
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
@@ -97,6 +98,7 @@ public:
 };
 
 QmitkAICPRegistrationView::QmitkAICPRegistrationView()
+  : m_Controls(std::make_unique<Ui::QmitkAICPRegistrationViewControls>())
 {
   d = new AICPRegistrationViewData();
 }
@@ -112,12 +114,12 @@ void QmitkAICPRegistrationView::SetFocus(){}
 void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
+  m_Controls->setupUi( parent );
 
   // connect signals and slots
-  connect ( m_Controls.m_EnableTreCalculation,SIGNAL(clicked()),this, SLOT(OnEnableTreCalculation()) );
-  connect ( m_Controls.m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnStartRegistration()) );
-  connect ( m_Controls.m_EnableTrimming, SIGNAL(clicked()), this, SLOT(OnEnableTrimming()) );
+  connect ( m_Controls->m_EnableTreCalculation,SIGNAL(clicked()),this, SLOT(OnEnableTreCalculation()) );
+  connect ( m_Controls->m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnStartRegistration()) );
+  connect ( m_Controls->m_EnableTrimming, SIGNAL(clicked()), this, SLOT(OnEnableTrimming()) );
   connect ( d->m_Worker, SIGNAL( RegistrationFinished()), this, SLOT( OnRegistrationFinished()) );
   connect(d->m_RegistrationThread,SIGNAL(started()), d->m_Worker,SLOT(RegistrationThreadFunc()) );
 
@@ -125,38 +127,38 @@ void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
   d->m_Worker->moveToThread(d->m_RegistrationThread);
 
   // setup tooltips
-  m_Controls.m_MovingSurfaceComboBox->setToolTip("Set the moving surface of the A-ICP algorithm");
-  m_Controls.m_FixedSurfaceComboBox->setToolTip("Set the fixed surface of the A-ICP algorithm");
-  m_Controls.m_EnableTreCalculation->setToolTip("Enable the trimmed version of the algorithm.");
-  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set the trimmfactor. The algorithm will use a percentage of the Moving pointset for the registration. Valid number are between 0 and 1.");
-  m_Controls.m_ThresholdSpinbox->setToolTip("Set the threshold to which the algorithm will converge.");
-  m_Controls.m_MaxIterationsSpinbox->setToolTip("The maximum number of iterations used by the algorithm.");
-  m_Controls.m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
-  m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
-  m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
-  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set the overlapping part of the surface in %. The valid range is between 0 and 1.");
-  m_Controls.m_MovingTargets->setToolTip("Select the targets for the moving surface.");
-  m_Controls.m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
+  m_Controls->m_MovingSurfaceComboBox->setToolTip("Set the moving surface of the A-ICP algorithm");
+  m_Controls->m_FixedSurfaceComboBox->setToolTip("Set the fixed surface of the A-ICP algorithm");
+  m_Controls->m_EnableTreCalculation->setToolTip("Enable the trimmed version of the algorithm.");
+  m_Controls->m_TrimmFactorSpinbox->setToolTip("Set the trimmfactor. The algorithm will use a percentage of the Moving pointset for the registration. Valid number are between 0 and 1.");
+  m_Controls->m_ThresholdSpinbox->setToolTip("Set the threshold to which the algorithm will converge.");
+  m_Controls->m_MaxIterationsSpinbox->setToolTip("The maximum number of iterations used by the algorithm.");
+  m_Controls->m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
+  m_Controls->m_RegisterSurfaceButton->setToolTip("Start the registration.");
+  m_Controls->m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
+  m_Controls->m_TrimmFactorSpinbox->setToolTip("Set the overlapping part of the surface in %. The valid range is between 0 and 1.");
+  m_Controls->m_MovingTargets->setToolTip("Select the targets for the moving surface.");
+  m_Controls->m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
 
   // init combo boxes
-  m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_FixedSurfaceComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+  m_Controls->m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls->m_FixedSurfaceComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
-  m_Controls.m_MovingSurfaceComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_MovingSurfaceComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+  m_Controls->m_MovingSurfaceComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls->m_MovingSurfaceComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
-  m_Controls.m_MovingTargets->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_MovingTargets->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
+  m_Controls->m_MovingTargets->SetDataStorage(this->GetDataStorage());
+  m_Controls->m_MovingTargets->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
 
-  m_Controls.m_FixedTargets->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_FixedTargets->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
+  m_Controls->m_FixedTargets->SetDataStorage(this->GetDataStorage());
+  m_Controls->m_FixedTargets->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
 
   // disable target selection
-  m_Controls.m_TargetSelectFrame->setEnabled(false);
+  m_Controls->m_TargetSelectFrame->setEnabled(false);
 
   // disable trimming options
-  m_Controls.m_TrimmFactorLabel->setEnabled(false);
-  m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
+  m_Controls->m_TrimmFactorLabel->setEnabled(false);
+  m_Controls->m_TrimmFactorSpinbox->setEnabled(false);
 }
 
 
@@ -165,8 +167,8 @@ bool QmitkAICPRegistrationView::CheckInput()
   QMessageBox msg;
   msg.setIcon(QMessageBox::Critical);
 
-  if ( m_Controls.m_MovingSurfaceComboBox->GetSelectedNode().IsNull() ||
-        m_Controls.m_FixedSurfaceComboBox->GetSelectedNode().IsNull() )
+  if ( m_Controls->m_MovingSurfaceComboBox->GetSelectedNode().IsNull() ||
+        m_Controls->m_FixedSurfaceComboBox->GetSelectedNode().IsNull() )
   {
     const char* message = "No Surfaces selected.";
     MITK_ERROR << message;
@@ -175,10 +177,10 @@ bool QmitkAICPRegistrationView::CheckInput()
     return false;
   }
 
-  if ( m_Controls.m_EnableTreCalculation->isChecked() )
+  if ( m_Controls->m_EnableTreCalculation->isChecked() )
   {
-    if ( m_Controls.m_FixedTargets->GetSelectedNode().IsNull() ||
-           m_Controls.m_MovingTargets->GetSelectedNode().IsNull() )
+    if ( m_Controls->m_FixedTargets->GetSelectedNode().IsNull() ||
+           m_Controls->m_MovingTargets->GetSelectedNode().IsNull() )
     {
       const char* message = "TRE calculation is enabled, but no target points are selected.";
       msg.setText(message);
@@ -191,24 +193,24 @@ bool QmitkAICPRegistrationView::CheckInput()
 
 void QmitkAICPRegistrationView::OnStartRegistration()
 {
-  d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
-  d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
-  d->m_SearchRadius = m_Controls.m_SearchRadius->value();
+  d->m_Threshold = m_Controls->m_ThresholdSpinbox->value();
+  d->m_MaxIterations = m_Controls->m_MaxIterationsSpinbox->value();
+  d->m_SearchRadius = m_Controls->m_SearchRadius->value();
   d->m_TrimmFactor = 0.0;
 
-  if ( m_Controls.m_EnableTrimming->isChecked() )
+  if ( m_Controls->m_EnableTrimming->isChecked() )
   {
-    d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
+    d->m_TrimmFactor = m_Controls->m_TrimmFactorSpinbox->value();
   }
 
   if (! CheckInput() )
     return;
 
   d->m_MovingSurface = dynamic_cast<mitk::Surface*>(
-            m_Controls.m_MovingSurfaceComboBox->GetSelectedNode()->GetData() );
+            m_Controls->m_MovingSurfaceComboBox->GetSelectedNode()->GetData() );
 
   d->m_FixedSurface = dynamic_cast<mitk::Surface*>(
-            m_Controls.m_FixedSurfaceComboBox->GetSelectedNode()->GetData() );
+            m_Controls->m_FixedSurfaceComboBox->GetSelectedNode()->GetData() );
 
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
@@ -222,9 +224,9 @@ void QmitkAICPRegistrationView::OnStartRegistration()
   }
 
   // enable trimming
-  if ( m_Controls.m_EnableTrimming->isChecked() )
+  if ( m_Controls->m_EnableTrimming->isChecked() )
   {
-    d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
+    d->m_TrimmFactor = m_Controls->m_TrimmFactorSpinbox->value();
   }
 
   // set data into the UI thread
@@ -234,30 +236,30 @@ void QmitkAICPRegistrationView::OnStartRegistration()
   d->m_RegistrationThread->start();
 
   // disable registration button
-  m_Controls.m_RegisterSurfaceButton->setEnabled(false);
+  m_Controls->m_RegisterSurfaceButton->setEnabled(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkAICPRegistrationView::OnEnableTreCalculation()
 {
-  if ( m_Controls.m_EnableTreCalculation->isChecked() )
-    m_Controls.m_TargetSelectFrame->setEnabled(true);
+  if ( m_Controls->m_EnableTreCalculation->isChecked() )
+    m_Controls->m_TargetSelectFrame->setEnabled(true);
   else
-    m_Controls.m_TargetSelectFrame->setEnabled(false);
+    m_Controls->m_TargetSelectFrame->setEnabled(false);
 }
 
 void QmitkAICPRegistrationView::OnEnableTrimming()
 {
-  if ( m_Controls.m_EnableTrimming->isChecked() )
+  if ( m_Controls->m_EnableTrimming->isChecked() )
   {
     // disable trimming options
-    m_Controls.m_TrimmFactorLabel->setEnabled(true);
-    m_Controls.m_TrimmFactorSpinbox->setEnabled(true);
+    m_Controls->m_TrimmFactorLabel->setEnabled(true);
+    m_Controls->m_TrimmFactorSpinbox->setEnabled(true);
   } else {
     // disable trimming options
-    m_Controls.m_TrimmFactorLabel->setEnabled(false);
-    m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
+    m_Controls->m_TrimmFactorLabel->setEnabled(false);
+    m_Controls->m_TrimmFactorSpinbox->setEnabled(false);
   }
 }
 
@@ -277,13 +279,13 @@ void QmitkAICPRegistrationView::OnRegistrationFinished()
   MITK_INFO << "FRE: " << d->m_AICP->GetFRE();
 
   // compute TRE
-  if ( m_Controls.m_EnableTreCalculation->isChecked() )
+  if ( m_Controls->m_EnableTreCalculation->isChecked() )
   {
     mitk::PointSet* movingTargets = dynamic_cast<mitk::PointSet*> (
-                     m_Controls.m_MovingTargets->GetSelectedNode()->GetData() );
+                     m_Controls->m_MovingTargets->GetSelectedNode()->GetData() );
 
     mitk::PointSet* fixedTargets = dynamic_cast<mitk::PointSet*> (
-                      m_Controls.m_FixedTargets->GetSelectedNode()->GetData() );
+                      m_Controls->m_FixedTargets->GetSelectedNode()->GetData() );
 
     // sanity check
     if ( movingTargets && fixedTargets )
@@ -335,8 +337,8 @@ void QmitkAICPRegistrationView::OnRegistrationFinished()
   std::string s(oss.str());
   text.append(s.c_str());
 
-  m_Controls.m_TextEdit->clear();
-  m_Controls.m_TextEdit->append(text);
+  m_Controls->m_TextEdit->clear();
+  m_Controls->m_TextEdit->append(text);
 
   mitk::AnisotropicRegistrationCommon::TransformPoints (
           d->m_MovingSurface->GetVtkPolyData()->GetPoints(),
@@ -349,7 +351,7 @@ void QmitkAICPRegistrationView::OnRegistrationFinished()
   d->m_MovingSurface->GetVtkPolyData()->Modified();
 
   // reanable registration button
-  m_Controls.m_RegisterSurfaceButton->setEnabled(true);
+  m_Controls->m_RegisterSurfaceButton->setEnabled(true);
 
   //update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

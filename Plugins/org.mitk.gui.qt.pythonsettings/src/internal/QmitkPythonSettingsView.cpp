@@ -212,7 +212,7 @@ namespace
 const std::string QmitkPythonSettingsView::VIEW_ID = "org.mitk.views.pythonsettings";
 
 QmitkPythonSettingsView::QmitkPythonSettingsView(QObject*)
-  : m_Ui(new Ui::QmitkPythonSettingsView)
+  : m_Ui(std::make_unique<Ui::QmitkPythonSettingsView>())
 {
 }
 

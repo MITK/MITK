@@ -28,7 +28,7 @@ found in the LICENSE file.
 QmitkExtractFromMultiLabelSegmentationWidget::QmitkExtractFromMultiLabelSegmentationWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent), m_DataStorage(dataStorage)
 {
-  m_Controls = new Ui::QmitkExtractFromMultiLabelSegmentationWidgetControls;
+  m_Controls = std::make_unique<Ui::QmitkExtractFromMultiLabelSegmentationWidgetControls>();
   m_Controls->setupUi(this);
 
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);

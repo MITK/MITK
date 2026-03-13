@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define QmitkServiceListWidget_h
 
 #include "MitkQtWidgetsExports.h"
-#include "ui_QmitkServiceListWidgetControls.h"
 #include <vector>
 
 // QT headers
+#include <QListWidget>
 #include <QListWidgetItem>
 #include <QWidget>
 
@@ -26,6 +26,9 @@ found in the LICENSE file.
 #include "usModuleContext.h"
 #include "usServiceEvent.h"
 #include "usServiceReference.h"
+#include <memory>
+
+namespace Ui { class QmitkServiceListWidgetControls; }
 
 /**
  * \ingroup QmitkModule
@@ -124,9 +127,11 @@ public:
   template <class T>
   T *GetSelectedService()
   {
-    if (this->m_Controls->m_ServiceList->currentRow() == -1)
+    if (m_ServiceList->currentRow() == -1)
       return nullptr;
-    us::ServiceReferenceU ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+
+    us::ServiceReferenceU ref = GetServiceForListItem(m_ServiceList->currentItem());
+
     return (m_Context->GetService(us::ServiceReference<T>(ref)));
   }
 
@@ -226,7 +231,8 @@ protected slots:
   void OnServiceSelectionChanged();
 
 protected:
-  Ui::QmitkServiceListWidgetControls *m_Controls; ///< member holding the UI elements of this widget
+  std::unique_ptr<Ui::QmitkServiceListWidgetControls> m_Controls; ///< member holding the UI elements of this widget
+  QListWidget* m_ServiceList;
 
   /**
   * \brief  Internal structure used to link ServiceReferences to their QListWidgetItems

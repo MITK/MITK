@@ -23,10 +23,11 @@ found in the LICENSE file.
 #include <QmitkPointListWidget.h>
 #include <QmitkRenderWindow.h>
 
+#include <ui_QmitkPointSetInteractionViewControls.h>
+
 const std::string QmitkPointSetInteractionView::VIEW_ID = "org.mitk.views.pointsetinteraction";
 
 QmitkPointSetInteractionView::QmitkPointSetInteractionView()
-  : m_Controls(nullptr)
 {
 }
 
@@ -36,7 +37,7 @@ QmitkPointSetInteractionView::~QmitkPointSetInteractionView()
 
 void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
 {
-  m_Controls = new Ui::QmitkPointSetInteractionViewControls;
+  m_Controls = std::make_unique<Ui::QmitkPointSetInteractionViewControls>();
   m_Controls->setupUi(parent);
 
   m_Controls->selectedPointSetWidget->SetDataStorage(GetDataStorage());

@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <utility>
+#include <memory>
 
 namespace Ui
 {
@@ -40,7 +41,7 @@ private:
   std::string FormatPercentage(double val);
   std::string GetMemoryDescription(size_t processSize, float percentage);
 
-  Ui::QmitkMemoryUsageIndicator* m_Ui;
+  std::unique_ptr<Ui::QmitkMemoryUsageIndicator> m_Ui;
   size_t m_PreviousState;
   std::array<std::pair<float, QPixmap>, 4> m_States;
 };

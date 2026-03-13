@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 #include "mitkIPreferences.h"
-#include <ui_QmitkTotalSegmentatorPreferencePage.h>
 #include "QmitkTotalSegmentatorToolInstaller.h"
 #include <QMessageBox>
 #include <QmitknnUNetGPU.h>
 #include "QmitkToolInstallDialog.h"
+#include <memory>
 
 namespace Ui
 {
@@ -33,7 +33,7 @@ class QmitkTotalSegmentatorPreferencePage : public QObject, public berry::IQtPre
 
 public:
   QmitkTotalSegmentatorPreferencePage();
-  ~QmitkTotalSegmentatorPreferencePage() override = default;
+  ~QmitkTotalSegmentatorPreferencePage() override;
 
   void Init(berry::IWorkbench::Pointer workbench) override;
   void CreateQtControl(QWidget *parent) override;
@@ -109,7 +109,7 @@ private:
    */
   QString GetExactPythonPath();
 
-  Ui::QmitkTotalSegmentatorPreferencePage *m_Ui;
+  std::unique_ptr<Ui::QmitkTotalSegmentatorPreferencePage> m_Ui;
   QWidget *m_Control;
   QString m_SysPythonPath;
   bool m_IsInstalled; // manual installed or not

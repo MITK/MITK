@@ -13,6 +13,8 @@ found in the LICENSE file.
 #include "QmitkExtWorkbenchWindowAdvisor.h"
 #include "QmitkExtActionBarAdvisor.h"
 
+#include <QApplication>
+#include <QLayout>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMainWindow>

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkDicomInspectorView_h
 #define QmitkDicomInspectorView_h
 
-#include "ui_QmitkDicomInspectorViewControls.h"
-
 // Blueberry
 #include <berryIPartListener.h>
 
@@ -29,6 +27,12 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <QmitkSelectionServiceConnector.h>
 #include <QmitkSliceNavigationListener.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkDicomInspectorViewControls;
+}
 
 /**
  *	@brief	View class to inspect all DICOM tags available for the data of a node.
@@ -75,7 +79,6 @@ private:
 
   void SetAsSelectionListener(bool checked);
 
-  Ui::QmitkDicomInspectorViewControls m_Controls;
   mitk::IRenderWindowPart* m_RenderWindowPart;
 
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
@@ -118,6 +121,7 @@ private:
   typedef std::map<std::string, TagInfo> TagMapType;
   TagMapType m_Tags;
 
+  std::unique_ptr<Ui::QmitkDicomInspectorViewControls> m_Controls;
 };
 
 #endif

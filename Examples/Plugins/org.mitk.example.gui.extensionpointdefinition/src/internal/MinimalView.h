@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "ChangeTextRegistry.h"
 
 #include <QSignalMapper>
+#include <memory>
 
 namespace Ui
 {
@@ -32,6 +33,7 @@ public:
   static const std::string VIEW_ID;
 
   MinimalView();
+  ~MinimalView() override;
 
 protected:
   void CreateQtPartControl(QWidget *parent) override;
@@ -43,7 +45,7 @@ private Q_SLOTS:
   void ChangeText(const QString &id);
 
 private:
-  Ui::MinimalViewControls *m_Controls;
+  std::unique_ptr<Ui::MinimalViewControls> m_Controls;
 
   QWidget *m_Parent;
   QSignalMapper m_SignalMapper;

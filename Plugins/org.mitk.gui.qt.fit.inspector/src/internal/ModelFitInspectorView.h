@@ -15,26 +15,29 @@ found in the LICENSE file.
 #define ModelFitInspectorView_h
 
 // Blueberry
-//#include <berryISelectionListener.h>
 #include <berryIPartListener.h>
 
 // mitk
-#include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-#include "QmitkSliceNavigationListener.h"
+#include <mitkModelFitStaticParameterMap.h>
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelFitInfo.h>
+#include <mitkIModelFitProvider.h>
+#include <mitkModelFitPlotDataHelper.h>
 
-#include "mitkModelFitStaticParameterMap.h"
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelFitInfo.h"
-#include "mitkIModelFitProvider.h"
-#include "mitkModelFitPlotDataHelper.h"
-#include "QmitkSelectionServiceConnector.h"
-#include "QmitkFitParameterModel.h"
+#include <QmitkAbstractView.h>
+#include <QmitkSliceNavigationListener.h>
+#include <QmitkPlotWidget.h>
+#include <QmitkSelectionServiceConnector.h>
+#include <QmitkFitParameterModel.h>
 #include <QmitkSimpleTextOverlayWidget.h>
 
-// Qt
-#include "ui_ModelFitInspectorViewControls.h"
+#include <memory>
 
+namespace Ui
+{
+  class ModelFitInspectorViewControls;
+}
 
 /**
  *	@brief	View class defining the UI part of the ModelFitInspector plug-in.
@@ -135,7 +138,7 @@ protected:
    to get the correct grid, otherwise just a simple time grid will be extracted.*/
   const mitk::ModelBase::TimeGridType GetCurrentTimeGrid() const;
 
-  Ui::ModelFitInspectorViewControls m_Controls;
+  std::unique_ptr<Ui::ModelFitInspectorViewControls> m_Controls;
 
   QmitkSimpleTextOverlayWidget* m_ErrorOverlay;
 

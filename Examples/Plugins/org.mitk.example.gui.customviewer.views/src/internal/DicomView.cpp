@@ -28,7 +28,7 @@ found in the LICENSE file.
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
 DicomView::DicomView()
-  : m_Controls(new Ui::QmitkDicomViewControls),
+  : m_Controls(std::make_unique<Ui::QmitkDicomViewControls>()),
     m_Parent(nullptr)
 {
 }

@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+#include <ui_RTUIPreferencePageControls.h>
+
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -30,7 +32,7 @@ namespace
 
 //-----------------------------------------------------------------------------
 RTUIPreferencePage::RTUIPreferencePage()
-  : m_MainControl(nullptr), m_Controls(nullptr)
+  : m_MainControl(nullptr)
 {
 
 }
@@ -39,7 +41,6 @@ RTUIPreferencePage::RTUIPreferencePage()
 //-----------------------------------------------------------------------------
 RTUIPreferencePage::~RTUIPreferencePage()
 {
-  delete m_Controls;
 }
 
 
@@ -54,7 +55,7 @@ void RTUIPreferencePage::Init(berry::IWorkbench::Pointer )
 void RTUIPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
-  m_Controls = new Ui::RTUIPreferencePageControls;
+  m_Controls = std::make_unique<Ui::RTUIPreferencePageControls>();
   m_Controls->setupUi( m_MainControl );
 
   connect(m_Controls->radioDefault, SIGNAL(toggled(bool)), m_Controls->spinDefault, SLOT(setEnabled(bool)));

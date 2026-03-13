@@ -12,17 +12,20 @@ found in the LICENSE file.
 
 #include "QmitkInspectionPositionWidget.h"
 
+#include <ui_QmitkInspectionPositionWidget.h>
+
 QmitkInspectionPositionWidget::QmitkInspectionPositionWidget(QWidget*)
+  : m_Controls(std::make_unique<Ui::QmitkInspectionPositionWidget>())
 {
-  this->m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
 
   this->m_CurrentPosition.Fill(0.0);
 
-  m_Controls.btnAdd->setEnabled(false);
+  m_Controls->btnAdd->setEnabled(false);
 
-  connect(m_Controls.pointlistWidget, SIGNAL(PointListChanged()), this,
+  connect(m_Controls->pointlistWidget, SIGNAL(PointListChanged()), this,
     SLOT(OnPointListChanged()));
-  connect(m_Controls.btnAdd, SIGNAL(clicked()), this,
+  connect(m_Controls->btnAdd, SIGNAL(clicked()), this,
     SLOT(OnAddCurrentPositionClicked()));
 }
 
@@ -41,7 +44,7 @@ const mitk::PointSet*
 QmitkInspectionPositionWidget::
 GetPositionBookmarks() const
 {
-  return m_Controls.pointlistWidget->GetPointSet();
+  return m_Controls->pointlistWidget->GetPointSet();
 };
 
 void
@@ -53,21 +56,21 @@ SetCurrentPosition(const mitk::Point3D& currentPos)
   std::ostringstream strm;
   strm.imbue(std::locale("C"));
   strm << currentPos[0] << " | " << currentPos[1] << " | " << currentPos[2];
-  m_Controls.lineCurrentPos->setText(QString::fromStdString(strm.str()));
+  m_Controls->lineCurrentPos->setText(QString::fromStdString(strm.str()));
 };
 
 void
 QmitkInspectionPositionWidget::
 SetPositionBookmarkNode(mitk::DataNode *newNode)
 {
-  m_Controls.pointlistWidget->SetPointSetNode(newNode);
-  m_Controls.btnAdd->setEnabled(newNode != nullptr);
+  m_Controls->pointlistWidget->SetPointSetNode(newNode);
+  m_Controls->btnAdd->setEnabled(newNode != nullptr);
 };
 
 mitk::DataNode *
 QmitkInspectionPositionWidget::GetPositionBookmarkNode()
 {
-  return m_Controls.pointlistWidget->GetPointSetNode();
+  return m_Controls->pointlistWidget->GetPointSetNode();
 };
 
 void
@@ -80,9 +83,9 @@ OnPointListChanged()
 void QmitkInspectionPositionWidget::
 OnAddCurrentPositionClicked()
 {
-  if (m_Controls.pointlistWidget->GetPointSet())
+  if (m_Controls->pointlistWidget->GetPointSet())
   {
-    m_Controls.pointlistWidget->GetPointSet()->InsertPoint(m_CurrentPosition);
+    m_Controls->pointlistWidget->GetPointSet()->InsertPoint(m_CurrentPosition);
     emit PositionBookmarksChanged();
   }
 }

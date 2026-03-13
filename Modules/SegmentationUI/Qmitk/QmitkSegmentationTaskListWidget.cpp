@@ -171,7 +171,7 @@ namespace
  */
 QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent)
   : QWidget(parent),
-    m_Ui(new Ui::QmitkSegmentationTaskListWidget),
+    m_Ui(std::make_unique<Ui::QmitkSegmentationTaskListWidget>()),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
     m_DataStorage(nullptr),
     m_ImageNode(nullptr),

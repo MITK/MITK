@@ -15,16 +15,17 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <ui_QmitkSingleNodeSelectionWidget.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkNodeSelectionButton.h>
+#include <memory>
 
 class QmitkAbstractDataStorageModel;
+
+namespace Ui { class QmitkSingleNodeSelectionWidget; }
 
 /**
 * @class QmitkSingleNodeSelectionWidget
@@ -43,6 +44,7 @@ class MITKQTWIDGETS_EXPORT QmitkSingleNodeSelectionWidget : public QmitkAbstract
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkSingleNodeSelectionWidget() override;
 
   mitk::DataNode::Pointer GetSelectedNode() const;
   bool GetAutoSelectNewNodes() const;
@@ -92,7 +94,7 @@ protected:
   /** See documentation of SetAutoSelectNewNodes for details*/
   bool m_AutoSelectNodes;
 
-  Ui_QmitkSingleNodeSelectionWidget m_Controls;
+  std::unique_ptr<Ui::QmitkSingleNodeSelectionWidget> m_Controls;
 };
 
 #endif

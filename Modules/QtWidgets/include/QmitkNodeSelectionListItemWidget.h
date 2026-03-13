@@ -16,11 +16,12 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <ui_QmitkNodeSelectionListItemWidget.h>
-
 #include <QWidget>
 
 #include <mitkDataNode.h>
+#include <memory>
+
+namespace Ui { class QmitkNodeSelectionListItemWidget; }
 
 class MITKQTWIDGETS_EXPORT QmitkNodeSelectionListItemWidget : public QWidget
 {
@@ -45,7 +46,7 @@ protected Q_SLOTS:
 protected:
   bool eventFilter(QObject *obj, QEvent *ev) override;
 
-  Ui_QmitkNodeSelectionListItemWidget m_Controls;
+  std::unique_ptr<Ui::QmitkNodeSelectionListItemWidget> m_Controls;
 };
 
 

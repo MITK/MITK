@@ -15,12 +15,18 @@ found in the LICENSE file.
 
 #include "QmitkSegWithPreviewToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>
-#include "ui_QmitkSegmentAnythingGUIControls.h"
 #include "QmitknnUNetGPU.h"
+
 #include "QmitkSetupVirtualEnvUtil.h"
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <mitkIPreferences.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkSegmentAnythingGUIControls;
+}
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -112,7 +118,7 @@ protected:
 
 private:
   mitk::IPreferences* m_Preferences;
-  Ui_QmitkSegmentAnythingGUIControls m_Controls;
+  std::unique_ptr<Ui::QmitkSegmentAnythingGUIControls> m_Controls;
   QmitkGPULoader m_GpuLoader;
   bool m_FirstPreviewComputation = true;
     const std::string WARNING_SAM_NOT_FOUND =

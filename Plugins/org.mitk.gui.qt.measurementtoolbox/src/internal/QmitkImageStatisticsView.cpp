@@ -66,7 +66,7 @@ namespace {
 } // unnamed namespace
 
 QmitkImageStatisticsView::QmitkImageStatisticsView()
-  : m_Controls(new Ui::QmitkImageStatisticsViewControls)
+  : m_Controls(std::make_unique<Ui::QmitkImageStatisticsViewControls>())
 {
 }
 

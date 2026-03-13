@@ -33,7 +33,7 @@ namespace
 
 QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegmentation* segmentation, mitk::Label* label, QWidget* parent)
   : QDialog(parent),
-    m_Ui(new Ui::QmitkCopyLabelToGroupDialog),
+    m_Ui(std::make_unique<Ui::QmitkCopyLabelToGroupDialog>()),
     m_Segmentation(segmentation),
     m_SourceLabel(label),
     m_DestinationLabel(nullptr)
@@ -54,7 +54,9 @@ QmitkCopyLabelToGroupDialog::QmitkCopyLabelToGroupDialog(mitk::MultiLabelSegment
   }
 }
 
-QmitkCopyLabelToGroupDialog::~QmitkCopyLabelToGroupDialog() = default;
+QmitkCopyLabelToGroupDialog::~QmitkCopyLabelToGroupDialog()
+{
+}
 
 void QmitkCopyLabelToGroupDialog::accept()
 {

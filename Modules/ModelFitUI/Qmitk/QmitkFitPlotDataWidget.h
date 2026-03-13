@@ -18,11 +18,16 @@ found in the LICENSE file.
 
 #include "MitkModelFitUIExports.h"
 
-#include "ui_QmitkFitPlotDataWidget.h"
 #include <QWidget>
+
 #include <memory>
 
 class QmitkFitPlotDataModel;
+
+namespace Ui
+{
+  class QmitkFitPlotDataWidget;
+}
 
 /**
 * \class QmitkFitPlotDataWidget
@@ -56,10 +61,8 @@ protected Q_SLOTS:
 protected:
   std::string StreamModelToString() const;
 
+  std::unique_ptr<Ui::QmitkFitPlotDataWidget> m_Controls;
   QmitkFitPlotDataModel * m_InternalModel;
-
-  Ui::QmitkFitPlotDataWidget m_Controls;
-
 };
 
 #endif

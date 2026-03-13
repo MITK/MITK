@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -77,7 +78,7 @@ private:
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  Ui::QmitkImageMaskingWidgetControls* m_Controls;
+  std::unique_ptr<Ui::QmitkImageMaskingWidgetControls> m_Controls;
 };
 
 #endif

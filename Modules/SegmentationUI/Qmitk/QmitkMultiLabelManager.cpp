@@ -47,7 +47,7 @@ found in the LICENSE file.
 
 
 QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
-  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelManagerControls), m_AddLabelInstanceShortcut(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
+  : QWidget(parent), m_Controls(std::make_unique<Ui::QmitkMultiLabelManagerControls>()), m_AddLabelInstanceShortcut(nullptr), m_ProcessingManualSelection(false), m_DataStorage(nullptr)
 {
   m_Controls->setupUi(this);
 
@@ -95,7 +95,6 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 QmitkMultiLabelManager::~QmitkMultiLabelManager()
 {
   this->SetMultiLabelSegmentation(nullptr);
-  delete m_Controls;
 }
 
 QmitkMultiLabelManager::LabelValueVectorType QmitkMultiLabelManager::GetSelectedLabels() const

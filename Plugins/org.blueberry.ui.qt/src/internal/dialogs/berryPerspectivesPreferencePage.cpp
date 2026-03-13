@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "berryPerspectivesPreferencePage.h"
-#include "ui_berryPerspectivesPreferencePage.h"
+#include <ui_berryPerspectivesPreferencePage.h>
 
 #include <berryIWorkbenchPage.h>
 
@@ -42,8 +42,7 @@ bool PerspectiveComparator(const PerspectiveDescriptor::Pointer& p1, const Persp
 }
 
 PerspectivesPreferencePage::PerspectivesPreferencePage()
-  : ui(nullptr)
-  , pageWidget(nullptr)
+  : pageWidget(nullptr)
   , workbench(nullptr)
   , perspRegistry(nullptr)
 {
@@ -51,13 +50,12 @@ PerspectivesPreferencePage::PerspectivesPreferencePage()
 
 PerspectivesPreferencePage::~PerspectivesPreferencePage()
 {
-  delete ui;
 }
 
 
 void PerspectivesPreferencePage::Init(berry::IWorkbench::Pointer workbench)
 {
-  ui = new Ui::PerspectivesPreferencePage;
+  ui = std::make_unique<Ui::PerspectivesPreferencePage>();
 
   this->workbench = workbench.GetPointer();
   perspRegistry = dynamic_cast<PerspectiveRegistry*>(workbench->GetPerspectiveRegistry());

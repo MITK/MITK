@@ -13,13 +13,26 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "ui_QmitkSegmentationViewControls.h"
-
-#include <QmitkAbstractView.h>
-#include <QmitkButtonOverlayWidget.h>
 #include <mitkITKEventObserverGuard.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkNodePredicateBase.h>
+
+#include <QmitkAbstractView.h>
+#include <QmitkButtonOverlayWidget.h>
+#include <QmitkMultiLabelManager.h>
+
+#include <memory>
+
+namespace mitk
+{
+  class ToolManager;
+}
+
+namespace Ui
+{
+  class QmitkSegmentationViewControls;
+}
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -150,7 +163,7 @@ private:
 
   QWidget* m_Parent;
 
-  Ui::QmitkSegmentationViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkSegmentationViewControls> m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 

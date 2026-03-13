@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 // qt
 #include "QWidget"
+#include <memory>
 
 namespace Ui
 {
@@ -39,6 +40,8 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidge
 public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkMultiWidgetLayoutSelectionWidget() override;
+
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
 Q_SIGNALS:
@@ -65,7 +68,7 @@ private:
   void Init();
 
 
-  Ui::QmitkMultiWidgetLayoutSelectionWidget* ui;
+  std::unique_ptr<Ui::QmitkMultiWidgetLayoutSelectionWidget> ui;
   std::map<int, nlohmann::json> m_PresetMap;
   QmitkAutomatedLayoutWidget* m_AutomatedDataLayoutWidget;
 

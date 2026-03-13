@@ -33,7 +33,7 @@ namespace
 }
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
-  : m_Ui(new Ui::QmitkSegmentationPreferencePageControls),
+  : m_Ui(std::make_unique<Ui::QmitkSegmentationPreferencePageControls>()),
     m_Control(nullptr),
     m_Initializing(false)
 {

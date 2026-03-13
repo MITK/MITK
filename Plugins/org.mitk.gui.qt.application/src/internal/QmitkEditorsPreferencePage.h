@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define QmitkEditorsPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
-#include <QScopedPointer>
 
 namespace Ui
 {
@@ -40,7 +39,7 @@ public:
 
 private:
   QWidget* m_Control;
-  QScopedPointer<Ui::QmitkEditorsPreferencePage> m_Ui;
+  std::unique_ptr<Ui::QmitkEditorsPreferencePage> m_Ui;
 };
 
 #endif

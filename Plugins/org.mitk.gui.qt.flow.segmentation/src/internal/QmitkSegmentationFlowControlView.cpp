@@ -36,7 +36,7 @@ found in the LICENSE file.
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
-    : m_Controls(new Ui::SegmentationFlowControlView)
+    : m_Controls(std::make_unique<Ui::SegmentationFlowControlView>())
 {
   berry::PlatformUI::GetWorkbench()->AddWorkbenchListener(this);
 

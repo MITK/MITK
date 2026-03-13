@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // Blueberry
 #include <berryISelectionService.h>
+#include <ui_QmitkDicomInspectorViewControls.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
 
@@ -66,6 +67,7 @@ QmitkDicomInspectorView::QmitkDicomInspectorView()
   , m_ValidSelectedPosition(false)
   , m_SelectedTimePoint(0.)
   , m_CurrentSelectedZSlice(0)
+  , m_Controls(std::make_unique<Ui::QmitkDicomInspectorViewControls>())
 {
   m_SelectedPosition.Fill(0.0);
 }
@@ -93,25 +95,25 @@ void QmitkDicomInspectorView::RenderWindowPartDeactivated(mitk::IRenderWindowPar
 void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   auto nodePredicate = mitk::NodePredicateAnd::New();
   nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
-  m_Controls.singleSlot->SetDataStorage(GetDataStorage());
-  m_Controls.singleSlot->SetSelectionIsOptional(true);
-  m_Controls.singleSlot->SetNodePredicate(nodePredicate);
-  m_Controls.singleSlot->SetEmptyInfo(QString("Please select a data node"));
-  m_Controls.singleSlot->SetPopUpTitel(QString("Select data node"));
+  m_Controls->singleSlot->SetDataStorage(GetDataStorage());
+  m_Controls->singleSlot->SetSelectionIsOptional(true);
+  m_Controls->singleSlot->SetNodePredicate(nodePredicate);
+  m_Controls->singleSlot->SetEmptyInfo(QString("Please select a data node"));
+  m_Controls->singleSlot->SetPopUpTitel(QString("Select data node"));
 
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
   SetAsSelectionListener(true);
 
-  m_Controls.timePointValueLabel->setText(QString(""));
-  m_Controls.sliceNumberValueLabel->setText(QString(""));
+  m_Controls->timePointValueLabel->setText(QString(""));
+  m_Controls->sliceNumberValueLabel->setText(QString(""));
 
-  connect(m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+  connect(m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkDicomInspectorView::OnCurrentSelectionChanged);
 
   mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
@@ -123,7 +125,7 @@ void QmitkDicomInspectorView::CreateQtPartControl(QWidget* parent)
   auto currentSelection = GetInitialSelection(selection);
 
   if (!currentSelection.isEmpty())
-    m_Controls.singleSlot->SetCurrentSelection(currentSelection);
+    m_Controls->singleSlot->SetCurrentSelection(currentSelection);
 }
 
 void QmitkDicomInspectorView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
@@ -195,7 +197,7 @@ void QmitkDicomInspectorView::OnSliceChanged()
 {
   ValidateAndSetCurrentPosition();
 
-  m_Controls.tableTags->setEnabled(m_ValidSelectedPosition);
+  m_Controls->tableTags->setEnabled(m_ValidSelectedPosition);
 
   if (m_SelectedNode.IsNotNull())
   {
@@ -214,7 +216,7 @@ void QmitkDicomInspectorView::RenderTable()
   {
     QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(
       element.second.prop->GetValue(timeStep, m_CurrentSelectedZSlice, true, true)));
-    m_Controls.tableTags->setItem(rowIndex, 3, newItem);
+    m_Controls->tableTags->setItem(rowIndex, 3, newItem);
     ++rowIndex;
   }
 
@@ -225,7 +227,7 @@ void QmitkDicomInspectorView::UpdateData()
 {
   QStringList headers;
 
-  m_Controls.tableTags->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+  m_Controls->tableTags->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
   m_Tags.clear();
 
@@ -250,19 +252,19 @@ void QmitkDicomInspectorView::UpdateData()
     }
   }
 
-  m_Controls.tableTags->setRowCount(m_Tags.size());
+  m_Controls->tableTags->setRowCount(m_Tags.size());
 
   unsigned int rowIndex = 0;
   for (const auto& element : m_Tags)
   {
     QTableWidgetItem* newItem = new QTableWidgetItem(QString::number(element.second.tag.GetGroup(), 16));
-    m_Controls.tableTags->setItem(rowIndex, 0, newItem);
+    m_Controls->tableTags->setItem(rowIndex, 0, newItem);
     newItem = new QTableWidgetItem(QString::number(element.second.tag.GetElement(), 16));
-    m_Controls.tableTags->setItem(rowIndex, 1, newItem);
+    m_Controls->tableTags->setItem(rowIndex, 1, newItem);
     newItem = new QTableWidgetItem(QString::fromStdString(element.second.tag.GetName()));
-    m_Controls.tableTags->setItem(rowIndex, 2, newItem);
+    m_Controls->tableTags->setItem(rowIndex, 2, newItem);
     newItem = new QTableWidgetItem(QString::fromStdString(element.second.prop->GetValue()));
-    m_Controls.tableTags->setItem(rowIndex, 3, newItem);
+    m_Controls->tableTags->setItem(rowIndex, 3, newItem);
     ++rowIndex;
   }
 
@@ -273,8 +275,8 @@ void QmitkDicomInspectorView::UpdateLabels()
 {
   if (m_SelectedData.IsNull())
   {
-    m_Controls.timePointValueLabel->setText(QString(""));
-    m_Controls.sliceNumberValueLabel->setText(QString(""));
+    m_Controls->timePointValueLabel->setText(QString(""));
+    m_Controls->sliceNumberValueLabel->setText(QString(""));
   }
   else
   {
@@ -282,13 +284,13 @@ void QmitkDicomInspectorView::UpdateLabels()
 
     if (m_ValidSelectedPosition)
     {
-      m_Controls.timePointValueLabel->setText(QString::number(timeStep) + QStringLiteral("(")+ QString::number(m_SelectedTimePoint/1000.) + QStringLiteral(" [s])"));
-      m_Controls.sliceNumberValueLabel->setText(QString::number(m_CurrentSelectedZSlice));
+      m_Controls->timePointValueLabel->setText(QString::number(timeStep) + QStringLiteral("(")+ QString::number(m_SelectedTimePoint/1000.) + QStringLiteral(" [s])"));
+      m_Controls->sliceNumberValueLabel->setText(QString::number(m_CurrentSelectedZSlice));
     }
     else
     {
-      m_Controls.timePointValueLabel->setText(QString("outside data geometry"));
-      m_Controls.sliceNumberValueLabel->setText(QString("outside data geometry"));
+      m_Controls->timePointValueLabel->setText(QString("outside data geometry"));
+      m_Controls->sliceNumberValueLabel->setText(QString("outside data geometry"));
     }
   }
 }
@@ -299,12 +301,12 @@ void QmitkDicomInspectorView::SetAsSelectionListener(bool checked)
   {
     m_SelectionServiceConnector->AddPostSelectionListener(GetSite()->GetWorkbenchWindow()->GetSelectionService());
     connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged,
-      m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+      m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
   else
   {
     m_SelectionServiceConnector->RemovePostSelectionListener();
     disconnect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged,
-      m_Controls.singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+      m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
   }
 }

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_algorithmcontrol_Activator.h"
+#include <ui_QmitkMatchPointControls.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -60,6 +61,7 @@ const std::string QmitkMatchPoint::VIEW_ID = "org.mitk.views.matchpoint.algorith
 
 QmitkMatchPoint::QmitkMatchPoint()
   : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr)
+  , m_Controls(std::make_unique<Ui::MatchPointAdvancedControls>())
 {
   m_CanLoadAlgorithm = false;
   m_ValidInputs = false;
@@ -85,23 +87,23 @@ void QmitkMatchPoint::SetFocus()
 
 void QmitkMatchPoint::CreateConnections()
 {
-  connect(m_Controls.targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
-  connect(m_Controls.movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
-  connect(m_Controls.targetMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
-  connect(m_Controls.movingMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
+  connect(m_Controls->targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
+  connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
+  connect(m_Controls->targetMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
+  connect(m_Controls->movingMaskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPoint::OnNodeSelectionChanged);
 
   // ------
   // Tab 1 - Shared library loading interface
   // ------
 
-  connect(m_Controls.m_pbLoadSelected, SIGNAL(clicked()), this, SLOT(OnLoadAlgorithmButtonPushed()));
+  connect(m_Controls->m_pbLoadSelected, SIGNAL(clicked()), this, SLOT(OnLoadAlgorithmButtonPushed()));
 
   // -----
   // Tab 2 - Execution
   // -----
-  connect(m_Controls.m_pbStartReg, SIGNAL(clicked()), this, SLOT(OnStartRegBtnPushed()));
-  connect(m_Controls.m_pbStopReg, SIGNAL(clicked()), this, SLOT(OnStopRegBtnPushed()));
-  connect(m_Controls.m_pbSaveLog, SIGNAL(clicked()), this, SLOT(OnSaveLogBtnPushed()));
+  connect(m_Controls->m_pbStartReg, SIGNAL(clicked()), this, SLOT(OnStartRegBtnPushed()));
+  connect(m_Controls->m_pbStopReg, SIGNAL(clicked()), this, SLOT(OnStopRegBtnPushed()));
+  connect(m_Controls->m_pbSaveLog, SIGNAL(clicked()), this, SLOT(OnSaveLogBtnPushed()));
 }
 
 const map::deployment::DLLInfo* QmitkMatchPoint::GetSelectedAlgorithmDLL() const
@@ -121,9 +123,9 @@ void QmitkMatchPoint::OnSelectedAlgorithmChanged()
     return;
   }
 
-  m_Controls.m_teAlgorithmDetails->updateInfo(currentItemInfo);
+  m_Controls->m_teAlgorithmDetails->updateInfo(currentItemInfo);
 
-  m_Controls.m_lbSelectedAlgorithm->setText(QString::fromStdString(
+  m_Controls->m_lbSelectedAlgorithm->setText(QString::fromStdString(
         currentItemInfo->getAlgorithmUID().getName()));
 
   // enable loading
@@ -155,7 +157,7 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
   this->m_LoadedAlgorithm = tempAlgorithm;
   this->m_LoadedDLLHandle = tempDLLHandle;
 
-  this->m_Controls.m_AlgoConfigurator->setAlgorithm(m_LoadedAlgorithm);
+  this->m_Controls->m_AlgoConfigurator->setAlgorithm(m_LoadedAlgorithm);
 
   typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
   const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
@@ -165,8 +167,8 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
   {
     m_spSelectedTargetMaskNode = nullptr;
     m_spSelectedMovingMaskNode = nullptr;
-    m_Controls.targetMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
-    m_Controls.movingMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
+    m_Controls->targetMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
+    m_Controls->movingMaskNodeSelector->SetCurrentSelection(QmitkAbstractNodeSelectionWidget::NodeList());
   }
 
 
@@ -175,8 +177,8 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
   this->CheckInputs();
   this->ConfigureRegistrationControls();
   this->ConfigureProgressInfos();
-  this->m_Controls.m_tabs->setCurrentIndex(1);
-  this->m_Controls.m_teLog->clear();
+  this->m_Controls->m_tabs->setCurrentIndex(1);
+  this->m_Controls->m_teLog->clear();
 }
 
 void QmitkMatchPoint::Error(QString msg)
@@ -184,34 +186,34 @@ void QmitkMatchPoint::Error(QString msg)
   mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
   MITK_ERROR << msg.toStdString().c_str();
 
-  m_Controls.m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
+  m_Controls->m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
 }
 
 void QmitkMatchPoint::AdaptFolderGUIElements()
 {
-  m_Controls.m_pbLoadSelected->setEnabled(m_CanLoadAlgorithm);
+  m_Controls->m_pbLoadSelected->setEnabled(m_CanLoadAlgorithm);
 }
 
 void QmitkMatchPoint::CreateQtPartControl(QWidget* parent)
 {
 
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
   m_Parent = parent;
 
-  m_Controls.m_tabs->setCurrentIndex(0);
+  m_Controls->m_tabs->setCurrentIndex(0);
 
-  m_Controls.movingNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.movingNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.targetNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.targetNodeSelector->SetSelectionIsOptional(false);
-  m_Controls.movingMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.movingMaskNodeSelector->SetSelectionIsOptional(true);
-  m_Controls.targetMaskNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.targetMaskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls->movingNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->movingNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->targetNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->targetNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->movingMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->movingMaskNodeSelector->SetSelectionIsOptional(true);
+  m_Controls->targetMaskNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->targetMaskNodeSelector->SetSelectionIsOptional(true);
 
-  m_Controls.movingMaskLabelSelector->SetHighlightingActivated(true);
-  m_Controls.targetMaskLabelSelector->SetHighlightingActivated(true);
+  m_Controls->movingMaskLabelSelector->SetHighlightingActivated(true);
+  m_Controls->targetMaskLabelSelector->SetHighlightingActivated(true);
 
   m_AlgorithmSelectionListener.reset(new berry::SelectionChangedAdapter<QmitkMatchPoint>(this,
                                      &QmitkMatchPoint::OnAlgorithmSelectionChanged));
@@ -247,87 +249,87 @@ bool QmitkMatchPoint::CheckInputs()
   }
   else
   {
-    if (m_Controls.movingNodeSelector->GetSelectedNode() != m_spSelectedMovingNode)
+    if (m_Controls->movingNodeSelector->GetSelectedNode() != m_spSelectedMovingNode)
     {
-      if (m_Controls.movingNodeSelector->GetSelectedNode().IsNull())
+      if (m_Controls->movingNodeSelector->GetSelectedNode().IsNull())
       {
         m_spSelectedMovingNode = nullptr;
         m_spSelectedMovingData = nullptr;
       }
       else
       {
-        m_spSelectedMovingNode = m_Controls.movingNodeSelector->GetSelectedNode();
+        m_spSelectedMovingNode = m_Controls->movingNodeSelector->GetSelectedNode();
         m_spSelectedMovingData = m_spSelectedMovingNode->GetData();
         auto movingImage = dynamic_cast<mitk::Image*>(m_spSelectedMovingNode->GetData());
 
         if (movingImage && movingImage->GetDimension() - 1 == m_LoadedAlgorithm->getMovingDimensions()
           && movingImage->GetTimeSteps() > 1)
         {
-          m_Controls.m_teLog->append(
+          m_Controls->m_teLog->append(
             QStringLiteral("<font color='gray'><i>Selected moving image has multiple time steps. First time step is used as moving image.</i></font>"));
         }
       }
     }
 
-    if (m_Controls.targetNodeSelector->GetSelectedNode() != m_spSelectedTargetNode)
+    if (m_Controls->targetNodeSelector->GetSelectedNode() != m_spSelectedTargetNode)
     {
-      if (m_Controls.targetNodeSelector->GetSelectedNode().IsNull())
+      if (m_Controls->targetNodeSelector->GetSelectedNode().IsNull())
       {
         m_spSelectedTargetNode = nullptr;
         m_spSelectedTargetData = nullptr;
       }
       else
       {
-        m_spSelectedTargetNode = m_Controls.targetNodeSelector->GetSelectedNode();
+        m_spSelectedTargetNode = m_Controls->targetNodeSelector->GetSelectedNode();
         m_spSelectedTargetData = m_spSelectedTargetNode->GetData();
         auto targetImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetNode->GetData());
 
         if (targetImage && targetImage->GetDimension() - 1 == m_LoadedAlgorithm->getTargetDimensions()
           && targetImage->GetTimeSteps() > 1)
         {
-          m_Controls.m_teLog->append(
+          m_Controls->m_teLog->append(
             QStringLiteral("<font color='gray'><i>Selected target image has multiple time steps. First time step is used as target image.</i></font>"));
         }
       }
     }
 
-    if (m_Controls.movingMaskNodeSelector->GetSelectedNode() != m_spSelectedMovingMaskNode)
+    if (m_Controls->movingMaskNodeSelector->GetSelectedNode() != m_spSelectedMovingMaskNode)
     {
-      m_Controls.movingMaskLabelSelector->SetMultiLabelNode(m_Controls.movingMaskNodeSelector->GetSelectedNode());
-      if (m_Controls.movingMaskNodeSelector->GetSelectedNode().IsNull())
+      m_Controls->movingMaskLabelSelector->SetMultiLabelNode(m_Controls->movingMaskNodeSelector->GetSelectedNode());
+      if (m_Controls->movingMaskNodeSelector->GetSelectedNode().IsNull())
       {
         m_spSelectedMovingMaskNode = nullptr;
       }
       else
       {
-        m_spSelectedMovingMaskNode = m_Controls.movingMaskNodeSelector->GetSelectedNode();
-        auto movingSeg = m_Controls.movingMaskLabelSelector->GetMultiLabelSegmentation();
+        m_spSelectedMovingMaskNode = m_Controls->movingMaskNodeSelector->GetSelectedNode();
+        auto movingSeg = m_Controls->movingMaskLabelSelector->GetMultiLabelSegmentation();
 
         if (movingSeg->GetDimension() - 1 == m_LoadedAlgorithm->getMovingDimensions()
           && movingSeg->GetTimeSteps() > 1)
         {
-          m_Controls.m_teLog->append(
+          m_Controls->m_teLog->append(
             QStringLiteral("<font color='gray'><i>Selected moving mask has multiple time steps. First time step is used as moving mask.</i></font>"));
         }
       }
     }
 
-    if (m_Controls.targetMaskNodeSelector->GetSelectedNode() != m_spSelectedTargetMaskNode)
+    if (m_Controls->targetMaskNodeSelector->GetSelectedNode() != m_spSelectedTargetMaskNode)
     {
-      m_Controls.targetMaskLabelSelector->SetMultiLabelNode(m_Controls.targetMaskNodeSelector->GetSelectedNode());
-      if (m_Controls.targetMaskNodeSelector->GetSelectedNode().IsNull())
+      m_Controls->targetMaskLabelSelector->SetMultiLabelNode(m_Controls->targetMaskNodeSelector->GetSelectedNode());
+      if (m_Controls->targetMaskNodeSelector->GetSelectedNode().IsNull())
       {
         m_spSelectedTargetMaskNode = nullptr;
       }
       else
       {
-        m_spSelectedTargetMaskNode = m_Controls.targetMaskNodeSelector->GetSelectedNode();
-        auto targetSeg = m_Controls.targetMaskLabelSelector->GetMultiLabelSegmentation();
+        m_spSelectedTargetMaskNode = m_Controls->targetMaskNodeSelector->GetSelectedNode();
+        auto targetSeg = m_Controls->targetMaskLabelSelector->GetMultiLabelSegmentation();
 
         if (targetSeg->GetDimension() - 1 == m_LoadedAlgorithm->getTargetDimensions()
           && targetSeg->GetTimeSteps() > 1)
         {
-          m_Controls.m_teLog->append(
+          m_Controls->m_teLog->append(
             QStringLiteral("<font color='gray'><i>Selected target mask has multiple time steps. First time step is used as target mask.</i></font>"));
         }
       }
@@ -404,64 +406,64 @@ std::string QmitkMatchPoint::GetDefaultRegJobName() const
 
 void QmitkMatchPoint::ConfigureRegistrationControls()
 {
-  m_Controls.m_tabSelection->setEnabled(!m_Working);
-  m_Controls.m_leRegJobName->setEnabled(!m_Working);
-  m_Controls.groupMasks->setEnabled(!m_Working);
+  m_Controls->m_tabSelection->setEnabled(!m_Working);
+  m_Controls->m_leRegJobName->setEnabled(!m_Working);
+  m_Controls->groupMasks->setEnabled(!m_Working);
 
-  m_Controls.m_pbStartReg->setEnabled(false);
-  m_Controls.m_pbStopReg->setEnabled(false);
-  m_Controls.m_pbStopReg->setVisible(false);
+  m_Controls->m_pbStartReg->setEnabled(false);
+  m_Controls->m_pbStopReg->setEnabled(false);
+  m_Controls->m_pbStopReg->setVisible(false);
 
-  m_Controls.targetMaskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull());
-  m_Controls.movingMaskLabelSelector->setVisible(m_spSelectedMovingMaskNode.IsNotNull());
+  m_Controls->targetMaskLabelSelector->setVisible(m_spSelectedTargetMaskNode.IsNotNull());
+  m_Controls->movingMaskLabelSelector->setVisible(m_spSelectedMovingMaskNode.IsNotNull());
 
   if (m_LoadedAlgorithm.IsNotNull())
   {
-    m_Controls.m_tabSettings->setEnabled(!m_Working);
-    m_Controls.m_tabExecution->setEnabled(true);
-    m_Controls.m_pbStartReg->setEnabled(m_ValidInputs && !m_Working);
-    m_Controls.m_leRegJobName->setEnabled(!m_Working);
-    m_Controls.m_checkMapEntity->setEnabled(!m_Working);
-    m_Controls.targetNodeSelector->setEnabled(!m_Working);
-    m_Controls.movingNodeSelector->setEnabled(!m_Working);
-    m_Controls.targetMaskNodeSelector->setEnabled(!m_Working);
-    m_Controls.movingMaskNodeSelector->setEnabled(!m_Working);
-    m_Controls.targetMaskLabelSelector->setEnabled(!m_Working);
-    m_Controls.movingMaskLabelSelector->setEnabled(!m_Working);
+    m_Controls->m_tabSettings->setEnabled(!m_Working);
+    m_Controls->m_tabExecution->setEnabled(true);
+    m_Controls->m_pbStartReg->setEnabled(m_ValidInputs && !m_Working);
+    m_Controls->m_leRegJobName->setEnabled(!m_Working);
+    m_Controls->m_checkMapEntity->setEnabled(!m_Working);
+    m_Controls->targetNodeSelector->setEnabled(!m_Working);
+    m_Controls->movingNodeSelector->setEnabled(!m_Working);
+    m_Controls->targetMaskNodeSelector->setEnabled(!m_Working);
+    m_Controls->movingMaskNodeSelector->setEnabled(!m_Working);
+    m_Controls->targetMaskLabelSelector->setEnabled(!m_Working);
+    m_Controls->movingMaskLabelSelector->setEnabled(!m_Working);
 
     const IStoppableAlgorithm* pIterativ = dynamic_cast<const IStoppableAlgorithm*>
                                            (m_LoadedAlgorithm.GetPointer());
 
     if (pIterativ)
     {
-      m_Controls.m_pbStopReg->setVisible(pIterativ->isStoppable());
+      m_Controls->m_pbStopReg->setVisible(pIterativ->isStoppable());
     }
 
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
     const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
                                        (m_LoadedAlgorithm.GetPointer());
 
-    m_Controls.groupMasks->setVisible(pMaskReg != nullptr);
+    m_Controls->groupMasks->setVisible(pMaskReg != nullptr);
 
     //if the stop button is set to visible and the algorithm is working ->
     //then the algorithm is stoppable, thus enable the button.
-    m_Controls.m_pbStopReg->setEnabled(m_Controls.m_pbStopReg->isVisible() && m_Working);
+    m_Controls->m_pbStopReg->setEnabled(m_Controls->m_pbStopReg->isVisible() && m_Working);
 
-    this->m_Controls.m_lbLoadedAlgorithmName->setText(
+    this->m_Controls->m_lbLoadedAlgorithmName->setText(
       QString::fromStdString(m_LoadedAlgorithm->getUID()->toStr()));
   }
   else
   {
-    m_Controls.m_tabSettings->setEnabled(false);
-    m_Controls.m_tabExecution->setEnabled(false);
-    this->m_Controls.m_lbLoadedAlgorithmName->setText(
+    m_Controls->m_tabSettings->setEnabled(false);
+    m_Controls->m_tabExecution->setEnabled(false);
+    this->m_Controls->m_lbLoadedAlgorithmName->setText(
       QStringLiteral("<font color='red'>no algorithm loaded!</font>"));
-    m_Controls.groupMasks->setVisible(false);
+    m_Controls->groupMasks->setVisible(false);
   }
 
   if (!m_Working)
   {
-    this->m_Controls.m_leRegJobName->setText(QString::fromStdString(this->GetDefaultRegJobName()));
+    this->m_Controls->m_leRegJobName->setText(QString::fromStdString(this->GetDefaultRegJobName()));
   }
 }
 
@@ -472,10 +474,10 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
   mitk::NodePredicateBase::Pointer dimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
 
 
-  m_Controls.movingNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
-  m_Controls.targetNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
-  m_Controls.movingMaskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
-  m_Controls.targetMaskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->movingNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->targetNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->movingMaskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls->targetMaskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
 
   if (m_LoadedAlgorithm.IsNotNull())
   {
@@ -490,12 +492,12 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
     {
       dataPredicate = mitk::NodePredicateAnd::New(isImage, dimensionPredicate);
 
-      m_Controls.movingNodeSelector->SetInvalidInfo("Select valid moving image.");
-      m_Controls.movingNodeSelector->SetPopUpTitel("Select moving image.");
-      m_Controls.movingNodeSelector->SetPopUpHint("Select the moving image that should be registered onto the target image.");
-      m_Controls.targetNodeSelector->SetInvalidInfo("Select valid target image.");
-      m_Controls.targetNodeSelector->SetPopUpTitel("Select target image.");
-      m_Controls.targetNodeSelector->SetPopUpHint("Select the target image that should be used as reference for the registration.");
+      m_Controls->movingNodeSelector->SetInvalidInfo("Select valid moving image.");
+      m_Controls->movingNodeSelector->SetPopUpTitel("Select moving image.");
+      m_Controls->movingNodeSelector->SetPopUpHint("Select the moving image that should be registered onto the target image.");
+      m_Controls->targetNodeSelector->SetInvalidInfo("Select valid target image.");
+      m_Controls->targetNodeSelector->SetPopUpTitel("Select target image.");
+      m_Controls->targetNodeSelector->SetPopUpHint("Select the target image that should be used as reference for the registration.");
     }
 
     if (mitk::MAPAlgorithmHelper::HasPointSetAlgorithmInterface(m_LoadedAlgorithm))
@@ -503,41 +505,41 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
       if (dataPredicate.IsNull())
       {
         dataPredicate = isPointSet;
-        m_Controls.movingNodeSelector->SetInvalidInfo("Select valid moving point set.");
-        m_Controls.movingNodeSelector->SetPopUpTitel("Select moving point set.");
-        m_Controls.movingNodeSelector->SetPopUpHint("Select the moving point set that should be registered onto the target point set.");
-        m_Controls.targetNodeSelector->SetInvalidInfo("Select valid target point set.");
-        m_Controls.targetNodeSelector->SetPopUpTitel("Select target point set.");
-        m_Controls.targetNodeSelector->SetPopUpHint("Select the target point set that should be used as reference for the registration.");
+        m_Controls->movingNodeSelector->SetInvalidInfo("Select valid moving point set.");
+        m_Controls->movingNodeSelector->SetPopUpTitel("Select moving point set.");
+        m_Controls->movingNodeSelector->SetPopUpHint("Select the moving point set that should be registered onto the target point set.");
+        m_Controls->targetNodeSelector->SetInvalidInfo("Select valid target point set.");
+        m_Controls->targetNodeSelector->SetPopUpTitel("Select target point set.");
+        m_Controls->targetNodeSelector->SetPopUpHint("Select the target point set that should be used as reference for the registration.");
       }
       else
       {
         dataPredicate = mitk::NodePredicateOr::New(dataPredicate, isPointSet);
-        m_Controls.movingNodeSelector->SetInvalidInfo("Select valid moving data.");
-        m_Controls.movingNodeSelector->SetPopUpTitel("Select moving data.");
-        m_Controls.movingNodeSelector->SetPopUpHint("Select the moving data that should be registered onto the target data. The algorithm supports images as well as point sets.");
-        m_Controls.targetNodeSelector->SetInvalidInfo("Select valid target data.");
-        m_Controls.targetNodeSelector->SetPopUpTitel("Select target data.");
-        m_Controls.targetNodeSelector->SetPopUpHint("Select the target data that should be used as reference for the registration. The algorithm supports images as well as point sets.");
+        m_Controls->movingNodeSelector->SetInvalidInfo("Select valid moving data.");
+        m_Controls->movingNodeSelector->SetPopUpTitel("Select moving data.");
+        m_Controls->movingNodeSelector->SetPopUpHint("Select the moving data that should be registered onto the target data. The algorithm supports images as well as point sets.");
+        m_Controls->targetNodeSelector->SetInvalidInfo("Select valid target data.");
+        m_Controls->targetNodeSelector->SetPopUpTitel("Select target data.");
+        m_Controls->targetNodeSelector->SetPopUpHint("Select the target data that should be used as reference for the registration. The algorithm supports images as well as point sets.");
       }
     }
     mitk::NodePredicateBase::ConstPointer nodePredicate = dataPredicate;
 
-    m_Controls.movingNodeSelector->SetNodePredicate(nodePredicate);
-    m_Controls.targetNodeSelector->SetNodePredicate(nodePredicate);
+    m_Controls->movingNodeSelector->SetNodePredicate(nodePredicate);
+    m_Controls->targetNodeSelector->SetNodePredicate(nodePredicate);
 
-    m_Controls.movingMaskNodeSelector->SetEmptyInfo("Select moving mask. (optional)");
-    m_Controls.movingMaskNodeSelector->SetPopUpTitel("Select moving mask");
-    m_Controls.movingMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as moving mask for the registration.");
-    m_Controls.targetMaskNodeSelector->SetEmptyInfo("Select target mask. (optional)");
-    m_Controls.targetMaskNodeSelector->SetPopUpTitel("Select target mask");
-    m_Controls.targetMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as target mask for the registration.");
+    m_Controls->movingMaskNodeSelector->SetEmptyInfo("Select moving mask. (optional)");
+    m_Controls->movingMaskNodeSelector->SetPopUpTitel("Select moving mask");
+    m_Controls->movingMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as moving mask for the registration.");
+    m_Controls->targetMaskNodeSelector->SetEmptyInfo("Select target mask. (optional)");
+    m_Controls->targetMaskNodeSelector->SetPopUpTitel("Select target mask");
+    m_Controls->targetMaskNodeSelector->SetPopUpHint("Select a segmentation that serves as target mask for the registration.");
 
-    mitk::BaseGeometry::Pointer movingGeometry = m_Controls.movingNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.movingNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
-    m_Controls.movingMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(movingGeometry));
+    mitk::BaseGeometry::Pointer movingGeometry = m_Controls->movingNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls->movingNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
+    m_Controls->movingMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(movingGeometry));
 
-    mitk::BaseGeometry::Pointer targetGeometry = m_Controls.targetNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls.targetNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
-    m_Controls.targetMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(targetGeometry));
+    mitk::BaseGeometry::Pointer targetGeometry = m_Controls->targetNodeSelector->GetSelectedNode().IsNotNull() ? m_Controls->targetNodeSelector->GetSelectedNode()->GetData()->GetGeometry() : nullptr;
+    m_Controls->targetMaskNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(targetGeometry));
   }
 
 }
@@ -549,8 +551,8 @@ void QmitkMatchPoint::ConfigureProgressInfos()
   const IMultiResAlgorithm* pMultiRes = dynamic_cast<const IMultiResAlgorithm*>
                                         (m_LoadedAlgorithm.GetPointer());
 
-  m_Controls.m_progBarIteration->setVisible(pIterative);
-  m_Controls.m_lbProgBarIteration->setVisible(pIterative);
+  m_Controls->m_progBarIteration->setVisible(pIterative);
+  m_Controls->m_lbProgBarIteration->setVisible(pIterative);
 
 
   if (pIterative)
@@ -560,31 +562,31 @@ void QmitkMatchPoint::ConfigureProgressInfos()
     if (!pIterative->hasMaxIterationCount())
     {
       format = "%v";
-      m_Controls.m_progBarIteration->setMaximum(0);
+      m_Controls->m_progBarIteration->setMaximum(0);
     }
     else
     {
-      m_Controls.m_progBarIteration->setMaximum(pIterative->getMaxIterations());
+      m_Controls->m_progBarIteration->setMaximum(pIterative->getMaxIterations());
     }
 
-    m_Controls.m_progBarIteration->setFormat(format);
+    m_Controls->m_progBarIteration->setFormat(format);
   }
 
-  m_Controls.m_progBarLevel->setVisible(pMultiRes);
-  m_Controls.m_lbProgBarLevel->setVisible(pMultiRes);
+  m_Controls->m_progBarLevel->setVisible(pMultiRes);
+  m_Controls->m_lbProgBarLevel->setVisible(pMultiRes);
 
   if (pMultiRes)
   {
-    m_Controls.m_progBarLevel->setMaximum(pMultiRes->getResolutionLevels());
+    m_Controls->m_progBarLevel->setMaximum(pMultiRes->getResolutionLevels());
 
   }
   else
   {
-    m_Controls.m_progBarLevel->setMaximum(1);
+    m_Controls->m_progBarLevel->setMaximum(1);
   }
 
-  m_Controls.m_progBarIteration->reset();
-  m_Controls.m_progBarLevel->reset();
+  m_Controls->m_progBarIteration->reset();
+  m_Controls->m_progBarLevel->reset();
 }
 
 void QmitkMatchPoint::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
@@ -604,14 +606,14 @@ void QmitkMatchPoint::OnStartRegBtnPushed()
   //configure GUI
   this->ConfigureProgressInfos();
 
-  m_Controls.m_progBarIteration->reset();
-  m_Controls.m_progBarLevel->reset();
+  m_Controls->m_progBarIteration->reset();
+  m_Controls->m_progBarLevel->reset();
 
   this->ConfigureRegistrationControls();
 
-  if (m_Controls.m_checkClearLog->checkState() == Qt::Checked)
+  if (m_Controls->m_checkClearLog->checkState() == Qt::Checked)
   {
-    this->m_Controls.m_teLog->clear();
+    this->m_Controls->m_teLog->clear();
   }
 
 
@@ -625,21 +627,21 @@ void QmitkMatchPoint::OnStartRegBtnPushed()
   pJob->m_TargetDataUID = mitk::EnsureUID(this->m_spSelectedTargetNode->GetData());
   pJob->m_MovingDataUID = mitk::EnsureUID(this->m_spSelectedMovingNode->GetData());
 
-  auto targetMask = m_Controls.targetMaskLabelSelector->CreateSelectedLabelMask();
+  auto targetMask = m_Controls->targetMaskLabelSelector->CreateSelectedLabelMask();
   if (targetMask.IsNotNull())
   {
     pJob->m_spTargetMask = mitk::SelectImageByTimeStep(targetMask,0);
-    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData())+"#"+std::to_string(m_Controls.targetMaskLabelSelector->GetSelectedLabels().front());
+    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData())+"#"+std::to_string(m_Controls->targetMaskLabelSelector->GetSelectedLabels().front());
   }
 
-  auto movingMask = m_Controls.movingMaskLabelSelector->CreateSelectedLabelMask();
+  auto movingMask = m_Controls->movingMaskLabelSelector->CreateSelectedLabelMask();
   if (m_spSelectedMovingMaskNode.IsNotNull())
   {
     pJob->m_spMovingMask = mitk::SelectImageByTimeStep(movingMask, 0);
-    pJob->m_MovingMaskDataUID = mitk::EnsureUID(this->m_spSelectedMovingMaskNode->GetData()) + "#" + std::to_string(m_Controls.movingMaskLabelSelector->GetSelectedLabels().front());
+    pJob->m_MovingMaskDataUID = mitk::EnsureUID(this->m_spSelectedMovingMaskNode->GetData()) + "#" + std::to_string(m_Controls->movingMaskLabelSelector->GetSelectedLabels().front());
   }
 
-  pJob->m_JobName = m_Controls.m_leRegJobName->text().toStdString();
+  pJob->m_JobName = m_Controls->m_leRegJobName->text().toStdString();
 
   pJob->m_StoreReg = true;
 
@@ -679,7 +681,7 @@ void QmitkMatchPoint::OnStopRegBtnPushed()
 
       }
 
-      m_Controls.m_pbStopReg->setEnabled(false);
+      m_Controls->m_pbStopReg->setEnabled(false);
     }
     else
     {
@@ -713,7 +715,7 @@ void QmitkMatchPoint::OnSaveLogBtnPushed()
                   << fileName.toStdString();
     }
 
-    file << this->m_Controls.m_teLog->toPlainText().toStdString() << std::endl;
+    file << this->m_Controls->m_teLog->toPlainText().toStdString() << std::endl;
 
     file.close();
   }
@@ -749,7 +751,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
 
   if (pRegJob->m_StoreReg)
   {
-    m_Controls.m_teLog->append(
+    m_Controls->m_teLog->append(
       QStringLiteral("<b><font color='blue'> Storing registration object in data manager ... </font></b>"));
 
     this->GetDataStorage()->Add(spResultRegistrationNode);
@@ -760,7 +762,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
       renderWindowPart->RequestUpdate();
   }
 
-  if (m_Controls.m_checkMapEntity->checkState() == Qt::Checked)
+  if (m_Controls->m_checkMapEntity->checkState() == Qt::Checked)
   {
     QmitkMappingJob* pMapJob = new QmitkMappingJob();
     pMapJob->setAutoDelete(true);
@@ -785,7 +787,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
             Qt::BlockingQueuedConnection);
     connect(pMapJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnAlgorithmInfo(QString)));
 
-    m_Controls.m_teLog->append(
+    m_Controls->m_teLog->append(
       QStringLiteral("<b><font color='blue'>Started mapping input data...</font></b>"));
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
@@ -801,7 +803,7 @@ void QmitkMatchPoint::OnMapJobError(QString err)
 void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
                              QString::fromStdString(job->m_MappedName) + QStringLiteral("</font></b>"));
 
   mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
@@ -820,30 +822,30 @@ void QmitkMatchPoint::OnAlgorithmIterated(QString info, bool hasIterationCount,
 {
   if (hasIterationCount)
   {
-    m_Controls.m_progBarIteration->setValue(currentIteration);
+    m_Controls->m_progBarIteration->setValue(currentIteration);
   }
 
-  m_Controls.m_teLog->append(info);
+  m_Controls->m_teLog->append(info);
 }
 
 void QmitkMatchPoint::OnLevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel)
 {
   if (hasLevelCount)
   {
-    m_Controls.m_progBarLevel->setValue(currentLevel);
+    m_Controls->m_progBarLevel->setValue(currentLevel);
   }
 
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='green'>") + info + QStringLiteral("</font></b>"));
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='green'>") + info + QStringLiteral("</font></b>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmStatusChanged(QString info)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>") + info + QStringLiteral(" </font></b>"));
+  m_Controls->m_teLog->append(QStringLiteral("<b><font color='blue'>") + info + QStringLiteral(" </font></b>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmInfo(QString info)
 {
-  m_Controls.m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
+  m_Controls->m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
 }
 
 void QmitkMatchPoint::OnAlgorithmSelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkTotalSegmentatorPreferencePage.h"
+#include <ui_QmitkTotalSegmentatorPreferencePage.h>
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
@@ -104,7 +105,11 @@ const QString QmitkTotalSegmentatorPreferencePage::WARNING_PYTHON_NOT_FOUND =
   "Please select a path with a valid python install.";
 
 QmitkTotalSegmentatorPreferencePage::QmitkTotalSegmentatorPreferencePage()
-  : m_Ui(new Ui::QmitkTotalSegmentatorPreferencePage), m_Control(nullptr){}
+  : m_Ui(std::make_unique<Ui::QmitkTotalSegmentatorPreferencePage>()), m_Control(nullptr){}
+
+QmitkTotalSegmentatorPreferencePage::~QmitkTotalSegmentatorPreferencePage()
+{
+}
 
 void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
 {

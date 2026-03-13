@@ -30,7 +30,7 @@ found in the LICENSE file.
 const std::string QmitkRemeshingView::VIEW_ID = "org.mitk.views.remeshing";
 
 QmitkRemeshingView::QmitkRemeshingView()
-  : m_Controls(new Ui::QmitkRemeshingViewControls)
+  : m_Controls(std::make_unique<Ui::QmitkRemeshingViewControls>())
 {
 }
 

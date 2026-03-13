@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QComboBox>
+#include <QPushButton>
 
 namespace mitk
 {

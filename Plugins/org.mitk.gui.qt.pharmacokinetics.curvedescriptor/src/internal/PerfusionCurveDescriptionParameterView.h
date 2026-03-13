@@ -13,18 +13,25 @@ found in the LICENSE file.
 #ifndef PerfusionCurveDescriptionParameterView_h
 #define PerfusionCurveDescriptionParameterView_h
 
-#include <QString>
+#include <mitkCurveDescriptionParameterBase.h>
+#include <mitkImage.h>
+#include <mitkNodePredicateBase.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_PerfusionCurveDescriptionParameterViewControls.h"
-#include "mitkCurveDescriptionParameterBase.h"
 #include <QmitkDescriptionParameterBackgroundJob.h>
 
-#include <mitkImage.h>
+#include <QString>
+
+#include <memory>
 
 namespace mitk
 {
   class CurveParameterFunctor;
+}
+
+namespace Ui
+{
+  class PerfusionCurveDescriptionParameterViewControls;
 }
 
 /*!
@@ -42,6 +49,7 @@ public:
 	static const std::string VIEW_ID;
 
   PerfusionCurveDescriptionParameterView();
+  ~PerfusionCurveDescriptionParameterView() override;
 
 protected slots:
 
@@ -86,7 +94,7 @@ protected:
 	// Variables
 
 	/*! @brief The view's UI controls */
-    Ui::PerfusionCurveDescriptionParameterViewControls m_Controls;
+    std::unique_ptr<Ui::PerfusionCurveDescriptionParameterViewControls> m_Controls;
     mitk::DataNode::Pointer m_selectedNode;
 
 private:

@@ -33,7 +33,7 @@ namespace
 }
 
 QmitkMovieMakerPreferencePage::QmitkMovieMakerPreferencePage()
-  : m_Ui(new Ui::QmitkMovieMakerPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkMovieMakerPreferencePage>()),
     m_Control(nullptr),
     m_FFmpegProcess(nullptr)
 {

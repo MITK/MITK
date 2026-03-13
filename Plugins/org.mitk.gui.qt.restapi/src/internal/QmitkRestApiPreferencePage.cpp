@@ -40,7 +40,7 @@ namespace
 
 QmitkRestApiPreferencePage::QmitkRestApiPreferencePage()
   : m_Control(nullptr),
-    m_Ui(new Ui::QmitkRestApiPreferencesControls)
+    m_Ui(std::make_unique<Ui::QmitkRestApiPreferencesControls>())
 {
 }
 

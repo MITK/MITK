@@ -24,30 +24,33 @@ found in the LICENSE file.
 
 #include <boost/math/constants/constants.hpp>
 
+#include <ui_QmitkRegistrationManipulationWidget.h>
+
 QmitkRegistrationManipulationWidget::QmitkRegistrationManipulationWidget(QWidget *parent)
-  : QWidget(parent), m_CenterOfRotationIsRelativeToTarget(false), m_internalUpdate(false)
+  : QWidget(parent), m_Controls(std::make_unique<Ui::QmitkRegistrationManipulationWidget>()), m_CenterOfRotationIsRelativeToTarget(false), m_internalUpdate(false)
 {
-  this->setupUi(this);
+  m_Controls->setupUi(this);
 
-  connect(this->slideRotX, SIGNAL(valueChanged(int)), this, SLOT(OnRotXSlideChanged(int)));
-  connect(this->sbRotX, SIGNAL(valueChanged(double)), this, SLOT(OnRotXChanged(double)));
-  connect(this->slideRotY, SIGNAL(valueChanged(int)), this, SLOT(OnRotYSlideChanged(int)));
-  connect(this->sbRotY, SIGNAL(valueChanged(double)), this, SLOT(OnRotYChanged(double)));
-  connect(this->slideRotZ, SIGNAL(valueChanged(int)), this, SLOT(OnRotZSlideChanged(int)));
-  connect(this->sbRotZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotZChanged(double)));
+  connect(m_Controls->slideRotX, SIGNAL(valueChanged(int)), this, SLOT(OnRotXSlideChanged(int)));
+  connect(m_Controls->sbRotX, SIGNAL(valueChanged(double)), this, SLOT(OnRotXChanged(double)));
+  connect(m_Controls->slideRotY, SIGNAL(valueChanged(int)), this, SLOT(OnRotYSlideChanged(int)));
+  connect(m_Controls->sbRotY, SIGNAL(valueChanged(double)), this, SLOT(OnRotYChanged(double)));
+  connect(m_Controls->slideRotZ, SIGNAL(valueChanged(int)), this, SLOT(OnRotZSlideChanged(int)));
+  connect(m_Controls->sbRotZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotZChanged(double)));
 
-  connect(this->slideTransX, SIGNAL(valueChanged(int)), this, SLOT(OnTransXSlideChanged(int)));
-  connect(this->sbTransX, SIGNAL(valueChanged(double)), this, SLOT(OnTransXChanged(double)));
-  connect(this->slideTransY, SIGNAL(valueChanged(int)), this, SLOT(OnTransYSlideChanged(int)));
-  connect(this->sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
-  connect(this->slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
-  connect(this->sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
+  connect(m_Controls->slideTransX, SIGNAL(valueChanged(int)), this, SLOT(OnTransXSlideChanged(int)));
+  connect(m_Controls->sbTransX, SIGNAL(valueChanged(double)), this, SLOT(OnTransXChanged(double)));
+  connect(m_Controls->slideTransY, SIGNAL(valueChanged(int)), this, SLOT(OnTransYSlideChanged(int)));
+  connect(m_Controls->sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
+  connect(m_Controls->slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
+  connect(m_Controls->sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
 
-  this->groupScale->setVisible(false);
+  m_Controls->groupScale->setVisible(false);
 }
 
 QmitkRegistrationManipulationWidget::~QmitkRegistrationManipulationWidget()
-= default;
+{
+}
 
 void QmitkRegistrationManipulationWidget::Initialize()
 {
@@ -128,12 +131,12 @@ void QmitkRegistrationManipulationWidget::InitControls()
   //set bounds of the translation slider widget to have sensible ranges
   this->m_internalUpdate = true;
   auto currenttrans = m_DirectCurrentTransform->GetTranslation();
-  this->slideTransX->setMinimum(currenttrans[0] - 250);
-  this->slideTransY->setMinimum(currenttrans[1] - 250);
-  this->slideTransZ->setMinimum(currenttrans[2] - 250);
-  this->slideTransX->setMaximum(currenttrans[0] + 250);
-  this->slideTransY->setMaximum(currenttrans[1] + 250);
-  this->slideTransZ->setMaximum(currenttrans[2] + 250);
+  m_Controls->slideTransX->setMinimum(currenttrans[0] - 250);
+  m_Controls->slideTransY->setMinimum(currenttrans[1] - 250);
+  m_Controls->slideTransZ->setMinimum(currenttrans[2] - 250);
+  m_Controls->slideTransX->setMaximum(currenttrans[0] + 250);
+  m_Controls->slideTransY->setMaximum(currenttrans[1] + 250);
+  m_Controls->slideTransZ->setMaximum(currenttrans[2] + 250);
   this->m_internalUpdate = false;
 
   this->UpdateTransformWidgets();
@@ -142,19 +145,19 @@ void QmitkRegistrationManipulationWidget::InitControls()
 void QmitkRegistrationManipulationWidget::UpdateTransformWidgets()
 {
   this->m_internalUpdate = true;
-  this->sbTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
-  this->sbTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
-  this->sbTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
-  this->slideTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
-  this->slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
-  this->slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
+  m_Controls->sbTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+  m_Controls->sbTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+  m_Controls->sbTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
+  m_Controls->slideTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+  m_Controls->slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+  m_Controls->slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
 
-  this->sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-  this->sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  this->sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
-  this->slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-  this->slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  this->slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  m_Controls->sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+  m_Controls->sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  m_Controls->sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  m_Controls->slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+  m_Controls->slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  m_Controls->slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
   this->m_internalUpdate = false;
 };
 
@@ -167,16 +170,16 @@ void QmitkRegistrationManipulationWidget::UpdateTransform(bool updateRotation)
      ConfigureTransformCenter();
     }
 
-    this->m_DirectCurrentTransform->SetRotation(this->sbRotX->value()*(boost::math::double_constants::pi / 180),
-      this->sbRotY->value()*(boost::math::double_constants::pi / 180),
-      this->sbRotZ->value()*(boost::math::double_constants::pi / 180));
+    this->m_DirectCurrentTransform->SetRotation(m_Controls->sbRotX->value()*(boost::math::double_constants::pi / 180),
+      m_Controls->sbRotY->value()*(boost::math::double_constants::pi / 180),
+      m_Controls->sbRotZ->value()*(boost::math::double_constants::pi / 180));
   }
   else
   {
     TransformType::OutputVectorType trans;
-    trans[0] = this->sbTransX->value();
-    trans[1] = this->sbTransY->value();
-    trans[2] = this->sbTransZ->value();
+    trans[0] = m_Controls->sbTransX->value();
+    trans[1] = m_Controls->sbTransY->value();
+    trans[2] = m_Controls->sbTransZ->value();
 
     this->m_DirectCurrentTransform->SetTranslation(trans);
   }
@@ -223,7 +226,7 @@ void QmitkRegistrationManipulationWidget::OnRotXChanged(double x)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideRotX->setValue(x);
+    m_Controls->slideRotX->setValue(x);
     m_internalUpdate = false;
     this->UpdateTransform(true);
   }
@@ -233,7 +236,7 @@ void QmitkRegistrationManipulationWidget::OnRotXSlideChanged(int x)
 {
   if (!m_internalUpdate)
   {
-    this->sbRotX->setValue(x);
+    m_Controls->sbRotX->setValue(x);
   }
 };
 
@@ -242,7 +245,7 @@ void QmitkRegistrationManipulationWidget::OnRotYChanged(double y)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideRotY->setValue(y);
+    m_Controls->slideRotY->setValue(y);
     m_internalUpdate = false;
     this->UpdateTransform(true);
   }
@@ -252,7 +255,7 @@ void QmitkRegistrationManipulationWidget::OnRotYSlideChanged(int y)
 {
   if (!m_internalUpdate)
   {
-    this->sbRotY->setValue(y);
+    m_Controls->sbRotY->setValue(y);
   }
 };
 
@@ -261,7 +264,7 @@ void QmitkRegistrationManipulationWidget::OnRotZChanged(double z)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideRotZ->setValue(z);
+    m_Controls->slideRotZ->setValue(z);
     m_internalUpdate = false;
     this->UpdateTransform(true);
   }
@@ -271,7 +274,7 @@ void QmitkRegistrationManipulationWidget::OnRotZSlideChanged(int z)
 {
   if (!m_internalUpdate)
   {
-    this->sbRotZ->setValue(z);
+    m_Controls->sbRotZ->setValue(z);
   }
 };
 
@@ -280,7 +283,7 @@ void QmitkRegistrationManipulationWidget::OnTransXChanged(double x)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideTransX->setValue(x);
+    m_Controls->slideTransX->setValue(x);
     m_internalUpdate = false;
     this->UpdateTransform();
   }
@@ -290,7 +293,7 @@ void QmitkRegistrationManipulationWidget::OnTransXSlideChanged(int x)
 {
   if (!m_internalUpdate)
   {
-    this->sbTransX->setValue(x);
+    m_Controls->sbTransX->setValue(x);
   }
 };
 
@@ -299,7 +302,7 @@ void QmitkRegistrationManipulationWidget::OnTransYChanged(double y)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideTransY->setValue(y);
+    m_Controls->slideTransY->setValue(y);
     m_internalUpdate = false;
     this->UpdateTransform();
   }
@@ -309,7 +312,7 @@ void QmitkRegistrationManipulationWidget::OnTransYSlideChanged(int y)
 {
   if (!m_internalUpdate)
   {
-    this->sbTransY->setValue(y);
+    m_Controls->sbTransY->setValue(y);
   }
 };
 
@@ -318,7 +321,7 @@ void QmitkRegistrationManipulationWidget::OnTransZChanged(double z)
   if (!m_internalUpdate)
   {
     m_internalUpdate = true;
-    this->slideTransZ->setValue(z);
+    m_Controls->slideTransZ->setValue(z);
     m_internalUpdate = false;
     this->UpdateTransform();
   }
@@ -328,7 +331,7 @@ void QmitkRegistrationManipulationWidget::OnTransZSlideChanged(int z)
 {
   if (!m_internalUpdate)
   {
-    this->sbTransZ->setValue(z);
+    m_Controls->sbTransZ->setValue(z);
   }
 };
 

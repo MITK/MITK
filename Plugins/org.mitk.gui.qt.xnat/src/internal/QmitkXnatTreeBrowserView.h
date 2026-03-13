@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "ui_QmitkXnatTreeBrowserViewControls.h"
 #include "QmitkHttpStatusCodeHandler.h"
 
 // ctkXnatCore
@@ -28,9 +27,15 @@ found in the LICENSE file.
 #include "mitkXnatSessionTracker.h"
 
 #include <QFileInfo>
+#include <memory>
 
 class QMenu;
 class QDir;
+
+namespace Ui
+{
+  class QmitkXnatTreeBrowserViewControls;
+}
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -100,7 +105,7 @@ protected:
 
   void SetFocus() override;
 
-  Ui::QmitkXnatTreeBrowserViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkXnatTreeBrowserViewControls> m_Controls;
 
 private slots:
   void OnXnatNodeSelected(const QModelIndex &index);

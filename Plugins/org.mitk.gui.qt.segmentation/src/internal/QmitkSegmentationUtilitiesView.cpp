@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSegmentationUtilitiesView.h"
+#include <ui_QmitkSegmentationUtilitiesViewControls.h>
 
 #include <QmitkBooleanOperationsWidget.h>
 #include <QmitkImageMaskingWidget.h>
@@ -33,7 +34,8 @@ QmitkSegmentationUtilitiesView::~QmitkSegmentationUtilitiesView()
 
 void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls = std::make_unique<Ui::QmitkSegmentationUtilitiesViewControls>();
+  m_Controls->setupUi(parent);
 
   auto dataStorage = this->GetDataStorage();
   m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(dataStorage, parent);
@@ -51,12 +53,12 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
 {
-  m_Controls.toolBox->addItem(widget, icon, text);
+  m_Controls->toolBox->addItem(widget, icon, text);
 }
 
 void QmitkSegmentationUtilitiesView::SetFocus()
 {
-  m_Controls.toolBox->setFocus();
+  m_Controls->toolBox->setFocus();
 }
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWindowPart*)

@@ -13,8 +13,13 @@ found in the LICENSE file.
 #ifndef QmitkFileListWidget_h
 #define QmitkFileListWidget_h
 
-#include "ui_QmitkPathListWidget.h"
 #include <QWidget>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPathListWidget;
+}
 
 /**
  * \class QmitkFileListWidget
@@ -22,12 +27,13 @@ found in the LICENSE file.
  * and provide simple file access for readable, executable files.
  * \author Matt Clarkson (m.clarkson@ucl.ac.uk)
  */
-class QmitkFileListWidget : public QWidget, public Ui::QmitkPathListWidget
+class QmitkFileListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   QmitkFileListWidget(QWidget* parent=nullptr);
+  ~QmitkFileListWidget() override;
 
   /**
    * \brief Get all file entries.
@@ -42,6 +48,8 @@ public:
    */
   void setFiles(const QStringList& paths);
 
+  void setText(const QString& text);
+
 Q_SIGNALS:
 
   void pathsChanged(const QStringList&, const QStringList&);
@@ -49,6 +57,9 @@ Q_SIGNALS:
 private Q_SLOTS:
 
   void OnPathsChanged(const QStringList&, const QStringList&);
+
+protected:
+  std::unique_ptr<Ui::QmitkPathListWidget> m_Controls;
 };
 
 #endif

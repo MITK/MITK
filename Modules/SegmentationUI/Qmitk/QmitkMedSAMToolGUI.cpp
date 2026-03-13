@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkMedSAMTool.h>
 
+#include <ui_QmitkMedSAMGUIControls.h>
+
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMedSAMToolGUI, "")
 
 namespace
@@ -29,7 +31,9 @@ namespace
   }
 }
 
-QmitkMedSAMToolGUI::QmitkMedSAMToolGUI() : QmitkSegWithPreviewToolGUIBase(true)
+QmitkMedSAMToolGUI::QmitkMedSAMToolGUI()
+  : QmitkSegWithPreviewToolGUIBase(true),
+    m_Controls(std::make_unique<Ui::QmitkMedSAMGUIControls>())
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
@@ -64,31 +68,32 @@ QmitkMedSAMToolGUI::~QmitkMedSAMToolGUI()
       mitk::MessageDelegate1<QmitkMedSAMToolGUI, const mitk::IPreferences::ChangeEvent &>(
         this, &QmitkMedSAMToolGUI::OnPreferenceChangedEvent);
   }
+
 }
 
 void QmitkMedSAMToolGUI::EnableAll(bool isEnable)
 {
-  m_Controls.activateButton->setEnabled(isEnable);
+  m_Controls->activateButton->setEnabled(isEnable);
 }
 
 void QmitkMedSAMToolGUI::WriteStatusMessage(const QString &message)
 {
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+  m_Controls->statusLabel->setText(message);
+  m_Controls->statusLabel->setStyleSheet("font-weight: bold; color: white");
   qApp->processEvents();
 }
 
 void QmitkMedSAMToolGUI::WriteErrorMessage(const QString &message)
 {
-  m_Controls.statusLabel->setText(message);
-  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
+  m_Controls->statusLabel->setText(message);
+  m_Controls->statusLabel->setStyleSheet("font-weight: bold; color: red");
   qApp->processEvents();
 }
 
 void QmitkMedSAMToolGUI::ShowProgressBar(bool enabled)
 {
-  m_Controls.samProgressBar->setEnabled(enabled);
-  m_Controls.samProgressBar->setVisible(enabled);
+  m_Controls->samProgressBar->setEnabled(enabled);
+  m_Controls->samProgressBar->setVisible(enabled);
 }
 
 void QmitkMedSAMToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
@@ -104,24 +109,24 @@ void QmitkMedSAMToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   auto wrapperWidget = new QWidget(this);
   mainLayout->addWidget(wrapperWidget);
-  m_Controls.setupUi(wrapperWidget);
+  m_Controls->setupUi(wrapperWidget);
 
-  m_Controls.statusLabel->setTextFormat(Qt::RichText);
+  m_Controls->statusLabel->setTextFormat(Qt::RichText);
 
   QString welcomeText;
   welcomeText = "<b>STATUS: </b><i>Welcome to MedSAM tool. " +
                   QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
 
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
-  connect(m_Controls.activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
-  connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
+  connect(m_Controls->previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  connect(m_Controls->activateButton, SIGNAL(clicked()), this, SLOT(OnActivateBtnClicked()));
+  connect(m_Controls->resetButton, SIGNAL(clicked()), this, SLOT(OnResetPicksClicked()));
 
   QIcon arrowIcon = QmitkStyleManager::ThemeIcon(
     QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
-  m_Controls.activateButton->setIcon(arrowIcon);
+  m_Controls->activateButton->setIcon(arrowIcon);
   this->UpdateMedSAMStatusMessage(welcomeText);
   this->ShowProgressBar(false);
-  m_Controls.samProgressBar->setMaximum(0);
+  m_Controls->samProgressBar->setMaximum(0);
 
   Superclass::InitializeUI(mainLayout);
 }

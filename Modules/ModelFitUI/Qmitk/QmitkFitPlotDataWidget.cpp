@@ -18,15 +18,18 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <ui_QmitkFitPlotDataWidget.h>
+
 QmitkFitPlotDataWidget::QmitkFitPlotDataWidget(QWidget*)
+  : m_Controls(std::make_unique<Ui::QmitkFitPlotDataWidget>())
 {
-  this->m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
 
   m_InternalModel = new QmitkFitPlotDataModel(this);
-  m_Controls.tablePlotData->setModel(m_InternalModel);
+  m_Controls->tablePlotData->setModel(m_InternalModel);
 
-  connect(m_Controls.btnCopyResultsToClipboard, SIGNAL(clicked()), this, SLOT(OnClipboardResultsButtonClicked()));
-  connect(m_Controls.btnSaveToFile, SIGNAL(clicked()), this, SLOT(OnExportClicked()));
+  connect(m_Controls->btnCopyResultsToClipboard, SIGNAL(clicked()), this, SLOT(OnClipboardResultsButtonClicked()));
+  connect(m_Controls->btnSaveToFile, SIGNAL(clicked()), this, SLOT(OnExportClicked()));
 }
 
 const mitk::ModelFitPlotData*

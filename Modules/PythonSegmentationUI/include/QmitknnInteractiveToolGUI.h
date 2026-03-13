@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkSegWithPreviewToolGUIBase.h>
 #include <mitknnInteractiveTool.h>
 #include <MitkPythonSegmentationUIExports.h>
+#include <memory>
 
 class QButtonGroup;
 class QPushButton;
@@ -62,7 +63,7 @@ protected:
   bool Install();
 
 private:
-  Ui::QmitknnInteractiveToolGUI* m_Ui;
+  std::unique_ptr<Ui::QmitknnInteractiveToolGUI> m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
   PromptType m_PromptType;
   std::unordered_map<InteractionType, QPushButton*> m_InteractorButtons;

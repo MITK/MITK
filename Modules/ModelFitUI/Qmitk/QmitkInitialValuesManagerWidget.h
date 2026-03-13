@@ -16,12 +16,12 @@ found in the LICENSE file.
 
 #include "MitkModelFitUIExports.h"
 
-#include "ui_QmitkInitialValuesManagerWidget.h"
 #include <QWidget>
 
 #include "mitkModelTraitsInterface.h"
 #include "mitkInitialParameterizationDelegateBase.h"
 #include "mitkNodePredicateBase.h"
+#include <memory>
 
 /*forward declarations*/
 class QmitkInitialValuesModel;
@@ -32,6 +32,11 @@ namespace mitk
 {
   class DataStorage;
   class BaseGeometry;
+}
+
+namespace Ui
+{
+  class QmitkInitialValuesManagerWidget;
 }
 
 /**
@@ -71,12 +76,11 @@ public Q_SLOTS:
 
 protected:
 
+  std::unique_ptr<Ui::QmitkInitialValuesManagerWidget> m_Controls;
   QmitkInitialValuesModel* m_InternalModel;
 
   QmitkInitialValuesTypeDelegate* m_TypeDelegate;
   QmitkInitialValuesDelegate* m_ValuesDelegate;
-
-  Ui::QmitkInitialValuesManagerWidget m_Controls;
 
   mitk::NodePredicateBase::Pointer m_NoHiddenOrHelperPredicate;
 

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkPythonSettingsView_h
 
 #include <QmitkAbstractView.h>
+#include <memory>
 
 namespace Ui
 {
@@ -39,7 +40,7 @@ private:
   void PopulateVenvsTreeWidget();
   void CalculateAllVenvSizes();
 
-  Ui::QmitkPythonSettingsView* m_Ui;
+  std::unique_ptr<Ui::QmitkPythonSettingsView> m_Ui;
 };
 
 #endif

@@ -15,8 +15,6 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <ui_QmitkNodeSelectionDialog.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
@@ -26,6 +24,9 @@ found in the LICENSE file.
 
 #include <QDialog>
 #include <QPushButton>
+#include <memory>
+
+namespace Ui { class QmitkNodeSelectionDialog; }
 
 /**
 * @class QmitkNodeSelectionDialog
@@ -38,6 +39,7 @@ class MITKQTWIDGETS_EXPORT QmitkNodeSelectionDialog : public QDialog
 
 public:
   explicit QmitkNodeSelectionDialog(QWidget* parent = nullptr, QString caption = "", QString hint = "");
+  ~QmitkNodeSelectionDialog() override;
 
   /**
   * @brief Set the data storage that will be used.
@@ -140,7 +142,7 @@ protected:
   PanelVectorType m_Panels;
 
   QPushButton* m_FavoriteNodesButton;
-  Ui_QmitkNodeSelectionDialog m_Controls;
+  std::unique_ptr<Ui::QmitkNodeSelectionDialog> m_Controls;
 };
 
 #endif

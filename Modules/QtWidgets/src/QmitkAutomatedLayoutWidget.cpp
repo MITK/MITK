@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 QmitkAutomatedLayoutWidget::QmitkAutomatedLayoutWidget(QWidget* parent)
   : QWidget(parent)
-  , m_Controls(new Ui::QmitkAutomatedLayoutWidget)
+  , m_Controls(std::make_unique<Ui::QmitkAutomatedLayoutWidget>())
 {
   m_Controls->setupUi(this);
 
@@ -38,6 +38,10 @@ QmitkAutomatedLayoutWidget::QmitkAutomatedLayoutWidget(QWidget* parent)
 
   connect(m_Controls->dataSelector, &QmitkMultiNodeSelectionWidget::DialogClosed, this, &QmitkAutomatedLayoutWidget::OnSelectionDialogClosed);
   connect(m_Controls->setLayoutButton, &QPushButton::clicked, this, &QmitkAutomatedLayoutWidget::OnSetLayoutClicked);
+}
+
+QmitkAutomatedLayoutWidget::~QmitkAutomatedLayoutWidget()
+{
 }
 
 void QmitkAutomatedLayoutWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)

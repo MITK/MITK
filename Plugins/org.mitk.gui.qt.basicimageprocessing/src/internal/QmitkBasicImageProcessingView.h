@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <QmitkStepperAdapter.h>
 #include <QmitkAbstractView.h>
+#include <memory>
 
 namespace Ui
 {
@@ -100,7 +101,7 @@ private:
   /** retrieve the tnc from renderwindow part */
   void InternalGetTimeNavigationController();
 
-  Ui::QmitkBasicImageProcessingViewControls* m_Controls;
+  std::unique_ptr<Ui::QmitkBasicImageProcessingViewControls> m_Controls;
 
   QmitkStepperAdapter* m_TimeStepperAdapter;
 

@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 #include <QDialog>
+#include <memory>
 
 namespace mitk
 {
@@ -40,7 +41,7 @@ public:
   mitk::Label* GetDestinationLabel() const;
 
 private:
-  Ui::QmitkCopyLabelToGroupDialog* m_Ui;
+  std::unique_ptr<Ui::QmitkCopyLabelToGroupDialog> m_Ui;
 
   mitk::MultiLabelSegmentation* m_Segmentation;
   mitk::Label* m_SourceLabel;

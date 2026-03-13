@@ -21,6 +21,7 @@ found in the LICENSE file.
 
 // Qt includes
 #include <QString>
+#include <memory>
 
 namespace Ui
 {
@@ -46,6 +47,7 @@ public:
   static const std::string VIEW_ID;
 
   ListenerViewMitk();
+  ~ListenerViewMitk() override;
 
 protected:
   void CreateQtPartControl(QWidget *parent) override;
@@ -73,7 +75,7 @@ private Q_SLOTS:
   void ToggleRadioMethod(QString selectStr);
 
 private:
-  Ui::ListenerViewMitkControls *m_Controls;
+  std::unique_ptr<Ui::ListenerViewMitkControls> m_Controls;
 
   QWidget *m_Parent;
 };

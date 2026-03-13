@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkRenderWindow.h"
 #include "mitkVtkPropRenderer.h"
+#include <memory>
 
 namespace Ui
 {
@@ -96,7 +97,7 @@ protected:
   vtkRenderWindow * renderWindow;
   mitk::VtkPropRenderer::Pointer m_PropRenderer;
 
-  Ui::QmitkScreenshotMakerControls* m_Controls;
+  std::unique_ptr<Ui::QmitkScreenshotMakerControls> m_Controls;
 
 private:
 

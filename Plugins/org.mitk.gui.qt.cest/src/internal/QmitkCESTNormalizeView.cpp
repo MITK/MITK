@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkCESTNormalizeView.h"
+#include <ui_QmitkCESTNormalizeViewControls.h>
 
 #include <QMessageBox>
 
@@ -31,32 +32,32 @@ const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.views.cest.normali
 
 void QmitkCESTNormalizeView::SetFocus()
 {
-  m_Controls.btnNormalize->setFocus();
+  m_Controls->btnNormalize->setFocus();
 }
 
 void QmitkCESTNormalizeView::CreateQtPartControl(QWidget* parent)
 {
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
-  m_Controls.btnNormalize->setEnabled(false);
+  m_Controls->btnNormalize->setEnabled(false);
 
-  m_Controls.comboCESTImage->SetPredicate(this->m_IsCESTImagePredicate);
-  m_Controls.comboCESTImage->SetDataStorage(this->GetDataStorage());
+  m_Controls->comboCESTImage->SetPredicate(this->m_IsCESTImagePredicate);
+  m_Controls->comboCESTImage->SetDataStorage(this->GetDataStorage());
 
-  connect(m_Controls.btnNormalize, SIGNAL(clicked()), this, SLOT(OnNormalizeButtonClicked()));
-  connect(m_Controls.comboCESTImage, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(UpdateGUIControls()));
+  connect(m_Controls->btnNormalize, SIGNAL(clicked()), this, SLOT(OnNormalizeButtonClicked()));
+  connect(m_Controls->comboCESTImage, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(UpdateGUIControls()));
 
   UpdateGUIControls();
 }
 
 void QmitkCESTNormalizeView::UpdateGUIControls()
 {
-    m_Controls.btnNormalize->setEnabled(m_Controls.comboCESTImage->GetSelectedNode().IsNotNull());
+    m_Controls->btnNormalize->setEnabled(m_Controls->comboCESTImage->GetSelectedNode().IsNotNull());
 }
 
 void QmitkCESTNormalizeView::OnNormalizeButtonClicked()
 {
-    auto selectedImageNode = m_Controls.comboCESTImage->GetSelectedNode();
+    auto selectedImageNode = m_Controls->comboCESTImage->GetSelectedNode();
     if (!selectedImageNode)
     {
       MITK_ERROR << "Invalid system state. CEST selection is invalid. Selected node is null_ptr.";
@@ -103,8 +104,13 @@ void QmitkCESTNormalizeView::OnNormalizeButtonClicked()
 }
 
 QmitkCESTNormalizeView::QmitkCESTNormalizeView()
+  : m_Controls(std::make_unique<Ui::QmitkCESTNormalizeViewControls>())
 {
   auto isImage = mitk::NodePredicateDataType::New("Image");
 
   this->m_IsCESTImagePredicate = mitk::NodePredicateAnd::New(isImage, mitk::CreateAnyCESTImageNodePredicate()).GetPointer();
+}
+
+QmitkCESTNormalizeView::~QmitkCESTNormalizeView()
+{
 }

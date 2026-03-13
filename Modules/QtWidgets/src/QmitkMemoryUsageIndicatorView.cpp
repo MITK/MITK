@@ -38,7 +38,7 @@ found in the LICENSE file.
 #include <ui_QmitkMemoryUsageIndicator.h>
 
 QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView(QWidget*)
-  : m_Ui(new Ui::QmitkMemoryUsageIndicator),
+  : m_Ui(std::make_unique<Ui::QmitkMemoryUsageIndicator>()),
     m_PreviousState(0),
     m_States {
       std::make_pair(0.0f, QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm)),

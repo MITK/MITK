@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkTimeSliceAnimationWidget_h
 
 #include "QmitkAnimationWidget.h"
+#include <memory>
 
 class QmitkTimeSliceAnimationItem;
 
@@ -38,7 +39,7 @@ private slots:
   void OnReverseChanged(bool reverse);
 
 private:
-  Ui::QmitkTimeSliceAnimationWidget* m_Ui;
+  std::unique_ptr<Ui::QmitkTimeSliceAnimationWidget> m_Ui;
   QmitkTimeSliceAnimationItem* m_AnimationItem;
 };
 

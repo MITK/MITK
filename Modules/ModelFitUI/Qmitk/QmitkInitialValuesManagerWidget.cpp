@@ -26,9 +26,12 @@ found in the LICENSE file.
 #include "QmitkInitialValuesTypeDelegate.h"
 #include "QmitkInitialValuesDelegate.h"
 
+#include <ui_QmitkInitialValuesManagerWidget.h>
+
 QmitkInitialValuesManagerWidget::QmitkInitialValuesManagerWidget(QWidget*)
+  : m_Controls(std::make_unique<Ui::QmitkInitialValuesManagerWidget>())
 {
-  this->m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
 
   m_InternalModel = new QmitkInitialValuesModel(this);
   m_TypeDelegate = new QmitkInitialValuesTypeDelegate(this);
@@ -38,18 +41,17 @@ QmitkInitialValuesManagerWidget::QmitkInitialValuesManagerWidget(QWidget*)
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
   m_ValuesDelegate->setNodePredicate(m_NoHiddenOrHelperPredicate);
 
-  this->m_Controls.initialsView->setModel(m_InternalModel);
+  m_Controls->initialsView->setModel(m_InternalModel);
 
-  this->m_Controls.initialsView->setItemDelegateForColumn(1, m_TypeDelegate);
-  this->m_Controls.initialsView->setItemDelegateForColumn(2, m_ValuesDelegate);
+  m_Controls->initialsView->setItemDelegateForColumn(1, m_TypeDelegate);
+  m_Controls->initialsView->setItemDelegateForColumn(2, m_ValuesDelegate);
 
   connect(m_InternalModel, SIGNAL(modelReset()), this, SLOT(OnModelReset()));
 
   this->update();
 }
 
-void
-QmitkInitialValuesManagerWidget::OnModelReset()
+void QmitkInitialValuesManagerWidget::OnModelReset()
 {
   emit initialValuesChanged();
 };

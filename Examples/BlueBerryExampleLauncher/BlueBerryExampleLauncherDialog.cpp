@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "BlueBerryExampleLauncherDialog.h"
-#include "ui_BlueBerryExampleLauncherDialog.h"
+#include <ui_BlueBerryExampleLauncherDialog.h>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <QPushButton>
 
 BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent)
-  : QDialog(parent), ui(new Ui::BlueBerryExampleLauncherDialog)
+  : QDialog(parent), ui(std::make_unique<Ui::BlueBerryExampleLauncherDialog>())
 {
   ui->setupUi(this);
 
@@ -83,7 +83,6 @@ BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent)
 
 BlueBerryExampleLauncherDialog::~BlueBerryExampleLauncherDialog()
 {
-  delete ui;
 }
 
 QString BlueBerryExampleLauncherDialog::getDemoConfiguration()

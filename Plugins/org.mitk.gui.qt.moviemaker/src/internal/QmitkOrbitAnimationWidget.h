@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkOrbitAnimationWidget_h
 
 #include "QmitkAnimationWidget.h"
+#include <memory>
 
 class QmitkOrbitAnimationItem;
 
@@ -37,7 +38,7 @@ private slots:
   void OnReverseChanged(bool reverse);
 
 private:
-  Ui::QmitkOrbitAnimationWidget* m_Ui;
+  std::unique_ptr<Ui::QmitkOrbitAnimationWidget> m_Ui;
   QmitkOrbitAnimationItem* m_AnimationItem;
 };
 

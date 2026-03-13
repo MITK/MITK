@@ -15,17 +15,20 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkLevelWindowPresetDefinition.h"
-
 #include <QDialog>
 #include <QSortFilterProxyModel>
 
 #include <map>
 #include <string>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkLevelWindowPresetDefinition;
+}
 
 /// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog,
-                                                                    public Ui::QmitkLevelWindowPresetDefinition
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog
 {
   Q_OBJECT
 
@@ -94,6 +97,7 @@ protected:
 
   void resizeColumns();
 
+  std::unique_ptr<Ui::QmitkLevelWindowPresetDefinition> m_Controls;
   PresetTableModel *m_TableModel;
   QSortFilterProxyModel m_SortModel;
 };

@@ -26,7 +26,7 @@ found in the LICENSE file.
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
 {
-  m_Controls = new Ui::QmitkBooleanOperationsWidgetControls;
+  m_Controls = std::make_unique<Ui::QmitkBooleanOperationsWidgetControls>();
   m_Controls->setupUi(this);
 
   m_Controls->label1st->setText("<img width=16 height=16 src=\":/Qmitk/BooleanLabelA_32x32.png\"/>");

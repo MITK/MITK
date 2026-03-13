@@ -43,7 +43,7 @@ namespace
 const std::string QmitkPixelValueView::VIEW_ID = "org.mitk.views.pixelvalue";
 
 QmitkPixelValueView::QmitkPixelValueView(QObject*)
-  : m_Ui(new Ui::QmitkPixelValueView)
+  : m_Ui(std::make_unique<Ui::QmitkPixelValueView>())
 {
 }
 

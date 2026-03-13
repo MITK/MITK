@@ -79,7 +79,7 @@ const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
 
 QmitkMovieMakerView::QmitkMovieMakerView()
   : m_Parent(nullptr),
-    m_Ui(new Ui::QmitkMovieMakerView),
+    m_Ui(std::make_unique<Ui::QmitkMovieMakerView>()),
     m_AnimationModel(nullptr),
     m_AddAnimationMenu(nullptr),
     m_RecordMenu(nullptr),

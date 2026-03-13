@@ -22,7 +22,7 @@ found in the LICENSE file.
 QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
 {
-  m_Controls = new Ui::QmitkMorphologicalOperationsWidgetControls;
+  m_Controls = std::make_unique<Ui::QmitkMorphologicalOperationsWidgetControls>();
   m_Controls->setupUi(this);
 
   m_Controls->segNodeSelector->SetDataStorage(dataStorage);

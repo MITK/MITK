@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* parent)
   : QWidget(parent),
-    m_Controls(new Ui::QmitkHistogramVisualizationControls)
+    m_Controls(std::make_unique<Ui::QmitkHistogramVisualizationControls>())
 {
   m_Controls->setupUi(this);
   m_Controls->checkBoxShowSubchart->setChecked(false);
@@ -30,6 +30,10 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
 
   SetGUIElementsEnabled(false);
   CreateConnections();
+}
+
+QmitkHistogramVisualizationWidget::~QmitkHistogramVisualizationWidget()
+{
 }
 
 void QmitkHistogramVisualizationWidget::SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string& dataLabel)

@@ -57,7 +57,7 @@ namespace
 
 QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent)
   : QDialog(parent),
-    m_Ui(new Ui::QmitkFindSegmentationTaskDialog)
+    m_Ui(std::make_unique<Ui::QmitkFindSegmentationTaskDialog>())
 {
   this->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 
@@ -86,7 +86,6 @@ QmitkFindSegmentationTaskDialog::QmitkFindSegmentationTaskDialog(QWidget* parent
 
 QmitkFindSegmentationTaskDialog::~QmitkFindSegmentationTaskDialog()
 {
-  delete m_Ui;
 }
 
 void QmitkFindSegmentationTaskDialog::SetTaskList(const mitk::SegmentationTaskList* taskList)

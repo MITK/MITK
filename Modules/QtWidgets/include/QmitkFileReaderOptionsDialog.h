@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkIOUtil.h"
 
 #include <QDialog>
+#include <memory>
 
 namespace Ui
 {
@@ -40,7 +41,7 @@ protected slots:
   void SetCurrentReader(int index);
 
 private:
-  Ui::QmitkFileReaderOptionsDialog *ui;
+  std::unique_ptr<Ui::QmitkFileReaderOptionsDialog> ui;
   mitk::IOUtil::LoadInfo &m_LoadInfo;
   std::vector<mitk::FileReaderSelector::Item> m_ReaderItems;
 };

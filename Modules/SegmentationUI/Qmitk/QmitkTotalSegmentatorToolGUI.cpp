@@ -35,7 +35,7 @@ namespace
 
 QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
   : QmitkMultiLabelSegWithPreviewToolGUIBase(),
-    m_Controls(new Ui::QmitkTotalSegmentatorToolGUIControls),
+    m_Controls(std::make_unique<Ui::QmitkTotalSegmentatorToolGUIControls>()),
     m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
@@ -64,6 +64,7 @@ QmitkTotalSegmentatorToolGUI::~QmitkTotalSegmentatorToolGUI()
       mitk::MessageDelegate1<QmitkTotalSegmentatorToolGUI, const mitk::IPreferences::ChangeEvent &>(
         this, &QmitkTotalSegmentatorToolGUI::OnPreferenceChangedEvent);
   }
+
 }
 
 void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)

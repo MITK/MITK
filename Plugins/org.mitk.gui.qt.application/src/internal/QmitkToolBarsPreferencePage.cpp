@@ -58,7 +58,7 @@ namespace
 }
 
 QmitkToolBarsPreferencePage::QmitkToolBarsPreferencePage()
-  : m_Ui(new Ui::QmitkToolBarsPreferencePage),
+  : m_Ui(std::make_unique<Ui::QmitkToolBarsPreferencePage>()),
     m_Control(nullptr)
 {
 }

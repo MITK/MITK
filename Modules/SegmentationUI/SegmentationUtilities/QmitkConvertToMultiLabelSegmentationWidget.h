@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkNodeSelectionDialog.h>
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -74,7 +75,7 @@ private:
   /** @brief Enable buttons if data selection is valid. */
   void ConfigureWidgets();
 
-  Ui::QmitkConvertToMultiLabelSegmentationWidgetControls* m_Controls;
+  std::unique_ptr<Ui::QmitkConvertToMultiLabelSegmentationWidgetControls> m_Controls;
 };
 
 #endif

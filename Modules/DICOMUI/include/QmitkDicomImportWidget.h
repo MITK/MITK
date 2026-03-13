@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkDICOMUIExports.h>
 
 #include <QWidget>
+#include <memory>
 
 class ctkFileDialog;
 class ctkDICOMDatabase;
@@ -84,7 +85,7 @@ private:
   QProgressDialog* m_ProgressDialog;
   QString m_ProgressStep;
 
-  Ui::QmitkDicomImportWidget* m_Ui;
+  std::unique_ptr<Ui::QmitkDicomImportWidget> m_Ui;
 };
 
 #endif

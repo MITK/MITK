@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkScreenshotWidget_h
 
 #include <QWidget>
+#include <memory>
 
 namespace Ui
 {
@@ -38,7 +39,7 @@ signals:
 private:
   void OnRemoveButtonClicked();
 
-  Ui::QmitkScreenshotWidget* m_Ui;
+  std::unique_ptr<Ui::QmitkScreenshotWidget> m_Ui;
   QString m_ScreenshotPath;
 };
 

@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define QmitkStdMultiWidgetEditorPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
-#include <QScopedPointer>
 #include <QString>
 
 #include <array>
+#include <memory>
 
 class QPushButton;
 
@@ -96,7 +96,8 @@ protected slots:
   void ColorChooserButtonClicked();
 
 private:
-  QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
+  std::unique_ptr<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
   QWidget* m_Control;
 };
+
 #endif

@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 #include "mitkNodePredicateBase.h"
+#include <memory>
 
 namespace Ui
 {
@@ -69,7 +70,7 @@ protected:
 
     void UpdateControls();
 
-    Ui::SegmentationFlowControlView* m_Controls;
+    std::unique_ptr<Ui::SegmentationFlowControlView> m_Controls;
 
 private:
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;

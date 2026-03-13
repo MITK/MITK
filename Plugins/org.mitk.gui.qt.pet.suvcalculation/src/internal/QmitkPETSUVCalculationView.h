@@ -17,11 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPETSUVCalculationView_h
 #define QmitkPETSUVCalculationView_h
 
-#include "ui_QmitkPETSUVCalculationViewControls.h"
 #include <QString>
 #include <QmitkAbstractView.h>
 #include <mitkImage.h>
 #include <mitkSUVCalculationHelper.h>
+#include <memory>
+
+namespace Ui
+{
+  class QmitkPETSUVCalculationViewControls;
+}
 
 /*!
  *	@brief Test Plugin for SUV calculations of PET images
@@ -35,6 +40,7 @@ public:
   static const std::string VIEW_ID;
 
   QmitkPETSUVCalculationView();
+  ~QmitkPETSUVCalculationView() override;
 
 protected slots:
 
@@ -78,7 +84,7 @@ protected:
   // Variables
 
   /*! @brief The view's UI controls */
-  Ui::QmitkPETSUVCalculationViewControls m_Controls;
+  std::unique_ptr<Ui::QmitkPETSUVCalculationViewControls> m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
 
 private:

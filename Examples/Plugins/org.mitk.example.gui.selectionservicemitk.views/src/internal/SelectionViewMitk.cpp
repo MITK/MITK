@@ -20,8 +20,12 @@ found in the LICENSE file.
 const std::string SelectionViewMitk::VIEW_ID = "org.mitk.views.selectionviewmitk";
 
 SelectionViewMitk::SelectionViewMitk()
-  : m_Controls(new Ui::SelectionViewMitkControls),
+  : m_Controls(std::make_unique<Ui::SelectionViewMitkControls>()),
     m_Parent(nullptr)
+{
+}
+
+SelectionViewMitk::~SelectionViewMitk()
 {
 }
 

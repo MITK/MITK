@@ -18,8 +18,12 @@ found in the LICENSE file.
 #include <QmitkAbstractDataStorageInspector.h>
 #include "QmitkSimpleTextOverlayWidget.h"
 #include <QSortFilterProxyModel>
+#include <memory>
 
-#include "ui_QmitkDataStorageTreeInspector.h"
+namespace Ui
+{
+  class QmitkDataStorageTreeInspector;
+}
 
 /*
 * @brief This is an inspector that offers a simple tree view on a data storage.
@@ -32,6 +36,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeInspector : public QmitkAbstractD
 
 public:
   QmitkDataStorageTreeInspector(QWidget* parent = nullptr);
+  ~QmitkDataStorageTreeInspector() override;
 
   QAbstractItemView* GetView() override;
   const QAbstractItemView* GetView() const override;
@@ -44,7 +49,7 @@ protected:
   void OnModelReset();
 
   QmitkAbstractDataStorageModel* m_StorageModel;
-  Ui_QmitkDataStorageTreeInspector m_Controls;
+  std::unique_ptr<Ui::QmitkDataStorageTreeInspector> m_Controls;
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 

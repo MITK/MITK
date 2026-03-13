@@ -476,6 +476,8 @@ void QmitkMultiLabelManager::OnThreadedCalculationDone()
 
 void QmitkMultiLabelManager::AddSegmentationObserver()
 {
+  m_ObservedSegmentation = this->GetMultiLabelSegmentation();
+
   if (this->GetMultiLabelSegmentation() != nullptr)
   {
     auto& widget = *this;
@@ -521,6 +523,8 @@ void QmitkMultiLabelManager::RemoveSegmentationObserver()
   m_GroupAddedObserver.Reset();
   m_GroupModifiedObserver.Reset();
   m_GroupRemovedObserver.Reset();
+
+  m_ObservedSegmentation = nullptr;
 }
 
 void QmitkMultiLabelManager::OnLabelEvent(mitk::MultiLabelSegmentation::LabelValueType /*labelValue*/)

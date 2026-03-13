@@ -191,6 +191,10 @@ private:
 
   mitk::DataStorage* m_DataStorage;
 
+  /** Prevents premature destruction of the segmentation the observer guards below
+   *  are registered on. Managed exclusively by Add/RemoveSegmentationObserver(). */
+  mitk::MultiLabelSegmentation::Pointer m_ObservedSegmentation;
+
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelModifiedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;

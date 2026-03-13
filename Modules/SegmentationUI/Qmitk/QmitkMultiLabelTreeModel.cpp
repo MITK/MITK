@@ -777,6 +777,12 @@ void QmitkMultiLabelTreeModel::SetSegmentation(mitk::MultiLabelSegmentation* seg
 {
   if (m_Segmentation != segmentation)
   {
+    // Keep the old segmentation alive until observer guards are properly reset in AddObserver().
+    // Without this, the assignment below may drop the last reference to the old segmentation,
+    // destroying it before AddObserver() can unregister the old observers. That leads to
+    // dangling pointers in the ITKEventObserverGuard's WeakPointer and a crash in Lock()
+    auto previousSegmentation = m_Segmentation;
+
     this->m_Segmentation = segmentation;
     this->AddObserver();
 

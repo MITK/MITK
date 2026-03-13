@@ -26,7 +26,10 @@ found in the LICENSE file.
 #include <ui_QmitkSurfaceStampWidgetGUIControls.h>
 
 QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /*name*/)
-  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr)
+  : QWidget(parent),
+    m_ToolManager(nullptr),
+    m_DataStorage(nullptr),
+    m_Controls(std::make_unique<Ui::QmitkSurfaceStampWidgetGUIControls>())
 {
   m_Controls->setupUi(this);
   m_Controls->m_InformationWidget->hide();
@@ -47,7 +50,6 @@ QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /
 
 QmitkSurfaceStampWidget::~QmitkSurfaceStampWidget()
 {
-  delete m_Controls;
 }
 
 void QmitkSurfaceStampWidget::SetDataStorage(mitk::DataStorage *storage)

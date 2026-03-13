@@ -19,7 +19,9 @@ found in the LICENSE file.
 
 #include <ui_QmitkSimpleBarrierManagerWidget.h>
 
-QmitkSimpleBarrierManagerWidget::QmitkSimpleBarrierManagerWidget(QWidget*): m_InternalUpdate(false)
+QmitkSimpleBarrierManagerWidget::QmitkSimpleBarrierManagerWidget(QWidget*)
+  : m_InternalUpdate(false),
+    m_Controls(std::make_unique<Ui::QmitkSimpleBarrierManagerWidget>())
 {
   m_Controls->setupUi(this);
 

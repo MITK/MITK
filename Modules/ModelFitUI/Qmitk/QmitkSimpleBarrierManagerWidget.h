@@ -77,7 +77,7 @@ protected:
 
   bool m_InternalUpdate;
 
-  Ui::QmitkSimpleBarrierManagerWidget* m_Controls;
+  std::unique_ptr<Ui::QmitkSimpleBarrierManagerWidget> m_Controls;
 
 };
 

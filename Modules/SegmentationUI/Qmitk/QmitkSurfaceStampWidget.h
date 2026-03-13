@@ -55,7 +55,7 @@ private:
 
   mitk::DataStorage *m_DataStorage;
 
-  Ui::QmitkSurfaceStampWidgetGUIControls* m_Controls;
+  std::unique_ptr<Ui::QmitkSurfaceStampWidgetGUIControls> m_Controls;
 };
 
 #endif

@@ -106,7 +106,6 @@ function(mitk_create_plugin)
   set(_PLUGIN_TRANSLATION_FILES ${TRANSLATION_FILES})
   set(_PLUGIN_QRC_FILES ${QRC_FILES})
   set(_PLUGIN_H_FILES ${H_FILES})
-  set(_PLUGIN_DOX_FILES ${DOX_FILES})
   set(_PLUGIN_CMAKE_FILES ${CMAKE_FILES} files.cmake)
   set(_PLUGIN_FILE_DEPENDENCIES ${FILE_DEPENDENCIES})
 
@@ -167,16 +166,17 @@ function(mitk_create_plugin)
   #------------------------------------------------------------#
   #------------------ Create Plug-in --------------------------#
 
+  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+  endif()
+
   mitkFunctionOrganizeSources(
     SOURCE ${_PLUGIN_CPP_FILES}
     HEADER ${_PLUGIN_H_FILES}
-    DOC ${_PLUGIN_DOX_FILES}
     UI ${_PLUGIN_UI_FILES}
     QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
     META ${_PLUGIN_META_FILES}
-    MOC ${MY_MOC_CPP}
-    GEN_UI ${MY_UI_CPP}
-    GEN_QRC ${MY_QRC_SRCS}
   )
 
   ctkMacroBuildPlugin(
@@ -268,10 +268,7 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkLog)
   endif()
 
-  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-  endif()
+  target_sources(${PLUGIN_TARGET} PRIVATE ${_PLUGIN_META_FILES})
 
   set(PLUGIN_TARGET ${PLUGIN_TARGET} PARENT_SCOPE)
 

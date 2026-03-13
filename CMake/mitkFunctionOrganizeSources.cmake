@@ -15,7 +15,7 @@ function(mitkFunctionOrganizeSources)
   #   CORRESPONDING__TPP_FILES - auto-discovered template implementation files
   #   GLOBBED__H_FILES         - all headers found via glob (header-only modules)
 
-  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;DOC;META;UI;QRC" ${ARGN})
+  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;META;UI;QRC" ${ARGN})
 
   set(CORRESPONDING__H_FILES "")
   set(CORRESPONDING__TPP_FILES "")
@@ -87,18 +87,15 @@ function(mitkFunctionOrganizeSources)
     source_group("Qt/Resource Files" FILES ${_ORG_QRC})
   endif()
 
-  # Categorize auto-generated Qt files (from AUTOMOC/AUTOUIC/AUTORCC)
+  # Categorize auto-generated Qt files (from AUTOMOC/AUTOUIC/AUTORCC/CTK)
   source_group("Qt/Generated Files/MOC" REGULAR_EXPRESSION "mocs_compilation_.*\\.cpp$")
   source_group("Qt/Generated Files/QRC" REGULAR_EXPRESSION "qrc_.*\\.cpp$")
   source_group("Qt/Generated Files/UI" REGULAR_EXPRESSION "ui_.*\\.h$")
   source_group("Qt/Generated Files/AUTOUIC" REGULAR_EXPRESSION "autouic_.*\\.stamp$")
-
-  if(_ORG_DOC)
-    source_group("Doxygen Files" FILES ${_ORG_DOC})
-  endif()
+  source_group("Qt/Generated Files/Resources" REGULAR_EXPRESSION "_(cached|manifest)\\.qrc$")
 
   if(_ORG_META)
-    source_group("Plugin META Files" FILES ${_ORG_META})
+    source_group("Plugin Files" FILES ${_ORG_META})
   endif()
 
 endfunction()

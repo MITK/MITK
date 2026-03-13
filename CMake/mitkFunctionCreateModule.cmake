@@ -38,7 +38,6 @@
 #! - RESOURCE_FILES A list of files (resources) which are embedded into the module
 #! - UI_FILES A list of .ui Qt UI files
 #! - QRC_FILES A list of .qrc Qt resource files
-#! - DOX_FILES A list of .dox Doxygen files
 #!
 #! List of variables available after the function is called:
 #! - MODULE_NAME
@@ -235,7 +234,6 @@ function(mitk_create_module)
     set(RESOURCE_FILES )
     set(CPP_FILES )
     set(H_FILES )
-    set(DOX_FILES )
     set(UI_FILES )
     set(QRC_FILES )
 
@@ -384,7 +382,6 @@ function(mitk_create_module)
     mitkFunctionOrganizeSources(
       SOURCE ${CPP_FILES}
       HEADER ${H_FILES}
-      DOC ${DOX_FILES}
       UI ${UI_FILES}
       QRC ${QRC_FILES}
       )
@@ -409,7 +406,7 @@ function(mitk_create_module)
         endif()
         add_executable(${MODULE_TARGET} ${_SHOW_CONSOLE_OPTION}
                        ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED}
-                       ${DOX_FILES} ${UI_FILES} ${QRC_FILES} ${WINDOWS_ICON_RESOURCE_FILE})
+                       ${UI_FILES} ${QRC_FILES} ${WINDOWS_ICON_RESOURCE_FILE})
         if(WIN32)
           mitk_add_manifest(${MODULE_TARGET})
         endif()
@@ -418,7 +415,7 @@ function(mitk_create_module)
       else()
         add_library(${MODULE_TARGET} ${_STATIC}
                     ${coverage_sources} ${CPP_FILES_GENERATED}
-                    ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+                    ${UI_FILES} ${QRC_FILES})
         set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})
       endif()

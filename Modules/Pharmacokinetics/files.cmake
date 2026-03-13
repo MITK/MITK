@@ -47,9 +47,3 @@ mitkDICOMSegmentationConstants.h
 
 )
 
-
-set(MOC_H_FILES
-)
-
-
-

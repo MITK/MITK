@@ -36,7 +36,6 @@
 #! - CPP_FILES A list of .cpp files
 #! - H_FILES A list of .h files without a corresponding .cpp file
 #! - RESOURCE_FILES A list of files (resources) which are embedded into the module
-#! - MOC_H_FILES A list of Qt header files which should be processed by the MOC
 #! - UI_FILES A list of .ui Qt UI files
 #! - QRC_FILES A list of .qrc Qt resource files
 #! - DOX_FILES A list of .dox Doxygen files
@@ -127,6 +126,7 @@ function(mitk_create_module)
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
+      AUTOMOC                # enable Qt AUTOMOC/AUTOUIC/AUTORCC even without UI or QRC files
       C_MODULE               # compile all source files as C sources
       CXX_MODULE             # compile all source files as C++ sources
      )
@@ -237,7 +237,6 @@ function(mitk_create_module)
     set(H_FILES )
     set(DOX_FILES )
     set(UI_FILES )
-    set(MOC_H_FILES )
     set(QRC_FILES )
 
     # check and set-up auto-loading
@@ -277,7 +276,7 @@ function(mitk_create_module)
       endforeach()
     endif()
 
-    if(CPP_FILES OR RESOURCE_FILES OR UI_FILES OR MOC_H_FILES OR QRC_FILES)
+    if(CPP_FILES OR RESOURCE_FILES OR UI_FILES OR QRC_FILES)
       set(MODULE_HEADERS_ONLY 0)
       if(MODULE_C_MODULE)
         set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE C)
@@ -391,7 +390,7 @@ function(mitk_create_module)
       )
 
     set(coverage_sources
-        ${CPP_FILES} ${H_FILES} ${MOC_H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES}
+        ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES}
         ${CORRESPONDING__TPP_FILES} ${TOOL_CPPS} ${TOOL_GUI_CPPS})
 
     # ---------------------------------------------------------------
@@ -428,22 +427,6 @@ function(mitk_create_module)
         target_link_libraries(${MODULE_TARGET} PRIVATE MitkCompilerFlags)
       endif()
 
-      if(MITK_USE_Qt6 AND (MOC_H_FILES OR UI_FILES OR QRC_FILES))
-        set_target_properties(${MODULE_TARGET} PROPERTIES
-          AUTOMOC ON
-          AUTOUIC ON
-          AUTORCC ON
-          AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src")
-
-        if(MODULE_AUTOMOC_FORCE_INCLUDES)
-          set(_automoc_options "")
-          foreach(_header ${MODULE_AUTOMOC_FORCE_INCLUDES})
-            list(APPEND _automoc_options "-b" "${_header}")
-          endforeach()
-          set_target_properties(${MODULE_TARGET} PROPERTIES
-            AUTOMOC_MOC_OPTIONS "${_automoc_options}")
-        endif()
-      endif()
 
       # Apply properties to the module target.
       target_compile_definitions(${MODULE_TARGET} PRIVATE US_MODULE_NAME=${_us_module_name})
@@ -603,6 +586,23 @@ function(mitk_create_module)
                        MODULES ${DEPENDS}
                        PACKAGES ${MODULE_PACKAGE_DEPENDS}
                       )
+    endif()
+
+    if(MITK_USE_Qt6 AND (MODULE_AUTOMOC OR UI_FILES OR QRC_FILES))
+      set_target_properties(${MODULE_TARGET} PROPERTIES
+        AUTOMOC ON
+        AUTOUIC ON
+        AUTORCC ON
+        AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+      if(MODULE_AUTOMOC_FORCE_INCLUDES)
+        set(_automoc_options "")
+        foreach(_header ${MODULE_AUTOMOC_FORCE_INCLUDES})
+          list(APPEND _automoc_options "-b" "${_header}")
+        endforeach()
+        set_target_properties(${MODULE_TARGET} PROPERTIES
+          AUTOMOC_MOC_OPTIONS "${_automoc_options}")
+      endif()
     endif()
 
     # add include directories

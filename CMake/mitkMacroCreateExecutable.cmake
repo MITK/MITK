@@ -44,6 +44,7 @@ macro(mitk_create_executable)
       NO_BATCH_FILE          # do not create batch files on Windows
       WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
       NO_INSTALL
+      AUTOMOC
      )
 
   cmake_parse_arguments(EXEC "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -57,6 +58,9 @@ macro(mitk_create_executable)
   endif()
   if(EXEC_NO_FEATURE_INFO)
     list(APPEND _EXEC_OPTIONS NO_FEATURE_INFO)
+  endif()
+  if(EXEC_AUTOMOC)
+    list(APPEND _EXEC_OPTIONS AUTOMOC)
   endif()
 
   mitk_create_module(${EXEC_UNPARSED_ARGUMENTS}

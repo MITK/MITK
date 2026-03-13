@@ -9,8 +9,6 @@ set(INTERNAL_CPP_FILES
   berryQtPlatformLogModel.cpp
 )
 
-set(CPP_FILES )
-
 set(MOC_H_FILES
   src/internal/berryLogView.h
   src/internal/berryQtLogPlugin.h

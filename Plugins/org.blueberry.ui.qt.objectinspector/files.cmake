@@ -28,8 +28,6 @@ set(RES_FILES
   resources/blueberry_ui_qt_objectinspector.qrc
 )
 
-set(CPP_FILES )
-
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})

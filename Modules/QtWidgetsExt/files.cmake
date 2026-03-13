@@ -42,42 +42,6 @@ set(CPP_FILES
   QtWidgetsExtRegisterClasses.cpp
 )
 
-set(MOC_H_FILES
-  include/qclickablelabel.h
-  include/QmitkAboutDialog.h
-  include/QmitkBasePropertyView.h
-  include/QmitkBoolPropertyWidget.h
-  include/QmitkBoundingObjectWidget.h
-  include/QmitkCallbackFromGUIThread.h
-  include/QmitkColorPropertyEditor.h
-  include/QmitkColorPropertyView.h
-  include/QmitkColorTransferFunctionCanvas.h
-  include/QmitkCrossWidget.h
-  include/QmitkEditPointDialog.h
-  include/QmitkEnumerationPropertyWidget.h
-  include/QmitkFileChooser.h
-  include/QmitkHotkeyLineEdit.h
-  include/QmitkNumberPropertyEditor.h
-  include/QmitkNumberPropertySlider.h
-  include/QmitkNumberPropertyView.h
-  include/QmitkPiecewiseFunctionCanvas.h
-  include/QmitkPlotWidget.h
-  include/QmitkPointListModel.h
-  include/QmitkPointListView.h
-  include/QmitkPointListWidget.h
-  include/QmitkPrimitiveMovieNavigatorWidget.h
-  include/QmitkSliceWidget.h
-  include/QmitkStandardViews.h
-  include/QmitkStringPropertyEditor.h
-  include/QmitkStringPropertyOnDemandEdit.h
-  include/QmitkStringPropertyView.h
-  include/QmitkTransferFunctionCanvas.h
-  include/QmitkTransferFunctionGeneratorWidget.h
-  include/QmitkTransferFunctionWidget.h
-  include/QmitkUGCombinedRepresentationPropertyWidget.h
-  include/QmitkVideoBackground.h
-)
-
 set(UI_FILES
   src/QmitkAboutDialogGUI.ui
   src/QmitkPrimitiveMovieNavigatorWidget.ui

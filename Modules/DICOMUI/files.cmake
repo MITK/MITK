@@ -9,8 +9,3 @@ set(UI_FILES
   src/QmitkDicomImportWidget.ui
 )
 
-set(MOC_H_FILES
-  include/QmitkDicomLocalStorageWidget.h
-  include/QmitkDicomImportWidget.h
-)
-

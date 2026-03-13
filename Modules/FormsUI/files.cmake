@@ -1,16 +1,3 @@
-set(MOC_H_FILES
-  include/QmitkCheckboxesQuestionWidget.h
-  include/QmitkDropdownQuestionWidget.h
-  include/QmitkForm.h
-  include/QmitkLinearScaleQuestionWidget.h
-  include/QmitkMultipleChoiceQuestionWidget.h
-  include/QmitkParagraphQuestionWidget.h
-  include/QmitkQuestionWidget.h
-  include/QmitkScreenshotQuestionWidget.h
-  include/QmitkShortAnswerQuestionWidget.h
-  src/QmitkScreenshotWidget.h
-)
-
 set(UI_FILES
   src/QmitkForm.ui
   src/QmitkScreenshotWidget.ui

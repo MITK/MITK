@@ -24,8 +24,6 @@ set(QRC_FILES
   resources/dicom.qrc
 )
 
-unset(CPP_FILES)
-
 foreach(file ${SRC_CPP_FILES})
   list(APPEND CPP_FILES src/${file})
 endforeach()

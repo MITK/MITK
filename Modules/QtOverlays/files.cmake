@@ -7,11 +7,3 @@ SET(CPP_FILES
   QmitkScalarBarOverlay.cpp
   QmitkTextOverlay.cpp
 )
-
-
-SET(MOC_H_FILES
-  QmitkOverlay.h
-  QmitkOverlayController.h
-  QmitkScalarBar.h
-  QmitkScalarBarOverlay.h
-)

@@ -6,6 +6,3 @@ set(CPP_FILES
    mitkMaskCleaningOperation.cpp
 )
 
-set(RESOURCE_FILES
-
-)

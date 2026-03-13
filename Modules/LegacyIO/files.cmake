@@ -1,7 +1,3 @@
-set(H_FILES
-
-)
-
 set(CPP_FILES
   mitkBaseDataIOFactory.cpp
   mitkFileSeriesReader.cpp

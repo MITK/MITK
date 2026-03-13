@@ -7,9 +7,3 @@ set(CPP_FILES
   ../Step6/Step6.cpp
   ../Step7/Step7.cpp
 )
-
-set(MOC_H_FILES
-  ../Step6/Step6.h
-  ../Step7/Step7.h
-  Step8.h
-)

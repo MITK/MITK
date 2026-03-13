@@ -24,9 +24,6 @@ set(QRC_FILES
   resources/Remeshing.qrc
 )
 
-set(CPP_FILES
-)
-
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach()

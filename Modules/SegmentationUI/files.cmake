@@ -57,64 +57,8 @@ set(CPP_FILES
 
 set(H_FILES
   Qmitk/QmitkMultiLabelPresetHelper.h
-)
-set(MOC_H_FILES
-  Qmitk/QmitkSegWithPreviewToolGUIBase.h
-  Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h
-  Qmitk/QmitkBinaryThresholdToolGUIBase.h
-  Qmitk/QmitkBinaryThresholdToolGUI.h
-  Qmitk/QmitkBinaryThresholdULToolGUI.h
-  Qmitk/QmitkConfirmSegmentationDialog.h
-  Qmitk/QmitkCopyLabelToGroupDialog.h
-  Qmitk/QmitkCopyToClipBoardDialog.h
-  Qmitk/QmitkDrawPaintbrushToolGUI.h
-  Qmitk/QmitkErasePaintbrushToolGUI.h
-  Qmitk/QmitkEditableContourToolGUIBase.h
-  Qmitk/QmitkGrowCutToolGUI.h
-  Qmitk/QmitkLiveWireTool2DGUI.h
-  Qmitk/QmitkLassoToolGUI.h
-  Qmitk/QmitkOtsuTool3DGUI.h
-  Qmitk/QmitkPaintbrushToolGUI.h
-  Qmitk/QmitkPickingToolGUI.h
-  Qmitk/QmitkSlicesInterpolator.h
-  Qmitk/QmitkToolGUI.h
-  Qmitk/QmitkToolGUIArea.h
-  Qmitk/QmitkToolSelectionBox.h
-  Qmitk/QmitknnUNetFolderParser.h
-  Qmitk/QmitknnUNetToolGUI.h
-  Qmitk/QmitknnUNetGPU.h
-  Qmitk/QmitknnUNetWorker.h
   Qmitk/QmitknnUNetEnsembleLayout.h
-  Qmitk/QmitkSurfaceStampWidget.h
-  Qmitk/QmitkStaticDynamicSegmentationDialog.h
-  Qmitk/QmitkSimpleLabelSetListWidget.h
-  Qmitk/QmitkSegmentationTaskListWidget.h
-  Qmitk/QmitkTotalSegmentatorToolGUI.h
-  Qmitk/QmitkSetupVirtualEnvUtil.h
-  Qmitk/QmitkMultiLabelInspector.h
-  Qmitk/QmitkMultiLabelManager.h
-  Qmitk/QmitkMultiLabelSelectionLabel.h
-  Qmitk/QmitkMultiLabelSelectionWidget.h
-  Qmitk/QmitkMultiLabelSelectionButton.h
-  Qmitk/QmitkFlatLabelInstanceProxyModel.h
-  Qmitk/QmitkMultiLabelTreeModel.h
-  Qmitk/QmitkMultiLabelTreeView.h
-  Qmitk/QmitkLabelColorItemDelegate.h
-  Qmitk/QmitkLabelToggleItemDelegate.h
-  Qmitk/QmitkFindSegmentationTaskDialog.h
-  Qmitk/QmitkSegmentAnythingToolGUI.h
-  Qmitk/QmitkMedSAMToolGUI.h
-  Qmitk/QmitkMonaiLabelToolGUI.h
-  Qmitk/QmitkMonaiLabel2DToolGUI.h
-  Qmitk/QmitkMonaiLabel3DToolGUI.h
-  Qmitk/QmitkLabelSelectionToolGUI.h
-  SegmentationUtilities/QmitkBooleanOperationsWidget.h
-  SegmentationUtilities/QmitkImageMaskingWidget.h
-  SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
-  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidget.h
-  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.h
 )
-
 set(UI_FILES
   Qmitk/QmitkConfirmSegmentationDialog.ui
   Qmitk/QmitkCopyLabelToGroupDialog.ui

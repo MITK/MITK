@@ -28,5 +28,3 @@ set(CPP_FILES
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
 
-set(MOC_H_FILES
-)

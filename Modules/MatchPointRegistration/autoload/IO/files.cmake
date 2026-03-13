@@ -4,5 +4,3 @@ set(CPP_FILES
   mitkMAPRegistrationWrapperSerializer.cpp
 )
 
-set(MOC_H_FILES
-)

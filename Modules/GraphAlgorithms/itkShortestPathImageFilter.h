@@ -230,6 +230,6 @@ namespace itk
 
 } // end of namespace itk
 
-#include "itkShortestPathImageFilter.txx"
+#include "itkShortestPathImageFilter.tpp"
 
 #endif

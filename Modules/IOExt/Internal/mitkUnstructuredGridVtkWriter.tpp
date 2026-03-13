@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_UNSTRUCTURED_GRID_VTKWRITER_TXX_
-#define _MITK_UNSTRUCTURED_GRID_VTKWRITER_TXX_
+#ifndef _MITK_UNSTRUCTURED_GRID_VTKWRITER_TPP_
+#define _MITK_UNSTRUCTURED_GRID_VTKWRITER_TPP_
 
 #include <itkLightObject.h>
 #include <vtkLinearTransform.h>

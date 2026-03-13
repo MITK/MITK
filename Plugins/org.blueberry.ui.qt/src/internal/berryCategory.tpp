@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __BERRY_CATEGORY_TXX__
-#define __BERRY_CATEGORY_TXX__
+#ifndef __BERRY_CATEGORY_TPP__
+#define __BERRY_CATEGORY_TPP__
 
 #include "berryWorkbenchRegistryConstants.h"
 
@@ -187,4 +187,4 @@ void Category<T>::Clear()
 
 } // namespace berry
 
-#endif // __BERRY_CATEGORY_TXX__
+#endif // __BERRY_CATEGORY_TPP__

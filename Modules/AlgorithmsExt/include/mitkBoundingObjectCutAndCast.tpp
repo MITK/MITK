@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBOUNDINGOBJECTCUTANDCAST_TXX
-#define MITKBOUNDINGOBJECTCUTANDCAST_TXX
+#ifndef MITKBOUNDINGOBJECTCUTANDCAST_TPP
+#define MITKBOUNDINGOBJECTCUTANDCAST_TPP
 
 #include "mitkBoundingObjectCutAndCast.h"
 #include "mitkImage.h"
@@ -51,4 +51,4 @@ namespace mitk
   }
 
 } // of namespace mitk
-#endif // of MITKBOUNDINGOBJECTCUTANDCAST_TXX
+#endif // of MITKBOUNDINGOBJECTCUTANDCAST_TPP

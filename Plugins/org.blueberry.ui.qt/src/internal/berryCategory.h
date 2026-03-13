@@ -188,6 +188,6 @@ protected:
 } // namespace berry
 
 
-#include "berryCategory.txx"
+#include "berryCategory.tpp"
 
 #endif /*BERRYCATEGORY_H_*/

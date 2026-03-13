@@ -59,4 +59,4 @@ namespace itk
 
 } // end namespace itk
 
-#endif // __itkShortestPathCostFunctionSimple_txx
+#endif // __itkShortestPathCostFunctionSimple_tpp

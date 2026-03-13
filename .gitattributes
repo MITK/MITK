@@ -49,7 +49,7 @@ zap.pl           crlf=input
 *.h              whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
 *.cxx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
 *.hxx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
-*.txx            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
+*.tpp            whitespace=tab-in-indent,no-lf-at-eof  copyright=mitk-license hooks.style=KWStyle,uncrustify
 *.txt            whitespace=tab-in-indent,no-lf-at-eof
 *.cmake          whitespace=tab-in-indent,no-lf-at-eof
 

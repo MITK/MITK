@@ -74,6 +74,6 @@ namespace itk
 
 } // end namespace itk
 
-#include "itkShortestPathCostFunction.txx"
+#include "itkShortestPathCostFunction.tpp"
 
 #endif /* __itkShortestPathCostFunction_h */

@@ -21,7 +21,7 @@ namespace mitk
                                   "",
                                   ".cxx",
                                   "",
-                                  ".txx",
+                                  ".tpp",
                                   "",
                                   ".h",
                                   "",

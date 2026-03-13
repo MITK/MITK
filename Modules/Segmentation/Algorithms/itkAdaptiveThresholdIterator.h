@@ -244,7 +244,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkAdaptiveThresholdIterator.txx"
+#include "itkAdaptiveThresholdIterator.tpp"
 #endif
 
 #endif

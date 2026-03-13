@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef _itkAdaptiveThresholdIterator_txx
-#define _itkAdaptiveThresholdIterator_txx
+#ifndef _itkAdaptiveThresholdIterator_tpp
+#define _itkAdaptiveThresholdIterator_tpp
 
 #include "itkAdaptiveThresholdIterator.h"
 #include "mitkProgressBar.h"

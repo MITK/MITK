@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkShortestPathCostFunctionLiveWire_txx
-#define __itkShortestPathCostFunctionLiveWire_txx
+#ifndef __itkShortestPathCostFunctionLiveWire_tpp
+#define __itkShortestPathCostFunctionLiveWire_tpp
 
 #include "itkShortestPathCostFunctionLiveWire.h"
 
@@ -396,4 +396,4 @@ namespace itk
 
 } // end namespace itk
 
-#endif // __itkShortestPathCostFunctionLiveWire_txx
+#endif // __itkShortestPathCostFunctionLiveWire_tpp

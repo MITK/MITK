@@ -85,5 +85,5 @@ void RegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage, Step6 *step6)
 } //RegionGrowing()
 
 /**
-\example Step6RegionGrowing.txx
+\example Step6RegionGrowing.tpp
 */

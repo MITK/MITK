@@ -16,8 +16,8 @@ This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
 
-#ifndef __itkContourExtractor2DImageFilter_txx
-#define __itkContourExtractor2DImageFilter_txx
+#ifndef __itkContourExtractor2DImageFilter_tpp
+#define __itkContourExtractor2DImageFilter_tpp
 
 #include "itkConstShapedNeighborhoodIterator.h"
 #include "itkConstShapedNeighborhoodIterator.h"

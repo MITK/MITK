@@ -190,7 +190,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
       The second list contains remaining files, which need to be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
 
       Relevant code that is matched here is in
-      itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+      itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
      */
     std::shared_ptr<SliceGroupingAnalysisResult>
     AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const DICOMDatasetList& files, bool groupsOfSimilarImages);

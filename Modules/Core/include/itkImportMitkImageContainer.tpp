@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _itkImportMitkImageContainer_txx
-#define _itkImportMitkImageContainer_txx
+#ifndef _itkImportMitkImageContainer_tpp
+#define _itkImportMitkImageContainer_tpp
 
 #include "itkImportMitkImageContainer.h"
 

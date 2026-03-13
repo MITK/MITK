@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <vtkErrorCode.h>
 
 #include "mitkSurfaceVtkWriter.h"
-#include "mitkSurfaceVtkWriter.txx"
+#include "mitkSurfaceVtkWriter.tpp"
 
 namespace mitk
 {

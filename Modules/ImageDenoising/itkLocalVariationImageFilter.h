@@ -104,7 +104,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLocalVariationImageFilter.txx"
+#include "itkLocalVariationImageFilter.tpp"
 #endif
 
 #endif // LocalVariationImageFilter

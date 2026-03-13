@@ -35,7 +35,7 @@
 #!
 #! - CPP_FILES A list of .cpp files
 #! - H_FILES A list of .h files without a corresponding .cpp file
-#! - TXX_FILES A list of .txx files
+#! - TPP_FILES A list of .tpp files
 #! - RESOURCE_FILES A list of files (resources) which are embedded into the module
 #! - MOC_H_FILES A list of Qt header files which should be processed by the MOC
 #! - UI_FILES A list of .ui Qt UI files
@@ -236,7 +236,7 @@ function(mitk_create_module)
     set(RESOURCE_FILES )
     set(CPP_FILES )
     set(H_FILES )
-    set(TXX_FILES )
+    set(TPP_FILES )
     set(DOX_FILES )
     set(UI_FILES )
     set(MOC_H_FILES )
@@ -387,14 +387,14 @@ function(mitk_create_module)
     mitkFunctionOrganizeSources(
       SOURCE ${CPP_FILES}
       HEADER ${H_FILES}
-      TXX ${TXX_FILES}
+      TPP ${TPP_FILES}
       DOC ${DOX_FILES}
       UI ${UI_FILES}
       QRC ${QRC_FILES}
       )
 
     set(coverage_sources
-        ${CPP_FILES} ${H_FILES} ${MOC_H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}
+        ${CPP_FILES} ${H_FILES} ${MOC_H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TPP_FILES}
         ${TOOL_CPPS} ${TOOL_GUI_CPPS})
 
     # ---------------------------------------------------------------

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _itkConnectedAdaptiveThresholdImageFilter_txx
-#define _itkConnectedAdaptiveThresholdImageFilter_txx
+#ifndef _itkConnectedAdaptiveThresholdImageFilter_tpp
+#define _itkConnectedAdaptiveThresholdImageFilter_tpp
 
 #include "itkAdaptiveThresholdIterator.h"
 #include "itkBinaryThresholdImageFunction.h"

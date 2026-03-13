@@ -15,8 +15,8 @@ found in the LICENSE file.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef _itkLocalVariationImageFilter_txx
-#define _itkLocalVariationImageFilter_txx
+#ifndef _itkLocalVariationImageFilter_tpp
+#define _itkLocalVariationImageFilter_tpp
 #include "itkLocalVariationImageFilter.h"
 
 #include "itkConstShapedNeighborhoodIterator.h"
@@ -186,4 +186,4 @@ namespace itk
 
 } // end namespace itk
 
-#endif //_itkLocalVariationImageFilter_txx
+#endif //_itkLocalVariationImageFilter_tpp

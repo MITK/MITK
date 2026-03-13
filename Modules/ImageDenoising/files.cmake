@@ -3,10 +3,10 @@ set(CPP_FILES
 )
 set(H_FILES
   itkLocalVariationImageFilter.h
-  itkLocalVariationImageFilter.txx
+  itkLocalVariationImageFilter.tpp
   itkTotalVariationDenoisingImageFilter.h
-  itkTotalVariationDenoisingImageFilter.txx
+  itkTotalVariationDenoisingImageFilter.tpp
   itkTotalVariationSingleIterationImageFilter.h
-  itkTotalVariationSingleIterationImageFilter.txx
+  itkTotalVariationSingleIterationImageFilter.tpp
   mitkBilateralFilter.h
 )

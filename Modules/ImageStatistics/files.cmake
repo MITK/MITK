@@ -21,31 +21,11 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  mitkImageStatisticsCalculator.h
-  mitkImageStatisticsContainer.h
-  mitkPointSetDifferenceStatisticsCalculator.h
-  mitkPointSetStatisticsCalculator.h
   mitkStatisticsImageFilter.h
   mitkLabelStatisticsImageFilter.h
   mitkHotspotMaskGenerator.h
-  mitkMaskGenerator.h
-  mitkPlanarFigureMaskGenerator.h
-  mitkMultiLabelMaskGenerator.h
-  mitkImageMaskGenerator.h
-  mitkHistogramStatisticsCalculator.h
   mitkMaskUtilities.h
   mitkitkMaskImageFilter.h
-  mitkIgnorePixelMaskGenerator.h
   mitkMinMaxImageFilterWithIndex.h
   mitkMinMaxLabelmageFilterWithIndex.h
-  mitkImageStatisticsPredicateHelper.h
-  mitkImageStatisticsContainerNodeHelper.h
-  mitkImageStatisticsContainerManager.h
-  mitkStatisticsToImageRelationRule.h
-  mitkStatisticsToMaskRelationRule.h
-  mitkImageStatisticsConstants.h
-)
-
-set(TPP_FILES
-  mitkMaskUtilities.tpp
 )

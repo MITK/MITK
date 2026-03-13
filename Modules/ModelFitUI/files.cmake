@@ -18,8 +18,6 @@ set(CPP_FILES
 set(H_FILES
 )
 
-set(TPP_FILES
-)
 
 set(UI_FILES
   Qmitk/QmitkSimpleBarrierManagerWidget.ui

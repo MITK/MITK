@@ -5,8 +5,6 @@ set(CPP_FILES
 set(H_FILES
 )
 
-set(TPP_FILES
-)
 
 set(MOC_H_FILES
 )

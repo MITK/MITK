@@ -16,8 +16,6 @@ set(H_FILES
 
 )
 
-set(TPP_FILES
-)
 
 set(UI_FILES
   Qmitk/QmitkAlgorithmProfileViewer.ui

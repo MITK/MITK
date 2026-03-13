@@ -73,16 +73,3 @@ set(CPP_FILES
   TestingHelper/mitkTestModelFactory.cpp
 )
 
-set(TPP_FILES
-    include/itkMultiOutputNaryFunctorImageFilter.tpp
-    include/itkMaskedStatisticsImageFilter.hxx
-    include/itkMaskedNaryStatisticsImageFilter.hxx
-	include/mitkModelFitProviderBase.tpp
-)
-
-set(HXX_FILES
-)
-
-
-set(MOC_H_FILES
-)

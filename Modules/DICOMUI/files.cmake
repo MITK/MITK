@@ -1,9 +1,4 @@
 
-set(H_FILES
-  include/QmitkDicomImportWidget.h
-  include/QmitkDicomLocalStorageWidget.h
-)
-
 set(CPP_FILES
   QmitkDicomLocalStorageWidget.cpp
   QmitkDicomImportWidget.cpp

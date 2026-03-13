@@ -4,13 +4,5 @@ set(CPP_FILES
   mitkMAPRegistrationWrapperSerializer.cpp
 )
 
-set(H_FILES
-  mitkMAPRegistrationWrapperIO.h
-  mitkMAPRegistrationWrapperSerializer.h
-)
-
-set(TPP_FILES
-)
-
 set(MOC_H_FILES
 )

@@ -2,43 +2,29 @@ set(MOC_H_FILES
   src/internal/berryPluginActivator.h
 )
 
-set(SRC_CPP_FILES
-  berryIJobChangeListener.cpp
-  berryIJobManager.cpp
-  berryJob.cpp
-  berryJobExceptions.cpp
-  berryJobStatus.cpp
-  berryMultiRule.cpp
-  berryNullProgressMonitor.cpp
-  berryProgressProvider.cpp
-  berryQualifiedName.cpp
-)
-
-set(INTERNAL_CPP_FILES
-  berryInternalJob.cpp
-  berryJobChangeEvent.cpp
-  berryJobListeners.cpp
-  berryJobManager.cpp
-  berryJobQueue.cpp
-  berryPluginActivator.cpp
-  berryWorker.cpp
-  berryWorkerPool.cpp
+set(CPP_FILES
+  src/berryIJobChangeListener.cpp
+  src/berryIJobManager.cpp
+  src/berryJob.cpp
+  src/berryJobExceptions.cpp
+  src/berryJobStatus.cpp
+  src/berryMultiRule.cpp
+  src/berryNullProgressMonitor.cpp
+  src/berryProgressProvider.cpp
+  src/berryQualifiedName.cpp
+  src/internal/berryInternalJob.cpp
+  src/internal/berryJobChangeEvent.cpp
+  src/internal/berryJobListeners.cpp
+  src/internal/berryJobManager.cpp
+  src/internal/berryJobQueue.cpp
+  src/internal/berryPluginActivator.cpp
+  src/internal/berryWorker.cpp
+  src/internal/berryWorkerPool.cpp
 )
 
 set(H_FILES
- src/berryLockListener.h
- src/berryISchedulingRule.h
- src/berryIProgressMonitor.h
- src/berryISchedulingRule.h
- src/berryILock.h
- )
-
-set(CPP_FILES )
-
-foreach(file ${SRC_CPP_FILES})
-  set(CPP_FILES ${CPP_FILES} src/${file})
-endforeach(file ${SRC_CPP_FILES})
-
-foreach(file ${INTERNAL_CPP_FILES})
-  set(CPP_FILES ${CPP_FILES} src/internal/${file})
-endforeach(file ${INTERNAL_CPP_FILES})
+  src/berryILock.h
+  src/berryIProgressMonitor.h
+  src/berryISchedulingRule.h
+  src/berryLockListener.h
+)

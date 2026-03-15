@@ -32,4 +32,5 @@ The following items describe some issues about MITK on a more abstract level.
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
 -# \subpage PythonInMITKPage
+-# \subpage PackagingPage
 */

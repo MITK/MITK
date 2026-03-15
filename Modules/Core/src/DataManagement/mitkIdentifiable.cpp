@@ -58,7 +58,6 @@ mitk::Identifiable & mitk::Identifiable::operator =(Identifiable &&other) noexce
   delete m_Impl;
   m_Impl = other.m_Impl;
   other.m_Impl = nullptr;
-  m_Impl->m_RuntimeUID = std::move(other.m_Impl->m_RuntimeUID);
 
   return *this;
 }

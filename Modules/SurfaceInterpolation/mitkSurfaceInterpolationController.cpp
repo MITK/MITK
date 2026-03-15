@@ -159,6 +159,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::SurfaceInterpolationControll
   if (m_DataStorage.IsNotNull()) result = m_DataStorage->GetDerivations(segNode, isContourPlaneGeometry);
   return result;
 }
+
 mitk::DataStorage::SetOfObjects::ConstPointer
 mitk::SurfaceInterpolationController::GetPlaneGeometryNodeFromDataStorage(
     const mitk::MultiLabelSegmentation* seg) const

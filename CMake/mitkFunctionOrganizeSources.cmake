@@ -88,7 +88,7 @@ function(mitkFunctionOrganizeSources)
   endif()
 
   # Categorize auto-generated Qt files (from AUTOMOC/AUTOUIC/AUTORCC/CTK)
-  source_group("Qt/Generated Files/MOC" REGULAR_EXPRESSION "mocs_compilation_.*\\.cpp$")
+  source_group("Qt/Generated Files/MOC" REGULAR_EXPRESSION "(moc_|mocs_compilation_).*\\.cpp$")
   source_group("Qt/Generated Files/QRC" REGULAR_EXPRESSION "qrc_.*\\.cpp$")
   source_group("Qt/Generated Files/UI" REGULAR_EXPRESSION "ui_.*\\.h$")
   source_group("Qt/Generated Files/AUTOUIC" REGULAR_EXPRESSION "autouic_.*\\.stamp$")

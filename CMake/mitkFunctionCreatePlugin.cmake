@@ -193,6 +193,7 @@ function(mitk_create_plugin)
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
     NO_INSTALL # we install the plug-in ourselves
+    NO_SOURCE_GROUPS # we organize sources ourselves
     ${is_test_plugin}
   )
 

@@ -225,7 +225,7 @@ if(NOT _APP_NO_INSTALL)
 
   if(NOT _APP_NO_PROVISIONING)
     get_filename_component(_prov_file_name "${_prov_file}" NAME)
-    install(FILES "${_prov_file}.install" DESTINATION bin RENAME "${_prov_file_name}")
+    install(FILES "${_prov_file}.install" DESTINATION ${MITK_INSTALL_BINDIR} RENAME "${_prov_file_name}")
   endif()
 
   # Tell cpack the executables that you want in the start menu as links

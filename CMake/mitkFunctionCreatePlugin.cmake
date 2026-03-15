@@ -291,6 +291,8 @@ function(mitk_create_plugin)
 
     if(LINUX)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+    elseif(APPLE)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
     endif()
 
     foreach(install_subdir ${install_directories})

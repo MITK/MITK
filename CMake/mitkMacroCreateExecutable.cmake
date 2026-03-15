@@ -120,7 +120,7 @@ macro(mitk_create_executable)
     if(NOT EXEC_NO_INSTALL)
       install(TARGETS ${EXECUTABLE_TARGET}
         RUNTIME_DEPENDENCY_SET mitk_deps
-        RUNTIME DESTINATION bin)
+        RUNTIME DESTINATION ${MITK_INSTALL_BINDIR})
 
       if(CMDAPP_NAME)
         set(_source "RunInstalledCmdLineApp")

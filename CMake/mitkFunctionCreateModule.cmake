@@ -525,16 +525,18 @@ function(mitk_create_module)
         if(MODULE_AUTOLOAD_WITH)
           install(TARGETS ${MODULE_TARGET}
             RUNTIME_DEPENDENCY_SET mitk_deps
-            RUNTIME DESTINATION bin/${MODULE_AUTOLOAD_WITH}
-            LIBRARY DESTINATION bin/${MODULE_AUTOLOAD_WITH})
+            RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH}
+            LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH})
           if(LINUX)
             set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+          elseif(APPLE)
+            set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
           endif()
         else()
           install(TARGETS ${MODULE_TARGET}
             RUNTIME_DEPENDENCY_SET mitk_deps
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION bin)
+            RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
         endif()
       endif()
 

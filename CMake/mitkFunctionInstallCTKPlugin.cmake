@@ -46,6 +46,17 @@ function(mitkFunctionInstallCTKPlugin)
                                FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\"
                                NEW_RPATH \"\$ORIGIN/..\")")
           endif()
+        elseif(APPLE)
+          if(_target_filename_debug)
+            install(CODE "file(RPATH_SET
+                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\"
+                               NEW_RPATH \"@loader_path/..\")")
+          endif()
+          if(_target_filename_release)
+            install(CODE "file(RPATH_SET
+                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\"
+                               NEW_RPATH \"@loader_path/..\")")
+          endif()
         endif()
       else()
         install(TARGETS ${_install_target}

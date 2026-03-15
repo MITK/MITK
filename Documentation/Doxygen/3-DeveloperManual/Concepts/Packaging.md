@@ -34,8 +34,8 @@ Every installable target registers with this set:
 ```cmake
 install(TARGETS MyTarget
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin)
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
 ```
 
 At the end of configuration, a single call in `mitkInstallRules.cmake` resolves all collected targets:
@@ -43,14 +43,25 @@ At the end of configuration, a single call in `mitkInstallRules.cmake` resolves 
 ```cmake
 install(RUNTIME_DEPENDENCY_SET mitk_deps
   PRE_EXCLUDE_REGEXES ...   # Skip Windows system DLLs
-  POST_EXCLUDE_REGEXES ...  # Skip system libraries, Python, plugin dirs
+  POST_EXCLUDE_REGEXES ...  # Skip system libraries, Python, plugin dirs, Qt frameworks (macOS)
   DIRECTORIES ${_search_dirs}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin
-  FRAMEWORK DESTINATION bin)
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
+  FRAMEWORK DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR})
 ```
 
 This replaces the legacy approach of manually walking targets with `BundleUtilities` or hand-maintained install loops.
+
+### Install Destination Variables
+
+All install destinations use two variables defined in `CMakeLists.txt` after `MACOSX_BUNDLE_NAMES` is populated:
+
+| Variable | macOS (with bundles) | Windows / Linux |
+|---|---|---|
+| `MITK_INSTALL_BINDIR` | `<PrimaryBundle>.app/Contents/MacOS` | `bin` |
+| `MITK_INSTALL_FRAMEWORKSDIR` | `<PrimaryBundle>.app/Contents/Frameworks` | `bin` |
+
+On macOS, the primary bundle is the first entry in `MACOSX_BUNDLE_NAMES` (typically `MitkWorkbench`). This ensures all MITK modules, executables, CppMicroServices, and resolved transitive dependencies land inside the `.app` bundle rather than in a flat `bin/` directory outside it.
 
 ### Dependency Filtering
 
@@ -65,6 +76,8 @@ The single resolution call uses two layers of filtering:
 - `/usr/lib`, `/lib`, `/System` — Linux/macOS system libraries
 - `python3[0-9]+.` — Python shared library (installed separately)
 - `.*/plugins/.*` — Qt/CTK plugins (deployed by Qt deployment or CTK plugin install)
+- `.*Qt[A-Z].*\.framework.*` — Qt frameworks on macOS (deployed by `qt_generate_deploy_app_script()`)
+- `.*/Qt[A-Z].*\.dylib$` — Qt dylibs in non-framework form (same reason)
 
 ### Search Directories
 
@@ -94,13 +107,13 @@ include(mitkInstallRules)  # Must come last
 
 ### Modules (Shared Libraries)
 
-Created by `mitk_create_module()` in `mitkFunctionCreateModule.cmake`. Non-static, non-executable modules are installed to `bin/`:
+Created by `mitk_create_module()` in `mitkFunctionCreateModule.cmake`. Non-static, non-executable modules are installed to `${MITK_INSTALL_BINDIR}`:
 
 ```cmake
 install(TARGETS ${MODULE_TARGET}
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin)
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
 ```
 
 ### Autoload Modules
@@ -110,13 +123,13 @@ Modules that specify `AUTOLOAD_WITH <ParentModule>` are installed into a subdire
 ```cmake
 install(TARGETS ${MODULE_TARGET}
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin/${MODULE_AUTOLOAD_WITH}
-  LIBRARY DESTINATION bin/${MODULE_AUTOLOAD_WITH})
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH})
 ```
 
 At runtime, CppMicroServices automatically loads these modules when the parent module is loaded.
 
-On Linux, autoload modules get `INSTALL_RPATH "$ORIGIN/.."` so they can find libraries in the parent `bin/` directory.
+On Linux, autoload modules get `INSTALL_RPATH "$ORIGIN/.."` so they can find libraries in the parent `bin/` directory. On macOS, they get `INSTALL_RPATH "@loader_path/.."` for the same reason.
 
 ### Plugins (CTK/BlueBerry)
 
@@ -129,18 +142,18 @@ install(TARGETS ${_install_target}
   LIBRARY DESTINATION bin/plugins)
 ```
 
-Third-party (imported) CTK plugins are installed via `install(FILES ...)` since they are not CMake targets in the current project. On Linux, their RPATH is set post-install using `file(RPATH_SET)`.
+Third-party (imported) CTK plugins are installed via `install(FILES ...)` since they are not CMake targets in the current project. On Linux and macOS, their RPATH is set post-install using `file(RPATH_SET)`.
 
-Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux to resolve libraries in `bin/`.
+Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux and `INSTALL_RPATH "@loader_path/.."` on macOS to resolve libraries in the parent directory (`bin/` or `Contents/MacOS/`).
 
 ### Executables
 
-Created by `mitk_create_executable()` (in `mitkMacroCreateExecutable.cmake`), which wraps `mitk_create_module()` with the `EXECUTABLE` option. Executables are installed to `bin/` with a wrapper script:
+Created by `mitk_create_executable()` (in `mitkMacroCreateExecutable.cmake`), which wraps `mitk_create_module()` with the `EXECUTABLE` option. Executables are installed to `${MITK_INSTALL_BINDIR}` with a wrapper script (Linux/Windows only — macOS executables are inside the bundle):
 
 ```cmake
 install(TARGETS ${EXECUTABLE_TARGET}
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR})
 ```
 
 Command-line apps (created via `mitkFunctionCreateCommandLineApp()`) follow the same path but their wrapper scripts go into `apps/` instead of the install root.
@@ -157,8 +170,8 @@ Created by `mitkFunctionCreateBlueBerryApplication()`. These are Qt-based GUI ap
 ```cmake
 install(TARGETS ${_APP_NAME}
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin
-  BUNDLE DESTINATION .)
+  RUNTIME DESTINATION bin     # Windows/Linux
+  BUNDLE DESTINATION .)       # macOS .app bundle
 ```
 
 ### CppMicroServices
@@ -168,8 +181,8 @@ The CppMicroServices library is a special case. It is built via `usMacroCreateMo
 ```cmake
 install(TARGETS CppMicroServices
   RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
   PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
   PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
 ```
@@ -193,7 +206,7 @@ install(TARGETS mitk_python_bindings
   LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
 ```
 
-On macOS, the destination is `../Frameworks/Python.framework` (relative to the bundle's `Contents/` directory).
+On macOS, the destination is `${MITK_INSTALL_FRAMEWORKSDIR}/Python.framework` which resolves to `<Bundle>.app/Contents/Frameworks/Python.framework`.
 
 ## Qt Deployment
 
@@ -284,10 +297,13 @@ Set in the top-level `CMakeLists.txt` for all MITK targets:
 ```cmake
 if(LINUX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/plugins")
+elseif(APPLE)
+  set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/plugins;@loader_path/../Frameworks")
+  set(CMAKE_MACOSX_RPATH TRUE)
 endif()
 ```
 
-This means most installed binaries look for libraries in their own directory and in `plugins/` relative to their location.
+This means most installed binaries look for libraries in their own directory, in `plugins/` relative to their location, and on macOS additionally in `../Frameworks/` (for Qt frameworks in `Contents/Frameworks/`).
 
 ### SuperBuild RPATH (External Projects)
 
@@ -308,15 +324,13 @@ This ensures external project libraries can find each other within the SuperBuil
 
 ### Per-Target RPATH Overrides
 
-| Target type | RPATH (Linux) | Reason |
-|---|---|---|
-| Regular modules | `$ORIGIN;$ORIGIN/plugins` | Global default — find peers and plugins |
-| Autoload modules | `$ORIGIN/..` | Installed in `bin/<parent>/`, must find libs in `bin/` |
-| Plugins | `$ORIGIN/..` | Installed in `bin/plugins/`, must find libs in `bin/` |
-| Imported CTK plugins | `$ORIGIN/..` (via `file(RPATH_SET)`) | Same as plugins, but set post-install since they are imported targets |
-| Executables | `$ORIGIN;$ORIGIN/plugins` | Global default |
-
-On **macOS**, `@loader_path` is used instead of `$ORIGIN`.
+| Target type | RPATH (Linux) | RPATH (macOS) | Reason |
+|---|---|---|---|
+| Regular modules | `$ORIGIN;$ORIGIN/plugins` | `@loader_path;@loader_path/plugins;@loader_path/../Frameworks` | Global default — find peers, plugins, and Qt frameworks |
+| Autoload modules | `$ORIGIN/..` | `@loader_path/..` | Installed in `<parent>/` subdir, must find libs in parent dir |
+| Plugins | `$ORIGIN/..` | `@loader_path/..` | Installed in `plugins/`, must find libs in parent dir |
+| Imported CTK plugins | `$ORIGIN/..` (via `file(RPATH_SET)`) | `@loader_path/..` (via `file(RPATH_SET)`) | Same as plugins, but set post-install since they are imported targets |
+| Executables | `$ORIGIN;$ORIGIN/plugins` | `@loader_path;@loader_path/plugins;@loader_path/../Frameworks` | Global default |
 
 On **Windows**, RPATH does not apply. DLLs are found via the executable's directory and `PATH`.
 
@@ -562,7 +576,7 @@ START file:///path/to/plugin.so
 1. **Build-time** (`<AppName>.provisioning`): Uses absolute `file:///` URLs pointing to the build tree
 2. **Install-time** (`<AppName>.provisioning.install`): Uses `@EXECUTABLE_DIR` placeholders that resolve relative to the executable at runtime
 
-The install-time variant is installed to `bin/` and renamed to drop the `.install` suffix. For example:
+The install-time variant is installed to `${MITK_INSTALL_BINDIR}` and renamed to drop the `.install` suffix. For example:
 
 ```
 START file://@EXECUTABLE_DIR/plugins/liborg_mitk_gui_qt_common.so

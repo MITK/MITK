@@ -849,6 +849,16 @@ if(MITK_USE_BLUEBERRY AND APPLE)
 
 endif()
 
+# Compute install destinations: bundle-relative on macOS, flat bin/ otherwise
+if(APPLE AND MACOSX_BUNDLE_NAMES)
+  list(GET MACOSX_BUNDLE_NAMES 0 _primary_bundle)
+  set(MITK_INSTALL_BINDIR "${_primary_bundle}.app/Contents/MacOS" CACHE INTERNAL "")
+  set(MITK_INSTALL_FRAMEWORKSDIR "${_primary_bundle}.app/Contents/Frameworks" CACHE INTERNAL "")
+else()
+  set(MITK_INSTALL_BINDIR "bin" CACHE INTERNAL "")
+  set(MITK_INSTALL_FRAMEWORKSDIR "bin" CACHE INTERNAL "")
+endif()
+
 #-----------------------------------------------------------------------------
 # Set coverage Flags
 #-----------------------------------------------------------------------------
@@ -1157,6 +1167,9 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER
 
 if(LINUX)
   set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/plugins")
+elseif(APPLE)
+  set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/plugins;@loader_path/../Frameworks")
+  set(CMAKE_MACOSX_RPATH TRUE)
 endif()
 
 #-----------------------------------------------------------------------------

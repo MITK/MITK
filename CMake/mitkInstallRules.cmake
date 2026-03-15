@@ -12,8 +12,8 @@ endif()
 if(TARGET CppMicroServices)
   install(TARGETS CppMicroServices
     RUNTIME_DEPENDENCY_SET mitk_deps
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION bin
+    RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
     PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
     PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
 endif()
@@ -22,7 +22,7 @@ endif()
 
 if(MITK_USE_Python3)
   if(APPLE)
-    set(_python_dest "../Frameworks/Python.framework")
+    set(_python_dest "${MITK_INSTALL_FRAMEWORKSDIR}/Python.framework")
   else()
     set(_python_dest "python")
   endif()
@@ -45,7 +45,11 @@ endif()
 # — whether from mitk_create_module(), mitk_create_executable(),
 # mitkFunctionCreateBlueBerryApplication(), mitkFunctionInstallCTKPlugin(),
 # or this file — has been recorded. This single call resolves their transitive
-# shared library dependencies and installs them to bin/.
+# shared library dependencies and installs them.
+#
+# On macOS, Qt frameworks are excluded because qt_generate_deploy_app_script()
+# handles them separately (deploying to Contents/Frameworks/). Without this
+# exclusion, both mechanisms would deploy Qt, causing conflicts.
 #-----------------------------------------------------------------------------
 
 mitkFunctionGetLibrarySearchPaths(_search_dirs Release RELEASE)
@@ -66,10 +70,12 @@ install(RUNTIME_DEPENDENCY_SET mitk_deps
     "^/System"
     "python3[0-9]+[.]"
     ".*/plugins/.*"
+    ".*Qt[A-Z].*\\.framework.*"   # Qt frameworks — handled by qt_generate_deploy_app_script() on macOS
+    ".*/Qt[A-Z].*\\.dylib$"       # Qt dylibs (non-framework form) — same reason
   DIRECTORIES ${_search_dirs}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin
-  FRAMEWORK DESTINATION bin
+  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
+  FRAMEWORK DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}
 )
 
 #-----------------------------------------------------------------------------

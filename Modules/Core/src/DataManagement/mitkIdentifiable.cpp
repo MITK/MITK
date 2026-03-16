@@ -13,9 +13,12 @@ found in the LICENSE file.
 #include <mitkIdentifiable.h>
 #include <mitkUIDGenerator.h>
 
+#include <sstream>
+
 struct mitk::Identifiable::Impl
 {
   UIDType uid;
+  UIDType m_RuntimeUID;
 };
 
 mitk::Identifiable::Identifiable()
@@ -23,12 +26,20 @@ mitk::Identifiable::Identifiable()
 {
   UIDGenerator generator;
   m_Impl->uid = generator.GetUID();
+
+  std::ostringstream ss;
+  ss << static_cast<const void*>(this);
+  m_Impl->m_RuntimeUID = ss.str();
 }
 
 mitk::Identifiable::Identifiable(const UIDType &uid)
   : m_Impl(new Impl)
 {
   m_Impl->uid = uid;
+
+  std::ostringstream ss;
+  ss << static_cast<const void*>(this);
+  m_Impl->m_RuntimeUID = ss.str();
 }
 
 mitk::Identifiable::Identifiable(Identifiable &&other) noexcept
@@ -56,7 +67,12 @@ mitk::Identifiable::UIDType mitk::Identifiable::GetUID() const
   return m_Impl->uid;
 }
 
- void mitk::Identifiable::SetUID(const UIDType &uid)
+void mitk::Identifiable::SetUID(const UIDType &uid)
 {
   m_Impl->uid = uid;
+}
+
+mitk::Identifiable::UIDType mitk::Identifiable::GetRuntimeUID() const noexcept
+{
+  return m_Impl->m_RuntimeUID;
 }

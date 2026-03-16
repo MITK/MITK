@@ -189,6 +189,10 @@ private:
 
   bool m_SelectionChangeIsAlreadyBeingHandled;
 
+  /** Prevents premature destruction of the segmentation the observer guards below
+   *  are registered on. Managed exclusively by Add/RemoveObserversToWorkingImage(). */
+  mitk::MultiLabelSegmentation::Pointer m_ObservedSegmentation;
+
   mitk::ITKEventObserverGuard m_LabelAddedObserver;
   mitk::ITKEventObserverGuard m_LabelRemovedObserver;
   mitk::ITKEventObserverGuard m_GroupRemovedObserver;

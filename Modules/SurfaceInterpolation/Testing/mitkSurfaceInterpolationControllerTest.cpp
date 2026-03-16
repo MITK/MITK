@@ -15,8 +15,11 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include "mitkImageAccessByItk.h"
+#include <mitkDataNode.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkStandaloneDataStorage.h>
 
 #include <vtkDebugLeaks.h>
 #include <vtkDoubleArray.h>
@@ -32,6 +35,7 @@ class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveAllInterpolationSessions);
   MITK_TEST(TestRemoveInterpolationSession);
   MITK_TEST(TestOnSegmentationDeleted);
+  MITK_TEST(TestOnSegmentationDeletedAfterDataExchange);
   MITK_TEST(TestOnLabelRemoved);
 
   MITK_TEST(TestSetCurrentInterpolationSession4D);
@@ -250,6 +254,55 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",
                            m_Controller->GetNumberOfInterpolationSessions() == 0);
+  }
+
+  // Regression test for crash when segmentation data is replaced on its DataNode while
+  // the controller holds an active interpolation session for that segmentation.
+  // Scenario: node->SetData(newSeg) is called externally (e.g. via REST API), which drops
+  // the refcount of oldSeg to zero, firing its DeleteEvent. The controller must clean up
+  // the session and its plane geometry nodes without crashing.
+  void TestOnSegmentationDeletedAfterDataExchange()
+  {
+    auto dataStorage = mitk::StandaloneDataStorage::New();
+    m_Controller->SetDataStorage(dataStorage);
+
+    unsigned int dimensions[] = {10, 10, 10};
+    auto segmentation = createLabelSetImage(dimensions);
+    segmentation->AddLabel(mitk::Label::New(1, "Label1"), 0);
+
+    auto segNode = mitk::DataNode::New();
+    segNode->SetData(segmentation);
+    dataStorage->Add(segNode);
+
+    m_Controller->SetCurrentInterpolationSession(segmentation);
+
+    // Add a contour — this creates a plane geometry child node in DataStorage
+    mitk::SurfaceInterpolationController::CPIVector cpis = {
+      {CreateContour(3), CreatePlaneGeometry(1), 1, 0}
+    };
+    m_Controller->AddNewContours(cpis);
+
+    auto isContourPlaneGeometry = mitk::NodePredicateProperty::New(
+        "isContourPlaneGeometry", mitk::BoolProperty::New(true));
+    CPPUNIT_ASSERT_MESSAGE("Plane geometry node should have been created",
+                           dataStorage->GetSubset(isContourPlaneGeometry)->Size() == 1);
+
+    // Replace the data on the node — this is the crash scenario.
+    // The old segmentation's refcount will drop to zero when we reset our local pointer.
+    unsigned int dimensions2[] = {10, 10, 10};
+    auto newSegmentation = createLabelSetImage(dimensions2);
+    segNode->SetData(newSegmentation);
+
+    // Drop old segmentation: fires DeleteEvent — must not crash
+    segmentation = nullptr;
+
+    CPPUNIT_ASSERT_MESSAGE("Session should be removed after deletion",
+                           m_Controller->GetNumberOfInterpolationSessions() == 0);
+
+    CPPUNIT_ASSERT_MESSAGE("Plane geometry nodes should be cleaned up via RuntimeUID fallback",
+                           dataStorage->GetSubset(isContourPlaneGeometry)->Size() == 0);
+
+    m_Controller->SetDataStorage(nullptr);
   }
 
   void TestAddNewContours()

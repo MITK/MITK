@@ -299,6 +299,7 @@ mitk::MultiLabelSegmentation* QmitkSegmentationView::GetWorkingImage()
 void QmitkSegmentationView::AddObserversToWorkingImage()
 {
   auto* workingImage = this->GetWorkingImage();
+  m_ObservedSegmentation = workingImage;
 
   if (workingImage != nullptr)
   {
@@ -327,6 +328,8 @@ void QmitkSegmentationView::RemoveObserversFromWorkingImage()
   m_LabelAddedObserver.Reset();
   m_LabelRemovedObserver.Reset();
   m_GroupRemovedObserver.Reset();
+
+  m_ObservedSegmentation = nullptr;
 }
 
 void QmitkSegmentationView::OnVisibilityShortcutActivated()

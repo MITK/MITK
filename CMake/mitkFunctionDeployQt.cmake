@@ -21,7 +21,7 @@ function(mitkFunctionDeployQt _target)
     # For Windows/Linux, deploy Qt into bin/ with plugins in bin/plugins/
     set(_deploy_tool_options "")
     if(WIN32)
-      set(_deploy_tool_options "DEPLOY_TOOL_OPTIONS \"--no-opengl-sw\"")
+      set(_deploy_tool_options "DEPLOY_TOOL_OPTIONS \"--no-opengl-sw\" \"--include-plugins\" \"qsqlite\"")
       if(OPENSSL_INCLUDE_DIR)
         get_filename_component(_openssl_root "${OPENSSL_INCLUDE_DIR}" DIRECTORY)
         string(APPEND _deploy_tool_options " \"--openssl-root\" \"${_openssl_root}\"")

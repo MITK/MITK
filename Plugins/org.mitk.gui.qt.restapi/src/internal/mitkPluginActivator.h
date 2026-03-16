@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class IRestServerService;
+  struct IRestServerService;
   class RenderWindowBridge;
 
   class RestApiPluginActivator : public berry::AbstractUICTKPlugin

@@ -78,7 +78,7 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandlePOST_update(const httplib::Request& req, httplib::Response& res);
+    void HandlePOST_update(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle POST /rendering/reinit request.
@@ -101,15 +101,14 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandlePOST_reinit(const httplib::Request& req, httplib::Response& res);
+    void HandlePOST_reinit(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle GET /rendering/selected-position request.
      *
-     * Returns the current crosshair positiom and the world-space AABB
+     * Returns the current crosshair position and the world-space AABB
      * (i.e. the reinit geometry). If no input geometry is available,
      * bounds.min and bounds.max are null.
-     * If the requested position is out of bound the request will be ignored.
      *
      * Returns 503 if no render window bridge or position getter is connected.
      *
@@ -118,13 +117,13 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandleGET_selectedPosition(const httplib::Request& req, httplib::Response& res);
+    void HandleGET_selectedPosition(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle PUT /rendering/selected-position request.
      *
      * Moves the global application crosshair to the given 3D world position.
-     * If the requested position is out of bound the request will be ignored.
+     * No bounds checking is performed. Out of bounds values will be ignored.
      *
      * Required body: {"position": [x, y, z]} — exactly 3 numbers.
      *
@@ -134,21 +133,20 @@ namespace mitk
      * @param req The HTTP request (must contain a JSON body with "position").
      * @param res The HTTP response to populate.
      */
-    void HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res);
+    void HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle GET /rendering/selected-time request.
      *
      * Returns the current time step and time point from the global
      * TimeNavigationController, together with the time geometry bounds.
-     * If the requested position is out of bound the request will be ignored.
      *
      * Response 200: {"timepoint_ms": ..., "timestep": ..., "bounds": {...}}
      *
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res);
+    void HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle PUT /rendering/selected-time request.
@@ -156,14 +154,14 @@ namespace mitk
      * Sets the active time step or time point in the global TimeNavigationController.
      * Exactly one of "timepoint_ms" (number) or "timestep" (non-negative integer)
      * must be present in the body.
-     * If the requested position is out of bound the request will be ignored.
+     * No bounds checking is performed. Out of bounds values will be ignored.
      *
      * Response 204 on success.
      *
      * @param req The HTTP request (must contain a JSON body with exactly one of the fields).
      * @param res The HTTP response to populate.
      */
-    void HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res);
+    void HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle GET /rendering/screenshot request.
@@ -181,7 +179,7 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandleGET_screenshot(const httplib::Request& req, httplib::Response& res);
+    void HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const;
 
   private:
     /**
@@ -191,7 +189,7 @@ namespace mitk
      */
     void Dispatch(std::function<void()> task) const;
 
-    void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error);
+    void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const;
 
     DataStorageBridge& m_Bridge;
     RenderWindowBridge* m_RenderWindowBridge = nullptr;

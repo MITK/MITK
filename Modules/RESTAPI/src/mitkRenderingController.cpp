@@ -19,8 +19,6 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
-#include <algorithm>
-#include <limits>
 #include <optional>
 #include <vector>
 
@@ -42,7 +40,7 @@ void RenderingController::SetRenderWindowBridge(RenderWindowBridge* bridge)
   m_RenderWindowBridge = bridge;
 }
 
-void RenderingController::HandlePOST_update(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandlePOST_update(const httplib::Request& req, httplib::Response& res) const
 {
   auto type = RenderingManager::REQUEST_UPDATE_ALL;
 
@@ -104,7 +102,7 @@ void RenderingController::HandlePOST_update(const httplib::Request& req, httplib
   }
 }
 
-void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib::Response& res) const
 {
   if (!m_Bridge.HasDataStorage())
   {
@@ -255,7 +253,7 @@ void RenderingController::HandlePOST_reinit(const httplib::Request& req, httplib
   }
 }
 
-void RenderingController::HandleGET_selectedPosition(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandleGET_selectedPosition(const httplib::Request& req, httplib::Response& res) const
 {
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasPositionGetter())
   {
@@ -297,7 +295,7 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
   res.set_content(response.dump(), "application/json");
 }
 
-void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const
 {
   if (req.body.empty())
   {
@@ -370,7 +368,7 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
   }
 }
 
-void RenderingController::HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const
 {
   int timestep = 0;
   double timepointMs = 0.0;
@@ -378,13 +376,15 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
   double maxTimepointMs = 0.0;
   int steps = 0;
 
+  bool tncNull = false;
   try
   {
-    this->Dispatch([&timestep, &timepointMs, &minTimepointMs, &maxTimepointMs, &steps]()
+    this->Dispatch([&timestep, &timepointMs, &minTimepointMs, &maxTimepointMs, &steps, &tncNull]()
     {
       auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
       if (tnc == nullptr)
       {
+        tncNull = true;
         return;
       }
 
@@ -423,6 +423,13 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
     return;
   }
 
+  if (tncNull)
+  {
+    const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
   nlohmann::json response;
   response["timepoint_ms"] = timepointMs;
   response["timestep"] = timestep;
@@ -434,7 +441,7 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
   res.set_content(response.dump(), "application/json");
 }
 
-void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const
 {
   if (req.body.empty())
   {
@@ -503,25 +510,55 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
     if (hasTimestep)
     {
       const auto ts = static_cast<unsigned int>(body["timestep"].get<int>());
-      this->Dispatch([ts]()
+      bool tncNull = false;
+      bool stepperNull = false;
+      this->Dispatch([ts, &tncNull, &stepperNull]()
       {
         auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
         if (tnc == nullptr)
         {
+          tncNull = true;
           return;
         }
-        tnc->GetStepper()->SetPos(ts);
+        auto* const stepper = tnc->GetStepper();
+        if (stepper == nullptr)
+        {
+          stepperNull = true;
+          return;
+        }
+        stepper->SetPos(ts);
         tnc->SendTime();
       });
+      if (tncNull)
+      {
+        const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      if (stepperNull)
+      {
+        const auto error = ErrorResponse::InternalError("Time stepper is not available.", req.path);
+        this->SendErrorResponse(res, 500, error);
+        return;
+      }
     }
     else
     {
       const double tp = body["timepoint_ms"].get<double>();
-      this->Dispatch([tp]()
+      bool tncNull = false;
+      bool stepperNull = false;
+      this->Dispatch([tp, &tncNull, &stepperNull]()
       {
         auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
         if (tnc == nullptr)
         {
+          tncNull = true;
+          return;
+        }
+        auto* const stepper = tnc->GetStepper();
+        if (stepper == nullptr)
+        {
+          stepperNull = true;
           return;
         }
         const auto tg = tnc->GetInputWorldTimeGeometry();
@@ -530,9 +567,21 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
         {
           ts = static_cast<unsigned int>(tg->TimePointToTimeStep(tp));
         }
-        tnc->GetStepper()->SetPos(ts);
+        stepper->SetPos(ts);
         tnc->SendTime();
       });
+      if (tncNull)
+      {
+        const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      if (stepperNull)
+      {
+        const auto error = ErrorResponse::InternalError("Time stepper is not available.", req.path);
+        this->SendErrorResponse(res, 500, error);
+        return;
+      }
     }
     res.status = 204;
   }
@@ -550,7 +599,7 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
   }
 }
 
-void RenderingController::HandleGET_screenshot(const httplib::Request& req, httplib::Response& res)
+void RenderingController::HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const
 {
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasScreenshotProvider())
   {
@@ -655,7 +704,7 @@ void RenderingController::Dispatch(std::function<void()> task) const
   }
 }
 
-void RenderingController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error)
+void RenderingController::SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const
 {
   res.status = status;
   res.set_content(error.dump(), "application/json");

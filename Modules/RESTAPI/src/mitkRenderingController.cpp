@@ -264,12 +264,11 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
     return;
   }
 
-  // Read position via the bridge (dispatches to UI thread internally).
-  Point3D pos;
-  pos.Fill(0.0);
+  // Read position and bounds atomically via the bridge (single UI-thread dispatch).
+  SelectedPositionInfo posInfo;
   try
   {
-    pos = m_RenderWindowBridge->GetSelectedPosition();
+    posInfo = m_RenderWindowBridge->GetSelectedPosition();
   }
   catch (const std::exception& e)
   {
@@ -279,60 +278,14 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
     return;
   }
 
-  // Read bounds from the TimeNavigationController's input world time geometry
-  // (i.e. the geometry established by reinit). Dispatched separately.
-  bool hasBounds = false;
-  double worldMin[3] = {0.0, 0.0, 0.0};
-  double worldMax[3] = {0.0, 0.0, 0.0};
-
-  try
-  {
-    this->Dispatch([&hasBounds, &worldMin, &worldMax]()
-    {
-      auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
-      if (tnc == nullptr)
-        return;
-
-      const auto tg = tnc->GetInputWorldTimeGeometry();
-      if (tg == nullptr)
-        return;
-
-      const auto baseGeom = tg->GetGeometryForTimeStep(tnc->GetSelectedTimeStep());
-      if (baseGeom.IsNull())
-        return;
-
-      for (int i = 0; i < 3; ++i)
-      {
-        worldMin[i] = std::numeric_limits<double>::max();
-        worldMax[i] = std::numeric_limits<double>::lowest();
-      }
-      for (int cornerId = 0; cornerId < 8; ++cornerId)
-      {
-        const auto corner = baseGeom->GetCornerPoint(cornerId);
-        for (int i = 0; i < 3; ++i)
-        {
-          worldMin[i] = std::min(worldMin[i], corner[i]);
-          worldMax[i] = std::max(worldMax[i], corner[i]);
-        }
-      }
-      hasBounds = true;
-    });
-  }
-  catch (const std::exception& e)
-  {
-    const auto error = ErrorResponse::InternalError(
-      std::string("Failed to read scene bounds: ") + e.what(), req.path);
-    this->SendErrorResponse(res, 500, error);
-    return;
-  }
-
   nlohmann::json response;
-  response["position"] = {pos[0], pos[1], pos[2]};
+  response["position"] = {posInfo.position[0], posInfo.position[1], posInfo.position[2]};
 
-  if (hasBounds)
+  if (posInfo.bounds.has_value())
   {
-    response["bounds"]["min"] = {worldMin[0], worldMin[1], worldMin[2]};
-    response["bounds"]["max"] = {worldMax[0], worldMax[1], worldMax[2]};
+    const auto& b = posInfo.bounds.value();
+    response["bounds"]["min"] = {b.min[0], b.min[1], b.min[2]};
+    response["bounds"]["max"] = {b.max[0], b.max[1], b.max[2]};
   }
   else
   {

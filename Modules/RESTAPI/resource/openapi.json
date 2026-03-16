@@ -1527,7 +1527,7 @@
         }
       }
     },
-    "/datastorage/nodes/{uid}/properties/{property_name}": {
+    "/datastorage/nodes/{uid}/properties/{property_key}": {
       "get": {
         "tags": [
           "Properties"
@@ -2750,7 +2750,7 @@
         "example": "node_1"
       },
       "PropertyKey": {
-        "name": "property_name",
+        "name": "property_key",
         "in": "path",
         "required": true,
         "description": "Property key name",

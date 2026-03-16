@@ -48,9 +48,9 @@ namespace mitk
    *
    * Property endpoints (on nodes):
    * - GET    /nodes/:uid/properties        -> HandleGET_nodes_uid_properties()
-   * - GET    /nodes/:uid/properties/:key   -> HandleGET_nodes_uid_properties_key()
-   * - PUT    /nodes/:uid/properties/:key   -> HandlePUT_nodes_uid_properties_key()
-   * - DELETE /nodes/:uid/properties/:key   -> HandleDELETE_nodes_uid_properties_key()
+   * - GET    /nodes/:uid/properties/:property_key   -> HandleGET_nodes_uid_properties_key()
+   * - PUT    /nodes/:uid/properties/:property_key   -> HandlePUT_nodes_uid_properties_key()
+   * - DELETE /nodes/:uid/properties/:property_key   -> HandleDELETE_nodes_uid_properties_key()
    * - PATCH  /nodes/:uid/properties        -> HandlePATCH_nodes_uid_properties()
    */
   class MITKRESTAPI_EXPORT DataStorageController
@@ -175,21 +175,21 @@ namespace mitk
     void HandleGET_nodes_uid_properties(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid/properties/:key request.
+     * @brief Handle GET /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Gets a single property value.
      */
     void HandleGET_nodes_uid_properties_key(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PUT /datastorage/nodes/:uid/properties/:key request.
+     * @brief Handle PUT /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Sets a single property value.
      */
     void HandlePUT_nodes_uid_properties_key(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle DELETE /datastorage/nodes/:uid/properties/:key request.
+     * @brief Handle DELETE /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Deletes a property.
      */

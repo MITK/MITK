@@ -1414,7 +1414,7 @@ Content-Type: application/json
 
 ---
 
-##### GET /api/v1/datastorage/nodes/{uid}/properties/{property_name}
+##### GET /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
 Get a single property value.
 
@@ -1473,7 +1473,7 @@ Get a single property value.
 
 ---
 
-##### PUT /api/v1/datastorage/nodes/{uid}/properties/{property_name}
+##### PUT /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
 Set a single property value (create or replace).
 
@@ -1529,7 +1529,7 @@ Content-Type: application/json
 
 ---
 
-##### DELETE /api/v1/datastorage/nodes/{uid}/properties/{property_name}
+##### DELETE /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
 Remove a property from a node.
 

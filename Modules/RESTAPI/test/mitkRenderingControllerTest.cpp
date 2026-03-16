@@ -380,7 +380,14 @@ public:
   {
     mitk::Point3D expectedPos;
     expectedPos[0] = 1.0; expectedPos[1] = 2.0; expectedPos[2] = 3.0;
-    m_RenderWindowBridge->SetPositionGetter([expectedPos]() { return expectedPos; });
+    m_RenderWindowBridge->SetPositionGetter(
+      [expectedPos]() -> mitk::SelectedPositionInfo
+      {
+        mitk::SelectedPositionInfo info;
+        info.position = expectedPos;
+        // bounds defaults to std::nullopt; no geometry available in headless test.
+        return info;
+      });
 
     const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
     httplib::Response res;

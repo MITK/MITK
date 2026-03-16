@@ -28,7 +28,7 @@ namespace
   {
     std::exception_ptr error;
 
-    auto task = [&callable, &error]()
+    auto task = [callable, &error]()
     {
       try
       {
@@ -127,7 +127,7 @@ std::vector<unsigned char> RenderWindowBridge::TakeScreenshot(
   return result;
 }
 
-Point3D RenderWindowBridge::GetSelectedPosition() const
+SelectedPositionInfo RenderWindowBridge::GetSelectedPosition() const
 {
   PositionGetter getter;
   StorageThreadDispatcherBase::Pointer dispatcher;
@@ -140,8 +140,8 @@ Point3D RenderWindowBridge::GetSelectedPosition() const
   if (!getter)
     throw std::runtime_error("No position getter is connected to the RenderWindowBridge");
 
-  Point3D result;
-  result.Fill(0.0);
+  SelectedPositionInfo result;
+  result.position.Fill(0.0);
   Dispatch(dispatcher, [&]() { result = getter(); });
   return result;
 }

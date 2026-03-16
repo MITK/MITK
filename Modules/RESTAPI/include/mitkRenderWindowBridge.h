@@ -35,6 +35,24 @@ namespace mitk
     Jpeg
   };
 
+  /** Axis-aligned world bounding box. */
+  struct WorldBounds
+  {
+    Point3D min;
+    Point3D max;
+  };
+
+  /**
+   * @brief Position and world-bounds snapshot read atomically on the UI thread. */
+  struct SelectedPositionInfo
+  {
+    /** Current crosshair position in world coordinates. */
+    Point3D position;
+
+    /** World bounding box, if available at read time. */
+    std::optional<WorldBounds> bounds;
+  };
+
   /**
    * @brief Bridge between the REST API server and the Qt/render-window layer.
    *
@@ -70,16 +88,19 @@ namespace mitk
         ScreenshotFormat format)>;
 
     /**
-     * @brief Callback type for reading the current global crosshair position.
+     * @brief Callback type for reading the current global crosshair position and scene bounds.
+     *
+     * Both pieces of data are read atomically within one callback invocation so
+     * that position and bounds always correspond to the same UI-thread snapshot.
      *
      * @pre Must be called on the UI thread.
      * @pre Must not re-enter RenderWindowBridge methods.
      * @note Exceptions thrown by the callback are caught by the bridge and
      *       transported to the REST thread — they never reach the UI event loop.
-     * @return Current position in world coordinates.
+     * @return SelectedPositionInfo containing position and optional bounds.
      * @throws std::exception on failure.
      */
-    using PositionGetter = std::function<Point3D()>;
+    using PositionGetter = std::function<SelectedPositionInfo()>;
 
     /**
      * @brief Callback type for setting the global crosshair position.
@@ -162,7 +183,7 @@ namespace mitk
       ScreenshotFormat format) const;
 
     /**
-     * @brief Read the current global crosshair position.
+     * @brief Read the current global crosshair position and scene bounds atomically.
      *
      * Dispatches to the UI thread if a dispatcher is set.
      *
@@ -170,7 +191,7 @@ namespace mitk
      * @throws std::runtime_error if no getter is set.
      * @throws Any exception thrown by the getter.
      */
-    Point3D GetSelectedPosition() const;
+    SelectedPositionInfo GetSelectedPosition() const;
 
     /**
      * @brief Move the crosshair to the given world position.

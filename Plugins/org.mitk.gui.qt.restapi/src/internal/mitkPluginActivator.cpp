@@ -16,6 +16,11 @@ found in the LICENSE file.
 
 #include <mitkIRestServerService.h>
 #include <mitkRenderWindowBridge.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
+
+#include <algorithm>
+#include <limits>
 
 #include <usModuleRegistry.h>
 #include <usModule.h>
@@ -103,12 +108,42 @@ namespace
       });
 
     rwb->SetPositionGetter(
-      []() -> mitk::Point3D
+      []() -> mitk::SelectedPositionInfo
       {
         auto* const rwp = GetStdMultiWidgetRenderWindowPart();
         if (rwp == nullptr)
           throw std::runtime_error("StdMultiWidgetEditor is not open — cannot read crosshair position");
-        return rwp->GetSelectedPosition();
+
+        mitk::SelectedPositionInfo info;
+        info.position = rwp->GetSelectedPosition();
+
+        auto* const tnc = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+        if (tnc != nullptr)
+        {
+          const auto tg = tnc->GetInputWorldTimeGeometry();
+          if (tg != nullptr)
+          {
+            const auto baseGeom = tg->GetGeometryForTimeStep(tnc->GetSelectedTimeStep());
+            if (baseGeom.IsNotNull())
+            {
+              mitk::WorldBounds bounds;
+              bounds.min.Fill(std::numeric_limits<double>::max());
+              bounds.max.Fill(std::numeric_limits<double>::lowest());
+              for (int cornerId = 0; cornerId < 8; ++cornerId)
+              {
+                const auto corner = baseGeom->GetCornerPoint(cornerId);
+                for (int i = 0; i < 3; ++i)
+                {
+                  bounds.min[i] = std::min(bounds.min[i], corner[i]);
+                  bounds.max[i] = std::max(bounds.max[i], corner[i]);
+                }
+              }
+              info.bounds = bounds;
+            }
+          }
+        }
+
+        return info;
       });
 
     rwb->SetPositionSetter(

@@ -864,19 +864,19 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Get(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandleGET_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Put(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Put(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandlePUT_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
     });
 
-  m_Server->Delete(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Delete(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandleDELETE_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "DELETE", res.status, req.remote_addr);

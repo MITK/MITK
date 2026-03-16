@@ -257,15 +257,15 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_Controller->HandlePATCH_nodes_uid_properties(req, res);
       };
-    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "get"}] =
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{property_key}", "get"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_Controller->HandleGET_nodes_uid_properties_key(req, res);
       };
-    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "put"}] =
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{property_key}", "put"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
       };
-    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{key}", "delete"}] =
+    m_EndpointRegistry[{"/datastorage/nodes/{uid}/properties/{property_key}", "delete"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
       };
@@ -1143,7 +1143,7 @@ public:
     const std::string uid = this->CreateTestNode("PropNotFoundNode");
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/nonexistent", "",
-      {{"uid", uid}, {"key", "nonexistent"}});
+      {{"uid", uid}, {"property_key", "nonexistent"}});
     httplib::Response res;
     m_Controller->HandleGET_nodes_uid_properties_key(req, res);
 

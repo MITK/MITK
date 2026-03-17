@@ -35,7 +35,6 @@ function(mitkFunctionDeployQt _target)
       TARGET ${_target}
       OUTPUT_SCRIPT _deploy_script
       NO_TRANSLATIONS
-      NO_APP_STORE_COMPLIANCE
       EXCLUDE_PLUGIN_TYPES ${_exclude_plugin_types}
       EXCLUDE_PLUGINS ${_exclude_plugins}
       INCLUDE_PLUGINS ${_include_plugins}

@@ -301,7 +301,7 @@ mitkFunctionFindWhitelists(MITK)
 option(MITK_USE_Qt6 "Use Qt 6 library" ON)
 
 if(MITK_USE_Qt6)
-  set(MITK_QT6_MINIMUM_VERSION 6.7)
+  set(MITK_QT6_MINIMUM_VERSION 6.10)
   set(MITK_QT6_COMPONENTS
     Concurrent
     Core

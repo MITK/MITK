@@ -70,13 +70,13 @@ We highly recommend installing Qt to the <b>default location</b>, so CMake can f
 In the Qt installer, make sure to select the following <b>additional libraries</b>:
 
   - Qt 5 Compatibility Module
+  - Qt Positioning
   - Qt State Machines
-  - Qt WebEngine (see note below)
-  - Qt WebChannel (Qt 6.8 and later)
-  - Qt Positioning (Qt 6.8 and later)
+  - Qt WebChannel
 
-Note: Starting with Qt 6.8, Qt WebEngine is no longer listed under "Additional Libraries".
-It is now located under "Extensions > Qt WebEngine".
+You also need the following <b>extension</b>:
+
+  - Qt WebEngine
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake
 

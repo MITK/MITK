@@ -7,6 +7,26 @@
 # transitive Qt dependencies from MITK DLLs already present in bin/.
 #
 function(mitkFunctionDeployQt _target)
+  set(_exclude_plugin_types
+    generic
+    networkinformation
+    position
+    qmltooling
+    tls
+  )
+
+  set(_exclude_plugins
+    qsqlibase
+    qsqlmimer
+    qsqloci
+    qsqlodbc
+    qsqlpsql
+  )
+
+  set(_include_plugins
+    qsqlite
+  )
+
   get_target_property(_is_bundle ${_target} MACOSX_BUNDLE)
 
   if(APPLE AND _is_bundle)
@@ -15,16 +35,20 @@ function(mitkFunctionDeployQt _target)
       TARGET ${_target}
       OUTPUT_SCRIPT _deploy_script
       NO_TRANSLATIONS
-      NO_COMPILER_RUNTIME
+      NO_APP_STORE_COMPLIANCE
+      EXCLUDE_PLUGIN_TYPES ${_exclude_plugin_types}
+      EXCLUDE_PLUGINS ${_exclude_plugins}
+      INCLUDE_PLUGINS ${_include_plugins}
     )
   else()
     # For Windows/Linux, deploy Qt into bin/ with plugins in bin/plugins/
-    set(_deploy_tool_options "")
+    set(_win_deploy_tool_options "")
+
     if(WIN32)
-      set(_deploy_tool_options "DEPLOY_TOOL_OPTIONS \"--no-opengl-sw\" \"--include-plugins\" \"qsqlite\"")
+      set(_win_deploy_tool_options "DEPLOY_TOOL_OPTIONS --no-opengl-sw")
       if(OPENSSL_INCLUDE_DIR)
         get_filename_component(_openssl_root "${OPENSSL_INCLUDE_DIR}" DIRECTORY)
-        string(APPEND _deploy_tool_options " \"--openssl-root\" \"${_openssl_root}\"")
+        string(APPEND _win_deploy_tool_options " --openssl-root \"${_openssl_root}\"")
       endif()
     endif()
 
@@ -44,6 +68,10 @@ set(QT_DEPLOY_DATA_DIR \"bin\")
 ")
     endif()
 
+    list(JOIN _exclude_plugin_types " " _exclude_plugin_types)
+    list(JOIN _exclude_plugins " " _exclude_plugins)
+    list(JOIN _include_plugins " " _include_plugins)
+
     qt_generate_deploy_script(
       TARGET ${_target}
       OUTPUT_SCRIPT _deploy_script
@@ -57,7 +85,10 @@ qt_deploy_runtime_dependencies(
   QML_DIR \"bin/qml\"
   NO_TRANSLATIONS
   NO_COMPILER_RUNTIME
-  ${_deploy_tool_options}
+  EXCLUDE_PLUGIN_TYPES ${_exclude_plugin_types}
+  EXCLUDE_PLUGINS ${_exclude_plugins}
+  INCLUDE_PLUGINS ${_include_plugins}
+  ${_win_deploy_tool_options}
 )
 "
     )

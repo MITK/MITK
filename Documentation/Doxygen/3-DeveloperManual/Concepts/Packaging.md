@@ -9,7 +9,7 @@ The system is built around a single **runtime dependency set** (`mitk_deps`) tha
 
 The high-level flow is:
 
-1. Each target creation site (`mitk_create_module()`, `mitk_create_executable()`, `mitkFunctionCreateBlueBerryApplication()`, `mitkFunctionInstallCTKPlugin()`) registers its target in the `mitk_deps` dependency set via `install(TARGETS ... RUNTIME_DEPENDENCY_SET mitk_deps)`.
+1. Each target creation site (`mitk_create_module()`, `mitk_create_executable()`, `mitkFunctionInstallCTKPlugin()`) registers its target in the `mitk_deps` dependency set via `install(TARGETS ... RUNTIME_DEPENDENCY_SET mitk_deps)`. BlueBerry applications are an exception — they are not registered with the dependency set because CMake only allows one bundle executable per set and MITK can build multiple BlueBerry apps. Their transitive dependencies are already covered by the modules they link to.
 2. At the end of the top-level `CMakeLists.txt`, `mitkInstallRules.cmake` is included. It installs special-case targets (CppMicroServices, Python), resolves all transitive dependencies, and deploys Qt.
 3. CPack picks up the resulting install tree and produces platform-specific packages.
 
@@ -171,10 +171,11 @@ Created by `mitkFunctionCreateBlueBerryApplication()`. These are Qt-based GUI ap
 
 ```cmake
 install(TARGETS ${_APP_NAME}
-  RUNTIME_DEPENDENCY_SET mitk_deps
   RUNTIME DESTINATION bin     # Windows/Linux
   BUNDLE DESTINATION .)       # macOS .app bundle
 ```
+
+BlueBerry applications are **not** registered with `RUNTIME_DEPENDENCY_SET` because CMake only permits one bundle executable per dependency set, and MITK can build multiple BlueBerry apps (e.g. MitkWorkbench and MitkFlowBench). This is safe because the apps only link to MITK modules that are themselves registered with the dependency set — their transitive dependencies are fully covered.
 
 ### CppMicroServices
 

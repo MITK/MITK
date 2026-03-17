@@ -212,8 +212,12 @@ if(NOT _APP_NO_INSTALL)
 
   # Install executable and wrapper scripts. Qt deployment stays in
   # mitkInstallRules.cmake (must run after dependency resolution).
+  # The app is NOT registered with RUNTIME_DEPENDENCY_SET because CMake
+  # only allows one bundle executable per set and MITK can have multiple
+  # BlueBerry apps (e.g. Workbench + FlowBench). The app's transitive
+  # dependencies are already covered by the modules it links to, which
+  # are all registered with the dependency set.
   install(TARGETS ${_APP_NAME}
-    RUNTIME_DEPENDENCY_SET mitk_deps
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION .)
 

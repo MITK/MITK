@@ -47,15 +47,22 @@ function(mitkFunctionInstallCTKPlugin)
                                NEW_RPATH \"\$ORIGIN/..\")")
           endif()
         elseif(APPLE)
+          # file(RPATH_SET) only supports ELF/XCOFF, not Mach-O.
+          # Use install_name_tool to add the install RPATH instead.
+          # Stale build-tree RPATHs are harmless (dead references).
           if(_target_filename_debug)
-            install(CODE "file(RPATH_SET
-                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\"
-                               NEW_RPATH \"@loader_path/..\")")
+            install(CODE "
+              set(_file \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")
+              if(EXISTS \"\${_file}\")
+                execute_process(COMMAND install_name_tool -add_rpath \"@loader_path/..\" \"\${_file}\" ERROR_QUIET)
+              endif()")
           endif()
           if(_target_filename_release)
-            install(CODE "file(RPATH_SET
-                               FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\"
-                               NEW_RPATH \"@loader_path/..\")")
+            install(CODE "
+              set(_file \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\")
+              if(EXISTS \"\${_file}\")
+                execute_process(COMMAND install_name_tool -add_rpath \"@loader_path/..\" \"\${_file}\" ERROR_QUIET)
+              endif()")
           endif()
         endif()
       else()

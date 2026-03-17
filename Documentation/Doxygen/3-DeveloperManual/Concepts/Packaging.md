@@ -5,11 +5,11 @@
 ## Overview
 
 MITK uses CMake's native install and packaging infrastructure to produce redistributable packages on Windows, Linux, and macOS.
-The system is built around a single **runtime dependency set** (`mitk_deps`) that collects all targets during configuration and resolves their transitive shared-library dependencies in one pass at install time.
+The system is built around **runtime dependency sets** that collect all targets during configuration and resolve their transitive shared-library dependencies at install time. On Windows and Linux, a single set (`mitk_deps`) is used. On macOS, each app bundle gets its own set (e.g. `mitk_deps_MitkWorkbench`, `mitk_deps_MitkFlowBench`) so that dependency resolution is fully independent per bundle.
 
 The high-level flow is:
 
-1. Each target creation site (`mitk_create_module()`, `mitk_create_executable()`, `mitkFunctionInstallCTKPlugin()`) registers its target in the `mitk_deps` dependency set via `install(TARGETS ... RUNTIME_DEPENDENCY_SET mitk_deps)`. BlueBerry applications are an exception — they are not registered with the dependency set because CMake only allows one bundle executable per set and MITK can build multiple BlueBerry apps. Their transitive dependencies are already covered by the modules they link to.
+1. Each target creation site (`mitk_create_module()`, `mitk_create_executable()`, `mitkFunctionInstallCTKPlugin()`) registers its target with all dependency sets and installs into all bundle directories. BlueBerry applications are not registered with the dependency sets because their transitive dependencies are already covered by the modules they link to.
 2. At the end of the top-level `CMakeLists.txt`, `mitkInstallRules.cmake` is included. It installs special-case targets (CppMicroServices, Python), resolves all transitive dependencies, and deploys Qt.
 3. CPack picks up the resulting install tree and produces platform-specific packages.
 
@@ -27,43 +27,50 @@ External projects are built and installed into the SuperBuild prefix. The MITK b
 
 ### The RUNTIME_DEPENDENCY_SET Approach
 
-CMake 3.21+ provides `install(RUNTIME_DEPENDENCY_SET)`, which collects targets and resolves their transitive shared-library dependencies at install time. MITK uses a single dependency set named `mitk_deps`.
+CMake 3.21+ provides `install(RUNTIME_DEPENDENCY_SET)`, which collects targets and resolves their transitive shared-library dependencies at install time.
 
-Every installable target registers with this set:
+The dependency set names are stored in the `MITK_RUNTIME_DEPENDENCY_SETS` list variable. On Windows/Linux this contains a single entry (`mitk_deps`). On macOS, there is one entry per bundle (e.g. `mitk_deps_MitkWorkbench`, `mitk_deps_MitkFlowBench`). This list is parallel to `MITK_INSTALL_BINDIR` and `MITK_INSTALL_FRAMEWORKSDIR` — all three have matching indices.
 
-```cmake
-install(TARGETS MyTarget
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
-```
-
-At the end of configuration, a single call in `mitkInstallRules.cmake` resolves all collected targets:
+Every installable target registers with all dependency sets and installs into all bundle directories using `foreach(... IN ZIP_LISTS ...)`:
 
 ```cmake
-install(RUNTIME_DEPENDENCY_SET mitk_deps
-  PRE_EXCLUDE_REGEXES ...   # Skip Windows system DLLs
-  POST_EXCLUDE_REGEXES ...  # Skip system libraries, Python, plugin dirs, Qt frameworks (macOS)
-  DIRECTORIES ${_search_dirs}
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}
-  FRAMEWORK DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR})
+foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(TARGETS MyTarget
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_bindir}
+    LIBRARY DESTINATION ${_bindir})
+endforeach()
 ```
 
-Note that `LIBRARY DESTINATION` uses `${MITK_INSTALL_FRAMEWORKSDIR}`, not `${MITK_INSTALL_BINDIR}`. On Windows and Linux both variables resolve to `bin/`, so there is no difference. On macOS, this places resolved transitive dependencies (external dylibs) into `Contents/Frameworks/` rather than `Contents/MacOS/`. This is necessary because `macdeployqt` (called by `qt_generate_deploy_app_script()`) hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs and rewrites binary references accordingly. Using the same destination for both mechanisms avoids duplication. MITK modules in `Contents/MacOS/` find these dependencies via their `@loader_path/../Frameworks` RPATH entry.
+At the end of configuration, `mitkInstallRules.cmake` resolves each dependency set independently:
+
+```cmake
+foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRAMEWORKSDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(RUNTIME_DEPENDENCY_SET ${_depset}
+    PRE_EXCLUDE_REGEXES ...   # Skip Windows system DLLs
+    POST_EXCLUDE_REGEXES ...  # Skip system libraries, Python, plugin dirs, Qt frameworks (macOS)
+    DIRECTORIES ${_search_dirs}
+    RUNTIME DESTINATION ${_bindir}
+    LIBRARY DESTINATION ${_fwdir}
+    FRAMEWORK DESTINATION ${_fwdir})
+endforeach()
+```
+
+Note that `LIBRARY DESTINATION` uses the Frameworks directory, not the binary directory. On Windows and Linux both resolve to `bin/`, so there is no difference. On macOS, this places resolved transitive dependencies (external dylibs) into `Contents/Frameworks/` rather than `Contents/MacOS/`. This is necessary because `macdeployqt` (called by `qt_generate_deploy_app_script()`) hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs and rewrites binary references accordingly. Using the same destination for both mechanisms avoids duplication. MITK modules in `Contents/MacOS/` find these dependencies via their `@loader_path/../Frameworks` RPATH entry.
 
 This replaces the legacy approach of manually walking targets with `BundleUtilities` or hand-maintained install loops.
 
 ### Install Destination Variables
 
-All install destinations use two variables defined in `CMakeLists.txt` after `MACOSX_BUNDLE_NAMES` is populated:
+All install destinations use three parallel list variables defined in `CMakeLists.txt` after `MACOSX_BUNDLE_NAMES` is populated:
 
 | Variable | macOS (with bundles) | Windows / Linux |
 |---|---|---|
-| `MITK_INSTALL_BINDIR` | `<PrimaryBundle>.app/Contents/MacOS` | `bin` |
-| `MITK_INSTALL_FRAMEWORKSDIR` | `<PrimaryBundle>.app/Contents/Frameworks` | `bin` |
+| `MITK_INSTALL_BINDIR` | `<Bundle>.app/Contents/MacOS` (one per bundle) | `bin` |
+| `MITK_INSTALL_FRAMEWORKSDIR` | `<Bundle>.app/Contents/Frameworks` (one per bundle) | `bin` |
+| `MITK_RUNTIME_DEPENDENCY_SETS` | `mitk_deps_<Bundle>` (one per bundle) | `mitk_deps` |
 
-On macOS, the primary bundle is the first entry in `MACOSX_BUNDLE_NAMES` (typically `MitkWorkbench`). This ensures all MITK code lands inside the `.app` bundle rather than in a flat `bin/` directory outside it. MITK's own targets (modules, executables, CppMicroServices) are installed to `MITK_INSTALL_BINDIR` (`Contents/MacOS/`), while resolved transitive dependencies (external libraries) and frameworks go to `MITK_INSTALL_FRAMEWORKSDIR` (`Contents/Frameworks/`).
+On macOS, these are lists with one entry per app bundle. On Windows/Linux, they are single-element lists. Install sites loop over them with `foreach(... IN ZIP_LISTS ...)` so the same code handles both cases. MITK's own targets (modules, executables, CppMicroServices) are installed to each `MITK_INSTALL_BINDIR` (`Contents/MacOS/`), while resolved transitive dependencies (external libraries) and frameworks go to each `MITK_INSTALL_FRAMEWORKSDIR` (`Contents/Frameworks/`).
 
 ### Dependency Filtering
 
@@ -109,13 +116,15 @@ include(mitkInstallRules)  # Must come last
 
 ### Modules (Shared Libraries)
 
-Created by `mitk_create_module()` in `mitkFunctionCreateModule.cmake`. Non-static, non-executable modules are installed to `${MITK_INSTALL_BINDIR}`:
+Created by `mitk_create_module()` in `mitkFunctionCreateModule.cmake`. Non-static, non-executable modules are installed to each bundle's binary directory and registered with each dependency set:
 
 ```cmake
-install(TARGETS ${MODULE_TARGET}
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
+foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(TARGETS ${MODULE_TARGET}
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_bindir}
+    LIBRARY DESTINATION ${_bindir})
+endforeach()
 ```
 
 ### Autoload Modules
@@ -123,10 +132,12 @@ install(TARGETS ${MODULE_TARGET}
 Modules that specify `AUTOLOAD_WITH <ParentModule>` are installed into a subdirectory named after the parent module:
 
 ```cmake
-install(TARGETS ${MODULE_TARGET}
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH}
-  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH})
+foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(TARGETS ${MODULE_TARGET}
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH}
+    LIBRARY DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH})
+endforeach()
 ```
 
 At runtime, CppMicroServices automatically loads these modules when the parent module is loaded.
@@ -139,10 +150,12 @@ MITK plugins are installed by `mitkFunctionInstallCTKPlugin()`, called from `mit
 
 ```cmake
 install(TARGETS ${_install_target}
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION bin/plugins
-  LIBRARY DESTINATION bin/plugins)
+  RUNTIME_DEPENDENCY_SET ${_depset}
+  RUNTIME DESTINATION ${install_subdir}
+  LIBRARY DESTINATION ${install_subdir})
 ```
+
+The plugin install function receives the dependency set name and destination per bundle from its caller, which loops over `MACOSX_BUNDLE_NAMES`.
 
 Third-party (imported) CTK plugins are installed via `install(FILES ...)` since they are not CMake targets in the current project. On Linux, their RPATH is set post-install using `file(RPATH_SET)`. On macOS, `install_name_tool -add_rpath` is used instead because `file(RPATH_SET)` only supports ELF and XCOFF formats, not Mach-O.
 
@@ -150,12 +163,14 @@ Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux and `INSTALL_RPATH "@loader_pa
 
 ### Executables
 
-Created by `mitk_create_executable()` (in `mitkMacroCreateExecutable.cmake`), which wraps `mitk_create_module()` with the `EXECUTABLE` option. Executables are installed to `${MITK_INSTALL_BINDIR}` with a wrapper script (Linux/Windows only — macOS executables are inside the bundle):
+Created by `mitk_create_executable()` (in `mitkMacroCreateExecutable.cmake`), which wraps `mitk_create_module()` with the `EXECUTABLE` option. Executables are installed to each bundle's binary directory with a wrapper script (Linux/Windows only — macOS executables are inside the bundle):
 
 ```cmake
-install(TARGETS ${EXECUTABLE_TARGET}
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR})
+foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(TARGETS ${EXECUTABLE_TARGET}
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_bindir})
+endforeach()
 ```
 
 Command-line apps (created via `mitkFunctionCreateCommandLineApp()`) follow the same path but their wrapper scripts go into `apps/` instead of the install root.
@@ -175,19 +190,21 @@ install(TARGETS ${_APP_NAME}
   BUNDLE DESTINATION .)       # macOS .app bundle
 ```
 
-BlueBerry applications are **not** registered with `RUNTIME_DEPENDENCY_SET` because CMake only permits one bundle executable per dependency set, and MITK can build multiple BlueBerry apps (e.g. MitkWorkbench and MitkFlowBench). This is safe because the apps only link to MITK modules that are themselves registered with the dependency set — their transitive dependencies are fully covered.
+BlueBerry applications are not registered with the dependency sets because they only link to MITK modules that are themselves registered — their transitive dependencies are fully covered.
 
 ### CppMicroServices
 
 The CppMicroServices library is a special case. It is built via `usMacroCreateModule()` (not `mitk_create_module()`), is not tracked in `MITK_MODULE_TARGETS`, and has `US_NO_INSTALL=1` to disable its own install rules. It must be explicitly installed in `mitkInstallRules.cmake`:
 
 ```cmake
-install(TARGETS CppMicroServices
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
-  PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
-  PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
+foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  install(TARGETS CppMicroServices
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_bindir}
+    LIBRARY DESTINATION ${_bindir}
+    PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
+    PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
+endforeach()
 ```
 
 The `EXCLUDE_FROM_ALL` on header destinations suppresses warnings about the unused header install components.
@@ -199,17 +216,25 @@ See also the dedicated \ref CppMicroServicesResourcesSection section below for h
 When `MITK_USE_Python3` is enabled, the entire Python distribution from the build tree is copied into the package, and the MITK Python bindings (`mitk_python_bindings` target) are installed into the appropriate site-packages directory:
 
 ```cmake
-install(DIRECTORY "${MITK_BINARY_DIR}/python/"
-  DESTINATION ${_python_dest}
-  USE_SOURCE_PERMISSIONS)
+foreach(_fwdir _depset IN ZIP_LISTS MITK_INSTALL_FRAMEWORKSDIR MITK_RUNTIME_DEPENDENCY_SETS)
+  if(APPLE)
+    set(_python_dest "${_fwdir}/Python.framework")
+  else()
+    set(_python_dest "python")
+  endif()
 
-install(TARGETS mitk_python_bindings
-  RUNTIME_DEPENDENCY_SET mitk_deps
-  RUNTIME DESTINATION ${_python_dest}/${_rel_sitearch}/mitk
-  LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
+  install(DIRECTORY "${MITK_BINARY_DIR}/python/"
+    DESTINATION ${_python_dest}
+    USE_SOURCE_PERMISSIONS)
+
+  install(TARGETS mitk_python_bindings
+    RUNTIME_DEPENDENCY_SET ${_depset}
+    RUNTIME DESTINATION ${_python_dest}/${_rel_sitearch}/mitk
+    LIBRARY DESTINATION ${_python_dest}/${_rel_sitearch}/mitk)
+endforeach()
 ```
 
-On macOS, the destination is `${MITK_INSTALL_FRAMEWORKSDIR}/Python.framework` which resolves to `<Bundle>.app/Contents/Frameworks/Python.framework`.
+On macOS, the destination is `${_fwdir}/Python.framework` which resolves to `<Bundle>.app/Contents/Frameworks/Python.framework` for each bundle.
 
 ## Qt Deployment
 
@@ -594,7 +619,7 @@ START file:///path/to/plugin.so
 1. **Build-time** (`<AppName>.provisioning`): Uses absolute `file:///` URLs pointing to the build tree
 2. **Install-time** (`<AppName>.provisioning.install`): Uses `@EXECUTABLE_DIR` placeholders that resolve relative to the executable at runtime
 
-The install-time variant is installed to `${MITK_INSTALL_BINDIR}` and renamed to drop the `.install` suffix. For example:
+The install-time variant is installed to each bundle's binary directory and renamed to drop the `.install` suffix. For example:
 
 ```
 START file://@EXECUTABLE_DIR/plugins/liborg_mitk_gui_qt_common.so
@@ -686,7 +711,6 @@ The current install system replaced several legacy approaches:
 
 - **Qt 6.10 plugin filtering**: Qt 6.10 introduced fine-grained plugin filtering (`INCLUDE_PLUGINS`, `EXCLUDE_PLUGINS`, `INCLUDE_PLUGIN_TYPES`, `EXCLUDE_PLUGIN_TYPES`). MITK does not use these yet. They could reduce package size by excluding unnecessary Qt plugins.
 
-- **mitkFunctionInstallThirdPartyCTKPlugins MACOSX_BUNDLE_NAMES**: The function supports multiple bundles via `MACOSX_BUNDLE_NAMES`, but this is rarely used and adds complexity.
 
 ## File Reference
 

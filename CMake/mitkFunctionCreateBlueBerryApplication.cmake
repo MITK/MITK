@@ -212,11 +212,8 @@ if(NOT _APP_NO_INSTALL)
 
   # Install executable and wrapper scripts. Qt deployment stays in
   # mitkInstallRules.cmake (must run after dependency resolution).
-  # The app is NOT registered with RUNTIME_DEPENDENCY_SET because CMake
-  # only allows one bundle executable per set and MITK can have multiple
-  # BlueBerry apps (e.g. Workbench + FlowBench). The app's transitive
-  # dependencies are already covered by the modules it links to, which
-  # are all registered with the dependency set.
+  # The app's transitive dependencies are already covered by the modules
+  # it links to, which are all registered with the dependency sets.
   install(TARGETS ${_APP_NAME}
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION .)
@@ -229,7 +226,9 @@ if(NOT _APP_NO_INSTALL)
 
   if(NOT _APP_NO_PROVISIONING)
     get_filename_component(_prov_file_name "${_prov_file}" NAME)
-    install(FILES "${_prov_file}.install" DESTINATION ${MITK_INSTALL_BINDIR} RENAME "${_prov_file_name}")
+    foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
+      install(FILES "${_prov_file}.install" DESTINATION ${_bindir} RENAME "${_prov_file_name}")
+    endforeach()
   endif()
 
   # Tell cpack the executables that you want in the start menu as links

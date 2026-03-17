@@ -849,14 +849,34 @@ if(MITK_USE_BLUEBERRY AND APPLE)
 
 endif()
 
-# Compute install destinations: bundle-relative on macOS, flat bin/ otherwise
+# Compute install destinations and runtime dependency set names.
+#
+# On macOS with bundles, each app gets its own install directories and its own
+# RUNTIME_DEPENDENCY_SET so that dependency resolution is fully independent per
+# bundle. On Windows/Linux, there is a single flat "bin/" layout shared by all
+# executables, with a single dependency set.
+#
+# The lists MITK_INSTALL_BINDIR, MITK_INSTALL_FRAMEWORKSDIR, and
+# MITK_RUNTIME_DEPENDENCY_SETS are parallel lists (same length, matching
+# indices). Install sites loop over them with foreach(... IN ZIP_LISTS ...) or
+# paired index access.
+
 if(APPLE AND MACOSX_BUNDLE_NAMES)
-  list(GET MACOSX_BUNDLE_NAMES 0 _primary_bundle)
-  set(MITK_INSTALL_BINDIR "${_primary_bundle}.app/Contents/MacOS" CACHE INTERNAL "")
-  set(MITK_INSTALL_FRAMEWORKSDIR "${_primary_bundle}.app/Contents/Frameworks" CACHE INTERNAL "")
+  set(_bindirs "")
+  set(_fwdirs "")
+  set(_depsets "")
+  foreach(_bundle ${MACOSX_BUNDLE_NAMES})
+    list(APPEND _bindirs "${_bundle}.app/Contents/MacOS")
+    list(APPEND _fwdirs "${_bundle}.app/Contents/Frameworks")
+    list(APPEND _depsets "mitk_deps_${_bundle}")
+  endforeach()
+  set(MITK_INSTALL_BINDIR "${_bindirs}" CACHE INTERNAL "")
+  set(MITK_INSTALL_FRAMEWORKSDIR "${_fwdirs}" CACHE INTERNAL "")
+  set(MITK_RUNTIME_DEPENDENCY_SETS "${_depsets}" CACHE INTERNAL "")
 else()
   set(MITK_INSTALL_BINDIR "bin" CACHE INTERNAL "")
   set(MITK_INSTALL_FRAMEWORKSDIR "bin" CACHE INTERNAL "")
+  set(MITK_RUNTIME_DEPENDENCY_SETS "mitk_deps" CACHE INTERNAL "")
 endif()
 
 #-----------------------------------------------------------------------------

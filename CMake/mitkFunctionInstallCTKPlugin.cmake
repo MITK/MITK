@@ -13,7 +13,7 @@
 #! \param DESTINATION (optional) The install destination. Defaults to "bin/".
 function(mitkFunctionInstallCTKPlugin)
 
-  cmake_parse_arguments(_INSTALL "" "DESTINATION" "TARGETS" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "DESTINATION;RUNTIME_DEPENDENCY_SET" "TARGETS" ${ARGN})
 
   if(NOT _INSTALL_DESTINATION)
     set(_INSTALL_DESTINATION "bin/")
@@ -66,8 +66,12 @@ function(mitkFunctionInstallCTKPlugin)
           endif()
         endif()
       else()
+        set(_depset_arg "")
+        if(_INSTALL_RUNTIME_DEPENDENCY_SET)
+          set(_depset_arg RUNTIME_DEPENDENCY_SET ${_INSTALL_RUNTIME_DEPENDENCY_SET})
+        endif()
         install(TARGETS ${_install_target}
-                RUNTIME_DEPENDENCY_SET mitk_deps
+                ${_depset_arg}
                 RUNTIME DESTINATION ${_INSTALL_DESTINATION}
                 LIBRARY DESTINATION ${_INSTALL_DESTINATION}
                 )

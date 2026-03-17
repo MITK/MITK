@@ -118,9 +118,11 @@ macro(mitk_create_executable)
 
     # Install executable and wrapper scripts
     if(NOT EXEC_NO_INSTALL)
-      install(TARGETS ${EXECUTABLE_TARGET}
-        RUNTIME_DEPENDENCY_SET mitk_deps
-        RUNTIME DESTINATION ${MITK_INSTALL_BINDIR})
+      foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+        install(TARGETS ${EXECUTABLE_TARGET}
+          RUNTIME_DEPENDENCY_SET ${_depset}
+          RUNTIME DESTINATION ${_bindir})
+      endforeach()
 
       if(CMDAPP_NAME)
         set(_source "RunInstalledCmdLineApp")

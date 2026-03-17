@@ -519,24 +519,31 @@ function(mitk_create_module)
       endif()
 
       # Install shared library modules into the package and register them
-      # with the runtime dependency set for transitive dependency resolution.
+      # with the runtime dependency set(s) for transitive dependency resolution.
       # Executables are handled by mitk_create_executable() / BB app function.
+      # MITK_INSTALL_BINDIR and MITK_RUNTIME_DEPENDENCY_SETS are parallel
+      # lists (one entry per bundle on macOS, single entry on Windows/Linux).
       if(NOT MODULE_EXECUTABLE AND NOT MODULE_FORCE_STATIC)
+        foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+          if(MODULE_AUTOLOAD_WITH)
+            install(TARGETS ${MODULE_TARGET}
+              RUNTIME_DEPENDENCY_SET ${_depset}
+              RUNTIME DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH}
+              LIBRARY DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH})
+          else()
+            install(TARGETS ${MODULE_TARGET}
+              RUNTIME_DEPENDENCY_SET ${_depset}
+              RUNTIME DESTINATION ${_bindir}
+              LIBRARY DESTINATION ${_bindir})
+          endif()
+        endforeach()
+
         if(MODULE_AUTOLOAD_WITH)
-          install(TARGETS ${MODULE_TARGET}
-            RUNTIME_DEPENDENCY_SET mitk_deps
-            RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH}
-            LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}/${MODULE_AUTOLOAD_WITH})
           if(LINUX)
             set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
           elseif(APPLE)
             set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
           endif()
-        else()
-          install(TARGETS ${MODULE_TARGET}
-            RUNTIME_DEPENDENCY_SET mitk_deps
-            RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-            LIBRARY DESTINATION ${MITK_INSTALL_BINDIR})
         endif()
       endif()
 

@@ -281,13 +281,16 @@ function(mitk_create_plugin)
   #------------------ Installer support -----------------------#
   if(NOT _PLUGIN_NO_INSTALL)
     set(install_directories "")
+    set(install_depsets "")
     if(NOT MACOSX_BUNDLE_NAMES)
       set(install_directories bin/plugins)
-    else(NOT MACOSX_BUNDLE_NAMES)
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    else()
       foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
         list(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
-      endforeach(bundle_name)
-    endif(NOT MACOSX_BUNDLE_NAMES)
+      endforeach()
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    endif()
 
     if(LINUX)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
@@ -295,11 +298,10 @@ function(mitk_create_plugin)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
     endif()
 
-    foreach(install_subdir ${install_directories})
-
+    foreach(install_subdir _depset IN ZIP_LISTS install_directories install_depsets)
       mitkFunctionInstallCTKPlugin(TARGETS ${PLUGIN_TARGET}
-                                   DESTINATION ${install_subdir})
-
+                                   DESTINATION ${install_subdir}
+                                   RUNTIME_DEPENDENCY_SET ${_depset})
     endforeach()
 
     set(_autoload_targets )

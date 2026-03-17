@@ -294,26 +294,6 @@ Since `qt.conf` lives in `bin/` and the prefix is `.`, Qt looks for plugins at `
 
 This fixup is fragile. If Qt's internal deployment hooks change their `qt.conf` generation behavior in a future version, the overwrite may need to be adjusted.
 
-### Qt Version Differences
-
-The Qt deployment CMake API evolves between versions, and some changes directly affect MITK's deployment strategy.
-
-**Qt 6.9 and earlier**: Plugin deployment uses a pre-populated plugin list (`__QT_DEPLOY_PLUGINS`). The deployment system does a single pass of dependency resolution.
-
-**Qt 6.10+**: A completely rewritten plugin discovery system that uses iterative resolution (up to 10 passes). It reads module JSON descriptor files (`Qt6InstallDescriptions/*.json`) to automatically determine which plugin types each Qt module requires. New parameters are available:
-
-- `NO_PLUGINS` — skip plugin deployment entirely
-- `INCLUDE_PLUGINS` / `EXCLUDE_PLUGINS` — filter by plugin name
-- `INCLUDE_PLUGIN_TYPES` / `EXCLUDE_PLUGIN_TYPES` — filter by plugin category
-
-These new parameters are forwarded to platform-specific tools (`windeployqt` flags on Windows, `macdeployqt` flags on macOS, CMake logic on Linux).
-
-Other notable changes in Qt 6.10:
-- The deprecated `FILENAME_VARIABLE` parameter has been removed from `qt_generate_deploy_app_script()` — only `OUTPUT_SCRIPT` works.
-- New internal variables like `__QT_DEPLOY_SHARED_LIBRARY_SUFFIX` and `__QT_LIBINFIX` are injected into deploy scripts for the new plugin discovery logic.
-
-MITK's current deployment code works with both Qt 6.9 and 6.10. However, the new plugin filtering parameters in Qt 6.10 could be used in the future to fine-tune which Qt plugins are included in packages.
-
 ## RPATH Configuration
 
 RPATH is configured per platform to ensure that shared libraries can find each other at runtime.
@@ -689,6 +669,8 @@ The trade-off documented in the CppMicroServices source is that LINK mode "may r
 
 To switch, set `US_DEFAULT_RESOURCE_MODE` to `"LINK"` for all platforms in `usFunctionCheckResourceLinking.cmake`, or pass `LINK` explicitly in each `usFunctionEmbedResources()` call.
 
+However, first tests on Windows and Linux revealed, that the LINK mode seems to be broken on these platforms.
+
 ## Changes from Legacy System
 
 The current install system replaced several legacy approaches:
@@ -708,9 +690,6 @@ The current install system replaced several legacy approaches:
 - **macOS autoload modules in Python**: The `FixMacOSInstaller.cmake` `@loader_path` fix does not cover autoload modules. Importing `mitk` in a standalone Python interpreter on macOS will not load autoload modules. Running Python as a subprocess of an MITK application works correctly.
 
 - **Qt WebEngine `qt.conf` on Linux**: The Qt WebEngine deployment hook writes `qt.conf` with an absolute staging path. A post-install step overwrites it, but this is fragile and depends on the hook's behavior not changing across Qt versions.
-
-- **Qt 6.10 plugin filtering**: Qt 6.10 introduced fine-grained plugin filtering (`INCLUDE_PLUGINS`, `EXCLUDE_PLUGINS`, `INCLUDE_PLUGIN_TYPES`, `EXCLUDE_PLUGIN_TYPES`). MITK does not use these yet. They could reduce package size by excluding unnecessary Qt plugins.
-
 
 ## File Reference
 

@@ -1,4 +1,3 @@
-
 if(CPACK_GENERATOR MATCHES "NSIS")
 
   # set the package header icon for MUI
@@ -12,7 +11,7 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   
   # tell cpack to create links to the doc files
   set(CPACK_NSIS_MENU_LINKS
-    "https://www.mitk.org" "MITK Web Site"
+    "https://www.mitk.org" "MITK Website"
     )
 
   # tell cpack the executables you want in the start menu as links
@@ -21,11 +20,9 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   # tell cpack to create a desktop link to MainApp
   set(CPACK_CREATE_DESKTOP_LINKS "@CPACK_CREATE_DESKTOP_LINKS@")
   set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\mitk.ico")
-  set(CPACK_NSIS_HELP_LINK "http:\\\\www.mitk.org")
-  set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\www.mitk.org")
-  set(CPACK_NSIS_CONTACT mitk@mitk.org)
+  set(CPACK_NSIS_HELP_LINK "https://www.mitk.org")
+  set(CPACK_NSIS_URL_INFO_ABOUT "https://www.mitk.org")
+  set(CPACK_NSIS_CONTACT mitk@dkfz.de)
   set(CPACK_NSIS_MODIFY_PATH ON)
   
 endif(CPACK_GENERATOR MATCHES "NSIS")
-
-

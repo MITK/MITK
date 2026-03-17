@@ -79,7 +79,7 @@ Var AR_RegFlags
 
   ClearErrors
   ;Reading component status from registry
-  ReadRegDWORD $AR_RegFlags HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" "Installed"
+  ReadRegDWORD $AR_RegFlags SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" "Installed"
   IfErrors "default_${SecName}"
     ;Status will stay default if registry value not found
     ;(component was never installed)
@@ -112,13 +112,13 @@ Var AR_RegFlags
     ;Section is not selected:
     ;Calling Section uninstall macro and writing zero installed flag
     !insertmacro "Remove_${${SecName}}"
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" \
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" \
   "Installed" 0
     Goto "exit_${SecName}"
 
  "leave_${SecName}:"
     ;Section is selected:
-    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" \
+    WriteRegDWORD SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@\Components\${SecName}" \
   "Installed" 1
 
  "exit_${SecName}:"
@@ -172,9 +172,6 @@ Var AR_RegFlags
 ;----------------------------------------
 ; based upon a script of "Written by KiCHiK 2003-01-18 05:57:02"
 ;----------------------------------------
-!verbose 3
-!include "WinMessages.NSH"
-!verbose 4
 ;====================================================
 ; get_NT_environment
 ;     Returns: the selected environment
@@ -209,7 +206,6 @@ FunctionEnd
 
 ; AddToPath - Adds the given dir to the search path.
 ;        Input - head of the stack
-;        Note - Win9x systems requires reboot
 
 Function AddToPath
   Exch $0
@@ -256,23 +252,7 @@ it from anywhere via command line."
   Pop $2
   StrCmp $2 "" "" AddToPath_done
 
-  Call IsNT
-  Pop $1
-  StrCmp $1 1 AddToPath_NT
-    ; Not on NT
-    StrCpy $1 $WINDIR 2
-    FileOpen $1 "$1\autoexec.bat" a
-    FileSeek $1 -1 END
-    FileReadByte $1 $2
-    IntCmp $2 26 0 +2 +2 # DOS EOF
-      FileSeek $1 -1 END # write over EOF
-    FileWrite $1 "$\r$\nSET PATH=%PATH%;$3$\r$\n"
-    FileClose $1
-    SetRebootFlag true
-    Goto AddToPath_done
-
-  AddToPath_NT:
-    StrCmp $ADD_TO_PATH_ALL_USERS "1" ReadAllKey
+  StrCmp $ADD_TO_PATH_ALL_USERS "1" ReadAllKey
       ReadRegStr $1 ${NT_current_env} "PATH"
       Goto DoTrim
     ReadAllKey:
@@ -312,46 +292,7 @@ Function un.RemoveFromPath
   Push $5
   Push $6
 
-  IntFmt $6 "%c" 26 # DOS EOF
-
-  Call un.IsNT
-  Pop $1
-  StrCmp $1 1 unRemoveFromPath_NT
-    ; Not on NT
-    StrCpy $1 $WINDIR 2
-    FileOpen $1 "$1\autoexec.bat" r
-    GetTempFileName $4
-    FileOpen $2 $4 w
-    GetFullPathName /SHORT $0 $0
-    StrCpy $0 "SET PATH=%PATH%;$0"
-    Goto unRemoveFromPath_dosLoop
-
-    unRemoveFromPath_dosLoop:
-      FileRead $1 $3
-      StrCpy $5 $3 1 -1 # read last char
-      StrCmp $5 $6 0 +2 # if DOS EOF
-        StrCpy $3 $3 -1 # remove DOS EOF so we can compare
-      StrCmp $3 "$0$\r$\n" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "$0$\n" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "$0" unRemoveFromPath_dosLoopRemoveLine
-      StrCmp $3 "" unRemoveFromPath_dosLoopEnd
-      FileWrite $2 $3
-      Goto unRemoveFromPath_dosLoop
-      unRemoveFromPath_dosLoopRemoveLine:
-        SetRebootFlag true
-        Goto unRemoveFromPath_dosLoop
-
-    unRemoveFromPath_dosLoopEnd:
-      FileClose $2
-      FileClose $1
-      StrCpy $1 $WINDIR 2
-      Delete "$1\autoexec.bat"
-      CopyFiles /SILENT $4 "$1\autoexec.bat"
-      Delete $4
-      Goto unRemoveFromPath_done
-
-  unRemoveFromPath_NT:
-    StrCmp $ADD_TO_PATH_ALL_USERS "1" unReadAllKey
+  StrCmp $ADD_TO_PATH_ALL_USERS "1" unReadAllKey
       ReadRegStr $1 ${NT_current_env} "PATH"
       Goto unDoTrim
     unReadAllKey:
@@ -403,39 +344,6 @@ FunctionEnd
 ###########################################
 #            Utility Functions            #
 ###########################################
-
-;====================================================
-; IsNT - Returns 1 if the current system is NT, 0
-;        otherwise.
-;     Output: head of the stack
-;====================================================
-; IsNT
-; no input
-; output, top of the stack = 1 if NT or 0 if not
-;
-; Usage:
-;   Call IsNT
-;   Pop $R0
-;  ($R0 at this point is 1 or 0)
-
-!macro IsNT un
-Function ${un}IsNT
-  Push $0
-  ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCmp $0 "" 0 IsNT_yes
-  ; we are not NT.
-  Pop $0
-  Push 0
-  Return
-
-  IsNT_yes:
-    ; NT!!!
-    Pop $0
-    Push 1
-FunctionEnd
-!macroend
-!insertmacro IsNT ""
-!insertmacro IsNT "un."
 
 ; StrStr
 ; input, top of stack = string to search for
@@ -765,37 +673,25 @@ Push $R2
 
 ClearErrors
 UserInfo::GetName
-IfErrors Win9x
+IfErrors UserInfoError
 Pop $R1
 UserInfo::GetAccountType
 Pop $R2
 
 StrCmp $R2 "Admin" 0 Continue
-; Observation: I get here when running Win98SE. (Lilla)
-; The functions UserInfo.dll looks for are there on Win98 too,
-; but just don't work. So UserInfo.dll, knowing that admin isn't required
-; on Win98, returns admin anyway. (per kichik)
-; MessageBox MB_OK 'User "$R1" is in the Administrators group'
 StrCpy $R0 "true"
 Goto Done
 
 Continue:
-; You should still check for an empty string because the functions
-; UserInfo.dll looks for may not be present on Windows 95. (per kichik)
-StrCmp $R2 "" Win9x
+StrCmp $R2 "" UserInfoError
 StrCpy $R0 "false"
-;MessageBox MB_OK 'User "$R1" is in the "$R2" group'
 Goto Done
 
-Win9x:
-; comment/message below is by UserInfo.nsi author:
-; This one means you don't need to care about admin or
-; not admin because Windows 9x doesn't either
-;MessageBox MB_OK "Error! This DLL can't run under Windows 9x!"
+UserInfoError:
+; Fallback: assume admin if UserInfo plugin fails
 StrCpy $R0 "true"
 
 Done:
-;MessageBox MB_OK 'User= "$R1"  AccountType= "$R2"  IsUserAdmin= "$R0"'
 
 Pop $R2
 Pop $R1
@@ -948,7 +844,7 @@ Section "Uninstall"
   DeleteRegKey /ifempty SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
 
   Push $INSTDIR\bin
-  StrCmp $DO_NOT_ADD_TO_PATH_ "1" doNotRemoveFromPath 0
+  StrCmp $DO_NOT_ADD_TO_PATH "1" doNotRemoveFromPath 0
     Call un.RemoveFromPath
   doNotRemoveFromPath:
 SectionEnd
@@ -956,7 +852,7 @@ SectionEnd
 ;--------------------------------
 ; determine admin versus local install
 ; Is install for "AllUsers" or "JustMe"?
-; Default to "JustMe" - set to "AllUsers" if admin or on Win9x
+; Default to "JustMe" - set to "AllUsers" if admin
 ; This function is used for the very first "custom page" of the installer.
 ; This custom page does not show up visibly, but it executes prior to the
 ; first visible page and sets up $INSTDIR properly...

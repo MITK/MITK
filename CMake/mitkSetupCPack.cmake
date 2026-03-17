@@ -29,7 +29,7 @@ endif()
 # On windows set default install directory appropriately for 32 and 64 bit
 # installers if not already set
 if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)
-  if(CMAKE_CL_64)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
   else()
     set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")

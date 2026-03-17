@@ -46,9 +46,11 @@ install(RUNTIME_DEPENDENCY_SET mitk_deps
   POST_EXCLUDE_REGEXES ...  # Skip system libraries, Python, plugin dirs, Qt frameworks (macOS)
   DIRECTORIES ${_search_dirs}
   RUNTIME DESTINATION ${MITK_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${MITK_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}
   FRAMEWORK DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR})
 ```
+
+Note that `LIBRARY DESTINATION` uses `${MITK_INSTALL_FRAMEWORKSDIR}`, not `${MITK_INSTALL_BINDIR}`. On Windows and Linux both variables resolve to `bin/`, so there is no difference. On macOS, this places resolved transitive dependencies (external dylibs) into `Contents/Frameworks/` rather than `Contents/MacOS/`. This is necessary because `macdeployqt` (called by `qt_generate_deploy_app_script()`) hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs and rewrites binary references accordingly. Using the same destination for both mechanisms avoids duplication. MITK modules in `Contents/MacOS/` find these dependencies via their `@loader_path/../Frameworks` RPATH entry.
 
 This replaces the legacy approach of manually walking targets with `BundleUtilities` or hand-maintained install loops.
 
@@ -61,7 +63,7 @@ All install destinations use two variables defined in `CMakeLists.txt` after `MA
 | `MITK_INSTALL_BINDIR` | `<PrimaryBundle>.app/Contents/MacOS` | `bin` |
 | `MITK_INSTALL_FRAMEWORKSDIR` | `<PrimaryBundle>.app/Contents/Frameworks` | `bin` |
 
-On macOS, the primary bundle is the first entry in `MACOSX_BUNDLE_NAMES` (typically `MitkWorkbench`). This ensures all MITK modules, executables, CppMicroServices, and resolved transitive dependencies land inside the `.app` bundle rather than in a flat `bin/` directory outside it.
+On macOS, the primary bundle is the first entry in `MACOSX_BUNDLE_NAMES` (typically `MitkWorkbench`). This ensures all MITK code lands inside the `.app` bundle rather than in a flat `bin/` directory outside it. MITK's own targets (modules, executables, CppMicroServices) are installed to `MITK_INSTALL_BINDIR` (`Contents/MacOS/`), while resolved transitive dependencies (external libraries) and frameworks go to `MITK_INSTALL_FRAMEWORKSDIR` (`Contents/Frameworks/`).
 
 ### Dependency Filtering
 
@@ -142,7 +144,7 @@ install(TARGETS ${_install_target}
   LIBRARY DESTINATION bin/plugins)
 ```
 
-Third-party (imported) CTK plugins are installed via `install(FILES ...)` since they are not CMake targets in the current project. On Linux and macOS, their RPATH is set post-install using `file(RPATH_SET)`.
+Third-party (imported) CTK plugins are installed via `install(FILES ...)` since they are not CMake targets in the current project. On Linux, their RPATH is set post-install using `file(RPATH_SET)`. On macOS, `install_name_tool -add_rpath` is used instead because `file(RPATH_SET)` only supports ELF and XCOFF formats, not Mach-O.
 
 Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux and `INSTALL_RPATH "@loader_path/.."` on macOS to resolve libraries in the parent directory (`bin/` or `Contents/MacOS/`).
 
@@ -229,7 +231,7 @@ MITK uses `qt_generate_deploy_app_script()` only on macOS (for `.app` bundles). 
 
 ### Platform-Specific Behavior
 
-**macOS**: Uses `qt_generate_deploy_app_script()` which handles the `.app` bundle layout natively.
+**macOS**: Uses `qt_generate_deploy_app_script()` which delegates to `macdeployqt`. This tool scans all binaries in the bundle, copies their non-system dependencies into `Contents/Frameworks/`, rewrites library references, and deploys Qt plugins to `Contents/PlugIns/`. Because `macdeployqt` hardcodes `Contents/Frameworks/` as the destination for all non-framework dylibs (with no option to override this), the `install(RUNTIME_DEPENDENCY_SET)` resolution also targets `Contents/Frameworks/` via `LIBRARY DESTINATION ${MITK_INSTALL_FRAMEWORKSDIR}`. This way `macdeployqt` overwrites (via `-always-overwrite`) rather than creating duplicates. Qt frameworks are excluded from `install(RUNTIME_DEPENDENCY_SET)` via `POST_EXCLUDE_REGEXES` to avoid conflicting with `macdeployqt`'s framework deployment.
 
 **Windows**: Uses `qt_generate_deploy_script()` with `qt_deploy_runtime_dependencies()`. The `--no-opengl-sw` option is passed to `windeployqt` to skip the software OpenGL fallback. If OpenSSL is available, its root directory is passed via `--openssl-root`.
 
@@ -303,7 +305,7 @@ elseif(APPLE)
 endif()
 ```
 
-This means most installed binaries look for libraries in their own directory, in `plugins/` relative to their location, and on macOS additionally in `../Frameworks/` (for Qt frameworks in `Contents/Frameworks/`).
+This means most installed binaries look for libraries in their own directory, in `plugins/` relative to their location, and on macOS additionally in `../Frameworks/` (for external dependencies and Qt frameworks in `Contents/Frameworks/`). On macOS, `@rpath` entries propagate up the dynamic loader chain: when the executable loads a plugin, the plugin can resolve `@rpath` references using the executable's RPATHs in addition to its own. This is why plugins with only `@loader_path/..` can still find libraries in `Contents/Frameworks/` — via the executable's `@loader_path/../Frameworks` entry.
 
 ### SuperBuild RPATH (External Projects)
 
@@ -320,7 +322,7 @@ if(Qt6_DIR)
 endif()
 ```
 
-This ensures external project libraries can find each other within the SuperBuild prefix during the build. At package time, these RPATHs are irrelevant since the dependency resolver copies all needed libraries into `bin/`.
+This ensures external project libraries can find each other within the SuperBuild prefix during the build. At package time, these RPATHs are irrelevant since the dependency resolver copies all needed libraries into `bin/` (Windows/Linux) or `Contents/Frameworks/` (macOS).
 
 ### Per-Target RPATH Overrides
 
@@ -329,7 +331,7 @@ This ensures external project libraries can find each other within the SuperBuil
 | Regular modules | `$ORIGIN;$ORIGIN/plugins` | `@loader_path;@loader_path/plugins;@loader_path/../Frameworks` | Global default — find peers, plugins, and Qt frameworks |
 | Autoload modules | `$ORIGIN/..` | `@loader_path/..` | Installed in `<parent>/` subdir, must find libs in parent dir |
 | Plugins | `$ORIGIN/..` | `@loader_path/..` | Installed in `plugins/`, must find libs in parent dir |
-| Imported CTK plugins | `$ORIGIN/..` (via `file(RPATH_SET)`) | `@loader_path/..` (via `file(RPATH_SET)`) | Same as plugins, but set post-install since they are imported targets |
+| Imported CTK plugins | `$ORIGIN/..` (via `file(RPATH_SET)`) | `@loader_path/..` (via `install_name_tool`) | Same as plugins, but set post-install since they are imported targets |
 | Executables | `$ORIGIN;$ORIGIN/plugins` | `@loader_path;@loader_path/plugins;@loader_path/../Frameworks` | Global default |
 
 On **Windows**, RPATH does not apply. DLLs are found via the executable's directory and `PATH`.
@@ -461,25 +463,40 @@ External projects register their library paths via `mitkFunctionAddLibrarySearch
 └── MitkWorkbench.app/
     └── Contents/
         ├── MacOS/
-        │   ├── MitkWorkbench       # Main executable
-        │   ├── *.dylib             # Shared libraries
-        │   └── plugins/            # CTK/BlueBerry plugins
+        │   ├── MitkWorkbench               # Main executable
+        │   ├── MitkWorkbench.provisioning   # Provisioning file
+        │   ├── libMitk*.dylib              # MITK modules
+        │   ├── libCppMicroServices.dylib   # CppMicroServices
+        │   ├── MitkCore/                   # Autoload module subdirectories
+        │   │   └── libMitkPreloadPython.dylib
+        │   └── plugins/                    # CTK/BlueBerry plugins
+        │       ├── liborg_mitk_gui_qt_*.dylib
+        │       └── liborg_blueberry_*.dylib
         ├── Frameworks/
-        │   ├── Qt*.framework/      # Qt frameworks
-        │   └── Python.framework/   # Python (converted from directory)
+        │   ├── Qt*.framework/              # Qt frameworks (deployed by macdeployqt)
+        │   ├── qwt.framework
+        │   ├── lib*.dylib                  # External dependencies (ITK, VTK, DCMTK, CTK, Boost, etc.)
+        │   └── Python.framework/           # Python (converted from directory)
         │       └── Versions/
         │           ├── A/
-        │           │   ├── Python  # Python shared library
+        │           │   ├── Python          # Python shared library
         │           │   ├── bin/
         │           │   ├── lib/
         │           │   ├── Headers/
         │           │   └── Resources/
         │           │       └── Info.plist
         │           └── Current -> A
-        ├── PlugIns/                # Qt plugins
+        ├── PlugIns/                        # Qt plugins (deployed by macdeployqt)
+        │   ├── platforms/
+        │   ├── imageformats/
+        │   ├── sqldrivers/
+        │   ├── styles/
+        │   └── ...
         └── Resources/
             └── icon.icns
 ```
+
+MITK's own code (modules, executables, CppMicroServices, CTK/BlueBerry plugins) lives in `Contents/MacOS/`. Third-party dependencies and frameworks live in `Contents/Frameworks/`. This separation follows Apple's bundle conventions and avoids duplication with `macdeployqt`, which hardcodes `Contents/Frameworks/` as the destination for all non-system shared libraries.
 
 ## External Project Special Cases
 
@@ -558,9 +575,9 @@ All app bundles are signed with `codesign` using the identity specified by `MITK
 - `com.apple.security.cs.disable-library-validation` — allows loading unsigned or differently-signed shared libraries (needed for plugins and Python modules)
 - `com.apple.security.cs.allow-jit` — allows JIT compilation (needed for some Python operations)
 
-### BundleUtilities and `@loader_path`
+### Python Module `@loader_path` Fix
 
-The `FixMacOSInstaller.cmake` script also fixes a problem caused by `BundleUtilities`: it rewrites all library dependency paths to `@executable_path/../MacOS`, which works for executables but breaks when the Python interpreter in `Frameworks/Python.framework/Versions/A/bin` tries to load the `mitk` package. The fix rewrites these paths to use `@loader_path` instead.
+The `FixMacOSInstaller.cmake` script fixes library dependency paths in the mitk Python module. `macdeployqt` rewrites dependency references to use `@executable_path/../MacOS/`, which works for binaries loaded by the main application but breaks when the Python interpreter in `Frameworks/Python.framework/Versions/A/bin` tries to load the `mitk` package. The fix rewrites these paths to use `@loader_path` instead.
 
 ## Provisioning Files
 

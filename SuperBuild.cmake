@@ -409,6 +409,7 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     MITK-Dependencies
+    MITK-Data
   )
 
 mitkFunctionInstallExternalCMakeProject(${proj})

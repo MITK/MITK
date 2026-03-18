@@ -2,10 +2,14 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
+# These variables are used by Doxygen for the build instructions.
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS 3.31)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER 3.28)
+
 if(WIN32)
-  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.31)
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS})
 else()
-  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.28)
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER})
 endif()
 
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})

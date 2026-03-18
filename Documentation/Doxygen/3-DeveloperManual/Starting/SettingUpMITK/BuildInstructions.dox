@@ -15,7 +15,7 @@ This page explains how to configure and use the MITK superbuild.
 You need the following software:
 
   -# <a href="https://git-scm.com/">Git</a>
-  -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or later; CMake 4 is not yet supported)
+  -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersionOther or later; version \minimumCMakeVersionWindows on Windows; CMake 4 is not yet supported)
   -# <a href="https://www.qt.io/">Qt</a> (version \minimumQt6Version or later; see below)
   -# <a href="https://www.doxygen.nl/">Doxygen</a> (version 1.9; Doxygen 1.10 and later are not yet supported)
   -# <a href="https://graphviz.org/">GraphViz</a>

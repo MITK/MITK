@@ -2,7 +2,12 @@
     in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
     long comment in CMakeExternals/Boost.cmake for details. ]]
 
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.28)
+if(WIN32)
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.31)
+else()
+  set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.28)
+endif()
+
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------

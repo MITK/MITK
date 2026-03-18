@@ -1,21 +1,4 @@
 #-----------------------------------------------------------------------------
-# Convenient macro allowing to download a file
-#-----------------------------------------------------------------------------
-
-if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
-  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL https://www.mitk.org/download/thirdparty)
-endif()
-
-macro(downloadFile url dest)
-  file(DOWNLOAD ${url} ${dest} STATUS status)
-  list(GET status 0 error_code)
-  list(GET status 1 error_msg)
-  if(error_code)
-    message(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
-  endif()
-endmacro()
-
-#-----------------------------------------------------------------------------
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
@@ -29,19 +12,6 @@ if(LINUX)
   # Check for libtiff4-dev
   mitkFunctionCheckPackageHeader(tiff.h libtiff4-dev)
 
-endif()
-
-# We need a proper patch program. On Linux and MacOS, we assume
-# that "patch" is available. On Windows, we download patch.exe
-# if not patch program is found.
-find_program(PATCH_COMMAND patch)
-if((NOT PATCH_COMMAND OR NOT EXISTS ${PATCH_COMMAND}) AND WIN32)
-  downloadFile(${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/patch.exe
-               ${CMAKE_CURRENT_BINARY_DIR}/patch.exe)
-  find_program(PATCH_COMMAND patch ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-if(NOT PATCH_COMMAND)
-  message(FATAL_ERROR "No patch program found.")
 endif()
 
 #-----------------------------------------------------------------------------

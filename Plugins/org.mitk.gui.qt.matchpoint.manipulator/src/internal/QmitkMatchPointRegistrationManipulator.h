@@ -18,8 +18,10 @@ found in the LICENSE file.
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkMAPRegistrationWrapper.h>
+#include <mitkRegistrationManipulationInteractor.h>
 #include <itkEuler3DTransform.h>
 
+#include <QList>
 #include <memory>
 
 namespace Ui
@@ -74,6 +76,9 @@ public:
 
   void OnSliceChanged();
 
+  void OnInteractionToolToggled(bool checked);
+  void OnScalingCheckboxToggled(bool checked);
+
   void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
 
   void Error(QString msg);
@@ -120,6 +125,29 @@ private:
 
   void ConfigureTransformCenter(int centerType);
 
+  /** Activates the mouse interaction tool: saves display interaction configs,
+   *  creates the interactor, connects events. */
+  void ActivateInteractionTool();
+
+  /** Deactivates the mouse interaction tool: restores display interaction configs,
+   *  disconnects events, removes interactor. */
+  void DeactivateInteractionTool();
+
+  /** Updates the center-of-rotation crosshair indicator node. */
+  void UpdateCenterOfRotationIndicator();
+
+  /** Called by ITK observer when the interactor emits a translation delta. */
+  void OnInteractorTranslation();
+
+  /** Called by ITK observer when the interactor emits a rotation delta. */
+  void OnInteractorRotation();
+
+  /** Called by ITK observer when the interactor emits a scale delta. */
+  void OnInteractorScale();
+
+  /** Called by ITK observer when the interactor emits a position-select event. */
+  void OnInteractorSelectPosition();
+
   mitk::DataNode::Pointer m_EvalNode;
 
   QmitkSliceNavigationListener m_SliceChangeListener;
@@ -147,6 +175,18 @@ private:
 
   bool m_internalUpdate;
   static const std::string HelperNodeName;
+
+  // Mouse interaction tool members
+  mitk::RegistrationManipulationInteractor::Pointer m_Interactor;
+  mitk::DataNode::Pointer m_CenterOfRotationIndicatorNode;
+  bool m_InteractionToolActive = false;
+
+  // ITK observer tags for interactor event connections
+  unsigned long m_TranslationObserverTag = 0;
+  unsigned long m_RotationObserverTag = 0;
+  unsigned long m_ScaleObserverTag = 0;
+  unsigned long m_SelectPositionObserverTag = 0;
+
 };
 
 #endif

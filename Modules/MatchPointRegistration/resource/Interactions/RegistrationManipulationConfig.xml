@@ -1,0 +1,61 @@
+<config>
+  <!-- Translation: Shift + Left mouse button -->
+  <event_variant name="StartTranslation" class="MousePressEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant name="Translating" class="MouseMoveEvent">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+
+  <!-- Rotation: Ctrl + Left mouse button -->
+  <event_variant name="StartRotation" class="MousePressEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="Rotating" class="MouseMoveEvent">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <!-- Scaling: Shift + Ctrl + Left mouse button -->
+  <event_variant name="StartScaling" class="MousePressEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+  <event_variant name="Scaling" class="MouseMoveEvent">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+
+  <!-- Position selection: plain Left mouse button (no modifiers) -->
+  <event_variant name="StartSelectPosition" class="MousePressEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="SelectingPosition" class="MouseMoveEvent">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+
+  <!-- End interactions: release left mouse button.
+       Four variants cover every modifier state that may be held at release time.
+       MITK's event matching requires an exact match on the Modifiers attribute,
+       so a release while still holding the gesture modifier would not match a
+       variant without a Modifiers entry.  All four variants map to the same
+       end actions in the state machine. -->
+  <event_variant name="EndInteraction" class="MouseReleaseEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="EndInteractionShift" class="MouseReleaseEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant name="EndInteractionCtrl" class="MouseReleaseEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="EndInteractionShiftCtrl" class="MouseReleaseEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift,ctrl"/>
+  </event_variant>
+</config>

@@ -27,6 +27,10 @@ found in the LICENSE file.
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
 #include <mitkProperties.h>
+#include <mitkRegistrationManipulationInteractor.h>
+#include <mitkCrosshairData.h>
+
+#include <usModuleRegistry.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -124,6 +128,8 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
 
   connect(m_Controls->comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(int)));
   connect(m_Controls->manipulationWidget, SIGNAL(RegistrationChanged(map::core::RegistrationBase*)), this, SLOT(OnRegistrationChanged()));
+  connect(m_Controls->pbInteractionTool, SIGNAL(toggled(bool)), this, SLOT(OnInteractionToolToggled(bool)));
+  connect(m_Controls->checkScaling, SIGNAL(toggled(bool)), this, SLOT(OnScalingCheckboxToggled(bool)));
 
   connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
   connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
@@ -279,6 +285,17 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   m_Controls->checkAutoSelect->setEnabled(!m_activeManipulation && m_Controls->radioSelectedReg->isChecked());
   m_Controls->movingNodeSelector->setEnabled(!m_activeManipulation);
   m_Controls->targetNodeSelector->setEnabled(!m_activeManipulation);
+
+  // Interaction tool controls: only available during active manipulation
+  m_Controls->pbInteractionTool->setEnabled(m_activeManipulation);
+  m_Controls->checkScaling->setEnabled(m_activeManipulation);
+  m_Controls->lblInteractionInfo->setVisible(m_activeManipulation && m_InteractionToolActive);
+  m_Controls->checkScaling->setVisible(m_activeManipulation);
+
+  if (!m_activeManipulation)
+  {
+    m_Controls->pbInteractionTool->setChecked(false);
+  }
 }
 
 void QmitkMatchPointRegistrationManipulator::InitSession()
@@ -325,6 +342,11 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
+  if (m_InteractionToolActive)
+  {
+    this->DeactivateInteractionTool();
+  }
+
   this->m_activeManipulation = false;
 
   if (this->m_EvalNode.IsNotNull())
@@ -380,6 +402,10 @@ void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
     if (m_activeManipulation && m_Controls->comboCenter->currentIndex() == 2)
     { //update transform with the current position.
       m_Controls->manipulationWidget->SetCenterOfRotation(m_currentSelectedPosition);
+      if (m_Interactor.IsNotNull())
+      {
+        m_Interactor->SetCenterOfRotation(m_currentSelectedPosition);
+      }
     }
   }
 }
@@ -504,22 +530,220 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
 
 void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int centerType)
 {
+  mitk::Point3D center;
+
   if (centerType == 0)
   { //image center
-    auto center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
+    center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
     m_Controls->manipulationWidget->SetCenterOfRotationIsRelativeToTarget(false);
     m_Controls->manipulationWidget->SetCenterOfRotation(center);
   }
   else if (centerType == 1)
   { //world origin
-    mitk::Point3D center;
     center.Fill(0.0);
     m_Controls->manipulationWidget->SetCenterOfRotationIsRelativeToTarget(false);
     m_Controls->manipulationWidget->SetCenterOfRotation(center);
   }
   else
   { //current selected point
+    center = m_currentSelectedPosition;
     m_Controls->manipulationWidget->SetCenterOfRotationIsRelativeToTarget(true);
-    m_Controls->manipulationWidget->SetCenterOfRotation(m_currentSelectedPosition);
+    m_Controls->manipulationWidget->SetCenterOfRotation(center);
+  }
+
+  if (m_Interactor.IsNotNull())
+  {
+    m_Interactor->SetCenterOfRotation(center);
+  }
+  this->UpdateCenterOfRotationIndicator();
+}
+
+void QmitkMatchPointRegistrationManipulator::OnInteractionToolToggled(bool checked)
+{
+  if (checked && m_activeManipulation)
+  {
+    this->ActivateInteractionTool();
+  }
+  else
+  {
+    this->DeactivateInteractionTool();
+  }
+  this->ConfigureControls();
+}
+
+void QmitkMatchPointRegistrationManipulator::OnScalingCheckboxToggled(bool checked)
+{
+  if (m_Interactor.IsNotNull())
+  {
+    m_Interactor->SetScalingEnabled(checked);
   }
 }
+
+void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
+{
+  if (m_InteractionToolActive)
+    return;
+
+  auto* regModule = us::ModuleRegistry::GetModule("MitkMatchPointRegistration");
+  if (nullptr == regModule)
+    return;
+
+  // Create and configure the interactor, attached to the moving data node
+  m_Interactor = mitk::RegistrationManipulationInteractor::New();
+  m_Interactor->LoadStateMachine("RegistrationManipulationStates.xml", regModule);
+  m_Interactor->SetEventConfig("RegistrationManipulationConfig.xml", regModule);
+  m_Interactor->SetDataNode(m_SelectedMovingNode);
+  m_Interactor->SetScalingEnabled(m_Controls->checkScaling->isChecked());
+
+  // Set current center of rotation
+  this->ConfigureTransformCenter(m_Controls->comboCenter->currentIndex());
+
+  // Connect ITK observer events to our handler methods
+  auto translationCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
+  translationCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorTranslation);
+  m_TranslationObserverTag = m_Interactor->AddObserver(mitk::RegistrationTranslationEvent(), translationCmd);
+
+  auto rotationCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
+  rotationCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorRotation);
+  m_RotationObserverTag = m_Interactor->AddObserver(mitk::RegistrationRotationEvent(), rotationCmd);
+
+  auto scaleCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
+  scaleCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorScale);
+  m_ScaleObserverTag = m_Interactor->AddObserver(mitk::RegistrationScaleEvent(), scaleCmd);
+
+  auto selectPosCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
+  selectPosCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition);
+  m_SelectPositionObserverTag = m_Interactor->AddObserver(mitk::RegistrationSelectPositionEvent(), selectPosCmd);
+
+  // Block LMB display interactions (via DisplayConfigBlockLMB.xml) to prevent
+  // conflict with our modifier+drag and plain-click gestures
+  m_Interactor->DisableOriginalInteraction();
+
+  m_InteractionToolActive = true;
+
+  // Push the base manipulation cursor
+  m_Interactor->PushManipulationCursor();
+
+  // Setup center of rotation indicator
+  this->UpdateCenterOfRotationIndicator();
+}
+
+void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
+{
+  if (!m_InteractionToolActive)
+    return;
+
+  // Disconnect observers and restore display interactions
+  if (m_Interactor.IsNotNull())
+  {
+    m_Interactor->PopManipulationCursor();
+    m_Interactor->RemoveObserver(m_TranslationObserverTag);
+    m_Interactor->RemoveObserver(m_RotationObserverTag);
+    m_Interactor->RemoveObserver(m_ScaleObserverTag);
+    m_Interactor->RemoveObserver(m_SelectPositionObserverTag);
+    m_Interactor->EnableOriginalInteraction();
+    m_Interactor->SetDataNode(nullptr);
+  }
+  m_Interactor = nullptr;
+
+  // Remove center indicator
+  if (m_CenterOfRotationIndicatorNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+  {
+    this->GetDataStorage()->Remove(m_CenterOfRotationIndicatorNode);
+  }
+  m_CenterOfRotationIndicatorNode = nullptr;
+
+  m_InteractionToolActive = false;
+}
+
+void QmitkMatchPointRegistrationManipulator::UpdateCenterOfRotationIndicator()
+{
+  if (!m_InteractionToolActive)
+    return;
+
+  const int centerMode = m_Controls->comboCenter->currentIndex();
+
+  // Don't show indicator when using "Current navigator position" mode (already shown by crosshair)
+  if (centerMode == 2)
+  {
+    if (m_CenterOfRotationIndicatorNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+    {
+      this->GetDataStorage()->Remove(m_CenterOfRotationIndicatorNode);
+      m_CenterOfRotationIndicatorNode = nullptr;
+    }
+    return;
+  }
+
+  // Determine center position
+  mitk::Point3D center;
+  if (centerMode == 0 && m_SelectedMovingNode.IsNotNull())
+  {
+    center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
+  }
+  else
+  {
+    center.Fill(0.0);
+  }
+
+  // Create or update the indicator node
+  if (m_CenterOfRotationIndicatorNode.IsNull())
+  {
+    auto crosshairData = mitk::CrosshairData::New();
+    crosshairData->SetPosition(center);
+
+    m_CenterOfRotationIndicatorNode = mitk::DataNode::New();
+    m_CenterOfRotationIndicatorNode->SetData(crosshairData);
+    m_CenterOfRotationIndicatorNode->SetName("RegistrationRotationCenter");
+    m_CenterOfRotationIndicatorNode->SetBoolProperty("helper object", true);
+    m_CenterOfRotationIndicatorNode->SetColor(1.0, 0.8, 0.0); // yellow/orange
+    m_CenterOfRotationIndicatorNode->SetIntProperty("Crosshair.Gap Size", 16);
+    m_CenterOfRotationIndicatorNode->SetFloatProperty("Line width", 2);
+    this->GetDataStorage()->Add(m_CenterOfRotationIndicatorNode);
+  }
+  else
+  {
+    auto* crosshairData = dynamic_cast<mitk::CrosshairData*>(
+      m_CenterOfRotationIndicatorNode->GetData());
+    if (crosshairData != nullptr)
+    {
+      crosshairData->SetPosition(center);
+      m_CenterOfRotationIndicatorNode->Modified();
+    }
+  }
+}
+
+void QmitkMatchPointRegistrationManipulator::OnInteractorTranslation()
+{
+  if (m_Interactor.IsNull())
+    return;
+
+  m_Controls->manipulationWidget->ApplyTranslationDelta(m_Interactor->GetTranslationDelta());
+}
+
+void QmitkMatchPointRegistrationManipulator::OnInteractorRotation()
+{
+  if (m_Interactor.IsNull())
+    return;
+
+  const auto& rotDelta = m_Interactor->GetRotationDelta();
+  m_Controls->manipulationWidget->ApplyRotationDelta(rotDelta.Axis, rotDelta.AngleDeg);
+}
+
+void QmitkMatchPointRegistrationManipulator::OnInteractorScale()
+{
+  // Scaling not yet implemented in widget - reserved for Phase 2
+  // Will call m_Controls->manipulationWidget->ApplyScaleDelta(m_Interactor->GetScaleFactor());
+}
+
+void QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition()
+{
+  if (m_Interactor.IsNull())
+    return;
+
+  auto* rwPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  if (rwPart != nullptr)
+  {
+    rwPart->SetSelectedPosition(m_Interactor->GetSelectPosition(), nullptr);
+  }
+}
+

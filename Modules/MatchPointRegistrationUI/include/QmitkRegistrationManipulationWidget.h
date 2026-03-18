@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mapContinuous.h>
 
 #include <mitkPoint.h>
+#include <mitkVector.h>
 
 #include <QWidget>
 
@@ -32,11 +33,13 @@ namespace Ui
 }
 
 /*!
-\brief QmitkMatchPointRegistrationManipulator
+\brief Widget that allows to manually manipulate a registration transform.
 
-\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+The widget operates on an itk::Euler3DTransform and provides slider/spinbox controls
+for rotation and translation. It also offers methods to apply incremental changes
+(e.g. from mouse interaction in render windows).
 
-\ingroup ${plugin_target}_internal
+\ingroup MatchPointRegistrationUI
 */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : public QWidget
 {
@@ -66,6 +69,20 @@ public:
   /**This function generates a new registration instance that resembles the state when the method was called.
   Ownership of the return goes to the caller.*/
   map::core::RegistrationBase::Pointer GenerateRegistration()const ;
+
+  /** Apply an incremental translation in world coordinates to the current transform.
+  * @pre delta must be a valid 3D vector (no NaN/Inf components).
+  */
+  void ApplyTranslationDelta(const mitk::Vector3D& delta);
+
+  /** Apply an incremental rotation around the given world-space axis.
+  * The rotation is composed with the current rotation matrix and decomposed
+  * back into Euler angles.
+  * @pre axis must be a non-zero vector. It will be normalized internally.
+  * @param axis  Rotation axis in world coordinates (e.g. view plane normal).
+  * @param angleDeg  Rotation angle in degrees.
+  */
+  void ApplyRotationDelta(const mitk::Vector3D& axis, double angleDeg);
 
 public Q_SLOTS:
   void SetCenterOfRotation(const mitk::Point3D& center);

@@ -22,13 +22,11 @@
 ;--------------------------------
 ;Include Modern UI
 
-  !include "MUI.nsh"
+  !include "MUI2.nsh"
+  !include "InstallOptions.nsh"
 
   ;Default installation folder
   InstallDir "@CPACK_NSIS_INSTALL_ROOT@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
-
-  ;Allow for very long title on the welcome page
-  !define MUI_WELCOMEPAGE_TITLE_3LINES
 
 ;--------------------------------
 ;General
@@ -43,6 +41,8 @@
   RequestExecutionLevel user
 
 @CPACK_NSIS_DEFINES@
+@CPACK_NSIS_MANIFEST_DPI_AWARE_CODE@
+@CPACK_NSIS_BRANDING_TEXT_CODE@
 
   !include Sections.nsh
 
@@ -124,16 +124,13 @@ Var AR_RegFlags
  "exit_${SecName}:"
 !macroend
 
-; NSIS example code to only include some code if a file exists at compile time (whereas IfFileExists works at runtime)
-; See https://nsis.sourceforge.io/Check_if_a_file_exists_at_compile_time for documentation
-!macro !defineifexist _VAR_NAME _FILE_NAME
-  !tempfile _TEMPFILE
-  !system 'if exist "${_FILE_NAME}" echo !define ${_VAR_NAME} > "${_TEMPFILE}"'
-  !include '${_TEMPFILE}'
-  !delfile '${_TEMPFILE}'
-  !undef _TEMPFILE
+!macro RemoveSection_CPack SecName
+  ;  This macro is used to call section's Remove_... macro
+  ;from the uninstaller.
+  ;Input: section index constant name specified in Section command.
+
+  !insertmacro "Remove_${${SecName}}"
 !macroend
-!define !defineifexist "!insertmacro !defineifexist"
 
 ; Determine whether the selection of SecName changed
 !macro MaybeSelectionChanged SecName
@@ -409,15 +406,15 @@ Done:
   Exch $R1
 FunctionEnd
 
-Function ConditionalAddToRegisty
+Function ConditionalAddToRegistry
   Pop $0
   Pop $1
-  StrCmp "$0" "" ConditionalAddToRegisty_EmptyString
+  StrCmp "$0" "" ConditionalAddToRegistry_EmptyString
     WriteRegStr SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@" \
     "$1" "$0"
     ;MessageBox MB_OK "Set Registry: '$1' to '$0'"
     DetailPrint "Set install registry entry: '$1' to '$0'"
-  ConditionalAddToRegisty_EmptyString:
+  ConditionalAddToRegistry_EmptyString:
 FunctionEnd
 
 ;--------------------------------
@@ -454,19 +451,23 @@ FunctionEnd
 ;--------------------------------
 ; Component sections
 @CPACK_NSIS_COMPONENT_SECTIONS@
+@CPACK_NSIS_INSTALLER_MUI_COMPONENTS_DESC@
 
 ;--------------------------------
 ; Define some macro setting for the gui
 @CPACK_NSIS_INSTALLER_MUI_ICON_CODE@
 @CPACK_NSIS_INSTALLER_ICON_CODE@
-@CPACK_NSIS_INSTALLER_MUI_COMPONENTS_DESC@
+@CPACK_NSIS_INSTALLER_MUI_WELCOMEFINISH_CODE@
+@CPACK_NSIS_INSTALLER_MUI_UNWELCOMEFINISH_CODE@
 @CPACK_NSIS_INSTALLER_MUI_FINISHPAGE_RUN_CODE@
 
 ;--------------------------------
 ;Pages
+  @CPACK_NSIS_INSTALLER_WELCOME_TITLE_CODE@
+  @CPACK_NSIS_INSTALLER_WELCOME_TITLE_3LINES_CODE@
   !insertmacro MUI_PAGE_WELCOME
 
-  !insertmacro MUI_PAGE_LICENSE "@CPACK_RESOURCE_FILE_LICENSE@"
+  @CPACK_NSIS_LICENSE_PAGE@
   Page custom InstallOptionsPage
   !insertmacro MUI_PAGE_DIRECTORY
 
@@ -479,6 +480,8 @@ FunctionEnd
   @CPACK_NSIS_PAGE_COMPONENTS@
 
   !insertmacro MUI_PAGE_INSTFILES
+  @CPACK_NSIS_INSTALLER_FINISH_TITLE_CODE@
+  @CPACK_NSIS_INSTALLER_FINISH_TITLE_3LINES_CODE@
   !insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -488,21 +491,27 @@ FunctionEnd
 ;Languages
 
   !insertmacro MUI_LANGUAGE "English" ;first language is the default language
+  !insertmacro MUI_LANGUAGE "Afrikaans"
   !insertmacro MUI_LANGUAGE "Albanian"
   !insertmacro MUI_LANGUAGE "Arabic"
+  !insertmacro MUI_LANGUAGE "Asturian"
   !insertmacro MUI_LANGUAGE "Basque"
   !insertmacro MUI_LANGUAGE "Belarusian"
   !insertmacro MUI_LANGUAGE "Bosnian"
   !insertmacro MUI_LANGUAGE "Breton"
   !insertmacro MUI_LANGUAGE "Bulgarian"
+  !insertmacro MUI_LANGUAGE "Catalan"
+  !insertmacro MUI_LANGUAGE "Corsican"
   !insertmacro MUI_LANGUAGE "Croatian"
   !insertmacro MUI_LANGUAGE "Czech"
   !insertmacro MUI_LANGUAGE "Danish"
   !insertmacro MUI_LANGUAGE "Dutch"
+  !insertmacro MUI_LANGUAGE "Esperanto"
   !insertmacro MUI_LANGUAGE "Estonian"
   !insertmacro MUI_LANGUAGE "Farsi"
   !insertmacro MUI_LANGUAGE "Finnish"
   !insertmacro MUI_LANGUAGE "French"
+  !insertmacro MUI_LANGUAGE "Galician"
   !insertmacro MUI_LANGUAGE "German"
   !insertmacro MUI_LANGUAGE "Greek"
   !insertmacro MUI_LANGUAGE "Hebrew"
@@ -521,22 +530,29 @@ FunctionEnd
   !insertmacro MUI_LANGUAGE "Malay"
   !insertmacro MUI_LANGUAGE "Mongolian"
   !insertmacro MUI_LANGUAGE "Norwegian"
+  !insertmacro MUI_LANGUAGE "NorwegianNynorsk"
+  !insertmacro MUI_LANGUAGE "Pashto"
   !insertmacro MUI_LANGUAGE "Polish"
   !insertmacro MUI_LANGUAGE "Portuguese"
   !insertmacro MUI_LANGUAGE "PortugueseBR"
   !insertmacro MUI_LANGUAGE "Romanian"
   !insertmacro MUI_LANGUAGE "Russian"
+  !insertmacro MUI_LANGUAGE "ScotsGaelic"
   !insertmacro MUI_LANGUAGE "Serbian"
   !insertmacro MUI_LANGUAGE "SerbianLatin"
   !insertmacro MUI_LANGUAGE "SimpChinese"
   !insertmacro MUI_LANGUAGE "Slovak"
   !insertmacro MUI_LANGUAGE "Slovenian"
   !insertmacro MUI_LANGUAGE "Spanish"
+  !insertmacro MUI_LANGUAGE "SpanishInternational"
   !insertmacro MUI_LANGUAGE "Swedish"
+  !insertmacro MUI_LANGUAGE "Tatar"
   !insertmacro MUI_LANGUAGE "Thai"
   !insertmacro MUI_LANGUAGE "TradChinese"
   !insertmacro MUI_LANGUAGE "Turkish"
   !insertmacro MUI_LANGUAGE "Ukrainian"
+  !insertmacro MUI_LANGUAGE "Uzbek"
+  !insertmacro MUI_LANGUAGE "Vietnamese"
   !insertmacro MUI_LANGUAGE "Welsh"
 
 
@@ -548,7 +564,9 @@ FunctionEnd
   ;Only for solid compression (by default, solid compression is enabled for BZIP2 and LZMA)
 
   ReserveFile "NSIS.InstallOptions.ini"
-  !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+
+  ; for UserInfo::GetName and UserInfo::GetAccountType
+  ReserveFile /plugin 'UserInfo.dll'
 
 ;--------------------------------
 ;Installer Sections
@@ -557,83 +575,84 @@ Section "-Core installation"
   ;Use the entire tree produced by the INSTALL target.  Keep the
   ;list of directories here in sync with the RMDir commands below.
   SetOutPath "$INSTDIR"
+  @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
   @CPACK_NSIS_FULL_INSTALL@
 
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
 
   ;Create uninstaller
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
+  WriteUninstaller "$INSTDIR\@CPACK_NSIS_UNINSTALL_NAME@.exe"
   Push "DisplayName"
   Push "@CPACK_NSIS_DISPLAY_NAME@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "DisplayVersion"
   Push "@CPACK_PACKAGE_VERSION@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "Publisher"
   Push "@CPACK_PACKAGE_VENDOR@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "UninstallString"
-  Push "$INSTDIR\Uninstall.exe"
-  Call ConditionalAddToRegisty
+  Push "$\"$INSTDIR\@CPACK_NSIS_UNINSTALL_NAME@.exe$\""
+  Call ConditionalAddToRegistry
   Push "NoRepair"
   Push "1"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
 
   !ifdef CPACK_NSIS_ADD_REMOVE
   ;Create add/remove functionality
   Push "ModifyPath"
   Push "$INSTDIR\AddRemove.exe"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   !else
   Push "NoModify"
   Push "1"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   !endif
 
   ; Optional registration
   Push "DisplayIcon"
   Push "$INSTDIR\@CPACK_NSIS_INSTALLED_ICON_NAME@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "HelpLink"
   Push "@CPACK_NSIS_HELP_LINK@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "URLInfoAbout"
   Push "@CPACK_NSIS_URL_INFO_ABOUT@"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "Contact"
   Push "@CPACK_NSIS_CONTACT@"
-  Call ConditionalAddToRegisty
-  !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
+  Call ConditionalAddToRegistry
+  !insertmacro INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 
   ;Create shortcuts
   CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
 @CPACK_NSIS_CREATE_ICONS@
 @CPACK_NSIS_CREATE_ICONS_EXTRA@
-  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\@CPACK_NSIS_UNINSTALL_NAME@.exe"
 
   ;Read a value from an InstallOptions INI file
-  !insertmacro MUI_INSTALLOPTIONS_READ $DO_NOT_ADD_TO_PATH "NSIS.InstallOptions.ini" "Field 2" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $ADD_TO_PATH_ALL_USERS "NSIS.InstallOptions.ini" "Field 3" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $ADD_TO_PATH_CURRENT_USER "NSIS.InstallOptions.ini" "Field 4" "State"
+  !insertmacro INSTALLOPTIONS_READ $DO_NOT_ADD_TO_PATH "NSIS.InstallOptions.ini" "Field 2" "State"
+  !insertmacro INSTALLOPTIONS_READ $ADD_TO_PATH_ALL_USERS "NSIS.InstallOptions.ini" "Field 3" "State"
+  !insertmacro INSTALLOPTIONS_READ $ADD_TO_PATH_CURRENT_USER "NSIS.InstallOptions.ini" "Field 4" "State"
 
   ; Write special uninstall registry entries
   Push "StartMenu"
   Push "$STARTMENU_FOLDER"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "DoNotAddToPath"
   Push "$DO_NOT_ADD_TO_PATH"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "AddToPathAllUsers"
   Push "$ADD_TO_PATH_ALL_USERS"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "AddToPathCurrentUser"
   Push "$ADD_TO_PATH_CURRENT_USER"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
   Push "InstallToDesktop"
   Push "$INSTALL_DESKTOP"
-  Call ConditionalAddToRegisty
+  Call ConditionalAddToRegistry
 
   !insertmacro MUI_STARTMENU_WRITE_END
 
@@ -653,7 +672,7 @@ SectionEnd
 ; Create custom pages
 Function InstallOptionsPage
   !insertmacro MUI_HEADER_TEXT "Install Options" "Choose options for installing @CPACK_NSIS_PACKAGE_NAME@"
-  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "NSIS.InstallOptions.ini"
+  !insertmacro INSTALLOPTIONS_DISPLAY "NSIS.InstallOptions.ini"
 
 FunctionEnd
 
@@ -791,7 +810,7 @@ Section "Uninstall"
 !endif
 
   ;Remove the uninstaller itself.
-  Delete "$INSTDIR\Uninstall.exe"
+  Delete "$INSTDIR\@CPACK_NSIS_UNINSTALL_NAME@.exe"
   DeleteRegKey SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@"
 
   ;Remove the installation directory if it is empty.
@@ -801,7 +820,7 @@ Section "Uninstall"
   DeleteRegKey SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
 
   ; Removes all optional components
-  !insertmacro SectionList "RemoveSection"
+  !insertmacro SectionList "RemoveSection_CPack"
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
 
@@ -860,6 +879,38 @@ SectionEnd
 ; "Program Files" for AllUsers, "My Documents" for JustMe...
 
 Function .onInit
+  StrCmp "@CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL@" "ON" 0 inst
+
+  ReadRegStr $0 SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_NAME@" "UninstallString"
+  StrCmp $0 "" inst
+
+  MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION \
+  "@CPACK_NSIS_PACKAGE_NAME@ is already installed. $\n$\nDo you want to uninstall the old version before installing the new one?" \
+  /SD IDYES IDYES uninst IDNO inst
+  Abort
+
+;Run the uninstaller
+uninst:
+  ClearErrors
+  # Remove quotes from UninstallString if present (for backward compatibility)
+  StrCpy $2 $0 1 0
+  StrCmp $2 "$\"" 0 +2
+  StrCpy $0 $0 "" 1
+  StrCpy $2 $0 1 -1
+  StrCmp $2 "$\"" 0 +2
+  StrCpy $0 $0 -1
+
+  StrLen $2 "\@CPACK_NSIS_UNINSTALL_NAME@.exe"
+  StrCpy $3 $0 -$2 ; remove "\@CPACK_NSIS_UNINSTALL_NAME@.exe" from UninstallString to get path
+  ExecWait '"$0" /S _?=$3' ;Do not copy the uninstaller to a temp file
+
+  IfErrors uninst_failed inst
+uninst_failed:
+  MessageBox MB_OK|MB_ICONSTOP "Uninstall failed."
+  Abort
+
+
+inst:
   ; Reads components status for registry
   !insertmacro SectionList "InitSection"
 
@@ -904,7 +955,7 @@ Function .onInit
       StrCpy $INSTDIR "@CPACK_NSIS_INSTALL_ROOT@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
   StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 noOptionsPage
-    !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
+    !insertmacro INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
 
   noOptionsPage:
 FunctionEnd

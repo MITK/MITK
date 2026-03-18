@@ -227,7 +227,7 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkVtkEventAdapter.cpp
-  Interactions/mitkVtkInteractorStyle.cxx
+  Interactions/mitkVtkInteractorStyle.cpp
   Interactions/mitkXML2EventParser.cpp
 
   IO/mitkAbstractFileIO.cpp

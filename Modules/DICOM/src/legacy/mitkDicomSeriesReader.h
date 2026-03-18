@@ -239,7 +239,7 @@ namespace mitk
   slice distance in this special case)
 
    Both errors are introduced in
-   itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of
+   itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of
   ITK 3.20)
 
    For the correction, we examine two consecutive slices of a series, both described as a pair (origin/orientation):
@@ -770,7 +770,7 @@ namespace mitk
       AnalyzeFileForITKImageSeriesReaderSpacingAssumption again.
 
       Relevant code that is matched here is in
-      itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as
+      itkImageSeriesReader.tpp (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as
       of
       ITK 3.20)
     */

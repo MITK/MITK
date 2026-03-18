@@ -5,6 +5,7 @@ if(BUILD_NewModuleMiniApps)
   mitkFunctionCreateCommandLineApp(
     NAME ExampleToUpperCaseMiniApp
     DEPENDS MitkNewModule
+    NO_INSTALL
   )
 
 endif()

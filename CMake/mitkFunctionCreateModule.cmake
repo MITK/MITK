@@ -35,12 +35,9 @@
 #!
 #! - CPP_FILES A list of .cpp files
 #! - H_FILES A list of .h files without a corresponding .cpp file
-#! - TXX_FILES A list of .txx files
 #! - RESOURCE_FILES A list of files (resources) which are embedded into the module
-#! - MOC_H_FILES A list of Qt header files which should be processed by the MOC
 #! - UI_FILES A list of .ui Qt UI files
 #! - QRC_FILES A list of .qrc Qt resource files
-#! - DOX_FILES A list of .dox Doxygen files
 #!
 #! List of variables available after the function is called:
 #! - MODULE_NAME
@@ -100,7 +97,6 @@ function(mitk_create_module)
 
   set(_macro_params
       VERSION                # module version number, e.g. "1.2.0"
-      EXPORT_DEFINE          # export macro name for public symbols of this module (DEPRECATED)
       AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
                              # automatic loading of this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
@@ -110,28 +106,26 @@ function(mitk_create_module)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels (deprecated)
       INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
-      INTERNAL_INCLUDE_DIRS  # include dirs internal to this module (DEPRECATED)
       PCH                    # list of header files for precompiled header
       DEPENDS                # list of modules this module depends on: [PUBLIC|PRIVATE|INTERFACE] <list>
-      DEPENDS_INTERNAL       # list of modules this module internally depends on (DEPRECATED)
       PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.): [PUBLIC|PRIVATE|INTERFACE] <package-list>
       TARGET_DEPENDS         # list of CMake targets this module should depend on: [PUBLIC|PRIVATE|INTERFACE] <list>
       ADDITIONAL_LIBS        # list of addidtional private libraries linked to this module.
       CPP_FILES              # list of cpp files
       H_FILES                # list of header files: [PUBLIC|PRIVATE] <list>
+      AUTOMOC_FORCE_INCLUDES # headers to force-include in moc output via -b (for Q_DECLARE_METATYPE ordering)
      )
 
   set(_macro_options
       FORCE_STATIC           # force building this module as a static library
-      HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
       NO_DEFAULT_INCLUDE_DIRS # do not add default include directories like "include" or "."
       NO_INIT                # do not create CppMicroServices initialization code
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
+      AUTOMOC                # enable Qt AUTOMOC/AUTOUIC/AUTORCC even without UI or QRC files
       C_MODULE               # compile all source files as C sources
       CXX_MODULE             # compile all source files as C++ sources
      )
@@ -150,13 +144,6 @@ function(mitk_create_module)
       message(SEND_ERROR "The module name must not be empty")
     endif()
   endif()
-
-  set(_deprecated_args INTERNAL_INCLUDE_DIRS DEPENDS_INTERNAL EXPORT_DEFINE HEADERS_ONLY)
-  foreach(_deprecated_arg ${_deprecated_args})
-    if(MODULE_${_deprecated_arg})
-      message(WARNING "The ${_deprecated_arg} argument is deprecated")
-    endif()
-  endforeach()
 
   set(_module_type module)
   set(_Module_type Module)
@@ -247,17 +234,8 @@ function(mitk_create_module)
     set(RESOURCE_FILES )
     set(CPP_FILES )
     set(H_FILES )
-    set(TXX_FILES )
-    set(DOX_FILES )
     set(UI_FILES )
-    set(MOC_H_FILES )
     set(QRC_FILES )
-
-    # clear other variables
-    set(GENERATED_CPP )
-    set(GENERATED_MOC_CPP )
-    set(GENERATED_QRC_CPP )
-    set(GENERATED_UI_CPP )
 
     # check and set-up auto-loading
     if(MODULE_AUTOLOAD_WITH)
@@ -270,10 +248,6 @@ function(mitk_create_module)
     if(NOT TARGET ${_module_autoload_meta_target})
       add_custom_target(${_module_autoload_meta_target})
       set_property(TARGET ${_module_autoload_meta_target} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules/Autoload")
-    endif()
-
-    if(NOT MODULE_EXPORT_DEFINE)
-      set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
     endif()
 
     if(MITK_GENERATE_MODULE_DOT)
@@ -300,7 +274,7 @@ function(mitk_create_module)
       endforeach()
     endif()
 
-    if(CPP_FILES OR RESOURCE_FILES OR UI_FILES OR MOC_H_FILES OR QRC_FILES)
+    if(CPP_FILES OR RESOURCE_FILES OR UI_FILES OR QRC_FILES)
       set(MODULE_HEADERS_ONLY 0)
       if(MODULE_C_MODULE)
         set_source_files_properties(${CPP_FILES} PROPERTIES LANGUAGE C)
@@ -321,7 +295,7 @@ function(mitk_create_module)
     set(module_cxx_flags_debug )
     set(module_cxx_flags_release )
 
-    if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_COMPILER_IS_GNUCXX)
+    if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       # We only support hidden visibility for gcc for now. Clang still has troubles with
       # correctly marking template declarations and explicit template instantiations as exported.
       set(CMAKE_CXX_VISIBILITY_PRESET default)
@@ -405,35 +379,16 @@ function(mitk_create_module)
       endif()
     endif()
 
-    if(MITK_USE_Qt6)
-      if(UI_FILES)
-        qt_wrap_ui(GENERATED_UI_CPP ${UI_FILES})
-      endif()
-      if(MOC_H_FILES)
-        qt_wrap_cpp(GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-      endif()
-      if(QRC_FILES)
-        qt_add_resources(GENERATED_QRC_CPP ${QRC_FILES})
-      endif()
-    endif()
-
-    set(GENERATED_CPP ${GENERATED_CPP} ${GENERATED_UI_CPP} ${GENERATED_MOC_CPP} ${GENERATED_QRC_CPP})
-
     mitkFunctionOrganizeSources(
       SOURCE ${CPP_FILES}
       HEADER ${H_FILES}
-      TXX ${TXX_FILES}
-      DOC ${DOX_FILES}
       UI ${UI_FILES}
       QRC ${QRC_FILES}
-      MOC ${GENERATED_MOC_CPP}
-      GEN_QRC ${GENERATED_QRC_CPP}
-      GEN_UI ${GENERATED_UI_CPP}
       )
 
     set(coverage_sources
-        ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}
-        ${TOOL_CPPS} ${TOOL_GUI_CPPS})
+        ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES}
+        ${CORRESPONDING__TPP_FILES} ${TOOL_CPPS} ${TOOL_GUI_CPPS})
 
     # ---------------------------------------------------------------
     # Create the actual module target
@@ -450,8 +405,8 @@ function(mitk_create_module)
           set(_SHOW_CONSOLE_OPTION WIN32)
         endif()
         add_executable(${MODULE_TARGET} ${_SHOW_CONSOLE_OPTION}
-                       ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED} ${GENERATED_CPP}
-                       ${DOX_FILES} ${UI_FILES} ${QRC_FILES} ${WINDOWS_ICON_RESOURCE_FILE})
+                       ${MODULE_CPP_FILES} ${coverage_sources} ${CPP_FILES_GENERATED}
+                       ${UI_FILES} ${QRC_FILES} ${WINDOWS_ICON_RESOURCE_FILE})
         if(WIN32)
           mitk_add_manifest(${MODULE_TARGET})
         endif()
@@ -459,11 +414,16 @@ function(mitk_create_module)
         set(_us_module_name main)
       else()
         add_library(${MODULE_TARGET} ${_STATIC}
-                    ${coverage_sources} ${CPP_FILES_GENERATED} ${GENERATED_CPP}
-                    ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+                    ${coverage_sources} ${CPP_FILES_GENERATED}
+                    ${UI_FILES} ${QRC_FILES})
         set_property(TARGET ${MODULE_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Modules")
         set(_us_module_name ${MODULE_TARGET})
       endif()
+
+      if(TARGET MitkCompilerFlags)
+        target_link_libraries(${MODULE_TARGET} PRIVATE MitkCompilerFlags)
+      endif()
+
 
       # Apply properties to the module target.
       target_compile_definitions(${MODULE_TARGET} PRIVATE US_MODULE_NAME=${_us_module_name})
@@ -558,23 +518,42 @@ function(mitk_create_module)
         usFunctionEmbedResources(TARGET ${MODULE_TARGET})
       endif()
 
+      # Install shared library modules into the package and register them
+      # with the runtime dependency set(s) for transitive dependency resolution.
+      # Executables are handled by mitk_create_executable() / BB app function.
+      # MITK_INSTALL_BINDIR and MITK_RUNTIME_DEPENDENCY_SETS are parallel
+      # lists (one entry per bundle on macOS, single entry on Windows/Linux).
+      if(NOT MODULE_EXECUTABLE AND NOT MODULE_FORCE_STATIC)
+        foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+          if(MODULE_AUTOLOAD_WITH)
+            install(TARGETS ${MODULE_TARGET}
+              RUNTIME_DEPENDENCY_SET ${_depset}
+              RUNTIME DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH}
+              LIBRARY DESTINATION ${_bindir}/${MODULE_AUTOLOAD_WITH})
+          else()
+            install(TARGETS ${MODULE_TARGET}
+              RUNTIME_DEPENDENCY_SET ${_depset}
+              RUNTIME DESTINATION ${_bindir}
+              LIBRARY DESTINATION ${_bindir})
+          endif()
+        endforeach()
+
+        if(MODULE_AUTOLOAD_WITH)
+          if(LINUX)
+            set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+          elseif(APPLE)
+            set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
+          endif()
+        endif()
+      endif()
+
       if(MODULE_DEPRECATED_SINCE)
         set_property(TARGET ${MODULE_TARGET} PROPERTY MITK_MODULE_DEPRECATED_SINCE ${MODULE_DEPRECATED_SINCE})
       endif()
 
       # create export macros
       if (NOT MODULE_EXECUTABLE)
-        set(_export_macro_name )
-        if(MITK_LEGACY_EXPORT_MACRO_NAME)
-          set(_export_macro_names
-            EXPORT_MACRO_NAME ${MODULE_EXPORT_DEFINE}
-            NO_EXPORT_MACRO_NAME ${MODULE_NAME}_NO_EXPORT
-            DEPRECATED_MACRO_NAME ${MODULE_NAME}_DEPRECATED
-            NO_DEPRECATED_MACRO_NAME ${MODULE_NAME}_NO_DEPRECATED
-          )
-        endif()
         generate_export_header(${MODULE_NAME}
-          ${_export_macro_names}
           EXPORT_FILE_NAME ${MODULE_NAME}Exports.h
         )
       endif()
@@ -615,10 +594,24 @@ function(mitk_create_module)
                       )
     endif()
 
-    # add include directories
-    if(MODULE_INTERNAL_INCLUDE_DIRS)
-      target_include_directories(${MODULE_TARGET} PRIVATE ${MODULE_INTERNAL_INCLUDE_DIRS})
+    if(MITK_USE_Qt6 AND (MODULE_AUTOMOC OR UI_FILES OR QRC_FILES))
+      set_target_properties(${MODULE_TARGET} PROPERTIES
+        AUTOMOC ON
+        AUTOUIC ON
+        AUTORCC ON
+        AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+      if(MODULE_AUTOMOC_FORCE_INCLUDES)
+        set(_automoc_options "")
+        foreach(_header ${MODULE_AUTOMOC_FORCE_INCLUDES})
+          list(APPEND _automoc_options "-b" "${_header}")
+        endforeach()
+        set_target_properties(${MODULE_TARGET} PROPERTIES
+          AUTOMOC_MOC_OPTIONS "${_automoc_options}")
+      endif()
     endif()
+
+    # add include directories
     if(NOT MODULE_NO_DEFAULT_INCLUDE_DIRS)
       if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/include)
         target_include_directories(${MODULE_TARGET} ${_module_property_type} include)

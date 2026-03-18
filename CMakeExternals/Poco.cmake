@@ -18,11 +18,6 @@ if(MITK_USE_Poco)
   if(NOT DEFINED ${proj}_DIR)
 
     set(additional_cmake_args )
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_cmake_args
-        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
 
     set(ssl_args
       -DENABLE_CRYPTO:BOOL=OFF

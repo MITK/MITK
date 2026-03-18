@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkImageCast.txx>
+#include <mitkImageCast.tpp>
 
 #include <itkDiffusionTensor3D.h>
 #include <itkRGBPixel.h>

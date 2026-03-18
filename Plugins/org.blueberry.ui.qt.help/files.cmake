@@ -19,8 +19,6 @@ set(INTERNAL_CPP_FILES
   berryQHelpEngineWrapper.cpp
 )
 
-set(CPP_FILES )
-
 set(MOC_H_FILES
   src/internal/berryHelpContentView.h
   src/internal/berryHelpEditor.h

@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
 #include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkITKDICOMSeriesReaderHelper.txx"
+#include "mitkITKDICOMSeriesReaderHelper.tpp"
 
 #include "mitkDICOMGDCMTagScanner.h"
 #include "mitkArbitraryTimeGeometry.h"

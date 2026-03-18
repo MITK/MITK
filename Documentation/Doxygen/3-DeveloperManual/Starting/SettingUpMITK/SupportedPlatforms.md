@@ -49,8 +49,3 @@ as well as in the current master branch.
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms as long as we have the hardware and capacity for maintenance.
-
-CI Build Clients
-----------------
-
-To get an overview of currently tested platforms, see the <a href="https://cdash.mitk.org/index.php?project=MITK">build reports on our CDash site</a>.

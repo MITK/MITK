@@ -95,7 +95,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTotalVariationDenoisingImageFilter.txx"
+#include "itkTotalVariationDenoisingImageFilter.tpp"
 #endif
 
 #endif //__itkTotalVariationDenoisingImageFilter__

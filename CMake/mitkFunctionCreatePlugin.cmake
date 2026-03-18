@@ -106,8 +106,6 @@ function(mitk_create_plugin)
   set(_PLUGIN_TRANSLATION_FILES ${TRANSLATION_FILES})
   set(_PLUGIN_QRC_FILES ${QRC_FILES})
   set(_PLUGIN_H_FILES ${H_FILES})
-  set(_PLUGIN_TXX_FILES ${TXX_FILES})
-  set(_PLUGIN_DOX_FILES ${DOX_FILES})
   set(_PLUGIN_CMAKE_FILES ${CMAKE_FILES} files.cmake)
   set(_PLUGIN_FILE_DEPENDENCIES ${FILE_DEPENDENCIES})
 
@@ -168,17 +166,17 @@ function(mitk_create_plugin)
   #------------------------------------------------------------#
   #------------------ Create Plug-in --------------------------#
 
+  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
+  endif()
+
   mitkFunctionOrganizeSources(
     SOURCE ${_PLUGIN_CPP_FILES}
     HEADER ${_PLUGIN_H_FILES}
-    TXX ${_PLUGIN_TXX_FILES}
-    DOC ${_PLUGIN_DOX_FILES}
     UI ${_PLUGIN_UI_FILES}
     QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
     META ${_PLUGIN_META_FILES}
-    MOC ${MY_MOC_CPP}
-    GEN_UI ${MY_UI_CPP}
-    GEN_QRC ${MY_QRC_SRCS}
   )
 
   ctkMacroBuildPlugin(
@@ -195,6 +193,7 @@ function(mitk_create_plugin)
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
     NO_INSTALL # we install the plug-in ourselves
+    NO_SOURCE_GROUPS # we organize sources ourselves
     ${is_test_plugin}
   )
 
@@ -215,6 +214,10 @@ function(mitk_create_plugin)
 
   set_property(TARGET ${PLUGIN_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${PLUGIN_TARGET})
   set_property(TARGET ${PLUGIN_TARGET} PROPERTY US_MODULE_NAME ${PLUGIN_TARGET})
+
+  if(TARGET MitkCompilerFlags)
+    target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkCompilerFlags)
+  endif()
 
   if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
     foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
@@ -266,30 +269,39 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkLog)
   endif()
 
-  set(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-    list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
-  endif()
+  target_sources(${PLUGIN_TARGET} PRIVATE ${_PLUGIN_META_FILES})
 
   set(PLUGIN_TARGET ${PLUGIN_TARGET} PARENT_SCOPE)
+
+  if(_PLUGIN_NO_INSTALL)
+    set_target_properties(${PLUGIN_TARGET} PROPERTIES NO_INSTALL TRUE)
+  endif()
 
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
   if(NOT _PLUGIN_NO_INSTALL)
     set(install_directories "")
+    set(install_depsets "")
     if(NOT MACOSX_BUNDLE_NAMES)
       set(install_directories bin/plugins)
-    else(NOT MACOSX_BUNDLE_NAMES)
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    else()
       foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
         list(APPEND install_directories ${bundle_name}.app/Contents/MacOS/plugins)
-      endforeach(bundle_name)
-    endif(NOT MACOSX_BUNDLE_NAMES)
+      endforeach()
+      set(install_depsets ${MITK_RUNTIME_DEPENDENCY_SETS})
+    endif()
 
-    foreach(install_subdir ${install_directories})
+    if(LINUX)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN/..")
+    elseif(APPLE)
+      set_target_properties(${PLUGIN_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
+    endif()
 
+    foreach(install_subdir _depset IN ZIP_LISTS install_directories install_depsets)
       mitkFunctionInstallCTKPlugin(TARGETS ${PLUGIN_TARGET}
-                                   DESTINATION ${install_subdir})
-
+                                   DESTINATION ${install_subdir}
+                                   RUNTIME_DEPENDENCY_SET ${_depset})
     endforeach()
 
     set(_autoload_targets )
@@ -300,8 +312,8 @@ function(mitk_create_plugin)
       endif()
     endforeach()
 
-    # The MITK_AUTOLOAD_TARGETS property is used in the mitkFunctionInstallAutoLoadModules
-    # macro which expects a list of plug-in targets.
+    # The MITK_AUTOLOAD_TARGETS property tracks auto-load modules associated
+    # with this plug-in target.
     if (_autoload_targets)
       list(REMOVE_DUPLICATES _autoload_targets)
       set_target_properties(${PLUGIN_TARGET} PROPERTIES MITK_AUTOLOAD_TARGETS "${_autoload_targets}")

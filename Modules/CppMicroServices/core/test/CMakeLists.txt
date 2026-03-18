@@ -76,7 +76,7 @@ endif()
 
 target_link_libraries(${_test_driver} ${Core_TARGET})
 
-if(UNIX AND NOT APPLE)
+if(LINUX)
   target_link_libraries(${_test_driver} rt)
 endif()
 

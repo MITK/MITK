@@ -5,8 +5,3 @@ set(CPP_FILES
   #mitkExtractSliceFilter.cpp
 )
 
-
-
-
-
-

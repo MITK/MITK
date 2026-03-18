@@ -113,7 +113,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTotalVariationSingleIterationImageFilter.txx"
+#include "itkTotalVariationSingleIterationImageFilter.tpp"
 #endif
 
 #endif //__itkTotalVariationSingleIterationImageFilter__

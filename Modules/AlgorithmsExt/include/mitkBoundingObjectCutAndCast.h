@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkBoundingObjectCutter.h"
 #include "mitkCommon.h"
 
-#include "mitkBoundingObjectCutter.txx"
+#include "mitkBoundingObjectCutter.tpp"
 
 namespace mitk
 {
@@ -50,7 +50,7 @@ namespace mitk
 } // namespace mitk
 
 #ifndef MITK_MANUAL_INSTANTIATION
-#include "mitkBoundingObjectCutAndCast.txx" // because it is a template
+#include "mitkBoundingObjectCutAndCast.tpp" // because it is a template
 #endif
 
 #endif

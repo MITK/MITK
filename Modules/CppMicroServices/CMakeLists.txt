@@ -30,7 +30,6 @@ include(usFunctionEmbedResources)
 include(usFunctionGetResourceSource)
 include(usFunctionCheckResourceLinking)
 include(usFunctionCheckCompilerFlags)
-include(usFunctionGetGccVersion)
 include(usFunctionGenerateModuleInit)
 include(usMacroCreateModule)
 
@@ -180,29 +179,11 @@ if(_have_visibility)
   set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
 
-  usFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  if(${GCC_VERSION} VERSION_LESS "4.0.0")
-    message(FATAL_ERROR "gcc version ${GCC_VERSION} not supported. Please use gcc >= 4.")
-  endif()
-
-  # With older versions of gcc the flag -fstack-protector-all requires an extra dependency to libssp.so.
-  # If the gcc version is lower than 4.4.0 and the build type is Release let's not include the flag.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
-  endif()
-
-  # Enable visibility support (only for gcc >= 4.5)
   # We only support hidden visibility with gcc for now.
-  #
-  # Clang has troubles with correctly marking template declarations and explicit template
-  # instantiations as exported across shared library boundaries. Specifically, comparing
-  # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
-  # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
-  # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
-  #
-  if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
+  if(_have_visibility)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   else()
     set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
@@ -228,7 +209,7 @@ set(CMAKE_C_FLAGS_REALEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 #-----------------------------------------------------------------------------
 
 set(US_LINK_FLAGS )
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
     usFunctionCheckCompilerFlags("${_linkflag}" _add_flag)

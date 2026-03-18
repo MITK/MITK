@@ -25,12 +25,3 @@ set(UI_FILES
   Qmitk/QmitkImageStatisticsWidget.ui
 )
 
-set(MOC_H_FILES
-  Qmitk/QmitkHistogramVisualizationWidget.h
-  Qmitk/QmitkImageStatisticsCalculationRunnable.h
-  Qmitk/QmitkIntensityProfileVisualizationWidget.h
-  Qmitk/QmitkImageStatisticsTreeModel.h
-  Qmitk/QmitkImageStatisticsWidget.h
-  Qmitk/QmitkDataGenerationJobBase.h
-  Qmitk/QmitkDataGeneratorBase.h
-)

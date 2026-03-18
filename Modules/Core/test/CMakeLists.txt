@@ -1,15 +1,15 @@
-# The core tests need relaxed compiler flags...
-# TODO fix core tests to compile without these additional no-error flags
-if(MSVC_VERSION)
-  # disable deprecated warnings (they would lead to errors)
-  mitkFunctionCheckCAndCXXCompilerFlags("/wd4996" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
-else()
-  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
-  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
-endif()
-
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
+  # The core tests need relaxed compiler flags...
+  # TODO fix core tests to compile without these additional no-error flags
+  if(MSVC_VERSION)
+    target_compile_options(${TESTDRIVER} PRIVATE /wd4996)
+  else()
+    target_compile_options(${TESTDRIVER} PRIVATE
+      -Wno-error=deprecated
+      -Wno-error=deprecated-declarations)
+  endif()
+
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|IONRRD VTK|TestingRendering tinyxml2)
 
   mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest

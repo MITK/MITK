@@ -29,9 +29,11 @@ if(MITK_USE_MatchPoint)
     else()
       set(download_step
           GIT_REPOSITORY https://github.com/MIC-DKFZ/MatchPoint.git
-          GIT_TAG c6188c953fe73d39882e2347a43c25605781e5d0 # 2025-04-10
+          GIT_TAG c4c8f0dfedadf4891eb03385c3e976e39d62b3c7 # 2026-03-10
          )
     endif()
+
+    set(MatchPoint_VERSION "0.14")
 
     string(REPLACE "-DBOOST_ALL_DYN_LINK" "" modified_ep_common_args "${ep_common_args}")
 
@@ -59,8 +61,7 @@ if(MITK_USE_MatchPoint)
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    ExternalProject_Get_Property(${proj} binary_dir)
-    set(${proj}_DIR ${binary_dir})
+    set(${proj}_DIR "${ep_prefix}/lib/cmake/MatchPoint-${MatchPoint_VERSION}")
     mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()

@@ -4,11 +4,6 @@ set(CPP_FILES
   QmitknnInteractiveToolGUI.cpp
 )
 
-set(MOC_H_FILES
-  include/QmitknnInteractiveInstallDialog.h
-  include/QmitknnInteractiveToolGUI.h
-)
-
 set(UI_FILES
   src/QmitknnInteractiveInstallDialog.ui
   src/QmitknnInteractiveToolGUI.ui

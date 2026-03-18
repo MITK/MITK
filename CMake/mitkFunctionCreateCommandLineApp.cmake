@@ -33,6 +33,7 @@ function(mitkFunctionCreateCommandLineApp)
      )
 
   set(_function_options
+       NO_INSTALL
        WARNINGS_NO_ERRORS
      )
 
@@ -46,8 +47,11 @@ function(mitkFunctionCreateCommandLineApp)
   if(NOT CMDAPP_CPP_FILES)
     set(CMDAPP_CPP_FILES ${CMDAPP_NAME}.cpp)
   endif()
+  if(CMDAPP_NO_INSTALL)
+    list(APPEND _CMDAPP_OPTIONS NO_INSTALL)
+  endif()
   if(CMDAPP_WARNINGS_NO_ERRORS)
-    LIST(APPEND _CMDAPP_OPTIONS WARNINGS_NO_ERRORS)
+    list(APPEND _CMDAPP_OPTIONS WARNINGS_NO_ERRORS)
   endif()
   mitk_create_executable(${CMDAPP_NAME}
   DEPENDS MitkCommandLine ${CMDAPP_DEPENDS}
@@ -56,5 +60,4 @@ function(mitkFunctionCreateCommandLineApp)
   CPP_FILES ${CMDAPP_CPP_FILES}
   ${_CMDAPP_OPTIONS}
   )
-  set_target_properties(${EXECUTABLE_TARGET} PROPERTIES COMMAND_LINE_APP TRUE)
 endfunction()

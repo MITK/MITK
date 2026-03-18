@@ -25,7 +25,6 @@ set(QRC_FILES
   resources/QmitkImageNavigatorView.qrc
 )
 
-
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})

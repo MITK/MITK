@@ -13,25 +13,33 @@ set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
 
-# set(revision_tag da5dd4ff) # first 8 characters of hash-tag
-#                  ^^^^^^^^  these are just to check correct length of hash part
+  if(DEFINED MITK_DATA_DIR)
 
-  ExternalProject_Add(${proj}
-    SOURCE_DIR ${proj}
-    GIT_REPOSITORY https://codebase.helmholtz.cloud/mitk/mitk-data.git
-#   GIT_TAG ${revision_tag}
-#   URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
-#   UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    DEPENDS ${proj_DEPENDENCIES}
-  )
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
-  set(MITK_DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj})
+  else()
+
+  # set(revision_tag da5dd4ff) # first 8 characters of hash-tag
+  #                  ^^^^^^^^  these are just to check correct length of hash part
+
+    ExternalProject_Add(${proj}
+      SOURCE_DIR ${proj}
+      GIT_REPOSITORY https://codebase.helmholtz.cloud/mitk/mitk-data.git
+  #   GIT_TAG ${revision_tag}
+  #   URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
+  #   UPDATE_COMMAND ""
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ""
+      INSTALL_COMMAND ""
+      DEPENDS ${proj_DEPENDENCIES}
+    )
+
+    set(MITK_DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj})
+
+  endif()
 
 else()
 
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
-endif(BUILD_TESTING)
+endif()

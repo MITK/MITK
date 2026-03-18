@@ -12,8 +12,3 @@ SET(CPP_FILES
   mitkDICOMRTMimeTypes.cpp
 )
 
-set(TPP_FILES
-)
-
-set(MOC_H_FILES
-)

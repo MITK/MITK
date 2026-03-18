@@ -12,5 +12,5 @@ set(CPP_FILES
   vtkMaskedGlyph3D.cpp
   vtkUnstructuredGridMapper.cpp
 
-  vtkPointSetSlicer.cxx
+  vtkPointSetSlicer.cpp
 )

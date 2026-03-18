@@ -1,5 +1,4 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-file(GLOB_RECURSE TPP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.tpp")
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 
 set(CPP_FILES
   mitkMAPRegistrationWrapper.cpp
@@ -29,5 +28,3 @@ set(CPP_FILES
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
 
-set(MOC_H_FILES
-)

@@ -96,7 +96,7 @@ namespace itk
 } // namespace itk
 
 #ifndef MITK_MANUAL_INSTANTIATION
-#include "itkVtkAbstractTransform.txx"
+#include "itkVtkAbstractTransform.tpp"
 #endif
 
 #endif /* MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C */

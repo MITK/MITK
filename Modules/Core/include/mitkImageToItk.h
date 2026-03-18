@@ -177,7 +177,7 @@ namespace mitk
 } // end namespace mitk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "mitkImageToItk.txx"
+#include "mitkImageToItk.tpp"
 #endif
 
 #endif

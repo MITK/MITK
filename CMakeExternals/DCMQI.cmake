@@ -18,12 +18,6 @@ if(MITK_USE_DCMQI)
   if(NOT DEFINED DCMQI_DIR)
     set(additional_cmake_args)
 
-    if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_cmake_args
-      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-      )
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/QIICR/dcmqi.git

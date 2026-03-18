@@ -12,13 +12,6 @@ set(CPP_FILES
   Qmitk/QmitkRegistrationManipulationWidget.cpp
 )
 
-set(H_FILES
-
-)
-
-set(TPP_FILES
-)
-
 set(UI_FILES
   Qmitk/QmitkAlgorithmProfileViewer.ui
   Qmitk/QmitkAlgorithmSettingsConfig.ui
@@ -27,16 +20,3 @@ set(UI_FILES
   Qmitk/QmitkRegistrationManipulationWidget.ui
 )
 
-set(MOC_H_FILES
-  Qmitk/QmitkRegistrationJob.h
-  Qmitk/QmitkMappingJob.h
-  Qmitk/QmitkFramesRegistrationJob.h
-  Qmitk/QmitkAlgorithmProfileViewer.h
-  Qmitk/QmitkAlgorithmSettingsConfig.h
-  Qmitk/QmitkMAPAlgorithmModel.h
-  Qmitk/QmitkAlgorithmListModel.h
-  Qmitk/QmitkMapPropertyDelegate.h
-  Qmitk/QmitkMapperSettingsWidget.h
-  Qmitk/QmitkRegEvalSettingsWidget.h
-  Qmitk/QmitkRegistrationManipulationWidget.h
-)

@@ -9,7 +9,7 @@ set(CPP_FILES
   mitkScaleLegendAnnotation.cpp
   mitkTextAnnotation2D.cpp
   mitkTextAnnotation3D.cpp
-  mitkVtkLogoRepresentation.cxx
+  mitkVtkLogoRepresentation.cpp
   mitkVtkAnnotation.cpp
   mitkVtkAnnotation2D.cpp
   mitkVtkAnnotation3D.cpp

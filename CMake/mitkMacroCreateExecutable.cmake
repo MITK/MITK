@@ -29,7 +29,7 @@ macro(mitk_create_executable)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels (deprecated)
+      SUBPROJECTS            # deprecated, unused
       INCLUDE_DIRS           # additional include dirs
       DEPENDS                # list of modules this module depends on
       PACKAGE_DEPENDS        # list of "packages" this module depends on (e.g. Qt, VTK, etc.)
@@ -44,6 +44,7 @@ macro(mitk_create_executable)
       NO_BATCH_FILE          # do not create batch files on Windows
       WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
       NO_INSTALL
+      AUTOMOC
      )
 
   cmake_parse_arguments(EXEC "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -57,6 +58,9 @@ macro(mitk_create_executable)
   endif()
   if(EXEC_NO_FEATURE_INFO)
     list(APPEND _EXEC_OPTIONS NO_FEATURE_INFO)
+  endif()
+  if(EXEC_AUTOMOC)
+    list(APPEND _EXEC_OPTIONS AUTOMOC)
   endif()
 
   mitk_create_module(${EXEC_UNPARSED_ARGUMENTS}
@@ -110,6 +114,28 @@ macro(mitk_create_executable)
       mitkFunctionConfigureVisualStudioUserProjectFile(
           NAME ${MODULE_TARGET}
         )
+    endif()
+
+    # Install executable and wrapper scripts
+    if(NOT EXEC_NO_INSTALL)
+      foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
+        install(TARGETS ${EXECUTABLE_TARGET}
+          RUNTIME_DEPENDENCY_SET ${_depset}
+          RUNTIME DESTINATION ${_bindir})
+      endforeach()
+
+      if(CMDAPP_NAME)
+        set(_source "RunInstalledCmdLineApp")
+        set(_destination "apps")
+      else()
+        set(_source "RunInstalledApp")
+        set(_destination ".")
+      endif()
+      if(LINUX)
+        install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/${_source}.sh" DESTINATION "${_destination}" RENAME "${EXECUTABLE_TARGET}.sh")
+      elseif(WIN32)
+        install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/${_source}.bat" DESTINATION "${_destination}" RENAME "${EXECUTABLE_TARGET}.bat")
+      endif()
     endif()
   endif()
 

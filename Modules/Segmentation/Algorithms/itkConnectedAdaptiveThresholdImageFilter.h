@@ -116,7 +116,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkConnectedAdaptiveThresholdImageFilter.txx"
+#include "itkConnectedAdaptiveThresholdImageFilter.tpp"
 #endif
 
 #endif

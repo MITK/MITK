@@ -159,7 +159,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkShortestPathCostFunctionLiveWire.txx"
+#include "itkShortestPathCostFunctionLiveWire.tpp"
 #endif
 
 #endif /* __itkShortestPathCostFunctionLiveWire_h */

@@ -237,7 +237,7 @@ namespace mitk
 } // namespace mitk
 
 #ifndef MITK_MANUAL_INSTANTIATION
-#include "mitkITKImageImport.txx"
+#include "mitkITKImageImport.tpp"
 #endif
 
 #endif

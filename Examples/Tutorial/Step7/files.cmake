@@ -6,8 +6,3 @@ set(CPP_FILES
   ../Step6/Step6RegionGrowing3.cpp
   ../Step6/Step6.cpp
 )
-
-set(MOC_H_FILES
-  ../Step6/Step6.h
-  Step7.h
-)

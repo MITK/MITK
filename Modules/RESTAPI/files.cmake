@@ -1,11 +1,6 @@
 set(H_FILES
-  include/mitkIRestServerService.h
   include/mitkRestServerConfig.h
-  include/mitkRestServer.h
-  include/mitkDataStorageBridge.h
-  include/mitkNodeUidMapper.h
   include/mitkNodeQueryParams.h
-  include/mitkErrorResponse.h
 )
 
 set(CPP_FILES

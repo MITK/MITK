@@ -9,7 +9,7 @@ endif()
 
 set(proj pybind11)
 set(proj_DEPENDENCIES )
-set(pybind11_DIR_DEPENDS ${proj})
+set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED pybind11_DIR)
 

@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include <itkGDCMImageIO.h>
 
-/* Forward deceleration of an DCMTK class. Used in the txx but part of the interface.*/
+/* Forward deceleration of an DCMTK class. Used in the tpp but part of the interface.*/
 class OFDateTime;
 
 namespace mitk

@@ -12,21 +12,9 @@ set(CPP_FILES
   QmitkHttpStatusCodeHandler.cpp
 )
 
-set(MOC_H_FILES
- include/mitkXnatSessionTracker.h
- include/QmitkXnatTreeModel.h
- include/QmitkXnatProjectWidget.h
- include/QmitkXnatSubjectWidget.h
- include/QmitkXnatExperimentWidget.h
- include/QmitkXnatCreateObjectDialog.h
- include/QmitkSelectXnatUploadDestinationDialog.h
- include/QmitkXnatUploadFromDataStorageDialog.h
-)
-
 set(QRC_FILES
   resources/xnat.qrc
 )
-
 
 set(UI_FILES
   src/QmitkXnatExperimentWidgetControls.ui

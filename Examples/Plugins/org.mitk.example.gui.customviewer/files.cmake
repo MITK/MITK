@@ -20,9 +20,6 @@ set(MOC_H_FILES
   src/internal/QtPerspectiveSwitcherTabBar.h
 )
 
-set(UI_FILES
-)
-
 set(QRC_FILES
   resources/org_mitk_example_gui_customviewer.qrc
 )
@@ -30,8 +27,6 @@ set(QRC_FILES
 set(CACHED_RESOURCE_FILES
   plugin.xml
 )
-
-set(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})

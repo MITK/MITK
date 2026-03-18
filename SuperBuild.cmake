@@ -1,3 +1,7 @@
+if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL https://www.mitk.org/download/thirdparty)
+endif()
+
 #-----------------------------------------------------------------------------
 # MITK Prerequisites
 #-----------------------------------------------------------------------------

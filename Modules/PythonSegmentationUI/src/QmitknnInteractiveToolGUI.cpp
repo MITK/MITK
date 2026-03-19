@@ -258,14 +258,8 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   m_InteractorButtons[InteractionType::Scribble] = m_Ui->scribbleButton;
   m_InteractorButtons[InteractionType::Lasso] = m_Ui->lassoButton;
 
-  for (const auto& interactorButton : m_InteractorButtons)
+  for (const auto& [interactionType, button] : m_InteractorButtons)
   {
-    // We cannot use a structured binding in this for loop because
-    // interactionType is captured by the lambda below. Capturing structured
-    // bindings is a C++20 feature and currently we are bound to C++17.
-    auto interactionType = interactorButton.first;
-    auto button = interactorButton.second;
-
     auto interactor = this->GetTool()->GetInteractor(interactionType);
     auto icon = interactor->GetIcon();
 

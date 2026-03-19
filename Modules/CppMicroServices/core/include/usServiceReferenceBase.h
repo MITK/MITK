@@ -178,6 +178,7 @@ public:
   bool operator<(const ServiceReferenceBase& reference) const;
 
   bool operator==(const ServiceReferenceBase& reference) const;
+  bool operator==(std::nullptr_t) const noexcept;
 
   ServiceReferenceBase& operator=(const ServiceReferenceBase& reference);
 

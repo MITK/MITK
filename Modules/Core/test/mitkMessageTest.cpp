@@ -27,7 +27,7 @@ namespace mitk
     public:
       Package(int content = 43) : m_Content(content) {}
       void Clear() { m_Content = 0; }
-      bool operator==(const Package &other) { return m_Content == other.m_Content; }
+      bool operator==(const Package &other) const { return m_Content == other.m_Content; }
     private:
       int m_Content;
     };

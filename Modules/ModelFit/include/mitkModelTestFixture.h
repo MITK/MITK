@@ -90,35 +90,35 @@ namespace mitk
 
     static void CompareModelAndReferenceProfile(const mitk::ModelBase::Pointer testmodel, const json profile_json_obj)
     {
-      CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", testmodel->GetNumberOfParameters() == profile_json_obj["numberOfParameters"]);
+      CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", testmodel->GetNumberOfParameters() == profile_json_obj["numberOfParameters"].get<unsigned int>());
       for (unsigned long i = 0; i < profile_json_obj["numberOfParameters"]; i++)
       {
-        CPPUNIT_ASSERT_MESSAGE("Checking parameter names.", testmodel->GetParameterNames()[i] == profile_json_obj["parameterNames"][i]);
-        CPPUNIT_ASSERT_MESSAGE("Checking parameter scales.", testmodel->GetParameterScales()[testmodel->GetParameterNames()[i]] == profile_json_obj["parameterScales"][i]);
-        CPPUNIT_ASSERT_MESSAGE("Checking parameter units.", testmodel->GetParameterUnits()[testmodel->GetParameterNames()[i]] == profile_json_obj["parameterUnits"][i]);
+        CPPUNIT_ASSERT_MESSAGE("Checking parameter names.", testmodel->GetParameterNames()[i] == profile_json_obj["parameterNames"][i].get<std::string>());
+        CPPUNIT_ASSERT_MESSAGE("Checking parameter scales.", testmodel->GetParameterScales()[testmodel->GetParameterNames()[i]] == profile_json_obj["parameterScales"][i].get<double>());
+        CPPUNIT_ASSERT_MESSAGE("Checking parameter units.", testmodel->GetParameterUnits()[testmodel->GetParameterNames()[i]] == profile_json_obj["parameterUnits"][i].get<std::string>());
       }
-      CPPUNIT_ASSERT_MESSAGE("Checking number of derived parameters in model.", testmodel->GetNumberOfDerivedParameters() == profile_json_obj["numberOfDerivedParameters"]);
+      CPPUNIT_ASSERT_MESSAGE("Checking number of derived parameters in model.", testmodel->GetNumberOfDerivedParameters() == profile_json_obj["numberOfDerivedParameters"].get<unsigned int>());
       for (unsigned long i = 0; i < profile_json_obj["numberOfDerivedParameters"]; i++)
       {
-        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter names.", testmodel->GetDerivedParameterNames()[i] == profile_json_obj["derivedParameterNames"][i]);
-        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter scales.", testmodel->GetDerivedParameterScales()[testmodel->GetDerivedParameterNames()[i]] == profile_json_obj["derivedParameterScales"][i]);
-        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter units.", testmodel->GetDerivedParameterUnits()[testmodel->GetDerivedParameterNames()[i]] == profile_json_obj["derivedParameterUnits"][i]);
+        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter names.", testmodel->GetDerivedParameterNames()[i] == profile_json_obj["derivedParameterNames"][i].get<std::string>());
+        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter scales.", testmodel->GetDerivedParameterScales()[testmodel->GetDerivedParameterNames()[i]] == profile_json_obj["derivedParameterScales"][i].get<double>());
+        CPPUNIT_ASSERT_MESSAGE("Checking derived parameter units.", testmodel->GetDerivedParameterUnits()[testmodel->GetDerivedParameterNames()[i]] == profile_json_obj["derivedParameterUnits"][i].get<std::string>());
       }
-      CPPUNIT_ASSERT_MESSAGE("Checking number of static parameters in model.", testmodel->GetNumberOfStaticParameters() == profile_json_obj["numberOfStaticParameters"]);
+      CPPUNIT_ASSERT_MESSAGE("Checking number of static parameters in model.", testmodel->GetNumberOfStaticParameters() == profile_json_obj["numberOfStaticParameters"].get<unsigned int>());
       for (unsigned long i = 0; i < profile_json_obj["numberOfStaticParameters"]; i++)
       {
-        CPPUNIT_ASSERT_MESSAGE("Checking static parameter names.", testmodel->GetStaticParameterNames()[i] == profile_json_obj["staticParameterNames"][i]);
-        CPPUNIT_ASSERT_MESSAGE("Checking static parameter units.", testmodel->GetStaticParameterUnits()[testmodel->GetStaticParameterNames()[i]] == profile_json_obj["staticParameterUnits"][i]);
+        CPPUNIT_ASSERT_MESSAGE("Checking static parameter names.", testmodel->GetStaticParameterNames()[i] == profile_json_obj["staticParameterNames"][i].get<std::string>());
+        CPPUNIT_ASSERT_MESSAGE("Checking static parameter units.", testmodel->GetStaticParameterUnits()[testmodel->GetStaticParameterNames()[i]] == profile_json_obj["staticParameterUnits"][i].get<std::string>());
       }
-      CPPUNIT_ASSERT_MESSAGE("Checking function string.", testmodel->GetFunctionString() == profile_json_obj["functionString"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking class ID.", testmodel->GetClassID() == profile_json_obj["classID"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking model display name.", testmodel->GetModelDisplayName() == profile_json_obj["modelDisplayName"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking model type.", testmodel->GetModelType() == profile_json_obj["modelType"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking x name.", testmodel->GetXName() == profile_json_obj["xName"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking x axis name.", testmodel->GetXAxisName() == profile_json_obj["xAxisName"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking x axis unit.", testmodel->GetXAxisUnit() == profile_json_obj["xAxisUnit"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking y axis name.", testmodel->GetYAxisName() == profile_json_obj["yAxisName"]);
-      CPPUNIT_ASSERT_MESSAGE("Checking y axis unit.", testmodel->GetYAxisUnit() == profile_json_obj["yAxisUnit"]);
+      CPPUNIT_ASSERT_MESSAGE("Checking function string.", testmodel->GetFunctionString() == profile_json_obj["functionString"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking class ID.", testmodel->GetClassID() == profile_json_obj["classID"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking model display name.", testmodel->GetModelDisplayName() == profile_json_obj["modelDisplayName"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking model type.", testmodel->GetModelType() == profile_json_obj["modelType"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking x name.", testmodel->GetXName() == profile_json_obj["xName"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking x axis name.", testmodel->GetXAxisName() == profile_json_obj["xAxisName"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking x axis unit.", testmodel->GetXAxisUnit() == profile_json_obj["xAxisUnit"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking y axis name.", testmodel->GetYAxisName() == profile_json_obj["yAxisName"].get<std::string>());
+      CPPUNIT_ASSERT_MESSAGE("Checking y axis unit.", testmodel->GetYAxisUnit() == profile_json_obj["yAxisUnit"].get<std::string>());
     }
 
     static void CompareModelAndReferenceSignal(mitk::ModelBase::Pointer testmodel, const json modelValues_json_obj, const json profile_json_obj)

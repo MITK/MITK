@@ -285,6 +285,19 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="checkPreview3D">
+         <property name="toolTip">
+          <string>Show a preview of the registered moving data position in the 3D render window. Clones the moving data (additional memory).</string>
+         </property>
+         <property name="text">
+          <string>Show 3D preview</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

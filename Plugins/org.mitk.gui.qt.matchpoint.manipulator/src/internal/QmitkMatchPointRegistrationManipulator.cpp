@@ -29,6 +29,12 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include <mitkRegistrationManipulationInteractor.h>
 #include <mitkCrosshairData.h>
+#include <mitkSurface.h>
+#include <mitkVtkRepresentationProperty.h>
+
+#include <vtkCubeSource.h>
+#include <vtkMatrix4x4.h>
+#include <vtkSmartPointer.h>
 
 #include <usModuleRegistry.h>
 
@@ -130,6 +136,7 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   connect(m_Controls->manipulationWidget, SIGNAL(RegistrationChanged(map::core::RegistrationBase*)), this, SLOT(OnRegistrationChanged()));
   connect(m_Controls->pbInteractionTool, SIGNAL(toggled(bool)), this, SLOT(OnInteractionToolToggled(bool)));
   connect(m_Controls->checkScaling, SIGNAL(toggled(bool)), this, SLOT(OnScalingCheckboxToggled(bool)));
+  connect(m_Controls->checkPreview3D, &QCheckBox::toggled, this, &QmitkMatchPointRegistrationManipulator::OnPreview3DToggled);
 
   connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
   connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
@@ -292,6 +299,8 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   m_Controls->lblInteractionInfo->setVisible(m_activeManipulation && m_InteractionToolActive);
   m_Controls->checkScaling->setVisible(m_activeManipulation);
 
+  m_Controls->checkPreview3D->setEnabled(m_activeManipulation);
+
   if (!m_activeManipulation)
   {
     m_Controls->pbInteractionTool->setChecked(false);
@@ -338,10 +347,17 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   m_Controls->evalSettings->SetNode(this->m_EvalNode);
 
   this->m_activeManipulation = true;
+
+  if (m_Controls->checkPreview3D->isChecked())
+  {
+    this->Start3DPreview();
+  }
 }
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
+  this->Stop3DPreview();
+
   if (m_InteractionToolActive)
   {
     this->DeactivateInteractionTool();
@@ -371,6 +387,11 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
   if (this->m_CurrentRegistrationWrapper.IsNotNull())
   {
     this->m_CurrentRegistrationWrapper->Modified();
+  }
+
+  if (m_3DPreviewActive)
+  {
+    this->Update3DPreviewGeometry();
   }
 
   auto* renderWindowPart = this->GetRenderWindowPart();
@@ -744,6 +765,178 @@ void QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition()
   if (rwPart != nullptr)
   {
     rwPart->SetSelectedPosition(m_Interactor->GetSelectPosition(), nullptr);
+  }
+}
+
+void QmitkMatchPointRegistrationManipulator::OnPreview3DToggled(bool checked)
+{
+  if (checked && m_activeManipulation)
+  {
+    this->Start3DPreview();
+  }
+  else
+  {
+    this->Stop3DPreview();
+  }
+}
+
+void QmitkMatchPointRegistrationManipulator::Start3DPreview()
+{
+  if (m_3DPreviewActive || !m_activeManipulation || m_SelectedMovingNode.IsNull())
+    return;
+
+  auto* movingData = m_SelectedMovingNode->GetData();
+  if (nullptr == movingData)
+    return;
+
+  auto clonedObj = movingData->Clone();
+  mitk::BaseData::Pointer clonedData = dynamic_cast<mitk::BaseData*>(clonedObj.GetPointer());
+  if (clonedData.IsNull())
+    return;
+
+  m_OriginalMovingVtkMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+  m_OriginalMovingVtkMatrix->DeepCopy(clonedData->GetGeometry()->GetVtkMatrix());
+
+  // The clone must remain visible (ImageVtkMapper2D::Update skips invisible nodes,
+  // which would break the 3D cut-plane texture via PlaneGeometryDataVtkMapper3D).
+  m_3DPreviewCloneNode = mitk::DataNode::New();
+  m_3DPreviewCloneNode->SetData(clonedData);
+  m_3DPreviewCloneNode->SetName("RegistrationManipulation3DPreview");
+  m_3DPreviewCloneNode->SetBoolProperty("helper object", true);
+
+  // Wireframe bounding box — Surface mappers have no cross-mapper dependency,
+  // so it can simply be hidden per 2D renderer.
+  mitk::BaseGeometry* geom = clonedData->GetGeometry();
+  const auto bounds = geom->GetBounds();
+
+  auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+  cubeSource->SetBounds(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
+  cubeSource->Update();
+
+  auto wireframeSurface = mitk::Surface::New();
+  wireframeSurface->SetVtkPolyData(cubeSource->GetOutput());
+  wireframeSurface->SetGeometry(geom->Clone());
+
+  m_3DPreviewWireframeNode = mitk::DataNode::New();
+  m_3DPreviewWireframeNode->SetData(wireframeSurface);
+  m_3DPreviewWireframeNode->SetName("RegistrationManipulation3DWireframe");
+  m_3DPreviewWireframeNode->SetBoolProperty("helper object", true);
+  m_3DPreviewWireframeNode->SetColor(0.0, 1.0, 0.0);
+  m_3DPreviewWireframeNode->SetFloatProperty("material.wireframeLineWidth", 2.0f);
+
+  auto reprProp = mitk::VtkRepresentationProperty::New();
+  reprProp->SetRepresentationToWireframe();
+  m_3DPreviewWireframeNode->SetProperty("material.representation", reprProp);
+
+  this->Update3DPreviewGeometry();
+
+  this->GetDataStorage()->Add(m_3DPreviewCloneNode);
+  this->GetDataStorage()->Add(m_3DPreviewWireframeNode);
+
+  // After adding to storage, the DataManager auto-assigns a high layer to each node.
+  // Explicitly order layers so that: moving/target < clone < eval node.
+  // This ensures the clone is covered by the eval node in 2D views, but still
+  // sits above the original moving and target images.
+  int movingLayer = 0;
+  if (m_SelectedMovingNode.IsNotNull())
+  {
+    m_SelectedMovingNode->GetIntProperty("layer", movingLayer);
+  }
+  int targetLayer = 0;
+  if (m_SelectedTargetNode.IsNotNull())
+  {
+    m_SelectedTargetNode->GetIntProperty("layer", targetLayer);
+  }
+  const int cloneLayer = std::max(movingLayer, targetLayer) + 1;
+  m_3DPreviewCloneNode->SetIntProperty("layer", cloneLayer);
+
+  // Ensure the eval node is strictly above the clone.
+  int evalNodeLayer = 0;
+  if (m_EvalNode.IsNotNull())
+  {
+    m_EvalNode->GetIntProperty("layer", evalNodeLayer);
+    if (evalNodeLayer <= cloneLayer)
+    {
+      m_EvalNode->SetIntProperty("layer", cloneLayer + 1);
+    }
+  }
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+  if (renderWindowPart != nullptr)
+  {
+    const QStringList planeIDs = {"axial", "sagittal", "coronal"};
+    for (const auto& id : planeIDs)
+    {
+      auto* renderWindow = renderWindowPart->GetQmitkRenderWindow(id);
+      if (renderWindow != nullptr)
+      {
+        m_3DPreviewWireframeNode->SetVisibility(false, renderWindow->GetRenderer());
+      }
+    }
+  }
+
+  m_3DPreviewActive = true;
+}
+
+void QmitkMatchPointRegistrationManipulator::Stop3DPreview()
+{
+  if (!m_3DPreviewActive)
+    return;
+
+  if (m_3DPreviewCloneNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+  {
+    this->GetDataStorage()->Remove(m_3DPreviewCloneNode);
+  }
+  if (m_3DPreviewWireframeNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+  {
+    this->GetDataStorage()->Remove(m_3DPreviewWireframeNode);
+  }
+
+  m_3DPreviewCloneNode = nullptr;
+  m_3DPreviewWireframeNode = nullptr;
+  m_OriginalMovingVtkMatrix = nullptr;
+  m_3DPreviewActive = false;
+}
+
+void QmitkMatchPointRegistrationManipulator::Update3DPreviewGeometry()
+{
+  if (m_CurrentRegistrationWrapper.IsNull() || m_OriginalMovingVtkMatrix == nullptr)
+    return;
+
+  // The interim registration only has a valid inverse kernel (direct is NullRegistrationKernel).
+  // Get the inverse kernel (target->moving) and invert to obtain the direct (moving->target) transform.
+  const auto inverseAffine =
+    mitk::MITKRegistrationHelper::getAffineMatrix(m_CurrentRegistrationWrapper, true);
+  if (inverseAffine.IsNull())
+    return;
+
+  mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer directTransform =
+    mitk::MITKRegistrationHelper::Affine3DTransformType::New();
+  if (!inverseAffine->GetInverse(directTransform))
+    return;
+
+  // Follow the refineGeometry pattern: reset geometry to original, compose with
+  // registration transform for each time step, then update the time geometry.
+  if (m_3DPreviewCloneNode.IsNotNull() && m_3DPreviewCloneNode->GetData() != nullptr)
+  {
+    auto* data = m_3DPreviewCloneNode->GetData();
+    for (unsigned int i = 0; i < data->GetTimeSteps(); ++i)
+    {
+      data->GetGeometry(i)->SetIndexToWorldTransformByVtkMatrix(m_OriginalMovingVtkMatrix);
+      data->GetGeometry(i)->Compose(directTransform);
+    }
+    data->GetTimeGeometry()->Update();
+  }
+
+  if (m_3DPreviewWireframeNode.IsNotNull() && m_3DPreviewWireframeNode->GetData() != nullptr)
+  {
+    auto* data = m_3DPreviewWireframeNode->GetData();
+    for (unsigned int i = 0; i < data->GetTimeSteps(); ++i)
+    {
+      data->GetGeometry(i)->SetIndexToWorldTransformByVtkMatrix(m_OriginalMovingVtkMatrix);
+      data->GetGeometry(i)->Compose(directTransform);
+    }
+    data->GetTimeGeometry()->Update();
   }
 }
 

@@ -21,6 +21,9 @@ found in the LICENSE file.
 #include <mitkRegistrationManipulationInteractor.h>
 #include <itkEuler3DTransform.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkMatrix4x4.h>
+
 #include <QList>
 #include <memory>
 
@@ -78,6 +81,7 @@ public:
 
   void OnInteractionToolToggled(bool checked);
   void OnScalingCheckboxToggled(bool checked);
+  void OnPreview3DToggled(bool checked);
 
   void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
 
@@ -148,6 +152,15 @@ private:
   /** Called by ITK observer when the interactor emits a position-select event. */
   void OnInteractorSelectPosition();
 
+  /** Creates the 3D preview clone and wireframe nodes. Only acts if session is active and not already previewing. */
+  void Start3DPreview();
+
+  /** Removes 3D preview nodes from DataStorage and restores visibility. */
+  void Stop3DPreview();
+
+  /** Resets preview geometry from stored original and composes current registration transform. */
+  void Update3DPreviewGeometry();
+
   mitk::DataNode::Pointer m_EvalNode;
 
   QmitkSliceNavigationListener m_SliceChangeListener;
@@ -180,6 +193,12 @@ private:
   mitk::RegistrationManipulationInteractor::Pointer m_Interactor;
   mitk::DataNode::Pointer m_CenterOfRotationIndicatorNode;
   bool m_InteractionToolActive = false;
+
+  // 3D preview members
+  mitk::DataNode::Pointer m_3DPreviewCloneNode;
+  mitk::DataNode::Pointer m_3DPreviewWireframeNode;
+  vtkSmartPointer<vtkMatrix4x4> m_OriginalMovingVtkMatrix;
+  bool m_3DPreviewActive = false;
 
   // ITK observer tags for interactor event connections
   unsigned long m_TranslationObserverTag = 0;

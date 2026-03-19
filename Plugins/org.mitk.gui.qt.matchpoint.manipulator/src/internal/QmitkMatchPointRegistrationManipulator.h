@@ -79,9 +79,13 @@ public:
 
   void OnSliceChanged();
 
+  void OnReinitMovingPerspective();
+  void OnReinitTargetPerspective();
+
   void OnInteractionToolToggled(bool checked);
   void OnScalingCheckboxToggled(bool checked);
   void OnPreview3DToggled(bool checked);
+  void OnTranslateMovingCenterToNavigator();
 
   void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
 

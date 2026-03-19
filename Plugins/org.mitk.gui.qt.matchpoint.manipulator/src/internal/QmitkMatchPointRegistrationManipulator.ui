@@ -28,6 +28,12 @@
    </property>
    <item>
     <widget class="QGroupBox" name="groupReg">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Source registration</string>
      </property>
@@ -53,27 +59,27 @@
        </widget>
       </item>
       <item>
-        <widget class="QmitkSingleNodeSelectionWidget" name="registrationNodeSelector" native="true">
-          <property name="minimumSize">
-            <size>
-              <width>0</width>
-              <height>40</height>
-            </size>
-          </property>
-        </widget>
+       <widget class="QmitkSingleNodeSelectionWidget" name="registrationNodeSelector" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item>
-        <widget class="QCheckBox" name="checkAutoSelect">
-          <property name="toolTip">
-            <string>If checked, the target and the moving image will be selected (if available) together with a selected pre registration.</string>
-          </property>
-          <property name="text">
-            <string>Autoselect images by registration</string>
-          </property>
-          <property name="checked">
-            <bool>true</bool>
-          </property>
-        </widget>
+       <widget class="QCheckBox" name="checkAutoSelect">
+        <property name="toolTip">
+         <string>If checked, the target and the moving image will be selected (if available) together with a selected pre registration.</string>
+        </property>
+        <property name="text">
+         <string>Autoselect images by registration</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -86,14 +92,14 @@
     </widget>
    </item>
    <item>
-     <widget class="QmitkSingleNodeSelectionWidget" name="movingNodeSelector" native="true">
-       <property name="minimumSize">
-         <size>
-           <width>0</width>
-           <height>40</height>
-         </size>
-       </property>
-     </widget>
+    <widget class="QmitkSingleNodeSelectionWidget" name="movingNodeSelector" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="label">
@@ -103,14 +109,14 @@
     </widget>
    </item>
    <item>
-     <widget class="QmitkSingleNodeSelectionWidget" name="targetNodeSelector" native="true">
-       <property name="minimumSize">
-         <size>
-           <width>0</width>
-           <height>40</height>
-         </size>
-       </property>
-     </widget>
+    <widget class="QmitkSingleNodeSelectionWidget" name="targetNodeSelector" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pbStart">
@@ -119,39 +125,6 @@
      </property>
      <property name="text">
       <string>Start manual registration</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_12">
-     <property name="text">
-      <string>New registration name:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="lbNewRegName">
-     <property name="toolTip">
-      <string>Name of the resulting manual registration</string>
-     </property>
-     <property name="text">
-      <string>ManualRegistration</string>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="checkMapEntity">
-     <property name="toolTip">
-      <string>Check if a mapped moving image should be generated if the manual registration is confirmed.</string>
-     </property>
-     <property name="text">
-      <string>Generate + store mapped result</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -218,6 +191,16 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbTranslateToNavigator">
+         <property name="toolTip">
+          <string>Translates the registration so that the moving image center is placed at the current navigator (crosshair) position. Only the translation component of the transform is modified; rotation is preserved. Useful for a quick rough pre-alignment when the misregistration is very large.</string>
+         </property>
+         <property name="text">
+          <string>Translate moving center to navigator</string>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="interactionToolLayout">
@@ -303,6 +286,70 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="reinitLayout">
+     <item>
+      <widget class="QPushButton" name="pbReinitMoving">
+       <property name="toolTip">
+        <string>Reinitialize render windows to the current transformed moving image geometry (moving image perspective).</string>
+       </property>
+       <property name="text">
+        <string>Reinit to moving image</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbReinitTarget">
+       <property name="toolTip">
+        <string>Reinitialize render windows to the target image geometry.</string>
+       </property>
+       <property name="text">
+        <string>Reinit to target image</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>New registration name:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lbNewRegName">
+     <property name="toolTip">
+      <string>Name of the resulting manual registration</string>
+     </property>
+     <property name="text">
+      <string>ManualRegistration</string>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkMapEntity">
+     <property name="toolTip">
+      <string>Check if a mapped moving image should be generated if the manual registration is confirmed.</string>
+     </property>
+     <property name="text">
+      <string>Generate + store mapped result</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pbCancel">
@@ -353,12 +400,12 @@
    <header>QmitkRegistrationManipulationWidget.h</header>
    <container>1</container>
   </customwidget>
-   <customwidget>
-     <class>QmitkSingleNodeSelectionWidget</class>
-     <extends>QWidget</extends>
-     <header location="global">QmitkSingleNodeSelectionWidget.h</header>
-     <container>1</container>
-   </customwidget>   
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>

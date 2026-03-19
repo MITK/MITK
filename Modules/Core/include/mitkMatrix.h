@@ -31,17 +31,17 @@ namespace mitk
     typedef typename itk::Matrix<T, NRows, NColumns>::InternalMatrixType InternalMatrixType;
 
     /** Default constructor. */
-    explicit Matrix<T, NRows, NColumns>() : itk::Matrix<T, NRows, NColumns>() {}
+    explicit Matrix() : itk::Matrix<T, NRows, NColumns>() {}
     /** Copy constructor. */
-    explicit Matrix<T, NRows, NColumns>(const Matrix &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
+    explicit Matrix(const Matrix &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
     /** Copy constructor for itk compatibility */
-    Matrix<T, NRows, NColumns>(const itk::Matrix<T, NRows, NColumns> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix)
+    Matrix(const itk::Matrix<T, NRows, NColumns> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix)
     {
     }
     /**For every operator=, there should be an equivalent copy constructor. */
-    inline Matrix<T, NRows, NColumns>(const vnl_matrix<T> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
+    inline Matrix(const vnl_matrix<T> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
     /**For every operator=, there should be an equivalent copy constructor. */
-    inline explicit Matrix<T, NRows, NColumns>(InternalMatrixType &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
+    inline explicit Matrix(InternalMatrixType &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
     /**
      * Necessary because otherwise operator= is default operator= from Matrix.
      */

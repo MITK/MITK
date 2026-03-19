@@ -33,11 +33,11 @@ namespace mitk
     /**
      * @brief Default constructor has nothing to do.
      */
-    explicit Vector<TCoordRep, NVectorDimension>() : itk::Vector<TCoordRep, NVectorDimension>() {}
+    explicit Vector() : itk::Vector<TCoordRep, NVectorDimension>() {}
     /**
      * @brief Copy constructor.
      */
-    explicit Vector<TCoordRep, NVectorDimension>(const mitk::Vector<TCoordRep, NVectorDimension> &r)
+    explicit Vector(const mitk::Vector<TCoordRep, NVectorDimension> &r)
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
@@ -52,7 +52,7 @@ namespace mitk
     /**
      * @brief Constructor to convert from itk::Vector to mitk::Vector.
      */
-    Vector<TCoordRep, NVectorDimension>(const itk::Vector<TCoordRep, NVectorDimension> &r)
+    Vector(const itk::Vector<TCoordRep, NVectorDimension> &r)
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
@@ -62,7 +62,7 @@ namespace mitk
      * @param r the array.
      * @attention must have NVectorDimension valid arguments!
      */
-    Vector<TCoordRep, NVectorDimension>(const TCoordRep r[NVectorDimension])
+    Vector(const TCoordRep r[NVectorDimension])
       : itk::Vector<TCoordRep, NVectorDimension>(r)
     {
     }
@@ -70,12 +70,12 @@ namespace mitk
     /**
      * Constructor to initialize entire vector to one value.
      */
-    Vector<TCoordRep, NVectorDimension>(const TCoordRep &v) : itk::Vector<TCoordRep, NVectorDimension>(v) {}
+    Vector(const TCoordRep &v) : itk::Vector<TCoordRep, NVectorDimension>(v) {}
     /**
      * @brief Constructor for vnl_vectors.
      * @throws mitk::Exception if vnl_vector.size() != NVectorDimension.
      */
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector<TCoordRep> &vnlVector)
+    Vector(const vnl_vector<TCoordRep> &vnlVector)
       : itk::Vector<TCoordRep, NVectorDimension>()
     {
       if (vnlVector.size() != NVectorDimension)
@@ -91,7 +91,7 @@ namespace mitk
     /**
      * @brief Constructor for vnl_vector_fixed.
      */
-    Vector<TCoordRep, NVectorDimension>(const vnl_vector_fixed<TCoordRep, NVectorDimension> &vnlVectorFixed)
+    Vector(const vnl_vector_fixed<TCoordRep, NVectorDimension> &vnlVectorFixed)
       : itk::Vector<TCoordRep, NVectorDimension>()
     {
       for (unsigned int var = 0; var < NVectorDimension; ++var)

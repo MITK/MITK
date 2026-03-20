@@ -814,7 +814,7 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   // replace multiple spaces by a single space
   std::string::iterator newEnditerator =
     std::unique(resultString.begin(), resultString.end(),
-      [=](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+      [](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
   );
   resultString.erase(newEnditerator, resultString.end());
 

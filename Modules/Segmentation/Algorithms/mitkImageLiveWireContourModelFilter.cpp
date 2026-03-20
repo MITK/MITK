@@ -335,7 +335,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK(
     // count pixel values
     // use scale factor to avoid mapping gradients between 0.0 and 1.0 to same bin
     histogram[static_cast<int>(gradientMagnImage->GetPixel((*pathIterator)) *
-                               ImageLiveWireContourModelFilter::CostFunctionType::MAPSCALEFACTOR)] += 1;
+                               static_cast<int>(ImageLiveWireContourModelFilter::CostFunctionType::MAPSCALEFACTOR))] += 1;
 
     pathIterator++;
   }

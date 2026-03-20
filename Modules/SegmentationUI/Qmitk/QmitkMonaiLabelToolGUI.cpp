@@ -98,7 +98,7 @@ void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls->fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
   connect(m_Controls->modelBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnModelChanged(m_Controls->modelBox->itemText(index)); });
+          [=, this](int index) { OnModelChanged(m_Controls->modelBox->itemText(index)); });
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls->fetchUrl->setIcon(refreshIcon);

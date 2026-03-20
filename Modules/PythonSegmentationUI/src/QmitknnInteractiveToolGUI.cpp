@@ -332,7 +332,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
   messageBox->show();
   qApp->processEvents();
 
-  QTimer::singleShot(100, this, [=]() {
+  QTimer::singleShot(100, this, [=, this]() {
     try
     {
       this->GetTool()->StartSession();

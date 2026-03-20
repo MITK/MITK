@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkWeakPointer_h
 
 #include <itkCommand.h>
+#include <compare>
 #include <functional>
 
 namespace mitk
@@ -169,48 +170,29 @@ namespace mitk
         m_DeleteEventCallback();
     }
 
-    // The following comparison operators need access to class internals.
-    // All remaining comparison operators are implemented as non-member
-    // non-friend functions that use logical combinations of these non-member
-    // friend functions.
+    // In C++20, operator== and operator<=> generate all comparison operators
+    // (!=, <, >, <=, >=) and their reversed-argument forms automatically.
+    // This also covers comparisons to T::Pointer and T::ConstPointer as
+    // itk::SmartPointer can be implicitly converted to a raw pointer.
 
     friend bool operator ==(const WeakPointer &left, const WeakPointer &right) noexcept
     {
       return left.m_RawPointer == right.m_RawPointer;
     }
 
-    // Also covers comparisons to T::Pointer and T::ConstPointer as
-    // itk::SmartPointer can be implicitly converted to a raw pointer.
+    friend std::strong_ordering operator <=>(const WeakPointer &left, const WeakPointer &right) noexcept
+    {
+      return std::compare_three_way()(left.m_RawPointer, right.m_RawPointer);
+    }
+
     friend bool operator ==(const WeakPointer &left, const T *right) noexcept
     {
       return left.m_RawPointer == right;
     }
 
-    friend bool operator <(const WeakPointer &left, const WeakPointer &right) noexcept
+    friend std::strong_ordering operator <=>(const WeakPointer &left, const T *right) noexcept
     {
-      // The specialization of std::less for any pointer type yields a total
-      // order, even if the built-in operator < doesn't.
-      return std::less<T*>()(left.m_RawPointer, right.m_RawPointer);
-    }
-
-    friend bool operator <(const WeakPointer &left, std::nullptr_t right) noexcept
-    {
-      return std::less<T*>()(left.m_RawPointer, right);
-    }
-
-    friend bool operator <(std::nullptr_t left, const WeakPointer &right) noexcept
-    {
-      return std::less<T*>()(left, right.m_RawPointer);
-    }
-
-    friend bool operator <(const WeakPointer &left, const T *right) noexcept
-    {
-      return std::less<T*>()(left.m_RawPointer, right);
-    }
-
-    friend bool operator <(const T *left, const WeakPointer &right) noexcept
-    {
-      return std::less<T*>()(left, right.m_RawPointer);
+      return std::compare_three_way()(left.m_RawPointer, right);
     }
 
     T *m_RawPointer;
@@ -222,198 +204,6 @@ namespace mitk
 
     DeleteEventCallbackType m_DeleteEventCallback;
   };
-}
-
-template <class T>
-bool operator !=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left == right);
-}
-
-template <class T>
-bool operator <=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator ==(const mitk::WeakPointer<T> &left, std::nullptr_t) noexcept
-{
-  return !left;
-}
-
-template <class T>
-bool operator !=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
-{
-  return !(left == right);
-}
-
-template <class T>
-bool operator ==(std::nullptr_t, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !right;
-}
-
-template <class T>
-bool operator !=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left == right);
-}
-
-template <class T>
-bool operator <=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator <=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator !=(const mitk::WeakPointer<T> &left, const T *right) noexcept
-{
-  return !(left == right);
-}
-
-template <class T>
-bool operator <=(const mitk::WeakPointer<T> &left, const T *right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(const mitk::WeakPointer<T> &left, const T *right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(const mitk::WeakPointer<T> &left, const T *right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator ==(const T *left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right == left;
-}
-
-template <class T>
-bool operator !=(const T *left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right == left);
-}
-
-template <class T>
-bool operator <=(const T *left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(const T *left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(const T *left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator !=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
-{
-  return !(left == right);
-}
-
-template <class T>
-bool operator <=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
-{
-  return !(left < right);
-}
-
-template <class T>
-bool operator ==(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right == left;
-}
-
-template <class T>
-bool operator !=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right == left);
-}
-
-template <class T>
-bool operator <=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(right < left);
-}
-
-template <class T>
-bool operator >(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return right < left;
-}
-
-template <class T>
-bool operator >=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
-{
-  return !(left < right);
 }
 
 #endif

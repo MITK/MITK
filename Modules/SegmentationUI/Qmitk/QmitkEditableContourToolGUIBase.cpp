@@ -32,13 +32,13 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase()
   m_Controls->m_AddBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_add.svg")));
   m_Controls->m_SubtractBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/lasso_mode_subtract.svg")));
 
-  connect(m_Controls->m_AddBtn, &QPushButton::clicked, this, [=](bool)
+  connect(m_Controls->m_AddBtn, &QPushButton::clicked, this, [=, this](bool)
     {
       m_Controls->m_AddBtn->setChecked(true);
       m_Controls->m_SubtractBtn->setChecked(false);
       this->OnModeToggled(Mode::Add);
     });
-  connect(m_Controls->m_SubtractBtn, &QPushButton::clicked, this, [=](bool)
+  connect(m_Controls->m_SubtractBtn, &QPushButton::clicked, this, [=, this](bool)
     {
       m_Controls->m_SubtractBtn->setChecked(true);
       m_Controls->m_AddBtn->setChecked(false);

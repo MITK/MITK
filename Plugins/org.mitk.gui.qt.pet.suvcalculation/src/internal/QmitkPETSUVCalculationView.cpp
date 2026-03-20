@@ -35,9 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
 
-const std::string PROPERTY_NAME_DICOM_SERIES_MODALITY = "dicom.series.Modality";
-const std::string PROPERTY_NAME_DICOM_PET_RADIOACTIVITYUNITS = "dicom.pet.RadioactivityUnits";
-
 void QmitkPETSUVCalculationView::SetFocus()
 {
   m_Controls->btnCalculateSUV->setFocus();

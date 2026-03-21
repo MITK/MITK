@@ -1,12 +1,13 @@
 mitk_create_module(
   INCLUDE_DIRS
-    Algorithms
-    Controllers
-    DataManagement
-    Interactions
-    Rendering
-    SegmentationUtilities/BooleanOperations
-    SegmentationUtilities/MorphologicalOperations
+    PRIVATE
+      src/Algorithms
+      src/Controllers
+      src/DataManagement
+      src/Interactions
+      src/Rendering
+      src/SegmentationUtilities/BooleanOperations
+      src/SegmentationUtilities/MorphologicalOperations
   PCH
     mitkTool.h
   DEPENDS

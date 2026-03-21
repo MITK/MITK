@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(ModelFitUI
-  INCLUDE_DIRS Common Qmitk
+  INCLUDE_DIRS PRIVATE src/Qmitk
   DEPENDS MitkModelFit MitkQtWidgets MitkQtWidgetsExt
   PACKAGE_DEPENDS CTK|CTKWidgets
 )

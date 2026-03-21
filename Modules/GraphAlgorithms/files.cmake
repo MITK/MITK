@@ -1,9 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   itkShortestPathNode.cpp
-)
-set(H_FILES
-  itkShortestPathCostFunction.h
-  itkShortestPathCostFunctionLiveWire.h
-  itkShortestPathCostFunctionTbss.h
-  itkShortestPathImageFilter.h
 )

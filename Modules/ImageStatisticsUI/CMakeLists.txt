@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS Qmitk
+  INCLUDE_DIRS PRIVATE src/Qmitk
   DEPENDS MitkCore MitkChart MitkImageStatistics MitkQtWidgets
 )
 

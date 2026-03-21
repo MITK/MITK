@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   Qmitk/QmitkSegWithPreviewToolGUIBase.cpp
   Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.cpp
@@ -55,34 +57,30 @@ set(CPP_FILES
   SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidget.cpp
 )
 
-set(H_FILES
-  Qmitk/QmitkMultiLabelPresetHelper.h
-  Qmitk/QmitknnUNetEnsembleLayout.h
-)
 set(UI_FILES
-  Qmitk/QmitkConfirmSegmentationDialog.ui
-  Qmitk/QmitkCopyLabelToGroupDialog.ui
-  Qmitk/QmitkGrowCutToolWidgetControls.ui
-  Qmitk/QmitkOtsuToolWidgetControls.ui
-  Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
-  Qmitk/QmitknnUNetToolGUIControls.ui
-  Qmitk/QmitkEditableContourToolGUIControls.ui
-  Qmitk/QmitkSegmentationTaskListWidget.ui
-  Qmitk/QmitkTotalSegmentatorGUIControls.ui
-  Qmitk/QmitkMultiLabelInspectorControls.ui
-  Qmitk/QmitkMultiLabelManagerControls.ui
-  Qmitk/QmitkMultiLabelSelectionLabel.ui
-  Qmitk/QmitkMultiLabelSelectionWidget.ui
-  Qmitk/QmitkFindSegmentationTaskDialog.ui
-  Qmitk/QmitkSegmentAnythingGUIControls.ui
-  Qmitk/QmitkMedSAMGUIControls.ui
-  Qmitk/QmitkMonaiLabelToolGUIControls.ui
-  Qmitk/QmitkLabelSelectionToolGUIControls.ui
-  SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
-  SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
-  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
-  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
+  src/Qmitk/QmitkConfirmSegmentationDialog.ui
+  src/Qmitk/QmitkCopyLabelToGroupDialog.ui
+  src/Qmitk/QmitkGrowCutToolWidgetControls.ui
+  src/Qmitk/QmitkOtsuToolWidgetControls.ui
+  src/Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
+  src/Qmitk/QmitknnUNetToolGUIControls.ui
+  src/Qmitk/QmitkEditableContourToolGUIControls.ui
+  src/Qmitk/QmitkSegmentationTaskListWidget.ui
+  src/Qmitk/QmitkTotalSegmentatorGUIControls.ui
+  src/Qmitk/QmitkMultiLabelInspectorControls.ui
+  src/Qmitk/QmitkMultiLabelManagerControls.ui
+  src/Qmitk/QmitkMultiLabelSelectionLabel.ui
+  src/Qmitk/QmitkMultiLabelSelectionWidget.ui
+  src/Qmitk/QmitkFindSegmentationTaskDialog.ui
+  src/Qmitk/QmitkSegmentAnythingGUIControls.ui
+  src/Qmitk/QmitkMedSAMGUIControls.ui
+  src/Qmitk/QmitkMonaiLabelToolGUIControls.ui
+  src/Qmitk/QmitkLabelSelectionToolGUIControls.ui
+  src/SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
+  src/SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
+  src/SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
+  src/SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
+  src/SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
 )
 
 set(QRC_FILES

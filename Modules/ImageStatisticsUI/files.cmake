@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   Qmitk/QmitkHistogramVisualizationWidget.cpp
   Qmitk/QmitkImageStatisticsCalculationRunnable.cpp
@@ -12,16 +14,8 @@ set(CPP_FILES
   Qmitk/QmitkImageStatisticsDataGenerator.cpp
 )
 
-set(H_FILES
-  Qmitk/QmitkStatisticsModelToStringConverter.h
-  Qmitk/QmitkImageStatisticsTreeItem.h
-  Qmitk/QmitkImageAndRoiDataGeneratorBase.h
-  Qmitk/QmitkImageStatisticsDataGenerator.h
-)
-
 set(UI_FILES
-  Qmitk/QmitkHistogramVisualizationWidget.ui
-  Qmitk/QmitkIntensityProfileVisualizationWidget.ui
-  Qmitk/QmitkImageStatisticsWidget.ui
+  src/Qmitk/QmitkHistogramVisualizationWidget.ui
+  src/Qmitk/QmitkIntensityProfileVisualizationWidget.ui
+  src/Qmitk/QmitkImageStatisticsWidget.ui
 )
-

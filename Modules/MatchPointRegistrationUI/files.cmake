@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   Qmitk/QmitkRegistrationJob.cpp
   Qmitk/QmitkMappingJob.cpp
@@ -13,10 +15,9 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  Qmitk/QmitkAlgorithmProfileViewer.ui
-  Qmitk/QmitkAlgorithmSettingsConfig.ui
-  Qmitk/QmitkMapperSettingsWidget.ui
-  Qmitk/QmitkRegEvalSettingsWidget.ui
-  Qmitk/QmitkRegistrationManipulationWidget.ui
+  src/Qmitk/QmitkAlgorithmProfileViewer.ui
+  src/Qmitk/QmitkAlgorithmSettingsConfig.ui
+  src/Qmitk/QmitkMapperSettingsWidget.ui
+  src/Qmitk/QmitkRegEvalSettingsWidget.ui
+  src/Qmitk/QmitkRegistrationManipulationWidget.ui
 )
-

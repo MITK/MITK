@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   mitkImageStatisticsCalculator.cpp
   mitkImageStatisticsContainer.cpp
@@ -18,14 +20,4 @@ set(CPP_FILES
   mitkStatisticsToImageRelationRule.cpp
   mitkStatisticsToMaskRelationRule.cpp
   mitkImageStatisticsConstants.cpp
-)
-
-set(H_FILES
-  mitkStatisticsImageFilter.h
-  mitkLabelStatisticsImageFilter.h
-  mitkHotspotMaskGenerator.h
-  mitkMaskUtilities.h
-  mitkitkMaskImageFilter.h
-  mitkMinMaxImageFilterWithIndex.h
-  mitkMinMaxLabelmageFilterWithIndex.h
 )

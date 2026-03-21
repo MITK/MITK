@@ -1,3 +1,5 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
   Qmitk/QmitkParameterFitBackgroundJob.cpp
   Qmitk/QmitkSimpleBarrierParametersDelegate.cpp
@@ -5,7 +7,7 @@ set(CPP_FILES
   Qmitk/QmitkSimpleBarrierModel.cpp
   Qmitk/QmitkSimpleBarrierManagerWidget.cpp
   Qmitk/QmitkInitialValuesModel.cpp
-  Qmitk/QmitkInitialValuesManagerWidget.cpp  
+  Qmitk/QmitkInitialValuesManagerWidget.cpp
   Qmitk/QmitkInitialValuesDelegate.cpp
   Qmitk/QmitkInitialValuesTypeDelegate.cpp
   Qmitk/QmitkFitParameterModel.cpp
@@ -16,10 +18,9 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  Qmitk/QmitkSimpleBarrierManagerWidget.ui
-  Qmitk/QmitkInitialValuesManagerWidget.ui
-  Qmitk/QmitkFitParameterWidget.ui
-  Qmitk/QmitkInspectionPositionWidget.ui
-  Qmitk/QmitkFitPlotDataWidget.ui
+  src/Qmitk/QmitkSimpleBarrierManagerWidget.ui
+  src/Qmitk/QmitkInitialValuesManagerWidget.ui
+  src/Qmitk/QmitkFitParameterWidget.ui
+  src/Qmitk/QmitkInspectionPositionWidget.ui
+  src/Qmitk/QmitkFitPlotDataWidget.ui
 )
-

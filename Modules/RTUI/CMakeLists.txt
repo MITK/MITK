@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS Qmitk Helper
+  INCLUDE_DIRS PRIVATE src/Qmitk src/Helper
   DEPENDS MitkRT
   PACKAGE_DEPENDS
     PUBLIC Qt6|Widgets

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itkStitchImageFilter_hxx
-#define itkStitchImageFilter_hxx
+#ifndef itkStitchImageFilter_tpp
+#define itkStitchImageFilter_tpp
 
 #include <itkStitchImageFilter.h>
 #include <itkObjectFactory.h>

@@ -15,8 +15,8 @@
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToTextureFeaturesFilter_hxx
-#define __itkEnhancedHistogramToTextureFeaturesFilter_hxx
+#ifndef itkEnhancedHistogramToTextureFeaturesFilter_tpp
+#define itkEnhancedHistogramToTextureFeaturesFilter_tpp
 
 #include "itkEnhancedHistogramToTextureFeaturesFilter.h"
 

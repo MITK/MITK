@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToRunLengthFeaturesFilter_hxx
-#define __itkEnhancedHistogramToRunLengthFeaturesFilter_hxx
+#ifndef itkEnhancedHistogramToRunLengthFeaturesFilter_tpp
+#define itkEnhancedHistogramToRunLengthFeaturesFilter_tpp
 
 #include "itkEnhancedHistogramToRunLengthFeaturesFilter.h"
 

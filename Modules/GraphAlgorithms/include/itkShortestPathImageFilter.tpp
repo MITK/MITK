@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkShortestPathImageFilter_tpp
-#define __itkShortestPathImageFilter_tpp
+#ifndef itkShortestPathImageFilter_tpp
+#define itkShortestPathImageFilter_tpp
 
 #include <itkShortestPathImageFilter.h>
 
@@ -886,4 +886,4 @@ namespace itk
 
 } /* end namespace itk */
 
-#endif // __itkShortestPathImageFilter_tpp
+#endif // itkShortestPathImageFilter_tpp

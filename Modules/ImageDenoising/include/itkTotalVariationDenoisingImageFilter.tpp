@@ -15,8 +15,8 @@ found in the LICENSE file.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef _itkTotalVariationDenoisingImageFilter_tpp
-#define _itkTotalVariationDenoisingImageFilter_tpp
+#ifndef itkTotalVariationDenoisingImageFilter_tpp
+#define itkTotalVariationDenoisingImageFilter_tpp
 #include <itkTotalVariationDenoisingImageFilter.h>
 
 #include <itkConstShapedNeighborhoodIterator.h>

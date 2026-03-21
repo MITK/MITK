@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_hxx
-#define __itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_hxx
+#ifndef itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_tpp
+#define itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter_tpp
 
 #include "itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h"
 

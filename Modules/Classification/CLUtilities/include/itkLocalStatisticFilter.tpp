@@ -1,5 +1,5 @@
-#ifndef itkLocalStatisticFilter_cpp
-#define itkLocalStatisticFilter_cpp
+#ifndef itkLocalStatisticFilter_tpp
+#define itkLocalStatisticFilter_tpp
 
 #include <itkLocalStatisticFilter.h>
 
@@ -111,4 +111,4 @@ void
   output->Allocate();
 }
 
-#endif //itkLocalStatisticFilter_cpp
+#endif //itkLocalStatisticFilter_tpp

@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkSurfaceVtkWriter_tpp
+#define mitkSurfaceVtkWriter_tpp
+
 #include <mitkSurfaceVtkWriter.h>
 #include <vtkErrorCode.h>
 #include <vtkLinearTransform.h>
@@ -168,3 +171,5 @@ std::string mitk::SurfaceVtkWriter<VTKWRITER>::GetFileExtension()
 {
   return m_Extension;
 }
+
+#endif

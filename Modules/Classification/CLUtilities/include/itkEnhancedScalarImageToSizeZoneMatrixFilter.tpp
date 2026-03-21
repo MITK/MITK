@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToSizeZoneMatrixFilter_hxx
-#define __itkEnhancedScalarImageToSizeZoneMatrixFilter_hxx
+#ifndef itkEnhancedScalarImageToSizeZoneMatrixFilter_tpp
+#define itkEnhancedScalarImageToSizeZoneMatrixFilter_tpp
 
 #include "itkEnhancedScalarImageToSizeZoneMatrixFilter.h"
 

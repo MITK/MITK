@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMaskedNaryStatisticsImageFilter_hxx
-#define __itkMaskedNaryStatisticsImageFilter_hxx
+#ifndef itkMaskedNaryStatisticsImageFilter_tpp
+#define itkMaskedNaryStatisticsImageFilter_tpp
 
 #include "itkMaskedNaryStatisticsImageFilter.h"
 #include "itkProgressReporter.h"

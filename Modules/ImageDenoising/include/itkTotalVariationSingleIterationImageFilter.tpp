@@ -16,8 +16,8 @@ This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
 
-#ifndef _itkTotalVariationSingleIterationImageFilter_tpp
-#define _itkTotalVariationSingleIterationImageFilter_tpp
+#ifndef itkTotalVariationSingleIterationImageFilter_tpp
+#define itkTotalVariationSingleIterationImageFilter_tpp
 
 #include <itkTotalVariationSingleIterationImageFilter.h>
 

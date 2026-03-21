@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMSERIESREADER_TPP_
-#define MITKDICOMSERIESREADER_TPP_
+#ifndef mitkDicomSeriesReader_tpp
+#define mitkDicomSeriesReader_tpp
 
 #include "legacy/mitkDicomSeriesReader.h"
 

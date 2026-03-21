@@ -16,8 +16,8 @@ This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
 
-#ifndef __itkImageToPathFilter_tpp
-#define __itkImageToPathFilter_tpp
+#ifndef itkImageToPathFilter_tpp
+#define itkImageToPathFilter_tpp
 
 #include <itkImageToPathFilter.h>
 

@@ -10,9 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkPythonSegmentationUI_h
+#define mitkPythonSegmentationUI_h
+
 #include <MitkPythonSegmentationUIExports.h>
 
 namespace mitk::PythonSegmentationUI
 {
   MITKPYTHONSEGMENTATIONUI_EXPORT void EnforceLinkage();
 }
+
+#endif

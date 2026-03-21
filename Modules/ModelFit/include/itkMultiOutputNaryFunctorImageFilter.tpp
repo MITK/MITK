@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMultiOutputNaryFunctorImageFilter_hxx
-#define __itkMultiOutputNaryFunctorImageFilter_hxx
+#ifndef itkMultiOutputNaryFunctorImageFilter_tpp
+#define itkMultiOutputNaryFunctorImageFilter_tpp
 
 #include <itkMultiOutputNaryFunctorImageFilter.h>
 #include <itkImageRegionIterator.h>

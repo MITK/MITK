@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkShortestPathCostFunctionTbss_cpp
-#define __itkShortestPathCostFunctionTbss_cpp
+#ifndef itkShortestPathCostFunctionTbss_tpp
+#define itkShortestPathCostFunctionTbss_tpp
 
 #include <limits>
 

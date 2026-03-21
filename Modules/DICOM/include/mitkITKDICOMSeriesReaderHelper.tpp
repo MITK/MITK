@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkITKDICOMSeriesReaderHelper_tpp
+#define mitkITKDICOMSeriesReaderHelper_tpp
+
 #include <mitkITKDICOMSeriesReaderHelper.h>
 
 #include <itkImageSeriesReader.h>
@@ -300,3 +303,5 @@ mitk::ITKDICOMSeriesReaderHelper
 }
 
 
+
+#endif

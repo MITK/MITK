@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itkLocalIntensityFilter_cpp
-#define itkLocalIntensityFilter_cpp
+#ifndef itkLocalIntensityFilter_tpp
+#define itkLocalIntensityFilter_tpp
 
 #include <itkLocalIntensityFilter.h>
 

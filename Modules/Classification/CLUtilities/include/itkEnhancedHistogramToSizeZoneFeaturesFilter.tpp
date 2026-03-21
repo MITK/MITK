@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedHistogramToSizeZoneFeaturesFilter_hxx
-#define __itkEnhancedHistogramToSizeZoneFeaturesFilter_hxx
+#ifndef itkEnhancedHistogramToSizeZoneFeaturesFilter_tpp
+#define itkEnhancedHistogramToSizeZoneFeaturesFilter_tpp
 
 #include "itkEnhancedHistogramToSizeZoneFeaturesFilter.h"
 

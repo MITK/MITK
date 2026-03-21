@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkStatisticsImageFilter_hxx
-#define mitkStatisticsImageFilter_hxx
+#ifndef mitkStatisticsImageFilter_tpp
+#define mitkStatisticsImageFilter_tpp
 
 #include <mitkStatisticsImageFilter.h>
 #include <mitkHistogramStatisticsCalculator.h>

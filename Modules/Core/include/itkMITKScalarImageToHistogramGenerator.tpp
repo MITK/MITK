@@ -15,8 +15,8 @@ found in the LICENSE file.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef _itkMITKScalarImageToHistogramGenerator_tpp
-#define _itkMITKScalarImageToHistogramGenerator_tpp
+#ifndef itkMITKScalarImageToHistogramGenerator_tpp
+#define itkMITKScalarImageToHistogramGenerator_tpp
 
 #include <itkDefaultConvertPixelTraits.h>
 #include <itkMITKScalarImageToHistogramGenerator.h>

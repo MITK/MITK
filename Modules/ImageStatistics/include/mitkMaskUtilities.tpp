@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMASKUTIL_TPP
-#define MITKMASKUTIL_TPP
+#ifndef mitkMaskUtilities_tpp
+#define mitkMaskUtilities_tpp
 
 #include <mitkMaskUtilities.h>
 #include <mitkImageAccessByItk.h>

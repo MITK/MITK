@@ -25,8 +25,8 @@
 *  please refer to the NOTICE file at the top of the ITK source tree.
 *
 *=========================================================================*/
-#ifndef __itkMultiGaussianImageSource_hxx
-#define __itkMultiGaussianImageSource_hxx
+#ifndef itkMultiGaussianImageSource_tpp
+#define itkMultiGaussianImageSource_tpp
 #include <iostream>
 #include <fstream>
 #include <ctime>

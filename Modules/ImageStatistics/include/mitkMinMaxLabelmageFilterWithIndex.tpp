@@ -1,5 +1,5 @@
-#ifndef MITK_MinMaxLabelImageFilterWithIndex_HXX
-#define MITK_MinMaxLabelImageFilterWithIndex_HXX
+#ifndef mitkMinMaxLabelmageFilterWithIndex_tpp
+#define mitkMinMaxLabelmageFilterWithIndex_tpp
 
 #include <mitkMinMaxLabelmageFilterWithIndex.h>
 #include <limits>

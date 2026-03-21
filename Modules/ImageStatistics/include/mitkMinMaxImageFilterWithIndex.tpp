@@ -1,5 +1,5 @@
-#ifndef MITK_MinMaxImageFilterWithIndex_HXX
-#define MITK_MinMaxImageFilterWithIndex_HXX
+#ifndef mitkMinMaxImageFilterWithIndex_tpp
+#define mitkMinMaxImageFilterWithIndex_tpp
 
 #include <mitkMinMaxImageFilterWithIndex.h>
 #include <limits>

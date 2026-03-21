@@ -230,7 +230,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedHistogramToSizeZoneFeaturesFilter.hxx>
+#include <itkEnhancedHistogramToSizeZoneFeaturesFilter.txx>
 #endif
 
 #endif

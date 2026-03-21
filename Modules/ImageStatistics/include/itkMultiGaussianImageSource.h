@@ -368,7 +368,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkMultiGaussianImageSource.hxx>
+#include <itkMultiGaussianImageSource.txx>
 #endif
 
 #endif

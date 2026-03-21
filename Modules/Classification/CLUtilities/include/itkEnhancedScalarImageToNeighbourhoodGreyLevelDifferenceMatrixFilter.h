@@ -289,7 +289,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.hxx>
+#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.txx>
 #endif
 
 #endif

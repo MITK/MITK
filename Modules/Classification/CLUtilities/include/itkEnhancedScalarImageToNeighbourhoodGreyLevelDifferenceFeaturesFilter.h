@@ -235,7 +235,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.hxx>
+#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.txx>
 #endif
 
 #endif

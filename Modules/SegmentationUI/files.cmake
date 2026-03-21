@@ -1,4 +1,6 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/QmitknnUNetEnsembleLayout.h
+)
 
 set(CPP_FILES
   Qmitk/QmitkSegWithPreviewToolGUIBase.cpp

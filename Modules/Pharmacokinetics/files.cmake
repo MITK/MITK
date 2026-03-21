@@ -1,4 +1,15 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/mitkAIFBasedModelParameterizerBase.h
+  include/mitkConcreteAIFBasedModelFactory.h
+  include/mitkConvertT2ConcentrationFunctor.h
+  include/mitkConvertToConcentrationAbsoluteFunctor.h
+  include/mitkConvertToConcentrationRelativeFunctor.h
+  include/mitkConvertToConcentrationTurboFlashFunctor.h
+  include/mitkConvertToConcentrationViaT1Functor.h
+  include/mitkConvolutionHelper.h
+  include/mitkTwoCompartmentExchangeModelFactoryBase.h
+  include/mitkTwoTissueCompartmentModelFactoryBase.h
+)
 
 set(CPP_FILES
   Common/mitkAterialInputFunctionGenerator.cpp

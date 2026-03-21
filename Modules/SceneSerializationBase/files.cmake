@@ -1,4 +1,7 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/mitkSerializerMacros.h
+  include/mitkStringsToNumbers.h
+)
 
 set(CPP_FILES
   mitkAnnotationPropertySerializer.cpp

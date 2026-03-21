@@ -1,4 +1,13 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/itkAdaptiveThresholdIterator.h
+  include/itkConnectedAdaptiveThresholdImageFilter.h
+  include/itkContourExtractor2DImageFilter.h
+  include/itkImageToPathFilter.h
+  include/mitkSegmentationInterpolationAlgorithm.h
+  include/mitkSegmentationTaskListMacros.h
+  include/mitkToolEvents.h
+  include/mitkToolFactoryMacro.h
+)
 
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp

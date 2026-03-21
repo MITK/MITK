@@ -1,4 +1,8 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/QmitkCustomVariants.h
+  include/QmitkDataStorageInspectorProviderBase.h
+  include/QmitkEnums.h
+)
 
 set(CPP_FILES
   QmitkAbstractDataStorageModel.cpp

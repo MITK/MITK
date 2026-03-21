@@ -1,4 +1,13 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/itkMultiGaussianImageSource.h
+  include/mitkHotspotMaskGenerator.h
+  include/mitkLabelStatisticsImageFilter.h
+  include/mitkMaskUtilities.h
+  include/mitkMinMaxImageFilterWithIndex.h
+  include/mitkMinMaxLabelmageFilterWithIndex.h
+  include/mitkStatisticsImageFilter.h
+  include/mitkitkMaskImageFilter.h
+)
 
 set(CPP_FILES
   mitkImageStatisticsCalculator.cpp

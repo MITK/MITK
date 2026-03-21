@@ -1,4 +1,22 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  include/itkMaskedNaryStatisticsImageFilter.h
+  include/itkMaskedStatisticsImageFilter.h
+  include/itkMultiOutputNaryFunctorImageFilter.h
+  include/mitkConcreteModelFactoryBase.h
+  include/mitkConcreteModelParameterizerBase.h
+  include/mitkConstraintCheckerInterface.h
+  include/mitkGaussianNoiseFunctor.h
+  include/mitkIModelProvider.h
+  include/mitkIndexedValueFunctorBase.h
+  include/mitkLinearModelParameterizer.h
+  include/mitkModelBasedValueFunctorBase.h
+  include/mitkModelFitCostFunctionInterface.h
+  include/mitkModelFitException.h
+  include/mitkModelFitFunctorPolicy.h
+  include/mitkModelFitProviderBase.h
+  include/mitkModelTestFixture.h
+  include/mitkModelTraitsInterface.h
+)
 
 set(CPP_FILES
   Common/mitkExtractTimeGrid.cpp

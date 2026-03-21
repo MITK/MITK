@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMODELTESTFIXTURE_H
-#define MITKMODELTESTFIXTURE_H
+#ifndef mitkModelTestFixture_h
+#define mitkModelTestFixture_h
 
 
 #include <mitkTestingMacros.h>
@@ -189,4 +189,4 @@ namespace mitk
     }
   };
 }
-#endif // MITKMODELTESTFIXTURE_H
+#endif // mitkModelTestFixture_h

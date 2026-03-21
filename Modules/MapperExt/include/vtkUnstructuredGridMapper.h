@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __vtkUnstructuredGridMapper_h
-#define __vtkUnstructuredGridMapper_h
+#ifndef vtkUnstructuredGridMapper_h
+#define vtkUnstructuredGridMapper_h
 
 #include <MitkMapperExtExports.h>
 #include <mitkBaseRenderer.h>
@@ -80,4 +80,4 @@ private:
   void operator=(const vtkUnstructuredGridMapper &);            // Not implemented.
 };
 
-#endif // __vtkUnstructuredGridMapper_h
+#endif // vtkUnstructuredGridMapper_h

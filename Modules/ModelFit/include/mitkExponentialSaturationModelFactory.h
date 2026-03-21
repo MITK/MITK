@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
-#define __EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
+#ifndef mitkExponentialSaturationModelFactory_h
+#define mitkExponentialSaturationModelFactory_h
 
 #include <mitkCommon.h>
 
@@ -50,4 +50,4 @@ namespace mitk
 }
 
 
-#endif //__EXPONENTIAL_SATURATION_TEST_MODEL_FACTORY_H
+#endif //mitkExponentialSaturationModelFactory_h

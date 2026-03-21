@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkMonaiLabelTool3DGUI_h
-#define QmitkMonaiLabelTool3DGUI_h
+#ifndef QmitkMonaiLabel3DToolGUI_h
+#define QmitkMonaiLabel3DToolGUI_h
 
 #include <MitkSegmentationUIExports.h>
 #include <QmitkMonaiLabelToolGUI.h>

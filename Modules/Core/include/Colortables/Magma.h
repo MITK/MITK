@@ -17,8 +17,8 @@ https://github.com/BIDS/colormap/blob/master/colormaps.py
 
 ============================================================================*/
 
-#ifndef _lut_Magma_h_
-#define _lut_Magma_h_
+#ifndef Magma_h
+#define Magma_h
 
 static const int Magma[256][3] =
 {

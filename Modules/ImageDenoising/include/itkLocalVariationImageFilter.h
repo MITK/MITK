@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkLocalVariationImageFilter_h
-#define __itkLocalVariationImageFilter_h
+#ifndef itkLocalVariationImageFilter_h
+#define itkLocalVariationImageFilter_h
 
 #include <itkImage.h>
 #include <itkImageToImageFilter.h>

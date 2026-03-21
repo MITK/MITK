@@ -17,8 +17,8 @@ https://github.com/BIDS/colormap/blob/master/colormaps.py
 
 ============================================================================*/
 
-#ifndef _lut_Viridis_h_
-#define _lut_Viridis_h_
+#ifndef Viridis_h
+#define Viridis_h
 
 static const int Viridis[256][3] =
 {

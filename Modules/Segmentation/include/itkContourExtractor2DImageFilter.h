@@ -16,8 +16,8 @@ This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
 
-#ifndef __itkContourExtractor2DImageFilter_h
-#define __itkContourExtractor2DImageFilter_h
+#ifndef itkContourExtractor2DImageFilter_h
+#define itkContourExtractor2DImageFilter_h
 
 #include <itkConceptChecking.h>
 #include <itkImageToPathFilter.h>

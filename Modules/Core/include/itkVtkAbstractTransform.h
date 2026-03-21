@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C
-#define MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C
+#ifndef itkVtkAbstractTransform_h
+#define itkVtkAbstractTransform_h
 
 #include <itkTransform.h>
 #include <MitkCoreExports.h>
@@ -99,4 +99,4 @@ namespace itk
 #include <itkVtkAbstractTransform.tpp>
 #endif
 
-#endif /* MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C */
+#endif /* itkVtkAbstractTransform_h */

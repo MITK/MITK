@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
-#define __itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
+#define itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
 
 #include <itkDataObjectDecorator.h>
 

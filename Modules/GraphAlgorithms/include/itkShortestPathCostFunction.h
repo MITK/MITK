@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkShortestPathCostFunction_h
-#define __itkShortestPathCostFunction_h
+#ifndef itkShortestPathCostFunction_h
+#define itkShortestPathCostFunction_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -76,4 +76,4 @@ namespace itk
 
 #include <itkShortestPathCostFunction.tpp>
 
-#endif /* __itkShortestPathCostFunction_h */
+#endif /* itkShortestPathCostFunction_h */

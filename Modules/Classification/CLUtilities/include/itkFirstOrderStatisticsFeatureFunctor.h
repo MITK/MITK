@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itkNeighborhoodFirstOrderStatistics_h
-#define itkNeighborhoodFirstOrderStatistics_h
+#ifndef itkFirstOrderStatisticsFeatureFunctor_h
+#define itkFirstOrderStatisticsFeatureFunctor_h
 
 #include <itkConstNeighborhoodIterator.h>
 

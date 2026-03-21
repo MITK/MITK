@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __vtkMaskedGlyph3D_h
-#define __vtkMaskedGlyph3D_h
+#ifndef vtkMaskedGlyph3D_h
+#define vtkMaskedGlyph3D_h
 
 #include <MitkMapperExtExports.h>
 

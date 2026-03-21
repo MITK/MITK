@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkShortestPathImageFilter_h
-#define __itkShortestPathImageFilter_h
+#ifndef itkShortestPathImageFilter_h
+#define itkShortestPathImageFilter_h
 
 #include <itkImageToImageFilter.h>
 #include <itkShortestPathCostFunction.h>

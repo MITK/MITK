@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMultiLabelSegmentation_h
-#define mitkMultiLabelSegmentation_h
+#ifndef mitkLabelSetImage_h
+#define mitkLabelSetImage_h
 
 #include <shared_mutex>
 #include <mitkImage.h>

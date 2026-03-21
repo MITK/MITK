@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMITKScalarImageToHistogramGenerator_h
-#define __itkMITKScalarImageToHistogramGenerator_h
+#ifndef itkMITKScalarImageToHistogramGenerator_h
+#define itkMITKScalarImageToHistogramGenerator_h
 
 #include <itkImageToListSampleAdaptor.h>
 #include <itkObject.h>

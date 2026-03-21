@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _lut_Multilabel_h_
-#define _lut_Multilabel_h_
+#ifndef Multilabel_h
+#define Multilabel_h
 
 static const double Multilabel[25][3] =
 {

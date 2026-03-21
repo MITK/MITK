@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _VTKPOINTSETSLICER_H_
-#define _VTKPOINTSETSLICER_H_
+#ifndef vtkPointSetSlicer_h
+#define vtkPointSetSlicer_h
 
 #include <iostream>
 
@@ -114,4 +114,4 @@ private:
   static POLY_CASES polyCases[256];
 };
 
-#endif /* _VTKPOINTSETSLICER_H_ */
+#endif /* vtkPointSetSlicer_h */

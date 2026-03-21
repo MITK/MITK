@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkIndexedUnaryFunctorImageFilter_h
-#define __itkIndexedUnaryFunctorImageFilter_h
+#ifndef itkIndexedUnaryFunctorImageFilter_h
+#define itkIndexedUnaryFunctorImageFilter_h
 
 #include <itkUnaryFunctorImageFilter.h>
 

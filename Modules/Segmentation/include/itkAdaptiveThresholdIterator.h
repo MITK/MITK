@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkAdaptiveThresholdIterator_h
-#define __itkAdaptiveThresholdIterator_h
+#ifndef itkAdaptiveThresholdIterator_h
+#define itkAdaptiveThresholdIterator_h
 
 #include <itkConditionalConstIterator.h>
 #include <itkImage.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.s
 
 ============================================================================*/
 
-#ifndef QmitkSetupVirtualEnvUtil_h_Included
-#define QmitkSetupVirtualEnvUtil_h_Included
+#ifndef QmitkSetupVirtualEnvUtil_h
+#define QmitkSetupVirtualEnvUtil_h
 
 #include <mitkLog.h>
 #include <mitkProcessExecutor.h>

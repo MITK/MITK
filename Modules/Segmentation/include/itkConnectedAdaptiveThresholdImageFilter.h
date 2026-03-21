@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkConnectedAdaptiveThresholdImageFilter_h
-#define __itkConnectedAdaptiveThresholdImageFilter_h
+#ifndef itkConnectedAdaptiveThresholdImageFilter_h
+#define itkConnectedAdaptiveThresholdImageFilter_h
 
 #include <itkConnectedThresholdImageFilter.h>
 #include <itkImage.h>

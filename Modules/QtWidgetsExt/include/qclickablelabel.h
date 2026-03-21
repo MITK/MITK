@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef qclickablelabelhincluded
-#define qclickablelabelhincluded
+#ifndef qclickablelabel_h
+#define qclickablelabel_h
 
 #include <MitkQtWidgetsExtExports.h>
 #include <QLabel>

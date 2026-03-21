@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
-#define __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#define itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
 
 #include <itkDataObjectDecorator.h>
 

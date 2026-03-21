@@ -15,8 +15,8 @@ found in the LICENSE file.
 This file is based heavily on a corresponding ITK filter.
 
 ===================================================================*/
-#ifndef __itkImageToPathFilter_h
-#define __itkImageToPathFilter_h
+#ifndef itkImageToPathFilter_h
+#define itkImageToPathFilter_h
 
 #include <itkImage.h>
 #include <itkPathSource.h>

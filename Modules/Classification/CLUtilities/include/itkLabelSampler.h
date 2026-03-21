@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itLabelSampler_h
-#define itLabelSampler_h
+#ifndef itkLabelSampler_h
+#define itkLabelSampler_h
 
 #include <itkImageToImageFilter.h>
 
@@ -75,4 +75,4 @@ private:
 #endif
 
 
-#endif // itLabelSampler_h
+#endif // itkLabelSampler_h

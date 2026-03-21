@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __itkShortestPathNode_h_
-#define __itkShortestPathNode_h_
+#ifndef itkShortestPathNode_h
+#define itkShortestPathNode_h
 
 #include <MitkGraphAlgorithmsExports.h>
 

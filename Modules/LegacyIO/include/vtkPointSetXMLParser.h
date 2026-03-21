@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _VTK_POINT_SET_XML_READER__H_
-#define _VTK_POINT_SET_XML_READER__H_
+#ifndef vtkPointSetXMLParser_h
+#define vtkPointSetXMLParser_h
 
 #include <MitkLegacyIOExports.h>
 #include <list>
@@ -129,4 +129,4 @@ namespace mitk
     std::locale m_PreviousLocale;
   };
 }
-#endif // _VTK_POINT_SET_XML_READER__H_
+#endif // vtkPointSetXMLParser_h

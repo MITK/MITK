@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itSmoothedClassProbabilites_h
-#define itSmoothedClassProbabilites_h
+#ifndef itkSmoothedClassProbabilites_h
+#define itkSmoothedClassProbabilites_h
 
 #include <itkImageToImageFilter.h>
 

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKSUVCALCULATION_H
-#define MITKSUVCALCULATION_H
+#ifndef mitkSUVCalculation_h
+#define mitkSUVCalculation_h
 
 #include <mitkNumericConstants.h>
 #include <MitkPETExports.h>

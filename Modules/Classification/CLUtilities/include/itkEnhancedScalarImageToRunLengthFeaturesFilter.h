@@ -27,8 +27,8 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToRunLengthFeaturesFilter_h
-#define __itkEnhancedScalarImageToRunLengthFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToRunLengthFeaturesFilter_h
+#define itkEnhancedScalarImageToRunLengthFeaturesFilter_h
 
 #include <itkDataObjectDecorator.h>
 

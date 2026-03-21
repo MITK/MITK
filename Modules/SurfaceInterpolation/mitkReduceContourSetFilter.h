@@ -13,17 +13,17 @@ found in the LICENSE file.
 #ifndef mitkReduceContourSetFilter_h
 #define mitkReduceContourSetFilter_h
 
-#include "mitkProgressBar.h"
-#include "mitkSurface.h"
-#include "mitkSurfaceToSurfaceFilter.h"
+#include <mitkProgressBar.h>
+#include <mitkSurface.h>
+#include <mitkSurfaceToSurfaceFilter.h>
 #include <MitkSurfaceInterpolationExports.h>
 
-#include "vtkCellArray.h"
-#include "vtkMath.h"
-#include "vtkPoints.h"
-#include "vtkPolyData.h"
-#include "vtkPolygon.h"
-#include "vtkSmartPointer.h"
+#include <vtkCellArray.h>
+#include <vtkMath.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolygon.h>
+#include <vtkSmartPointer.h>
 
 #include <stack>
 

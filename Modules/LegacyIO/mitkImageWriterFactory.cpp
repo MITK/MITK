@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageWriterFactory.h"
+#include <mitkImageWriterFactory.h>
 
-#include "itkCreateObjectFunction.h"
-#include "itkVersion.h"
+#include <itkCreateObjectFunction.h>
+#include <itkVersion.h>
 
-#include "mitkImageWriter.h"
+#include <mitkImageWriter.h>
 
 namespace mitk
 {

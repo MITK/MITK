@@ -14,10 +14,10 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 #include <itkBinaryFunctorImageFilter.h>
-#include "mitkConvertToConcentrationAbsoluteFunctor.h"
-#include "mitkConvertToConcentrationRelativeFunctor.h"
+#include <mitkConvertToConcentrationAbsoluteFunctor.h>
+#include <mitkConvertToConcentrationRelativeFunctor.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk {
 

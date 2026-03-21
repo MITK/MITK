@@ -9,13 +9,13 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkPersistenceService.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkUIDGenerator.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <mitkPersistenceService.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkUIDGenerator.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <itksys/SystemTools.hxx>
 
 std::string mitk::PersistenceService::GetPersistencePropertyName()

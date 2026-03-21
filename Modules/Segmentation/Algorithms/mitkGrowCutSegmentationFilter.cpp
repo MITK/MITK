@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkFastGrowCut.h"
-#include "mitkStringProperty.h"
-#include "mitkLabel.h"
-#include "mitkLabelSetImage.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkGrowCutSegmentationFilter.h"
+#include <itkFastGrowCut.h>
+#include <mitkStringProperty.h>
+#include <mitkLabel.h>
+#include <mitkLabelSetImage.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkGrowCutSegmentationFilter.h>
 
 template <typename TPixel, unsigned int VImageDimension>
 void AccessItkGrowCutFilter(const itk::Image<TPixel, VImageDimension> *inputImage,

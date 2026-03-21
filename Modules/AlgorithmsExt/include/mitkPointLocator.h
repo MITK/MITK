@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkPointLocator_h
 #define mitkPointLocator_h
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 #include <itkObject.h>
 
-#include "mitkPointSet.h"
+#include <mitkPointSet.h>
 
 #include <vtkPoints.h>
 

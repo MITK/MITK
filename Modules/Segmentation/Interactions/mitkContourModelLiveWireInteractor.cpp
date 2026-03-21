@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelLiveWireInteractor.h"
+#include <mitkContourModelLiveWireInteractor.h>
 
-#include "mitkInteractionPositionEvent.h"
-#include "mitkToolManager.h"
+#include <mitkInteractionPositionEvent.h>
+#include <mitkToolManager.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
+#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
 
 #include <mitkInteractionConst.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 mitk::ContourModelLiveWireInteractor::ContourModelLiveWireInteractor() : ContourModelInteractor()
 {

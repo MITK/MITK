@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelGenerator.h"
-#include "mitkIModelFitProvider.h"
+#include <mitkModelGenerator.h>
+#include <mitkIModelFitProvider.h>
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
 mitk::IModelFitProvider* mitk::ModelGenerator::GetProviderService(const ModelClassIDType& id)
 {

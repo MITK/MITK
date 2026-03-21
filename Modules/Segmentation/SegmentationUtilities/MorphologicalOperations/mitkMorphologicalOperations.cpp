@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMorphologicalOperations.h"
+#include <mitkMorphologicalOperations.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>

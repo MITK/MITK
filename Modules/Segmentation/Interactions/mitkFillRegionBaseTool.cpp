@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFillRegionBaseTool.h"
-#include "mitkToolManager.h"
+#include <mitkFillRegionBaseTool.h>
+#include <mitkToolManager.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataStorage.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDataStorage.h>
 
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 #include <itkConnectedThresholdImageFilter.h>
 

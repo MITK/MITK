@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef __EXPONENTIAL_SATURATION_MODEL_PARAMETERIZER_H
 #define __EXPONENTIAL_SATURATION_MODEL_PARAMETERIZER_H
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkExponentialSaturationModel.h"
-#include "MitkModelFitExports.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkExponentialSaturationModel.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkMVModelFitCostFunction.h>
 #include <mitkConstraintCheckerBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

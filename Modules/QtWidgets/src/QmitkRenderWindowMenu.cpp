@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowMenu.h"
+#include <QmitkRenderWindowMenu.h>
 
 // mitk core
-#include "mitkProperties.h"
-#include "mitkResliceMethodProperty.h"
-#include "mitkIPreferencesService.h"
-#include "mitkIPreferences.h"
-#include "mitkCoreServices.h"
+#include <mitkProperties.h>
+#include <mitkResliceMethodProperty.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+#include <mitkCoreServices.h>
 
 // qt
 #include <QActionGroup>
@@ -32,12 +32,12 @@ found in the LICENSE file.
 #include <QWidgetAction>
 
 //#include"iconClose.xpm"
-#include "iconCrosshairMode.xpm"
-#include "iconFullScreen.xpm"
+#include <iconCrosshairMode.xpm>
+#include <iconFullScreen.xpm>
 //#include"iconHoriSplit.xpm"
-#include "iconSettings.xpm"
+#include <iconSettings.xpm>
 //#include"iconVertiSplit.xpm"
-#include "iconLeaveFullScreen.xpm"
+#include <iconLeaveFullScreen.xpm>
 
 // c++
 #include <cmath>

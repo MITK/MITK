@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkSegmentAnythingTool_h
 #define mitkSegmentAnythingTool_h
 
-#include "mitkSegWithPreviewTool.h"
-#include "mitkPointSet.h"
-#include "mitkProcessExecutor.h"
-#include "mitkSegmentAnythingPythonService.h"
+#include <mitkSegWithPreviewTool.h>
+#include <mitkPointSet.h>
+#include <mitkProcessExecutor.h>
+#include <mitkSegmentAnythingPythonService.h>
 #include <MitkSegmentationExports.h>
 #include <itkImage.h>
 #include <mitkLevelWindow.h>

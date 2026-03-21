@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef __vtkUnstructuredGridMapper_h
 #define __vtkUnstructuredGridMapper_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkBoundingObject.h"
-#include "mitkCommon.h"
+#include <MitkMapperExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkBoundingObject.h>
+#include <mitkCommon.h>
 
-#include "vtkMapper.h"
+#include <vtkMapper.h>
 
 class vtkPolyDataMapper;
 class vtkGeometryFilter;

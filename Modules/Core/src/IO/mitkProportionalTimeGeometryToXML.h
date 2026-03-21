@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkProportionalTimeGeometryToXML_h
 #define mitkProportionalTimeGeometryToXML_h
 
-#include "mitkProportionalTimeGeometry.h"
+#include <mitkProportionalTimeGeometry.h>
 
 namespace tinyxml2
 {

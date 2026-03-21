@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPickingToolGUI.h"
+#include <QmitkPickingToolGUI.h>
 
 #include <mitkPickingTool.h>
 #include <QLabel>

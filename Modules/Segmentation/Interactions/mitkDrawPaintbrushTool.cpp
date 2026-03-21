@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDrawPaintbrushTool.h"
+#include <mitkDrawPaintbrushTool.h>
 
 // us
 #include <usGetModuleContext.h>

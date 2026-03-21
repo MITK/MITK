@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkContourElement_h
 #define mitkContourElement_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkContourModelExports.h>
 #include <mitkNumericTypes.h>
 

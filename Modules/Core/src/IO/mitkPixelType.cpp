@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPixelType.h"
+#include <mitkPixelType.h>
 #include <mitkLog.h>
 
 mitk::PixelType::PixelType(const mitk::PixelType &other)

@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTag.h"
+#include <mitkDICOMTag.h>
 
 #include <gdcmGlobal.h>
 #include <gdcmDicts.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include "mitkLog.h"
-#include "dcmtk/ofstd/ofstd.h"
+#include <mitkLog.h>
+#include <dcmtk/ofstd/ofstd.h>
 
 mitk::DICOMTag
 ::DICOMTag(unsigned int group, unsigned int element)

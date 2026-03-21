@@ -22,19 +22,19 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
 #include <mitkTransferFunctionProperty.h>
-#include "mitkImageStatisticsHolder.h"
-#include "mitkPlaneClipping.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkPlaneClipping.h>
 
-#include "mitkRegVisPropertyTags.h"
-#include "mitkRegVisHelper.h"
-#include "mitkRegEvalStyleProperty.h"
-#include "mitkRegEvalWipeStyleProperty.h"
+#include <mitkRegVisPropertyTags.h>
+#include <mitkRegVisHelper.h>
+#include <mitkRegEvalStyleProperty.h>
+#include <mitkRegEvalWipeStyleProperty.h>
 
 //MITK Rendering
-#include "mitkRegEvaluationMapper2D.h"
-#include "vtkMitkThickSlicesFilter.h"
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <mitkRegEvaluationMapper2D.h>
+#include <vtkMitkThickSlicesFilter.h>
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 //VTK
 #include <vtkProperty.h>

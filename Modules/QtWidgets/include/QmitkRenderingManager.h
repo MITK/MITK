@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 #include <QEvent>
 #include <QObject>
 

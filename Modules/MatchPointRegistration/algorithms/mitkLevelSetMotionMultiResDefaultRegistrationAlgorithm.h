@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm_h
 #define mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm_h
 
-#include "mapDiscreteElements.h"
-#include "mapITKLevelSetMotionMultiResRegistrationAlgorithm.h"
-#include "mapConfigure.h"
+#include <mapDiscreteElements.h>
+#include <mapITKLevelSetMotionMultiResRegistrationAlgorithm.h>
+#include <mapConfigure.h>
 
-#include "mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm_ProfileResource.h"
+#include <mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm_ProfileResource.h>
 
 namespace mitk
 {

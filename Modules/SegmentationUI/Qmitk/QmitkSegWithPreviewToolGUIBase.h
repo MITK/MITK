@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkSegWithPreviewToolGUIBase_h
 #define QmitkSegWithPreviewToolGUIBase_h
 
-#include "QmitkToolGUI.h"
+#include <QmitkToolGUI.h>
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 
 #include <MitkSegmentationUIExports.h>
 

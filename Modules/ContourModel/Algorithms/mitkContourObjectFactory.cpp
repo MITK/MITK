@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourObjectFactory.h"
+#include <mitkContourObjectFactory.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
 
-#include "mitkContourModel.h"
-#include "mitkContourModelGLMapper2D.h"
-#include "mitkContourModelMapper2D.h"
-#include "mitkContourModelMapper3D.h"
-#include "mitkContourModelSet.h"
-#include "mitkContourModelSetGLMapper2D.h"
-#include "mitkContourModelSetMapper3D.h"
-#include "mitkContourModelSetWriter.h"
-#include "mitkContourModelWriter.h"
+#include <mitkContourModel.h>
+#include <mitkContourModelGLMapper2D.h>
+#include <mitkContourModelMapper2D.h>
+#include <mitkContourModelMapper3D.h>
+#include <mitkContourModelSet.h>
+#include <mitkContourModelSetGLMapper2D.h>
+#include <mitkContourModelSetMapper3D.h>
+#include <mitkContourModelSetWriter.h>
+#include <mitkContourModelWriter.h>
 
 mitk::ContourObjectFactory::ContourObjectFactory() : CoreObjectFactoryBase()
 {

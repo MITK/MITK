@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileSeriesReader.h"
+#include <mitkFileSeriesReader.h>
 #include <itkImageFileReader.h>
 #include <itksys/Directory.hxx>
 #include <itksys/SystemTools.hxx>

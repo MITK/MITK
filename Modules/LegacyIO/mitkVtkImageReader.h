@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkVtkImageReader_h
 #define mitkVtkImageReader_h
 
-#include "mitkFileReader.h"
-#include "mitkImageSource.h"
+#include <mitkFileReader.h>
+#include <mitkImageSource.h>
 #include <MitkLegacyIOExports.h>
 
 namespace mitk

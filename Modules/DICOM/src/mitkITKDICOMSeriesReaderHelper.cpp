@@ -24,13 +24,13 @@ found in the LICENSE file.
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-#include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkITKDICOMSeriesReaderHelper.tpp"
+#include <mitkITKDICOMSeriesReaderHelper.h>
+#include <mitkITKDICOMSeriesReaderHelper.tpp>
 
-#include "mitkDICOMGDCMTagScanner.h"
-#include "mitkArbitraryTimeGeometry.h"
+#include <mitkDICOMGDCMTagScanner.h>
+#include <mitkArbitraryTimeGeometry.h>
 
-#include "dcmtk/dcmdata/dcvrda.h"
+#include <dcmtk/dcmdata/dcvrda.h>
 
 
 const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk::DICOMTag( 0x0008, 0x0022 );

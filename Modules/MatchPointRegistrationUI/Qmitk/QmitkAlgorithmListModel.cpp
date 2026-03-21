@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAlgorithmListModel.h"
+#include <QmitkAlgorithmListModel.h>
 
-#include "mapAlgorithmProfileHelper.h"
+#include <mapAlgorithmProfileHelper.h>
 
 QmitkAlgorithmListModel::QmitkAlgorithmListModel(QObject *parent) : QAbstractTableModel(parent)
 {

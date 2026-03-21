@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkOpenMxNMultiWidgetEditorAction.h"
 
-#include "mitkCoreObjectFactory.h"
+#include <mitkCoreObjectFactory.h>
 
 #include <berryIEditorPart.h>
 #include <berryIWorkbench.h>

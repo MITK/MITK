@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkShowSegmentationAsSmoothedSurface_h
 #define mitkShowSegmentationAsSmoothedSurface_h
 
-#include "mitkSegmentationSink.h"
+#include <mitkSegmentationSink.h>
 #include <MitkSegmentationExports.h>
 #include <mitkSurface.h>
 

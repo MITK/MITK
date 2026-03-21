@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkPadImageFilter_h
 #define mitkPadImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 namespace mitk
 {

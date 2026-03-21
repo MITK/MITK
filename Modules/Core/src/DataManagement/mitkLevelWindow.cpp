@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLevelWindow.h"
-#include "mitkImage.h"
-#include "mitkImageSliceSelector.h"
-#include "mitkImageStatisticsHolder.h"
+#include <mitkLevelWindow.h>
+#include <mitkImage.h>
+#include <mitkImageSliceSelector.h>
+#include <mitkImageStatisticsHolder.h>
 
 #include <algorithm>
 #include <nlohmann/json.hpp>

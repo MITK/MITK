@@ -16,8 +16,8 @@ found in the LICENSE file.
 
 
 #include <itkEuler3DTransform.h>
-#include "mapRegistration.h"
-#include "mapContinuous.h"
+#include <mapRegistration.h>
+#include <mapContinuous.h>
 
 #include <mitkPoint.h>
 

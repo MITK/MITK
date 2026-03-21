@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef mitkUnstructuredGridMapper2D_h
 #define mitkUnstructuredGridMapper2D_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkColorProperty.h"
-#include "mitkCommon.h"
-#include "mitkGLMapper.h"
-#include "mitkProperties.h"
-#include "mitkTransferFunction.h"
-#include "mitkVtkScalarModeProperty.h"
+#include <MitkMapperExtExports.h>
+#include <mitkColorProperty.h>
+#include <mitkCommon.h>
+#include <mitkGLMapper.h>
+#include <mitkProperties.h>
+#include <mitkTransferFunction.h>
+#include <mitkVtkScalarModeProperty.h>
 
 class vtkPointSetSlicer;
 class vtkPlane;

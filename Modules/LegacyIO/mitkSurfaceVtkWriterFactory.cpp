@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceVtkWriterFactory.h"
+#include <mitkSurfaceVtkWriterFactory.h>
 
-#include "itkCreateObjectFunction.h"
-#include "itkVersion.h"
+#include <itkCreateObjectFunction.h>
+#include <itkVersion.h>
 
 #include <mitkSurfaceVtkWriter.h>
 #include <vtkXMLPolyDataWriter.h>

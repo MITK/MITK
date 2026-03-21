@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPointListModel.h"
-#include "mitkInteractionConst.h"
-#include "mitkPointOperation.h"
-#include "mitkRenderingManager.h"
+#include <QmitkPointListModel.h>
+#include <mitkInteractionConst.h>
+#include <mitkPointOperation.h>
+#include <mitkRenderingManager.h>
 #include <itkCommand.h>
 #include <mitkInteractionConst.h>
 #include <mitkInternalEvent.h>

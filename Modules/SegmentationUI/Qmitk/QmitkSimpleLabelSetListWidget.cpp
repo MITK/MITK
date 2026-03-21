@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSimpleLabelSetListWidget.h"
+#include <QmitkSimpleLabelSetListWidget.h>
 
-#include "mitkMessage.h"
+#include <mitkMessage.h>
 
 #include <QGridLayout>
 

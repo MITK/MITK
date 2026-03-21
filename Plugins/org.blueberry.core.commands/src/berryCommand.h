@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include "berryNamedHandleObjectWithState.h"
 
-#include <berryICommandListener.h>
-#include <berryIHandlerListener.h>
-#include <berryIExecutionListenerWithChecks.h>
-#include <berryIParameter.h>
+#include "berryICommandListener.h"
+#include "berryIHandlerListener.h"
+#include "berryIExecutionListenerWithChecks.h"
+#include "berryIParameter.h"
 
-#include <berryParameterType.h>
+#include "berryParameterType.h"
 
 namespace berry
 {

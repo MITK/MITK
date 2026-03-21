@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorageEditorInputFactory.h"
 
-#include <mitkDataStorageEditorInput.h>
+#include "mitkDataStorageEditorInput.h"
 #include <mitkDataStorageReference.h>
 
 #include <berryIMemento.h>

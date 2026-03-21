@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include <QMenu>
 
-#include "QmitkSimpleBarrierManagerWidget.h"
-#include "QmitkSimpleBarrierModel.h"
-#include "QmitkSimpleBarrierParametersDelegate.h"
-#include "QmitkSimpleBarrierTypeDelegate.h"
+#include <QmitkSimpleBarrierManagerWidget.h>
+#include <QmitkSimpleBarrierModel.h>
+#include <QmitkSimpleBarrierParametersDelegate.h>
+#include <QmitkSimpleBarrierTypeDelegate.h>
 
 #include <ui_QmitkSimpleBarrierManagerWidget.h>
 

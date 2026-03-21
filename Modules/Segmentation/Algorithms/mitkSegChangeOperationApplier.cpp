@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegChangeOperationApplier.h"
+#include <mitkSegChangeOperationApplier.h>
 
 #include <mitkSegLabelPropModifyOperation.h>
 #include <mitkSegGroupModifyOperation.h>

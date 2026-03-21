@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #define SMW_INFO MITK_INFO("widget.stdmulti")
 
-#include "QmitkStdMultiWidget.h"
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkStdMultiWidget.h>
+#include <QmitkRenderWindowWidget.h>
 
 // mitk core
 #include <mitkCameraController.h>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMaximumCurveDescriptionParameter_h
 #define mitkMaximumCurveDescriptionParameter_h
 
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
 namespace mitk {
 

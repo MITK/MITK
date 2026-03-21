@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <string>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
-#include "mitkMatchPointPropertyTags.h"
+#include <MitkMatchPointRegistrationExports.h>
+#include <mitkMatchPointPropertyTags.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationTaskList.h"
+#include <mitkSegmentationTaskList.h>
 
 #include <mitkIOUtil.h>
 #include <mitkProperties.h>

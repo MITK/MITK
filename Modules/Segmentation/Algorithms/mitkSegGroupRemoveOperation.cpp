@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegGroupRemoveOperation.h"
+#include <mitkSegGroupRemoveOperation.h>
 
 mitk::SegGroupRemoveOperation::SegGroupRemoveOperation(MultiLabelSegmentation* segmentation,
   const GroupIndexSetType& removalGroupIDs)

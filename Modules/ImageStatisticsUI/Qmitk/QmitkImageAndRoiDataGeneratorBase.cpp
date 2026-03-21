@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageAndRoiDataGeneratorBase.h"
+#include <QmitkImageAndRoiDataGeneratorBase.h>
 
 QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType
 QmitkImageAndRoiDataGeneratorBase::GetROINodes() const

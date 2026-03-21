@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkSurfaceStampImageFilter_h
 #define mitkSurfaceStampImageFilter_h
 
-#include "MitkSegmentationExports.h"
-#include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
-#include "mitkSurface.h"
+#include <MitkSegmentationExports.h>
+#include <mitkCommon.h>
+#include <mitkImageToImageFilter.h>
+#include <mitkSurface.h>
 
 #include <itkQuadEdgeMesh.h>
 

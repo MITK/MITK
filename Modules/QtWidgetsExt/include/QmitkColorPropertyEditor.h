@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef QmitkColorPropertyEditor_h
 #define QmitkColorPropertyEditor_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "QmitkColorPropertyView.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <QmitkColorPropertyView.h>
 #include <QFrame>
 #include <mitkColorProperty.h>
 

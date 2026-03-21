@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceOperation.h"
+#include <mitkSurfaceOperation.h>
 
 mitk::SurfaceOperation::SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, unsigned int t)
   : mitk::Operation(operationType), m_polyData(polyData), m_timeStep(t)

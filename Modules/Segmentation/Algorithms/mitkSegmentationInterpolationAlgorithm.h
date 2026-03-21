@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSegmentationInterpolationAlgorithm_h
 #define mitkSegmentationInterpolationAlgorithm_h
 
-#include "mitkCommon.h"
-#include "mitkImage.h"
+#include <mitkCommon.h>
+#include <mitkImage.h>
 #include <MitkSegmentationExports.h>
 
 #include <itkObjectFactory.h>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYREGISTRYOBJECTREFERENCEMAP_H
 #define BERRYREGISTRYOBJECTREFERENCEMAP_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QHash>
 

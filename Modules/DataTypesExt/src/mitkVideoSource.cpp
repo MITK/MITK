@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVideoSource.h"
+#include <mitkVideoSource.h>
 
 mitk::VideoSource::VideoSource()
   : m_CurrentVideoTexture(nullptr),

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "../DataManagement/mitkBoundingShapeUtil.h"
+#include "mitkBoundingShapeUtil.h"
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkInteractionConst.h>
@@ -26,8 +26,8 @@ found in the LICENSE file.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 
-#include "usGetModuleContext.h"
-#include "usModuleRegistry.h"
+#include <usGetModuleContext.h>
+#include <usModuleRegistry.h>
 
 // Properties to allow the user to interact with the base data
 const char *selectedColorPropertyName = "Bounding Shape.Selected Color";

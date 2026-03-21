@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkAddContourTool_h
 #define mitkAddContourTool_h
 
-#include "mitkContourTool.h"
+#include <mitkContourTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

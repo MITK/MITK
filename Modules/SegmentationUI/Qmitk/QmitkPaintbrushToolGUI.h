@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkPaintbrushToolGUI_h
 #define QmitkPaintbrushToolGUI_h
 
-#include "QmitkToolGUI.h"
-#include "mitkPaintbrushTool.h"
+#include <QmitkToolGUI.h>
+#include <mitkPaintbrushTool.h>
 #include <MitkSegmentationUIExports.h>
 
 class QSlider;

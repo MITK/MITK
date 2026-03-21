@@ -16,16 +16,16 @@ found in the LICENSE file.
 
 
 //MatchPoint
-#include "mapRegistrationAlgorithmBase.h"
-#include "mapRegistrationBase.h"
+#include <mapRegistrationAlgorithmBase.h>
+#include <mapRegistrationBase.h>
 
 //MITK
 #include <mitkImage.h>
 #include <mitkPointSet.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <MitkMatchPointRegistrationExports.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 namespace mitk
 {

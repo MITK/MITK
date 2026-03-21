@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationsProcessingTool.h"
-#include "mitkProgressBar.h"
-#include "mitkToolManager.h"
+#include <mitkSegmentationsProcessingTool.h>
+#include <mitkProgressBar.h>
+#include <mitkToolManager.h>
 
 mitk::SegmentationsProcessingTool::SegmentationsProcessingTool() : Tool("dummy")
 {

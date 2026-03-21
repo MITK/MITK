@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkImageStatisticsDataGenerator_h
 #define QmitkImageStatisticsDataGenerator_h
 
-#include "QmitkImageAndRoiDataGeneratorBase.h"
+#include <QmitkImageAndRoiDataGeneratorBase.h>
 
 #include <MitkImageStatisticsUIExports.h>
 

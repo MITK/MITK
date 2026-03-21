@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkToolCommand.h"
-#include "mitkProgressBar.h"
+#include <mitkToolCommand.h>
+#include <mitkProgressBar.h>
 
 mitk::ToolCommand::ToolCommand() : m_ProgressValue(0), m_StopProcessing(false)
 {

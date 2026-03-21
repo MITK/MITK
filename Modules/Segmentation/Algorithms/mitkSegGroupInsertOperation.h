@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSegGroupInsertOperation_h
 #define mitkSegGroupInsertOperation_h
 
-#include "mitkCompressedImageContainer.h"
+#include <mitkCompressedImageContainer.h>
 #include <MitkSegmentationExports.h>
 #include <mitkSegChangeOperationBase.h>
 

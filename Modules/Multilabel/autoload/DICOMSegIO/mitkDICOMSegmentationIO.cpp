@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSegmentationIO.h"
+#include <mitkDICOMSegmentationIO.h>
 
-#include "mitkDICOMSegIOMimeTypes.h"
-#include "mitkDICOMSegmentationConstants.h"
+#include <mitkDICOMSegIOMimeTypes.h>
+#include <mitkDICOMSegmentationConstants.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkDICOMProperty.h>

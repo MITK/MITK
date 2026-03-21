@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkBaseGeometry.h>
 #include <mitkITKImageImport.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 #include <mitkExtractImageFilter.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkImageTimeSelector.h>

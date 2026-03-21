@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include "berryNewEditorHandler.h"
 
-#include <berryHandlerUtil.h>
-#include <berryXMLMemento.h>
+#include "berryHandlerUtil.h"
+#include "berryXMLMemento.h"
 
 #include "internal/berryWorkbenchConstants.h"
 #include "internal/berryWorkbenchPage.h"
 
-#include <berryIPersistableEditor.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
+#include "berryIPersistableEditor.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPage.h"
 
 #include <QApplication>
 #include <QMessageBox>

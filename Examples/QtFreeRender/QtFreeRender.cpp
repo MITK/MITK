@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderWindow.h"
+#include <mitkRenderWindow.h>
 
 #include <mitkCameraController.h>
 #include <mitkDisplayActionEventBroadcast.h>

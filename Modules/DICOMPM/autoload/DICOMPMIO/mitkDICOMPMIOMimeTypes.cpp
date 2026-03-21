@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMPMIOMimeTypes.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkDICOMPMIOMimeTypes.h>
+#include <mitkIOMimeTypes.h>
 
 #include <mitkLog.h>
 

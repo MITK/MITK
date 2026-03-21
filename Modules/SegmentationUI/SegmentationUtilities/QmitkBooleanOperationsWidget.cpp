@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkBooleanOperationsWidget.h"
+#include <QmitkBooleanOperationsWidget.h>
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
 
 #include <mitkDataStorage.h>

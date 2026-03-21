@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPointListView.h"
+#include <QmitkPointListView.h>
 
 #include <QmitkEditPointDialog.h>
 #include <QmitkPointListModel.h>

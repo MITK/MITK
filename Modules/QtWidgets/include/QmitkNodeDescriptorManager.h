@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "QmitkNodeDescriptor.h"
+#include <QmitkNodeDescriptor.h>
 
 /**
  * \ingroup QmitkModule

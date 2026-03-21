@@ -13,35 +13,35 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <ui_PerfusionDataSimulationViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include "PerfusionDataSimulationView.h"
 
-#include "itkUnaryFunctorImageFilter.h"
+#include <itkUnaryFunctorImageFilter.h>
 #include <boost/tokenizer.hpp>
-#include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkITKImageImport.h"
-#include "mitkGaussianNoiseFunctor.h"
-#include "mitkTwoCompartmentExchangeModel.h"
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
-#include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkExtendedToftsModel.h"
-#include "mitkExtendedToftsModelFactory.h"
-#include "mitkExtendedToftsModelParameterizer.h"
-#include "mitkTwoTissueCompartmentModel.h"
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
-#include "mitkTwoTissueCompartmentModelFactory.h"
-#include "mitkOneTissueCompartmentModel.h"
-#include "mitkOneTissueCompartmentModelParameterizer.h"
-#include "mitkOneTissueCompartmentModelFactory.h"
-#include "mitkModelSignalImageGenerator.h"
+#include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkITKImageImport.h>
+#include <mitkGaussianNoiseFunctor.h>
+#include <mitkTwoCompartmentExchangeModel.h>
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
+#include <mitkTwoCompartmentExchangeModelFactory.h>
+#include <mitkExtendedToftsModel.h>
+#include <mitkExtendedToftsModelFactory.h>
+#include <mitkExtendedToftsModelParameterizer.h>
+#include <mitkTwoTissueCompartmentModel.h>
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
+#include <mitkTwoTissueCompartmentModelFactory.h>
+#include <mitkOneTissueCompartmentModel.h>
+#include <mitkOneTissueCompartmentModelParameterizer.h>
+#include <mitkOneTissueCompartmentModelFactory.h>
+#include <mitkModelSignalImageGenerator.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
-#include "mitkSimpleFunctorBase.h"
-#include "mitkArbitraryTimeGeometry.h"
+#include <mitkSimpleFunctorBase.h>
+#include <mitkArbitraryTimeGeometry.h>
 #include <iostream>
  #include <QFileDialog>
 

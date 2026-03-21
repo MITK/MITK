@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDnDFrameWidget.h>
+#include "QmitkDnDFrameWidget.h"
 
 #include <berryPlatformUI.h>
 

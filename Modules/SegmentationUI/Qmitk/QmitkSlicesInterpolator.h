@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkSlicesInterpolator_h
 #define QmitkSlicesInterpolator_h
 
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkSegmentationInterpolationController.h"
-#include "mitkSurfaceInterpolationController.h"
-#include "mitkToolManager.h"
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkSegmentationInterpolationController.h>
+#include <mitkSurfaceInterpolationController.h>
+#include <mitkToolManager.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QWidget>
@@ -29,8 +29,8 @@ found in the LICENSE file.
 #include <QGroupBox>
 #include <QRadioButton>
 
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkProperty.h"
+#include <mitkVtkRepresentationProperty.h>
+#include <vtkProperty.h>
 
 // For running 3D interpolation in background
 #include <QFuture>

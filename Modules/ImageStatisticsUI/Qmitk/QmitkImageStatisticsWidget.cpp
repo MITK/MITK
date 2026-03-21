@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsWidget.h"
+#include <QmitkImageStatisticsWidget.h>
 #include <ui_QmitkImageStatisticsWidget.h>
 
-#include "QmitkStatisticsModelToStringConverter.h"
-#include "QmitkImageStatisticsTreeModel.h"
+#include <QmitkStatisticsModelToStringConverter.h>
+#include <QmitkImageStatisticsTreeModel.h>
 
 #include <QSortFilterProxyModel>
 #include <QClipboard>

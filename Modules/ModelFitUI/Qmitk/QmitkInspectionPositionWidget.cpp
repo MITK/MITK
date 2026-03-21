@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkInspectionPositionWidget.h"
+#include <QmitkInspectionPositionWidget.h>
 
 #include <ui_QmitkInspectionPositionWidget.h>
 

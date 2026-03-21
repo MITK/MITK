@@ -20,9 +20,9 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkException.h>
 
-#include "mitkMAPRegistrationWrapper.h"
-#include "mitkRegistrationWrapperMapper2D.h"
-#include "mitkRegVisHelper.h"
+#include <mitkMAPRegistrationWrapper.h>
+#include <mitkRegistrationWrapperMapper2D.h>
+#include <mitkRegVisHelper.h>
 
 mitk::MITKRegistrationWrapperMapper2D::MITKRegistrationWrapperMapper2D()
 {

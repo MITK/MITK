@@ -30,10 +30,10 @@ found in the LICENSE file.
 #ifndef __itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
 #define __itkEnhancedScalarImageToSizeZoneFeaturesFilter_h
 
-#include "itkDataObjectDecorator.h"
+#include <itkDataObjectDecorator.h>
 
-#include "itkEnhancedHistogramToSizeZoneFeaturesFilter.h"
-#include "itkEnhancedScalarImageToSizeZoneMatrixFilter.h"
+#include <itkEnhancedHistogramToSizeZoneFeaturesFilter.h>
+#include <itkEnhancedScalarImageToSizeZoneMatrixFilter.h>
 
 namespace itk
 {
@@ -235,7 +235,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToSizeZoneFeaturesFilter.hxx"
+#include <itkEnhancedScalarImageToSizeZoneFeaturesFilter.hxx>
 #endif
 
 #endif

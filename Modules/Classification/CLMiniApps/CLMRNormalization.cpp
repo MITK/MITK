@@ -12,14 +12,14 @@ found in the LICENSE file.
 #ifndef mitkCLPolyToNrrd_cpp
 #define mitkCLPolyToNrrd_cpp
 
-#include "time.h"
+#include <time.h>
 #include <sstream>
 #include <fstream>
 
 #include <mitkIOUtil.h>
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
-#include "itkImageRegionIterator.h"
+#include <itkImageRegionIterator.h>
 // MITK
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>

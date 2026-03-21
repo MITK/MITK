@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDataStorageCompare_h
 #define mitkDataStorageCompare_h
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 namespace mitk
 {

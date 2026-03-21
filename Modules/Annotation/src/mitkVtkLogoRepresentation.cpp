@@ -10,24 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkLogoRepresentation.h"
-#include "vtkActor2D.h"
-#include "vtkCallbackCommand.h"
-#include "vtkCellArray.h"
-#include "vtkFloatArray.h"
-#include "vtkImageData.h"
-#include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkPoints.h"
-#include "vtkPolyData.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper2D.h"
-#include "vtkPolyDataMapper2D.h"
-#include "vtkPropCollection.h"
-#include "vtkProperty2D.h"
-#include "vtkRenderer.h"
-#include "vtkTexture.h"
-#include "vtkWindow.h"
+#include <mitkVtkLogoRepresentation.h>
+#include <vtkActor2D.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
+#include <vtkImageData.h>
+#include <vtkObjectFactory.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkPropCollection.h>
+#include <vtkProperty2D.h>
+#include <vtkRenderer.h>
+#include <vtkTexture.h>
+#include <vtkWindow.h>
 
 vtkStandardNewMacro(mitkVtkLogoRepresentation);
 

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkShapeBasedInterpolationAlgorithm.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkShapeBasedInterpolationAlgorithm.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
 #include <itkFastChamferDistanceImageFilter.h>

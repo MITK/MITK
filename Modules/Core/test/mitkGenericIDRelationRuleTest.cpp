@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericIDRelationRule.h"
+#include <mitkGenericIDRelationRule.h>
 
-#include "mitkDataNode.h"
-#include "mitkStringProperty.h"
+#include <mitkDataNode.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 class mitkGenericIDRelationRuleTestSuite : public mitk::TestFixture
 {

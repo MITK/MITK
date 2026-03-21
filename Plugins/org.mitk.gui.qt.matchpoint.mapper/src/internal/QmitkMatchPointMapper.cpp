@@ -19,10 +19,10 @@ found in the LICENSE file.
 // Mitk
 #include <mitkImageAccessByItk.h>
 #include <mitkStatusBar.h>
-#include "mitkImageMappingHelper.h"
-#include "mitkMAPRegistrationWrapper.h"
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkImageMappingHelper.h>
+#include <mitkMAPRegistrationWrapper.h>
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegistrationHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
 #include <mitkMAPAlgorithmHelper.h>

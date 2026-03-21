@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExceptionMacro.h"
-#include "mitkModelFitParameterValueExtraction.h"
+#include <mitkExceptionMacro.h>
+#include <mitkModelFitParameterValueExtraction.h>
 
-#include "QmitkFitParameterModel.h"
+#include <QmitkFitParameterModel.h>
 
 
 QmitkFitParameterModel::

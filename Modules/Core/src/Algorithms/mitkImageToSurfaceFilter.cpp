@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkException.h"
+#include <mitkException.h>
 #include <mitkImageToSurfaceFilter.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkProgressBar.h"
+#include <mitkProgressBar.h>
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter()
   : m_Smooth(false),

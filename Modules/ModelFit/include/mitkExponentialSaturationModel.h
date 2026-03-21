@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef __MITK_EXPONENTIAL_SATURATION_MODEL_H_
 #define __MITK_EXPONENTIAL_SATURATION_MODEL_H_
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

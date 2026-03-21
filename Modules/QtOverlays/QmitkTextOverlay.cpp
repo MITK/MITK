@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTextOverlay.h"
+#include <QmitkTextOverlay.h>
 
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
+#include <mitkColorProperty.h>
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
 
 #include <itkCommand.h>
 

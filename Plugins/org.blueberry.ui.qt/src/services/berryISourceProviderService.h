@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef BERRYISOURCEPROVIDERSERVICE_H
 #define BERRYISOURCEPROVIDERSERVICE_H
 
-#include "org_blueberry_ui_qt_Export.h"
+#include <org_blueberry_ui_qt_Export.h>
 
-#include "berryObject.h"
+#include <berryObject.h>
 
 #include <QList>
 

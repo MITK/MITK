@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include <QmitkDataStorageLayerStackModel.h>
 
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 QmitkDataStorageLayerStackModel::QmitkDataStorageLayerStackModel(QObject* parent/* = nullptr*/)
   : QmitkAbstractDataStorageModel(parent)

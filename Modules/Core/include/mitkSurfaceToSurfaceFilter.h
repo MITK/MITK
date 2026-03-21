@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSurfaceToSurfaceFilter_h
 #define mitkSurfaceToSurfaceFilter_h
 
-#include "mitkSurfaceSource.h"
+#include <mitkSurfaceSource.h>
 
 namespace mitk
 {

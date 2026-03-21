@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSceneIOTestScenarioProvider_h
 #define mitkSceneIOTestScenarioProvider_h
 
-#include "mitkStandaloneDataStorage.h"
+#include <mitkStandaloneDataStorage.h>
 
 namespace mitk
 {

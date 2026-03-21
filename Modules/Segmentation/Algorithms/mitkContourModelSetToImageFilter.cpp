@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSetToImageFilter.h"
+#include <mitkContourModelSetToImageFilter.h>
 
 #include <mitkContourModelSet.h>
 #include <mitkContourModelUtils.h>

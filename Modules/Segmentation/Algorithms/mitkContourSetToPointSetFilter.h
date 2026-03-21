@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkContourSetToPointSetFilter_h
 #define mitkContourSetToPointSetFilter_h
 
-#include "mitkCommon.h"
-#include "mitkContourSet.h"
-#include "mitkPointSet.h"
-#include "mitkPointSetSource.h"
+#include <mitkCommon.h>
+#include <mitkContourSet.h>
+#include <mitkPointSet.h>
+#include <mitkPointSetSource.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define mitkMultiComponentImageDataComparisonFilter_h
 
 // mitk includes
-#include "mitkCompareImageDataFilter.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkCompareImageDataFilter.h>
+#include <mitkImageToImageFilter.h>
 
 // struct CompareFilterResults;
 

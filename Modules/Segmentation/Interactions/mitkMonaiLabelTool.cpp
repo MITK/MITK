@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMonaiLabelTool.h"
+#include <mitkMonaiLabelTool.h>
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkToolManager.h>
 #include <itkIntensityWindowingImageFilter.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 
 mitk::MonaiLabelTool::MonaiLabelTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {

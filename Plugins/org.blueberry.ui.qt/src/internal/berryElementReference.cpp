@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "berryElementReference.h"
 
-#include <berryUIElement.h>
+#include "berryUIElement.h"
 
 namespace berry {
 

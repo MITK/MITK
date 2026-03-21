@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkVerboseLimitedLinearUndo_h
 
 // MITK header
-#include "mitkLimitedLinearUndo.h"
+#include <mitkLimitedLinearUndo.h>
 #include <MitkCoreExports.h>
 // STL header
 #include <list>

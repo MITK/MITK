@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkConvertToConcentrationAbsoluteFunctor_h
 #define mitkConvertToConcentrationAbsoluteFunctor_h
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk {
 

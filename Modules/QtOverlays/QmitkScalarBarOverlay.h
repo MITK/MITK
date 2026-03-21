@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <MitkQtOverlaysExports.h>
 
 // MITK-Stuff
-#include "QmitkOverlay.h"
-#include "mitkCommon.h"
-#include "mitkPropertyList.h"
+#include <QmitkOverlay.h>
+#include <mitkCommon.h>
+#include <mitkPropertyList.h>
 #include <QmitkScalarBar.h>
 
 /** \class  QmitkScalarBarOverlay

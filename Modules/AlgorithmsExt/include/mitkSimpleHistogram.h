@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <itkHistogram.h>
 #endif
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 #include <mitkImage.h>
 #include <mitkWeakPointer.h>

@@ -95,7 +95,7 @@ private:
 };
 }
 
-#include "mitkMinMaxImageFilterWithIndex.hxx"
+#include <mitkMinMaxImageFilterWithIndex.hxx>
 
 
 #endif

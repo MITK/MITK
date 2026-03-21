@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourMapper2D.h"
-#include "mitkBaseRenderer.h"
-#include "mitkColorProperty.h"
-#include "mitkContour.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkContourMapper2D.h>
+#include <mitkBaseRenderer.h>
+#include <mitkColorProperty.h>
+#include <mitkContour.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 #include <vtkLinearTransform.h>
-#include "vtk_glad.h"
+#include <vtk_glad.h>
 
 mitk::ContourMapper2D::ContourMapper2D()
 {

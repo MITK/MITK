@@ -33,7 +33,7 @@ found in the LICENSE file.
 #include <mapRegistrationBase.h>
 
 // Map4CTK
-#include "mitkUIDHelper.h"
+#include <mitkUIDHelper.h>
 #include <mitkTimeFramesRegistrationHelper.h>
 
 #include <MitkMatchPointRegistrationUIExports.h>

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <string>
 #include <mitkDoseValueType.h>
 
-#include "MitkRTUIExports.h"
+#include <MitkRTUIExports.h>
 
 namespace mitk
 {

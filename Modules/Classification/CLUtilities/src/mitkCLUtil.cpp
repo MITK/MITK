@@ -25,9 +25,9 @@ found in the LICENSE file.
 // itk includes
 #include <itkCheckerBoardImageFilter.h>
 #include <itkShapedNeighborhoodIterator.h>
-#include "itkHessianRecursiveGaussianImageFilter.h"
-#include "itkUnaryFunctorImageFilter.h"
-#include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkHessianRecursiveGaussianImageFilter.h>
+#include <itkUnaryFunctorImageFilter.h>
+#include <vnl/algo/vnl_symmetric_eigensystem.h>
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include <itkMultiHistogramFilter.h>
 

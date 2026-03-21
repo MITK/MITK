@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkHttpStatusCodeHandler.h"
-#include "QMessageBox"
+#include <QmitkHttpStatusCodeHandler.h>
+#include <QMessageBox>
 #include <mitkCommon.h>
 #include <sstream>
 

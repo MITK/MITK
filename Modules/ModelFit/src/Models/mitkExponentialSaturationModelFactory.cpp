@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialSaturationModelFactory.h"
-#include "mitkExponentialSaturationModelParameterizer.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkExponentialSaturationModelFactory.h>
+#include <mitkExponentialSaturationModelParameterizer.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 mitk::ExponentialSaturationModelFactory::ExponentialSaturationModelFactory()
 {

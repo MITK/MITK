@@ -14,11 +14,11 @@ found in the LICENSE file.
 #ifndef QmitkSimpleBarrierManagerWidget_h
 #define QmitkSimpleBarrierManagerWidget_h
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 #include <QWidget>
 
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 /*forward declarations*/
 class QmitkSimpleBarrierParametersDelegate;

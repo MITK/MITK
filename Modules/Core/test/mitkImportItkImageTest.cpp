@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkITKImageImport.h"
-#include "mitkImageCast.h"
-#include "mitkTestingMacros.h"
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkImagePixelReadAccessor.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkRandomImageSource.h>

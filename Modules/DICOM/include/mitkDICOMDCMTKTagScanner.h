@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <set>
 
-#include "mitkDICOMTagScanner.h"
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMGenericTagCache.h"
+#include <mitkDICOMTagScanner.h>
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMGenericTagCache.h>
 
 namespace mitk
 {

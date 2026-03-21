@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMonaiLabel2DToolGUI.h"
+#include <QmitkMonaiLabel2DToolGUI.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMonaiLabel2DToolGUI, "")
 

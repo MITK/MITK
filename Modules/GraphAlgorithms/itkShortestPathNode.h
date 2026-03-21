@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef __itkShortestPathNode_h_
 #define __itkShortestPathNode_h_
 
-#include "MitkGraphAlgorithmsExports.h"
+#include <MitkGraphAlgorithmsExports.h>
 
 namespace itk
 {

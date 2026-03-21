@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkContourSetVtkMapper3D_h
 #define mitkContourSetVtkMapper3D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkContourSet.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkContourSet.h>
+#include <mitkVtkMapper.h>
 #include <MitkSegmentationExports.h>
 
 #include <vtkPolyData.h>

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMCodeSequenceWithModifiers.h"
+#include <mitkDICOMCodeSequenceWithModifiers.h>
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkReduceContourSetFilter.h"
+#include <mitkReduceContourSetFilter.h>
 
 mitk::ReduceContourSetFilter::ReduceContourSetFilter()
 {

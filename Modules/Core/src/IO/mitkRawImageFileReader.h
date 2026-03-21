@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRawImageFileReader_h
 #define mitkRawImageFileReader_h
 
-#include "mitkAbstractFileReader.h"
+#include <mitkAbstractFileReader.h>
 
 namespace mitk
 {

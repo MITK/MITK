@@ -10,30 +10,30 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegTool2D.h"
-#include "mitkToolManager.h"
+#include <mitkSegTool2D.h>
+#include <mitkToolManager.h>
 
 #include <mitkApplicationCursor.h>
-#include "mitkBaseRenderer.h"
-#include "mitkDataStorage.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDataStorage.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkTimeNavigationController.h>
-#include "mitkImageAccessByItk.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkLabelSetImageHelper.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkLabelSetImageHelper.h>
 
 // Include of the new ImageExtractor
-#include "mitkMorphologicalOperations.h"
-#include "mitkPlanarCircle.h"
+#include <mitkMorphologicalOperations.h>
+#include <mitkPlanarCircle.h>
 
-#include "usGetModuleContext.h"
+#include <usGetModuleContext.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
 // Includes for 3DSurfaceInterpolation
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToContourFilter.h"
-#include "mitkSurfaceInterpolationController.h"
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToContourFilter.h>
+#include <mitkSurfaceInterpolationController.h>
 
 // includes for resling and overwriting
 #include <mitkExtractSliceFilter.h>
@@ -44,10 +44,10 @@ found in the LICENSE file.
 #include <mitkUndoController.h>
 #include <mitkSegChangeOperationApplier.h>
 
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkLabelSetImage.h"
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkLabelSetImage.h>
 
-#include "mitkContourModelUtils.h"
+#include <mitkContourModelUtils.h>
 
 // #include <itkImageRegionIterator.h>
 

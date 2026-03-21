@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkParRecFileReader_h
 #define mitkParRecFileReader_h
 
-#include "mitkCommon.h"
-#include "mitkFileReader.h"
-#include "mitkImageSource.h"
+#include <mitkCommon.h>
+#include <mitkFileReader.h>
+#include <mitkImageSource.h>
 
 namespace mitk
 {

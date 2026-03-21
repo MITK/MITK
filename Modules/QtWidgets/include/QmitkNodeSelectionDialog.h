@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
-#include "mitkIDataStorageInspectorProvider.h"
+#include <mitkIDataStorageInspectorProvider.h>
 
 #include <QmitkAbstractDataStorageInspector.h>
 

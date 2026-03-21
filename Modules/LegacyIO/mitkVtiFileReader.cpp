@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtiFileReader.h"
+#include <mitkVtiFileReader.h>
 
 #include <vtkImageData.h>
 #include <vtkXMLImageDataReader.h>

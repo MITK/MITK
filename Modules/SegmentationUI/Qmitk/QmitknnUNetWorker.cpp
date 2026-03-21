@@ -1,6 +1,6 @@
-#include "QmitknnUNetWorker.h"
+#include <QmitknnUNetWorker.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 #include <QMutexLocker>
 #include <itksys/SystemTools.hxx>
 

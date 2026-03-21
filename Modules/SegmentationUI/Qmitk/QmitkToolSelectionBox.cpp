@@ -13,9 +13,9 @@ found in the LICENSE file.
 //#define MBILOG_ENABLE_DEBUG 1
 
 #include <QmitkStyleManager.h>
-#include "QmitkToolSelectionBox.h"
-#include "QmitkToolGUI.h"
-#include "mitkBaseRenderer.h"
+#include <QmitkToolSelectionBox.h>
+#include <QmitkToolGUI.h>
+#include <mitkBaseRenderer.h>
 
 #include <QList>
 #include <QApplication>
@@ -27,10 +27,10 @@ found in the LICENSE file.
 
 #include <queue>
 
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
-#include "mitkToolManagerProvider.h"
+#include <mitkToolManagerProvider.h>
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage *)
   : QWidget(parent),

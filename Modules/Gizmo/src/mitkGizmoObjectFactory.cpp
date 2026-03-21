@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkGizmoObjectFactory.h"
 
 // Project includes
-#include "mitkGizmo.h"
+#include <mitkGizmo.h>
 #include "mitkGizmoMapper2D.h"
 
 // MITK includes

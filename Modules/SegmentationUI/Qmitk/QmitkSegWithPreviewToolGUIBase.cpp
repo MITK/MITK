@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSegWithPreviewToolGUIBase.h"
+#include <QmitkSegWithPreviewToolGUIBase.h>
 
 #include <QCheckBox>
 #include <QPushButton>

@@ -10,7 +10,7 @@ found in the LICENSE file.s
 
 ============================================================================*/
 
-#include "QmitknnUNetGPU.h"
+#include <QmitknnUNetGPU.h>
 #include <QProcess>
 
 QmitkGPULoader::QmitkGPULoader()

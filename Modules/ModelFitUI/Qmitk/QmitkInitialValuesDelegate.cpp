@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkInitialValuesDelegate.h"
+#include <QmitkInitialValuesDelegate.h>
 
 #include <mitkModelTraitsInterface.h>
 #include <QmitkDataStorageComboBox.h>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMultilabelObjectFactory_h
 #define mitkMultilabelObjectFactory_h
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 
 #include <mitkAbstractFileIO.h>
 

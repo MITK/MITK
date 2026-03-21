@@ -10,7 +10,7 @@ found in the LICENSE file.s
 
 ============================================================================*/
 
-#include "QmitknnUNetFolderParser.h"
+#include <QmitknnUNetFolderParser.h>
 
 QmitknnUNetFolderParser::QmitknnUNetFolderParser(const QString parentFolder)
 {

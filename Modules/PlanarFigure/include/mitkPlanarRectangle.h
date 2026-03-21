@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarRectangle_h
 #define mitkPlanarRectangle_h
 
-#include "mitkPlanarPolygon.h"
+#include <mitkPlanarPolygon.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

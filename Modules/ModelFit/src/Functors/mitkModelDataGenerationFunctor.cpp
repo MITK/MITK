@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelDataGenerationFunctor.h"
+#include <mitkModelDataGenerationFunctor.h>
 
 mitk::SimpleFunctorBase::OutputPixelVectorType
 mitk::ModelDataGenerationFunctor::Compute(const InputPixelVectorType &value) const {

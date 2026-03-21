@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkITKDICOMSeriesReaderHelper_h
 #define mitkITKDICOMSeriesReaderHelper_h
 
-#include "mitkImage.h"
-#include "mitkGantryTiltInformation.h"
-#include "mitkDICOMTag.h"
+#include <mitkImage.h>
+#include <mitkGantryTiltInformation.h>
+#include <mitkDICOMTag.h>
 
 #include <itkGDCMImageIO.h>
 

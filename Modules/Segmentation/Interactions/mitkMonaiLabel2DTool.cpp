@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkMonaiLabel2DTool.h"
+#include <mitkMonaiLabel2DTool.h>
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkSegTool2D.h>

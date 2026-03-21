@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkSurfaceIOFactory.h"
-#include "mitkIOAdapter.h"
-#include "mitkVtkSurfaceReader.h"
+#include <mitkVtkSurfaceIOFactory.h>
+#include <mitkIOAdapter.h>
+#include <mitkVtkSurfaceReader.h>
 
-#include "itkVersion.h"
+#include <itkVersion.h>
 
 namespace mitk
 {

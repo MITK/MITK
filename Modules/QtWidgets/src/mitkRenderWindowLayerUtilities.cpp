@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager module
-#include "mitkRenderWindowLayerUtilities.h"
+#include <mitkRenderWindowLayerUtilities.h>
 
 // mitk core
 #include <mitkNodePredicateProperty.h>

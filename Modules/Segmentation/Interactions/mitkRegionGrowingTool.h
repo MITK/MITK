@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRegionGrowingTool_h
 #define mitkRegionGrowingTool_h
 
-#include "mitkFeedbackContourTool.h"
+#include <mitkFeedbackContourTool.h>
 #include <MitkSegmentationExports.h>
 #include <array>
 

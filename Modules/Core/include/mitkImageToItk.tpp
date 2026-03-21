@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef IMAGETOITK_TPP_INCLUDED_C1C2FCD2
 #define IMAGETOITK_TPP_INCLUDED_C1C2FCD2
 
-#include "itkImportMitkImageContainer.h"
-#include "mitkBaseProcess.h"
-#include "mitkException.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageToItk.h"
-#include "mitkImageWriteAccessor.h"
+#include <itkImportMitkImageContainer.h>
+#include <mitkBaseProcess.h>
+#include <mitkException.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageToItk.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <memory>
 

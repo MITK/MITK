@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "BlueBerryExampleLauncherDialog.h"
+#include <BlueBerryExampleLauncherDialog.h>
 #include <ui_BlueBerryExampleLauncherDialog.h>
 
 #include <QCoreApplication>

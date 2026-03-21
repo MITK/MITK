@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 
 #include "mitkDoseVisPreferenceHelper.h"
-#include "mitkRTUIConstants.h"
-#include "mitkIsoLevelsGenerator.h"
+#include <mitkRTUIConstants.h>
+#include <mitkIsoLevelsGenerator.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

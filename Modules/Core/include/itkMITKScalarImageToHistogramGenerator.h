@@ -84,7 +84,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMITKScalarImageToHistogramGenerator.tpp"
+#include <itkMITKScalarImageToHistogramGenerator.tpp>
 #endif
 
 #endif

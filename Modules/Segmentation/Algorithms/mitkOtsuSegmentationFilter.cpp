@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkOtsuSegmentationFilter.h"
-#include "itkOtsuMultipleThresholdsImageFilter.h"
-#include "itkAddImageFilter.h"
+#include <mitkOtsuSegmentationFilter.h>
+#include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkAddImageFilter.h>
 
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 
 struct paramContainer
 {

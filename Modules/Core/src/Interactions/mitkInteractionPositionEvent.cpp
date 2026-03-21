@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionPositionEvent.h"
+#include <mitkInteractionPositionEvent.h>
 #include <string>
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer *baseRenderer,

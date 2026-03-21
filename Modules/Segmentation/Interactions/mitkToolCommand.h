@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkToolCommand_h
 #define mitkToolCommand_h
 
-#include "itkCommand.h"
-#include "mitkCommon.h"
+#include <itkCommand.h>
+#include <mitkCommon.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

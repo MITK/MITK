@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkContourUtils_h
 #define mitkContourUtils_h
 
-#include "mitkContour.h"
-#include "mitkContourModel.h"
-#include "mitkImage.h"
+#include <mitkContour.h>
+#include <mitkContourModel.h>
+#include <mitkImage.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

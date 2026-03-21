@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
-#include <mitkProvisioningInfo.h>
+#include "mitkProvisioningInfo.h"
 
 #include <QmitkSafeApplication.h>
 #include <QmitkSingleApplication.h>

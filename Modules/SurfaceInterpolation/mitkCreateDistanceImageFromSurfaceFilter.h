@@ -15,13 +15,13 @@ found in the LICENSE file.
 
 #include <MitkSurfaceInterpolationExports.h>
 
-#include "mitkImageSource.h"
-#include "mitkProgressBar.h"
-#include "mitkSurface.h"
+#include <mitkImageSource.h>
+#include <mitkProgressBar.h>
+#include <mitkSurface.h>
 
-#include "vnl/vnl_vector_fixed.h"
+#include <vnl/vnl_vector_fixed.h>
 
-#include "itkImageBase.h"
+#include <itkImageBase.h>
 
 #include <itkeigen/Eigen/Dense>
 

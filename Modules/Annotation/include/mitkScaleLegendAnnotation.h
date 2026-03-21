@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkScaleLegendAnnotation_h
 #define mitkScaleLegendAnnotation_h
 
-#include "MitkAnnotationExports.h"
+#include <MitkAnnotationExports.h>
 #include <mitkLocalStorageHandler.h>
 #include <mitkVtkAnnotation.h>
 #include <vtkSmartPointer.h>

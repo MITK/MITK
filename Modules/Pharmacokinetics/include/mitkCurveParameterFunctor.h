@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkCurveParameterFunctor_h
 #define mitkCurveParameterFunctor_h
 
-#include "mitkCurveDescriptionParameterBase.h"
-#include "mitkSimpleFunctorBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkCurveDescriptionParameterBase.h>
+#include <mitkSimpleFunctorBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

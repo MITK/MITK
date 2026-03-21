@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurface.h"
-#include "mitkInteractionConst.h"
-#include "mitkSurfaceOperation.h"
+#include <mitkSurface.h>
+#include <mitkInteractionConst.h>
+#include <mitkSurfaceOperation.h>
 
 #include <algorithm>
 #include <vtkPolyData.h>

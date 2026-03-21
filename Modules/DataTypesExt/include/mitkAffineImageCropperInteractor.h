@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkAffineImageCropperInteractor_h
 #define mitkAffineImageCropperInteractor_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkDataInteractor.h"
-#include "mitkGeometry3D.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkDataInteractor.h>
+#include <mitkGeometry3D.h>
 
 namespace mitk
 {

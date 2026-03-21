@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include <QAbstractTableModel>
 
-#include "mitkSimpleBarrierConstraintChecker.h"
-#include "mitkModelTraitsInterface.h"
-#include "mitkDataNode.h"
-#include "mitkInitialParameterizationDelegateBase.h"
+#include <mitkSimpleBarrierConstraintChecker.h>
+#include <mitkModelTraitsInterface.h>
+#include <mitkDataNode.h>
+#include <mitkInitialParameterizationDelegateBase.h>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 
 /*!

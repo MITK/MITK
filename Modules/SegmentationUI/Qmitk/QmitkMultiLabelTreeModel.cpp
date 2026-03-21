@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiLabelTreeModel.h"
+#include <QmitkMultiLabelTreeModel.h>
 
 #include <mitkMultiLabelEvents.h>
 #include <mitkRenderingManager.h>

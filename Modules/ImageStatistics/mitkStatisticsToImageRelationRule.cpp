@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStatisticsToImageRelationRule.h"
+#include <mitkStatisticsToImageRelationRule.h>
 
 mitk::StatisticsToImageRelationRule::StatisticsToImageRelationRule() :
   GenericIDRelationRule("statisticsToImage", "relation between ImageStatisticsContainer and Image that was used as computation input", "ImageStatisticsContainer", "Image"){

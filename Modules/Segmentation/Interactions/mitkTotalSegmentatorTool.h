@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef MITKTOTALSEGMENTATORTOOL_H
 #define MITKTOTALSEGMENTATORTOOL_H
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 #include <MitkSegmentationExports.h>
-#include "mitkProcessExecutor.h"
+#include <mitkProcessExecutor.h>
 
 
 namespace us

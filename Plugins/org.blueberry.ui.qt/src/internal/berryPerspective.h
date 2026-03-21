@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPartReference.h"
 #include "berryIViewReference.h"
 #include "berryIViewPart.h"
-#include "berryIStatus.h"
+#include <berryIStatus.h>
 
 namespace berry {
 

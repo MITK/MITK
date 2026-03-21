@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkCrossWidget_h
 #define QmitkCrossWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLabel>
 
 #include <mitkCommon.h>

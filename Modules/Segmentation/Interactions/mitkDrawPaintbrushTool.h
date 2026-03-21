@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDrawPaintbrushTool_h
 #define mitkDrawPaintbrushTool_h
 
-#include "mitkPaintbrushTool.h"
+#include <mitkPaintbrushTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkComputeContourSetNormalsFilter.h"
+#include <mitkComputeContourSetNormalsFilter.h>
 
-#include "mitkIOUtil.h"
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkIOUtil.h>
+#include <mitkImagePixelReadAccessor.h>
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
   : m_SegmentationBinaryImage(nullptr),

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkScalarBar.h"
+#include <QmitkScalarBar.h>
 
 #include <QPaintEvent>
 #include <QPainter>

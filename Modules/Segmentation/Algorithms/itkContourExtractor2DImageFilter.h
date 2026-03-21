@@ -19,10 +19,10 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkContourExtractor2DImageFilter_h
 #define __itkContourExtractor2DImageFilter_h
 
-#include "itkConceptChecking.h"
-#include "itkImageToPathFilter.h"
-#include "itkNumericTraits.h"
-#include "itkPolyLineParametricPath.h"
+#include <itkConceptChecking.h>
+#include <itkImageToPathFilter.h>
+#include <itkNumericTraits.h>
+#include <itkPolyLineParametricPath.h>
 #include <deque>
 #include <list>
 #include <unordered_map>
@@ -272,7 +272,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkContourExtractor2DImageFilter.tpp"
+#include <itkContourExtractor2DImageFilter.tpp>
 #endif
 
 #endif

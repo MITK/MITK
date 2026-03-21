@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTransferFunctionCanvas.h"
+#include <QmitkTransferFunctionCanvas.h>
 
 #include <itkObject.h>
 

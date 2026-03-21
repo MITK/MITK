@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkToolGUI.h"
+#include <QmitkToolGUI.h>
 
 #include <iostream>
 

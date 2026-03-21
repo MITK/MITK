@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRotationOperation.h"
+#include <mitkRotationOperation.h>
 
 mitk::RotationOperation::RotationOperation(OperationType operationType,
                                            Point3D pointOfRotation,

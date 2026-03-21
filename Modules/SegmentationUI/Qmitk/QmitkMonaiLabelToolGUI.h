@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkMonaiLabelToolGUI_h
 #define QmitkMonaiLabelToolGUI_h
 
-#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
+#include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
 
 #include <MitkSegmentationUIExports.h>
 

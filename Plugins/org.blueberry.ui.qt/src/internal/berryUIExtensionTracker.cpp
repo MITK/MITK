@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryUIExtensionTracker.h"
 
-#include <berryDisplay.h>
+#include "berryDisplay.h"
 #include <berryIExtension.h>
 #include <berryObject.h>
 #include "berryWorkbenchPlugin.h"

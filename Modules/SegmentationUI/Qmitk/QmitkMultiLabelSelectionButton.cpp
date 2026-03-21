@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiLabelSelectionButton.h"
+#include <QmitkMultiLabelSelectionButton.h>
 
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>

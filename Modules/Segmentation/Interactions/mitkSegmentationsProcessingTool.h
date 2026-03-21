@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSegmentationsProcessingTool_h
 #define mitkSegmentationsProcessingTool_h
 
-#include "mitkCommon.h"
-#include "mitkDataNode.h"
-#include "mitkTool.h"
+#include <mitkCommon.h>
+#include <mitkDataNode.h>
+#include <mitkTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

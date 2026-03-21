@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkReducedChiSquareFitCostFunction.h"
-#include "mitkModelBase.h"
+#include <mitkReducedChiSquareFitCostFunction.h>
+#include <mitkModelBase.h>
 
 mitk::ReducedChiSquareFitCostFunction::MeasureType mitk::ReducedChiSquareFitCostFunction::CalcMeasure(const ParametersType &/*parameters*/, const SignalType &signal) const
 {

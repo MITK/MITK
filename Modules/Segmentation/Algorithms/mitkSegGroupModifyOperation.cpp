@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegGroupModifyOperation.h"
+#include <mitkSegGroupModifyOperation.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImage.h>
 

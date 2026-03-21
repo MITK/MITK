@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLiveWireTool2DGUI.h"
+#include <QmitkLiveWireTool2DGUI.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLiveWireTool2DGUI, "")
 

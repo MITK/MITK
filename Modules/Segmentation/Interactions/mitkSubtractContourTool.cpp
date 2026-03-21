@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSubtractContourTool.h"
+#include <mitkSubtractContourTool.h>
 
 // us
 #include <usGetModuleContext.h>

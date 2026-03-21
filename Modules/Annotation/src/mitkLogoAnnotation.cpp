@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLogoAnnotation.h"
+#include <mitkLogoAnnotation.h>
 #include <mitkIOUtil.h>
 #include <vtkImageData.h>
 #include <vtkImageData.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMorphologicalOperationsWidget.h"
+#include <QmitkMorphologicalOperationsWidget.h>
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
 #include <mitkMultiLabelPredicateHelper.h>

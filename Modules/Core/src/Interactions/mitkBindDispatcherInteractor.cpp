@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBindDispatcherInteractor.h"
-#include "mitkMessage.h"
+#include <mitkBindDispatcherInteractor.h>
+#include <mitkMessage.h>
 #include <cstring>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleRegistry.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleRegistry.h>
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor(const std::string &rendererName) : m_DataStorage(nullptr)
 {

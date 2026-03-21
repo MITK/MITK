@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <tweaklets/berryGuiWidgetsTweaklet.h>
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "berryQtShell.h"
 
 #include "berryQtWidgetsTweakletImpl.h"
 #include "berryQtMainWindowControl.h"
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
-#include <berryConstants.h>
-#include <internal/berryTweaklets.h>
+#include "berryConstants.h"
+#include "internal/berryTweaklets.h"
 
 #include <QApplication>
 #include <QVariant>

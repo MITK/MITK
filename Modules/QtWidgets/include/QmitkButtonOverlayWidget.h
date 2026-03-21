@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkButtonOverlayWidget_h
 #define QmitkButtonOverlayWidget_h
 
-#include "QmitkOverlayWidget.h"
+#include <QmitkOverlayWidget.h>
 #include <MitkQtWidgetsExports.h>
 #include <QIcon>
 #include <QLabel>

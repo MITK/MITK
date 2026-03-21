@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkContourTool_h
 #define mitkContourTool_h
 
-#include "mitkCommon.h"
-#include "mitkFeedbackContourTool.h"
+#include <mitkCommon.h>
+#include <mitkFeedbackContourTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

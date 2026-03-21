@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegEvalSettingsWidget.h"
+#include <QmitkRegEvalSettingsWidget.h>
 
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegEvalStyleProperty.h"
-#include "mitkRegEvalWipeStyleProperty.h"
-#include "mitkRegEvaluationObject.h"
-#include "mitkRegVisPropertyTags.h"
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegEvalStyleProperty.h>
+#include <mitkRegEvalWipeStyleProperty.h>
+#include <mitkRegEvaluationObject.h>
+#include <mitkRegVisPropertyTags.h>
 #include <mitkNodePredicateProperty.h>
 
 #include <ui_QmitkRegEvalSettingsWidget.h>

@@ -17,16 +17,16 @@ This file is based heavily on a corresponding ITK filter.
 ===================================================================*/
 #ifndef _itkLocalVariationImageFilter_tpp
 #define _itkLocalVariationImageFilter_tpp
-#include "itkLocalVariationImageFilter.h"
+#include <itkLocalVariationImageFilter.h>
 
-#include "itkConstShapedNeighborhoodIterator.h"
-#include "itkImageRegionIterator.h"
-#include "itkNeighborhoodAlgorithm.h"
-#include "itkNeighborhoodInnerProduct.h"
-#include "itkOffset.h"
-#include "itkProgressReporter.h"
-#include "itkVectorImage.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
+#include <itkConstShapedNeighborhoodIterator.h>
+#include <itkImageRegionIterator.h>
+#include <itkNeighborhoodAlgorithm.h>
+#include <itkNeighborhoodInnerProduct.h>
+#include <itkOffset.h>
+#include <itkProgressReporter.h>
+#include <itkVectorImage.h>
+#include <itkZeroFluxNeumannBoundaryCondition.h>
 
 #include <algorithm>
 #include <vector>

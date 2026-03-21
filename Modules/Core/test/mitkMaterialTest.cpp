@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseProperty.h"
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
-#include "mitkMaterial.h"
-#include "mitkTestingMacros.h"
+#include <mitkBaseProperty.h>
+#include <mitkBaseRenderer.h>
+#include <mitkDataNode.h>
+#include <mitkMaterial.h>
+#include <mitkTestingMacros.h>
 #include <mitkColorProperty.h>
 #include <mitkVtkPropRenderer.h>
 

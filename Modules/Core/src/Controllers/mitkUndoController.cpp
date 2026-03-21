@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkUndoController.h"
-#include "mitkInteractionConst.h"
-#include "mitkLimitedLinearUndo.h"
-#include "mitkRenderingManager.h"
-#include "mitkVerboseLimitedLinearUndo.h"
-#include "mitkCoreServices.h"
-#include "mitkIPreferencesService.h"
-#include "mitkIPreferences.h"
+#include <mitkUndoController.h>
+#include <mitkInteractionConst.h>
+#include <mitkLimitedLinearUndo.h>
+#include <mitkRenderingManager.h>
+#include <mitkVerboseLimitedLinearUndo.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 
 constexpr unsigned int DEFAULT_UNDO_REDO_LIMIT = 50;

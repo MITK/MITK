@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkPointSetStatisticsCalculator.h"
+#include <mitkPointSetStatisticsCalculator.h>
 
 mitk::PointSetStatisticsCalculator::PointSetStatisticsCalculator()
 {

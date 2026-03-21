@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitknnUnetTool_h
 #define mitknnUnetTool_h
 
-#include "mitkSegWithPreviewTool.h"
-#include "mitkCommon.h"
-#include "mitkToolManager.h"
+#include <mitkSegWithPreviewTool.h>
+#include <mitkCommon.h>
+#include <mitkToolManager.h>
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
 #include <numeric>

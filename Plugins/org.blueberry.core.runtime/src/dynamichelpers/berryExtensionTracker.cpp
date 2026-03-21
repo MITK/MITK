@@ -12,16 +12,16 @@ found in the LICENSE file.
 
 #include "berryExtensionTracker.h"
 
-#include <berryIExtension.h>
-#include <berryIExtensionPoint.h>
-#include <berryIExtensionPointFilter.h>
-#include <berryIExtensionRegistry.h>
-#include <berryIExtensionChangeHandler.h>
-#include <berryIRegistryEventListener.h>
-#include <berryListenerList.h>
-#include <berryLog.h>
+#include "berryIExtension.h"
+#include "berryIExtensionPoint.h"
+#include "berryIExtensionPointFilter.h"
+#include "berryIExtensionRegistry.h"
+#include "berryIExtensionChangeHandler.h"
+#include "berryIRegistryEventListener.h"
+#include "berryListenerList.h"
+#include "berryLog.h"
 #include "internal/berrySimpleExtensionPointFilter.h"
-#include <berryPlatform.h>
+#include "berryPlatform.h"
 
 #include <QSet>
 #include <QHash>

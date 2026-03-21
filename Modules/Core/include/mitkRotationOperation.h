@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkRotationOperation_h
 #define mitkRotationOperation_h
 
-#include "mitkNumericTypes.h"
-#include "mitkOperation.h"
+#include <mitkNumericTypes.h>
+#include <mitkOperation.h>
 
 namespace mitk
 {

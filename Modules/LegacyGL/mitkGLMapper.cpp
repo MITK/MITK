@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGLMapper.h"
-#include "mitkGL.h"
+#include <mitkGLMapper.h>
+#include <mitkGL.h>
 
 mitk::GLMapper::GLMapper()
 {

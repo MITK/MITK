@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef __itkShortestPathCostFunctionLiveWire_h
 #define __itkShortestPathCostFunctionLiveWire_h
 
-#include "itkShortestPathCostFunction.h"
+#include <itkShortestPathCostFunction.h>
 
-#include "itkImageRegionConstIterator.h"
+#include <itkImageRegionConstIterator.h>
 
 namespace itk
 {
@@ -159,7 +159,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkShortestPathCostFunctionLiveWire.tpp"
+#include <itkShortestPathCostFunctionLiveWire.tpp>
 #endif
 
 #endif /* __itkShortestPathCostFunctionLiveWire_h */

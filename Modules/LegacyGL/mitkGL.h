@@ -19,9 +19,9 @@ found in the LICENSE file.
 
 #ifndef __APPLE__
 //#include "GL/gl.h"
-#include "vtk_glad.h"
+#include <vtk_glad.h>
 #else
-#include "OpenGL/gl.h"
+#include <OpenGL/gl.h>
 #endif
 
 #endif

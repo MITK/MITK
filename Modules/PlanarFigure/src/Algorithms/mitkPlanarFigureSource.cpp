@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureSource.h"
+#include <mitkPlanarFigureSource.h>
 
-#include "mitkPlanarCircle.h"
+#include <mitkPlanarCircle.h>
 
 mitk::PlanarFigureSource::PlanarFigureSource()
 {

@@ -15,9 +15,9 @@ found in the LICENSE file.
 #define mitkRegistrationWrapperMapper3D_h
 
 
-#include "mitkRegistrationWrapperMapperBase.h"
+#include <mitkRegistrationWrapperMapperBase.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 class vtkPropAssembly;
 

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <QString>
 #include <string>
 
-#include "org_mitk_matchpoint_core_helper_Export.h"
+#include <org_mitk_matchpoint_core_helper_Export.h>
 
 /**
  * \class MatchPointBrowserConstants

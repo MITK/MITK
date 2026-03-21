@@ -14,11 +14,11 @@ found in the LICENSE file.
 #ifndef QmitkImageStatisticsTreeModel_h
 #define QmitkImageStatisticsTreeModel_h
 
-#include "QmitkAbstractDataStorageModel.h"
+#include <QmitkAbstractDataStorageModel.h>
 
 //MITK
 #include <MitkImageStatisticsUIExports.h>
-#include "mitkImageStatisticsContainer.h"
+#include <mitkImageStatisticsContainer.h>
 
 #include <mutex>
 

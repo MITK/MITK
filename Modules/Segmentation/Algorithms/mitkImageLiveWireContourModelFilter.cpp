@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageLiveWireContourModelFilter.h"
+#include <mitkImageLiveWireContourModelFilter.h>
 
 #include <itkCastImageFilter.h>
 #include <itkGradientMagnitudeImageFilter.h>
 #include <itkImageRegionIterator.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
 {

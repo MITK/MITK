@@ -15,7 +15,7 @@ found in the LICENSE file.
 #define mitkMAPRegistrationWrapperObjectFactory_h
 
 #include <mitkCoreObjectFactory.h>
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk {
 

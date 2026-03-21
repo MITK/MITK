@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkBinaryThresholdULToolGUI_h
 #define QmitkBinaryThresholdULToolGUI_h
 
-#include "QmitkBinaryThresholdToolGUIBase.h"
+#include <QmitkBinaryThresholdToolGUIBase.h>
 
 #include <MitkSegmentationUIExports.h>
 

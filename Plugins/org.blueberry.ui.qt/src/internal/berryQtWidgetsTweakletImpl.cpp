@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryQtWidgetsTweakletImpl.h"
 
 #include "berryQtSash.h"
 #include "berryQtShell.h"
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
-#include <berryConstants.h>
+#include "berryConstants.h"
 
 #include <QAbstractButton>
 #include <QApplication>

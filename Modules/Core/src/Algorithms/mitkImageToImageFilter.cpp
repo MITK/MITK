@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 
 mitk::ImageToImageFilter::ImageToImageFilter()
 {

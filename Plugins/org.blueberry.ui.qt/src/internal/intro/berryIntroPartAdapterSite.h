@@ -14,11 +14,11 @@ found in the LICENSE file.
 #ifndef BERRYVIEWINTROADAPTERSITE_H_
 #define BERRYVIEWINTROADAPTERSITE_H_
 
-#include <intro/berryIIntroSite.h>
+#include "intro/berryIIntroSite.h"
 
 #include "berryIntroDescriptor.h"
 
-#include <berryIWorkbenchPartSite.h>
+#include "berryIWorkbenchPartSite.h"
 
 namespace berry {
 

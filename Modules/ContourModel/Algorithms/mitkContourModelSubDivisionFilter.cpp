@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSubDivisionFilter.h"
+#include <mitkContourModelSubDivisionFilter.h>
 #include <mitkInteractionConst.h>
 #include <mitkPointOperation.h>
 

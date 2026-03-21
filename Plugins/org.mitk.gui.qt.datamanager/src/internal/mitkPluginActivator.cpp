@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 #include "mitkPluginActivator.h"
-#include "../QmitkDataManagerHotkeysPrefPage.h"
-#include "../QmitkDataManagerPreferencePage.h"
-#include "../QmitkDataManagerView.h"
+#include "QmitkDataManagerHotkeysPrefPage.h"
+#include "QmitkDataManagerPreferencePage.h"
+#include "QmitkDataManagerView.h"
 
 #include <usModuleInitialization.h>
 

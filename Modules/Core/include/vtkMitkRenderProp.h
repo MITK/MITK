@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
 #define VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
 
-#include "mitkVtkPropRenderer.h"
-#include "vtkProp.h"
+#include <mitkVtkPropRenderer.h>
+#include <vtkProp.h>
 
 /*!
 \brief vtkMitkRenderProp

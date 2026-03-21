@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef __itkShortestPathCostFunction_h
 #define __itkShortestPathCostFunction_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkShapedNeighborhoodIterator.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkShapedNeighborhoodIterator.h>
 
 namespace itk
 {
@@ -74,6 +74,6 @@ namespace itk
 
 } // end namespace itk
 
-#include "itkShortestPathCostFunction.tpp"
+#include <itkShortestPathCostFunction.tpp>
 
 #endif /* __itkShortestPathCostFunction_h */

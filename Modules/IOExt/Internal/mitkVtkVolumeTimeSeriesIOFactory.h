@@ -16,8 +16,8 @@ found in the LICENSE file.
 #pragma warning(disable : 4786)
 #endif
 
-#include "itkObjectFactoryBase.h"
-#include "mitkBaseData.h"
+#include <itkObjectFactoryBase.h>
+#include <mitkBaseData.h>
 
 namespace mitk
 {

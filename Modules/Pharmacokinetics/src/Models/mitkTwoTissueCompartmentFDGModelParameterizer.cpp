@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoTissueCompartmentFDGModelParameterizer.h"
+#include <mitkTwoTissueCompartmentFDGModelParameterizer.h>
 
 mitk::TwoTissueCompartmentFDGModelParameterizer::ParametersType
 mitk::TwoTissueCompartmentFDGModelParameterizer::GetDefaultInitialParameterization() const

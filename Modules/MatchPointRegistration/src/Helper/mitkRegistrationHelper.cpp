@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegistrationHelper.h"
+#include <mitkRegistrationHelper.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImage.h>
 
 //MatchPoint
-#include "mapRegistrationKernel.h"
+#include <mapRegistrationKernel.h>
 
 namespace mitk
 {

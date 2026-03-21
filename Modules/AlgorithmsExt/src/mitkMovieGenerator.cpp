@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMovieGenerator.h"
-#include "mitkConfig.h"
+#include <mitkMovieGenerator.h>
+#include <mitkConfig.h>
 #include <mitkRenderingManager.h>
-#include "vtk_glad.h"
+#include <vtk_glad.h>
 
 #if WIN32
 #ifndef __GNUC__
 //#if ! (_MSC_VER >= 1400)
-#include "mitkMovieGeneratorWin32.h"
+#include <mitkMovieGeneratorWin32.h>
 //#endif
 #else
-#include "GL/glext.h"
+#include <GL/glext.h>
 #endif
 #endif
 #ifndef GL_BGR

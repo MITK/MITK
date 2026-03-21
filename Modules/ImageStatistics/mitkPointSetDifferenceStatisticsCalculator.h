@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 #include <MitkImageStatisticsExports.h>
-#include "mitkImageStatisticsCalculator.h"
+#include <mitkImageStatisticsCalculator.h>
 #include <mitkPointSet.h>
 
 namespace mitk

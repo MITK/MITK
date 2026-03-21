@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPickingTool_h
 #define mitkPickingTool_h
 
-#include "mitkSegWithPreviewTool.h"
-#include "mitkPointSet.h"
+#include <mitkSegWithPreviewTool.h>
+#include <mitkPointSet.h>
 
 #include <MitkSegmentationExports.h>
 

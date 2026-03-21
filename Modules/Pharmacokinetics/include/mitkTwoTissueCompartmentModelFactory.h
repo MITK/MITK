@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTwoTissueCompartmentModelFactory_h
 #define mitkTwoTissueCompartmentModelFactory_h
 
-#include "mitkTwoTissueCompartmentModelFactoryBase.h"
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
+#include <mitkTwoTissueCompartmentModelFactoryBase.h>
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
 
 namespace mitk
 {

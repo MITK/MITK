@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryLayoutPartSash.h"
 
 #include "berryConstants.h"
-#include "berryLog.h"
+#include <berryLog.h>
 
 namespace berry
 {

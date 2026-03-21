@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYQTINTROPART_H_
 #define BERRYQTINTROPART_H_
 
-#include <berryIntroPart.h>
+#include "berryIntroPart.h"
 
 #include <org_blueberry_ui_qt_Export.h>
 

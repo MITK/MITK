@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkPointSetDataInteractor_h
 #define mitkPointSetDataInteractor_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkSmartPointer.h"
-#include "mitkCommon.h"
-#include "mitkDataInteractor.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkSmartPointer.h>
+#include <mitkCommon.h>
+#include <mitkDataInteractor.h>
 #include <MitkCoreExports.h>
 #include <mitkPointSet.h>
 

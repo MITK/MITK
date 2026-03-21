@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTemporoSpatialStringPropertySerializer_h_included
 #define mitkTemporoSpatialStringPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkTemporoSpatialStringProperty.h>
 #include <tinyxml2.h>
 
 namespace mitk

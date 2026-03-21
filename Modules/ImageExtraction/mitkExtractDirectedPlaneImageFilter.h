@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkExtractDirectedPlaneImageFilter_h
 #define mitkExtractDirectedPlaneImageFilter_h
 
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 #include <MitkImageExtractionExports.h>
 
-#include "mitkVtkResliceInterpolationProperty.h"
-#include "vtkImageReslice.h"
+#include <mitkVtkResliceInterpolationProperty.h>
+#include <vtkImageReslice.h>
 
 #define setMacro(name, type)                                                                                           \
   virtual void Set##name(type _arg)                                                                                    \

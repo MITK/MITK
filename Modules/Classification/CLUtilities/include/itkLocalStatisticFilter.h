@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef itkLocalStatisticFilter_h
 #define itkLocalStatisticFilter_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -57,7 +57,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLocalStatisticFilter.hxx"
+#include <itkLocalStatisticFilter.hxx>
 #endif
 
 #endif // itkLocalStatisticFilter_h

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkEventProvider.h"
-#include "mitkVtkEventAdapter.h"
+#include <mitkVtkEventProvider.h>
+#include <mitkVtkEventAdapter.h>
 #include <mitkLog.h>
 
 #include <vtkCallbackCommand.h>
@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include "mitkInteractionEvent.h"
+#include <mitkInteractionEvent.h>
 
 #define VTKEVENTPROVIDER_INFO MITK_INFO("mitk.core.vtkeventprovider")
 #define VTKEVENTPROVIDER_WARN MITK_WARN("mitk.core.vtkeventprovider")

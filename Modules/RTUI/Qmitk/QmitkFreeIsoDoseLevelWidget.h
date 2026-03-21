@@ -14,11 +14,11 @@ found in the LICENSE file.
 #ifndef QmitkFreeIsoDoseLevelWidget_h
 #define QmitkFreeIsoDoseLevelWidget_h
 
-#include "MitkRTUIExports.h"
+#include <MitkRTUIExports.h>
 
 #include <QWidget>
 
-#include "mitkIsoDoseLevel.h"
+#include <mitkIsoDoseLevel.h>
 #include <memory>
 
 namespace Ui

@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkContourModel_h
 #define mitkContourModel_h
 
-#include "mitkBaseData.h"
-#include "mitkCommon.h"
+#include <mitkBaseData.h>
+#include <mitkCommon.h>
 #include <MitkContourModelExports.h>
 
 #include <mitkContourElement.h>

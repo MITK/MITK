@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.hxx>
 
-#include "mitkInteractionConst.h"
-#include "mitkRotationOperation.h"
+#include <mitkInteractionConst.h>
+#include <mitkRotationOperation.h>
 #include <mitkImageCast.h>
 #include <mitkMatrixConvert.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <fstream>
 #include <mitkNumericTypes.h>
 

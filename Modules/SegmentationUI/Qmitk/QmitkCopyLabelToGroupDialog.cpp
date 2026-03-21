@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkCopyLabelToGroupDialog.h"
+#include <QmitkCopyLabelToGroupDialog.h>
 
 #include <mitkSegChangeOperationApplier.h>
 

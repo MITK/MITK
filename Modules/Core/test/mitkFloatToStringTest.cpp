@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkLexicalCast.h>
 
-#include "mitkEqual.h"
+#include <mitkEqual.h>
 #include <cmath>
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 #include <functional>
 #include <limits>

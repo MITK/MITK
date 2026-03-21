@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkSegWithPreviewTool_h
 #define mitkSegWithPreviewTool_h
 
-#include "mitkTool.h"
-#include "mitkCommon.h"
-#include "mitkDataNode.h"
-#include "mitkToolCommand.h"
+#include <mitkTool.h>
+#include <mitkCommon.h>
+#include <mitkDataNode.h>
+#include <mitkToolCommand.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

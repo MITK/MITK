@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSetWriter.h"
-#include "mitkContourModelWriter.h"
+#include <mitkContourModelSetWriter.h>
+#include <mitkContourModelWriter.h>
 #include <fstream>
 #include <iostream>
 #include <mitkCustomMimeType.h>

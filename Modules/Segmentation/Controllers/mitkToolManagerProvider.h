@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkServiceInterface.h>
 #include <usModuleContext.h>
 
-#include "mitkToolManager.h"
+#include <mitkToolManager.h>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 

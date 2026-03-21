@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #ifndef __mitkITKImageImport_tpp
 #define __mitkITKImageImport_tpp
-#include "mitkITKImageImport.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkITKImageImport.h>
+#include <mitkImageReadAccessor.h>
 
 template <class TInputImage>
 mitk::ITKImageImport<TInputImage>::ITKImageImport()

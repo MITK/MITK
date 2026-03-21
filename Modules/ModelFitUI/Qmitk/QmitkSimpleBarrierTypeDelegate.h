@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <QStyledItemDelegate>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 
 /** \class QmitkSimpleBarrierTypeDelegate

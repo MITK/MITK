@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkPlotWidget_h
 #define QmitkPlotWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkCommon.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkCommon.h>
 #include <QWidget>
 #include <qwt_legend.h>
 #include <qwt_plot.h>

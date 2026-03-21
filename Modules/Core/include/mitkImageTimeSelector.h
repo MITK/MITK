@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageTimeSelector_h
 #define mitkImageTimeSelector_h
 
-#include "mitkSubImageSelector.h"
+#include <mitkSubImageSelector.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegSliceOperation.h"
+#include <mitkSegSliceOperation.h>
 
 #include <mitkImage.h>
 

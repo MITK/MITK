@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDoseColorDelegate.h"
+#include <QmitkDoseColorDelegate.h>
 
 #include <QPainter>
 #include <QApplication>

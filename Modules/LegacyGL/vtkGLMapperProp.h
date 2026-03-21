@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef vtkGLMapperProp_h
 #define vtkGLMapperProp_h
 
-#include "MitkLegacyGLExports.h"
+#include <MitkLegacyGLExports.h>
 
-#include "mitkGLMapper.h"
+#include <mitkGLMapper.h>
 #include <vtkProp.h>
 #include <vtkSmartPointer.h>
 

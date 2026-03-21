@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDescriptivePharmacokineticBrixModel.h"
+#include <mitkDescriptivePharmacokineticBrixModel.h>
 
 const std::string mitk::DescriptivePharmacokineticBrixModel::MODEL_DISPLAY_NAME =
   "Descriptive Pharmacokinetic Brix Model";

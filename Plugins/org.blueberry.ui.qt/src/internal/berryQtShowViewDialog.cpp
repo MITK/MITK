@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "berryQtShowViewDialog.h"
 #include <ui_berryQtShowViewDialog.h>
 
-#include <berryIViewDescriptor.h>
+#include "berryIViewDescriptor.h"
 
-#include <berryViewTreeModel.h>
+#include "berryViewTreeModel.h"
 
 #include "berryWorkbenchPlugin.h"
 #include "berryXMLMemento.h"

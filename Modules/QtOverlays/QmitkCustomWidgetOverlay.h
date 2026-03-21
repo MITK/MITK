@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkCustomWidgetOverlay_h
 
 // MITK
-#include "QmitkOverlay.h"
+#include <QmitkOverlay.h>
 
 #include <MitkQtOverlaysExports.h>
 

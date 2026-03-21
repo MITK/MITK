@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkImageToContourModelFilter_h
 #define mitkImageToContourModelFilter_h
 
-#include "mitkCommon.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelSource.h"
+#include <mitkCommon.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelSource.h>
 #include <MitkContourModelExports.h>
 #include <mitkImage.h>
 

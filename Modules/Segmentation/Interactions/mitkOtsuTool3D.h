@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkOtsuTool3D_h
 #define mitkOtsuTool3D_h
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

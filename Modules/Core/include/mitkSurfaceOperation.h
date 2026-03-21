@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSurfaceOperation_h
 #define mitkSurfaceOperation_h
 
-#include "mitkOperation.h"
+#include <mitkOperation.h>
 #include <MitkCoreExports.h>
 
 #include <vtkPolyData.h>

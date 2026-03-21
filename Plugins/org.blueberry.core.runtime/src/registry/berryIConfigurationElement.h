@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef BERRYIEXTENSIONELEMENT_H_
 #define BERRYIEXTENSIONELEMENT_H_
 
-#include <berryObject.h>
+#include "berryObject.h"
 
-#include <berryLog.h>
+#include "berryLog.h"
 
 namespace berry {
 

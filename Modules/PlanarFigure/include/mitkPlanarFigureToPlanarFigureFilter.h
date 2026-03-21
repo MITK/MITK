@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureToPlanarFigureFilter_h
 #define mitkPlanarFigureToPlanarFigureFilter_h
 
-#include "mitkCommon.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureSource.h"
+#include <mitkCommon.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureSource.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

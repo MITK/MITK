@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelGLMapper2D.h"
-#include "mitkBaseRenderer.h"
-#include "mitkColorProperty.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelSubDivisionFilter.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkContourModelGLMapper2D.h>
+#include <mitkBaseRenderer.h>
+#include <mitkColorProperty.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelSubDivisionFilter.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 #include <vtkLinearTransform.h>
 
-#include "mitkGL.h"
+#include <mitkGL.h>
 
 mitk::ContourModelGLMapper2D::ContourModelGLMapper2D()
   : m_SubdivisionContour(mitk::ContourModel::New()), m_InitSubdivisionCurve(true)

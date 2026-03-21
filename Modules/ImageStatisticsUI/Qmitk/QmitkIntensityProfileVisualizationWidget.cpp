@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkIntensityProfileVisualizationWidget.h"
+#include <QmitkIntensityProfileVisualizationWidget.h>
 #include <ui_QmitkIntensityProfileVisualizationWidget.h>
 
 #include <QClipboard>

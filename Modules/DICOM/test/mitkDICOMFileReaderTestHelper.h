@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMFileReaderTestHelper_h
 #define mitkDICOMFileReaderTestHelper_h
 
-#include "mitkDICOMFileReader.h"
-#include "mitkDICOMEnums.h"
+#include <mitkDICOMFileReader.h>
+#include <mitkDICOMEnums.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 namespace mitk
 {

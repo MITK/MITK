@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImage.h"
-#include "mitkImageGenerator.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkImage.h>
+#include <mitkImageGenerator.h>
+#include <mitkImageTimeSelector.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>

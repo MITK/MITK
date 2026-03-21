@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <QmitkSimpleTextOverlayWidget.h>
 
-#include "QTextDocument"
-#include "QPainter"
-#include "QApplication"
+#include <QTextDocument>
+#include <QPainter>
+#include <QApplication>
 
 QmitkSimpleTextOverlayWidget::QmitkSimpleTextOverlayWidget(QWidget* parent)
   : QmitkOverlayWidget(parent)

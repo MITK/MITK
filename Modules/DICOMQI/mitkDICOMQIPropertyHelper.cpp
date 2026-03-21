@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkPropertyList.h>
 
-#include "mitkDICOMQIPropertyHelper.h"
+#include <mitkDICOMQIPropertyHelper.h>
 
 namespace mitk
 {

@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkBoundingShapeCropper_h
 #define mitkBoundingShapeCropper_h
 
-#include "MitkBoundingShapeExports.h"
-#include "mitkBoundingShapeCropper.h"
-#include "mitkCommon.h"
-#include "mitkGeometryData.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkBoundingShapeExports.h>
+#include <mitkBoundingShapeCropper.h>
+#include <mitkCommon.h>
+#include <mitkGeometryData.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 namespace mitk
 {

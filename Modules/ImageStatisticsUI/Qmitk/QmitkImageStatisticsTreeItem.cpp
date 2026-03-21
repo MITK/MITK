@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsTreeItem.h"
+#include <QmitkImageStatisticsTreeItem.h>
 
 QmitkImageStatisticsTreeItem::QmitkImageStatisticsTreeItem(
   const ImageStatisticsObject& statisticsData,

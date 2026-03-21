@@ -99,7 +99,7 @@ namespace mitk
   \endcode
 
   \code
-  #include "mitkCallbackFromGUIThread.h"
+  #include <mitkCallbackFromGUIThread.h>
   #include <itkCommand.h>
 
 

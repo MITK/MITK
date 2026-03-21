@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentAnythingPythonService.h"
+#include <mitkSegmentAnythingPythonService.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 #include <mitkSegmentAnythingProcessExecutor.h>
 #include <itksys/SystemTools.hxx>
 #include <chrono>
 #include <thread>
 #include <mitkFileSystem.h>
 #include <itkImageFileWriter.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 #include <mitkLocaleSwitch.h>
 
 using namespace std::chrono_literals;

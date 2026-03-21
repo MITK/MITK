@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <itkCommand.h>
 
 // MITK
-#include "mitkUIDHelper.h"
+#include <mitkUIDHelper.h>
 #include <mitkDataNode.h>
 #include <mitkImage.h>
 #include <mitkMAPRegistrationWrapper.h>

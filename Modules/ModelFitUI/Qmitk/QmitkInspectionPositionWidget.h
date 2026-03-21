@@ -14,10 +14,10 @@ found in the LICENSE file.
 #ifndef QmitkInspectionPositionWidget_h
 #define QmitkInspectionPositionWidget_h
 
-#include "mitkModelFitInfo.h"
-#include "mitkPointSet.h"
+#include <mitkModelFitInfo.h>
+#include <mitkPointSet.h>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 #include <QWidget>
 #include <memory>

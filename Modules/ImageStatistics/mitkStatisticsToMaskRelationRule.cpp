@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStatisticsToMaskRelationRule.h"
+#include <mitkStatisticsToMaskRelationRule.h>
 
 mitk::StatisticsToMaskRelationRule::StatisticsToMaskRelationRule() :
   GenericIDRelationRule("statisticsToMask", "relation between ImageStatisticsContainer and Mask that was used as computation input", "ImageStatisticsContainer", "Mask") {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkToolGUIArea_h
 #define QmitkToolGUIArea_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QWidget>

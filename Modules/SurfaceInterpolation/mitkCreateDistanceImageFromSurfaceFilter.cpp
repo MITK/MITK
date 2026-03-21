@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCreateDistanceImageFromSurfaceFilter.h"
-#include "mitkImageCast.h"
+#include <mitkCreateDistanceImageFromSurfaceFilter.h>
+#include <mitkImageCast.h>
 
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkDoubleArray.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkNeighborhoodIterator.h"
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkNeighborhoodIterator.h>
 
 #include <queue>
 

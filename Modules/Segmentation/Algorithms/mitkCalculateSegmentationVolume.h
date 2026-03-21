@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkCalculateSegmentationVolume_h
 #define mitkCalculateSegmentationVolume_h
 
-#include "mitkImageCast.h"
-#include "mitkSegmentationSink.h"
+#include <mitkImageCast.h>
+#include <mitkSegmentationSink.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

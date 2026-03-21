@@ -13,8 +13,8 @@ found in the LICENSE file.
 // MITK
 #include "mitkPointSetReaderService.h"
 #include "mitkGeometry3DToXML.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkProportionalTimeGeometry.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkLocaleSwitch.h>
 
 // STL

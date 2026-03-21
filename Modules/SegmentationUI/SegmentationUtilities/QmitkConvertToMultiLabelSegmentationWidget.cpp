@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkConvertToMultiLabelSegmentationWidget.h"
+#include <QmitkConvertToMultiLabelSegmentationWidget.h>
 #include <ui_QmitkConvertToMultiLabelSegmentationWidgetControls.h>
 
 #include <mitkDataStorage.h>

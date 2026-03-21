@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageStatisticsConstants.h"
+#include <mitkImageStatisticsConstants.h>
 
 const std::string mitk::ImageStatisticsConstants::MEAN() {
   return "Mean";

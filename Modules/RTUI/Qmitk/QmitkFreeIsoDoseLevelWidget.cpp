@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFreeIsoDoseLevelWidget.h"
+#include <QmitkFreeIsoDoseLevelWidget.h>
 #include <ui_QmitkFreeIsoDoseLevelWidget.h>
 
 QmitkFreeIsoDoseLevelWidget::QmitkFreeIsoDoseLevelWidget(QWidget*)

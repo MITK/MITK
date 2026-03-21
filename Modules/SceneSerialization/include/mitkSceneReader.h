@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <itkObjectFactory.h>
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 namespace tinyxml2
 {

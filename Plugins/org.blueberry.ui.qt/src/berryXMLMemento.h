@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include "berryIMemento.h"
 #include "berryUIException.h"
 
-#include "Poco/DOM/Document.h"
-#include "Poco/DOM/Element.h"
-#include "Poco/SAX/XMLReader.h"
+#include <Poco/DOM/Document.h>
+#include <Poco/DOM/Element.h>
+#include <Poco/SAX/XMLReader.h>
 
 
 namespace berry {

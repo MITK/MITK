@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkModelTestFixture.h"
+#include <mitkModelTestFixture.h>
 
 //MITK includes
-#include "mitkExponentialDecayModel.h"
+#include <mitkExponentialDecayModel.h>
 
 
   class mitkExponentialDecayModelTestSuite : public mitk::mitkModelTestFixture

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkGrowCutTool_h
 #define mitkGrowCutTool_h
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

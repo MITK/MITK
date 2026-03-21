@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataGenerationJobBase.h"
+#include <QmitkDataGenerationJobBase.h>
 
 bool QmitkDataGenerationJobBase::IsRunning() const
 {

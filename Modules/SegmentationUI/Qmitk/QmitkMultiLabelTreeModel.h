@@ -14,13 +14,13 @@ found in the LICENSE file.
 #ifndef QmitkMultiLabelTreeModel_h
 #define QmitkMultiLabelTreeModel_h
 
-#include "mitkLabelSetImage.h"
+#include <mitkLabelSetImage.h>
 #include <mitkITKEventObserverGuard.h>
 
 // qt
 #include <QAbstractItemModel>
 
-#include "MitkSegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
 
 class QmitkMultiLabelSegTreeItem;

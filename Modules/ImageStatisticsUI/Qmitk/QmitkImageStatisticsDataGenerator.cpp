@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsDataGenerator.h"
+#include <QmitkImageStatisticsDataGenerator.h>
 
-#include "mitkImageStatisticsContainer.h"
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
-#include "mitkNodePredicateFunction.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateDataProperty.h"
-#include "mitkProperties.h"
-#include "mitkImageStatisticsContainerManager.h"
+#include <mitkImageStatisticsContainer.h>
+#include <mitkStatisticsToImageRelationRule.h>
+#include <mitkStatisticsToMaskRelationRule.h>
+#include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateDataProperty.h>
+#include <mitkProperties.h>
+#include <mitkImageStatisticsContainerManager.h>
 
-#include "QmitkImageStatisticsCalculationRunnable.h"
+#include <QmitkImageStatisticsCalculationRunnable.h>
 
 void QmitkImageStatisticsDataGenerator::SetIgnoreZeroValueVoxel(bool _arg)
 {

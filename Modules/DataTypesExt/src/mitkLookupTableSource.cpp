@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTableSource.h"
+#include <mitkLookupTableSource.h>
 
 mitk::LookupTableSource::LookupTableSource()
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneLandmarkProjector.h"
+#include <mitkPlaneLandmarkProjector.h>
 
 mitk::PlaneLandmarkProjector::PlaneLandmarkProjector() : m_ProjectionPlane(nullptr)
 {

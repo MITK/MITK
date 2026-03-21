@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyListsXmlFileReaderAndWriter.h"
-#include "mitkProperties.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkPropertyListsXmlFileReaderAndWriter.h>
+#include <mitkProperties.h>
+#include <mitkStandaloneDataStorage.h>
 #include <itksys/SystemTools.hxx>
 #include <tinyxml2.h>
 

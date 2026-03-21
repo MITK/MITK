@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 
-#include "itkCreateObjectFunction.h"
-#include "itkVersion.h"
+#include <itkCreateObjectFunction.h>
+#include <itkVersion.h>
 
 #include "mitkUnstructuredGridVtkWriter.h"
 

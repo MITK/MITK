@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef mitkPersistenceService_h
 #define mitkPersistenceService_h
 
-#include "mitkIPersistenceService.h"
-#include "mitkPropertyListsXmlFileReaderAndWriter.h"
-#include "mitkSceneIO.h"
+#include <mitkIPersistenceService.h>
+#include <mitkPropertyListsXmlFileReaderAndWriter.h>
+#include <mitkSceneIO.h>
 #include <MitkPersistenceExports.h>
 #include <itkLightObject.h>
 

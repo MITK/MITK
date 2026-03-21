@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateAnd_h
 #define mitkNodePredicateAnd_h
 
-#include "mitkNodePredicateCompositeBase.h"
+#include <mitkNodePredicateCompositeBase.h>
 
 namespace mitk
 {

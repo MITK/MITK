@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetWriter.h"
+#include <mitkPointSetWriter.h>
 #include <fstream>
 #include <iostream>
 #include <locale>

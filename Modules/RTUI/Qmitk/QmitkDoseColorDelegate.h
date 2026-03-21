@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <QStyledItemDelegate>
 
-#include "MitkRTUIExports.h"
+#include <MitkRTUIExports.h>
 
 /** \class QmitkDoseColorDelegate
 \brief An item delegate for rendering and editing dose color in a QTableView.*/

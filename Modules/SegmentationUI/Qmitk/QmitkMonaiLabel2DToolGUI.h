@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkMonaiLabelTool2DGUI_h
 
 #include <MitkSegmentationUIExports.h>
-#include "QmitkMonaiLabelToolGUI.h"
+#include <QmitkMonaiLabelToolGUI.h>
 
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabel2DToolGUI : public QmitkMonaiLabelToolGUI
 {

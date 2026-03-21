@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <map>
 
-#include "mitkImage.h"
+#include <mitkImage.h>
 
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

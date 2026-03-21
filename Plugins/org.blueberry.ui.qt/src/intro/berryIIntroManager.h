@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryIIntroPart.h"
 
-#include <berryIWorkbenchWindow.h>
+#include "berryIWorkbenchWindow.h"
 
 namespace berry
 {

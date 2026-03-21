@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include "berryPropertyTesterDescriptor.h"
 
-#include "berryPlatform.h"
-#include "berryCoreException.h"
-#include "berryStatus.h"
+#include <berryPlatform.h>
+#include <berryCoreException.h>
+#include <berryStatus.h>
 #include "berryExpressionPlugin.h"
 
 #include <berryIConfigurationElement.h>
 #include <berryIContributor.h>
 
-#include "Poco/String.h"
+#include <Poco/String.h>
 
 namespace berry
 {

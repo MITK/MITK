@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSelectXnatUploadDestinationDialog.h"
+#include <QmitkSelectXnatUploadDestinationDialog.h>
 #include <ui_QmitkSelectXnatUploadDestinationDialog.h>
 
 #include <ctkXnatObject.h>
@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <ctkXnatResourceFolder.h>
 #include <ctkXnatSession.h>
 
-#include "QmitkXnatTreeModel.h"
+#include <QmitkXnatTreeModel.h>
 
 #include <QModelIndex>
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
 mitk::DICOMDatasetAccessingImageFrameInfo
 ::DICOMDatasetAccessingImageFrameInfo(const std::string& filename, unsigned int frameNo)

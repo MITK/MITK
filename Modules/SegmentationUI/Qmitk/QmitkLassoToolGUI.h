@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkLassoToolGUI_h
 #define QmitkLassoToolGUI_h
 
-#include "QmitkEditableContourToolGUIBase.h"
+#include <QmitkEditableContourToolGUIBase.h>
 #include <MitkSegmentationUIExports.h>
 
 /**

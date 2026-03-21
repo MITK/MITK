@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYKEYEDHASHSET_H
 #define BERRYKEYEDHASHSET_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 #include "berryKeyedElement.h"
 
 #include <QSet>

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef _itkConnectedAdaptiveThresholdImageFilter_tpp
 #define _itkConnectedAdaptiveThresholdImageFilter_tpp
 
-#include "itkAdaptiveThresholdIterator.h"
-#include "itkBinaryThresholdImageFunction.h"
-#include "itkConnectedAdaptiveThresholdImageFilter.h"
-#include "itkMinimumMaximumImageFilter.h"
-#include "itkThresholdImageFilter.h"
+#include <itkAdaptiveThresholdIterator.h>
+#include <itkBinaryThresholdImageFunction.h>
+#include <itkConnectedAdaptiveThresholdImageFilter.h>
+#include <itkMinimumMaximumImageFilter.h>
+#include <itkThresholdImageFilter.h>
 
 namespace itk
 {

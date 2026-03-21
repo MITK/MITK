@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
-#include "mitkIOAdapter.h"
+#include <mitkIOAdapter.h>
 #include "mitkVtkVolumeTimeSeriesReader.h"
 
-#include "itkVersion.h"
+#include <itkVersion.h>
 
 namespace mitk
 {

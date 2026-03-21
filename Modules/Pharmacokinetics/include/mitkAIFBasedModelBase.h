@@ -13,9 +13,9 @@ found in the LICENSE file.
 #define mitkAIFBasedModelBase_h
 
 
-#include "MitkPharmacokineticsExports.h"
-#include "mitkModelBase.h"
-#include "itkArray2D.h"
+#include <MitkPharmacokineticsExports.h>
+#include <mitkModelBase.h>
+#include <itkArray2D.h>
 
 namespace mitk
 {

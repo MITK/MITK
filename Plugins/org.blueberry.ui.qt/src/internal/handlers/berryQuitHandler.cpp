@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryQuitHandler.h"
 
-#include <berryIWorkbench.h>
-#include <berryHandlerUtil.h>
+#include "berryIWorkbench.h"
+#include "berryHandlerUtil.h"
 
 namespace berry {
 

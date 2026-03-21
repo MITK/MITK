@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QRunnable>
 
 // ITK
-#include "itkCommand.h"
+#include <itkCommand.h>
 
 // MatchPoint
 #include <mapRegistrationBase.h>

@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "berryIntroConstants.h"
 #include "internal/berryWorkbenchRegistryConstants.h"
 
-#include <berryAbstractUICTKPlugin.h>
+#include "berryAbstractUICTKPlugin.h"
 #include <berryStatus.h>
 #include <berryCoreException.h>
 #include <berryIContributor.h>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #define mitkPersistenceActivator_h
 
 // Microservices
-#include "mitkPersistenceService.h"
+#include <mitkPersistenceService.h>
 #include <usModuleActivator.h>
 #include <usServiceRegistration.h>
 

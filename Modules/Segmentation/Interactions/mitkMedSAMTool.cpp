@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMedSAMTool.h"
+#include <mitkMedSAMTool.h>
 
-#include "mitkToolManager.h"
-#include "mitkGeometryData.h"
-#include "mitkInteractionPositionEvent.h"
+#include <mitkToolManager.h>
+#include <mitkGeometryData.h>
+#include <mitkInteractionPositionEvent.h>
 
 // us
 #include <usGetModuleContext.h>

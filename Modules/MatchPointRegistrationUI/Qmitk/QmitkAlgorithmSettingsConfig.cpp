@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAlgorithmSettingsConfig.h"
+#include <QmitkAlgorithmSettingsConfig.h>
 
 #include <mapConvert.h>
 #include <mapMetaPropertyAccessor.h>

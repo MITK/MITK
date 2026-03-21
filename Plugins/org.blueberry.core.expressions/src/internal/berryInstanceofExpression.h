@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryExpression.h"
 
-#include "Poco/DOM/Element.h"
+#include <Poco/DOM/Element.h>
 
 namespace berry {
 

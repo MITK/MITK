@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegChangeOperationBase.h"
+#include <mitkSegChangeOperationBase.h>
 
 mitk::SegChangeOperationBase::SegChangeOperationBase(mitk::MultiLabelSegmentation* segmentation, OperationType operationType)
   : Operation(operationType)

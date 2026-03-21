@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef __itkTotalVariationDenoisingImageFilter_h
 #define __itkTotalVariationDenoisingImageFilter_h
 
-#include "itkCastImageFilter.h"
-#include "itkImage.h"
-#include "itkImageToImageFilter.h"
-#include "itkTotalVariationSingleIterationImageFilter.h"
+#include <itkCastImageFilter.h>
+#include <itkImage.h>
+#include <itkImageToImageFilter.h>
+#include <itkTotalVariationSingleIterationImageFilter.h>
 
 namespace itk
 {
@@ -95,7 +95,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTotalVariationDenoisingImageFilter.tpp"
+#include <itkTotalVariationDenoisingImageFilter.tpp>
 #endif
 
 #endif //__itkTotalVariationDenoisingImageFilter__

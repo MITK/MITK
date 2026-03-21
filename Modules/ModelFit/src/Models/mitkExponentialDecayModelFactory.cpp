@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialDecayModelFactory.h"
-#include "mitkExponentialDecayModelParameterizer.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkExponentialDecayModelFactory.h>
+#include <mitkExponentialDecayModelParameterizer.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 mitk::ExponentialDecayModelFactory::ExponentialDecayModelFactory()
 {

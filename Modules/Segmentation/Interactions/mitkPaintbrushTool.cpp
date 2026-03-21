@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPaintbrushTool.h"
+#include <mitkPaintbrushTool.h>
 
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkBaseRenderer.h"
-#include "mitkToolManager.h"
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkBaseRenderer.h>
+#include <mitkToolManager.h>
 
-#include "mitkContourModelUtils.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkContourModelUtils.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkImageWriteAccessor.h>
 
 mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),

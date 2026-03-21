@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "berryPlatform.h"
 
-#include <berryIProduct.h>
+#include "berryIProduct.h"
 
 #include "internal/berryInternalPlatform.h"
 #include "internal/berryIRuntimeConstants.h"

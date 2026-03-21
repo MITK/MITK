@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef mitkMouseReleaseEvent_h
 #define mitkMouseReleaseEvent_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
-#include "mitkInteractionPositionEvent.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
+#include <mitkInteractionPositionEvent.h>
 
 #include <MitkCoreExports.h>
 

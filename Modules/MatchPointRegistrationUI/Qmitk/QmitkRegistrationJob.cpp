@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegistrationJob.h"
+#include <QmitkRegistrationJob.h>
 
 // Mitk
 #include <mitkMAPAlgorithmHelper.h>

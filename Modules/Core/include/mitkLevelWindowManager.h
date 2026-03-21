@@ -14,9 +14,9 @@ found in the LICENSE file.
 #define mitkLevelWindowManager_h
 
 // mitk core
-#include "mitkBaseProperty.h"
-#include "mitkDataStorage.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkBaseProperty.h>
+#include <mitkDataStorage.h>
+#include <mitkLevelWindowProperty.h>
 
 //  c++
 #include <map>

@@ -14,16 +14,16 @@ found in the LICENSE file.
 #ifndef mitkImageStitchingHelper_h
 #define mitkImageStitchingHelper_h
 
-#include "mapRegistrationBase.h"
-#include "mitkImage.h"
-#include "mitkGeometry3D.h"
+#include <mapRegistrationBase.h>
+#include <mitkImage.h>
+#include <mitkGeometry3D.h>
 
-#include "mitkMAPRegistrationWrapper.h"
-#include "mitkImageMappingHelper.h"
+#include <mitkMAPRegistrationWrapper.h>
+#include <mitkImageMappingHelper.h>
 
 #include <itkStitchImageFilter.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

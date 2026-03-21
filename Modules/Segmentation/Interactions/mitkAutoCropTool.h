@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkAutoCropTool_h
 #define mitkAutoCropTool_h
 
-#include "mitkCommon.h"
-#include "mitkSegmentationsProcessingTool.h"
+#include <mitkCommon.h>
+#include <mitkSegmentationsProcessingTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkPlanePositionManager.h"
-#include "mitkInteractionConst.h"
+#include <mitkPlanePositionManager.h>
+#include <mitkInteractionConst.h>
 
 mitk::PlanePositionManagerService::PlanePositionManagerService()
 {

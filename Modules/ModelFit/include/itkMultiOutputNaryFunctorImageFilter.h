@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef __itkMultiOutputNaryFunctorImageFilter_h
 #define __itkMultiOutputNaryFunctorImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkImageIterator.h"
-#include "itkArray.h"
+#include <itkImageToImageFilter.h>
+#include <itkImageIterator.h>
+#include <itkArray.h>
 
 namespace itk
 {
@@ -140,7 +140,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiOutputNaryFunctorImageFilter.tpp"
+#include <itkMultiOutputNaryFunctorImageFilter.tpp>
 #endif
 
 #endif

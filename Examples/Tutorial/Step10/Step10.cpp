@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "Step10.h"
-#include "mitkInternalEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkRenderingManager.h"
+#include <Step10.h>
+#include <mitkInternalEvent.h>
+#include <mitkMouseMoveEvent.h>
+#include <mitkRenderingManager.h>
 #include <mitkPointOperation.h>
 //
-#include "mitkBaseRenderer.h"
-#include "mitkDispatcher.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDispatcher.h>
 #include <mitkPropertyList.h>
 
 void mitk::ExampleInteractor::ConnectActionsAndFunctions()

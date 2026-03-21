@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkItkImageFileReader.h"
-#include "mitkConfig.h"
-#include "mitkException.h"
+#include <mitkItkImageFileReader.h>
+#include <mitkConfig.h>
+#include <mitkException.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkProportionalTimeGeometry.h>
 

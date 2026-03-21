@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSegmentationObjectFactory_h
 #define mitkSegmentationObjectFactory_h
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

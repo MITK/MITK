@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkGrowCutSegmentationFilter_h
 #define mitkGrowCutSegmentationFilter_h
 
-#include "itkImage.h"
-#include "mitkITKImageImport.h"
-#include "mitkImage.h"
-#include "mitkImageToImageFilter.h"
+#include <itkImage.h>
+#include <mitkITKImageImport.h>
+#include <mitkImage.h>
+#include <mitkImageToImageFilter.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

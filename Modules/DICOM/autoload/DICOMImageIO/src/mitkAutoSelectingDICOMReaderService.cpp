@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAutoSelectingDICOMReaderService.h"
+#include <mitkAutoSelectingDICOMReaderService.h>
 
 #include <mitkDICOMFileReaderSelector.h>
 

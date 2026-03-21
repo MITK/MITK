@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkUnstructuredGridSource.h"
-#include "mitkUnstructuredGrid.h"
+#include <mitkUnstructuredGridSource.h>
+#include <mitkUnstructuredGrid.h>
 
 mitk::UnstructuredGridSource::UnstructuredGridSource()
 {

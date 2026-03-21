@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <QAbstractTableModel>
 
-#include "mitkIsoDoseLevelCollections.h"
+#include <mitkIsoDoseLevelCollections.h>
 
-#include "MitkRTUIExports.h"
+#include <MitkRTUIExports.h>
 
 
 /*!

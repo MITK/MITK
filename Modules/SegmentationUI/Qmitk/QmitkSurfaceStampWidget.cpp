@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSurfaceStampWidget.h"
+#include <QmitkSurfaceStampWidget.h>
 
 #include <mitkLabelSetImage.h>
 #include <mitkRenderingManager.h>

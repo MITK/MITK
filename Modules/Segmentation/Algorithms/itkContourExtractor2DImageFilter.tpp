@@ -19,10 +19,10 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkContourExtractor2DImageFilter_tpp
 #define __itkContourExtractor2DImageFilter_tpp
 
-#include "itkConstShapedNeighborhoodIterator.h"
-#include "itkConstShapedNeighborhoodIterator.h"
-#include "itkContourExtractor2DImageFilter.h"
-#include "itkProgressReporter.h"
+#include <itkConstShapedNeighborhoodIterator.h>
+#include <itkConstShapedNeighborhoodIterator.h>
+#include <itkContourExtractor2DImageFilter.h>
+#include <itkProgressReporter.h>
 #include <cmath>
 
 namespace itk

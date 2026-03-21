@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationIO.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkMultilabelIOMimeTypes.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkMultiLabelIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
+#include <mitkMultiLabelSegmentationIO.h>
+#include <mitkBasePropertySerializer.h>
+#include <mitkMultilabelIOMimeTypes.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkMultiLabelIOHelper.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -24,11 +24,11 @@ found in the LICENSE file.
 #include <mitkUIDManipulator.h>
 
 // itk
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
+#include <itkImageFileReader.h>
+#include <itkImageFileWriter.h>
+#include <itkMetaDataDictionary.h>
+#include <itkMetaDataObject.h>
+#include <itkNrrdImageIO.h>
 
 #include <tinyxml2.h>
 

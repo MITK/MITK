@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlaneOrientationProperty_h
 #define mitkPlaneOrientationProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

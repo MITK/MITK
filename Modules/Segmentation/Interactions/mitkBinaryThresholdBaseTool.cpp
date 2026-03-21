@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBinaryThresholdBaseTool.h"
+#include <mitkBinaryThresholdBaseTool.h>
 
-#include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageStatisticsHolder.h"
-#include "mitkLabelSetImage.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageStatisticsHolder.h>
+#include <mitkLabelSetImage.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageRegionIterator.h>
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkConfirmSegmentationDialog.h"
+#include <QmitkConfirmSegmentationDialog.h>
 #include <ui_QmitkConfirmSegmentationDialog.h>
 
 QmitkConfirmSegmentationDialog::QmitkConfirmSegmentationDialog(QWidget *parent)

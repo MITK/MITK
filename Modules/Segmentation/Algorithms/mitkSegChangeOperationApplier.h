@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSegChangeOperationApplier_h
 #define mitkSegChangeOperationApplier_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <mitkOperationActor.h>
 #include <MitkSegmentationExports.h>
 

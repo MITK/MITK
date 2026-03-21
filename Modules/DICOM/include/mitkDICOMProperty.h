@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkDICOMProperty_h
 #define mitkDICOMProperty_h
 
-#include "mitkDICOMImageBlockDescriptor.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkDICOMTagPath.h"
+#include <mitkDICOMImageBlockDescriptor.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkDICOMTagPath.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

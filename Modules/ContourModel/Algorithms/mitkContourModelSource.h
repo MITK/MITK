@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkContourModelSource_h
 #define mitkContourModelSource_h
 
-#include "mitkBaseDataSource.h"
-#include "mitkContourModel.h"
+#include <mitkBaseDataSource.h>
+#include <mitkContourModel.h>
 #include <MitkContourModelExports.h>
 
 namespace mitk

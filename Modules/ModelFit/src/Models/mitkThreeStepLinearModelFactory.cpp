@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeStepLinearModelFactory.h"
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkThreeStepLinearModelFactory.h>
+#include <mitkConcreteModelParameterizerBase.h>
 
 mitk::ThreeStepLinearModelFactory::ThreeStepLinearModelFactory()
 {

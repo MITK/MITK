@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageReadAccessor_h
 #define mitkImageReadAccessor_h
 
-#include "mitkImageAccessorBase.h"
+#include <mitkImageAccessorBase.h>
 
 namespace mitk
 {

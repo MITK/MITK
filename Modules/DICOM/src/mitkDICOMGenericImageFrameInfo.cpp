@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMGenericImageFrameInfo.h"
-#include "mitkException.h"
+#include <mitkDICOMGenericImageFrameInfo.h>
+#include <mitkException.h>
 
 mitk::DICOMGenericImageFrameInfo
 ::DICOMGenericImageFrameInfo(const std::string& filename, unsigned int frameNo)

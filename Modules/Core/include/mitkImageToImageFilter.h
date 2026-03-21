@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageToImageFilter_h
 #define mitkImageToImageFilter_h
 
-#include "mitkImageSource.h"
+#include <mitkImageSource.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

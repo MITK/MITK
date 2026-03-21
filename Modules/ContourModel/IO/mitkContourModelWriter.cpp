@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelWriter.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkTimeGeometry.h"
+#include <mitkContourModelWriter.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkTimeGeometry.h>
 #include <fstream>
 #include <iostream>
 #include <locale>

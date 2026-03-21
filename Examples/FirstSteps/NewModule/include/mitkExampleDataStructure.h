@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkNewModuleExports.h>
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 namespace mitk
 {

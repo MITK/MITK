@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkMonaiLabelTool_h
 #define mitkMonaiLabelTool_h
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 #include <MitkSegmentationExports.h>
 #include <memory>
 #include <unordered_map>

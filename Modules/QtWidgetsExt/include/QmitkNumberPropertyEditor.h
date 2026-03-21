@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkNumberPropertyEditor_h
 #define QmitkNumberPropertyEditor_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QSpinBox>
 #include <mitkProperties.h>
 #include <mitkPropertyObserver.h>

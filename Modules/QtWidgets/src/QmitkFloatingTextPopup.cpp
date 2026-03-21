@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFloatingTextPopup.h"
+#include <QmitkFloatingTextPopup.h>
 
 #include <QPainter>
 #include <QTextDocument>

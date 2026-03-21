@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef __itkAdaptiveThresholdIterator_h
 #define __itkAdaptiveThresholdIterator_h
 
-#include "itkConditionalConstIterator.h"
-#include "itkImage.h"
-#include "itkIndex.h"
-#include "itkSize.h"
+#include <itkConditionalConstIterator.h>
+#include <itkImage.h>
+#include <itkIndex.h>
+#include <itkSize.h>
 
 #include <map>
 #include <queue>
@@ -244,7 +244,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkAdaptiveThresholdIterator.tpp"
+#include <itkAdaptiveThresholdIterator.tpp>
 #endif
 
 #endif

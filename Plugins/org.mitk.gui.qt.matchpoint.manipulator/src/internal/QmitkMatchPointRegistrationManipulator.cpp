@@ -18,18 +18,18 @@ found in the LICENSE file.
 #include <mitkStatusBar.h>
 #include <mitkNodePredicateDataProperty.h>
 #include <mitkMAPRegistrationWrapper.h>
-#include "mitkRegVisPropertyTags.h"
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegEvaluationObject.h"
-#include "mitkRegistrationHelper.h"
-#include "mitkRegEvaluationMapper2D.h"
+#include <mitkRegVisPropertyTags.h>
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegEvaluationObject.h>
+#include <mitkRegistrationHelper.h>
+#include <mitkRegEvaluationMapper2D.h>
 #include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 // Qmitk
-#include "QmitkRenderWindow.h"
+#include <QmitkRenderWindow.h>
 #include "QmitkMatchPointRegistrationManipulator.h"
 #include <QmitkMappingJob.h>
 

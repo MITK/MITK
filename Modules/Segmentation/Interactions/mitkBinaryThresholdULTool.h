@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkBinaryThresholdULTool_h
 #define mitkBinaryThresholdULTool_h
 
-#include "mitkBinaryThresholdBaseTool.h"
+#include <mitkBinaryThresholdBaseTool.h>
 #include <MitkSegmentationExports.h>
 
 

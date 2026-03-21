@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMonaiLabelToolGUI.h"
+#include <QmitkMonaiLabelToolGUI.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

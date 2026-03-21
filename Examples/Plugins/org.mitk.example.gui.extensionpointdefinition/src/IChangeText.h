@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <berryObject.h>
 
-#include "org_mitk_example_gui_extensionpointdefinition_Export.h"
+#include <org_mitk_example_gui_extensionpointdefinition_Export.h>
 
 struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText : public virtual berry::Object
 {

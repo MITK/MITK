@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaskImageFilter.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkProperties.h"
-#include "mitkTimeHelper.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkMaskImageFilter.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkProperties.h>
+#include <mitkTimeHelper.h>
+#include <mitkImageTimeSelector.h>
 
-#include "mitkImageAccessByItk.h"
-#include "mitkImageToItk.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageToItk.h>
 
-#include "itkMaskImageFilter.h"
+#include <itkMaskImageFilter.h>
 
 #include <limits>
 

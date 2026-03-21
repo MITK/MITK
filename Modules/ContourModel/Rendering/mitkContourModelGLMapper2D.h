@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkContourModelGLMapper2D_h
 #define mitkContourModelGLMapper2D_h
 
-#include "mitkCommon.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelGLMapper2DBase.h"
+#include <mitkCommon.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelGLMapper2DBase.h>
 #include <MitkContourModelExports.h>
 
 namespace mitk

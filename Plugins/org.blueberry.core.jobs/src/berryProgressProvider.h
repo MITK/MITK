@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define _BERRY_PROGRESSPROVIDER_H
 
 #include "berryIProgressMonitor.h"
-#include "berryObject.h"
+#include <berryObject.h>
 #include "berryJob.h"
 
 namespace berry

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPointListWidget.h"
+#include <QmitkPointListWidget.h>
 
 #include <QDir>
 #include <QFileDialog>

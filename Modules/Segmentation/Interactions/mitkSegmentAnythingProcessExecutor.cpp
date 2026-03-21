@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentAnythingProcessExecutor.h"
+#include <mitkSegmentAnythingProcessExecutor.h>
 
 #include <itksys/SystemTools.hxx>
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataStorageSelection.h"
+#include <mitkDataStorageSelection.h>
 #include <itkCommand.h>
 #include <mitkBaseProperty.h>
 #include <mitkPropertyList.h>

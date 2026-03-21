@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkWeakPointerProperty.h"
+#include <mitkWeakPointerProperty.h>
 
 bool mitk::WeakPointerProperty::IsEqual(const BaseProperty &property) const
 {

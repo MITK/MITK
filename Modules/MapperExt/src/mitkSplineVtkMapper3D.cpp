@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSplineVtkMapper3D.h"
+#include <mitkSplineVtkMapper3D.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <vtkActor.h>

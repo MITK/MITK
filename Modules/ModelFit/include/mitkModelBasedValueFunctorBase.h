@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkModelBasedValueFunctorBase_h
 #define mitkModelBasedValueFunctorBase_h
 
-#include "mitkIndexedValueFunctorBase.h"
+#include <mitkIndexedValueFunctorBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

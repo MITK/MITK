@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMNullFileReader_h
 #define mitkDICOMNullFileReader_h
 
-#include "mitkDICOMFileReader.h"
+#include <mitkDICOMFileReader.h>
 
 namespace mitk
 {

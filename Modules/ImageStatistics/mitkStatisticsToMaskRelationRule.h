@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkStatisticsToMaskRelationRule_h
 
 #include <MitkImageStatisticsExports.h>
-#include "mitkGenericIDRelationRule.h"
+#include <mitkGenericIDRelationRule.h>
 
 namespace mitk
 {

@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <berryISelectionListener.h>
 
-#include "mitkAnnotation.h"
-#include "mitkILifecycleAwarePart.h"
+#include <mitkAnnotation.h>
+#include <mitkILifecycleAwarePart.h>
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <memory>

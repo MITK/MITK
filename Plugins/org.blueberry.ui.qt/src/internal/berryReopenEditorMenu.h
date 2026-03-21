@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYREOPENEDITORMENU_H
 #define BERRYREOPENEDITORMENU_H
 
-#include <berryContributionItem.h>
+#include "berryContributionItem.h"
 
 namespace berry {
 

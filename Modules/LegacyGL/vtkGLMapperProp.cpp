@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkGLMapperProp.h"
+#include <vtkGLMapperProp.h>
 
 #include <vtkObjectFactory.h>
 

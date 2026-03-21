@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateBase.h"
+#include <mitkNodePredicateBase.h>
 
 mitk::NodePredicateBase::~NodePredicateBase()
 {

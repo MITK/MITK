@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkVtkVolumeTimeSeriesReader_h
 #define mitkVtkVolumeTimeSeriesReader_h
 
-#include "mitkCommon.h"
-#include "mitkFileSeriesReader.h"
-#include "mitkSurfaceSource.h"
+#include <mitkCommon.h>
+#include <mitkFileSeriesReader.h>
+#include <mitkSurfaceSource.h>
 
 namespace mitk
 {

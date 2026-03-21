@@ -28,10 +28,10 @@
 #ifndef __itkMultiGaussianImageSource_h
 #define __itkMultiGaussianImageSource_h
 
-#include "itkImageSource.h"
-#include "itkNumericTraits.h"
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkImageFileWriter.h"
+#include <itkImageSource.h>
+#include <itkNumericTraits.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageFileWriter.h>
 #include <itkMapContainer.h>
 
 
@@ -368,7 +368,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiGaussianImageSource.hxx"
+#include <itkMultiGaussianImageSource.hxx>
 #endif
 
 #endif

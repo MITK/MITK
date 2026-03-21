@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define mitkOtsuSegmentationFilter_h
 
 //#include "MitkSBExports.h"
-#include "mitkITKImageImport.h"
-#include "mitkImage.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkITKImageImport.h>
+#include <mitkImage.h>
+#include <mitkImageToImageFilter.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 #include <MitkSegmentationExports.h>
 

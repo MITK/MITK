@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkGLMapperWrapper.h"
+#include <mitkVtkGLMapperWrapper.h>
 
 // mitk includes
-#include "mitkDataNode.h"
-#include "mitkGL.h"
-#include "vtkGLMapperProp.h"
+#include <mitkDataNode.h>
+#include <mitkGL.h>
+#include <vtkGLMapperProp.h>
 
 // constructor LocalStorage
 mitk::VtkGLMapperWrapper::LocalStorage::LocalStorage()

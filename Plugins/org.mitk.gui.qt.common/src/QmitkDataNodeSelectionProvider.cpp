@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkDataNodeSelectionProvider.h"
 
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 #include "internal/QmitkDataNodeSelection.h"
 

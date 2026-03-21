@@ -24,11 +24,11 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkException.h>
 
-#include "mitkMAPRegistrationWrapper.h"
-#include "mitkRegistrationWrapperMapperBase.h"
-#include "mitkRegVisColorStyleProperty.h"
-#include "mitkRegVisHelper.h"
-#include "mitkRegVisPropertyTags.h"
+#include <mitkMAPRegistrationWrapper.h>
+#include <mitkRegistrationWrapperMapperBase.h>
+#include <mitkRegVisColorStyleProperty.h>
+#include <mitkRegVisHelper.h>
+#include <mitkRegVisPropertyTags.h>
 
 mitk::MITKRegistrationWrapperMapperBase::MITKRegistrationWrapperMapperBase()
 {

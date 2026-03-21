@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelSegmentationSerializer_h
 #define mitkMultiLabelSegmentationSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {

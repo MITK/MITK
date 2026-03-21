@@ -11,23 +11,23 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 // std includes
 #include <string>
 
 // MITK includes
-#include "mitkCommon.h"
-#include "mitkNumericTypes.h"
-#include "mitkSurface.h"
+#include <mitkCommon.h>
+#include <mitkNumericTypes.h>
+#include <mitkSurface.h>
 
 // MITK includes
 #include <mitkWeakPointer.h>
 
 // VTK includes
-#include "vtkPolyData.h"
-#include "vtkSphereSource.h"
+#include <vtkPolyData.h>
+#include <vtkSphereSource.h>
 
 // stream includes
 #include <fstream>

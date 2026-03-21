@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
-#include <QmitkViewNavigatorView.h>
+#include "QmitkViewNavigatorView.h"
 
 #include <usModuleInitialization.h>
 

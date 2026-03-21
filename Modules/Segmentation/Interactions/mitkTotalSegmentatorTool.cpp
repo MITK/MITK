@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkTotalSegmentatorTool.h"
+#include <mitkTotalSegmentatorTool.h>
 
 #include <mitkIOUtil.h>
 #include <mitkImageReadAccessor.h>

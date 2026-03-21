@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkContourSetMapper2D_h
 #define mitkContourSetMapper2D_h
 
-#include "mitkCommon.h"
-#include "mitkGLMapper.h"
+#include <mitkCommon.h>
+#include <mitkGLMapper.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

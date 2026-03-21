@@ -14,8 +14,8 @@ found in the LICENSE file.
 #ifndef BERRYIQTCONTROLWIDGET_H_
 #define BERRYIQTCONTROLWIDGET_H_
 
-#include <berryGuiTkIControlListener.h>
-#include <berryIShellListener.h>
+#include "berryGuiTkIControlListener.h"
+#include "berryIShellListener.h"
 
 #include <QMetaType>
 

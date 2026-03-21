@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef mitkBilateralFilter_h
 #define mitkBilateralFilter_h
 
-#include "MitkImageDenoisingExports.h"
+#include <MitkImageDenoisingExports.h>
 
 // MITK
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 #include <itkImage.h>
 #include <mitkImage.h>
 

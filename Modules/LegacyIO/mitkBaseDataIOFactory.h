@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkLegacyIOExports.h>
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
-#include "itkObject.h"
+#include <itkObject.h>
 
 namespace mitk
 {

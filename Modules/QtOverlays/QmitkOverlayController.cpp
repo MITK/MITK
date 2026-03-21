@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkOverlayController.h"
+#include <QmitkOverlayController.h>
 
-#include "QmitkOverlay.h"
-#include "QmitkOverlayContainerWidget.h"
-#include "QmitkRenderWindow.h"
+#include <QmitkOverlay.h>
+#include <QmitkOverlayContainerWidget.h>
+#include <QmitkRenderWindow.h>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

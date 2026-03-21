@@ -14,13 +14,13 @@ found in the LICENSE file.
 #define mitkTargetPointsCalculator_h
 
 // mitk headers
-#include "mitkCommon.h"
-#include "mitkImage.h"
-#include "mitkPointSet.h"
-#include "mitkSurface.h"
+#include <mitkCommon.h>
+#include <mitkImage.h>
+#include <mitkPointSet.h>
+#include <mitkSurface.h>
 
 // itk headers
-#include "itkObject.h"
+#include <itkObject.h>
 #include <itkObjectFactory.h>
 
 namespace mitk

@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include "internal/util/berryTabbedStackPresentation.h"
 
 #include "internal/berryQtSash.h"
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
 #include <QApplication>
 

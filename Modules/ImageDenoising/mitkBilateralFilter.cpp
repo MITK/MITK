@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBilateralFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkBilateralFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <itkBilateralImageFilter.h>
 
 mitk::BilateralFilter::BilateralFilter()

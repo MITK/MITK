@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyRelationRuleBase.h"
+#include <mitkPropertyRelationRuleBase.h>
 
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkStringProperty.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <regex>
 

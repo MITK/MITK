@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageToPointCloudFilter.h"
+#include <mitkImageToPointCloudFilter.h>
 
 #include <itkImageRegionIterator.h>
 #include <itkLaplacianImageFilter.h>

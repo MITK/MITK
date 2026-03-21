@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <functional>
 
-#include "itkIndex.h"
-#include "mitkNumericConstants.h"
+#include <itkIndex.h>
+#include <mitkNumericConstants.h>
 
-#include "MitkPETExports.h"
+#include <MitkPETExports.h>
 
 namespace mitk
 {

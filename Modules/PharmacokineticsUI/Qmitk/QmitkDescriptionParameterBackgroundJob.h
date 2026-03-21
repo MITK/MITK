@@ -28,7 +28,7 @@ found in the LICENSE file.
 // ITK
 #include <itkCommand.h>
 
-#include "MitkPharmacokineticsUIExports.h"
+#include <MitkPharmacokineticsUIExports.h>
 
 class MITKPHARMACOKINETICSUI_EXPORT DescriptionParameterBackgroundJob : public QObject, public QRunnable
 {

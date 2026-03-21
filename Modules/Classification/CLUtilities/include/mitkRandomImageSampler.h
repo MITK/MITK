@@ -12,11 +12,11 @@ found in the LICENSE file.
 #ifndef mitkRandomImageSampler_h
 #define mitkRandomImageSampler_h
 
-#include "MitkCLUtilitiesExports.h"
+#include <MitkCLUtilitiesExports.h>
 
 //MITK
 #include <mitkImage.h>
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 #include <itkImage.h>
 
 namespace mitk

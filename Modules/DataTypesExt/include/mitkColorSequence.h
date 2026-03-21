@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkColorSequence_h
 #define mitkColorSequence_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <mitkColorProperty.h>
 
 namespace mitk

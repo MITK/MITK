@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef __itkShortestPathCostFunctionTbss_h
 #define __itkShortestPathCostFunctionTbss_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkShapedNeighborhoodIterator.h"
-#include "itkShortestPathCostFunction.h" // Superclass of Metrics
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkShapedNeighborhoodIterator.h>
+#include <itkShortestPathCostFunction.h> // Superclass of Metrics
 #include <itkImageRegionConstIterator.h>
 #include <itkMacro.h>
 
@@ -64,6 +64,6 @@ namespace itk
 
 } // end namespace itk
 
-#include "itkShortestPathCostFunctionTbss.tpp"
+#include <itkShortestPathCostFunctionTbss.tpp>
 
 #endif /* __itkShortestPathCostFunctionTbss_h */

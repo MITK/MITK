@@ -11,16 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
 //MITK includes
-#include "mitkVector.h"
-#include "mitkMaximumCurveDescriptionParameter.h"
-#include "mitkMeanResidenceTimeDescriptionParameter.h"
-#include "mitkAreaUnderTheCurveDescriptionParameter.h"
-#include "mitkAreaUnderFirstMomentDescriptionParameter.h"
-#include "mitkTimeToPeakCurveDescriptionParameter.h"
+#include <mitkVector.h>
+#include <mitkMaximumCurveDescriptionParameter.h>
+#include <mitkMeanResidenceTimeDescriptionParameter.h>
+#include <mitkAreaUnderTheCurveDescriptionParameter.h>
+#include <mitkAreaUnderFirstMomentDescriptionParameter.h>
+#include <mitkTimeToPeakCurveDescriptionParameter.h>
 
 class mitkCurveDescriptiveParametersTestSuite : public mitk::TestFixture
 {

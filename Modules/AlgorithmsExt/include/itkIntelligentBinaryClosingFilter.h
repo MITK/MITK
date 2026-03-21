@@ -127,7 +127,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkIntelligentBinaryClosingFilter.tpp"
+#include <itkIntelligentBinaryClosingFilter.tpp>
 
 #endif
 

@@ -14,9 +14,9 @@ found in the LICENSE file.
 #define QmitkTextOverlay_h
 
 // MITK
-#include "QmitkOverlay.h"
-#include "mitkCommon.h"
-#include "mitkPropertyList.h"
+#include <QmitkOverlay.h>
+#include <mitkCommon.h>
+#include <mitkPropertyList.h>
 
 // Qt
 #include <QLabel>

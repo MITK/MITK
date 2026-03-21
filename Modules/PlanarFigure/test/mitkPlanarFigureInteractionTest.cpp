@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
 
@@ -33,7 +33,7 @@ found in the LICENSE file.
 
 #include <vtkDebugLeaks.h>
 
-#include "usModuleRegistry.h"
+#include <usModuleRegistry.h>
 
 class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGroupTagProperty.h"
+#include <mitkGroupTagProperty.h>
 #include <nlohmann/json.hpp>
 
 mitk::GroupTagProperty::GroupTagProperty() : mitk::BaseProperty()

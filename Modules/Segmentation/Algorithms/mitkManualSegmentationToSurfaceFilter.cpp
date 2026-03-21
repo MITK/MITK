@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <vtkImageConstantPad.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkProgressBar.h"
+#include <mitkProgressBar.h>
 
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
 {

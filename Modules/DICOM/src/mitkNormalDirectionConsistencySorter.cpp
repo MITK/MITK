@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 //#define MBILOG_ENABLE_DEBUG
 
-#include "mitkNormalDirectionConsistencySorter.h"
+#include <mitkNormalDirectionConsistencySorter.h>
 
 #include <algorithm>
 

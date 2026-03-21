@@ -10,24 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSlicesInterpolator.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkSlicesInterpolator.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkRenderWindowWidget.h>
 
-#include "mitkColorProperty.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkInteractionConst.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkOperationEvent.h"
-#include "mitkProgressBar.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkSegTool2D.h"
-#include "mitkSliceNavigationController.h"
-#include "mitkSurfaceToImageFilter.h"
+#include <mitkColorProperty.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkInteractionConst.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkOperationEvent.h>
+#include <mitkProgressBar.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkSegTool2D.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkSurfaceToImageFilter.h>
 #include <mitkTimeNavigationController.h>
-#include "mitkToolManager.h"
-#include "mitkUndoController.h"
+#include <mitkToolManager.h>
+#include <mitkUndoController.h>
 
 #include <mitkNodePredicateProperty.h>
 
@@ -50,7 +50,7 @@ found in the LICENSE file.
 #include <mitkSegChangeOperationApplier.h>
 
 //  Includes for the merge operation
-#include "mitkImageToContourFilter.h"
+#include <mitkImageToContourFilter.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
 

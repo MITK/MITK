@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkGizmoMapper2D.h"
 
-#include "mitkGizmo.h"
+#include <mitkGizmo.h>
 
 // MITK includes
 #include <mitkBaseRenderer.h>

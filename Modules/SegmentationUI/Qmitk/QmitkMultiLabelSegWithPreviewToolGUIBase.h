@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkMultiLabelSegWithPreviewToolGUIBase_h
 #define QmitkMultiLabelSegWithPreviewToolGUIBase_h
 
-#include "QmitkSegWithPreviewToolGUIBase.h"
+#include <QmitkSegWithPreviewToolGUIBase.h>
 
-#include "QmitkSimpleLabelSetListWidget.h"
+#include <QmitkSimpleLabelSetListWidget.h>
 
 #include <MitkSegmentationUIExports.h>
 

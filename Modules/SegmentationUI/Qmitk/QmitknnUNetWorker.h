@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitknnUNetWorker_h
 #define QmitknnUNetWorker_h
 
-#include "mitkProcessExecutor.h"
+#include <mitkProcessExecutor.h>
 #include <QMutex>
 #include <QObject>
 

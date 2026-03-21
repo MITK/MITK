@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkShowSegmentationAsSmoothedSurface.h"
-#include "itkIntelligentBinaryClosingFilter.h"
-#include "mitkImageCast.h"
-#include "mitkImageToItk.h"
+#include <mitkShowSegmentationAsSmoothedSurface.h>
+#include <itkIntelligentBinaryClosingFilter.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
 #include <itkAddImageFilter.h>
 #include <itkBinaryMedianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>

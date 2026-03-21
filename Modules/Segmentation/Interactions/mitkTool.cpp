@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTool.h"
+#include <mitkTool.h>
 
-#include "mitkDisplayActionEventBroadcast.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkProperties.h"
-#include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkDisplayActionEventBroadcast.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkProperties.h>
+#include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkToolManager.h>
 #include <mitkMultiLabelPredicateHelper.h>

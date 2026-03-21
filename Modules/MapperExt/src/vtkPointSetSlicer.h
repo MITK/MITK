@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "vtkVersion.h"
+#include <vtkVersion.h>
 
 class vtkCutter;
 class vtkPlane;
@@ -26,9 +26,9 @@ class vtkCellArray;
 class vtkPointData;
 class vtkCellData;
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 
-#include "vtkPolyDataAlgorithm.h"
+#include <vtkPolyDataAlgorithm.h>
 
 class vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {

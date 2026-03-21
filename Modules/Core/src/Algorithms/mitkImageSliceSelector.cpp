@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageSliceSelector.h"
+#include <mitkImageSliceSelector.h>
 
 void mitk::ImageSliceSelector::GenerateOutputInformation()
 {

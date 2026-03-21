@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkContourModelSubDivisionFilter_h
 #define mitkContourModelSubDivisionFilter_h
 
-#include "mitkCommon.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelSource.h"
+#include <mitkCommon.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelSource.h>
 #include <MitkContourModelExports.h>
 
 namespace mitk

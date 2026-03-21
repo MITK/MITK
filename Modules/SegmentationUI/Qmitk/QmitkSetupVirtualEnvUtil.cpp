@@ -10,9 +10,9 @@ found in the LICENSE file.s
 
 ============================================================================*/
 
-#include "QmitkSetupVirtualEnvUtil.h"
+#include <QmitkSetupVirtualEnvUtil.h>
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 #include <QStandardPaths>
 #include <itkCommand.h>
 #include <regex>

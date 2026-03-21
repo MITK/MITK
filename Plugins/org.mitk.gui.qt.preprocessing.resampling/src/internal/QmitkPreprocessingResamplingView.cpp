@@ -21,22 +21,22 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 
 // MITK includes (GUI)
-#include "QmitkDataNodeSelectionProvider.h"
-#include "mitkDataNodeObject.h"
+#include <QmitkDataNodeSelectionProvider.h>
+#include <mitkDataNodeObject.h>
 
 // MITK includes (general)
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkVectorImageMapper2D.h"
-#include "mitkProperties.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkVectorImageMapper2D.h>
+#include <mitkProperties.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkTimeNavigationController.h>
 
 // Includes for image casting between ITK and MITK
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 
 // ITK includes (general)
 #include <itkVectorImage.h>

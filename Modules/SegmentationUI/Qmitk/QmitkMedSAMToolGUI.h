@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkMedSAMToolGUI_h
 #define QmitkMedSAMToolGUI_h
 
-#include "QmitkSegmentAnythingToolGUI.h"
+#include <QmitkSegmentAnythingToolGUI.h>
 #include <MitkSegmentationUIExports.h>
 #include <mitkIPreferences.h>
-#include "QmitknnUNetGPU.h"
+#include <QmitknnUNetGPU.h>
 #include <memory>
 
 namespace Ui

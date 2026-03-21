@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSplitParameterToVector_h
 #define mitkSplitParameterToVector_h
 
-#include "MitkCLUtilitiesExports.h"
+#include <MitkCLUtilitiesExports.h>
 #include <string>
 #include <vector>
 

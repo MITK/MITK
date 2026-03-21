@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetWriterFactory.h"
+#include <mitkPointSetWriterFactory.h>
 
-#include "itkCreateObjectFunction.h"
-#include "itkVersion.h"
+#include <itkCreateObjectFunction.h>
+#include <itkVersion.h>
 
-#include "mitkPointSetWriter.h"
+#include <mitkPointSetWriter.h>
 
 namespace mitk
 {

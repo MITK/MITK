@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include "berryWorkbenchPlugin.h"
 #include "berryWorkbenchConstants.h"
 #include "berryPerspectiveRegistry.h"
-#include "berryStatus.h"
-#include "berryIContributor.h"
+#include <berryStatus.h>
+#include <berryIContributor.h>
 
 #include <QIcon>
 

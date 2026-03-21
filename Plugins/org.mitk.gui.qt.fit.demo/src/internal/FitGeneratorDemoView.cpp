@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkImage.h>
 #include <mitkImageTimeSelector.h>

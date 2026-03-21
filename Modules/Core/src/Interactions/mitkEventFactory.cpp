@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEventFactory.h"
+#include <mitkEventFactory.h>
 #include <algorithm>
 #include <mitkInteractionEventConst.h>
 #include <mitkInteractionKeyEvent.h>

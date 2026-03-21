@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef QmitkXnatSessionManager_h
 #define QmitkXnatSessionManager_h
 
-#include "ctkXnatLoginProfile.h"
+#include <ctkXnatLoginProfile.h>
 
-#include "mitkXnatSessionTracker.h"
+#include <mitkXnatSessionTracker.h>
 
 class QmitkXnatSessionManager
 {

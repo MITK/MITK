@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkLookupTableProperty_h
 #define mitkLookupTableProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkLookupTable.h"
+#include <mitkBaseProperty.h>
+#include <mitkLookupTable.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

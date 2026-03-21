@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContour.h"
+#include <mitkContour.h>
 #include <mitkProportionalTimeGeometry.h>
 
 mitk::Contour::Contour()

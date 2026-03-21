@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAutoCropTool.h"
+#include <mitkAutoCropTool.h>
 
-#include "mitkAutoCropImageFilter.h"
+#include <mitkAutoCropImageFilter.h>
 
 namespace mitk
 {

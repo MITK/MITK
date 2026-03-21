@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkChangeInformationImageFilter.h"
+#include <itkChangeInformationImageFilter.h>
 
-#include "mitkROIBasedParameterFitImageGenerator.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkROIBasedParameterFitImageGenerator.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 
 void
 mitk::ROIBasedParameterFitImageGenerator::

@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef _itkAdaptiveThresholdIterator_tpp
 #define _itkAdaptiveThresholdIterator_tpp
 
-#include "itkAdaptiveThresholdIterator.h"
-#include "mitkProgressBar.h"
+#include <itkAdaptiveThresholdIterator.h>
+#include <mitkProgressBar.h>
 #include <cmath>
 
 namespace itk

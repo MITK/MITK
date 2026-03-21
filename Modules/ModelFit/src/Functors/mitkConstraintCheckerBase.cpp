@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkConstraintCheckerBase.h"
+#include <mitkConstraintCheckerBase.h>
 
 
 mitk::ConstraintCheckerBase::PenaltyValueType

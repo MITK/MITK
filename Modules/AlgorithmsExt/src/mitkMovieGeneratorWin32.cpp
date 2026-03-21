@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMovieGeneratorWin32.h"
+#include <mitkMovieGeneratorWin32.h>
 #include <GL/gl.h>
 
 mitk::MovieGeneratorWin32::MovieGeneratorWin32()

@@ -75,7 +75,7 @@ private:
 };
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "QmitkDataStorageInspectorProviderBase.tpp"
+#include <QmitkDataStorageInspectorProviderBase.tpp>
 #endif
 
 #endif

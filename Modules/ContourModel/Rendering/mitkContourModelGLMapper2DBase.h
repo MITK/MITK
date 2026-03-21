@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkContourModelGLMapper2DBase_h
 #define mitkContourModelGLMapper2DBase_h
 
-#include "mitkCommon.h"
-#include "mitkMapper.h"
-#include "mitkTextAnnotation2D.h"
+#include <mitkCommon.h>
+#include <mitkMapper.h>
+#include <mitkTextAnnotation2D.h>
 #include <MitkContourModelExports.h>
 #include <vtkSmartPointer.h>
 

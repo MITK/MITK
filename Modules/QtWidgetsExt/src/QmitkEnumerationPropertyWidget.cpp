@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkEnumerationPropertyWidget.h"
+#include <QmitkEnumerationPropertyWidget.h>
 
 #include <mitkEnumerationProperty.h>
 #include <mitkPropertyObserver.h>

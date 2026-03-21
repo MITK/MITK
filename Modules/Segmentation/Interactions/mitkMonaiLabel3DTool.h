@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkMonaiLabel3DTool_h
 #define mitkMonaiLabel3DTool_h
 
-#include "mitkMonaiLabelTool.h"
+#include <mitkMonaiLabelTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

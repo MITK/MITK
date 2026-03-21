@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagsOfInterestAddHelper.h"
+#include <mitkDICOMTagsOfInterestAddHelper.h>
 
 #include <mitkIDICOMTagsOfInterest.h>
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
 void mitk::DICOMTagsOfInterestAddHelper::Activate(us::ModuleContext* context, TagsOfInterestVector tags)
 {

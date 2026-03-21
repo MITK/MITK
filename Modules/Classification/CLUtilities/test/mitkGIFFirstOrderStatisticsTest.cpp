@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 #include <cmath>
 
 #include <mitkGIFFirstOrderStatistics.h>

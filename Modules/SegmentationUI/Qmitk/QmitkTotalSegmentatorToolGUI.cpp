@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTotalSegmentatorToolGUI.h"
+#include <QmitkTotalSegmentatorToolGUI.h>
 #include <ui_QmitkTotalSegmentatorGUIControls.h>
 
 #include <mitkProcessExecutor.h>

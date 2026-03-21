@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkContourModelSetMapper3D_h
 #define mitkContourModelSetMapper3D_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkContourModelExports.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
 
-#include "mitkContourModel.h"
-#include "mitkContourModelSet.h"
-#include "mitkContourModelToSurfaceFilter.h"
+#include <mitkContourModel.h>
+#include <mitkContourModelSet.h>
+#include <mitkContourModelToSurfaceFilter.h>
 
 #include <vtkActor.h>
 #include <vtkAssembly.h>

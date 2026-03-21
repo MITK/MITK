@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkExtrudedContour_h
 #define mitkExtrudedContour_h
 
-#include "mitkBoundingObject.h"
+#include <mitkBoundingObject.h>
 #include <MitkSegmentationExports.h>
 #include <mitkContour.h>
 #include <mitkPlaneGeometry.h>

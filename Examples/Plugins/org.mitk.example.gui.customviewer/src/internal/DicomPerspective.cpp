@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "DicomPerspective.h"
-#include "berryIFolderLayout.h"
+#include <berryIFolderLayout.h>
 
 DicomPerspective::DicomPerspective()
 {

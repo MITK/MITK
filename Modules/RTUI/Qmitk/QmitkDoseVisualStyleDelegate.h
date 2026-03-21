@@ -17,7 +17,7 @@ found in the LICENSE file.
 /// Toolkit includes.
 #include <QStyledItemDelegate>
 
-#include "MitkRTUIExports.h"
+#include <MitkRTUIExports.h>
 
 
 /** \class QmitkDoseVisualStyleDelegate

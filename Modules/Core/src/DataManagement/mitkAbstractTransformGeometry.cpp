@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAbstractTransformGeometry.h"
+#include <mitkAbstractTransformGeometry.h>
 #include <vtkAbstractTransform.h>
 
 mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Superclass(), m_Plane(nullptr), m_FrameGeometry(nullptr)

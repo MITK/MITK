@@ -92,7 +92,7 @@ namespace itk
   }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkImportMitkImageContainer.tpp"
+#include <itkImportMitkImageContainer.tpp>
 #endif
 
 #endif

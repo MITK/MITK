@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "QmitkDataGeneratorBase.h"
+#include <QmitkDataGeneratorBase.h>
 
-#include "QmitkDataGenerationJobBase.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
-#include "mitkImageStatisticsContainerManager.h"
+#include <QmitkDataGenerationJobBase.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkImageStatisticsContainerManager.h>
 
 #include <QThreadPool>
 

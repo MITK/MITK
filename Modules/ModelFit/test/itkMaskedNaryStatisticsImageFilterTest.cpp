@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkImage.h"
-#include "itkImageRegionIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
 
-#include "itkMaskedNaryStatisticsImageFilter.h"
+#include <itkMaskedNaryStatisticsImageFilter.h>
 
-#include "mitkTestingMacros.h"
-#include "mitkVector.h"
+#include <mitkTestingMacros.h>
+#include <mitkVector.h>
 
-#include "mitkTestDynamicImageGenerator.h"
+#include <mitkTestDynamicImageGenerator.h>
 
 int itkMaskedNaryStatisticsImageFilterTest(int  /*argc*/ , char*[] /*argv[]*/)
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegGroupInsertOperation.h"
+#include <mitkSegGroupInsertOperation.h>
 #include <mitkImage.h>
 #include <mitkUndoController.h>
 

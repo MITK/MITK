@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometryData.h"
-#include "mitkImage.h"
-#include "mitkPointSet.h"
-#include "mitkSurface.h"
+#include <mitkGeometryData.h>
+#include <mitkImage.h>
+#include <mitkPointSet.h>
+#include <mitkSurface.h>
 
 // this include after all specific type includes! (for mitk::Equal)
-#include "mitkBaseDataCompare.h"
+#include <mitkBaseDataCompare.h>
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usServiceProperties.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceProperties.h>
 
 bool mitk::BaseDataCompare::AreEqual(const BaseData *left, const BaseData *right, ScalarType eps, bool verbose)
 {

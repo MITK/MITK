@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef __itkShortestPathCostFunctionLiveWire_tpp
 #define __itkShortestPathCostFunctionLiveWire_tpp
 
-#include "itkShortestPathCostFunctionLiveWire.h"
+#include <itkShortestPathCostFunctionLiveWire.h>
 
 #include <cmath>
 

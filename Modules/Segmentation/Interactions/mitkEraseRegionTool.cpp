@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEraseRegionTool.h"
+#include <mitkEraseRegionTool.h>
 
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImageGenerator.h>

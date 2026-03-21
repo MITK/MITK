@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkImage.h"
-#include "mitkRenderingTestHelper.h"
-#include "mitkTestingMacros.h"
+#include <mitkImage.h>
+#include <mitkRenderingTestHelper.h>
+#include <mitkTestingMacros.h>
 #include <mitkNodePredicateDataType.h>
 
 // VTK

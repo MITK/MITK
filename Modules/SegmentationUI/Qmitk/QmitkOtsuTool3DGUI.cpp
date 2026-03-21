@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkOtsuTool3DGUI.h"
-#include "mitkOtsuTool3D.h"
+#include <QmitkOtsuTool3DGUI.h>
+#include <mitkOtsuTool3D.h>
 
 #include <QMessageBox>
 

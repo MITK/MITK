@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkGrowCutToolGUI_h
 #define QmitkGrowCutToolGUI_h
 
-#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
+#include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
 
 #include <MitkSegmentationUIExports.h>
 #include <memory>

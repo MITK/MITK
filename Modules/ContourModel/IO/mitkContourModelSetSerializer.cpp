@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSetSerializer.h"
-#include "mitkContourModelSetWriter.h"
+#include <mitkContourModelSetSerializer.h>
+#include <mitkContourModelSetWriter.h>
 
 #include <itksys/SystemTools.hxx>
 

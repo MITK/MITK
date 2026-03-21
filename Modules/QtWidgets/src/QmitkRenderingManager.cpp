@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderingManager.h"
+#include <QmitkRenderingManager.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkGeometry3D.h"
-#include "mitkSliceNavigationController.h"
+#include <mitkBaseRenderer.h>
+#include <mitkGeometry3D.h>
+#include <mitkSliceNavigationController.h>
 
 #include <QApplication>
 #include <QTimer>

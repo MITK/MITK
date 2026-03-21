@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAlgorithmProfileViewer.h"
+#include <QmitkAlgorithmProfileViewer.h>
 
 #include <mapAlgorithmProfileHelper.h>
 #include <mapConvert.h>

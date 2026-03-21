@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkErasePaintbrushToolGUI_h
 #define QmitkErasePaintbrushToolGUI_h
 
-#include "QmitkPaintbrushToolGUI.h"
+#include <QmitkPaintbrushToolGUI.h>
 #include <MitkSegmentationUIExports.h>
 
 /**

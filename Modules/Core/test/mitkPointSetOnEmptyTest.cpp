@@ -20,8 +20,8 @@ found in the LICENSE file.
  * TestSuite for PointSet which tests properties on an empty PointSet
  */
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkInteractionConst.h>
 #include <mitkPointOperation.h>

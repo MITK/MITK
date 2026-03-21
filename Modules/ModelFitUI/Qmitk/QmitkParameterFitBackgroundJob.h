@@ -28,7 +28,7 @@ found in the LICENSE file.
 // ITK
 #include <itkCommand.h>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 class MITKMODELFITUI_EXPORT ParameterFitBackgroundJob : public QObject, public QRunnable
 {

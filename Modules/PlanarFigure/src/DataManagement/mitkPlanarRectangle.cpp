@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
-#include "mitkPlanarRectangle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarRectangle.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarRectangle::PlanarRectangle()
   : FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")), FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))

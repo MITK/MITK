@@ -13,16 +13,16 @@ found in the LICENSE file.
 #ifndef mitkFeedbackContourTool_h
 #define mitkFeedbackContourTool_h
 
-#include "mitkCommon.h"
-#include "mitkContourModelUtils.h"
-#include "mitkContourUtils.h" //TODO remove legacy support
-#include "mitkImage.h"
-#include "mitkSegTool2D.h"
+#include <mitkCommon.h>
+#include <mitkContourModelUtils.h>
+#include <mitkContourUtils.h> //TODO remove legacy support
+#include <mitkImage.h>
+#include <mitkSegTool2D.h>
 #include <MitkSegmentationExports.h>
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
-#include "mitkImageCast.h"
+#include <mitkImageCast.h>
 
 namespace mitk
 {

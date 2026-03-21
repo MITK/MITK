@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "QmitkNodeSelectionListItemWidget.h"
+#include <QmitkNodeSelectionListItemWidget.h>
 
 #include <ui_QmitkNodeSelectionListItemWidget.h>
 

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkToolManager_h
 #define mitkToolManager_h
 
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkTool.h"
-#include "mitkWeakPointer.h"
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkTool.h>
+#include <mitkWeakPointer.h>
 #include <MitkSegmentationExports.h>
 #include <mitkLabelSetImage.h>
 

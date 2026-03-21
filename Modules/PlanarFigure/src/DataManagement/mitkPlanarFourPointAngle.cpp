@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFourPointAngle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {

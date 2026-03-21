@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkLabeledImageVolumeCalculator_h
 #define mitkLabeledImageVolumeCalculator_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <itkObject.h>
 
-#include "mitkImage.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkImage.h>
+#include <mitkImageTimeSelector.h>
 
 #include <itkImage.h>
 

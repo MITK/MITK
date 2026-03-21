@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelReader.h"
+#include <mitkContourModelReader.h>
 #include <fstream>
 #include <iostream>
 #include <regex>

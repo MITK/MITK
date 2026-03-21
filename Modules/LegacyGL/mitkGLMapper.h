@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkGLMapper_h
 #define mitkGLMapper_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkMapper.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkBaseRenderer.h>
+#include <mitkMapper.h>
+#include <mitkVtkPropRenderer.h>
 #include <MitkLegacyGLExports.h>
 
 namespace mitk

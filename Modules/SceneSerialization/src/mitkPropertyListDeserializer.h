@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPropertyListDeserializer_h
 #define mitkPropertyListDeserializer_h
 
-#include "mitkPropertyList.h"
+#include <mitkPropertyList.h>
 
 namespace mitk
 {

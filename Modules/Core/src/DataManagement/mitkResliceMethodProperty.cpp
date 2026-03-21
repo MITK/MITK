@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkResliceMethodProperty.h"
+#include <mitkResliceMethodProperty.h>
 
 mitk::ResliceMethodProperty::ResliceMethodProperty()
 {

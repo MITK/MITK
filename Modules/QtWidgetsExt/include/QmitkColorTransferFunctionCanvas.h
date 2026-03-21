@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkColorTransferFunctionCanvas_h
 #define QmitkColorTransferFunctionCanvas_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "QmitkTransferFunctionCanvas.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <QmitkTransferFunctionCanvas.h>
 
 #include <vtkColorTransferFunction.h>
 

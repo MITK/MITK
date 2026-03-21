@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMAPAlgorithmModel.h"
+#include <QmitkMAPAlgorithmModel.h>
 
-#include "mapMetaProperty.h"
+#include <mapMetaProperty.h>
 
 QmitkMAPAlgorithmModel::QmitkMAPAlgorithmModel(QObject *parent) : QAbstractTableModel(parent), m_pMetaInterface(nullptr)
 {

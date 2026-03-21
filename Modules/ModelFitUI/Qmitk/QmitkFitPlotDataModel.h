@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <QAbstractTableModel>
 
-#include "mitkModelFitPlotDataHelper.h"
-#include "MitkModelFitUIExports.h"
+#include <mitkModelFitPlotDataHelper.h>
+#include <MitkModelFitUIExports.h>
 
 /*!
 \class QmitkFitPlotDataModel

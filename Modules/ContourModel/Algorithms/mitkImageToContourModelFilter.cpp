@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageToContourModelFilter.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkImageToContourModelFilter.h>
+#include <mitkImageAccessByItk.h>
 
 #include <itkConstantPadImageFilter.h>
 #include <itkContourExtractor2DImageFilter.h>

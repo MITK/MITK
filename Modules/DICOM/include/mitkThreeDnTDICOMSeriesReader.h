@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkThreeDnTDICOMSeriesReader_h
 #define mitkThreeDnTDICOMSeriesReader_h
 
-#include "mitkDICOMITKSeriesGDCMReader.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

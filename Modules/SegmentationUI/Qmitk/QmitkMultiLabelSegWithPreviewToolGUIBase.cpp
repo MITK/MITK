@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
-#include "mitkSegWithPreviewTool.h"
+#include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
+#include <mitkSegWithPreviewTool.h>
 
 #include <QRadioButton>
 #include <QBoxLayout>

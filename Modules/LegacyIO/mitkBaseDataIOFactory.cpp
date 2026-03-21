@@ -14,9 +14,9 @@ found in the LICENSE file.
 #pragma warning(disable : 4786)
 #endif
 
-#include "mitkBaseDataIOFactory.h"
+#include <mitkBaseDataIOFactory.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 namespace mitk
 {

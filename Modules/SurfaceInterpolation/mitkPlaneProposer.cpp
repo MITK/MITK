@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneProposer.h"
+#include <mitkPlaneProposer.h>
 
 #include <mitkGeometryData.h>
 #include <mitkPlaneFit.h>

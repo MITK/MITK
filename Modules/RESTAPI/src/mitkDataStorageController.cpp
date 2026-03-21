@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkDataStorageController.h"
-#include "mitkErrorResponse.h"
-#include "mitkNodeQueryParams.h"
+#include <mitkErrorResponse.h>
+#include <mitkNodeQueryParams.h>
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 

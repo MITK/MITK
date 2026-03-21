@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentAnythingTool.h"
+#include <mitkSegmentAnythingTool.h>
 
 #include <chrono>
 #include <thread>
 #include <iomanip>
-#include "mitkInteractionPositionEvent.h"
-#include "mitkPointSetShapeProperty.h"
-#include "mitkProperties.h"
-#include "mitkToolManager.h"
+#include <mitkInteractionPositionEvent.h>
+#include <mitkPointSetShapeProperty.h>
+#include <mitkProperties.h>
+#include <mitkToolManager.h>
 #include <mitkSegTool2D.h>
 // us
 #include <usGetModuleContext.h>
@@ -27,7 +27,7 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 
 #include <itkIntensityWindowingImageFilter.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 
 using namespace std::chrono_literals;
 

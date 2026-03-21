@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMAPAlgorithmHelper.h"
+#include <mitkMAPAlgorithmHelper.h>
 
 //itk
 #include <itkImageDuplicator.h>

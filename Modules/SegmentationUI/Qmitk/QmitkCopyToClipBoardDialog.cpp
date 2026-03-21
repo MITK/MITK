@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkCopyToClipBoardDialog.h"
+#include <QmitkCopyToClipBoardDialog.h>
 
 #include <QVBoxLayout>
 #include <QTextEdit>

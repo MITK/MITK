@@ -13,16 +13,16 @@ found in the LICENSE file.
 
 #include "berryEvaluationAuthority.h"
 
-#include "berryCommandTracing.h"
-#include "berryExpressionInfo.h"
-#include "berryExpression.h"
+#include <berryCommandTracing.h>
+#include <berryExpressionInfo.h>
+#include <berryExpression.h>
 #include "berryEvaluationReference.h"
 #include "berryPolicy.h"
 #include "berryWorkbenchPlugin.h"
 
 #include <berryObjects.h>
-#include <berryISources.h>
-#include <berryIEvaluationService.h>
+#include "berryISources.h"
+#include "berryIEvaluationService.h"
 
 #include <QStringList>
 #include <QString>

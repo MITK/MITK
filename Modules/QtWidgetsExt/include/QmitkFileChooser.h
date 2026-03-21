@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkFileChooser_h
 #define QmitkFileChooser_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QWidget>
 
 class QPushButton;

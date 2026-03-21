@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCallbackFromGUIThread.h"
+#include <mitkCallbackFromGUIThread.h>
 #include <mitkLog.h>
 
 mitk::CallbackFromGUIThread *mitk::CallbackFromGUIThread::m_Instance = nullptr;

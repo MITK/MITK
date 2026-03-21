@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkImageBasedParameterizationDelegate_h
 #define mitkImageBasedParameterizationDelegate_h
 
-#include "mitkValueBasedParameterizationDelegate.h"
+#include <mitkValueBasedParameterizationDelegate.h>
 #include <itkIndex.h>
 #include <itkObject.h>
 
-#include "mitkModelBase.h"
-#include "mitkImage.h"
-#include "mitkModelTraitsInterface.h"
+#include <mitkModelBase.h>
+#include <mitkImage.h>
+#include <mitkModelTraitsInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk {
 

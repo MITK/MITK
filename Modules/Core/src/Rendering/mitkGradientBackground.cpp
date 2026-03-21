@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGradientBackground.h"
-#include "mitkVtkLayerController.h"
+#include <mitkGradientBackground.h>
+#include <mitkVtkLayerController.h>
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>

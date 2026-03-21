@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkIOExtObjectFactory.h"
 
-#include "mitkCoreObjectFactory.h"
+#include <mitkCoreObjectFactory.h>
 
 #include "mitkParRecFileIOFactory.h"
 //#include "mitkObjFileIOFactory.h"
@@ -22,10 +22,10 @@ found in the LICENSE file.
 #include "mitkUnstructuredGridVtkWriter.h"
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 
-#include "mitkVolumeMapperVtkSmart3D.h"
-#include "mitkUnstructuredGridMapper2D.h"
-#include "mitkUnstructuredGridVtkMapper3D.h"
-#include "mitkVtkGLMapperWrapper.h"
+#include <mitkVolumeMapperVtkSmart3D.h>
+#include <mitkUnstructuredGridMapper2D.h>
+#include <mitkUnstructuredGridVtkMapper3D.h>
+#include <mitkVtkGLMapperWrapper.h>
 
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>

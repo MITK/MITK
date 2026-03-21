@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef itkMultiHistogramFilter_h
 #define itkMultiHistogramFilter_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -72,7 +72,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiHistogramFilter.cpp"
+#include <itkMultiHistogramFilter.cpp>
 #endif
 
 #endif // itkMultiHistogramFilter_h

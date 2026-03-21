@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationObjectFactory.h"
+#include <mitkSegmentationObjectFactory.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
 
-#include "mitkContour.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContourSetMapper2D.h"
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkContourVtkMapper3D.h"
+#include <mitkContour.h>
+#include <mitkContourMapper2D.h>
+#include <mitkContourSetMapper2D.h>
+#include <mitkContourSetVtkMapper3D.h>
+#include <mitkContourVtkMapper3D.h>
 
 #include <mitkVtkGLMapperWrapper.h>
 

@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkGeometryDataSerializer.h"
-#include "mitkGeometry3D.h"
-#include "mitkGeometryData.h"
-#include "mitkIOUtil.h"
+#include <mitkGeometry3D.h>
+#include <mitkGeometryData.h>
+#include <mitkIOUtil.h>
 
 MITK_REGISTER_SERIALIZER(GeometryDataSerializer)
 

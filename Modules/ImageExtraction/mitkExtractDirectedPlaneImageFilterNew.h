@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkExtractDirectedPlaneImageFilterNew_h
 #define mitkExtractDirectedPlaneImageFilterNew_h
 
-#include "itkImage.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageToImageFilter.h"
+#include <itkImage.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageToImageFilter.h>
 #include <MitkImageExtractionExports.h>
 
 namespace mitk

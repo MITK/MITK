@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSetSource.h"
+#include <mitkContourModelSetSource.h>
 
 mitk::ContourModelSetSource::ContourModelSetSource()
 {

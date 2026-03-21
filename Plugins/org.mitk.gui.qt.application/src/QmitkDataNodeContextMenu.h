@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include "QmitkDataNodeTextureInterpolationAction.h"
 #include "QmitkDataNodeSurfaceRepresentationAction.h"
 #include "Qmitk3DMultiSegVisStyleAction.h"
-#include "QmitkNodeDescriptor.h"
+#include <QmitkNodeDescriptor.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

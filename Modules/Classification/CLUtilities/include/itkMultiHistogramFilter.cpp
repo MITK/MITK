@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <itkNeighborhoodIterator.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageIterator.h>
-#include "itkMinimumMaximumImageCalculator.h"
+#include <itkMinimumMaximumImageCalculator.h>
 
 template< class TInputImageType, class TOuputImageType>
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():

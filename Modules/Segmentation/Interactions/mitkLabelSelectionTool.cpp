@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSelectionTool.h"
-#include "mitkToolManager.h"
+#include <mitkLabelSelectionTool.h>
+#include <mitkToolManager.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>

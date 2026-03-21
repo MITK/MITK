@@ -13,20 +13,20 @@ found in the LICENSE file.
 #ifndef mitkComputeContourSetNormalsFilter_h
 #define mitkComputeContourSetNormalsFilter_h
 
-#include "mitkProgressBar.h"
-#include "mitkSurface.h"
-#include "mitkSurfaceToSurfaceFilter.h"
+#include <mitkProgressBar.h>
+#include <mitkSurface.h>
+#include <mitkSurfaceToSurfaceFilter.h>
 #include <MitkSurfaceInterpolationExports.h>
 
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkDoubleArray.h"
-#include "vtkLine.h"
-#include "vtkMath.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
+#include <vtkLine.h>
+#include <vtkMath.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
-#include "mitkImage.h"
+#include <mitkImage.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkToolGUIArea.h"
+#include <QmitkToolGUIArea.h>
 
 QmitkToolGUIArea::QmitkToolGUIArea(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRawImageFileReader.h"
-#include "mitkImageCast.h"
+#include <mitkRawImageFileReader.h>
+#include <mitkImageCast.h>
 
 #include <itkImage.h>
 #include <itkImageFileReader.h>

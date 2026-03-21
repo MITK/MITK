@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTIOMimeTypes.h"
-#include "mitkIOMimeTypes.h"
+#include <mitkCESTIOMimeTypes.h>
+#include <mitkIOMimeTypes.h>
 #include <mitkCustomTagParser.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>

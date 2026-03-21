@@ -23,10 +23,10 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
-#include "mitkImageMappingHelper.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkImageMappingHelper.h>
+#include <mitkRegistrationHelper.h>
 
 template <typename TImage >
 typename ::itk::InterpolateImageFunction< TImage >::Pointer generateInterpolator(mitk::ImageMappingInterpolator::Type interpolatorType)

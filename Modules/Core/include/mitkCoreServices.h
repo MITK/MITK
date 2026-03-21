@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCoreServices_h
 #define mitkCoreServices_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 #include <mitkCommon.h>
 #include <mitkLog.h>

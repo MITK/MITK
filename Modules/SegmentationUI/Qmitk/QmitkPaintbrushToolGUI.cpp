@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPaintbrushToolGUI.h"
+#include <QmitkPaintbrushToolGUI.h>
 
 #include <QLabel>
 #include <QHBoxLayout>

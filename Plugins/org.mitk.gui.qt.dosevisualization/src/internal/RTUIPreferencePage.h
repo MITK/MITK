@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef __RT_UI_PREFERENCE_PAGE_H
 #define __RT_UI_PREFERENCE_PAGE_H
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 #include <memory>
 
 class QWidget;

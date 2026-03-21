@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define QmitkMapPropertyDelegate_h
 
 /// Toolkit includes.
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 #include <QStyledItemDelegate>
 
 // MITK
-#include "MitkMatchPointRegistrationUIExports.h"
+#include <MitkMatchPointRegistrationUIExports.h>
 
 /// Forward declarations.
 

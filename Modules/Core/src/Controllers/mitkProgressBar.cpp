@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProgressBar.h"
-#include "mitkCallbackFromGUIThread.h"
-#include "mitkProgressBarImplementation.h"
+#include <mitkProgressBar.h>
+#include <mitkCallbackFromGUIThread.h>
+#include <mitkProgressBarImplementation.h>
 #include <itkCommand.h>
 #include <itkObjectFactory.h>
 #include <itkOutputWindow.h>

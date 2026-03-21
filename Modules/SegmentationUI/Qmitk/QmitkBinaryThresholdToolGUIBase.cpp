@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkBinaryThresholdToolGUIBase.h"
+#include <QmitkBinaryThresholdToolGUIBase.h>
 
-#include "mitkBinaryThresholdBaseTool.h"
-#include "mitkBinaryThresholdTool.h"
+#include <mitkBinaryThresholdBaseTool.h>
+#include <mitkBinaryThresholdTool.h>
 
 #include <ctkDoubleSpinBox.h>
 

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkToolSelectionBox_h
 #define QmitkToolSelectionBox_h
 
-#include "QmitkToolGUIArea.h"
+#include <QmitkToolGUIArea.h>
 #include <MitkSegmentationUIExports.h>
 
-#include "mitkToolManager.h"
+#include <mitkToolManager.h>
 
 #include <QButtonGroup>
 #include <QGridLayout>

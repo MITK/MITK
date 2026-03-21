@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetVtkMapper3D.h"
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkProperties.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkPointSetVtkMapper3D.h>
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkProperties.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>

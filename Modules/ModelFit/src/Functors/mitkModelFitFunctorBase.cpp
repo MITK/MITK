@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitFunctorBase.h"
+#include <mitkModelFitFunctorBase.h>
 
 mitk::ModelFitFunctorBase::OutputPixelArrayType
 mitk::ModelFitFunctorBase::

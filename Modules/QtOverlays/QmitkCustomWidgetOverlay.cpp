@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkCustomWidgetOverlay.h"
+#include <QmitkCustomWidgetOverlay.h>
 
 QmitkCustomWidgetOverlay::QmitkCustomWidgetOverlay(const char *id) : QmitkOverlay(id)
 {

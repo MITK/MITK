@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAbstractAnnotationRenderer.h"
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
-#include "usGetModuleContext.h"
+#include <mitkAbstractAnnotationRenderer.h>
+#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
+#include <usGetModuleContext.h>
 #include <memory>
 
 namespace mitk

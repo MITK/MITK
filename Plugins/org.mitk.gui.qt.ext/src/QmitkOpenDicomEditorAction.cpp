@@ -15,9 +15,9 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QFileInfo>
 
-#include "mitkCoreObjectFactory.h"
-#include "mitkSceneIO.h"
-#include "mitkProgressBar.h"
+#include <mitkCoreObjectFactory.h>
+#include <mitkSceneIO.h>
+#include <mitkProgressBar.h>
 
 #include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>
@@ -25,10 +25,10 @@ found in the LICENSE file.
 #include <berryIWorkbench.h>
 #include <berryFileEditorInput.h>
 
-#include "mitkProperties.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
+#include <mitkProperties.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(nullptr)

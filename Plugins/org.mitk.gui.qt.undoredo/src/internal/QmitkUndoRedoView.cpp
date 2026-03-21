@@ -4,9 +4,9 @@
 #include <mitkRenderingManager.h>
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include "mitkCoreServices.h"
-#include "mitkIPreferencesService.h"
-#include "mitkIPreferences.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QmitkRenderWindow.h>
 

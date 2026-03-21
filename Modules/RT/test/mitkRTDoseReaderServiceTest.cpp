@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <mitkRTConstants.h>
 #include <mitkProperties.h>
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkTemporoSpatialStringProperty.h>
 #include <mitkIOUtil.h>
 
 class mitkRTDoseReaderServiceTestSuite : public mitk::TestFixture

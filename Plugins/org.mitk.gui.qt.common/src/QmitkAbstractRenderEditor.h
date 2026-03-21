@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <berryQtEditorPart.h>
 
-#include "mitkIRenderWindowPart.h"
+#include <mitkIRenderWindowPart.h>
 
 #include <mitkDataStorage.h>
 #include <mitkDataStorageReference.h>

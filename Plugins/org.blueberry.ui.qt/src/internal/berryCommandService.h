@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYCOMMANDSERVICE_H
 #define BERRYCOMMANDSERVICE_H
 
-#include <berryICommandService.h>
+#include "berryICommandService.h"
 #include "berryCommandPersistence.h"
 #include <string>
 

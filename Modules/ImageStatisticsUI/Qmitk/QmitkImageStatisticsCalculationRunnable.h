@@ -15,7 +15,7 @@ found in the LICENSE file.
 //mitk headers
 #include <mitkImageStatisticsContainer.h>
 
-#include "QmitkDataGenerationJobBase.h"
+#include <QmitkDataGenerationJobBase.h>
 
 // itk headers
 #ifndef __itkHistogram_h

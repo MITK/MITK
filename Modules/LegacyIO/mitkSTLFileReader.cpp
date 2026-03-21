@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkSTLFileReader.h"
+#include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
 #include <vtkCleanPolyData.h>
 #include <vtkPolyData.h>

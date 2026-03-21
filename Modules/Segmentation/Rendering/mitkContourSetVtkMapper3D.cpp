@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkContourSetVtkMapper3D.h>
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkVtkPropRenderer.h>
 
 #include <vtkActor.h>
 #include <vtkActor.h>

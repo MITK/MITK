@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkLassoTool_h
 #define mitkLassoTool_h
 
-#include "mitkEditableContourTool.h"
-#include "mitkContourTool.h"
-#include "mitkContourModelInteractor.h"
+#include <mitkEditableContourTool.h>
+#include <mitkContourTool.h>
+#include <mitkContourModelInteractor.h>
 
 namespace mitk
 {

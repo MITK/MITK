@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtrudedContour.h"
-#include "mitkBaseProcess.h"
-#include "mitkNumericTypes.h"
-#include "mitkProportionalTimeGeometry.h"
+#include <mitkExtrudedContour.h>
+#include <mitkBaseProcess.h>
+#include <mitkNumericTypes.h>
+#include <mitkProportionalTimeGeometry.h>
 
 #include <vtkCellArray.h>
 #include <vtkClipPolyData.h>

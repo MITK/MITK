@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
-#include "mitkErrorResponse.h"
-#include "mitkRestServer.h"
-#include "mitkRestServerConfig.h"
+#include <mitkErrorResponse.h>
+#include <mitkRestServer.h>
+#include <mitkRestServerConfig.h>
 #include "mitkHealthController.h"
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStandaloneDataStorage.h>
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT

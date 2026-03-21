@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSegmentationTaskListWidget.h"
+#include <QmitkSegmentationTaskListWidget.h>
 
 #include <mitkCoreServices.h>
 #include <mitkINodeSelectionService.h>

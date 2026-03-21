@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
-#include "QmitkFitPlotDataModel.h"
+#include <QmitkFitPlotDataModel.h>
 
 
 QmitkFitPlotDataModel::

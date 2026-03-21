@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMFileReader.h"
+#include <mitkDICOMFileReader.h>
 
 #include <itkGDCMImageIO.h>
 

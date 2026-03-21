@@ -18,10 +18,10 @@
 #ifndef __itkMaskedStatisticsImageFilter_h
 #define __itkMaskedStatisticsImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkNumericTraits.h"
-#include "itkArray.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkImageToImageFilter.h>
+#include <itkNumericTraits.h>
+#include <itkArray.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk
 {
@@ -189,7 +189,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMaskedStatisticsImageFilter.hxx"
+#include <itkMaskedStatisticsImageFilter.hxx>
 #endif
 
 #endif

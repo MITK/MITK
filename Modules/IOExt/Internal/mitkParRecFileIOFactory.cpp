@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkParRecFileIOFactory.h"
-#include "mitkIOAdapter.h"
+#include <mitkIOAdapter.h>
 #include "mitkParRecFileReader.h"
 
-#include "itkVersion.h"
+#include <itkVersion.h>
 
 namespace mitk
 {

@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkBoundingObjectCutter_h
 #define mitkBoundingObjectCutter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "itkImage.h"
-#include "mitkBoundingObject.h"
-#include "mitkCommon.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <itkImage.h>
+#include <mitkBoundingObject.h>
+#include <mitkCommon.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
 namespace mitk
 {

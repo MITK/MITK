@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
-#include "mitkCommandLineParser.h"
-#include "mitkIOUtil.h"
+#include <mitkCommandLineParser.h>
+#include <mitkIOUtil.h>
 
 #include <mitkArithmeticOperation.h>
 

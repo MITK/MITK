@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourSet.h"
+#include <mitkContourSet.h>
 #include <mitkProportionalTimeGeometry.h>
 
 mitk::ContourSet::ContourSet() : m_ContourVector(ContourVectorType())

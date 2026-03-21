@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationHelper.h"
+#include <mitkSegmentationHelper.h>
 
 #include <mitkImageTimeSelector.h>
 #include <mitkRenderingManager.h>

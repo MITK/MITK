@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkVtkGLMapperWrapper_h
 #define mitkVtkGLMapperWrapper_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkGLMapper.h"
-#include "mitkLocalStorageHandler.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkGLMapper.h>
+#include <mitkLocalStorageHandler.h>
+#include <mitkVtkMapper.h>
 #include <MitkLegacyGLExports.h>
 #include <vtkSmartPointer.h>
 

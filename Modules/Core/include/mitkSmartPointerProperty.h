@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSmartPointerProperty_h
 #define mitkSmartPointerProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkUIDGenerator.h"
+#include <mitkBaseProperty.h>
+#include <mitkUIDGenerator.h>
 #include <MitkCoreExports.h>
 
 #include <list>

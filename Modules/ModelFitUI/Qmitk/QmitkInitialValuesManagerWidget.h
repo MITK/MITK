@@ -14,13 +14,13 @@ found in the LICENSE file.
 #ifndef QmitkInitialValuesManagerWidget_h
 #define QmitkInitialValuesManagerWidget_h
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 #include <QWidget>
 
-#include "mitkModelTraitsInterface.h"
-#include "mitkInitialParameterizationDelegateBase.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkModelTraitsInterface.h>
+#include <mitkInitialParameterizationDelegateBase.h>
+#include <mitkNodePredicateBase.h>
 #include <memory>
 
 /*forward declarations*/

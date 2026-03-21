@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QVBoxLayout>
 #include <QPushButton>
 
-#include "QmitkPlotDialog.h"
+#include <QmitkPlotDialog.h>
 
 QmitkPlotDialog::QmitkPlotDialog(const char *title, QWidget *parent, const char *) : QDialog(parent)
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkContour_h
 #define mitkContour_h
 
-#include "mitkBaseData.h"
-#include "mitkCommon.h"
+#include <mitkBaseData.h>
+#include <mitkCommon.h>
 #include <MitkSegmentationExports.h>
 #include <vtkRenderWindow.h>
 

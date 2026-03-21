@@ -14,9 +14,9 @@ found in the LICENSE file.
 
 #include "MatchPointBrowserPreferencesPage.h"
 
-#include "QmitkNodeDescriptorManager.h"
-#include "QmitkStyleManager.h"
-#include "mitkNodePredicateDataType.h"
+#include <QmitkNodeDescriptorManager.h>
+#include <QmitkStyleManager.h>
+#include <mitkNodePredicateDataType.h>
 
 #include <usModuleInitialization.h>
 

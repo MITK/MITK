@@ -24,15 +24,15 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 
 //#include <mitkTransferFunction.h>
-#include "mitkImageStatisticsHolder.h"
-#include "mitkPlaneClipping.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkPlaneClipping.h>
 #include <mitkTransferFunctionProperty.h>
 
 // MITK Rendering
-#include "mitkImageVtkMapper2D.h"
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkMitkThickSlicesFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <mitkImageVtkMapper2D.h>
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkMitkThickSlicesFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 // VTK
 #include <vtkCamera.h>

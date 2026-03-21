@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkToolManagerProvider.h"
+#include <mitkToolManagerProvider.h>
 
 // micro service includes
 #include <usGetModuleContext.h>

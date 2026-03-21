@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAnnotationProperty.h"
+#include <mitkAnnotationProperty.h>
 
 mitk::AnnotationProperty::AnnotationProperty() : m_Position(0.0)
 {

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlanePositionManager_h
 #define mitkPlanePositionManager_h
 
-#include "mitkCommon.h"
-#include "mitkDataStorage.h"
-#include "mitkRestorePlanePositionOperation.h"
+#include <mitkCommon.h>
+#include <mitkDataStorage.h>
+#include <mitkRestorePlanePositionOperation.h>
 
 #include <mitkPlaneGeometry.h>
 #include <mitkServiceInterface.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFitParameterWidget.h"
-#include "QmitkFitParameterModel.h"
+#include <QmitkFitParameterWidget.h>
+#include <QmitkFitParameterModel.h>
 
 #include <QClipboard>
 #include <QFileDialog>

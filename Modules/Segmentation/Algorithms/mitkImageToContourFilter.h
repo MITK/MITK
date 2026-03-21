@@ -14,17 +14,17 @@ found in the LICENSE file.
 #define mitkImageToContourFilter_h
 
 //#include "MitkSBExports.h"
-#include "itkContourExtractor2DImageFilter.h"
-#include "itkImage.h"
-#include "mitkImage.h"
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkSurface.h"
-#include "vtkCellArray.h"
-#include "vtkPolyData.h"
-#include "vtkPolygon.h"
+#include <itkContourExtractor2DImageFilter.h>
+#include <itkImage.h>
+#include <mitkImage.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkSurface.h>
+#include <vtkCellArray.h>
+#include <vtkPolyData.h>
+#include <vtkPolygon.h>
 #include <MitkSegmentationExports.h>
 
-#include "mitkProgressBar.h"
+#include <mitkProgressBar.h>
 
 namespace mitk
 {

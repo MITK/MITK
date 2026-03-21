@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include <QColor>
 #include <QSize>
 
-#include "QmitkIsoDoseLevelSetModel.h"
-#include "mitkRTUIConstants.h"
+#include <QmitkIsoDoseLevelSetModel.h>
+#include <mitkRTUIConstants.h>
 
 QmitkIsoDoseLevelSetModel::QmitkIsoDoseLevelSetModel(QObject *parent)
   : QAbstractTableModel(parent),

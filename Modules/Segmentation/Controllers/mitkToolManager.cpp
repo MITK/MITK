@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkToolManager.h"
-#include "mitkToolManagerProvider.h"
-#include "mitkCoreObjectFactory.h"
+#include <mitkToolManager.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkCoreObjectFactory.h>
 
 #include <itkCommand.h>
 #include <itkObjectFactoryBase.h>
 
 #include <list>
 
-#include "mitkInteractionEventObserver.h"
-#include "mitkSegTool2D.h"
-#include "mitkRenderingManager.h"
-#include "mitkTimeNavigationController.h"
+#include <mitkInteractionEventObserver.h>
+#include <mitkSegTool2D.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 mitk::ToolManager::ToolManager(DataStorage *storage)
   : m_ActiveTool(nullptr), m_ActiveToolID(-1), m_RegisteredClients(0), m_DataStorage(storage)

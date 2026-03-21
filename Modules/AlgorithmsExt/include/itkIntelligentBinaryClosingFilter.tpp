@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef _itkIntelligentBinaryClosingFilter_tpp
 #define _itkIntelligentBinaryClosingFilter_tpp
 
-#include "itkIntelligentBinaryClosingFilter.h"
+#include <itkIntelligentBinaryClosingFilter.h>
 #include <vector>
 
 namespace itk

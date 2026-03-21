@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFeedbackContourTool.h"
-#include "mitkToolManager.h"
+#include <mitkFeedbackContourTool.h>
+#include <mitkToolManager.h>
 
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
-#include "mitkStringProperty.h"
+#include <mitkColorProperty.h>
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataStorage.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDataStorage.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
-#include "mitkAbstractTransformGeometry.h"
+#include <mitkAbstractTransformGeometry.h>
 
 mitk::FeedbackContourTool::FeedbackContourTool(const char *type) : SegTool2D(type), m_FeedbackContourVisible(false)
 {

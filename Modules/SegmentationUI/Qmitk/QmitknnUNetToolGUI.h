@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef QmitknnUNetToolGUI_h
 #define QmitknnUNetToolGUI_h
 
-#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
-#include "QmitknnUNetFolderParser.h"
-#include "QmitknnUNetGPU.h"
-#include "QmitknnUNetWorker.h"
-#include "mitkProcessExecutor.h"
-#include "mitknnUnetTool.h"
+#include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
+#include <QmitknnUNetFolderParser.h>
+#include <QmitknnUNetGPU.h>
+#include <QmitknnUNetWorker.h>
+#include <mitkProcessExecutor.h>
+#include <mitknnUnetTool.h>
 #include <MitkSegmentationUIExports.h>
 
 #include <QCache>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingShapeVtkMapper3D.h"
-#include "../DataManagement/mitkBoundingShapeUtil.h"
+#include <mitkBoundingShapeVtkMapper3D.h>
+#include "mitkBoundingShapeUtil.h"
 #include <mitkBaseProperty.h>
 #include <vtkAppendPolyData.h>
 #include <vtkCamera.h>

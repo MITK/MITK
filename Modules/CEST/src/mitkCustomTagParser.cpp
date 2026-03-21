@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCustomTagParser.h"
+#include <mitkCustomTagParser.h>
 
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 
-#include "mitkCESTPropertyHelper.h"
-#include "mitkIPropertyPersistence.h"
+#include <mitkCESTPropertyHelper.h>
+#include <mitkIPropertyPersistence.h>
 
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 #include <itksys/SystemTools.hxx>
 

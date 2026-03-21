@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractDirectedPlaneImageFilter.h"
-#include "mitkAbstractTransformGeometry.h"
+#include <mitkExtractDirectedPlaneImageFilter.h>
+#include <mitkAbstractTransformGeometry.h>
 //#include "mitkImageMapperGL2D.h"
 
-#include "vtkMitkThickSlicesFilter.h"
+#include <vtkMitkThickSlicesFilter.h>
 #include <mitkDataNode.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>

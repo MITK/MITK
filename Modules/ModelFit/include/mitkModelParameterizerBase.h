@@ -16,10 +16,10 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkIndex.h>
 
-#include "mitkModelBase.h"
-#include "mitkInitialParameterizationDelegateBase.h"
+#include <mitkModelBase.h>
+#include <mitkInitialParameterizationDelegateBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

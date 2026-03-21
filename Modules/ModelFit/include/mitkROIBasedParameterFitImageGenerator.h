@@ -17,11 +17,11 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelFitFunctorBase.h"
-#include "mitkParameterFitImageGeneratorBase.h"
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelFitFunctorBase.h>
+#include <mitkParameterFitImageGeneratorBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkContourModelSetMapper3D.h>
 
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>

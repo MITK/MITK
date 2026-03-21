@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkIOExtObjectFactory_h
 #define mitkIOExtObjectFactory_h
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 
 namespace mitk
 {

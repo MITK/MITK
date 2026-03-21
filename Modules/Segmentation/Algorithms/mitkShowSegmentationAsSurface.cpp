@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkShowSegmentationAsSurface.h"
-#include "mitkManualSegmentationToSurfaceFilter.h"
-#include "mitkVtkRepresentationProperty.h"
+#include <mitkShowSegmentationAsSurface.h>
+#include <mitkManualSegmentationToSurfaceFilter.h>
+#include <mitkVtkRepresentationProperty.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>

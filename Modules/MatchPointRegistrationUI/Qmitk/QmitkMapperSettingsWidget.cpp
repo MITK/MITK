@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMapperSettingsWidget.h"
+#include <QmitkMapperSettingsWidget.h>
 
 #include <QmitkMappingJob.h>
 

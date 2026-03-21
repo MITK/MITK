@@ -15,12 +15,12 @@ found in the LICENSE file.
 #include <ui_QmitkColourImageProcessingViewControls.h>
 
 #include "mitkColourImageProcessor.h"
-#include "mitkDataNodeObject.h"
-#include "mitkTransferFunction.h"
-#include "mitkTransferFunctionProperty.h"
+#include <mitkDataNodeObject.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
 
-#include "QmitkColorTransferFunctionCanvas.h"
-#include "QmitkPiecewiseFunctionCanvas.h"
+#include <QmitkColorTransferFunctionCanvas.h>
+#include <QmitkPiecewiseFunctionCanvas.h>
 
 #include <berryISelectionProvider.h>
 #include <berryISelectionService.h>

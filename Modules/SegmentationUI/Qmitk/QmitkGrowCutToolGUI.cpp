@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkGrowCutToolGUI.h"
+#include <QmitkGrowCutToolGUI.h>
 #include <mitkGrowCutTool.h>
 #include <mitkToolManagerProvider.h>
 

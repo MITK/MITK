@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagCache.h"
+#include <mitkDICOMTagCache.h>
 
 mitk::DICOMTagCache::DICOMTagCache()
 :itk::Object()

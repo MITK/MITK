@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef __itkMaskedNaryStatisticsImageFilter_h
 #define __itkMaskedNaryStatisticsImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkImageIterator.h"
-#include "itkArray.h"
+#include <itkImageToImageFilter.h>
+#include <itkImageIterator.h>
+#include <itkArray.h>
 
 namespace itk
 {
@@ -104,7 +104,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMaskedNaryStatisticsImageFilter.hxx"
+#include <itkMaskedNaryStatisticsImageFilter.hxx>
 #endif
 
 #endif

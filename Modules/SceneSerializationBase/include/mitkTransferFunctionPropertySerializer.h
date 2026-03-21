@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTransferFunctionPropertySerializer_h
 #define mitkTransferFunctionPropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkTransferFunctionProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkTransferFunctionProperty.h>
 
 namespace mitk
 {

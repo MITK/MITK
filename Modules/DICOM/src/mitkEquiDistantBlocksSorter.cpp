@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 //#define MBILOG_ENABLE_DEBUG
 
-#include "mitkEquiDistantBlocksSorter.h"
+#include <mitkEquiDistantBlocksSorter.h>
 
 mitk::EquiDistantBlocksSorter::SliceGroupingAnalysisResult
 ::SliceGroupingAnalysisResult() : m_SplitReason(IOVolumeSplitReason::New())

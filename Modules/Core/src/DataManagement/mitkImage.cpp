@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkImage.h"
-#include "mitkCompareImageDataFilter.h"
-#include "mitkImageStatisticsHolder.h"
-#include "mitkImageVtkReadAccessor.h"
-#include "mitkPixelTypeMultiplex.h"
+#include <mitkImage.h>
+#include <mitkCompareImageDataFilter.h>
+#include <mitkImageStatisticsHolder.h>
+#include <mitkImageVtkReadAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 #include <mitkProportionalTimeGeometry.h>
 
 // VTK

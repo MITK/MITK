@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkMitkRenderProp.h"
+#include <vtkMitkRenderProp.h>
 
 #include <vtkObjectFactory.h>
 #include <vtkPropAssembly.h>
 #include <vtkInformation.h>
 
-#include "mitkVtkMapper.h"
+#include <mitkVtkMapper.h>
 
 vtkStandardNewMacro(vtkMitkRenderProp);
 

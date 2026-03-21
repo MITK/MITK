@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <vtkErrorCode.h>
 
-#include "mitkSurfaceVtkWriter.h"
-#include "mitkSurfaceVtkWriter.tpp"
+#include <mitkSurfaceVtkWriter.h>
+#include <mitkSurfaceVtkWriter.tpp>
 
 namespace mitk
 {

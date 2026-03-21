@@ -15,10 +15,10 @@ found in the LICENSE file.
 #include "berryPresentablePartFolder.h"
 #include "berryAbstractTabItem.h"
 
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
-#include <berryConstants.h>
-#include <internal/berryDragUtil.h>
+#include "berryConstants.h"
+#include "internal/berryDragUtil.h"
 
 namespace berry
 {

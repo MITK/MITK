@@ -10,45 +10,45 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCoreObjectFactory.h"
-#include "mitkConfig.h"
+#include <mitkCoreObjectFactory.h>
+#include <mitkConfig.h>
 
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkEnumerationProperty.h"
-#include "mitkGeometry3D.h"
-#include "mitkGeometryData.h"
-#include "mitkImage.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkLookupTable.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneGeometryData.h"
-#include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkPlaneGeometryDataVtkMapper3D.h"
-#include "mitkPointSet.h"
-#include "mitkPointSetVtkMapper2D.h"
-#include "mitkPointSetVtkMapper3D.h"
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkStringProperty.h"
-#include "mitkSurface.h"
-#include "mitkSurface.h"
-#include "mitkSurfaceVtkMapper2D.h"
-#include "mitkSurfaceVtkMapper3D.h"
-#include "mitkTimeGeometry.h"
-#include "mitkTransferFunctionProperty.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkEnumerationProperty.h>
+#include <mitkGeometry3D.h>
+#include <mitkGeometryData.h>
+#include <mitkImage.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneGeometryData.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
+#include <mitkPointSet.h>
+#include <mitkPointSetVtkMapper2D.h>
+#include <mitkPointSetVtkMapper3D.h>
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkStringProperty.h>
+#include <mitkSurface.h>
+#include <mitkSurface.h>
+#include <mitkSurfaceVtkMapper2D.h>
+#include <mitkSurfaceVtkMapper3D.h>
+#include <mitkTimeGeometry.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkImageVtkMapper2D.h>
 
 // Legacy Support:
 #include <mitkCoreServices.h>
-#include <mitkLegacyFileReaderService.h>
-#include <mitkLegacyFileWriterService.h>
+#include "mitkLegacyFileReaderService.h"
+#include "mitkLegacyFileWriterService.h"
 
 #include <mitkCrosshairData.h>
 #include <mitkCrosshairVtkMapper2D.h>

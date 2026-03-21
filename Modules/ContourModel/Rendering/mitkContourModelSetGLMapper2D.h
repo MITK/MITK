@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkContourModelSetGLMapper2D_h
 #define mitkContourModelSetGLMapper2D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkContourModelGLMapper2DBase.h"
-#include "mitkContourModelSet.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkContourModelGLMapper2DBase.h>
+#include <mitkContourModelSet.h>
 #include <MitkContourModelExports.h>
 
 namespace mitk

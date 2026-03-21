@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <itkIndex.h>
 #include <itkSmartPointer.h>
 
-#include "mitkImageDataItem.h"
+#include <mitkImageDataItem.h>
 
 #include <mutex>
 

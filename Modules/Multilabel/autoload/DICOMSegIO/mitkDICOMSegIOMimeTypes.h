@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMSegIOMimeTypes_h
 #define mitkDICOMSegIOMimeTypes_h
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 #include <MitkDICOMSegIOExports.h>
 
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef _itkImportMitkImageContainer_tpp
 #define _itkImportMitkImageContainer_tpp
 
-#include "itkImportMitkImageContainer.h"
+#include <itkImportMitkImageContainer.h>
 
 namespace itk
 {

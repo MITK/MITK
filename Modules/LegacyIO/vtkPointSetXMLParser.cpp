@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkPointSetXMLParser.h"
-#include "mitkInteractionConst.h"
-#include "mitkOperation.h"
-#include "mitkPointOperation.h"
-#include "mitkPointSetWriter.h"
-#include "vtkObjectFactory.h"
+#include <vtkPointSetXMLParser.h>
+#include <mitkInteractionConst.h>
+#include <mitkOperation.h>
+#include <mitkPointOperation.h>
+#include <mitkPointSetWriter.h>
+#include <vtkObjectFactory.h>
 
 namespace mitk
 {

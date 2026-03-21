@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractDirectedPlaneImageFilterNew.h"
-#include "itkImageRegionIterator.h"
-#include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkExtractDirectedPlaneImageFilterNew.h>
+#include <itkImageRegionIterator.h>
+#include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
 
 #include <mitkImageAccessByItk.h>
 

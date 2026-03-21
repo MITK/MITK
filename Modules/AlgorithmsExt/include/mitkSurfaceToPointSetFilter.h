@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define mitkSurfaceToPointSetFilter_h
 
 // exports
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // mitk headers
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 #include <mitkPointSetSource.h>
 //#include <itkExtendedDoublyLinkedFaceList.h>
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkLabelSelectionToolGUI_h
 #define QmitkLabelSelectionToolGUI_h
 
-#include "QmitkToolGUI.h"
+#include <QmitkToolGUI.h>
 #include <MitkSegmentationUIExports.h>
 #include <memory>
 

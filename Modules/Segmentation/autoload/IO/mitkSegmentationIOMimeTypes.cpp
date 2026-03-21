@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationIOMimeTypes.h"
+#include <mitkSegmentationIOMimeTypes.h>
 
 #include <mitkFileSystem.h>
 #include <mitkIOMimeTypes.h>

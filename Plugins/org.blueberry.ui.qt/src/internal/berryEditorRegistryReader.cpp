@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryEditorDescriptor.h"
 #include "berryWorkbenchRegistryConstants.h"
 #include "berryPlatformUI.h"
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 
 #include <QStringList>
 

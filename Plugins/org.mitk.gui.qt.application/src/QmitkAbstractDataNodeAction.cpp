@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkAbstractDataNodeAction.h>
+#include "QmitkAbstractDataNodeAction.h"
 
-#include "mitkIRenderWindowPart.h"
+#include <mitkIRenderWindowPart.h>
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>

@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef QmitkFitPlotDataWidget_h
 #define QmitkFitPlotDataWidget_h
 
-#include "mitkModelFitPlotDataHelper.h"
+#include <mitkModelFitPlotDataHelper.h>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 #include <QWidget>
 

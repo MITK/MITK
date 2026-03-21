@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkErrorResponse.h"
+#include <mitkErrorResponse.h>
 
 namespace mitk
 {

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelInteractor.h"
+#include <mitkContourModelInteractor.h>
 
-#include "mitkToolManager.h"
+#include <mitkToolManager.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
+#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
 
 #include <mitkInteractionPositionEvent.h>
 

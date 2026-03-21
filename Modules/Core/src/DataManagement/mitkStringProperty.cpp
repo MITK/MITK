@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 #include <nlohmann/json.hpp>
 
 const char *mitk::StringProperty::PATH = "path";

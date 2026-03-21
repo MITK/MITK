@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkSegmentAnythingToolGUI_h
 #define QmitkSegmentAnythingToolGUI_h
 
-#include "QmitkSegWithPreviewToolGUIBase.h"
+#include <QmitkSegWithPreviewToolGUIBase.h>
 #include <MitkSegmentationUIExports.h>
-#include "QmitknnUNetGPU.h"
+#include <QmitknnUNetGPU.h>
 
-#include "QmitkSetupVirtualEnvUtil.h"
+#include <QmitkSetupVirtualEnvUtil.h>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <mitkIPreferences.h>

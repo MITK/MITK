@@ -2,7 +2,7 @@
 #define MITKHALFLIFECONSTANTS_H
 
 #include <string>
-#include "MitkPETExports.h"
+#include <MitkPETExports.h>
 
 namespace mitk
 {

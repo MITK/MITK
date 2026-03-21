@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourUtils.h"
-#include "mitkContourModelUtils.h"
+#include <mitkContourUtils.h>
+#include <mitkContourModelUtils.h>
 
 mitk::ContourUtils::ContourUtils()
 {

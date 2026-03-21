@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYNATIVETABFOLDER_H_
 #define BERRYNATIVETABFOLDER_H_
 
-#include <internal/util/berryAbstractTabFolder.h>
+#include "internal/util/berryAbstractTabFolder.h"
 
 #include <QObject>
 

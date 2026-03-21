@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelReader.h"
-#include "mitkContourModelSetReader.h"
-#include "mitkContourModelSetWriter.h"
-#include "mitkContourModelWriter.h"
+#include <mitkContourModelReader.h>
+#include <mitkContourModelSetReader.h>
+#include <mitkContourModelSetWriter.h>
+#include <mitkContourModelWriter.h>
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSurfaceSerializer_h
 #define mitkSurfaceSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {

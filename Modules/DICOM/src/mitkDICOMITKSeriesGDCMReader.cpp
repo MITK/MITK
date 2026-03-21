@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <itkTimeProbesCollectorBase.h>
 #include <gdcmUIDs.h>
-#include "mitkDICOMITKSeriesGDCMReader.h"
-#include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkGantryTiltInformation.h"
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMGDCMTagScanner.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
+#include <mitkITKDICOMSeriesReaderHelper.h>
+#include <mitkGantryTiltInformation.h>
+#include <mitkDICOMTagBasedSorter.h>
+#include <mitkDICOMGDCMTagScanner.h>
 
 std::mutex mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex;
 

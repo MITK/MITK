@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRTUIConstants.h"
+#include <mitkRTUIConstants.h>
 
 const std::string mitk::RTUIConstants::ROOT_PREFERENCE_NODE_ID = "/RT/UI";
 const std::string mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID = "unkownDoseHandlingStyle";

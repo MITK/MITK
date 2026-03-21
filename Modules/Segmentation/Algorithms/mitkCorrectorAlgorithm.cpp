@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCorrectorAlgorithm.h"
-#include "mitkContourUtils.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageDataItem.h"
+#include <mitkCorrectorAlgorithm.h>
+#include <mitkContourUtils.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageDataItem.h>
 
 #include <mitkContourModelUtils.h>
 
-#include "itkCastImageFilter.h"
-#include "itkImageDuplicator.h"
-#include "itkImageRegionIterator.h"
+#include <itkCastImageFilter.h>
+#include <itkImageDuplicator.h>
+#include <itkImageRegionIterator.h>
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm() : ImageToImageFilter(), m_FillColor(1), m_EraseColor(0)
 {

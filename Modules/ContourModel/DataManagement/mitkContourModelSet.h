@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef mitkContourModelSet_h
 #define mitkContourModelSet_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkContourModelExports.h>
 
-#include "mitkContourModel.h"
+#include <mitkContourModel.h>
 
 #include <deque>
 

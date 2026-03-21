@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <map>
 #include <nlohmann/json_fwd.hpp>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

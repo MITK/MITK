@@ -21,7 +21,7 @@ found in the LICENSE file.
 //MITK
 #include <mitkDataStorage.h>
 
-#include "QmitkDataGenerationJobBase.h"
+#include <QmitkDataGenerationJobBase.h>
 
 #include <MitkImageStatisticsUIExports.h>
 

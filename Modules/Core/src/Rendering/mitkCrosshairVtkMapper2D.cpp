@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCrosshairVtkMapper2D.h"
+#include <mitkCrosshairVtkMapper2D.h>
 
 // mitk includes
 #include <mitkAbstractTransformGeometry.h>

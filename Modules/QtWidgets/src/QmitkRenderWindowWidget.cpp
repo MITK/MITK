@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowWidget.h"
+#include <QmitkRenderWindowWidget.h>
 
 // vtk
 #include <vtkCornerAnnotation.h>

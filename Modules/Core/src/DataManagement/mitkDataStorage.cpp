@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
-#include "itkCommand.h"
-#include "mitkDataNode.h"
-#include "mitkGroupTagProperty.h"
-#include "mitkImage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkNodePredicateFunction.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
-#include "mitkArbitraryTimeGeometry.h"
+#include <itkCommand.h>
+#include <mitkDataNode.h>
+#include <mitkGroupTagProperty.h>
+#include <mitkImage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
+#include <mitkArbitraryTimeGeometry.h>
 
 #include <regex>
 #include <set>

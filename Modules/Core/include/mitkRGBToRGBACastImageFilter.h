@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkRGBToRGBACastImageFilter_h
 #define mitkRGBToRGBACastImageFilter_h
 
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 #include <MitkCoreExports.h>
 
 #include <itkRGBPixel.h>

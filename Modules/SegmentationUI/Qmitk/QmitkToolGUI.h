@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "mitkCommon.h"
-#include "mitkTool.h"
+#include <mitkCommon.h>
+#include <mitkTool.h>
 
 #include <QWidget>
 

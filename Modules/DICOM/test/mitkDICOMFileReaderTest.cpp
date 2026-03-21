@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMNullFileReader.h"
-#include "mitkDICOMFileReaderTestHelper.h"
+#include <mitkDICOMNullFileReader.h>
+#include <mitkDICOMFileReaderTestHelper.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 int mitkDICOMFileReaderTest(int argc, char* argv[])
 {

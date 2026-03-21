@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef __itkShortestPathImageFilter_h
 #define __itkShortestPathImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkShortestPathCostFunction.h"
-#include "itkShortestPathNode.h"
+#include <itkImageToImageFilter.h>
+#include <itkShortestPathCostFunction.h>
+#include <itkShortestPathNode.h>
 #include <itkImageRegionIteratorWithIndex.h>
 
 #include <itkMacro.h>
@@ -230,6 +230,6 @@ namespace itk
 
 } // end of namespace itk
 
-#include "itkShortestPathImageFilter.tpp"
+#include <itkShortestPathImageFilter.tpp>
 
 #endif

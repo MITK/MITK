@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkContourVtkMapper3D_h
 #define mitkContourVtkMapper3D_h
 
-#include "mitkVtkMapper.h"
+#include <mitkVtkMapper.h>
 #include <MitkSegmentationExports.h>
 
 #include <vtkPolyData.h>

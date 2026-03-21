@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #ifndef mitkRawImageFileReader_h
 #define mitkRawImageFileReader_h
-#include "itkVector.h"
-#include "mitkFileReader.h"
-#include "mitkImageSource.h"
+#include <itkVector.h>
+#include <mitkFileReader.h>
+#include <mitkImageSource.h>
 #include <MitkLegacyIOExports.h>
 
 namespace mitk

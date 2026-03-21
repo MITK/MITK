@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindow.h"
+#include <QmitkRenderWindow.h>
 
-#include "mitkInteractionKeyEvent.h"
-#include "mitkInternalEvent.h"
-#include "mitkMouseDoubleClickEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkMousePressEvent.h"
-#include "mitkMouseReleaseEvent.h"
-#include "mitkMouseWheelEvent.h"
+#include <mitkInteractionKeyEvent.h>
+#include <mitkInternalEvent.h>
+#include <mitkMouseDoubleClickEvent.h>
+#include <mitkMouseMoveEvent.h>
+#include <mitkMousePressEvent.h>
+#include <mitkMouseReleaseEvent.h>
+#include <mitkMouseWheelEvent.h>
 #include <mitkStatusBar.h>
 
 #include <QCursor>

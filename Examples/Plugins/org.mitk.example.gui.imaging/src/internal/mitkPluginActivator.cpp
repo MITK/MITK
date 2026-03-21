@@ -11,13 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 #include "mitkPluginActivator.h"
 
-#include "src/internal/colourimageprocessing/QmitkColourImageProcessingView.h"
-#include "src/internal/isosurface/QmitkIsoSurface.h"
-#include "src/internal/simpleexample/QmitkSimpleExampleView.h"
-#include "src/internal/simplemeasurement/QmitkSimpleMeasurement.h"
-#include "src/internal/surfaceutilities/QmitkSurfaceUtilities.h"
-#include "src/internal/viewinitialization/QmitkViewInitializationView.h"
-#include "src/internal/volumetry/QmitkVolumetryView.h"
+#include "colourimageprocessing/QmitkColourImageProcessingView.h"
+#include "isosurface/QmitkIsoSurface.h"
+#include "simpleexample/QmitkSimpleExampleView.h"
+#include "simplemeasurement/QmitkSimpleMeasurement.h"
+#include "surfaceutilities/QmitkSurfaceUtilities.h"
+#include "viewinitialization/QmitkViewInitializationView.h"
+#include "volumetry/QmitkVolumetryView.h"
 
 #include <usModuleInitialization.h>
 

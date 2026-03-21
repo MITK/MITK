@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageStatisticsCalculator.h"
+#include <mitkImageStatisticsCalculator.h>
 #include <mitkLabelStatisticsImageFilter.h>
 #include <mitkStatisticsImageFilter.h>
 #include <mitkImage.h>

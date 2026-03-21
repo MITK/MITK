@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkPointSetDifferenceStatisticsCalculator.h"
-#include "mitkImageStatisticsConstants.h"
+#include <mitkPointSetDifferenceStatisticsCalculator.h>
+#include <mitkImageStatisticsConstants.h>
 
 mitk::PointSetDifferenceStatisticsCalculator::PointSetDifferenceStatisticsCalculator() :
   m_StatisticsCalculated(false)

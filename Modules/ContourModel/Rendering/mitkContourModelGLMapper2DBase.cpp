@@ -10,21 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkContourModelSetGLMapper2D.h"
+#include <mitkContourModelSetGLMapper2D.h>
 
-#include "mitkColorProperty.h"
-#include "mitkContourModelSet.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkColorProperty.h>
+#include <mitkContourModelSet.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 #include <vtkContext2D.h>
 #include <vtkLinearTransform.h>
 #include <vtkOpenGLContextDevice2D.h>
 #include <vtkPen.h>
 
-#include "mitkManualPlacementAnnotationRenderer.h"
-#include "mitkBaseRenderer.h"
-#include "mitkContourModel.h"
-#include "mitkTextAnnotation2D.h"
+#include <mitkManualPlacementAnnotationRenderer.h>
+#include <mitkBaseRenderer.h>
+#include <mitkContourModel.h>
+#include <mitkTextAnnotation2D.h>
 
 mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
 {

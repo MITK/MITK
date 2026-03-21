@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef _BERRY_IPROGRESSMONITORWITHBLOCKING_H
 #define _BERRY_IPROGRESSMONITORWITHBLOCKING_H
 
-#include "berryObject.h"
+#include <berryObject.h>
 #include <org_blueberry_core_jobs_Export.h>
-#include "berryIStatus.h"
+#include <berryIStatus.h>
 #include "berryIProgressMonitor.h"
 
 namespace berry

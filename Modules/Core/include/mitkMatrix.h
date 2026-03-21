@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <itkMatrix.h>
 
-#include "mitkArray.h"
-#include "mitkEqual.h"
-#include "mitkNumericConstants.h"
+#include <mitkArray.h>
+#include <mitkEqual.h>
+#include <mitkNumericConstants.h>
 
 namespace mitk
 {

@@ -16,10 +16,10 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 /// Own includes.
-#include "mitkBaseProperty.h"
-#include "mitkDataStorage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkWeakPointer.h"
+#include <mitkBaseProperty.h>
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkWeakPointer.h>
 
 /// Toolkit includes.
 #include <QAbstractTableModel>

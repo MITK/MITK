@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLabeledImageToSurfaceFilter_h
 #define mitkLabeledImageToSurfaceFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 #include <map>
 #include <mitkImageToSurfaceFilter.h>
 #include <vtkImageData.h>

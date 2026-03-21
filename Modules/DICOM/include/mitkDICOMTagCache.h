@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkDICOMTagCache_h
 #define mitkDICOMTagCache_h
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "mitkDICOMTag.h"
-#include "mitkDICOMDatasetAccess.h"
-#include "mitkDICOMEnums.h"
+#include <mitkDICOMTag.h>
+#include <mitkDICOMDatasetAccess.h>
+#include <mitkDICOMEnums.h>
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
-#include "MitkDICOMExports.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

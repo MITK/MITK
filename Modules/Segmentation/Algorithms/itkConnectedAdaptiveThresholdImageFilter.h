@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef __itkConnectedAdaptiveThresholdImageFilter_h
 #define __itkConnectedAdaptiveThresholdImageFilter_h
 
-#include "itkConnectedThresholdImageFilter.h"
-#include "itkImage.h"
+#include <itkConnectedThresholdImageFilter.h>
+#include <itkImage.h>
 
 namespace itk
 {
@@ -116,7 +116,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkConnectedAdaptiveThresholdImageFilter.tpp"
+#include <itkConnectedAdaptiveThresholdImageFilter.tpp>
 #endif
 
 #endif

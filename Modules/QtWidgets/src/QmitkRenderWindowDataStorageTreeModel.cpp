@@ -11,14 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager UI module
-#include "QmitkRenderWindowDataStorageTreeModel.h"
+#include <QmitkRenderWindowDataStorageTreeModel.h>
 
 #include <QmitkDataStorageTreeModelInternalItem.h>
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
-#include "QmitkMimeTypes.h"
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
+#include <QmitkMimeTypes.h>
+#include <QmitkNodeDescriptorManager.h>
 
 #include <QIODevice>
 

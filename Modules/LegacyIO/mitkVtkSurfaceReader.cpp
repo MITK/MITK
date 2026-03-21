@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkVtkSurfaceReader.h"
+#include <mitkVtkSurfaceReader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkSurface.h>
 #include <vtkDataReader.h>

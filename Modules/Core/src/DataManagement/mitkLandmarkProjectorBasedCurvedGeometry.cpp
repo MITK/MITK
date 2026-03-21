@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLandmarkProjectorBasedCurvedGeometry.h"
+#include <mitkLandmarkProjectorBasedCurvedGeometry.h>
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYQTWIDGETSTWEAKLET_H_
 #define BERRYQTWIDGETSTWEAKLET_H_
 
-#include <berryGuiWidgetsTweaklet.h>
+#include "berryGuiWidgetsTweaklet.h"
 
 #include "berryQtWidgetsTweakletImpl.h"
 

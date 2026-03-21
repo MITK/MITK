@@ -17,8 +17,8 @@ found in the LICENSE file.
 
 #include "berryObjectBrowserView.h"
 #include <ui_berryQtObjectBrowserView.h>
-#include "berryDebugUtil.h"
-#include "berryDebugBreakpointManager.h"
+#include <berryDebugUtil.h>
+#include <berryDebugBreakpointManager.h>
 
 namespace berry
 {

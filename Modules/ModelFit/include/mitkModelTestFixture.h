@@ -14,17 +14,17 @@ found in the LICENSE file.
 #define MITKMODELTESTFIXTURE_H
 
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestingConfig.h>
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkModelBase.h>
-#include "mitkModelFitException.h"
+#include <mitkModelFitException.h>
 
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
-#include "mitkVector.h"
+#include <mitkVector.h>
 
 using json = nlohmann::json;
 

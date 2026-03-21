@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkImageIOFactory.h"
-#include "mitkIOAdapter.h"
-#include "mitkVtkImageReader.h"
+#include <mitkVtkImageIOFactory.h>
+#include <mitkIOAdapter.h>
+#include <mitkVtkImageReader.h>
 
-#include "itkVersion.h"
+#include <itkVersion.h>
 
 namespace mitk
 {

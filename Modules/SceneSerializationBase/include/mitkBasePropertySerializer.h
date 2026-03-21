@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkBasePropertySerializer_h
 #define mitkBasePropertySerializer_h
 
-#include "mitkSerializerMacros.h"
+#include <mitkSerializerMacros.h>
 #include <MitkSceneSerializationBaseExports.h>
 
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 #include <itkObjectFactoryBase.h>
 
 namespace tinyxml2

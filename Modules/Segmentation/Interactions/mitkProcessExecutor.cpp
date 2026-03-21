@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProcessExecutor.h"
+#include <mitkProcessExecutor.h>
 
 #include <fstream>
 #include <iostream>

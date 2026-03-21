@@ -15,8 +15,8 @@ found in the LICENSE file.
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/version.hpp>
 
-#include "mitkFormulaParser.h"
-#include "mitkFresnel.h"
+#include <mitkFormulaParser.h>
+#include <mitkFresnel.h>
 
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;

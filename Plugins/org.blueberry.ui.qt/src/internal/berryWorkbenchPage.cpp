@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "tweaklets/berryWorkbenchPageTweaklet.h"

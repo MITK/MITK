@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkVtkSurfaceReader_h
 #define mitkVtkSurfaceReader_h
 
-#include "mitkSurfaceSource.h"
+#include <mitkSurfaceSource.h>
 #include <MitkLegacyIOExports.h>
 
 namespace mitk

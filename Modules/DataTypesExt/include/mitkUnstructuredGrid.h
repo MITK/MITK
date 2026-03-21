@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkUnstructuredGrid_h
 #define mitkUnstructuredGrid_h
 
-#include "MitkDataTypesExtExports.h"
-#include "itkImageRegion.h"
-#include "mitkBaseData.h"
+#include <MitkDataTypesExtExports.h>
+#include <itkImageRegion.h>
+#include <mitkBaseData.h>
 
 #include <vtkSmartPointer.h>
 

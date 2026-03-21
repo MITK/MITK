@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "ChangeTextDescriptor.h"
 #include "ExtensionPointDefinitionConstants.h"
 
-#include "berryIContributor.h"
+#include <berryIContributor.h>
 
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
   : m_ChangeTextExtensionPoint(changeTextExtensionPoint)

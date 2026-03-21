@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkFillRegionTool_h
 #define mitkFillRegionTool_h
 
-#include "mitkFillRegionBaseTool.h"
+#include <mitkFillRegionBaseTool.h>
 #include <MitkSegmentationExports.h>
 
 namespace us

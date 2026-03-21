@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <QWidget>
 
-#include "berryQtViewPart.h"
+#include <berryQtViewPart.h>
 
 namespace berry {
 

@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkLabelSelectionTool_h
 #define mitkLabelSelectionTool_h
 
-#include "mitkCommon.h"
-#include "mitkSegTool2D.h"
+#include <mitkCommon.h>
+#include <mitkSegTool2D.h>
 #include <mitkLabelHighlightGuard.h>
 
 #include <MitkSegmentationExports.h>

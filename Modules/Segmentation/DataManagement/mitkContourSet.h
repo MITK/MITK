@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkContourSet_h
 #define mitkContourSet_h
 
-#include "mitkBaseData.h"
-#include "mitkCommon.h"
-#include "mitkContour.h"
+#include <mitkBaseData.h>
+#include <mitkCommon.h>
+#include <mitkContour.h>
 #include <MitkSegmentationExports.h>
 #include <map>
 

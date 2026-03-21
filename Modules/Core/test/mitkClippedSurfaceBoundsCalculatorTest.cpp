@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <iostream>
 
-#include "mitkClippedSurfaceBoundsCalculator.h"
-#include "mitkGeometry3D.h"
-#include "mitkNumericTypes.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkClippedSurfaceBoundsCalculator.h>
+#include <mitkGeometry3D.h>
+#include <mitkNumericTypes.h>
+#include <mitkPlaneGeometry.h>
 
 static void CheckPlanesInsideBoundingBoxOnlyOnOneSlice(mitk::BaseGeometry::Pointer geometry3D)
 {

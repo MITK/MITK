@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryTypeExtensionManager.h"
 
@@ -19,8 +19,8 @@ found in the LICENSE file.
 
 #include "berryPropertyTesterDescriptor.h"
 
-#include "berryPlatform.h"
-#include "berryCoreException.h"
+#include <berryPlatform.h>
+#include <berryCoreException.h>
 #include <berryIExtensionRegistry.h>
 
 #include <ctime>

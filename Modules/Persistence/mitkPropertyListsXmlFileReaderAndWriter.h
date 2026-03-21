@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPropertyListsXmlFileReaderAndWriter_h
 #define mitkPropertyListsXmlFileReaderAndWriter_h
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 namespace tinyxml2
 {

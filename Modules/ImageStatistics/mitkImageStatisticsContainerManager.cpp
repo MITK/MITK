@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageStatisticsContainerManager.h"
+#include <mitkImageStatisticsContainerManager.h>
 
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateFunction.h"
-#include "mitkNodePredicateDataProperty.h"
-#include "mitkProperties.h"
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateDataProperty.h>
+#include <mitkProperties.h>
 
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
+#include <mitkStatisticsToImageRelationRule.h>
+#include <mitkStatisticsToMaskRelationRule.h>
 
 mitk::ImageStatisticsContainer::Pointer mitk::ImageStatisticsContainerManager::GetImageStatistics(const mitk::DataStorage* dataStorage, const mitk::BaseData* image, const mitk::BaseData* mask, bool ignoreZeroVoxel, unsigned int histogramNBins, bool onlyIfUpToDate, bool noWIP)
 {

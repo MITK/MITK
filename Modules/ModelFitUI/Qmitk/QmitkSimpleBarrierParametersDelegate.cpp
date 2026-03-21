@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSimpleBarrierParametersDelegate.h"
+#include <QmitkSimpleBarrierParametersDelegate.h>
 
 #include <QPainter>
 #include <QApplication>

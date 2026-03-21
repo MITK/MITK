@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkEditPointDialog.h"
+#include <QmitkEditPointDialog.h>
 
 #include <QGridLayout>
 #include <QLabel>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkTotalSegmentatorToolGUI_h_Included
 #define QmitkTotalSegmentatorToolGUI_h_Included
 
-#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
+#include <QmitkMultiLabelSegWithPreviewToolGUIBase.h>
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkIPreferences.h>

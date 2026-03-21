@@ -20,8 +20,8 @@ found in the LICENSE file.
 // Qmitk
 #include "QmitkAddNewPropertyDialog.h"
 #include "QmitkOverlayManagerView.h"
-#include "QmitkPropertyItemDelegate.h"
-#include "QmitkPropertyItemModel.h"
+#include <QmitkPropertyItemDelegate.h>
+#include <QmitkPropertyItemModel.h>
 #include <QmitkRenderWindow.h>
 
 // Qt
@@ -31,11 +31,11 @@ found in the LICENSE file.
 
 #include "internal/org_mitk_gui_qt_overlaymanager_Activator.h"
 
-#include "mitkAnnotationUtils.h"
+#include <mitkAnnotationUtils.h>
 #include "mitkGetPropertyService.h"
-#include "mitkLayoutAnnotationRenderer.h"
-#include "mitkManualPlacementAnnotationRenderer.h"
-#include "mitkRenderingManager.h"
+#include <mitkLayoutAnnotationRenderer.h>
+#include <mitkManualPlacementAnnotationRenderer.h>
+#include <mitkRenderingManager.h>
 #include <mitkColorBarAnnotation.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>

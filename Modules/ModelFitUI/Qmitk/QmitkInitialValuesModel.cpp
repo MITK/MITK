@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include <QColor>
 #include <QSize>
 
-#include "mitkExceptionMacro.h"
-#include "mitkImage.h"
-#include "mitkImageBasedParameterizationDelegate.h"
+#include <mitkExceptionMacro.h>
+#include <mitkImage.h>
+#include <mitkImageBasedParameterizationDelegate.h>
 
-#include "QmitkInitialValuesModel.h"
+#include <QmitkInitialValuesModel.h>
 
 
 QmitkInitialValuesModel::

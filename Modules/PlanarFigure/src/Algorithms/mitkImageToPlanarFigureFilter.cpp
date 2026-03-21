@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageToPlanarFigureFilter.h"
+#include <mitkImageToPlanarFigureFilter.h>
 
 mitk::ImageToPlanarFigureFilter::ImageToPlanarFigureFilter()
 {

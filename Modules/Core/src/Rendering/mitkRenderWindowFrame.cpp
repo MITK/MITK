@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderWindowFrame.h"
-#include "mitkVtkLayerController.h"
-#include "vtkMitkRectangleProp.h"
+#include <mitkRenderWindowFrame.h>
+#include <mitkVtkLayerController.h>
+#include <vtkMitkRectangleProp.h>
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkOtsuTool3D.h"
-#include "mitkOtsuSegmentationFilter.h"
+#include <mitkOtsuTool3D.h>
+#include <mitkOtsuSegmentationFilter.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkImageStatisticsHolder.h>
 

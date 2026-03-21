@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkIntLookupTablePropertySerializer_h_included
 #define mitkIntLookupTablePropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkProperties.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkProperties.h>
 #include <tinyxml2.h>
 
 namespace mitk

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateCompositeBase.h"
+#include <mitkNodePredicateCompositeBase.h>
 
 // for std::find
 #include <algorithm>

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkShowSegmentationAsSurface_h
 #define mitkShowSegmentationAsSurface_h
 
-#include "mitkSegmentationSink.h"
-#include "mitkSurface.h"
-#include "mitkUIDGenerator.h"
+#include <mitkSegmentationSink.h>
+#include <mitkSurface.h>
+#include <mitkUIDGenerator.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk

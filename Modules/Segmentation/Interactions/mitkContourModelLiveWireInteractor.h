@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkContourModelLiveWireInteractor_h
 #define mitkContourModelLiveWireInteractor_h
 
-#include "mitkCommon.h"
-#include "mitkContourModelInteractor.h"
+#include <mitkCommon.h>
+#include <mitkContourModelInteractor.h>
 #include <MitkSegmentationExports.h>
 
 #include <mitkImageLiveWireContourModelFilter.h>

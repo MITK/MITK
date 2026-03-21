@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <vtkXMLPUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 
-#include "mitkUnstructuredGrid.h"
+#include <mitkUnstructuredGrid.h>
 
 namespace mitk
 {

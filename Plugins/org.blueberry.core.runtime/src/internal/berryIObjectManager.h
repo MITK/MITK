@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIOBJECTMANAGER_H
 #define BERRYIOBJECTMANAGER_H
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 namespace berry {
 

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMReaderConfigurator.h"
+#include <mitkDICOMReaderConfigurator.h>
 
-#include "mitkDICOMSortByTag.h"
-#include "mitkSortByImagePositionPatient.h"
+#include <mitkDICOMSortByTag.h>
+#include <mitkSortByImagePositionPatient.h>
 
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLabelSelectionToolGUI.h"
+#include <QmitkLabelSelectionToolGUI.h>
 
-#include "QmitkFloatingTextPopup.h"
+#include <QmitkFloatingTextPopup.h>
 
 #include <mitkLabelSelectionTool.h>
 #include <mitkLabelSetImageHelper.h>

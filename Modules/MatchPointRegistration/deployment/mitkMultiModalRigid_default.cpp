@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mapDeploymentDLLHelper.h"
-#include "mapDiscreteElements.h"
-#include "mapConfigure.h"
+#include <mapDeploymentDLLHelper.h>
+#include <mapDiscreteElements.h>
+#include <mapConfigure.h>
 
-#include "mitkMultiModalRigidDefaultRegistrationAlgorithm.h"
+#include <mitkMultiModalRigidDefaultRegistrationAlgorithm.h>
 
 typedef map::core::discrete::Elements<3>::InternalImageType ImageType;
 

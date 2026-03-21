@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkBoundingObject_h
 #define mitkBoundingObject_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <mitkSurface.h>
 
 namespace mitk

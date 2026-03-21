@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBooleanOperation.h"
+#include <mitkBooleanOperation.h>
 #include <itkNaryFunctorImageFilter.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImageCast.h>

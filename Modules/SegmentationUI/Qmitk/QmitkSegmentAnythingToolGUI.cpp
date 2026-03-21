@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSegmentAnythingToolGUI.h"
+#include <QmitkSegmentAnythingToolGUI.h>
 
 #include <mitkSegmentAnythingTool.h>
 #include <mitkProcessExecutor.h>

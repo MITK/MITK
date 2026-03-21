@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkGizmoInteractor_h
 #define mitkGizmoInteractor_h
 
-#include "mitkGizmo.h"
+#include <mitkGizmo.h>
 
 // MITK includes
 #include <mitkDataInteractor.h>
@@ -27,7 +27,7 @@ found in the LICENSE file.
 // System includes
 #include <memory>
 
-#include "MitkGizmoExports.h"
+#include <MitkGizmoExports.h>
 
 namespace mitk
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkMedSAMTool_h
 #define mitkMedSAMTool_h
 
-#include "mitkSegmentAnythingTool.h"
-#include "mitkBoundingShapeInteractor.h"
+#include <mitkSegmentAnythingTool.h>
+#include <mitkBoundingShapeInteractor.h>
 #include <MitkSegmentationExports.h>
 #include <mitkRenderingManager.h>
 

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkVector.h>
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // forward declarations
 class vtkPoints;

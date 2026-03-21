@@ -22,9 +22,9 @@ found in the LICENSE file.
 
 #include <mitkPropertyNameHelper.h>
 
-#include "QmitkDataStorageTreeModel.h"
-#include "QmitkDataStorageTreeModelInternalItem.h"
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkDataStorageTreeModel.h>
+#include <QmitkDataStorageTreeModelInternalItem.h>
+#include <QmitkNodeDescriptorManager.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 #include <QmitkMimeTypes.h>

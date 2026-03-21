@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkVtkAbstractTransform.h"
+#include <itkVtkAbstractTransform.h>
 #include <mitkNumericTypes.h>
 #include <vtkAbstractTransform.h>
 

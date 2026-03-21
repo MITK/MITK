@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCustomMimeType.h"
+#include <mitkCustomMimeType.h>
 
-#include "mitkMimeType.h"
+#include <mitkMimeType.h>
 
 #include <mitkUtf8Util.h>
 

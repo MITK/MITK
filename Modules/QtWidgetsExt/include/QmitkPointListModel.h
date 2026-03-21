@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkPointListModel_h
 #define QmitkPointListModel_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QAbstractListModel>
 
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPointListModel : public QAbstractListModel
 {

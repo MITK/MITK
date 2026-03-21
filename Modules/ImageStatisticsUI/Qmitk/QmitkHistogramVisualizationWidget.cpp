@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkHistogramVisualizationWidget.h"
+#include <QmitkHistogramVisualizationWidget.h>
 #include <ui_QmitkHistogramVisualizationWidget.h>
 
 #include <QClipboard>

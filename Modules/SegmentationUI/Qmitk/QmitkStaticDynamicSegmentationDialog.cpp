@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkStaticDynamicSegmentationDialog.h"
+#include <QmitkStaticDynamicSegmentationDialog.h>
 
 #include <mitkSegmentationHelper.h>
 

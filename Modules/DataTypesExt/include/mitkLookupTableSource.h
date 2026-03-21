@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkLookupTableSource_h
 #define mitkLookupTableSource_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
-#include "mitkLookupTable.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCommon.h>
+#include <mitkLookupTable.h>
 
-#include "itkProcessObject.h"
+#include <itkProcessObject.h>
 
 namespace mitk
 {

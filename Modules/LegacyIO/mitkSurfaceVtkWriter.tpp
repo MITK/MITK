@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceVtkWriter.h"
+#include <mitkSurfaceVtkWriter.h>
 #include <vtkErrorCode.h>
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>

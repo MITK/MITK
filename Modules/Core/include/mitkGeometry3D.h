@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef mitkGeometry3D_h
 #define mitkGeometry3D_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
-#include "itkScalableAffineTransform.h"
+#include <itkScalableAffineTransform.h>
 #include <itkIndex.h>
 
-#include "mitkBaseGeometry.h"
+#include <mitkBaseGeometry.h>
 
 class vtkLinearTransform;
 

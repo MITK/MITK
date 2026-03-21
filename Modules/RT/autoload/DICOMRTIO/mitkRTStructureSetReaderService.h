@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <mitkAbstractFileReader.h>
 
-#include "MitkDICOMRTIOExports.h"
+#include <MitkDICOMRTIOExports.h>
 #include <mitkContourModelSet.h>
 
 #include <usModuleContext.h>

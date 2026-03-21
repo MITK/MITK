@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef __itkShortestPathCostFunction_tpp
 #define __itkShortestPathCostFunction_tpp
 
-#include "itkShortestPathCostFunction.h"
+#include <itkShortestPathCostFunction.h>
 
 namespace itk
 {

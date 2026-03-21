@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkHeightFieldSurfaceClipImageFilter_h
 #define mitkHeightFieldSurfaceClipImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
-#include "mitkSurface.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
+#include <mitkSurface.h>
 
 namespace itk
 {

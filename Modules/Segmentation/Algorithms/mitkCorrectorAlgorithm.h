@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkCorrectorAlgorithm_h
 #define mitkCorrectorAlgorithm_h
 
-#include "mitkContourModel.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkContourModel.h>
+#include <mitkImageToImageFilter.h>
 #include <MitkSegmentationExports.h>
 #include <mitkLabel.h>
 

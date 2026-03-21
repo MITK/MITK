@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkContourObjectFactory_h
 #define mitkContourObjectFactory_h
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 #include <MitkContourModelExports.h>
 
 namespace mitk

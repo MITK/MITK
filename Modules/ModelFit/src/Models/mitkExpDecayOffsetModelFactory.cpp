@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExpDecayOffsetModelFactory.h"
-#include "mitkExpDecayOffsetModelParameterizer.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkExpDecayOffsetModelFactory.h>
+#include <mitkExpDecayOffsetModelParameterizer.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 mitk::ExpDecayOffsetModelFactory::ExpDecayOffsetModelFactory()
 {

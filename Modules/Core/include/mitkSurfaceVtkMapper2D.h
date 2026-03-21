@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSurfaceVtkMapper2D_h
 #define mitkSurfaceVtkMapper2D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkLocalStorageHandler.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkLocalStorageHandler.h>
+#include <mitkVtkMapper.h>
 #include <MitkCoreExports.h>
 
 // VTK

@@ -21,9 +21,9 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkStepperAdapter.h>
 
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 #include <QDir>
 #include <QFileDialog>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitknnUNetToolGUI.h"
+#include <QmitknnUNetToolGUI.h>
 
 #include <mitkProcessExecutor.h>
 #include <mitknnUnetTool.h>

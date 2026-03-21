@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkImageStatisticsHolder.h"
-#include "mitkPlaneClipping.h"
-#include "mitkPropertyNameHelper.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkPlaneClipping.h>
+#include <mitkPropertyNameHelper.h>
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
 #include <mitkImageSliceSelector.h>
@@ -31,11 +31,11 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 
 // MITK Rendering
-#include "mitkDoseImageVtkMapper2D.h"
+#include <mitkDoseImageVtkMapper2D.h>
 
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkMitkThickSlicesFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkMitkThickSlicesFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 // VTK
 #include <vtkCamera.h>

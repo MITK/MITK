@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRegionGrowingTool.h"
-#include "mitkBaseRenderer.h"
-#include "mitkImageToContourModelFilter.h"
-#include "mitkRenderingManager.h"
-#include "mitkToolManager.h"
+#include <mitkRegionGrowingTool.h>
+#include <mitkBaseRenderer.h>
+#include <mitkImageToContourModelFilter.h>
+#include <mitkRenderingManager.h>
+#include <mitkToolManager.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -23,8 +23,8 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 
 // ITK
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
 #include <itkConnectedComponentImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
 #include <itkNeighborhoodIterator.h>

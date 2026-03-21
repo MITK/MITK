@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYSIMPLEEXTENSIONPOINTFILTER_H
 #define BERRYSIMPLEEXTENSIONPOINTFILTER_H
 
-#include <berryIExtensionPointFilter.h>
+#include "berryIExtensionPointFilter.h"
 
 #include <QString>
 

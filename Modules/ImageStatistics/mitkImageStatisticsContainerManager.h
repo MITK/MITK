@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkImageStatisticsContainerManager_h
 #define mitkImageStatisticsContainerManager_h
 
-#include "MitkImageStatisticsExports.h"
+#include <MitkImageStatisticsExports.h>
 
 #include <mitkDataStorage.h>
 #include <mitkImageStatisticsContainer.h>

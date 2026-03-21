@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef __itkShortestPathImageFilter_tpp
 #define __itkShortestPathImageFilter_tpp
 
-#include "itkShortestPathImageFilter.h"
+#include <itkShortestPathImageFilter.h>
 
-#include "mitkMemoryUtilities.h"
+#include <mitkMemoryUtilities.h>
 #include <ctime>
 #include <algorithm>
 #include <iostream>

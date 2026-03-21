@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkItkLoggingAdapter.h"
-#include "mitkLog.h"
+#include <mitkItkLoggingAdapter.h>
+#include <mitkLog.h>
 
 void mitk::ItkLoggingAdapter::Initialize()
 {

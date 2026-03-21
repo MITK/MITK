@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkOverlayContainerWidget.h"
+#include <QmitkOverlayContainerWidget.h>
 
 #include <QPainter>
 

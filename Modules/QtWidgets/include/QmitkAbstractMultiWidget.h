@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkAbstractMultiWidget_h
 
 // mitk qt widgets module
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "QmitkDataStorageComboBox.h"
-#include "QmitkCustomVariants.h"
-#include "mitkDataNode.h"
+#include <QmitkDataStorageComboBox.h>
+#include <QmitkCustomVariants.h>
+#include <mitkDataNode.h>
 
 
 /**

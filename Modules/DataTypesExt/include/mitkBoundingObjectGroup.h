@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkBoundingObjectGroup_h
 #define mitkBoundingObjectGroup_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <deque>
 #include <mitkBoundingObject.h>
 

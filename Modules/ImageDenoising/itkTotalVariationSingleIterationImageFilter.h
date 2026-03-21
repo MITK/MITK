@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef __itkTotalVariationSingleIterationImageFilter_h
 #define __itkTotalVariationSingleIterationImageFilter_h
 
-#include "itkImage.h"
-#include "itkImageToImageFilter.h"
+#include <itkImage.h>
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -113,7 +113,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTotalVariationSingleIterationImageFilter.tpp"
+#include <itkTotalVariationSingleIterationImageFilter.tpp>
 #endif
 
 #endif //__itkTotalVariationSingleIterationImageFilter__

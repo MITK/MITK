@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImageStatisticsContainer.h>
-#include "mitkIntensityProfile.h"
+#include <mitkIntensityProfile.h>
 
 using namespace mitk;
 

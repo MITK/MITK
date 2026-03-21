@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "mitkWeakPointer.h"
+#include <mitkWeakPointer.h>
 #include <memory>
 
 namespace Ui

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabeledImageLookupTable.h"
+#include <mitkLabeledImageLookupTable.h>
 #include <cstdlib>
 #include <vtkLookupTable.h>
 

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkEnumerationPropertySerializer_h
 #define mitkEnumerationPropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

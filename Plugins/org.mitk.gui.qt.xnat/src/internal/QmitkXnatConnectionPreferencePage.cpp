@@ -26,9 +26,9 @@ found in the LICENSE file.
 #include <QMap>
 #include <QValidator>
 
-#include "ctkXnatSession.h"
-#include "ctkXnatLoginProfile.h"
-#include "ctkXnatException.h"
+#include <ctkXnatSession.h>
+#include <ctkXnatLoginProfile.h>
+#include <ctkXnatException.h>
 
 #include <mitkIOUtil.h>
 #include <mitkCoreServices.h>

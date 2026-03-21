@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define mitkLimitedLinearUndo_h
 
 // MITK header
-#include "mitkOperationEvent.h"
-#include "mitkUndoModel.h"
+#include <mitkOperationEvent.h>
+#include <mitkUndoModel.h>
 #include <MitkCoreExports.h>
 // STL header
 #include <vector>

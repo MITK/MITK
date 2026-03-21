@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 #include <mitkDataNode.h>
 
-#include "mitkImageStatisticsContainer.h"
+#include <mitkImageStatisticsContainer.h>
 
 /*!
 \class QmitkImageStatisticsTreeItem

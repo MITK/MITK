@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageStatisticsPredicateHelper.h"
+#include <mitkImageStatisticsPredicateHelper.h>
 
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkNodePredicateAnd.h>

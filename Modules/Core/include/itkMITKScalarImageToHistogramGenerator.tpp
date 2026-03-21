@@ -18,8 +18,8 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef _itkMITKScalarImageToHistogramGenerator_tpp
 #define _itkMITKScalarImageToHistogramGenerator_tpp
 
-#include "itkDefaultConvertPixelTraits.h"
-#include "itkMITKScalarImageToHistogramGenerator.h"
+#include <itkDefaultConvertPixelTraits.h>
+#include <itkMITKScalarImageToHistogramGenerator.h>
 
 namespace itk
 {

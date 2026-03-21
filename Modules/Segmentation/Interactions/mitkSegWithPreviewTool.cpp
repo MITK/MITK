@@ -10,25 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegWithPreviewTool.h"
+#include <mitkSegWithPreviewTool.h>
 
-#include "mitkToolManager.h"
+#include <mitkToolManager.h>
 
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
+#include <mitkColorProperty.h>
+#include <mitkProperties.h>
 
-#include "mitkDataStorage.h"
-#include "mitkRenderingManager.h"
+#include <mitkDataStorage.h>
+#include <mitkRenderingManager.h>
 #include <mitkTimeNavigationController.h>
 
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetImageHelper.h"
-#include "mitkMaskAndCutRoiImageFilter.h"
-#include "mitkPadImageFilter.h"
-#include "mitkNodePredicateGeometry.h"
-#include "mitkSegTool2D.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
+#include <mitkMaskAndCutRoiImageFilter.h>
+#include <mitkPadImageFilter.h>
+#include <mitkNodePredicateGeometry.h>
+#include <mitkSegTool2D.h>
 
 #include <mitkSegChangeOperationApplier.h>
 

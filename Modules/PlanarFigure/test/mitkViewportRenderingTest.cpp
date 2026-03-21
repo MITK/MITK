@@ -11,15 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkColorProperty.h"
-#include "mitkImage.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkPlanarFigure.h"
-#include "mitkRenderingTestHelper.h"
-#include "mitkSurface.h"
-#include "mitkTestingMacros.h"
+#include <mitkColorProperty.h>
+#include <mitkImage.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkPlanarFigure.h>
+#include <mitkRenderingTestHelper.h>
+#include <mitkSurface.h>
+#include <mitkTestingMacros.h>
 #include <mitkTestNotRunException.h>
 
 // ITK

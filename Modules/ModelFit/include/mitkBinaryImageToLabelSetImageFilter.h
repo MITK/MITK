@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <mitkImageToImageFilter.h>
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <itkDataObject.h>
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 #include <nlohmann/json.hpp>

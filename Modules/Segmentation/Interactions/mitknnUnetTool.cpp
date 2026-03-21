@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitknnUnetTool.h"
+#include <mitknnUnetTool.h>
 
-#include "mitkIOUtil.h"
-#include "mitkProcessExecutor.h"
+#include <mitkIOUtil.h>
+#include <mitkProcessExecutor.h>
 #include <itksys/SystemTools.hxx>
 #include <usGetModuleContext.h>
 #include <usModule.h>

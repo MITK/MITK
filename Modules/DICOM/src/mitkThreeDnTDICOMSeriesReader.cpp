@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeDnTDICOMSeriesReader.h"
-#include "mitkITKDICOMSeriesReaderHelper.h"
+#include <mitkThreeDnTDICOMSeriesReader.h>
+#include <mitkITKDICOMSeriesReaderHelper.h>
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)

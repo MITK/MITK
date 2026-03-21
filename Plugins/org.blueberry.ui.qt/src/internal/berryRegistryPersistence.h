@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define BERRYREGISTRYPERSISTENCE_H
 
 #include "berryWorkbenchRegistryConstants.h"
-#include "berryIRegistryEventListener.h"
+#include <berryIRegistryEventListener.h>
 
 #include <QScopedPointer>
 

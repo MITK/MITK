@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QDirIterator>
 #include <QFileDialog>
-#include "QmitkStyleManager.h"
+#include <QmitkStyleManager.h>
 #include "QmitkToolInstallDialog.h"
 #include <QtConcurrent/QtConcurrentRun>
 #include <QProcess>

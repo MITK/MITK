@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTIOActivator.h"
+#include <mitkCESTIOActivator.h>
 
-#include "mitkCESTDICOMReaderService.h"
-#include "mitkCESTGenericDICOMReaderService.h"
+#include <mitkCESTDICOMReaderService.h>
+#include <mitkCESTGenericDICOMReaderService.h>
 
 #include <usModuleContext.h>
 #include <mitkDICOMIOHelper.h>
 
-#include "mitkCESTIOMimeTypes.h"
+#include <mitkCESTIOMimeTypes.h>
 
 #include <mutex>
 

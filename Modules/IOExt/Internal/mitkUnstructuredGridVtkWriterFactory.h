@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkUnstructuredGridVtkWriterFactory_h
 #define mitkUnstructuredGridVtkWriterFactory_h
 
-#include "itkObjectFactoryBase.h"
-#include "mitkBaseData.h"
+#include <itkObjectFactoryBase.h>
+#include <mitkBaseData.h>
 
 namespace mitk
 {

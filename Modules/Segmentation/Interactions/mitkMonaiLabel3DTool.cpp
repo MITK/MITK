@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMonaiLabel3DTool.h"
+#include <mitkMonaiLabel3DTool.h>
 
 #include <mitkIOUtil.h>
 #include <usGetModuleContext.h>

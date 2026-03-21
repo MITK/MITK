@@ -1,4 +1,4 @@
-#include "mitkHalfLifeConstants.h"
+#include <mitkHalfLifeConstants.h>
 
 const std::string mitk::HALFLIFECONSTANTS::NAME_18F = "18F";
 const std::string mitk::HALFLIFECONSTANTS::NAME_68Ga = "68Ga";

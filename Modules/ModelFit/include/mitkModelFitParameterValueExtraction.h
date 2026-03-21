@@ -15,10 +15,10 @@ found in the LICENSE file.
 
 #include <mitkPoint.h>
 
-#include "mitkModelFitInfo.h"
-#include "mitkModelTraitsInterface.h"
+#include <mitkModelFitInfo.h>
+#include <mitkModelTraitsInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 
 namespace mitk

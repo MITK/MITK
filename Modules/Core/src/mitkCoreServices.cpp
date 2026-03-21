@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCoreServices.h"
+#include <mitkCoreServices.h>
 
 #include <mitkIDataStorageService.h>
 #include <mitkIMimeTypeProvider.h>

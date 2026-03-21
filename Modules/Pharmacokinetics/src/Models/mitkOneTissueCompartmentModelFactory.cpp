@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkOneTissueCompartmentModelFactory.h"
+#include <mitkOneTissueCompartmentModelFactory.h>
 
 #include <mitkImageTimeSelector.h>
 #include <mitkImageCast.h>

@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <mitkImageAccessByItk.h>
 
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "mitkCalculateSegmentationVolume.h"
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <mitkCalculateSegmentationVolume.h>
 
 #include <limits>
 

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurface.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkSurface.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>

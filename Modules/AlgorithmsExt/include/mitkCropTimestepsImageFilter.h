@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCropTimestepsImageFilter_h
 #define mitkCropTimestepsImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 #include <mitkSubImageSelector.h>
 

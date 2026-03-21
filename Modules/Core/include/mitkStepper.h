@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkStepper_h
 #define mitkStepper_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 

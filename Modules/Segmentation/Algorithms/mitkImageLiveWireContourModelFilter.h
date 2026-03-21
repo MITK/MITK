@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkImageLiveWireContourModelFilter_h
 #define mitkImageLiveWireContourModelFilter_h
 
-#include "mitkCommon.h"
-#include "mitkContourModel.h"
-#include "mitkContourModelSource.h"
+#include <mitkCommon.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelSource.h>
 #include <MitkSegmentationExports.h>
 
 #include <mitkImage.h>

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 //Qmitk
-#include "QmitkRegistrationManipulationWidget.h"
+#include <QmitkRegistrationManipulationWidget.h>
 
 //MatchPoint
 #include <mapRegistrationManipulator.h>

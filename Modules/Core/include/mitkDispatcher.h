@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkDispatcher_h
 #define mitkDispatcher_h
 
-#include "itkLightObject.h"
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
-#include "mitkDataInteractor.h"
-#include "mitkDataNode.h"
-#include "usServiceTracker.h"
+#include <itkLightObject.h>
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
+#include <mitkDataInteractor.h>
+#include <mitkDataNode.h>
+#include <usServiceTracker.h>
 #include <MitkCoreExports.h>
 #include <list>
 #include <mitkWeakPointer.h>

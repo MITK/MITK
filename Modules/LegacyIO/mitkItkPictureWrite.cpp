@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <MitkLegacyIOExports.h>
 
-#include "mitkItkPictureWrite.h"
+#include <mitkItkPictureWrite.h>
 #include <mitkInstantiateAccessFunctions.h>
 
 #include <itkImageSeriesWriter.h>

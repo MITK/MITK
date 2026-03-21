@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLocaleSwitch.h"
+#include <mitkLocaleSwitch.h>
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 #include <clocale>
 #include <string>

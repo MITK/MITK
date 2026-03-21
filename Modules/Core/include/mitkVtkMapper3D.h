@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkMapper3D_h
 #define mitkVtkMapper3D_h
 
-#include "mitkVtkMapper.h"
+#include <mitkVtkMapper.h>
 
 namespace mitk
 {

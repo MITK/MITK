@@ -27,13 +27,13 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 
 //MITK
-#include "mitkRegVisHelper.h"
-#include "mitkRegVisPropertyTags.h"
-#include "mitkRegVisDirectionProperty.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkRegVisHelper.h>
+#include <mitkRegVisPropertyTags.h>
+#include <mitkRegVisDirectionProperty.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 //MAP
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
 namespace mitk
 {

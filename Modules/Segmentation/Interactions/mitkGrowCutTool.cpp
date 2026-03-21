@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGrowCutTool.h"
-#include "mitkToolManager.h"
-#include "mitkImageCast.h"
-#include "mitkTool.h"
+#include <mitkGrowCutTool.h>
+#include <mitkToolManager.h>
+#include <mitkImageCast.h>
+#include <mitkTool.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
-#include "mitkGrowCutSegmentationFilter.h"
+#include <mitkGrowCutSegmentationFilter.h>
 
 // us
 #include <usGetModuleContext.h>

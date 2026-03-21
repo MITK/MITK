@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <mitkSVModelFitCostFunction.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

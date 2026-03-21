@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef MITKDICOMSERIESREADER_TPP_
 #define MITKDICOMSERIESREADER_TPP_
 
-#include <legacy/mitkDicomSeriesReader.h>
+#include "legacy/mitkDicomSeriesReader.h"
 
 #include <itkImageSeriesReader.h>
 #include <mitkProperties.h>

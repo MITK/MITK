@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkVtkVolumeTimeSeriesReader.h"
-#include "mitkSurface.h"
-#include "mitkVtkSurfaceReader.h"
-#include "vtkPolyData.h"
+#include <mitkSurface.h>
+#include <mitkVtkSurfaceReader.h>
+#include <vtkPolyData.h>
 
 void mitk::VtkVolumeTimeSeriesReader::GenerateData()
 {

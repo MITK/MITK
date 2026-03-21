@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkIOUtil.h"
+#include <QmitkIOUtil.h>
 
-#include "mitkCoreServices.h"
-#include "mitkCustomMimeType.h"
-#include "mitkFileReaderRegistry.h"
-#include "mitkFileWriterRegistry.h"
-#include "mitkIMimeTypeProvider.h"
-#include "mitkMimeType.h"
+#include <mitkCoreServices.h>
+#include <mitkCustomMimeType.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkFileWriterRegistry.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkMimeType.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
-#include "QmitkFileReaderOptionsDialog.h"
-#include "QmitkFileWriterOptionsDialog.h"
+#include <QmitkFileReaderOptionsDialog.h>
+#include <QmitkFileWriterOptionsDialog.h>
 
 // QT
 #include <QDebug>

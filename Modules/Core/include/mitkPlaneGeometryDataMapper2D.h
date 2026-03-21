@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlaneGeometryDataMapper2D_h
 #define mitkPlaneGeometryDataMapper2D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
 #include <MitkCoreExports.h>
 #include <vtkSmartPointer.h>
 

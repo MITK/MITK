@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkContourModelToSurfaceFilter_h
 #define mitkContourModelToSurfaceFilter_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkContourModelExports.h>
 
-#include "mitkContourModel.h"
-#include "mitkContourModelSource.h"
+#include <mitkContourModel.h>
+#include <mitkContourModelSource.h>
 
 #include <mitkSurfaceSource.h>
 

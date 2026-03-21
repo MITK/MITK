@@ -21,10 +21,10 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-#include "QmitkInitialValuesManagerWidget.h"
-#include "QmitkInitialValuesModel.h"
-#include "QmitkInitialValuesTypeDelegate.h"
-#include "QmitkInitialValuesDelegate.h"
+#include <QmitkInitialValuesManagerWidget.h>
+#include <QmitkInitialValuesModel.h>
+#include <QmitkInitialValuesTypeDelegate.h>
+#include <QmitkInitialValuesDelegate.h>
 
 #include <ui_QmitkInitialValuesManagerWidget.h>
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMFileReaderSelector_h
 #define mitkDICOMFileReaderSelector_h
 
-#include "mitkDICOMFileReader.h"
+#include <mitkDICOMFileReader.h>
 
 #include <usModuleResource.h>
 

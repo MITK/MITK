@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsCalculationRunnable.h"
+#include <QmitkImageStatisticsCalculationRunnable.h>
 
-#include "mitkImageStatisticsCalculator.h"
+#include <mitkImageStatisticsCalculator.h>
 #include <mitkPlanarFigure.h>
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <mitkImageMaskGenerator.h>
 #include <mitkMultiLabelMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
-#include "mitkImageStatisticsContainerManager.h"
-#include "mitkProperties.h"
+#include <mitkStatisticsToImageRelationRule.h>
+#include <mitkStatisticsToMaskRelationRule.h>
+#include <mitkImageStatisticsContainerManager.h>
+#include <mitkProperties.h>
 
 QmitkImageStatisticsCalculationRunnable::QmitkImageStatisticsCalculationRunnable()
   : QmitkDataGenerationJobBase()

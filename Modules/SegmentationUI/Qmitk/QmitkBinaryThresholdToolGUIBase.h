@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkBinaryThresholdToolGUIBase_h
 #define QmitkBinaryThresholdToolGUIBase_h
 
-#include "QmitkSegWithPreviewToolGUIBase.h"
-#include "ctkRangeWidget.h"
-#include "ctkSliderWidget.h"
+#include <QmitkSegWithPreviewToolGUIBase.h>
+#include <ctkRangeWidget.h>
+#include <ctkSliderWidget.h>
 
 #include <MitkSegmentationUIExports.h>
 

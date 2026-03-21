@@ -17,16 +17,16 @@ found in the LICENSE file.
 #include <mitkModelFitProviderBase.h>
 
 //MR perfusion models
-#include "mitkDescriptivePharmacokineticBrixModelFactory.h"
-#include "mitkExtendedToftsModelFactory.h"
-#include "mitkStandardToftsModelFactory.h"
-#include "mitkTwoCompartmentExchangeModelFactory.h"
+#include <mitkDescriptivePharmacokineticBrixModelFactory.h>
+#include <mitkExtendedToftsModelFactory.h>
+#include <mitkStandardToftsModelFactory.h>
+#include <mitkTwoCompartmentExchangeModelFactory.h>
 
 //PET perfusion models
-#include "mitkOneTissueCompartmentModelFactory.h"
-#include "mitkExtendedOneTissueCompartmentModelFactory.h"
-#include "mitkTwoTissueCompartmentModelFactory.h"
-#include "mitkTwoTissueCompartmentFDGModelFactory.h"
+#include <mitkOneTissueCompartmentModelFactory.h>
+#include <mitkExtendedOneTissueCompartmentModelFactory.h>
+#include <mitkTwoTissueCompartmentModelFactory.h>
+#include <mitkTwoTissueCompartmentFDGModelFactory.h>
 
 
 namespace mitk

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDescriptionParameterBackgroundJob.h"
-#include "mitkModelFitInfo.h"
+#include <QmitkDescriptionParameterBackgroundJob.h>
+#include <mitkModelFitInfo.h>
 
 void DescriptionParameterBackgroundJob::OnComputeEvent(::itk::Object* caller,
     const itk::EventObject& event)

@@ -13,17 +13,17 @@ found in the LICENSE file.
 #ifndef mitkTool_h
 #define mitkTool_h
 
-#include "itkObjectFactoryBase.h"
-#include "itkVersion.h"
-#include "mitkCommon.h"
-#include "mitkDataNode.h"
-#include "mitkEventStateMachine.h"
-#include "mitkInteractionEventObserver.h"
-#include "mitkLabelSetImage.h"
-#include "mitkMessage.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkToolEvents.h"
-#include "mitkToolFactoryMacro.h"
+#include <itkObjectFactoryBase.h>
+#include <itkVersion.h>
+#include <mitkCommon.h>
+#include <mitkDataNode.h>
+#include <mitkEventStateMachine.h>
+#include <mitkInteractionEventObserver.h>
+#include <mitkLabelSetImage.h>
+#include <mitkMessage.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkToolEvents.h>
+#include <mitkToolFactoryMacro.h>
 #include <MitkSegmentationExports.h>
 #include <mitkLabel.h>
 
@@ -33,7 +33,7 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 
-#include "usServiceRegistration.h"
+#include <usServiceRegistration.h>
 
 namespace us
 {

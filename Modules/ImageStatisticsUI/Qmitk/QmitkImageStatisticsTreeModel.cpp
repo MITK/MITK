@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsTreeModel.h"
+#include <QmitkImageStatisticsTreeModel.h>
 
-#include "QmitkImageStatisticsTreeItem.h"
-#include "mitkImageStatisticsContainerManager.h"
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
+#include <QmitkImageStatisticsTreeItem.h>
+#include <mitkImageStatisticsContainerManager.h>
+#include <mitkProportionalTimeGeometry.h>
+#include <mitkStatisticsToImageRelationRule.h>
+#include <mitkStatisticsToMaskRelationRule.h>
 #include <mitkLabelSetImageHelper.h>
 
-#include "QmitkStyleManager.h"
+#include <QmitkStyleManager.h>
 
 QmitkImageStatisticsTreeModel::QmitkImageStatisticsTreeModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {

@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include "berryIMemento.h"
 #include "berryIPersistableElement.h"
 
-#include "berryStatus.h"
+#include <berryStatus.h>
 #include "berryWorkbenchConstants.h"
 #include "berryWorkbenchPlugin.h"
 

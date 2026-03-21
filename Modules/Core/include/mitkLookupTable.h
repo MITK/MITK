@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkLookupTable_h
 #define mitkLookupTable_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkCoreExports.h>
 
 #include <itkDataObject.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageMaskingWidget.h"
+#include <QmitkImageMaskingWidget.h>
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
 #include <mitkException.h>

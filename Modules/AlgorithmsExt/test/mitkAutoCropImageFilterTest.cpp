@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAutoCropImageFilter.h"
+#include <mitkAutoCropImageFilter.h>
 
 int mitkAutoCropImageFilterTest(int /*argc*/, char * /*argv*/ [])
 {

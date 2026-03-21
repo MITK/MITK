@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 // This file is based on ITK's itkMaskImageFilter.h
 
-#include "itkBinaryFunctorImageFilter.h"
-#include "itkNumericTraits.h"
-#include "itkVariableLengthVector.h"
+#include <itkBinaryFunctorImageFilter.h>
+#include <itkNumericTraits.h>
+#include <itkVariableLengthVector.h>
 #include <MitkImageStatisticsExports.h>
 
 namespace itk

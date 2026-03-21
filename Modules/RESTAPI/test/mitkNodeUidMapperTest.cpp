@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
-#include "mitkNodeUidMapper.h"
+#include <mitkNodeUidMapper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 

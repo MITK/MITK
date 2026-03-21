@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include "mitkToolManagerProvider.h"
+#include <mitkToolManagerProvider.h>
 
 namespace mitk
 {

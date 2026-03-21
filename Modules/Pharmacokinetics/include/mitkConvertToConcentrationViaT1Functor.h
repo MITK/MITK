@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkConvertToConcentrationViaT1Functor_h
 #define mitkConvertToConcentrationViaT1Functor_h
 
-#include "itkMath.h"
+#include <itkMath.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk {
 

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define NOMINMAX
 #endif
 
-#include "QmitkMapPropertyDelegate.h"
+#include <QmitkMapPropertyDelegate.h>
 
 #include <QmitkCustomVariants.h>
 

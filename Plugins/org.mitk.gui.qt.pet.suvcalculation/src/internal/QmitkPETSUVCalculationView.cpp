@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPETSUVCalculationView.h"
 #include <ui_QmitkPETSUVCalculationViewControls.h>
 
-#include "itkIndexedUnaryFunctorImageFilter.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageCast.h"
-#include "mitkSUVCalculation.h"
-#include "mitkSUVFunctorPolicy.h"
-#include "mitkWorkbenchUtil.h"
+#include <itkIndexedUnaryFunctorImageFilter.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
+#include <mitkSUVCalculation.h>
+#include <mitkSUVFunctorPolicy.h>
+#include <mitkWorkbenchUtil.h>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <iostream>

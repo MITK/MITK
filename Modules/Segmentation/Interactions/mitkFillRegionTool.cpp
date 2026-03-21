@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFillRegionTool.h"
+#include <mitkFillRegionTool.h>
 
 // us
 #include <usGetModuleContext.h>

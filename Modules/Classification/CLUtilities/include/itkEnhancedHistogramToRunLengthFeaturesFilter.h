@@ -30,10 +30,10 @@ found in the LICENSE file.
 #ifndef __itkEnhancedHistogramToRunLengthFeaturesFilter_h
 #define __itkEnhancedHistogramToRunLengthFeaturesFilter_h
 
-#include "itkHistogram.h"
-#include "itkMacro.h"
-#include "itkProcessObject.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkHistogram.h>
+#include <itkMacro.h>
+#include <itkProcessObject.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk {
   namespace Statistics {
@@ -231,7 +231,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedHistogramToRunLengthFeaturesFilter.hxx"
+#include <itkEnhancedHistogramToRunLengthFeaturesFilter.hxx>
 #endif
 
 #endif

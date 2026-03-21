@@ -24,20 +24,20 @@ found in the LICENSE file.
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "mitkVtkImageOverwrite.h"
+#include <mitkVtkImageOverwrite.h>
 
-#include "vtkDataSetAttributes.h"
-#include "vtkGarbageCollector.h"
-#include "vtkImageData.h"
-#include "vtkImageStencilData.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkMath.h"
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkTransform.h"
+#include <vtkDataSetAttributes.h>
+#include <vtkGarbageCollector.h>
+#include <vtkImageData.h>
+#include <vtkImageStencilData.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkMath.h>
+#include <vtkObjectFactory.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkTransform.h>
 
-#include "vtkTemplateAliasMacro.h"
+#include <vtkTemplateAliasMacro.h>
 // turn off 64-bit ints when templating over all types
 #undef VTK_USE_INT64
 #define VTK_USE_INT64 0

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMedSAMToolGUI.h"
+#include <QmitkMedSAMToolGUI.h>
 
 #include <QApplication>
 #include <QmitkStyleManager.h>

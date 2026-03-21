@@ -14,8 +14,8 @@ found in the LICENSE file.
 #ifndef BERRYQTSTYLEPREFERENCEPAGE_H_
 #define BERRYQTSTYLEPREFERENCEPAGE_H_
 
-#include <berryIQtPreferencePage.h>
-#include <berryIQtStyleManager.h>
+#include "berryIQtPreferencePage.h"
+#include "berryIQtStyleManager.h"
 
 #include <QStringList>
 #include <memory>

@@ -15,10 +15,10 @@ found in the LICENSE file.
 
 #include <QAbstractTableModel>
 
-#include "mitkModelFitInfo.h"
-#include "mitkPointSet.h"
+#include <mitkModelFitInfo.h>
+#include <mitkPointSet.h>
 
-#include "MitkModelFitUIExports.h"
+#include <MitkModelFitUIExports.h>
 
 
 /*!

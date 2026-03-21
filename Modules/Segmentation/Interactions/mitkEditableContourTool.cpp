@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEditableContourTool.h"
+#include <mitkEditableContourTool.h>
 #include <mitkToolManager.h>
 
 

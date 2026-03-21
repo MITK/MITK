@@ -12,14 +12,14 @@ found in the LICENSE file.
 
 #include "berryChangeToPerspectiveMenu.h"
 
-#include <berryMenuManager.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
-#include <berryCommandContributionItem.h>
-#include <berrySeparator.h>
-#include <berryIPluginContribution.h>
-#include <berryIPerspectiveRegistry.h>
-#include <berryIWorkbenchCommandConstants.h>
+#include "berryMenuManager.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPage.h"
+#include "berryCommandContributionItem.h"
+#include "berrySeparator.h"
+#include "berryIPluginContribution.h"
+#include "berryIPerspectiveRegistry.h"
+#include "berryIWorkbenchCommandConstants.h"
 #include <berryObjectString.h>
 #include <berryObjects.h>
 

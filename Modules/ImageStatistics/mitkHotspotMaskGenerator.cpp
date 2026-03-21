@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkImageCast.h>
 #include <mitkPoint.h>
 #include <itkImageRegionIterator.h>
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 #include <itkImageDuplicator.h>
 #include <itkFFTConvolutionImageFilter.h>
 #include <itkVnlFFTImageFilterInitFactory.h>

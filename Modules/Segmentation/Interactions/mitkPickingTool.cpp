@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPickingTool.h"
+#include <mitkPickingTool.h>
 
-#include "mitkProperties.h"
-#include "mitkToolManager.h"
+#include <mitkProperties.h>
+#include <mitkToolManager.h>
 
-#include "mitkInteractionPositionEvent.h"
+#include <mitkInteractionPositionEvent.h>
 // us
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
 
 #include <itkImage.h>
 #include <itkConnectedThresholdImageFilter.h>

@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationInterpolationController.h"
+#include <mitkSegmentationInterpolationController.h>
 
-#include "mitkImageCast.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageAccessByItk.h>
 //#include <mitkPlaneGeometry.h>

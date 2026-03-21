@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBinaryThresholdULTool.h"
+#include <mitkBinaryThresholdULTool.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
 
 namespace mitk
 {

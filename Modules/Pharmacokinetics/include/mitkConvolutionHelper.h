@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef mitkConvolutionHelper_h
 #define mitkConvolutionHelper_h
 
-#include "itkArray.h"
-#include "mitkAIFBasedModelBase.h"
+#include <itkArray.h>
+#include <mitkAIFBasedModelBase.h>
 #include <iostream>
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace  mitk {
 /** @namespace convolution

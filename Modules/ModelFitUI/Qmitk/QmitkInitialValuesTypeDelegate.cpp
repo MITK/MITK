@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkInitialValuesTypeDelegate.h"
+#include <QmitkInitialValuesTypeDelegate.h>
 
 #include <QPainter>
 #include <QApplication>

@@ -18,8 +18,8 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkImageToPathFilter_h
 #define __itkImageToPathFilter_h
 
-#include "itkImage.h"
-#include "itkPathSource.h"
+#include <itkImage.h>
+#include <itkPathSource.h>
 
 namespace itk
 {
@@ -76,7 +76,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkImageToPathFilter.tpp"
+#include <itkImageToPathFilter.tpp>
 #endif
 
 #endif

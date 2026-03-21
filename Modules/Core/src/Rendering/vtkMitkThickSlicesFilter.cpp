@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkMitkThickSlicesFilter.h"
+#include <vtkMitkThickSlicesFilter.h>
 
-#include "vtkDataArray.h"
-#include "vtkImageData.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include <vtkDataArray.h>
+#include <vtkImageData.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkObjectFactory.h>
+#include <vtkPointData.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 #include <cmath>
 #include <sstream>

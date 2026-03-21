@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertyItem.h"
+#include <QmitkPropertyItem.h>
 #include <QStringList>
 
 QmitkPropertyItem::QmitkPropertyItem(const QList<QVariant> &data) : m_Data(data), m_Parent(nullptr)

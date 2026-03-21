@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QStringList>
 
 // MITK
-#include "MitkMatchPointRegistrationUIExports.h"
+#include <MitkMatchPointRegistrationUIExports.h>
 
 // MatchPoint
 #include <mapMetaPropertyAlgorithmInterface.h>

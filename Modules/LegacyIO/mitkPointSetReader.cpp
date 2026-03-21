@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetReader.h"
+#include <mitkPointSetReader.h>
 #include <fstream>
 #include <iostream>
 #include <mitkLocaleSwitch.h>

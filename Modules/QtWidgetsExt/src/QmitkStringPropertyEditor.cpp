@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "QmitkStringPropertyEditor.h"
+#include <QmitkStringPropertyEditor.h>
 
 QmitkStringPropertyEditor::QmitkStringPropertyEditor(mitk::StringProperty *property, QWidget *parent)
   : QLineEdit(parent), PropertyEditor(property), m_StringProperty(property)

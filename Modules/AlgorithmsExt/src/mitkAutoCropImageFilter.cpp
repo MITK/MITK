@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAutoCropImageFilter.h"
+#include <mitkAutoCropImageFilter.h>
 
-#include "mitkGeometry3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkStatusBar.h"
+#include <mitkGeometry3D.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkStatusBar.h>
 
 #include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>

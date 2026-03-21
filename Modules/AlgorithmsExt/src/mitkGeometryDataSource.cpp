@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometryDataSource.h"
-#include "mitkGeometryData.h"
+#include <mitkGeometryDataSource.h>
+#include <mitkGeometryData.h>
 
 mitk::GeometryDataSource::GeometryDataSource()
 {

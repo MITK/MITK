@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageWriteAccessor.h"
-#include "mitkLevelWindow.h"
+#include <mitkImageWriteAccessor.h>
+#include <mitkLevelWindow.h>
 #include <mitkImage.h>
 
 /*

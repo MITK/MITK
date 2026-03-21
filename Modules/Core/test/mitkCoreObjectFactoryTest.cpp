@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCoreObjectFactory.h"
-#include "mitkTestingMacros.h"
+#include <mitkCoreObjectFactory.h>
+#include <mitkTestingMacros.h>
 
 int mitkCoreObjectFactoryTest(int /*argc*/, char * /*argv*/ [])
 {

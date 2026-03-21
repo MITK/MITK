@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "MinimalPerspective.h"
 
 // Berry
-#include "berryIViewLayout.h"
+#include <berryIViewLayout.h>
 
 MinimalPerspective::MinimalPerspective()
 {

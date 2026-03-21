@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkSurfaceStampWidget_h
 #define QmitkSurfaceStampWidget_h
 
-#include "MitkSegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
 #include <QWidget>
 

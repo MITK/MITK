@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStandardToftsModelFactory.h"
+#include <mitkStandardToftsModelFactory.h>
 
 #include <mitkImageTimeSelector.h>
 #include <mitkImageCast.h>

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPage.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryPartPane.h"
-#include "berryIContributor.h"
+#include <berryIContributor.h>
 #include "berryIServiceScopes.h"
 
 #include "services/berryIServiceFactory.h"

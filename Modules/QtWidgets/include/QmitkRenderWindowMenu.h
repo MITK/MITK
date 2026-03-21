@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define QmitkRenderWindowMenu_h
 
 // mitk qtwidgets module
-#include "MitkQtWidgetsExports.h"
-#include "QmitkMultiWidgetLayoutManager.h"
+#include <MitkQtWidgetsExports.h>
+#include <QmitkMultiWidgetLayoutManager.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

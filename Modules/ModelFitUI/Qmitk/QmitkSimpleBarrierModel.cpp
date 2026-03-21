@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QColor>
 #include <QSize>
 
-#include "QmitkSimpleBarrierModel.h"
+#include <QmitkSimpleBarrierModel.h>
 
 const int NUMBER_OF_CONSTRAINT_ASPECTS = 5;
 const int INDEX_CONSTRAINT_PARAMS = 0;

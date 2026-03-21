@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkStatisticsModelToStringConverter.h"
-#include "mitkExceptionMacro.h"
+#include <QmitkStatisticsModelToStringConverter.h>
+#include <mitkExceptionMacro.h>
 
 QmitkStatisticsModelToStringConverter::QmitkStatisticsModelToStringConverter() {}
 

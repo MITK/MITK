@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkGeometry3D.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 class mitkGeometry3DEqualTestSuite : public mitk::TestFixture
 {

@@ -137,7 +137,7 @@ namespace mitk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <mitkStatisticsImageFilter.txx>
+#include <mitkStatisticsImageFilter.tpp>
 #endif
 
 #endif

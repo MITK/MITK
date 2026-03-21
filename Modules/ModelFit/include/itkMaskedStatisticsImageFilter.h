@@ -189,7 +189,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkMaskedStatisticsImageFilter.txx>
+#include <itkMaskedStatisticsImageFilter.tpp>
 #endif
 
 #endif

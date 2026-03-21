@@ -178,7 +178,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.txx>
+#include <itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.tpp>
 #endif
 
 #endif

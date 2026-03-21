@@ -163,7 +163,7 @@ namespace mitk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <mitkLabelStatisticsImageFilter.txx>
+#include <mitkLabelStatisticsImageFilter.tpp>
 #endif
 
 #endif

@@ -104,7 +104,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkMaskedNaryStatisticsImageFilter.txx>
+#include <itkMaskedNaryStatisticsImageFilter.tpp>
 #endif
 
 #endif

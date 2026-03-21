@@ -239,7 +239,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedScalarImageToTextureFeaturesFilter.txx>
+#include <itkEnhancedScalarImageToTextureFeaturesFilter.tpp>
 #endif
 
 #endif

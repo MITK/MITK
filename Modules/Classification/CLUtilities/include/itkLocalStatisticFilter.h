@@ -57,7 +57,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkLocalStatisticFilter.txx>
+#include <itkLocalStatisticFilter.tpp>
 #endif
 
 #endif // itkLocalStatisticFilter_h

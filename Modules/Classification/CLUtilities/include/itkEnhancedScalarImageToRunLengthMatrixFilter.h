@@ -282,7 +282,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedScalarImageToRunLengthMatrixFilter.txx>
+#include <itkEnhancedScalarImageToRunLengthMatrixFilter.tpp>
 #endif
 
 #endif

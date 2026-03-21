@@ -231,7 +231,7 @@ namespace itk {
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <itkEnhancedHistogramToRunLengthFeaturesFilter.txx>
+#include <itkEnhancedHistogramToRunLengthFeaturesFilter.tpp>
 #endif
 
 #endif

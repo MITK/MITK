@@ -188,7 +188,7 @@ private:
 };
 }
 
-#include <mitkMinMaxLabelmageFilterWithIndex.txx>
+#include <mitkMinMaxLabelmageFilterWithIndex.tpp>
 
 
 #endif

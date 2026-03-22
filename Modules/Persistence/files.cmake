@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkIPersistable.h
+  mitkIPersistable.h
 )
 
 set(CPP_FILES

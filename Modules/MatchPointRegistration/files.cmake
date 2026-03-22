@@ -1,6 +1,6 @@
 set(H_FILES
-  include/itkStitchImageFilter.h
-  include/mitkMatchPointPropertyTags.h
+  itkStitchImageFilter.h
+  mitkMatchPointPropertyTags.h
 )
 
 set(CPP_FILES
@@ -30,4 +30,3 @@ set(CPP_FILES
   Rendering/mitkRegEvalStyleProperty.cpp
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
-

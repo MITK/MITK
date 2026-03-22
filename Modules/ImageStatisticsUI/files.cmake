@@ -13,7 +13,7 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkHistogramVisualizationWidget.ui
-  src/QmitkIntensityProfileVisualizationWidget.ui
-  src/QmitkImageStatisticsWidget.ui
+  QmitkHistogramVisualizationWidget.ui
+  QmitkIntensityProfileVisualizationWidget.ui
+  QmitkImageStatisticsWidget.ui
 )

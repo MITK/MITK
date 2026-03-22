@@ -1,8 +1,8 @@
 set(H_FILES
-  include/itkIntelligentBinaryClosingFilter.h
-  include/mitkBoundingObjectCutAndCast.h
-  include/mitkMovieGeneratorWin32.h
-  include/mitkNonBlockingAlgorithmEvents.h
+  itkIntelligentBinaryClosingFilter.h
+  mitkBoundingObjectCutAndCast.h
+  mitkMovieGeneratorWin32.h
+  mitkNonBlockingAlgorithmEvents.h
 )
 
 set(CPP_FILES

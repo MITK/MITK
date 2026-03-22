@@ -1,12 +1,12 @@
 set(H_FILES
-  include/itkAdaptiveThresholdIterator.h
-  include/itkConnectedAdaptiveThresholdImageFilter.h
-  include/itkContourExtractor2DImageFilter.h
-  include/itkImageToPathFilter.h
-  include/mitkSegmentationInterpolationAlgorithm.h
-  include/mitkSegmentationTaskListMacros.h
-  include/mitkToolEvents.h
-  include/mitkToolFactoryMacro.h
+  itkAdaptiveThresholdIterator.h
+  itkConnectedAdaptiveThresholdImageFilter.h
+  itkContourExtractor2DImageFilter.h
+  itkImageToPathFilter.h
+  mitkSegmentationInterpolationAlgorithm.h
+  mitkSegmentationTaskListMacros.h
+  mitkToolEvents.h
+  mitkToolFactoryMacro.h
 )
 
 set(CPP_FILES

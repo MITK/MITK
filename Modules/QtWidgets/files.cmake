@@ -1,7 +1,7 @@
 set(H_FILES
-  include/QmitkCustomVariants.h
-  include/QmitkDataStorageInspectorProviderBase.h
-  include/QmitkEnums.h
+  QmitkCustomVariants.h
+  QmitkDataStorageInspectorProviderBase.h
+  QmitkEnums.h
 )
 
 set(CPP_FILES
@@ -94,26 +94,26 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkAutomatedLayoutWidget.ui
-  src/QmitkFileReaderOptionsDialog.ui
-  src/QmitkFileWriterOptionsDialog.ui
-  src/QmitkLevelWindowPresetDefinition.ui
-  src/QmitkLevelWindowWidget.ui
-  src/QmitkLevelWindowRangeChange.ui
-  src/QmitkMemoryUsageIndicator.ui
-  src/QmitkMultiNodeSelectionWidget.ui
-  src/QmitkMultiWidgetLayoutSelectionWidget.ui
-  src/QmitkNodeSelectionDialog.ui
-  src/QmitkNodeSelectionListItemWidget.ui
-  src/QmitkRenderWindowContextDataStorageInspector.ui
-  src/QmitkServiceListWidgetControls.ui
-  src/QmitkSingleNodeSelectionWidget.ui
-  src/QmitkSliceNavigationWidget.ui
-  src/QmitkDataStorageListInspector.ui
-  src/QmitkDataStorageTreeInspector.ui
-  src/QmitkDataStorageSelectionHistoryInspector.ui
-  src/QmitkSynchronizedNodeSelectionWidget.ui
-  src/QmitkNodeDetailsDialog.ui
+  QmitkAutomatedLayoutWidget.ui
+  QmitkFileReaderOptionsDialog.ui
+  QmitkFileWriterOptionsDialog.ui
+  QmitkLevelWindowPresetDefinition.ui
+  QmitkLevelWindowWidget.ui
+  QmitkLevelWindowRangeChange.ui
+  QmitkMemoryUsageIndicator.ui
+  QmitkMultiNodeSelectionWidget.ui
+  QmitkMultiWidgetLayoutSelectionWidget.ui
+  QmitkNodeSelectionDialog.ui
+  QmitkNodeSelectionListItemWidget.ui
+  QmitkRenderWindowContextDataStorageInspector.ui
+  QmitkServiceListWidgetControls.ui
+  QmitkSingleNodeSelectionWidget.ui
+  QmitkSliceNavigationWidget.ui
+  QmitkDataStorageListInspector.ui
+  QmitkDataStorageTreeInspector.ui
+  QmitkDataStorageSelectionHistoryInspector.ui
+  QmitkSynchronizedNodeSelectionWidget.ui
+  QmitkNodeDetailsDialog.ui
 )
 
 set(RESOURCE_FILES
@@ -121,5 +121,5 @@ set(RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resource/Qmitk.qrc
+  Qmitk.qrc
 )

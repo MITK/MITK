@@ -1,8 +1,8 @@
 set(H_FILES
-  include/mitkTestCaller.h
-  include/mitkTestFixture.h
-  include/mitkTestNotRunException.h
-  include/mitkTestingMacros.h
+  mitkTestCaller.h
+  mitkTestFixture.h
+  mitkTestNotRunException.h
+  mitkTestingMacros.h
 )
 
 set(CPP_FILES
@@ -10,4 +10,3 @@ set(CPP_FILES
   mitkInteractionTestHelper.cpp
   mitkTestDynamicImageGenerator.cpp
 )
-

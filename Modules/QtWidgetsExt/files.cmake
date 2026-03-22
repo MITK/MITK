@@ -41,13 +41,13 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkAboutDialogGUI.ui
-  src/QmitkPrimitiveMovieNavigatorWidget.ui
-  src/QmitkSliceWidget.ui
-  src/QmitkTransferFunctionGeneratorWidget.ui
-  src/QmitkTransferFunctionWidget.ui
+  QmitkAboutDialogGUI.ui
+  QmitkPrimitiveMovieNavigatorWidget.ui
+  QmitkSliceWidget.ui
+  QmitkTransferFunctionGeneratorWidget.ui
+  QmitkTransferFunctionWidget.ui
 )
 
 set(QRC_FILES
-  resource/QtWidgetsExt.qrc
+  QtWidgetsExt.qrc
 )

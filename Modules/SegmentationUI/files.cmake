@@ -1,5 +1,5 @@
 set(H_FILES
-  include/QmitknnUNetEnsembleLayout.h
+  QmitknnUNetEnsembleLayout.h
 )
 
 set(CPP_FILES
@@ -60,31 +60,31 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkConfirmSegmentationDialog.ui
-  src/QmitkCopyLabelToGroupDialog.ui
-  src/QmitkGrowCutToolWidgetControls.ui
-  src/QmitkOtsuToolWidgetControls.ui
-  src/QmitkSurfaceStampWidgetGUIControls.ui
-  src/QmitknnUNetToolGUIControls.ui
-  src/QmitkEditableContourToolGUIControls.ui
-  src/QmitkSegmentationTaskListWidget.ui
-  src/QmitkTotalSegmentatorGUIControls.ui
-  src/QmitkMultiLabelInspectorControls.ui
-  src/QmitkMultiLabelManagerControls.ui
-  src/QmitkMultiLabelSelectionLabel.ui
-  src/QmitkMultiLabelSelectionWidget.ui
-  src/QmitkFindSegmentationTaskDialog.ui
-  src/QmitkSegmentAnythingGUIControls.ui
-  src/QmitkMedSAMGUIControls.ui
-  src/QmitkMonaiLabelToolGUIControls.ui
-  src/QmitkLabelSelectionToolGUIControls.ui
-  src/SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
-  src/SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
-  src/SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
-  src/SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
-  src/SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
+  QmitkConfirmSegmentationDialog.ui
+  QmitkCopyLabelToGroupDialog.ui
+  QmitkGrowCutToolWidgetControls.ui
+  QmitkOtsuToolWidgetControls.ui
+  QmitkSurfaceStampWidgetGUIControls.ui
+  QmitknnUNetToolGUIControls.ui
+  QmitkEditableContourToolGUIControls.ui
+  QmitkSegmentationTaskListWidget.ui
+  QmitkTotalSegmentatorGUIControls.ui
+  QmitkMultiLabelInspectorControls.ui
+  QmitkMultiLabelManagerControls.ui
+  QmitkMultiLabelSelectionLabel.ui
+  QmitkMultiLabelSelectionWidget.ui
+  QmitkFindSegmentationTaskDialog.ui
+  QmitkSegmentAnythingGUIControls.ui
+  QmitkMedSAMGUIControls.ui
+  QmitkMonaiLabelToolGUIControls.ui
+  QmitkLabelSelectionToolGUIControls.ui
+  SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
+  SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
+  SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
+  SegmentationUtilities/QmitkConvertToMultiLabelSegmentationWidgetControls.ui
+  SegmentationUtilities/QmitkExtractFromMultiLabelSegmentationWidgetControls.ui
 )
 
 set(QRC_FILES
-  resources/SegmentationUI.qrc
+  SegmentationUI.qrc
 )

@@ -1,7 +1,7 @@
 set(H_FILES
-  include/itkLocalVariationImageFilter.h
-  include/itkTotalVariationDenoisingImageFilter.h
-  include/itkTotalVariationSingleIterationImageFilter.h
+  itkLocalVariationImageFilter.h
+  itkTotalVariationDenoisingImageFilter.h
+  itkTotalVariationSingleIterationImageFilter.h
 )
 
 set(CPP_FILES

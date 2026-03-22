@@ -1,8 +1,8 @@
 set(H_FILES
-  include/itkShortestPathCostFunction.h
-  include/itkShortestPathCostFunctionLiveWire.h
-  include/itkShortestPathCostFunctionTbss.h
-  include/itkShortestPathImageFilter.h
+  itkShortestPathCostFunction.h
+  itkShortestPathCostFunctionLiveWire.h
+  itkShortestPathCostFunctionTbss.h
+  itkShortestPathImageFilter.h
 )
 
 set(CPP_FILES

@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkDoseValueType.h
+  mitkDoseValueType.h
 )
 
 SET(CPP_FILES
@@ -13,4 +13,3 @@ SET(CPP_FILES
   mitkDoseNodeHelper.cpp
   mitkDICOMRTMimeTypes.cpp
 )
-

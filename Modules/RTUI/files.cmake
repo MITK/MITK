@@ -8,9 +8,9 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkFreeIsoDoseLevelWidget.ui
+  QmitkFreeIsoDoseLevelWidget.ui
 )
 
 set(QRC_FILES
-  resources/RTUI.qrc
+  RTUI.qrc
 )

@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkDICOMDatasetAccess.h
+  mitkDICOMDatasetAccess.h
 )
 
 set(CPP_FILES

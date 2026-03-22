@@ -1,12 +1,12 @@
 set(H_FILES
-  include/itkMultiGaussianImageSource.h
-  include/mitkHotspotMaskGenerator.h
-  include/mitkLabelStatisticsImageFilter.h
-  include/mitkMaskUtilities.h
-  include/mitkMinMaxImageFilterWithIndex.h
-  include/mitkMinMaxLabelmageFilterWithIndex.h
-  include/mitkStatisticsImageFilter.h
-  include/mitkitkMaskImageFilter.h
+  itkMultiGaussianImageSource.h
+  mitkHotspotMaskGenerator.h
+  mitkLabelStatisticsImageFilter.h
+  mitkMaskUtilities.h
+  mitkMinMaxImageFilterWithIndex.h
+  mitkMinMaxLabelmageFilterWithIndex.h
+  mitkStatisticsImageFilter.h
+  mitkitkMaskImageFilter.h
 )
 
 set(CPP_FILES

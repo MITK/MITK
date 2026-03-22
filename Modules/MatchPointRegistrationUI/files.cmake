@@ -13,9 +13,9 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkAlgorithmProfileViewer.ui
-  src/QmitkAlgorithmSettingsConfig.ui
-  src/QmitkMapperSettingsWidget.ui
-  src/QmitkRegEvalSettingsWidget.ui
-  src/QmitkRegistrationManipulationWidget.ui
+  QmitkAlgorithmProfileViewer.ui
+  QmitkAlgorithmSettingsConfig.ui
+  QmitkMapperSettingsWidget.ui
+  QmitkRegEvalSettingsWidget.ui
+  QmitkRegistrationManipulationWidget.ui
 )

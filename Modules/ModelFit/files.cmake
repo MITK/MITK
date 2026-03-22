@@ -1,21 +1,21 @@
 set(H_FILES
-  include/itkMaskedNaryStatisticsImageFilter.h
-  include/itkMaskedStatisticsImageFilter.h
-  include/itkMultiOutputNaryFunctorImageFilter.h
-  include/mitkConcreteModelFactoryBase.h
-  include/mitkConcreteModelParameterizerBase.h
-  include/mitkConstraintCheckerInterface.h
-  include/mitkGaussianNoiseFunctor.h
-  include/mitkIModelProvider.h
-  include/mitkIndexedValueFunctorBase.h
-  include/mitkLinearModelParameterizer.h
-  include/mitkModelBasedValueFunctorBase.h
-  include/mitkModelFitCostFunctionInterface.h
-  include/mitkModelFitException.h
-  include/mitkModelFitFunctorPolicy.h
-  include/mitkModelFitProviderBase.h
-  include/mitkModelTestFixture.h
-  include/mitkModelTraitsInterface.h
+  itkMaskedNaryStatisticsImageFilter.h
+  itkMaskedStatisticsImageFilter.h
+  itkMultiOutputNaryFunctorImageFilter.h
+  mitkConcreteModelFactoryBase.h
+  mitkConcreteModelParameterizerBase.h
+  mitkConstraintCheckerInterface.h
+  mitkGaussianNoiseFunctor.h
+  mitkIModelProvider.h
+  mitkIndexedValueFunctorBase.h
+  mitkLinearModelParameterizer.h
+  mitkModelBasedValueFunctorBase.h
+  mitkModelFitCostFunctionInterface.h
+  mitkModelFitException.h
+  mitkModelFitFunctorPolicy.h
+  mitkModelFitProviderBase.h
+  mitkModelTestFixture.h
+  mitkModelTraitsInterface.h
 )
 
 set(CPP_FILES
@@ -90,4 +90,3 @@ set(CPP_FILES
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )
-

@@ -1,14 +1,14 @@
 set(H_FILES
-  include/mitkAIFBasedModelParameterizerBase.h
-  include/mitkConcreteAIFBasedModelFactory.h
-  include/mitkConvertT2ConcentrationFunctor.h
-  include/mitkConvertToConcentrationAbsoluteFunctor.h
-  include/mitkConvertToConcentrationRelativeFunctor.h
-  include/mitkConvertToConcentrationTurboFlashFunctor.h
-  include/mitkConvertToConcentrationViaT1Functor.h
-  include/mitkConvolutionHelper.h
-  include/mitkTwoCompartmentExchangeModelFactoryBase.h
-  include/mitkTwoTissueCompartmentModelFactoryBase.h
+  mitkAIFBasedModelParameterizerBase.h
+  mitkConcreteAIFBasedModelFactory.h
+  mitkConvertT2ConcentrationFunctor.h
+  mitkConvertToConcentrationAbsoluteFunctor.h
+  mitkConvertToConcentrationRelativeFunctor.h
+  mitkConvertToConcentrationTurboFlashFunctor.h
+  mitkConvertToConcentrationViaT1Functor.h
+  mitkConvolutionHelper.h
+  mitkTwoCompartmentExchangeModelFactoryBase.h
+  mitkTwoTissueCompartmentModelFactoryBase.h
 )
 
 set(CPP_FILES
@@ -52,9 +52,3 @@ set(CPP_FILES
   Models/mitkTwoTissueCompartmentFDGModelParameterizer.cpp
   SimulationFramework/mitkImageGenerationHelper.cpp
 )
-
-set(HXX_FILES
-mitkDICOMSegmentationConstants.h
-
-)
-

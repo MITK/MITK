@@ -1,76 +1,76 @@
 set(H_FILES
-  include/Colortables/HotIron.h
-  include/Colortables/Inferno.h
-  include/Colortables/Jet.h
-  include/Colortables/Magma.h
-  include/Colortables/Multilabel.h
-  include/Colortables/PET20.h
-  include/Colortables/PETColor.h
-  include/Colortables/Plasma.h
-  include/Colortables/Turbo.h
-  include/Colortables/Viridis.h
-  include/itkImportMitkImageContainer.h
-  include/itkMITKScalarImageToHistogramGenerator.h
-  include/itkVtkAbstractTransform.h
-  include/mitkAnatomicalPlanes.h
-  include/mitkAntiAliasing.h
-  include/mitkArray.h
-  include/mitkBaseDataTestImplementation.h
-  include/mitkBaseProcess.h
-  include/mitkCommon.h
-  include/mitkDisplayActionEvents.h
-  include/mitkEqual.h
-  include/mitkEventInformer.h
-  include/mitkExceptionMacro.h
-  include/mitkFileSystem.h
-  include/mitkFileWriterWithInformation.h
-  include/mitkGenericLookupTable.h
-  include/mitkGenericProperty.h
-  include/mitkGetClassHierarchy.h
-  include/mitkINodeSelectionListener.h
-  include/mitkIOAdapter.h
-  include/mitkITKImageImport.h
-  include/mitkImageAccessByItk.h
-  include/mitkImageCast.h
-  include/mitkImageGenerator.h
-  include/mitkImagePixelAccessor.h
-  include/mitkImagePixelReadAccessor.h
-  include/mitkImagePixelWriteAccessor.h
-  include/mitkImageToItk.h
-  include/mitkInstantiateAccessFunctions.h
-  include/mitkInteractionConst.h
-  include/mitkItkMatrixHack.h
-  include/mitkLexicalCast.h
-  include/mitkLine.h
-  include/mitkLocalStorageHandler.h
-  include/mitkLogMacros.h
-  include/mitkMatrix.h
-  include/mitkMatrixConvert.h
-  include/mitkMessage.h
-  include/mitkMoveSurfaceInteractor.h
-  include/mitkNumericTypes.h
-  include/mitkOperationActor.h
-  include/mitkPPArgCount.h
-  include/mitkPixelTypeList.h
-  include/mitkPixelTypeMultiplex.h
-  include/mitkPixelTypeTraits.h
-  include/mitkPlaneClipping.h
-  include/mitkPoint.h
-  include/mitkProgressBarImplementation.h
-  include/mitkQuaternion.h
-  include/mitkReferenceCountWatcher.h
-  include/mitkRenderingManagerFactory.h
-  include/mitkServiceInterface.h
-  include/mitkStatusBarImplementation.h
-  include/mitkStdFunctionCommand.h
-  include/mitkStorageThreadDispatcherBase.h
-  include/mitkTimeHelper.h
-  include/mitkUndoModel.h
-  include/mitkVector.h
-  include/mitkVectorDeprecated.h
-  include/mitkVtkMapper2D.h
-  include/mitkVtkMapper3D.h
-  include/mitkWeakPointer.h
+  Colortables/HotIron.h
+  Colortables/Inferno.h
+  Colortables/Jet.h
+  Colortables/Magma.h
+  Colortables/Multilabel.h
+  Colortables/PET20.h
+  Colortables/PETColor.h
+  Colortables/Plasma.h
+  Colortables/Turbo.h
+  Colortables/Viridis.h
+  itkImportMitkImageContainer.h
+  itkMITKScalarImageToHistogramGenerator.h
+  itkVtkAbstractTransform.h
+  mitkAnatomicalPlanes.h
+  mitkAntiAliasing.h
+  mitkArray.h
+  mitkBaseDataTestImplementation.h
+  mitkBaseProcess.h
+  mitkCommon.h
+  mitkDisplayActionEvents.h
+  mitkEqual.h
+  mitkEventInformer.h
+  mitkExceptionMacro.h
+  mitkFileSystem.h
+  mitkFileWriterWithInformation.h
+  mitkGenericLookupTable.h
+  mitkGenericProperty.h
+  mitkGetClassHierarchy.h
+  mitkINodeSelectionListener.h
+  mitkIOAdapter.h
+  mitkITKImageImport.h
+  mitkImageAccessByItk.h
+  mitkImageCast.h
+  mitkImageGenerator.h
+  mitkImagePixelAccessor.h
+  mitkImagePixelReadAccessor.h
+  mitkImagePixelWriteAccessor.h
+  mitkImageToItk.h
+  mitkInstantiateAccessFunctions.h
+  mitkInteractionConst.h
+  mitkItkMatrixHack.h
+  mitkLexicalCast.h
+  mitkLine.h
+  mitkLocalStorageHandler.h
+  mitkLogMacros.h
+  mitkMatrix.h
+  mitkMatrixConvert.h
+  mitkMessage.h
+  mitkMoveSurfaceInteractor.h
+  mitkNumericTypes.h
+  mitkOperationActor.h
+  mitkPPArgCount.h
+  mitkPixelTypeList.h
+  mitkPixelTypeMultiplex.h
+  mitkPixelTypeTraits.h
+  mitkPlaneClipping.h
+  mitkPoint.h
+  mitkProgressBarImplementation.h
+  mitkQuaternion.h
+  mitkReferenceCountWatcher.h
+  mitkRenderingManagerFactory.h
+  mitkServiceInterface.h
+  mitkStatusBarImplementation.h
+  mitkStdFunctionCommand.h
+  mitkStorageThreadDispatcherBase.h
+  mitkTimeHelper.h
+  mitkUndoModel.h
+  mitkVector.h
+  mitkVectorDeprecated.h
+  mitkVtkMapper2D.h
+  mitkVtkMapper3D.h
+  mitkWeakPointer.h
 )
 
 set(CPP_FILES
@@ -388,25 +388,26 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-Interactions/globalConfig.xml
-Interactions/DisplayInteraction.xml
-Interactions/DisplayConfigMITKBase.xml
-Interactions/DisplayConfigPACSBase.xml
-Interactions/DisplayConfigCrosshair.xml
-Interactions/DisplayConfigRotation.xml
-Interactions/DisplayConfigActivateCoupling.xml
-Interactions/DisplayConfigSwivel.xml
-Interactions/DisplayConfigPACSPan.xml
-Interactions/DisplayConfigPACSScroll.xml
-Interactions/DisplayConfigPACSZoom.xml
-Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigBlockLMB.xml
-Interactions/PointSet.xml
-Interactions/PointSetConfig.xml
-Interactions/PointSetConfigLMB.xml
+  Interactions/globalConfig.xml
+  Interactions/DisplayInteraction.xml
+  Interactions/DisplayConfigMITKBase.xml
+  Interactions/DisplayConfigPACSBase.xml
+  Interactions/DisplayConfigCrosshair.xml
+  Interactions/DisplayConfigRotation.xml
+  Interactions/DisplayConfigActivateCoupling.xml
+  Interactions/DisplayConfigSwivel.xml
+  Interactions/DisplayConfigPACSPan.xml
+  Interactions/DisplayConfigPACSScroll.xml
+  Interactions/DisplayConfigPACSZoom.xml
+  Interactions/DisplayConfigPACSLevelWindow.xml
+  Interactions/DisplayConfigBlockLMB.xml
+  Interactions/PointSet.xml
+  Interactions/PointSetConfig.xml
+  Interactions/PointSetConfigLMB.xml
 
-mitkLevelWindowPresets.xml
-mitkAnatomicalStructureColorPresets.xml
-LabelSuggestions/mitk_classic.json
-LabelSuggestions/EUCAIM.json
+  LabelSuggestions/mitk_classic.json
+  LabelSuggestions/EUCAIM.json
+
+  mitkLevelWindowPresets.xml
+  mitkAnatomicalStructureColorPresets.xml
 )

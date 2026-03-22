@@ -1,20 +1,20 @@
 set(H_FILES
-  include/itkCoocurenceMatrixFeatureFunctor.h
-  include/itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
-  include/itkEnhancedHistogramToRunLengthFeaturesFilter.h
-  include/itkEnhancedHistogramToSizeZoneFeaturesFilter.h
-  include/itkEnhancedHistogramToTextureFeaturesFilter.h
-  include/itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
-  include/itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.h
-  include/itkEnhancedScalarImageToRunLengthFeaturesFilter.h
-  include/itkEnhancedScalarImageToRunLengthMatrixFilter.h
-  include/itkEnhancedScalarImageToSizeZoneFeaturesFilter.h
-  include/itkEnhancedScalarImageToSizeZoneMatrixFilter.h
-  include/itkEnhancedScalarImageToTextureFeaturesFilter.h
-  include/itkFirstOrderStatisticsFeatureFunctor.h
-  include/itkLocalIntensityFilter.h
-  include/itkLocalStatisticFilter.h
-  include/itkMultiHistogramFilter.h
+  itkCoocurenceMatrixFeatureFunctor.h
+  itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
+  itkEnhancedHistogramToRunLengthFeaturesFilter.h
+  itkEnhancedHistogramToSizeZoneFeaturesFilter.h
+  itkEnhancedHistogramToTextureFeaturesFilter.h
+  itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h
+  itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.h
+  itkEnhancedScalarImageToRunLengthFeaturesFilter.h
+  itkEnhancedScalarImageToRunLengthMatrixFilter.h
+  itkEnhancedScalarImageToSizeZoneFeaturesFilter.h
+  itkEnhancedScalarImageToSizeZoneMatrixFilter.h
+  itkEnhancedScalarImageToTextureFeaturesFilter.h
+  itkFirstOrderStatisticsFeatureFunctor.h
+  itkLocalIntensityFilter.h
+  itkLocalStatisticFilter.h
+  itkMultiHistogramFilter.h
 )
 
 set(CPP_FILES
@@ -50,8 +50,4 @@ set(CPP_FILES
   MiniAppUtils/mitkSplitParameterToVector.cpp
 
   mitkCLUtil.cpp
-
-)
-
-set( TOOL_FILES
 )

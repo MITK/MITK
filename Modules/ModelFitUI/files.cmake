@@ -16,9 +16,9 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkSimpleBarrierManagerWidget.ui
-  src/QmitkInitialValuesManagerWidget.ui
-  src/QmitkFitParameterWidget.ui
-  src/QmitkInspectionPositionWidget.ui
-  src/QmitkFitPlotDataWidget.ui
+  QmitkSimpleBarrierManagerWidget.ui
+  QmitkInitialValuesManagerWidget.ui
+  QmitkFitParameterWidget.ui
+  QmitkInspectionPositionWidget.ui
+  QmitkFitPlotDataWidget.ui
 )

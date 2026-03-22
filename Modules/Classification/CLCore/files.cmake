@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkConfigFileReader.h
+  mitkConfigFileReader.h
 )
 
 set(CPP_FILES
@@ -7,7 +7,4 @@ set(CPP_FILES
   mitkAbstractClassifier.cpp
   mitkAbstractGlobalImageFeature.cpp
   mitkIntensityQuantifier.cpp
-)
-
-set( TOOL_FILES
 )

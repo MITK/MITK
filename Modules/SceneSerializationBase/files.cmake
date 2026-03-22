@@ -1,6 +1,6 @@
 set(H_FILES
-  include/mitkSerializerMacros.h
-  include/mitkStringsToNumbers.h
+  mitkSerializerMacros.h
+  mitkStringsToNumbers.h
 )
 
 set(CPP_FILES
@@ -34,4 +34,3 @@ set(CPP_FILES
   mitkVector3DPropertySerializer.cpp
   mitkVectorPropertySerializer.cpp
 )
-

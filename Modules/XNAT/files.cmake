@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkXnatSession.h
+  mitkXnatSession.h
 )
 
 set(CPP_FILES
@@ -15,13 +15,13 @@ set(CPP_FILES
 )
 
 set(QRC_FILES
-  resources/xnat.qrc
+  xnat.qrc
 )
 
 set(UI_FILES
-  src/QmitkXnatExperimentWidgetControls.ui
-  src/QmitkXnatProjectWidgetControls.ui
-  src/QmitkSelectXnatUploadDestinationDialog.ui
-  src/QmitkXnatSubjectWidgetControls.ui
-  src/QmitkXnatUploadFromDataStorageDialog.ui
+  QmitkXnatExperimentWidgetControls.ui
+  QmitkXnatProjectWidgetControls.ui
+  QmitkSelectXnatUploadDestinationDialog.ui
+  QmitkXnatSubjectWidgetControls.ui
+  QmitkXnatUploadFromDataStorageDialog.ui
 )

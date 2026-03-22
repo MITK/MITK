@@ -1,7 +1,6 @@
 mitk_create_module(
   INCLUDE_DIRS
     PRIVATE
-      src/Qmitk
       src/SegmentationUtilities
   PCH
     mitkDataNode.h

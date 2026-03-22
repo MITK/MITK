@@ -1,14 +1,14 @@
 set(CPP_FILES
-  Qmitk/QmitkFreeIsoDoseLevelWidget.cpp
-  Qmitk/QmitkIsoDoseLevelSetModel.cpp
-  Qmitk/QmitkDoseColorDelegate.cpp
-  Qmitk/QmitkDoseValueDelegate.cpp
-  Qmitk/QmitkDoseVisualStyleDelegate.cpp
-  Helper/mitkRTUIConstants.cpp
+  QmitkFreeIsoDoseLevelWidget.cpp
+  QmitkIsoDoseLevelSetModel.cpp
+  QmitkDoseColorDelegate.cpp
+  QmitkDoseValueDelegate.cpp
+  QmitkDoseVisualStyleDelegate.cpp
+  mitkRTUIConstants.cpp
 )
 
 set(UI_FILES
-  src/Qmitk/QmitkFreeIsoDoseLevelWidget.ui
+  src/QmitkFreeIsoDoseLevelWidget.ui
 )
 
 set(QRC_FILES

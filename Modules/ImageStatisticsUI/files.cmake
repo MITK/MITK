@@ -1,19 +1,19 @@
 set(CPP_FILES
-  Qmitk/QmitkHistogramVisualizationWidget.cpp
-  Qmitk/QmitkImageStatisticsCalculationRunnable.cpp
-  Qmitk/QmitkIntensityProfileVisualizationWidget.cpp
-  Qmitk/QmitkImageStatisticsTreeModel.cpp
-  Qmitk/QmitkStatisticsModelToStringConverter.cpp
-  Qmitk/QmitkImageStatisticsWidget.cpp
-  Qmitk/QmitkImageStatisticsTreeItem.cpp
-  Qmitk/QmitkDataGenerationJobBase.cpp
-  Qmitk/QmitkDataGeneratorBase.cpp
-  Qmitk/QmitkImageAndRoiDataGeneratorBase.cpp
-  Qmitk/QmitkImageStatisticsDataGenerator.cpp
+  QmitkHistogramVisualizationWidget.cpp
+  QmitkImageStatisticsCalculationRunnable.cpp
+  QmitkIntensityProfileVisualizationWidget.cpp
+  QmitkImageStatisticsTreeModel.cpp
+  QmitkStatisticsModelToStringConverter.cpp
+  QmitkImageStatisticsWidget.cpp
+  QmitkImageStatisticsTreeItem.cpp
+  QmitkDataGenerationJobBase.cpp
+  QmitkDataGeneratorBase.cpp
+  QmitkImageAndRoiDataGeneratorBase.cpp
+  QmitkImageStatisticsDataGenerator.cpp
 )
 
 set(UI_FILES
-  src/Qmitk/QmitkHistogramVisualizationWidget.ui
-  src/Qmitk/QmitkIntensityProfileVisualizationWidget.ui
-  src/Qmitk/QmitkImageStatisticsWidget.ui
+  src/QmitkHistogramVisualizationWidget.ui
+  src/QmitkIntensityProfileVisualizationWidget.ui
+  src/QmitkImageStatisticsWidget.ui
 )

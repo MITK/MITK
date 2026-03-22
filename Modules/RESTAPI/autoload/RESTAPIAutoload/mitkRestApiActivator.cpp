@@ -70,8 +70,6 @@ public:
 
     m_RestServer.reset();
     m_Context = nullptr;
-
-    MITK_INFO << "REST API module unloaded";
   }
 
 private:

@@ -10,5 +10,5 @@ set(UI_FILES
 )
 
 set(QRC_FILES
-  Resources/nnInteractive/nnInteractive.qrc
+  resource/nnInteractive/nnInteractive.qrc
 )

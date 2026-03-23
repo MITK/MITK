@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <vtkMitkThickSlicesFilter.h>
 #include <vtkMitkLevelWindowFilter.h>
 #include <vtkNeverTranslucentTexture.h>
+#include "vtkInformation.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -59,6 +60,9 @@ found in the LICENSE file.
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageLuminance.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+
+#include <algorithm>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -284,6 +288,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
   {
     //Map moving image
     localStorage->m_slicedMappedImage = mitk::ImageMappingHelper::map(movingInput,reg,false,0,localStorage->m_slicedTargetImage->GetGeometry(),false,0);
+
     updated = true;
   }
 
@@ -570,6 +575,26 @@ void mitk::RegEvaluationMapper2D::PrepareCheckerBoard( mitk::DataNode* datanode,
   checkerboardFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
   checkerboardFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
   checkerboardFilter->SetNumberOfDivisions(checkerCount, checkerCount, 1);
+
+  // Clamp divisions to avoid integer division-by-zero in vtkImageCheckerboard.
+  // vtkImageCheckerboard computes divSize = dimWhole / numDivisions per axis.
+  // If dimWhole < numDivisions (e.g. 2D images with 1-pixel degenerate slices),
+  // divSize becomes 0, causing a division-by-zero crash.
+  checkerboardFilter->UpdateInformation();
+  int wholeExt[6];
+  checkerboardFilter->GetOutputInformation(0)->Get(
+    vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExt);
+
+  const int dimX = wholeExt[1] - wholeExt[0] + 1;
+  const int dimY = wholeExt[3] - wholeExt[2] + 1;
+  const int dimZ = wholeExt[5] - wholeExt[4] + 1;
+
+  const int clampedX = std::max(1, std::min(checkerCount, dimX));
+  const int clampedY = std::max(1, std::min(checkerCount, dimY));
+  const int clampedZ = std::min(1, dimZ);
+
+  checkerboardFilter->SetNumberOfDivisions(clampedX, clampedY, clampedZ);
+
   checkerboardFilter->Update();
 
   localStorage->m_EvaluationImage = checkerboardFilter->GetOutput();

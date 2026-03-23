@@ -162,7 +162,7 @@ public:
     auto req = this->CreateRequest(
       "/api/v1/datastorage/nodes/test-uid/properties/bad\nkey",
       R"({"value": "test"})",
-      {{"uid", "test-uid"}, {"key", "bad\nkey"}},
+      {{"uid", "test-uid"}, {"property_key", "bad\nkey"}},
       {},
       "application/json");
     httplib::Response res;
@@ -182,7 +182,7 @@ public:
     auto req = this->CreateRequest(
       "/api/v1/datastorage/nodes/test-uid/properties/restapi.internal",
       R"({"value": "test"})",
-      {{"uid", "test-uid"}, {"key", "restapi.internal"}},
+      {{"uid", "test-uid"}, {"property_key", "restapi.internal"}},
       {},
       "application/json");
     httplib::Response res;
@@ -201,7 +201,7 @@ public:
     auto req = this->CreateRequest(
       "/api/v1/datastorage/nodes/test-uid/properties/" + longKey,
       R"({"value": "test"})",
-      {{"uid", "test-uid"}, {"key", longKey}},
+      {{"uid", "test-uid"}, {"property_key", longKey}},
       {},
       "application/json");
     httplib::Response res;

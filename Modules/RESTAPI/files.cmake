@@ -2,6 +2,7 @@ set(H_FILES
   include/mitkRestServerConfig.h
   include/mitkNodeQueryParams.h
   include/mitkRenderWindowBridge.h
+  include/mitkRenderWindowBridge.h
 )
 
 set(CPP_FILES

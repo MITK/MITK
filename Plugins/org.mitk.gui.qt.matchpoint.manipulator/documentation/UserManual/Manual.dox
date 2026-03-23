@@ -67,8 +67,89 @@ The offset as well as the rotation matrix stay constant if the center point chan
 
 \note To ease the orientation, the edit fields have background colors which resemble the colors of the plane the changes will
 "happen".\n
-For translation, the translation vector will be perpendicular to the indicated plane (The image moves "through" the plane).
+For translation, the translation vector will be parallel to the indicated plane (The image slides "over" the plane).
 For rotation, the rotation axis will be perpendicular to the indicated plane.
+
+\subsection MAP_REGMANIP_CoRIndicator Center of rotation indicator
+A yellow diamond-shaped indicator is displayed in the 2D render windows to mark the exact center of rotation.
+This helps you keep track of the pivot point while manipulating the registration, especially after the image has been
+translated or rotated away from its original position.
+The indicator size scales automatically with the moving image extent so it remains visible without dominating small
+fields of view.
+
+\subsection MAP_REGMANIP_QuickAlign Quick alignment: translate moving center to navigator
+The <b>Translate moving center to navigator</b> button provides a fast way to achieve a rough pre-alignment when
+the misregistration between moving and target image is very large. Pressing the button computes a pure translation
+that moves the center of the moving image to the current crosshair/navigator position in the render windows.
+The rotation component of the current transform is fully preserved; only the translation changes.\n\n
+Typical use:\n
+- Navigate the crosshair in the target image to a recognizable anatomical landmark.
+- Press <em>Translate moving center to navigator</em> to shift the moving image so its center overlaps that landmark.
+- Fine-tune the alignment using the sliders, spinboxes, or the mouse interaction tool (\ref MAP_REGMANIP_MouseInteraction).
+
+\subsection MAP_REGMANIP_ReinitViews Reinitializing the render window perspective
+Two buttons and a lock checkbox give you control over the viewing perspective during a session:\n
+- <b>Reinit to moving image</b>: Reinitializes the render windows to the current transformed position of the moving
+  image, i.e. the position the moving image occupies after the registration is applied. Use this to inspect how the
+  moving image aligns with structures in the target image after a manipulation step.
+- <b>Reinit to target image</b>: Reinitializes the render windows to the geometry of the target image. Use this to
+  return to the target-image field of view at any time.
+- <b>Lock to moving</b>: When this checkbox is active, the render windows automatically follow the moving image's
+  current transformed geometry after every change to the registration. This is especially useful when the moving
+  image is thin (e.g. a single slice) and would otherwise disappear from view once it is rotated out of the
+  target image's slice plane. Unchecking the box returns the render windows to the target image perspective.
+
+\remark The automatic reinit triggered by <em>Lock to moving</em> uses the same mechanism as the <em>Reinit to
+moving image</em> button, which means the camera and slice position are reset to the center of the moving image on
+each update. If you need to zoom into a specific region while simultaneously rotating the moving image, use the
+manual <em>Reinit to moving image</em> button instead of the lock, and reinitialize only when needed.
+
+\section MAP_REGMANIP_MouseInteraction Mouse-based interaction
+\imageMacro{map_view_manipulator_mouse_interaction.png, "Transform tab showing the mouse interaction controls.", 10}
+
+In addition to the sliders and spinboxes, you can manipulate the registration directly in the 2D render windows
+using the mouse. This is particularly useful for large, coarse adjustments where dragging feels more natural than
+editing numerical values.\n\n
+
+<b>Enabling the tool:</b> Press the <em>Enable mouse interaction</em> toggle button on the <em>Transformation settings</em> tab
+to activate the tool. The cursor changes to indicate that the tool is active. Press the button again to deactivate it and
+restore the standard navigation behaviour.\n\n
+
+<b>Gesture mapping:</b>
+| Gesture | Effect |
+|---------|--------|
+| Shift + Drag | Translate the moving image in the current view plane |
+| Ctrl + Drag | Rotate the moving image around the current center of rotation, within the current view plane |
+| Shift + Ctrl + Drag | Scale the moving image uniformly (only if <em>Allow scaling</em> is checked) |
+
+\remark All gestures act relative to the plane of the render window in which you drag. Working in different 2D views
+therefore lets you constrain the manipulation to the desired anatomical plane.
+
+\remark The center of rotation used for Ctrl + Drag is exactly the one selected in the <em>Center of rotation</em>
+combo box. The yellow diamond-shaped indicator (\ref MAP_REGMANIP_CoRIndicator) always shows the current pivot
+point in the render windows, regardless of which center mode is active.
+
+<b>Allow scaling:</b> Check the <em>Allow scaling</em> checkbox to allow uniform scaling of the moving image via
+Shift + Ctrl + Drag. Scaling is disabled by default because it changes the physical size of the data and is
+typically not appropriate for rigid registration tasks.
+
+\section MAP_REGMANIP_3DPreview 3D preview
+\imageMacro{map_view_manipulator_3d_preview.png, "3D render window showing the wireframe preview of the moving image.", 10}
+
+The <b>Show 3D preview</b> checkbox on the <em>Evaluation settings</em> tab enables a live 3D preview of the moving
+image's current registered position. When active, two additional helper objects appear in the 3D render window:\n
+- A semi-transparent clone of the moving image rendered at the position defined by the current registration transform,
+  so you can see how the volume is spatially positioned relative to the target.
+- A green wireframe bounding box that outlines the moving image's transformed extent, making the spatial relationship
+  visible even when the image content itself is not well-contrasted in 3D.
+
+Both objects update continuously as you change the transform, giving immediate spatial feedback in 3D while you work
+in the 2D views.\n\n
+
+\remark The preview objects require additional memory because the moving image data is cloned. For large volumes,
+consider activating the preview only when needed.
+
+\remark The preview objects are automatically removed when the session is cancelled or confirmed.
 
 \section MAP_REGMANIP_EvalSettings Evaluation settings
 The settings you can choose are equal to the settings of the evaluation view (\ref org_mitk_views_matchpoint_evaluator).

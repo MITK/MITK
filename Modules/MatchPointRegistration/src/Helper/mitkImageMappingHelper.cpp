@@ -186,7 +186,7 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
         // lead in loosing one slice. Such a case was just detected. To compensate for that double precision
         // error we add half a spacing to ensure the number of voxel in the dimension match.
         size[i] += 0.5 * fieldSpacing[i];
-        MITK_INFO << "Fixed field size for ResultImageDescriptor of image mapping operation.";
+        MITK_DEBUG << "Fixed field size for ResultImageDescriptor of image mapping operation.";
       }
     }
 

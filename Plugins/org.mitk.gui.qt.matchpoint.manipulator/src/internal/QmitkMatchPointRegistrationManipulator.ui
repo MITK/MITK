@@ -271,7 +271,7 @@
        <item>
         <widget class="QCheckBox" name="checkPreview3D">
          <property name="toolTip">
-          <string>Show a preview of the registered moving data position in the 3D render window. Clones the moving data (additional memory).</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show a preview of the registered moving data position in the 3D render window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Show 3D preview</string>
@@ -304,6 +304,16 @@
        </property>
        <property name="text">
         <string>Reinit to target image</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkLockMovingPerspective">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatically keep 2D render windows aligned with the moving image. Useful for thin moving images that would otherwise disappear when rotated out-of-plane.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Lock to moving</string>
        </property>
       </widget>
      </item>
@@ -346,6 +356,19 @@
      </property>
      <property name="checked">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkRefineGeometry">
+     <property name="toolTip">
+      <string>If checked, a copy of the moving image with its geometry refined by the confirmed registration is stored as result. The image data is not resampled; only the spatial geometry is updated.</string>
+     </property>
+     <property name="text">
+      <string>Refine geometry + store result</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>

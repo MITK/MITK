@@ -28,8 +28,8 @@ found in the LICENSE file.
 #include <mitkUIDHelper.h>
 #include <mitkProperties.h>
 #include <mitkRegistrationManipulationInteractor.h>
-#include <mitkCrosshairData.h>
-#include <mitkCrosshairVtkMapper2D.h>
+#include <mitkPointSet.h>
+#include <mitkPointSetShapeProperty.h>
 #include <mitkSurface.h>
 #include <mitkVtkRepresentationProperty.h>
 
@@ -38,6 +38,8 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 #include <usModuleRegistry.h>
+
+#include <algorithm>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -141,6 +143,15 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   connect(m_Controls->pbInteractionTool, SIGNAL(toggled(bool)), this, SLOT(OnInteractionToolToggled(bool)));
   connect(m_Controls->checkScaling, SIGNAL(toggled(bool)), this, SLOT(OnScalingCheckboxToggled(bool)));
   connect(m_Controls->checkPreview3D, &QCheckBox::toggled, this, &QmitkMatchPointRegistrationManipulator::OnPreview3DToggled);
+  connect(m_Controls->checkLockMovingPerspective, &QCheckBox::toggled, this, [this](bool checked) {
+    if (m_activeManipulation)
+    {
+      if (checked)
+        this->OnReinitMovingPerspective();
+      else
+        this->OnReinitTargetPerspective();
+    }
+  });
 
   connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
   connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
@@ -259,10 +270,9 @@ void QmitkMatchPointRegistrationManipulator::NodeRemoved(const mitk::DataNode* n
     }
     if (this->m_activeManipulation)
     {
-      MITK_INFO << "Stopped current MatchPoint manual registration session, because at least one relevant node was removed from storage.";
+      MITK_DEBUG << "Stopped current MatchPoint manual registration session, because at least one relevant node was removed from storage.";
     }
     this->OnCancelBtnPushed();
-
   }
 }
 
@@ -289,6 +299,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 
   m_Controls->lbNewRegName->setEnabled(m_activeManipulation);
   m_Controls->checkMapEntity->setEnabled(m_activeManipulation);
+  m_Controls->checkRefineGeometry->setEnabled(m_activeManipulation);
   m_Controls->tabWidget->setEnabled(m_activeManipulation);
   m_Controls->pbCancel->setEnabled(m_activeManipulation);
   m_Controls->pbStore->setEnabled(m_activeManipulation);
@@ -307,6 +318,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   m_Controls->pbReinitMoving->setEnabled(m_activeManipulation);
   m_Controls->pbReinitTarget->setEnabled(m_activeManipulation);
   m_Controls->checkPreview3D->setEnabled(m_activeManipulation);
+  m_Controls->checkLockMovingPerspective->setEnabled(m_activeManipulation);
 
   if (!m_activeManipulation)
   {
@@ -365,6 +377,12 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
+  if (m_Controls->checkLockMovingPerspective->isChecked())
+  {
+    m_Controls->checkLockMovingPerspective->setChecked(false);
+    this->OnReinitTargetPerspective();
+  }
+
   this->Stop3DPreview();
 
   if (m_InteractionToolActive)
@@ -411,6 +429,14 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
     this->Update3DPreviewGeometry();
   }
 
+  if (m_Controls->checkLockMovingPerspective->isChecked())
+  {
+    this->OnReinitMovingPerspective();
+  }
+
+  // Update indicator position: for "Moving image center" mode the center moves with the image
+  this->UpdateCenterOfRotationIndicator();
+
   auto* renderWindowPart = this->GetRenderWindowPart();
 
   if (nullptr != renderWindowPart)
@@ -444,6 +470,7 @@ void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
       {
         m_Interactor->SetCenterOfRotation(m_currentSelectedPosition);
       }
+      this->UpdateCenterOfRotationIndicator();
     }
   }
 }
@@ -520,6 +547,41 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pMapJob);
+  }
+
+  if (m_Controls->checkRefineGeometry->checkState() == Qt::Checked)
+  {
+    const auto* movingImage =
+      dynamic_cast<const mitk::Image*>(this->m_SelectedMovingNode->GetData());
+
+    if (movingImage != nullptr &&
+        mitk::ImageMappingHelper::canRefineGeometry(newRegWrapper.GetPointer()))
+    {
+      try
+      {
+        mitk::ImageMappingHelper::ResultImageType::Pointer refinedImage =
+          mitk::ImageMappingHelper::refineGeometry(movingImage, newRegWrapper.GetPointer(), true);
+
+        const std::string refinedName =
+          m_Controls->lbNewRegName->text().toStdString() + std::string(" refined geometry");
+
+        mitk::DataNode::Pointer spRefinedNode = mitk::generateMappedResultNode(
+          refinedName, refinedImage,
+          newReg->getRegistrationUID(),
+          mitk::EnsureUID(m_SelectedMovingNode->GetData()),
+          true, "geometry refinement");
+
+        this->GetDataStorage()->Add(spRefinedNode);
+      }
+      catch (const std::exception& e)
+      {
+        this->Error(QString("Geometry refinement failed: ") + QString::fromStdString(e.what()));
+      }
+    }
+    else if (movingImage != nullptr)
+    {
+      this->Error(QString("Cannot refine geometry: registration does not support geometry refinement (requires affine transform)."));
+    }
   }
 
   this->StopSession();
@@ -701,53 +763,82 @@ void QmitkMatchPointRegistrationManipulator::UpdateCenterOfRotationIndicator()
 
   const int centerMode = m_Controls->comboCenter->currentIndex();
 
-  // Don't show indicator when using "Current navigator position" mode (already shown by crosshair)
-  if (centerMode == 2)
-  {
-    if (m_CenterOfRotationIndicatorNode.IsNotNull() && this->GetDataStorage().IsNotNull())
-    {
-      this->GetDataStorage()->Remove(m_CenterOfRotationIndicatorNode);
-      m_CenterOfRotationIndicatorNode = nullptr;
-    }
-    return;
-  }
-
-  // Determine center position
+  // Determine center position in target/world space.
   mitk::Point3D center;
+  center.Fill(0.0);
+
   if (centerMode == 0 && m_SelectedMovingNode.IsNotNull())
   {
     center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
+
+    // Apply current direct (moving->target) registration transform to show the current position.
+    if (m_CurrentRegistrationWrapper.IsNotNull())
+    {
+      const auto inverseAffine =
+        mitk::MITKRegistrationHelper::getAffineMatrix(m_CurrentRegistrationWrapper, true);
+      if (inverseAffine.IsNotNull())
+      {
+        mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer directTransform =
+          mitk::MITKRegistrationHelper::Affine3DTransformType::New();
+        if (inverseAffine->GetInverse(directTransform))
+        {
+          center = directTransform->TransformPoint(center);
+        }
+      }
+    }
   }
-  else
+  else if (centerMode == 1)
   {
-    center.Fill(0.0);
+    // World origin — center is already (0,0,0).
+  }
+  else if (centerMode == 2)
+  {
+    center = m_currentSelectedPosition;
   }
 
-  // Create or update the indicator node
+  // Scale indicator size relative to the moving image extent so it remains
+  // visible but does not dominate small images (e.g. 2 cm field of view).
+  float indicatorSize = 8.0f;
+  if (m_SelectedMovingNode.IsNotNull())
+  {
+    const auto* geometry = m_SelectedMovingNode->GetData()->GetGeometry();
+    const double extX = geometry->GetExtentInMM(0);
+    const double extY = geometry->GetExtentInMM(1);
+    const double extZ = geometry->GetExtentInMM(2);
+    const double minExtent = std::min({extX, extY, extZ});
+    // Use ~5% of the smallest extent, clamped to a reasonable range.
+    indicatorSize = static_cast<float>(std::clamp(minExtent * 0.05, 1.0, 20.0));
+  }
+
+  // Create or update the indicator as a PointSet glyph.
   if (m_CenterOfRotationIndicatorNode.IsNull())
   {
-    auto crosshairData = mitk::CrosshairData::New();
-    crosshairData->SetPosition(center);
+    auto pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(0, center);
 
     m_CenterOfRotationIndicatorNode = mitk::DataNode::New();
-    m_CenterOfRotationIndicatorNode->SetData(crosshairData);
-    m_CenterOfRotationIndicatorNode->SetMapper(mitk::BaseRenderer::Standard2D, mitk::CrosshairVtkMapper2D::New());
+    m_CenterOfRotationIndicatorNode->SetData(pointSet);
     m_CenterOfRotationIndicatorNode->SetName("RegistrationRotationCenter");
     m_CenterOfRotationIndicatorNode->SetBoolProperty("helper object", true);
-    m_CenterOfRotationIndicatorNode->SetColor(1.0, 0.8, 0.0); // yellow/orange
-    m_CenterOfRotationIndicatorNode->SetIntProperty("Crosshair.Gap Size", 16);
-    m_CenterOfRotationIndicatorNode->SetFloatProperty("Line width", 2);
+    m_CenterOfRotationIndicatorNode->SetColor(1.0, 0.8, 0.0);
+    m_CenterOfRotationIndicatorNode->SetFloatProperty("pointsize", indicatorSize);
+    m_CenterOfRotationIndicatorNode->SetFloatProperty("point 2D size", indicatorSize);
+    m_CenterOfRotationIndicatorNode->SetProperty("Pointset.2D.shape",
+      mitk::PointSetShapeProperty::New(mitk::PointSetShapeProperty::DIAMOND));
+    m_CenterOfRotationIndicatorNode->SetBoolProperty("Pointset.2D.fill shape", true);
+    m_CenterOfRotationIndicatorNode->SetIntProperty("point line width", 2);
     this->GetDataStorage()->Add(m_CenterOfRotationIndicatorNode);
   }
   else
   {
-    auto* crosshairData = dynamic_cast<mitk::CrosshairData*>(
-      m_CenterOfRotationIndicatorNode->GetData());
-    if (crosshairData != nullptr)
+    auto* pointSet = dynamic_cast<mitk::PointSet*>(m_CenterOfRotationIndicatorNode->GetData());
+    if (pointSet != nullptr)
     {
-      crosshairData->SetPosition(center);
+      pointSet->SetPoint(0, center);
       m_CenterOfRotationIndicatorNode->Modified();
     }
+    m_CenterOfRotationIndicatorNode->SetFloatProperty("pointsize", indicatorSize);
+    m_CenterOfRotationIndicatorNode->SetFloatProperty("point 2D size", indicatorSize);
   }
 }
 
@@ -906,8 +997,13 @@ void QmitkMatchPointRegistrationManipulator::Start3DPreview()
   mitk::BaseGeometry* geom = clonedData->GetGeometry();
   const auto bounds = geom->GetBounds();
 
+  // MITK's index-to-world transform places the origin at voxel-center 0.
+  // The physical image extent therefore runs from index -0.5 to N-0.5 per dimension.
+  // Subtracting 0.5 from each bound aligns the wireframe with the actual pixel corners.
   auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
-  cubeSource->SetBounds(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
+  cubeSource->SetBounds(bounds[0] - 0.5, bounds[1] - 0.5,
+                        bounds[2] - 0.5, bounds[3] - 0.5,
+                        bounds[4] - 0.5, bounds[5] - 0.5);
   cubeSource->Update();
 
   auto wireframeSurface = mitk::Surface::New();

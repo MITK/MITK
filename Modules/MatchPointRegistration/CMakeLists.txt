@@ -5,7 +5,7 @@ mitk_create_module(
   DEPENDS MitkCore MitkSceneSerializationBase MitkMultilabel
   PACKAGE_DEPENDS
    PUBLIC MatchPoint
-   PRIVATE VTK|ImagingGeneral+ImagingHybrid
+   PRIVATE VTK|ImagingGeneral+ImagingHybrid+ImagingColor
 )
 
 if(BUILD_TESTING)

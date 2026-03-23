@@ -58,7 +58,7 @@ found in the LICENSE file.
 #include <vtkImageRectilinearWipe.h>
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageAppendComponents.h>
-#include <vtkImageExtractComponents.h>
+#include <vtkImageLuminance.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -329,14 +329,42 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     this->ApplyLevelWindow(renderer, this->GetTargetNode(), localStorage->m_TargetLevelWindowFilter);
     this->ApplyLevelWindow(renderer, this->GetMovingNode(), localStorage->m_MappedLevelWindowFilter);
 
-    //connect the input with the levelwindow filter
+    //connect the input with the level-window filter
     localStorage->m_TargetLevelWindowFilter->SetInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
     localStorage->m_MappedLevelWindowFilter->SetInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
 
-    localStorage->m_TargetExtractFilter->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-    localStorage->m_MappedExtractFilter->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-    localStorage->m_TargetExtractFilter->SetComponents(0);
-    localStorage->m_MappedExtractFilter->SetComponents(0);
+    // Scalar extraction for evaluation modes that need single-component data.
+    // If EITHER image is multi-component, both go through the perceptual luminance path
+    // (extract RGB 0,1,2 from RGBA level-window output, then apply luminance weights).
+    // For single-component images in this path, R=G=B in the RGBA level-window output,
+    // so luminance(R,G,B) = R = component 0 -> result is numerically identical to simple extraction.
+    // Using the same path for both ensures diff/blend/contour comparisons are consistent.
+    const bool usePerceptualGrayscale =
+      targetInput->GetPixelType().GetNumberOfComponents() > 1 ||
+      movingInput->GetPixelType().GetNumberOfComponents() > 1;
+
+    if (usePerceptualGrayscale)
+    {
+      localStorage->m_TargetExtractFilter->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+      localStorage->m_TargetExtractFilter->SetComponents(0, 1, 2);
+      localStorage->m_TargetLuminanceFilter->SetInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+      localStorage->m_TargetScalarOutput = localStorage->m_TargetLuminanceFilter->GetOutputPort();
+
+      localStorage->m_MappedExtractFilter->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+      localStorage->m_MappedExtractFilter->SetComponents(0, 1, 2);
+      localStorage->m_MappedLuminanceFilter->SetInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+      localStorage->m_MappedScalarOutput = localStorage->m_MappedLuminanceFilter->GetOutputPort();
+    }
+    else
+    {
+      localStorage->m_TargetExtractFilter->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+      localStorage->m_TargetExtractFilter->SetComponents(0);
+      localStorage->m_TargetScalarOutput = localStorage->m_TargetExtractFilter->GetOutputPort();
+
+      localStorage->m_MappedExtractFilter->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+      localStorage->m_MappedExtractFilter->SetComponents(0);
+      localStorage->m_MappedScalarOutput = localStorage->m_MappedExtractFilter->GetOutputPort();
+    }
 
     updated = true;
   }
@@ -455,11 +483,11 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
 
   if(targetContour)
   {
-    magFilter->SetInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+    magFilter->SetInputConnection(localStorage->m_TargetScalarOutput);
   }
   else
   {
-    magFilter->SetInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+    magFilter->SetInputConnection(localStorage->m_MappedScalarOutput);
   }
 
   vtkSmartPointer<vtkImageAppendComponents> appendFilter =
@@ -469,11 +497,11 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
   appendFilter->AddInputConnection(magFilter->GetOutputPort());
   if(targetContour)
   {
-    appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+    appendFilter->AddInputConnection(localStorage->m_MappedScalarOutput);
   }
   else
   {
-    appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+    appendFilter->AddInputConnection(localStorage->m_TargetScalarOutput);
   }
   appendFilter->Update();
 
@@ -489,11 +517,11 @@ void mitk::RegEvaluationMapper2D::PrepareDifference( LocalStorage * localStorage
   vtkSmartPointer<vtkImageMathematics> maxFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
 
-  minFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
-  minFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  minFilter->SetInputConnection(0, localStorage->m_TargetScalarOutput);
+  minFilter->SetInputConnection(1, localStorage->m_MappedScalarOutput);
   minFilter->SetOperationToMin();
-  maxFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
-  maxFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  maxFilter->SetInputConnection(0, localStorage->m_TargetScalarOutput);
+  maxFilter->SetInputConnection(1, localStorage->m_MappedScalarOutput);
   maxFilter->SetOperationToMax();
 
   diffFilter->SetInputConnection(0, maxFilter->GetOutputPort());
@@ -553,12 +581,12 @@ void mitk::RegEvaluationMapper2D::PrepareColorBlend( LocalStorage * localStorage
     vtkSmartPointer<vtkImageAppendComponents>::New();
 
   //red channel
-  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+  appendFilter->AddInputConnection(localStorage->m_MappedScalarOutput);
   //green channel
-  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+  appendFilter->AddInputConnection(localStorage->m_MappedScalarOutput);
 
   //blue channel
-  appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+  appendFilter->AddInputConnection(localStorage->m_TargetScalarOutput);
   appendFilter->Update();
 
   localStorage->m_EvaluationImage = appendFilter->GetOutput();
@@ -572,8 +600,8 @@ void mitk::RegEvaluationMapper2D::PrepareBlend( mitk::DataNode* datanode, LocalS
   vtkSmartPointer<vtkImageWeightedSum> blendFilter =
     vtkSmartPointer<vtkImageWeightedSum>::New();
 
-  blendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
-  blendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+  blendFilter->AddInputConnection(localStorage->m_TargetScalarOutput);
+  blendFilter->AddInputConnection(localStorage->m_MappedScalarOutput);
   blendFilter->SetWeight(0, (100 - blendfactor) / 100.);
   blendFilter->SetWeight(1,blendfactor/100.);
   blendFilter->Update();
@@ -798,6 +826,9 @@ mitk::RegEvaluationMapper2D::LocalStorage::LocalStorage()
 
   m_TargetExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
   m_MappedExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+
+  m_TargetLuminanceFilter = vtkSmartPointer<vtkImageLuminance>::New();
+  m_MappedLuminanceFilter = vtkSmartPointer<vtkImageLuminance>::New();
 
   m_mmPerPixel = nullptr;
 

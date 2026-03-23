@@ -29,8 +29,6 @@ set(CPP_FILES
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
 
-)
-
 set(RESOURCE_FILES
   Interactions/RegistrationManipulationStates.xml
   Interactions/RegistrationManipulationConfig.xml
@@ -38,3 +36,4 @@ set(RESOURCE_FILES
   Cursors/RegManip_Translate_Cursor.svg
   Cursors/RegManip_Rotate_Cursor.svg
   Cursors/RegManip_Scale_Cursor.svg
+)

@@ -1,0 +1,23 @@
+import os as _os
+import sys as _sys
+
+_pkg_dir = _os.path.dirname(_os.path.abspath(__file__))
+_libs_dir = _os.path.join(_pkg_dir, ".libs")
+_is_wheel = _os.path.isdir(_libs_dir)
+
+if _is_wheel:
+    # Tell PreloadPython activator to skip (Python is already loaded).
+    _os.environ["PYMITK"] = "1"
+
+    # Tell CppMicroServices where to find auto-load module subdirectories.
+    _os.environ["US_AUTOLOAD_PATHS"] = _pkg_dir
+
+    # Windows: register DLL search directory for bundled native libraries.
+    if _sys.platform == "win32":
+        _os.add_dll_directory(_libs_dir)
+    # Linux: auditwheel sets RPATH to $ORIGIN/../mitk.libs
+    # macOS: delocate rewrites @loader_path references
+
+from .mitk import *
+
+__version__ = "@MITK_VERSION_STRING@"

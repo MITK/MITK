@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <legacy/mitkDicomSeriesReader.h>
+#include "legacy/mitkDicomSeriesReader.h"
 
 namespace mitk
 {

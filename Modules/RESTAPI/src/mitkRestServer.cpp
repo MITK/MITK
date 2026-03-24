@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRestServer.h>
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include "mitkHealthController.h"
 #include "mitkDataStorageController.h"
 #include "mitkSwaggerController.h"
 #include "mitkRenderingController.h"
-#include "mitkErrorResponse.h"
+#include <mitkErrorResponse.h>
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT

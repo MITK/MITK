@@ -14,10 +14,10 @@ found in the LICENSE file.
 #include <string>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 // CTK includes
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
 // MITK includes
 #include <mitkIOUtil.h>

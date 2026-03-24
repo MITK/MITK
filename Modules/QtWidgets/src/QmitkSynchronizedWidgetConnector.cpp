@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk gui qt common plugin
-#include "QmitkSynchronizedWidgetConnector.h"
+#include <QmitkSynchronizedWidgetConnector.h>
 
 bool NodeListsEqual(const QmitkSynchronizedWidgetConnector::NodeList& selection1, const QmitkSynchronizedWidgetConnector::NodeList& selection2)
 {

@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkPlanarFigureExports.h>
 
-#include "mitkCommon.h"
-#include "mitkDataInteractor.h"
-#include "mitkNumericTypes.h"
+#include <mitkCommon.h>
+#include <mitkDataInteractor.h>
+#include <mitkNumericTypes.h>
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>

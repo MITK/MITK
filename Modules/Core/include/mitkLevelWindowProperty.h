@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkLevelWindowProperty_h
 #define mitkLevelWindowProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkLevelWindow.h"
+#include <mitkBaseProperty.h>
+#include <mitkLevelWindow.h>
 
 namespace mitk
 {

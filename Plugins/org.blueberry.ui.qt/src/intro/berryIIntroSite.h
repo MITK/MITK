@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYIINTROSITE_H_
 #define BERRYIINTROSITE_H_
 
-#include <berryIWorkbenchSite.h>
+#include "berryIWorkbenchSite.h"
 
 namespace berry {
 

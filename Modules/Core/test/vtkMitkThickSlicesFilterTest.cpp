@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <vtkMitkThickSlicesFilter.h>
 
-#include "mitkImage.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkImage.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <vtkDataArray.h>
 #include <vtkImageData.h>

@@ -11,13 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRTPlanReader.h"
+#include <mitkRTPlanReader.h>
 
-#include "mitkDICOMDCMTKTagScanner.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkDICOMTagPath.h"
-#include "mitkDICOMTagsOfInterestService.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkDICOMTagPath.h>
+#include <mitkDICOMTagsOfInterestService.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 namespace mitk
 {

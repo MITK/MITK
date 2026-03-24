@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureObjectFactory_h
 #define mitkPlanarFigureObjectFactory_h
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

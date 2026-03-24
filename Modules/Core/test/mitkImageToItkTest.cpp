@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkDiffusionTensor3D.h"
-#include "mitkITKImageImport.h"
-#include "mitkImage.h"
-#include "mitkReferenceCountWatcher.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <itkDiffusionTensor3D.h>
+#include <mitkITKImageImport.h>
+#include <mitkImage.h>
+#include <mitkReferenceCountWatcher.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 #include <fstream>
 #include <mitkIOUtil.h>
 #include <mitkImageAccessByItk.h>

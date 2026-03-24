@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTDICOMReaderService.h"
+#include <mitkCESTDICOMReaderService.h>
 
-#include "mitkCESTIOMimeTypes.h"
+#include <mitkCESTIOMimeTypes.h>
 #include <mitkCustomTagParser.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
-#include "mitkCESTImageNormalizationFilter.h"
+#include <mitkCESTImageNormalizationFilter.h>
 
 #include <itkGDCMImageIO.h>
 

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkScalarListLookupTablePropertySerializer_h
 #define mitkScalarListLookupTablePropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

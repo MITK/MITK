@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAffineTransform3D.h"
-#include "mitkBaseGeometry.h"
-#include "mitkGeometry3D.h"
-#include "mitkInteractionConst.h"
-#include "mitkLine.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkRotationOperation.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkThinPlateSplineCurvedGeometry.h"
+#include <mitkAffineTransform3D.h>
+#include <mitkBaseGeometry.h>
+#include <mitkGeometry3D.h>
+#include <mitkInteractionConst.h>
+#include <mitkLine.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkRotationOperation.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkThinPlateSplineCurvedGeometry.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

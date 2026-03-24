@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkUndoModel_h
 #define mitkUndoModel_h
 
-#include "mitkCommon.h"
-#include "mitkOperation.h"
+#include <mitkCommon.h>
+#include <mitkOperation.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 

@@ -11,18 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 //#define MBILOG_ENABLE_DEBUG
 
-#include "mitkTestDICOMLoading.h"
-#include "mitkDICOMIOMetaInformationPropertyConstants.h"
-#include "mitkIOMetaInformationPropertyConstants.h"
-#include "mitkDICOMProperty.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkDICOMReaderConfigurator.h"
+#include <mitkTestDICOMLoading.h>
+#include <mitkDICOMIOMetaInformationPropertyConstants.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
+#include <mitkDICOMProperty.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkDICOMReaderConfigurator.h>
 
 #include <stack>
 
 #include <gdcmVersion.h>
 #include <dcmtk/config/osconfig.h>
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 mitk::TestDICOMLoading::TestDICOMLoading()
 :m_PreviousCLocale(nullptr)

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYTABDRAGHANDLER_H_
 #define BERRYTABDRAGHANDLER_H_
 
-#include <berryStackDropResult.h>
+#include "berryStackDropResult.h"
 
 #include <QWidget>
 #include <QPoint>

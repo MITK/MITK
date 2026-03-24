@@ -264,6 +264,11 @@ bool ServiceRegistrationBase::operator==(const ServiceRegistrationBase& registra
   return d == registration.d;
 }
 
+bool ServiceRegistrationBase::operator==(std::nullptr_t) const noexcept
+{
+  return d == nullptr;
+}
+
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(const ServiceRegistrationBase& registration)
 {
   ServiceRegistrationBasePrivate* curr_d = d;

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYCOMBINEDEVENTDELTA_H
 #define BERRYCOMBINEDEVENTDELTA_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QExplicitlySharedDataPointer>
 

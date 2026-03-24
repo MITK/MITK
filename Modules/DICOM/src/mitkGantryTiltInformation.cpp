@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 //#define MBILOG_ENABLE_DEBUG
 
-#include "mitkGantryTiltInformation.h"
+#include <mitkGantryTiltInformation.h>
 
-#include "mitkDICOMTag.h"
+#include <mitkDICOMTag.h>
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 mitk::GantryTiltInformation::GantryTiltInformation()
 : m_ShiftUp(0.0)

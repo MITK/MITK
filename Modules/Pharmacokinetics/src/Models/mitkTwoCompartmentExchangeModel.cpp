@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoCompartmentExchangeModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkTwoCompartmentExchangeModel.h>
+#include <mitkConvolutionHelper.h>
 #include <fstream>
 
 const std::string mitk::TwoCompartmentExchangeModel::MODEL_DISPLAY_NAME = "Two Compartment Exchange Model";

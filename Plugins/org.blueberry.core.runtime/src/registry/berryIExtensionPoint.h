@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIEXTENSIONPOINT_H_
 #define BERRYIEXTENSIONPOINT_H_
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 namespace berry {
 

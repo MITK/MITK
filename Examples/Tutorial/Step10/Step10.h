@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "itkSmartPointer.h"
-#include "mitkCommon.h"
-#include "mitkDataInteractor.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <itkSmartPointer.h>
+#include <mitkCommon.h>
+#include <mitkDataInteractor.h>
 #include <mitkPointSet.h>
 
 namespace mitk

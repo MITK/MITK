@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOMimeTypes.h"
-#include "mitkPropertyPersistence.h"
-#include "mitkStringProperty.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkPropertyPersistence.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkEqual.h>
 #include <mitkNumericConstants.h>

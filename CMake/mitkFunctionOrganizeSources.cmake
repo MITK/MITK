@@ -47,6 +47,10 @@ function(mitkFunctionOrganizeSources)
     endif()
   endforeach()
 
+  if(CORRESPONDING__H_FILES)
+    list(REMOVE_DUPLICATES CORRESPONDING__H_FILES)
+  endif()
+
   if(CORRESPONDING__TPP_FILES)
     list(REMOVE_DUPLICATES CORRESPONDING__TPP_FILES)
   endif()

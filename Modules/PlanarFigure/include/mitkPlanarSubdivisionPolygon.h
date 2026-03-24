@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlanarSubdivisionPolygon_h
 #define mitkPlanarSubdivisionPolygon_h
 
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarPolygon.h"
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarPolygon.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPrimitiveMovieNavigatorWidget.h"
+#include <QmitkPrimitiveMovieNavigatorWidget.h>
 #include <ui_QmitkPrimitiveMovieNavigatorWidget.h>
 
 QmitkPrimitiveMovieNavigatorWidget::QmitkPrimitiveMovieNavigatorWidget(QWidget *parent, Qt::WindowFlags fl)

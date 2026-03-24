@@ -17,8 +17,8 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageListInspector.h>
 
-#include "mitkNodePredicateProperty.h"
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <mitkNodePredicateProperty.h>
+#include <QmitkSimpleTextOverlayWidget.h>
 
 /*
 * @brief This is an inspector that offers a simple list view on favorite nodes of a data storage.

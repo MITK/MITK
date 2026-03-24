@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYPLATFORMLOGCHANNEL_H_
 #define BERRYPLATFORMLOGCHANNEL_H_
 
-#include "Poco/Message.h"
-#include "Poco/SimpleFileChannel.h"
+#include <Poco/Message.h>
+#include <Poco/SimpleFileChannel.h>
 
 namespace berry {
 

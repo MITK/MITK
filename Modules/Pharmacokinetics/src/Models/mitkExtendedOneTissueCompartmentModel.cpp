@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtendedOneTissueCompartmentModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkExtendedOneTissueCompartmentModel.h>
+#include <mitkConvolutionHelper.h>
 #include <vnl/algo/vnl_fft_1d.h>
 #include <fstream>
 

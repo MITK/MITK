@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkPreferencesDialog.h"
 
-#include "berryPlatform.h"
-#include "berryPlatformUI.h"
-#include "berryIWorkbench.h"
-#include "berryIConfigurationElement.h"
-#include "berryIExtensionRegistry.h"
-#include "berryIExtension.h"
+#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIWorkbench.h>
+#include <berryIConfigurationElement.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIExtension.h>
 #include <berryIQtPreferencePage.h>
 
 #include "internal/org_mitk_gui_qt_application_Activator.h"

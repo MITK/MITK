@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMProperty.h"
+#include <mitkDICOMProperty.h>
 
-#include "mitkImage.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkImage.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 class mitkDICOMPropertyTestSuite : public mitk::TestFixture
 {

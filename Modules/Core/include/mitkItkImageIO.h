@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkItkImageIO_h
 #define mitkItkImageIO_h
 
-#include "mitkAbstractFileIO.h"
+#include <mitkAbstractFileIO.h>
 #include <mitkImage.h>
 #include <itkImageIOBase.h>
 

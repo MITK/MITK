@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define mitkRenderWindowLayerController_h
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
-#include "mitkRenderWindowLayerUtilities.h"
+#include <MitkQtWidgetsExports.h>
+#include <mitkRenderWindowLayerUtilities.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

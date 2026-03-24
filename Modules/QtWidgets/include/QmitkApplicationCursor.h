@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkApplicationCursor_h
 #define QmitkApplicationCursor_h
 
-#include "mitkApplicationCursor.h"
+#include <mitkApplicationCursor.h>
 #include <MitkQtWidgetsExports.h>
 
 /*!

@@ -4,5 +4,5 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkRenderWindowDataStorageInspector.ui
+  QmitkRenderWindowDataStorageInspector.ui
 )

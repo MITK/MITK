@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelAnnotation3D.h"
+#include <mitkLabelAnnotation3D.h>
 #include <mitkPointSet.h>
 #include <vtkActor2D.h>
 #include <vtkIntArray.h>

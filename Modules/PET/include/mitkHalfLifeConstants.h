@@ -1,8 +1,8 @@
-#ifndef MITKHALFLIFECONSTANTS_H
-#define MITKHALFLIFECONSTANTS_H
+#ifndef mitkHalfLifeConstants_h
+#define mitkHalfLifeConstants_h
 
 #include <string>
-#include "MitkPETExports.h"
+#include <MitkPETExports.h>
 
 namespace mitk
 {

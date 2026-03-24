@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLesionPropagation.h"
+#include <mitkLesionPropagation.h>
 
 void mitk::FindClosestSegmentationMask()
 {

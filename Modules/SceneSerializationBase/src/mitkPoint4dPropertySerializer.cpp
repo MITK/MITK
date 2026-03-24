@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPoint4dPropertySerializer_h_included
 #define mitkPoint4dPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkProperties.h"
-#include "mitkStringsToNumbers.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkProperties.h>
+#include <mitkStringsToNumbers.h>
 #include <mitkLocaleSwitch.h>
 #include <array>
 #include <tinyxml2.h>

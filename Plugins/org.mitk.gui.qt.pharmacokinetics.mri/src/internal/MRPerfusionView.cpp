@@ -13,14 +13,14 @@ found in the LICENSE file.
 #include "MRPerfusionView.h"
 #include <ui_MRPerfusionViewControls.h>
 
-#include "boost/tokenizer.hpp"
-#include "boost/math/constants/constants.hpp"
+#include <boost/tokenizer.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <iostream>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
-#include "mitkAterialInputFunctionGenerator.h"
-#include "mitkConcentrationCurveGenerator.h"
+#include <mitkAterialInputFunctionGenerator.h>
+#include <mitkConcentrationCurveGenerator.h>
 
 #include <mitkDescriptivePharmacokineticBrixModelFactory.h>
 #include <mitkDescriptivePharmacokineticBrixModelParameterizer.h>
@@ -29,8 +29,8 @@ found in the LICENSE file.
 #include <mitkExtendedToftsModelParameterizer.h>
 #include <mitkStandardToftsModelFactory.h>
 #include <mitkStandardToftsModelParameterizer.h>
-#include "mitkTwoCompartmentExchangeModelFactory.h"
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
+#include <mitkTwoCompartmentExchangeModelFactory.h>
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
 #include <mitkInitialParameterizationDelegateBase.h>
 
 #include <mitkNodePredicateAnd.h>
@@ -39,7 +39,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
@@ -61,8 +61,8 @@ found in the LICENSE file.
 
 // Includes for image casting between ITK and MITK
 #include <mitkImage.h>
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 

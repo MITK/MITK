@@ -16,12 +16,12 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkDataNode.h>
 
-#include "mitkScalarListLookupTableProperty.h"
-#include "mitkModelBase.h"
-#include "mitkModelFitParameter.h"
-#include "mitkModelFitStaticParameterMap.h"
+#include <mitkScalarListLookupTableProperty.h>
+#include <mitkModelBase.h>
+#include <mitkModelFitParameter.h>
+#include <mitkModelFitStaticParameterMap.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkOperation.h"
+#include <mitkOperation.h>
 
 mitk::Operation::Operation(mitk::OperationType operationType) : m_OperationType(operationType)
 {

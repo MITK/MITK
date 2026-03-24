@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDisplayActionEventBroadcast_h
 #define mitkDisplayActionEventBroadcast_h
 
-#include "mitkInteractionEventObserver.h"
+#include <mitkInteractionEventObserver.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

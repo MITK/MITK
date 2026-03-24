@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkModelFitCostFunctionInterface_h
 #define mitkModelFitCostFunctionInterface_h
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

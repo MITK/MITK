@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkModelFitResultRelationRule_h
 #define mitkModelFitResultRelationRule_h
 
-#include "mitkSourceImageRelationRule.h"
+#include <mitkSourceImageRelationRule.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

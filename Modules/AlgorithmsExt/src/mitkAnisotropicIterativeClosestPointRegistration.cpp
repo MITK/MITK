@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkAnisotropicIterativeClosestPointRegistration.h"
-#include "mitkAnisotropicRegistrationCommon.h"
-#include "mitkWeightedPointTransform.h"
+#include <mitkAnisotropicIterativeClosestPointRegistration.h>
+#include <mitkAnisotropicRegistrationCommon.h>
+#include <mitkWeightedPointTransform.h>
 #include <mitkProgressBar.h>
 #include <mitkSurface.h>
 // VTK

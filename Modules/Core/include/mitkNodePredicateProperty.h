@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateProperty_h
 #define mitkNodePredicateProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkBaseRenderer.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkBaseProperty.h>
+#include <mitkBaseRenderer.h>
+#include <mitkNodePredicateBase.h>
 
 namespace mitk
 {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #define mitkConvert2Dto3DImageFilter_h
 
 // MITK
-#include "mitkImageToImageFilter.h"
+#include <mitkImageToImageFilter.h>
 #include <itkImage.h>
 #include <mitkImage.h>
 

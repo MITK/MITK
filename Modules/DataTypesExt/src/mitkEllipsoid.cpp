@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEllipsoid.h"
-#include "mitkNumericTypes.h"
-#include "vtkLinearTransform.h"
+#include <mitkEllipsoid.h>
+#include <mitkNumericTypes.h>
+#include <vtkLinearTransform.h>
 #include <vtkSphereSource.h>
 
 mitk::Ellipsoid::Ellipsoid() : BoundingObject()

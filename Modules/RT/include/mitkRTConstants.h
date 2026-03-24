@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <string>
 
-#include "MitkRTExports.h"
+#include <MitkRTExports.h>
 
 namespace mitk
 {

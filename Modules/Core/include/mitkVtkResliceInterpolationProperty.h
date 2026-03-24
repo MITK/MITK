@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkResliceInterpolationProperty_h
 #define mitkVtkResliceInterpolationProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 #include <vtkImageReslice.h>
 

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkInteractionSchemeSwitcher_h
 #define mitkInteractionSchemeSwitcher_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
-#include "mitkInteractionEventHandler.h"
+#include <mitkInteractionEventHandler.h>
 
 #include <itkObject.h>
 

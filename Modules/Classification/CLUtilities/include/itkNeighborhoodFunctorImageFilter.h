@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef itkNeighborhoodFunctorImageFilter_h
 #define itkNeighborhoodFunctorImageFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
-#include "itkConstNeighborhoodIterator.h"
-#include "itkImage.h"
+#include <itkImageToImageFilter.h>
+#include <itkZeroFluxNeumannBoundaryCondition.h>
+#include <itkConstNeighborhoodIterator.h>
+#include <itkImage.h>
 #include <cstdio>
 
 #include <itkHistogramToTextureFeaturesFilter.h>
-#include "itkHistogram.h"
+#include <itkHistogram.h>
 
 namespace itk
 {

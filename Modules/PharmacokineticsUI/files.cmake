@@ -1,4 +1,3 @@
 set(CPP_FILES
-  Qmitk/QmitkDescriptionParameterBackgroundJob.cpp
+  QmitkDescriptionParameterBackgroundJob.cpp
 )
-

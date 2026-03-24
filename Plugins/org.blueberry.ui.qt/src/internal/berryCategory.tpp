@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryWorkbenchRegistryConstants.h"
 
 #include <berryIContributor.h>
-#include <berryUIException.h>
+#include "berryUIException.h"
 
 #include <QStringList>
 

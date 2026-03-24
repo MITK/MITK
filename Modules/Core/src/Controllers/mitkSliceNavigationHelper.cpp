@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSliceNavigationHelper.h"
+#include <mitkSliceNavigationHelper.h>
 
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkProportionalTimeGeometry.h>

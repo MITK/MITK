@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryQtShowViewAction.h"
 
-#include <berryIWorkbenchPage.h>
-#include <berryUIException.h>
+#include "berryIWorkbenchPage.h"
+#include "berryUIException.h"
 
 #include <QWidget>
 

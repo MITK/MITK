@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "mitkProperties.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkProperties.h>
+#include <mitkStandaloneDataStorage.h>
 
-#include "mitkModelFitInfo.h"
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitException.h"
-#include "mitkModelFitResultRelationRule.h"
+#include <mitkModelFitInfo.h>
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitException.h>
+#include <mitkModelFitResultRelationRule.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <mitkUIDGenerator.h>

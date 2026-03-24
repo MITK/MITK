@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertyItemModel.h"
-#include "QmitkPropertyItem.h"
+#include <QmitkPropertyItemModel.h>
+#include <QmitkPropertyItem.h>
 #include <QColor>
 #include <mitkColorProperty.h>
 #include <mitkEnumerationProperty.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowUtilityWidget.h"
+#include <QmitkRenderWindowUtilityWidget.h>
 
 #include <QWidgetAction>
 

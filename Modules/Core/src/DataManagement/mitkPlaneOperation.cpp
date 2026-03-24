@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneOperation.h"
-#include "mitkLog.h"
+#include <mitkPlaneOperation.h>
+#include <mitkLog.h>
 
 namespace mitk
 {

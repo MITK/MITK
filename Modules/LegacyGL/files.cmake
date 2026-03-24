@@ -1,8 +1,8 @@
 #We are deprecated. Please don't use us.
 
 set(H_FILES
-  mitkGLMapper2D.h
   mitkGL.h
+  mitkGLMapper2D.h
 )
 
 set(CPP_FILES

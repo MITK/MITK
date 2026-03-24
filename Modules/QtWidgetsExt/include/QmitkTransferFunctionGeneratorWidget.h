@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkTransferFunctionGeneratorWidget_h
 #define QmitkTransferFunctionGeneratorWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <mitkCommon.h>
 

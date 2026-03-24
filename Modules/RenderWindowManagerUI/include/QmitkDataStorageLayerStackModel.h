@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define QmitkDataStorageLayerStackModel_h
 
 // render window manager UI module
-#include "MitkRenderWindowManagerUIExports.h"
+#include <MitkRenderWindowManagerUIExports.h>
 
 // render window manager module
-#include "mitkRenderWindowLayerUtilities.h"
+#include <mitkRenderWindowLayerUtilities.h>
 
 // qt widgets module
 #include <QmitkAbstractDataStorageModel.h>

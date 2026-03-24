@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYTABBEDSTACKPRESENTATION_H_
 #define BERRYTABBEDSTACKPRESENTATION_H_
 
-#include <berryStackPresentation.h>
+#include "berryStackPresentation.h"
 
 #include "berryPresentablePartFolder.h"
 #include "berryTabOrder.h"

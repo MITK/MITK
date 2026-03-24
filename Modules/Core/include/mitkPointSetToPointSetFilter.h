@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPointSetToPointSetFilter_h
 #define mitkPointSetToPointSetFilter_h
 
-#include "mitkPointSetSource.h"
+#include <mitkPointSetSource.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

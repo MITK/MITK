@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkFormulaParser.h"
+#include <mitkTestingMacros.h>
+#include <mitkFormulaParser.h>
 
 using namespace mitk;
 

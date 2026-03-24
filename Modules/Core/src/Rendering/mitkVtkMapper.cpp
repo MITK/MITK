@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkMapper.h"
+#include <mitkVtkMapper.h>
 
 mitk::VtkMapper::VtkMapper()
 {

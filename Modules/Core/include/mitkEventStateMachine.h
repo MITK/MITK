@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkEventStateMachine_h
 #define mitkEventStateMachine_h
 
-#include "itkObject.h"
-#include "mitkCommon.h"
-#include "mitkInteractionEventHandler.h"
-#include "mitkMessage.h"
+#include <itkObject.h>
+#include <mitkCommon.h>
+#include <mitkInteractionEventHandler.h>
+#include <mitkMessage.h>
 
 #include <MitkCoreExports.h>
 #include <string>

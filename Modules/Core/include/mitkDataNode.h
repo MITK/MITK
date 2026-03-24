@@ -13,22 +13,22 @@ found in the LICENSE file.
 #ifndef mitkDataNode_h
 #define mitkDataNode_h
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 //#include "mitkMapper.h"
-#include "mitkDataInteractor.h"
-#include "mitkIdentifiable.h"
-#include "mitkIPropertyOwner.h"
+#include <mitkDataInteractor.h>
+#include <mitkIdentifiable.h>
+#include <mitkIPropertyOwner.h>
 
 #include <fstream>
 #include <iostream>
 
-#include "mitkColorProperty.h"
-#include "mitkPropertyList.h"
-#include "mitkStringProperty.h"
+#include <mitkColorProperty.h>
+#include <mitkPropertyList.h>
+#include <mitkStringProperty.h>
 //#include "mitkMapper.h"
 
-#include "mitkGeometry3D.h"
-#include "mitkLevelWindow.h"
+#include <mitkGeometry3D.h>
+#include <mitkLevelWindow.h>
 #include <map>
 #include <set>
 

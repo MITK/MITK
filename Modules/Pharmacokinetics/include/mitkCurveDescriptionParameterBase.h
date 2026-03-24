@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <itkArray2D.h>
 #include <itkObject.h>
 #include <mitkModelBase.h>
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

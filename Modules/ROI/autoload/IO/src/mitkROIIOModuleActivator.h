@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkROIIOModuleActivator_h
+#define mitkROIIOModuleActivator_h
+
 #include <usModuleActivator.h>
 
 #include <memory>
@@ -35,3 +38,5 @@ namespace mitk
     std::vector<std::shared_ptr<AbstractFileIO>> m_FileIOs;
   };
 }
+
+#endif

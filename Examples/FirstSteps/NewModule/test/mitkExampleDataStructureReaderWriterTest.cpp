@@ -11,15 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 // std includes
 #include <string>
 
 // MITK includes
-#include "mitkExampleDataStructure.h"
-#include "mitkIOUtil.h"
+#include <mitkExampleDataStructure.h>
+#include <mitkIOUtil.h>
 
 // VTK includes
 #include <vtkDebugLeaks.h>

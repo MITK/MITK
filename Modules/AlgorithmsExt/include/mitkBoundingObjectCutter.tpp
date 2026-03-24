@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBOUNDINGOBJECTCUTTER_TPP
-#define MITKBOUNDINGOBJECTCUTTER_TPP
+#ifndef mitkBoundingObjectCutter_tpp
+#define mitkBoundingObjectCutter_tpp
 
-#include "itkImageRegionIteratorWithIndex.h"
-#include "mitkImageToItk.h"
-#include "mitkStatusBar.h"
+#include <itkImageRegionIteratorWithIndex.h>
+#include <mitkImageToItk.h>
+#include <mitkStatusBar.h>
 
 namespace mitk
 {
@@ -271,6 +271,6 @@ namespace mitk
 
 } // of namespace mitk
 
-#include "mitkImageCast.h"
+#include <mitkImageCast.h>
 
-#endif // of MITKBOUNDINGOBJECTCUTTER_TPP
+#endif // of mitkBoundingObjectCutter_tpp

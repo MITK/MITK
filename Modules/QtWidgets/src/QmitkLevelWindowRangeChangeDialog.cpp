@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLevelWindowRangeChangeDialog.h"
+#include <QmitkLevelWindowRangeChangeDialog.h>
 #include <ui_QmitkLevelWindowRangeChange.h>
 
 #include <QMessageBox>

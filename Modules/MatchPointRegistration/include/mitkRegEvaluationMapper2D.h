@@ -15,22 +15,22 @@ found in the LICENSE file.
 
 //MatchPoint
 #include <mapRegistration.h>
-#include "mitkRegEvaluationObject.h"
+#include <mitkRegEvaluationObject.h>
 
 //MITK
 #include <mitkCommon.h>
 
 //MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
-#include "mitkExtractSliceFilter.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
+#include <mitkExtractSliceFilter.h>
 
 //VTK
 #include <vtkSmartPointer.h>
 #include <vtkPropAssembly.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 class vtkActor;
 class vtkPolyDataMapper;

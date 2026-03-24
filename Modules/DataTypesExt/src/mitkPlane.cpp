@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlane.h"
-#include "mitkNumericTypes.h"
+#include <mitkPlane.h>
+#include <mitkNumericTypes.h>
 
 #include <vtkDoubleArray.h>
 #include <vtkLinearTransform.h>

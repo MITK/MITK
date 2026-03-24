@@ -13,8 +13,8 @@ found in the LICENSE file.
 
 #include "berryQActionContributionItem.h"
 
-#include <berryIContributionManager.h>
-#include <berryIContributionManagerOverrides.h>
+#include "berryIContributionManager.h"
+#include "berryIContributionManagerOverrides.h"
 
 #include <QMenu>
 

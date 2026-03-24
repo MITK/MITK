@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericProperty.h"
-#include "mitkNumericTypes.h"
-#include "mitkProperties.h"
-#include "mitkStringProperty.h"
-#include "mitkTestingMacros.h"
+#include <mitkGenericProperty.h>
+#include <mitkNumericTypes.h>
+#include <mitkProperties.h>
+#include <mitkStringProperty.h>
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 #include <string>

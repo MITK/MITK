@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkSceneSerializationBaseExports.h>
 
-#include "mitkPropertyList.h"
+#include <mitkPropertyList.h>
 
 #include <itkObjectFactoryBase.h>
 

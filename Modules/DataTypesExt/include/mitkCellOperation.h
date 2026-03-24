@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkCellOperation_h
 #define mitkCellOperation_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
-#include "mitkOperation.h"
-#include "mitkVector.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCommon.h>
+#include <mitkOperation.h>
+#include <mitkVector.h>
 
 namespace mitk
 {

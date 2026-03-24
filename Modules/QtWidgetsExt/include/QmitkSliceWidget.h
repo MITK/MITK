@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef QmitkSliceWidget_h
 #define QmitkSliceWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
-#include "QmitkRenderWindow.h"
-#include "mitkDataStorage.h"
-#include "mitkSliceNavigationController.h"
-#include "QmitkSliceNavigationWidget.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkStandaloneDataStorage.h"
+#include <QmitkRenderWindow.h>
+#include <mitkDataStorage.h>
+#include <mitkSliceNavigationController.h>
+#include <QmitkSliceNavigationWidget.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkStandaloneDataStorage.h>
 #include <QWidget>
 #include <memory>
 

@@ -14,14 +14,14 @@ found in the LICENSE file.
 #define mitkLabelSetImageVtkMapper2D_h
 
 // MITK
-#include "MitkMultilabelExports.h"
-#include "mitkCommon.h"
+#include <MitkMultilabelExports.h>
+#include <mitkCommon.h>
 
 // MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkExtractSliceFilter.h"
-#include "mitkLabelSetImage.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkExtractSliceFilter.h>
+#include <mitkLabelSetImage.h>
+#include <mitkVtkMapper.h>
 
 // VTK
 #include <vtkSmartPointer.h>

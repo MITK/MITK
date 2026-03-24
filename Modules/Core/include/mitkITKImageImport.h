@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkITKImageImport_h
 #define mitkITKImageImport_h
 
-#include "itkImageToImageFilterDetail.h"
-#include "mitkImageSource.h"
+#include <itkImageToImageFilterDetail.h>
+#include <mitkImageSource.h>
 #include <MitkCoreExports.h>
 
 namespace mitk
@@ -237,7 +237,7 @@ namespace mitk
 } // namespace mitk
 
 #ifndef MITK_MANUAL_INSTANTIATION
-#include "mitkITKImageImport.tpp"
+#include <mitkITKImageImport.tpp>
 #endif
 
 #endif

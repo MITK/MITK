@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTransferFunctionGeneratorWidget.h"
+#include <QmitkTransferFunctionGeneratorWidget.h>
 #include <ui_QmitkTransferFunctionGeneratorWidget.h>
 
 #include <QFileDialog>

@@ -16,15 +16,15 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include "mitkCameraRotationController.h"
-#include "mitkStepper.h"
-#include "mitkMultiStepper.h"
-#include "mitkMovieGenerator.h"
-#include "itkCommand.h"
+#include <mitkCameraRotationController.h>
+#include <mitkStepper.h>
+#include <mitkMultiStepper.h>
+#include <mitkMovieGenerator.h>
+#include <itkCommand.h>
 
-#include "vtkEventQtSlotConnect.h"
-#include "vtkRenderWindow.h"
-#include "mitkVtkPropRenderer.h"
+#include <vtkEventQtSlotConnect.h>
+#include <vtkRenderWindow.h>
+#include <mitkVtkPropRenderer.h>
 #include <memory>
 
 namespace Ui

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkArithmeticOperation.h"
+#include <mitkArithmeticOperation.h>
 
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <itkArithmeticOpsFunctors.h>
 #include <itkImage.h>
-#include "itkUnaryFunctorImageFilter.h"
+#include <itkUnaryFunctorImageFilter.h>
 #include <itkBinaryFunctorImageFilter.h>
 
 #include <itkTanImageFilter.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyFilter.h"
+#include <mitkPropertyFilter.h>
 #include <algorithm>
 
 namespace mitk

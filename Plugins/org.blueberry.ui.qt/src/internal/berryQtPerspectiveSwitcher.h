@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <QToolBar>
 #include <QHash>
 
-#include <berryIPerspectiveListener.h>
-#include <berryIWorkbenchWindow.h>
+#include "berryIPerspectiveListener.h"
+#include "berryIWorkbenchWindow.h"
 
 namespace berry {
 

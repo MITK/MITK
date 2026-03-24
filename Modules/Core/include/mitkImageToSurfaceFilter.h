@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageToSurfaceFilter_h
 #define mitkImageToSurfaceFilter_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <mitkSurface.h>
 #include <mitkSurfaceSource.h>

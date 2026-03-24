@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkManualPlacementAnnotationRenderer_h
 #define mitkManualPlacementAnnotationRenderer_h
 
-#include "MitkAnnotationExports.h"
-#include "mitkAbstractAnnotationRenderer.h"
-#include "mitkAnnotation.h"
+#include <MitkAnnotationExports.h>
+#include <mitkAbstractAnnotationRenderer.h>
+#include <mitkAnnotation.h>
 
 namespace mitk
 {

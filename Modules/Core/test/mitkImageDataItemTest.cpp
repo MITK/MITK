@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <array>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkImageDataItem.h>
 

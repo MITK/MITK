@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLocaleSwitch_h
 #define mitkLocaleSwitch_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

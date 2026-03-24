@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <QStandardPaths>
 #include <QDir>
 #include <QMessageBox>
-#include <QmitkSegmentAnythingToolInstaller.h>
+#include "QmitkSegmentAnythingToolInstaller.h"
 #include <memory>
 
 namespace Ui

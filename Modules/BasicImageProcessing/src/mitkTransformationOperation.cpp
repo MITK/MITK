@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransformationOperation.h"
+#include <mitkTransformationOperation.h>
 
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
@@ -30,13 +30,13 @@ found in the LICENSE file.
 #include <itkForwardFFTImageFilter.h>
 #include <itkInverseFFTImageFilter.h>
 #include <itkFFTPadImageFilter.h>
-#include "itkZeroFluxNeumannBoundaryCondition.h"
-#include "itkPeriodicBoundaryCondition.h"
-#include "itkConstantBoundaryCondition.h"
+#include <itkZeroFluxNeumannBoundaryCondition.h>
+#include <itkPeriodicBoundaryCondition.h>
+#include <itkConstantBoundaryCondition.h>
 //#include <itkComplexToRealImageFilter.h>
-#include "itkCastImageFilter.h"
+#include <itkCastImageFilter.h>
 
-#include "itkUnaryFunctorImageFilter.h"
+#include <itkUnaryFunctorImageFilter.h>
 #include <mitkImageMappingHelper.h>
 #include <mitkMAPAlgorithmHelper.h>
 #include <itkImageDuplicator.h>

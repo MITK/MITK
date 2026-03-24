@@ -14,10 +14,10 @@ found in the LICENSE file.
 #ifndef BERRYQTWIDGETSTWEAKLETIMPL_H_
 #define BERRYQTWIDGETSTWEAKLETIMPL_H_
 
-#include <internal/berryQtWidgetController.h>
+#include "internal/berryQtWidgetController.h"
 
-#include <berryShell.h>
-#include <berryGuiTkISelectionListener.h>
+#include "berryShell.h"
+#include "berryGuiTkISelectionListener.h"
 
 #include <QMetaType>
 

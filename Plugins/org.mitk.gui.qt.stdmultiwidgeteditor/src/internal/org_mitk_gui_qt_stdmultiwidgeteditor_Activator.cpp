@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_stdmultiwidgeteditor_Activator.h"
 
-#include "../QmitkStdMultiWidgetEditor.h"
+#include "QmitkStdMultiWidgetEditor.h"
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
 
 #include <usModuleInitialization.h>

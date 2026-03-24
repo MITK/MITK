@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "berryIContextService.h"
 #include "berryIEditorSite.h"
-#include "berryIEvaluationContext.h"
+#include <berryIEvaluationContext.h>
 #include "berryIPartService.h"
 #include "berryISelectionService.h"
 #include "berryIShowInSource.h"
@@ -25,8 +25,8 @@ found in the LICENSE file.
 
 #include "berryDetachedWindow.h"
 #include "berryDisplay.h"
-#include "berryObjectString.h"
-#include "berryObjects.h"
+#include <berryObjectString.h>
+#include <berryObjects.h>
 #include "berryShowInContext.h"
 #include "berryUiUtil.h"
 #include "berryWorkbench.h"

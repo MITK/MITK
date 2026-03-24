@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define QmitkRenderWindowDataStorageListModel_h
 
 // render window manager UI model
-#include "MitkRenderWindowManagerUIExports.h"
+#include <MitkRenderWindowManagerUIExports.h>
 
 // render window manager module
-#include "mitkRenderWindowLayerController.h"
-#include "mitkRenderWindowLayerUtilities.h"
+#include <mitkRenderWindowLayerController.h>
+#include <mitkRenderWindowLayerUtilities.h>
 
 //mitk core
 #include <mitkBaseRenderer.h>

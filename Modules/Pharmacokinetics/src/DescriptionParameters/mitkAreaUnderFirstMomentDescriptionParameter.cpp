@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAreaUnderFirstMomentDescriptionParameter.h"
+#include <mitkAreaUnderFirstMomentDescriptionParameter.h>
 
 const std::string mitk::AreaUnderFirstMomentDescriptionParameter::PARAMETER_NAME = "AreaUnderFirstMoment";
 

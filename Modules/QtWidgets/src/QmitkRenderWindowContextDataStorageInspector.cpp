@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager UI module
-#include "QmitkRenderWindowContextDataStorageInspector.h"
+#include <QmitkRenderWindowContextDataStorageInspector.h>
 
 #include <ui_QmitkRenderWindowContextDataStorageInspector.h>
 

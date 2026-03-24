@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkGridRepresentationProperty_h
 #define mitkGridRepresentationProperty_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkEnumerationProperty.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

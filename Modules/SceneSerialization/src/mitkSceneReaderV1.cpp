@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSceneReaderV1.h"
-#include "Poco/Path.h"
-#include "mitkBaseRenderer.h"
-#include "mitkIOUtil.h"
-#include "mitkProgressBar.h"
+#include <Poco/Path.h>
+#include <mitkBaseRenderer.h>
+#include <mitkIOUtil.h>
+#include <mitkProgressBar.h>
 #include "mitkPropertyListDeserializer.h"
-#include "mitkSerializerMacros.h"
+#include <mitkSerializerMacros.h>
 #include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
 #include <tinyxml2.h>

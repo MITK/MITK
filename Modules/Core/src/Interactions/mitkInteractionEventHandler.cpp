@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionEventHandler.h"
-#include "mitkInteractionEvent.h"
+#include <mitkInteractionEventHandler.h>
+#include <mitkInteractionEvent.h>
 
 mitk::InteractionEventHandler::InteractionEventHandler() : m_EventConfig()
 {

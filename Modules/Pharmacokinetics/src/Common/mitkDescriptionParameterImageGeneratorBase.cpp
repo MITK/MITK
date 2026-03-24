@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDescriptionParameterImageGeneratorBase.h"
+#include <mitkDescriptionParameterImageGeneratorBase.h>
 
 mitk::DescriptionParameterImageGeneratorBase::DescriptionParameterImageGeneratorBase() = default;
 mitk::DescriptionParameterImageGeneratorBase::~DescriptionParameterImageGeneratorBase() = default;

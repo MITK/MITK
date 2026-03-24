@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSimpleBarrierConstraintChecker_h
 #define mitkSimpleBarrierConstraintChecker_h
 
-#include "mitkConstraintCheckerBase.h"
+#include <mitkConstraintCheckerBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

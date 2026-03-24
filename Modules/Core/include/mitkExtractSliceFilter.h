@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkExtractSliceFilter_h
 #define mitkExtractSliceFilter_h
 
-#include "MitkCoreExports.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkCoreExports.h>
+#include <mitkImageToImageFilter.h>
 
 #include <vtkAbstractTransform.h>
 #include <vtkImageData.h>

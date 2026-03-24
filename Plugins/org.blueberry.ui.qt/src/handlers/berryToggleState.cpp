@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryToggleState.h"
 
-#include "berryObjects.h"
+#include <berryObjects.h>
 
 #include <QStringList>
 

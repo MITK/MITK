@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGizmo.h"
-#include "mitkGizmoInteractor.h"
+#include <mitkGizmo.h>
+#include <mitkGizmoInteractor.h>
 
 // MITK includes
 #include <mitkBaseRenderer.h>

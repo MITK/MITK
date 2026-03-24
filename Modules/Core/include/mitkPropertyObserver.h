@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPropertyObserver_h
 #define mitkPropertyObserver_h
 
-#include "MitkCoreExports.h"
-#include "mitkCommon.h"
+#include <MitkCoreExports.h>
+#include <mitkCommon.h>
 #include <itkEventObject.h>
 
 namespace mitk

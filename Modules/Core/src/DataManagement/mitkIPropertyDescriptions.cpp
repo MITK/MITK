@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIPropertyDescriptions.h"
+#include <mitkIPropertyDescriptions.h>
 
 mitk::IPropertyDescriptions::~IPropertyDescriptions()
 {

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QMITKSINGLENODESELECTION_H_
 
 // Own includes
-#include "berryISelection.h"
+#include <berryISelection.h>
 /// Qmitk
 #include <org_mitk_gui_qt_datamanager_Export.h>
 

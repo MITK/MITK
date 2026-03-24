@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkThinPlateSplineCurvedGeometry_h
 #define mitkThinPlateSplineCurvedGeometry_h
 
-#include "mitkLandmarkProjectorBasedCurvedGeometry.h"
+#include <mitkLandmarkProjectorBasedCurvedGeometry.h>
 
 class vtkPoints;
 class vtkThinPlateSplineTransform;

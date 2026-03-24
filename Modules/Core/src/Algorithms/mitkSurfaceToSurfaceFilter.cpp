@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceToSurfaceFilter.h"
-#include "mitkSurface.h"
+#include <mitkSurfaceToSurfaceFilter.h>
+#include <mitkSurface.h>
 
 mitk::SurfaceToSurfaceFilter::SurfaceToSurfaceFilter() : SurfaceSource()
 {

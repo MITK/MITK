@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkUGCombinedRepresentationPropertyWidget.h"
+#include <QmitkUGCombinedRepresentationPropertyWidget.h>
 
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>

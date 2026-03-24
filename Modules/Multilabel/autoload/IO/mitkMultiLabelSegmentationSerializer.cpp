@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationSerializer.h"
-#include "mitkLabelSetImage.h"
+#include <mitkMultiLabelSegmentationSerializer.h>
+#include <mitkLabelSetImage.h>
 
 #include <itksys/SystemTools.hxx>
 

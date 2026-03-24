@@ -13,27 +13,27 @@ found in the LICENSE file.
 #include <algorithm>
 #include <fstream>
 
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkGroupTagProperty.h"
-#include "mitkImage.h"
-#include "mitkReferenceCountWatcher.h"
-#include "mitkStringProperty.h"
-#include "mitkSurface.h"
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkGroupTagProperty.h>
+#include <mitkImage.h>
+#include <mitkReferenceCountWatcher.h>
+#include <mitkStringProperty.h>
+#include <mitkSurface.h>
 
-#include "mitkDataStorage.h"
-#include "mitkIOUtil.h"
-#include "mitkMessage.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkDataStorage.h>
+#include <mitkIOUtil.h>
+#include <mitkMessage.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkStandaloneDataStorage.h>
 //#include "mitkPicFileReader.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 void TestDataStorage(mitk::DataStorage *ds, std::string filename);
 

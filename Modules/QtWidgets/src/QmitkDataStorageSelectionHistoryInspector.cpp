@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <ui_QmitkDataStorageSelectionHistoryInspector.h>
 
-#include "QmitkDataStorageHistoryModel.h"
+#include <QmitkDataStorageHistoryModel.h>
 
 QmitkDataStorageSelectionHistoryInspector::QmitkDataStorageSelectionHistoryInspector(QWidget* parent/* = nullptr*/)
   : QmitkAbstractDataStorageInspector(parent)

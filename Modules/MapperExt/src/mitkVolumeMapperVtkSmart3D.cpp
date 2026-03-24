@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVolumeMapperVtkSmart3D.h"
-#include "mitkTransferFunctionProperty.h"
-#include "mitkTransferFunctionInitializer.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkVolumeMapperVtkSmart3D.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkTransferFunctionInitializer.h>
+#include <mitkLevelWindowProperty.h>
 #include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>

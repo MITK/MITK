@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkPropertyList.h>
 
-#include "mitkDICOMSegmentationPropertyHelper.h"
+#include <mitkDICOMSegmentationPropertyHelper.h>
 
 #include <vtkSmartPointer.h>
 

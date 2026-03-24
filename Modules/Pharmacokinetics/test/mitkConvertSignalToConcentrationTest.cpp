@@ -11,14 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
 //MITK includes
-#include "mitkConcentrationCurveGenerator.h"
-#include "mitkTestDynamicImageGenerator.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "boost/math/constants/constants.hpp"
+#include <mitkConcentrationCurveGenerator.h>
+#include <mitkTestDynamicImageGenerator.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <boost/math/constants/constants.hpp>
 
 
 class mitkConvertSignalToConcentrationTestSuite : public mitk::TestFixture

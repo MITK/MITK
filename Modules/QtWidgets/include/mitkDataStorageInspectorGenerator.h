@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDataStorageInspectorGenerator_h
 #define mitkDataStorageInspectorGenerator_h
 
-#include "mitkIDataStorageInspectorProvider.h"
+#include <mitkIDataStorageInspectorProvider.h>
 
 #include <MitkQtWidgetsExports.h>
 

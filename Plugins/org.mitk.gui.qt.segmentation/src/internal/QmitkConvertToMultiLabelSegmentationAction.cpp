@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 
-#include "mitkLabelSetImage.h"
-#include "mitkRenderingManager.h"
+#include <mitkLabelSetImage.h>
+#include <mitkRenderingManager.h>
 
 //needed for qApp
 #include <QCoreApplication>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigure.h>
 #include <mitkExtrudePlanarFigureFilter.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkSurface.h>

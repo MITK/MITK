@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryEvaluationReference.h"
 #include "berryEvaluationAuthority.h"
-#include "berryExpression.h"
+#include <berryExpression.h>
 
 #include <berryIEvaluationContext.h>
 

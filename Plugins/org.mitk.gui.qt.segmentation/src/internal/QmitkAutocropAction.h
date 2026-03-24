@@ -12,13 +12,13 @@ found in the LICENSE file.
 #ifndef QmitkAutocropAction_h
 #define QmitkAutocropAction_h
 
-#include "mitkIContextMenuAction.h"
+#include <mitkIContextMenuAction.h>
 
-#include "org_mitk_gui_qt_segmentation_Export.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
-#include "vector"
-#include "mitkDataNode.h"
-#include "mitkImage.h"
+#include <vector>
+#include <mitkDataNode.h>
+#include <mitkImage.h>
 
 class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IContextMenuAction
 {

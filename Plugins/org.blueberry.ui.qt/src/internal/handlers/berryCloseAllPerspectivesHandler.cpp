@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "berryCloseAllPerspectivesHandler.h"
 
-#include <berryIWorkbenchPage.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryHandlerUtil.h>
+#include "berryIWorkbenchPage.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryHandlerUtil.h"
 
 namespace berry {
 

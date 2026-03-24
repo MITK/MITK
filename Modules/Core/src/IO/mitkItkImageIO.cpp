@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkItkImageIO.h"
+#include <mitkItkImageIO.h>
 
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkCoreServices.h>

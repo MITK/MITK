@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkAnnotation.h"
+#include <mitkVtkAnnotation.h>
 #include <vtkProp.h>
 #include <vtkProperty.h>
 

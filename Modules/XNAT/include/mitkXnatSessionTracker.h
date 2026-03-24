@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkXnatSessionTracker_h
 #define mitkXnatSessionTracker_h
 
-#include "usServiceTracker.h"
+#include <usServiceTracker.h>
 
-#include "MitkXNATExports.h"
+#include <MitkXNATExports.h>
 
-#include "mitkXnatSession.h"
+#include <mitkXnatSession.h>
 
 namespace mitk
 {

@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAffineImageCropperInteractor.h"
+#include <mitkAffineImageCropperInteractor.h>
 
-#include "mitkInteractionConst.h"
-#include "mitkInteractionPositionEvent.h"
-#include "mitkRotationOperation.h"
-#include "mitkSurface.h"
-#include "mitkVtkMapper.h"
+#include <mitkInteractionConst.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkRotationOperation.h>
+#include <mitkSurface.h>
+#include <mitkVtkMapper.h>
 
 #include <mitkBoundingObject.h>
 #include <mitkMouseWheelEvent.h>

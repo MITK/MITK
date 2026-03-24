@@ -15,15 +15,15 @@ found in the LICENSE file.
 
 #include <QString>
 
-#include "QmitkAbstractView.h"
-#include "itkCommand.h"
+#include <QmitkAbstractView.h>
+#include <itkCommand.h>
 
-#include "mitkModelBase.h"
-#include "QmitkParameterFitBackgroundJob.h"
-#include "mitkModelFitResultHelper.h"
-#include "mitkModelFactoryBase.h"
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkModelBase.h>
+#include <QmitkParameterFitBackgroundJob.h>
+#include <mitkModelFitResultHelper.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 #include <mitkNodePredicateBase.h>
 #include <memory>

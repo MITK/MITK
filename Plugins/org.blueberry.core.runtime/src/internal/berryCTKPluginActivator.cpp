@@ -16,9 +16,9 @@ found in the LICENSE file.
 
 #include "berryCTKPluginActivator.h"
 
-#include <berryIApplication.h>
-#include <berryIConfigurationElement.h>
-#include <berryIContributor.h>
+#include "berryIApplication.h"
+#include "berryIConfigurationElement.h"
+#include "berryIContributor.h"
 
 #include "berryApplicationContainer.h"
 #include "berryPlatform.h"

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageStitchingHelper.h"
+#include <mitkImageStitchingHelper.h>
 
 #include <itkInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
@@ -24,9 +24,9 @@ found in the LICENSE file.
 #include <mitkImageToItk.h>
 #include <mitkMAPAlgorithmHelper.h>
 
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
-#include "mitkRegistrationHelper.h"
+#include <mitkRegistrationHelper.h>
 
 template <typename TImage >
 typename ::itk::InterpolateImageFunction< TImage >::Pointer generateInterpolator(mitk::ImageMappingInterpolator::Type interpolatorType)

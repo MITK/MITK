@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkClippedSurfaceBoundsCalculator.h"
-#include "mitkLine.h"
+#include <mitkClippedSurfaceBoundsCalculator.h>
+#include <mitkLine.h>
 
 #define ROUND_P(x) ((x) >= 0 ? (int)((x) + 0.5) : (int)((x)-0.5))
 

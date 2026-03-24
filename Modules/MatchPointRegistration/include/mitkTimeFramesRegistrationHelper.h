@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <mapRegistrationBase.h>
 #include <mapEvents.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

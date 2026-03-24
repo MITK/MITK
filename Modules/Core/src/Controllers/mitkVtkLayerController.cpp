@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkLayerController.h"
+#include <mitkVtkLayerController.h>
 
 #include <algorithm>
 #include <vtkObjectFactory.h>

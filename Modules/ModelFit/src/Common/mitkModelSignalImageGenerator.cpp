@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelSignalImageGenerator.h"
-#include "itkMultiOutputNaryFunctorImageFilter.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkImageCast.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
-#include "mitkModelDataGenerationFunctor.h"
-#include "mitkSimpleFunctorPolicy.h"
+#include <mitkModelSignalImageGenerator.h>
+#include <itkMultiOutputNaryFunctorImageFilter.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageCast.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkITKImageImport.h>
+#include <mitkModelDataGenerationFunctor.h>
+#include <mitkSimpleFunctorPolicy.h>
 
 
 void mitk::ModelSignalImageGenerator::SetParameterInputImage(const ParametersIndexType parameterIndex, ParameterImageType parameterImage)

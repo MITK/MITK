@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLevelWindowProperty.h"
+#include <mitkLevelWindowProperty.h>
 
 mitk::LevelWindowProperty::LevelWindowProperty()
 {

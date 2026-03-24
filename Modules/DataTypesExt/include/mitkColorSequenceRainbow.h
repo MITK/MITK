@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkColorSequenceRainbow_h
 #define mitkColorSequenceRainbow_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkColorSequence.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkColorSequence.h>
 
 namespace mitk
 {

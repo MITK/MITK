@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericParamModel.h"
-#include "mitkFormulaParser.h"
+#include <mitkGenericParamModel.h>
+#include <mitkFormulaParser.h>
 
 const std::string mitk::GenericParamModel::NAME_STATIC_PARAMETER_number = "number_of_parameters";
 

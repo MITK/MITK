@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkTestCaller_h
 #define mitkTestCaller_h
 
-#include "cppunit/TestCase.h"
+#include <cppunit/TestCase.h>
 
 #include <string>
 #include <vector>

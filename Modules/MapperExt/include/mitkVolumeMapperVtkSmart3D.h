@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define mitkVolumeMapperVtkSmart3D_h
 
 // MITK
-#include "MitkMapperExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkImage.h"
-#include "mitkVtkMapper.h"
+#include <MitkMapperExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkImage.h>
+#include <mitkVtkMapper.h>
 
 // VTK
 #include <vtkImageChangeInformation.h>

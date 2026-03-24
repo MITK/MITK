@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetToPointSetFilter.h"
+#include <mitkPointSetToPointSetFilter.h>
 
 mitk::PointSetToPointSetFilter::PointSetToPointSetFilter()
 {

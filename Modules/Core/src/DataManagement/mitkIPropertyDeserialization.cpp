@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIPropertyDeserialization.h"
+#include <mitkIPropertyDeserialization.h>
 
 mitk::IPropertyDeserialization::~IPropertyDeserialization()
 {

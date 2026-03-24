@@ -15,8 +15,8 @@ found in the LICENSE file.
 #include "berryPerspective.h"
 #include "berryWorkbenchPlugin.h"
 
-#include <berryIStickyViewDescriptor.h>
-#include <berryIWorkbenchPage.h>
+#include "berryIStickyViewDescriptor.h"
+#include "berryIWorkbenchPage.h"
 
 namespace berry
 {

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDICOMGDCMImageFrameInfo_h
 #define mitkDICOMGDCMImageFrameInfo_h
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
-#include "gdcmScanner.h"
+#include <gdcmScanner.h>
 
 namespace mitk
 {

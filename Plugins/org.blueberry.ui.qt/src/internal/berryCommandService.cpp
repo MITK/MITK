@@ -17,15 +17,15 @@ found in the LICENSE file.
 #include <berryCommandManager.h>
 #include <berryCommandCategory.h>
 #include <berryParameterizedCommand.h>
-#include <berryUIElement.h>
+#include "berryUIElement.h"
 
 #include "berryPersistentState.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryElementReference.h"
 
 #include <berryIHandler.h>
-#include <berryIElementUpdater.h>
-#include <berryIElementReference.h>
+#include "berryIElementUpdater.h"
+#include "berryIElementReference.h"
 #include <berryISafeRunnable.h>
 #include <berrySafeRunner.h>
 #include <berryObjectString.h>

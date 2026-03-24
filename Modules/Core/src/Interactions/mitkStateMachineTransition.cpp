@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineTransition.h"
-#include "mitkEventFactory.h"
-#include "mitkInteractionEventConst.h"
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineState.h"
+#include <mitkStateMachineTransition.h>
+#include <mitkEventFactory.h>
+#include <mitkInteractionEventConst.h>
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineState.h>
 
 mitk::StateMachineTransition::StateMachineTransition(const std::string &nextStateName,
                                                      const std::string &eventClass,

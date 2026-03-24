@@ -12,29 +12,29 @@ found in the LICENSE file.
 
 #include "berryHandlerProxy.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryIEvaluationContext.h"
+#include <berryIConfigurationElement.h>
+#include <berryIEvaluationContext.h>
 #include "berryIEvaluationService.h"
 #include "berryICommandService.h"
-#include "berryIContributor.h"
+#include <berryIContributor.h>
 #include "berryIEvaluationReference.h"
 
-#include "berryEvaluationResult.h"
-#include "berryExpression.h"
-#include "berryCoreException.h"
-#include "berryCommandExceptions.h"
+#include <berryEvaluationResult.h>
+#include <berryExpression.h>
+#include <berryCoreException.h>
+#include <berryCommandExceptions.h>
 #include "berryUtil.h"
 #include "berryShell.h"
-#include "berryObjects.h"
-#include "berryObjectString.h"
+#include <berryObjects.h>
+#include <berryObjectString.h>
 #include "berryUIElement.h"
 #include "berryRadioState.h"
 #include "berryRegistryToggleState.h"
-#include "berryHandlerEvent.h"
+#include <berryHandlerEvent.h>
 #include "berryPlatformUI.h"
 #include "berryBundleUtility.h"
 #include "berryWorkbenchRegistryConstants.h"
-#include "berryStatus.h"
+#include <berryStatus.h>
 #include "berryWorkbenchPlugin.h"
 
 #include <QMessageBox>

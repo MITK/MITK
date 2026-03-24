@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkUnstructuredGridSource_h
 #define mitkUnstructuredGridSource_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkBaseDataSource.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkBaseDataSource.h>
 
 namespace mitk
 {

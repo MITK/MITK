@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkStateMachineState_h
 #define mitkStateMachineState_h
 
-#include "MitkCoreExports.h"
-#include "mitkStateMachineTransition.h"
+#include <MitkCoreExports.h>
+#include <mitkStateMachineTransition.h>
 #include <itkLightObject.h>
 #include <string>
 

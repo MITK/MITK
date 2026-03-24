@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkStdFunctionCommand.h"
+#include <mitkStdFunctionCommand.h>
 
 namespace mitk
 {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSVModelFitCostFunction.h"
-#include "mitkModelBase.h"
+#include <mitkSVModelFitCostFunction.h>
+#include <mitkModelBase.h>
 
 #include <iostream>
 

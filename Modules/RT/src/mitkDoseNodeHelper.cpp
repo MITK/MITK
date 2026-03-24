@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkDoseNodeHelper.h"
+#include <mitkDoseNodeHelper.h>
 
 #include <mitkRTConstants.h>
 #include <mitkIsoDoseLevelCollections.h>

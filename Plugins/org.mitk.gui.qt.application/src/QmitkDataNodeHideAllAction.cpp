@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeHideAllAction.h>
+#include "QmitkDataNodeHideAllAction.h"
 
 // mitk core
 #include <mitkRenderingManager.h>

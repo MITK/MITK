@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkImageToItk_h
 #define mitkImageToItk_h
 
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkImage.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <itkImage.h>
 #include <itkImageSource.h>
@@ -177,7 +177,7 @@ namespace mitk
 } // end namespace mitk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "mitkImageToItk.tpp"
+#include <mitkImageToItk.tpp>
 #endif
 
 #endif

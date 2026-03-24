@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _lut_HotIron_h_
-#define _lut_HotIron_h_
+#ifndef HotIron_h
+#define HotIron_h
 
 static const int HotIron[256][3] = {
   {0, 0, 0},       {2, 0, 0},       {4, 0, 0},       {6, 0, 0},       {8, 0, 0},       {10, 0, 0},      {12, 0, 0},

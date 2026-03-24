@@ -32,9 +32,9 @@ found in the LICENSE file.
 //#include "event/berryPlatformEvents.h"
 //#include "berryPlatformLogChannel.h"
 
-#include <berryIApplicationContext.h>
-#include <berryIExtensionRegistry.h>
-#include <berryIProduct.h>
+#include "berryIApplicationContext.h"
+#include "berryIExtensionRegistry.h"
+#include "berryIProduct.h"
 
 #include <service/datalocation/ctkLocation.h>
 #include <service/debug/ctkDebugOptions.h>

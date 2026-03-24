@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTable.h"
+#include <mitkLookupTable.h>
 #include <itkProcessObject.h>
 
 #include <vtkColorTransferFunction.h>

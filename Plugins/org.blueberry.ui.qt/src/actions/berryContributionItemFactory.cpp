@@ -13,8 +13,8 @@ found in the LICENSE file.
 
 #include "berryContributionItemFactory.h"
 
-#include <berryIContributionItem.h>
-#include <berryIWorkbenchWindow.h>
+#include "berryIContributionItem.h"
+#include "berryIWorkbenchWindow.h"
 
 #include "internal/berryChangeToPerspectiveMenu.h"
 #include "internal/berryShowViewMenu.h"

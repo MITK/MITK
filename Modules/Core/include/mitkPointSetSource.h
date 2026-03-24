@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPointSetSource_h
 #define mitkPointSetSource_h
 
-#include "mitkBaseDataSource.h"
-#include "mitkPointSet.h"
+#include <mitkBaseDataSource.h>
+#include <mitkPointSet.h>
 
 namespace mitk
 {

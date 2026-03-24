@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include "mitkSegmentationIOMimeTypes.h"
-#include "mitkSegmentationTaskListIO.h"
+#include <mitkSegmentationIOMimeTypes.h>
+#include <mitkSegmentationTaskListIO.h>
 
 #include <memory>
 #include <vector>

@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include "berryExpressionStatus.h"
 #include "berryExpressionPlugin.h"
 
-#include "berryPlatform.h"
-#include "berryCoreException.h"
+#include <berryPlatform.h>
+#include <berryCoreException.h>
 
 #include <berryObjectString.h>
 #include <berryIConfigurationElement.h>

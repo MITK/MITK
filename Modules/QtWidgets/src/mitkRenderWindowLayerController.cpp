@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager module
-#include "mitkRenderWindowLayerController.h"
+#include <mitkRenderWindowLayerController.h>
 
 mitk::RenderWindowLayerController::RenderWindowLayerController()
   : m_DataStorage(nullptr)

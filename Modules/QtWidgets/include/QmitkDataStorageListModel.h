@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 // MITK
-#include "mitkDataStorage.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateBase.h>
 
 // Qt
 #include <QAbstractListModel>

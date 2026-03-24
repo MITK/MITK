@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkCameraRotationController.h"
-#include "mitkSliceNavigationController.h"
-#include "mitkVtkPropRenderer.h"
-#include "vtkMitkRenderProp.h"
+#include <mitkCameraRotationController.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkVtkPropRenderer.h>
+#include <vtkMitkRenderProp.h>
 
-#include "mitkInteractionEvent.h"
+#include <mitkInteractionEvent.h>
 
 namespace mitk
 {

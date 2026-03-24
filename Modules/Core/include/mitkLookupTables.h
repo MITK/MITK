@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLookupTables_h
 #define mitkLookupTables_h
 
-#include "mitkGenericLookupTable.h"
+#include <mitkGenericLookupTable.h>
 
 namespace mitk
 {

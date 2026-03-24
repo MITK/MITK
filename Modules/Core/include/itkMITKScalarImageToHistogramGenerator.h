@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkMITKScalarImageToHistogramGenerator_h
-#define __itkMITKScalarImageToHistogramGenerator_h
+#ifndef itkMITKScalarImageToHistogramGenerator_h
+#define itkMITKScalarImageToHistogramGenerator_h
 
 #include <itkImageToListSampleAdaptor.h>
 #include <itkObject.h>
@@ -84,7 +84,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMITKScalarImageToHistogramGenerator.tpp"
+#include <itkMITKScalarImageToHistogramGenerator.tpp>
 #endif
 
 #endif

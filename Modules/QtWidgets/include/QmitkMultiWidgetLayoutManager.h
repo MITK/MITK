@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkMultiWidgetLayoutManager_h
 #define QmitkMultiWidgetLayoutManager_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <QObject>
 

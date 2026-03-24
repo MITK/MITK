@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define mitkModelSignalImageGenerator_h
 
 
-#include "mitkModelParameterizerBase.h"
-#include "mitkImage.h"
+#include <mitkModelParameterizerBase.h>
+#include <mitkImage.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaskedDynamicImageStatisticsGenerator.h"
+#include <mitkMaskedDynamicImageStatisticsGenerator.h>
 
-#include "mitkImageTimeSelector.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "itkMaskedNaryStatisticsImageFilter.h"
+#include <mitkImageTimeSelector.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <itkMaskedNaryStatisticsImageFilter.h>
 
 mitk::MaskedDynamicImageStatisticsGenerator::MaskedDynamicImageStatisticsGenerator()
 {

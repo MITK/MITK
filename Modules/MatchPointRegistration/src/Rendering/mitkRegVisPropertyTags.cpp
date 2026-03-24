@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegVisPropertyTags.h"
+#include <mitkRegVisPropertyTags.h>
 
 
 namespace mitk

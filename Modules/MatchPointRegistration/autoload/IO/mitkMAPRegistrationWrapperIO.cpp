@@ -15,17 +15,17 @@ found in the LICENSE file.
 
 #include <clocale>
 
-#include "mapRegistration.h"
-#include "mapRegistrationFileWriter.h"
-#include "mapRegistrationFileReader.h"
-#include "mapLazyFileFieldKernelLoader.h"
+#include <mapRegistration.h>
+#include <mapRegistrationFileWriter.h>
+#include <mapRegistrationFileReader.h>
+#include <mapLazyFileFieldKernelLoader.h>
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkLocaleSwitch.h>
 
-#include "mitkMAPRegistrationWrapperIO.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapperIO.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 namespace mitk
 {

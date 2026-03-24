@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCameraController.h"
-#include "mitkRenderingManager.h"
-#include "mitkVtkPropRenderer.h"
-#include "vtkCommand.h"
+#include <mitkCameraController.h>
+#include <mitkRenderingManager.h>
+#include <mitkVtkPropRenderer.h>
+#include <vtkCommand.h>
 #include <vtkRenderWindowInteractor.h>
 
-#include "vtkCamera.h"
-#include "vtkRenderer.h"
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 

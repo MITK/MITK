@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __EXPONENTIAL_SATURATION_MODEL_PARAMETERIZER_H
-#define __EXPONENTIAL_SATURATION_MODEL_PARAMETERIZER_H
+#ifndef mitkExponentialSaturationModelParameterizer_h
+#define mitkExponentialSaturationModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkExponentialSaturationModel.h"
-#include "MitkModelFitExports.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkExponentialSaturationModel.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {
@@ -60,4 +60,4 @@ namespace mitk
   };
 }
 
-#endif // __EXPONENTIAL_SATURATION_MODEL_PARAMETERIZER_H
+#endif // mitkExponentialSaturationModelParameterizer_h

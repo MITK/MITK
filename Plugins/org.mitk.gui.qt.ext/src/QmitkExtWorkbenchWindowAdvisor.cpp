@@ -46,7 +46,7 @@ found in the LICENSE file.
 
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileSaveAction.h>
-#include <QmitkExtFileSaveProjectAction.h>
+#include "QmitkExtFileSaveProjectAction.h"
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
 #include <QmitkUndoAction.h>
@@ -56,9 +56,9 @@ found in the LICENSE file.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
-#include <QmitkOpenDicomEditorAction.h>
-#include <QmitkOpenMxNMultiWidgetEditorAction.h>
-#include <QmitkOpenStdMultiWidgetEditorAction.h>
+#include "QmitkOpenDicomEditorAction.h"
+#include "QmitkOpenMxNMultiWidgetEditorAction.h"
+#include "QmitkOpenStdMultiWidgetEditorAction.h"
 #include <QmitkApplicationConstants.h>
 
 #include <itkConfigure.h>
@@ -78,15 +78,15 @@ found in the LICENSE file.
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
 #include "internal/QmitkCommonExtPlugin.h"
 #include "internal/QmitkThemedStyle.h"
-#include "mitkUndoController.h"
-#include "mitkVerboseLimitedLinearUndo.h"
+#include <mitkUndoController.h>
+#include <mitkVerboseLimitedLinearUndo.h>
 #include <QToolBar>
 #include <QToolButton>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
-#include <QmitkStartupDialog.h>
+#include "QmitkStartupDialog.h"
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack =
   new QmitkExtWorkbenchWindowAdvisorHack();

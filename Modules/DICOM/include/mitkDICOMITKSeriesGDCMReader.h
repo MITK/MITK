@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include <mutex>
 #include <stack>
-#include "mitkDICOMFileReader.h"
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkDICOMGDCMImageFrameInfo.h"
-#include "mitkEquiDistantBlocksSorter.h"
-#include "mitkNormalDirectionConsistencySorter.h"
-#include "MitkDICOMExports.h"
+#include <mitkDICOMFileReader.h>
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkDICOMGDCMImageFrameInfo.h>
+#include <mitkEquiDistantBlocksSorter.h>
+#include <mitkNormalDirectionConsistencySorter.h>
+#include <MitkDICOMExports.h>
 
 
 namespace itk

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarPolygon.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkTestingMacros.h"
+#include <mitkPlanarPolygon.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkTestingMacros.h>
 
 class mitkPlanarPolygonTestClass
 {

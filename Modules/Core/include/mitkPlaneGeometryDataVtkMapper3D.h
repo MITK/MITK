@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkPlaneGeometryDataVtkMapper3D_h
 #define mitkPlaneGeometryDataVtkMapper3D_h
 
-#include "mitkDataStorage.h"
-#include "mitkPlaneGeometryDataToSurfaceFilter.h"
-#include "mitkVtkMapper.h"
-#include "mitkWeakPointer.h"
+#include <mitkDataStorage.h>
+#include <mitkPlaneGeometryDataToSurfaceFilter.h>
+#include <mitkVtkMapper.h>
+#include <mitkWeakPointer.h>
 #include <MitkCoreExports.h>
 
 #include <vtkCleanPolyData.h>

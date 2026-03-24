@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef itSmoothedClassProbabilites_cpp
 #define itSmoothedClassProbabilites_cpp
 
-#include "itkSmoothedClassProbabilites.h"
-#include "itkObjectFactory.h"
-#include "itkImageRegionIterator.h"
-#include "itkImageRegionConstIterator.h"
+#include <itkSmoothedClassProbabilites.h>
+#include <itkObjectFactory.h>
+#include <itkImageRegionIterator.h>
+#include <itkImageRegionConstIterator.h>
 #include <itkDiscreteGaussianImageFilter.h>
 
 

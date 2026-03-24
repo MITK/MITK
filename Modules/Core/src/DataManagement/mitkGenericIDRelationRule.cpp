@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericIDRelationRule.h"
+#include <mitkGenericIDRelationRule.h>
 
 bool mitk::GenericIDRelationRule::IsAbstract() const
 {

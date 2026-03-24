@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRegEvaluationObjectFactory.h"
+#include <mitkRegEvaluationObjectFactory.h>
 
 #include <mitkProperties.h>
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 
-#include "mitkRegEvaluationMapper2D.h"
+#include <mitkRegEvaluationMapper2D.h>
 
 typedef std::multimap<std::string, std::string> MultimapType;
 

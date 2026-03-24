@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegEvalStyleProperty.h"
+#include <mitkRegEvalStyleProperty.h>
 
 
 mitk::RegEvalStyleProperty::RegEvalStyleProperty( )

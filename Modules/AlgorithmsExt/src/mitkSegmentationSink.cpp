@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationSink.h"
-#include "mitkDataStorage.h"
-#include "mitkRenderingManager.h"
+#include <mitkSegmentationSink.h>
+#include <mitkDataStorage.h>
+#include <mitkRenderingManager.h>
 
 namespace mitk
 {

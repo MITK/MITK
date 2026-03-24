@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLinearModelFactory.h"
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkLinearModelFactory.h>
+#include <mitkConcreteModelParameterizerBase.h>
 
 mitk::LinearModelFactory::LinearModelFactory()
 {

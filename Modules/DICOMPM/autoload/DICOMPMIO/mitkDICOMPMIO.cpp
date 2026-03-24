@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef __mitkDICOMPMIO__cpp
 #define __mitkDICOMPMIO__cpp
 
-#include "mitkDICOMPMIO.h"
-#include "mitkDICOMPMIOMimeTypes.h"
+#include <mitkDICOMPMIO.h>
+#include <mitkDICOMPMIOMimeTypes.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkDICOMProperty.h>
@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 #include <mitkPropertyNameHelper.h>
 #include <dcmqi/ParaMapConverter.h>
-#include "mitkParamapPresetsParser.h"
+#include <mitkParamapPresetsParser.h>
 
 
 // us
@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 
 // model fit parameters
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitConstants.h>
 
 
 namespace mitk

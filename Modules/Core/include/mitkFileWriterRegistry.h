@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <usServiceObjects.h>
 #include <usServiceReference.h>
 
-#include "mitkIFileWriter.h"
+#include <mitkIFileWriter.h>
 
 namespace mitk
 {

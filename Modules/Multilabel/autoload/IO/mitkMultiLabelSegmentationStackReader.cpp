@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationStackReader.h"
+#include <mitkMultiLabelSegmentationStackReader.h>
 
-#include "mitkMultilabelIOMimeTypes.h"
-#include "mitkMultiLabelIOHelper.h"
+#include <mitkMultilabelIOMimeTypes.h>
+#include <mitkMultiLabelIOHelper.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
 #include <mitkIPropertyPersistence.h>
@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 
 // itk
-#include "itkImageFileReader.h"
+#include <itkImageFileReader.h>
 
 namespace
 {

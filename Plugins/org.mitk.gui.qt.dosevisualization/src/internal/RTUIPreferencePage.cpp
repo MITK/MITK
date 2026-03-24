@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "RTUIPreferencePage.h"
 
-#include "mitkRTUIConstants.h"
+#include <mitkRTUIConstants.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

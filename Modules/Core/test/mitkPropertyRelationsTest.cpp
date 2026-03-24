@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkPropertyRelations.h"
-#include "mitkGenericIDRelationRule.h"
-#include "mitkDataNode.h"
+#include <mitkPropertyRelations.h>
+#include <mitkGenericIDRelationRule.h>
+#include <mitkDataNode.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkEqual.h>
 #include <mitkNumericConstants.h>

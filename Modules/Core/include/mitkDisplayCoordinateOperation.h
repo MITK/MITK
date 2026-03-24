@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDisplayCoordinateOperation_h
 #define mitkDisplayCoordinateOperation_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkNumericTypes.h"
-#include "mitkOperation.h"
+#include <mitkBaseRenderer.h>
+#include <mitkNumericTypes.h>
+#include <mitkOperation.h>
 #include <MitkCoreExports.h>
 #include <mitkWeakPointer.h>
 

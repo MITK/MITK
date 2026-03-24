@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLevelWindowPresetDefinitionDialog.h"
+#include <QmitkLevelWindowPresetDefinitionDialog.h>
 #include <ui_QmitkLevelWindowPresetDefinition.h>
 
 #include <QHeaderView>

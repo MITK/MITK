@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateGeometry.h"
-#include "mitkDataNode.h"
-#include "mitkImage.h"
+#include <mitkNodePredicateGeometry.h>
+#include <mitkDataNode.h>
+#include <mitkImage.h>
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const BaseGeometry* refGeometry, TimePointType relevantTimePoint)
   : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckCoordinatePrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION), m_CheckDirectionPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION)

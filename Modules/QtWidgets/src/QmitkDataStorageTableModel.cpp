@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataStorageTableModel.h"
+#include <QmitkDataStorageTableModel.h>
 
 //# Own includes
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <QmitkNodeDescriptorManager.h>
 
 //# Toolkit includes

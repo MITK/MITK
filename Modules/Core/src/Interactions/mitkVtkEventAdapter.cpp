@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkEventAdapter.h"
-#include "mitkInteractionEventConst.h"
-#include "vtkCommand.h"
+#include <mitkVtkEventAdapter.h>
+#include <mitkInteractionEventConst.h>
+#include <vtkCommand.h>
 #include <mitkInteractionConst.h> // INTERACTION LEGACY
 #include <cstring>
 

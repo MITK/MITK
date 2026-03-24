@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkQuaternion_h
 #define mitkQuaternion_h
 
-#include "mitkNumericConstants.h"
+#include <mitkNumericConstants.h>
 #include <vnl/vnl_quaternion.h>
 
 namespace mitk

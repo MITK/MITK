@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSet.h"
+#include <mitkPointSet.h>
 
-#include "mitkFileWriterSelector.h"
-#include "mitkTestingMacros.h"
+#include <mitkFileWriterSelector.h>
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 #include <ctime>

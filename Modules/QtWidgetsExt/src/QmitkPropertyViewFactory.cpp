@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertyViewFactory.h"
+#include <QmitkPropertyViewFactory.h>
 
 // the different view and editor classes
-#include "QmitkBasePropertyView.h"
-#include "QmitkBoolPropertyWidget.h"
-#include "QmitkColorPropertyEditor.h"
-#include "QmitkColorPropertyView.h"
-#include "QmitkEnumerationPropertyWidget.h"
-#include "QmitkNumberPropertyEditor.h"
-#include "QmitkNumberPropertyView.h"
-#include "QmitkStringPropertyEditor.h"
-#include "QmitkStringPropertyOnDemandEdit.h"
-#include "QmitkStringPropertyView.h"
+#include <QmitkBasePropertyView.h>
+#include <QmitkBoolPropertyWidget.h>
+#include <QmitkColorPropertyEditor.h>
+#include <QmitkColorPropertyView.h>
+#include <QmitkEnumerationPropertyWidget.h>
+#include <QmitkNumberPropertyEditor.h>
+#include <QmitkNumberPropertyView.h>
+#include <QmitkStringPropertyEditor.h>
+#include <QmitkStringPropertyOnDemandEdit.h>
+#include <QmitkStringPropertyView.h>
 
 #include <mitkEnumerationProperty.h>
 

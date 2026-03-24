@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCompressedImageContainer.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkIOUtil.h"
-#include "mitkImageDataItem.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkCompressedImageContainer.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageReadAccessor.h>
 
 class mitkCompressedImageContainerTestClass
 {

@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include "berryApplicationContainer.h"
 
-#include <berryIConfigurationElement.h>
-#include <berryIContributor.h>
-#include <berryIExtensionRegistry.h>
-#include <berryIExtension.h>
-#include <berryIExtensionPoint.h>
-#include <berryIProductProvider.h>
-#include <berryIProduct.h>
+#include "berryIConfigurationElement.h"
+#include "berryIContributor.h"
+#include "berryIExtensionRegistry.h"
+#include "berryIExtension.h"
+#include "berryIExtensionPoint.h"
+#include "berryIProductProvider.h"
+#include "berryIProduct.h"
 
 #include "berryApplicationHandle.h"
 #include "berryApplicationDescriptor.h"
@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include "berryProductExtensionBranding.h"
 #include "berryProviderExtensionBranding.h"
 
-#include <berryLog.h>
+#include "berryLog.h"
 
 #include "berryCTKPluginActivator.h"
 

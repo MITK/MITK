@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNumericConstants.h"
-#include "vnl/vnl_math.h"
+#include <mitkNumericConstants.h>
+#include <vnl/vnl_math.h>
 #include <limits>
 
 const mitk::ScalarType mitk::eps = vnl_math::eps * 100;

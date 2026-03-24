@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define QmitkStdMultiWidget_h
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
-#include "QmitkAbstractMultiWidget.h"
+#include <MitkQtWidgetsExports.h>
+#include <QmitkAbstractMultiWidget.h>
 
 /**
 * @brief The 'QmitkStdMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.

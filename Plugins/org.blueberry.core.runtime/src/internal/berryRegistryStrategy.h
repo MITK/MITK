@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYREGISTRYSTRATEGY_H
 #define BERRYREGISTRYSTRATEGY_H
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QList>
 #include <QSharedPointer>

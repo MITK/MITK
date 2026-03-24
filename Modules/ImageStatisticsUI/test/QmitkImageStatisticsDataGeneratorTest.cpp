@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkImageStatisticsDataGenerator.h"
+#include <QmitkImageStatisticsDataGenerator.h>
 #include <QApplication>
 #include <mitkStandaloneDataStorage.h>
-#include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-#include "mitkIOUtil.h"
+#include <mitkImage.h>
+#include <mitkPlanarFigure.h>
+#include <mitkIOUtil.h>
 
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
-#include "mitkImageStatisticsContainerManager.h"
-#include "mitkProperties.h"
+#include <mitkStatisticsToImageRelationRule.h>
+#include <mitkStatisticsToMaskRelationRule.h>
+#include <mitkImageStatisticsContainerManager.h>
+#include <mitkProperties.h>
 
-#include "QmitkImageStatisticsCalculationRunnable.h"
+#include <QmitkImageStatisticsCalculationRunnable.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berrySingleNodeSelection.h"
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
 namespace berry
 {

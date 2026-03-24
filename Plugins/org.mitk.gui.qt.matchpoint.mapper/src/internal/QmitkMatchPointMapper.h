@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <QSortFilterProxyModel>
 
-#include "QmitkMappingJob.h"
+#include <QmitkMappingJob.h>
 #include <memory>
 
 namespace Ui

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkModelFitFunctorPolicy_h
 #define mitkModelFitFunctorPolicy_h
 
-#include "itkIndex.h"
-#include "mitkModelFitFunctorBase.h"
-#include "MitkModelFitExports.h"
+#include <itkIndex.h>
+#include <mitkModelFitFunctorBase.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

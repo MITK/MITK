@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryWorker.h"
 #include "berryWorkerPool.h"
 #include "berryJobManager.h"
-#include "berryLog.h"
+#include <berryLog.h>
 
 namespace berry
 {

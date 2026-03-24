@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMGenericImageFrameInfo_h
 #define mitkDICOMGenericImageFrameInfo_h
 
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
 #include <map>
 

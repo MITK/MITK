@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "berryIPerspectiveRegistry.h"
 
-#include "berryIExtensionChangeHandler.h"
+#include <berryIExtensionChangeHandler.h>
 #include "berryPerspectiveDescriptor.h"
 
 #include <list>

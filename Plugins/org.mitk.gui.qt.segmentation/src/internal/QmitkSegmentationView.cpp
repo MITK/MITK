@@ -41,7 +41,7 @@ found in the LICENSE file.
 // Qmitk
 #include <QmitkRenderWindow.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
-#include <QmitkNewSegmentationDialog.h>
+#include "QmitkNewSegmentationDialog.h"
 #include <QmitkMultiLabelManager.h>
 #include <QmitkStyleManager.h>
 

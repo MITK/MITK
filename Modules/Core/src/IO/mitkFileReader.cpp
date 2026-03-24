@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileReader.h"
+#include <mitkFileReader.h>
 
 mitk::FileReader::FileReader() : m_CanReadFromMemory(false), m_ReadFromMemory(false)
 {

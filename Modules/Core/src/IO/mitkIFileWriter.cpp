@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIFileWriter.h"
+#include <mitkIFileWriter.h>
 
 namespace mitk
 {

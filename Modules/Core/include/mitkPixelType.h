@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPixelType_h
 #define mitkPixelType_h
 
-#include "mitkCommon.h"
-#include "mitkPixelTypeTraits.h"
+#include <mitkCommon.h>
+#include <mitkPixelTypeTraits.h>
 #include <MitkCoreExports.h>
 
 #include <string>

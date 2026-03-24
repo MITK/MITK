@@ -17,18 +17,18 @@ found in the LICENSE file.
 #include <vtkMatrix4x4.h>
 #include <vtkMatrixToLinearTransform.h>
 
-#include "mitkApplyTransformMatrixOperation.h"
-#include "mitkBaseGeometry.h"
-#include "mitkGeometryTransformHolder.h"
-#include "mitkInteractionConst.h"
-#include "mitkMatrixConvert.h"
-#include "mitkModifiedLock.h"
-#include "mitkPointOperation.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkRotationOperation.h"
-#include "mitkScaleOperation.h"
-#include "mitkVector.h"
-#include "mitkMatrix.h"
+#include <mitkApplyTransformMatrixOperation.h>
+#include <mitkBaseGeometry.h>
+#include <mitkGeometryTransformHolder.h>
+#include <mitkInteractionConst.h>
+#include <mitkMatrixConvert.h>
+#include <mitkModifiedLock.h>
+#include <mitkPointOperation.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkRotationOperation.h>
+#include <mitkScaleOperation.h>
+#include <mitkVector.h>
+#include <mitkMatrix.h>
 
 mitk::BaseGeometry::BaseGeometry()
   : Superclass(),

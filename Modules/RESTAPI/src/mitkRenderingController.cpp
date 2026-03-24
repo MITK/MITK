@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkRenderingController.h"
-#include "mitkErrorResponse.h"
+#include <mitkErrorResponse.h>
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>

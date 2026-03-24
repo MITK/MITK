@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkDICOMDatasetSorter_h
 #define mitkDICOMDatasetSorter_h
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "mitkDICOMDatasetAccess.h"
-#include "mitkIOVolumeSplitReason.h"
+#include <mitkDICOMDatasetAccess.h>
+#include <mitkIOVolumeSplitReason.h>
 
 namespace mitk
 {

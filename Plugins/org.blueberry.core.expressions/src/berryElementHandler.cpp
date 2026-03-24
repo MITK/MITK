@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 #include <berryIConfigurationElement.h>
 
-#include "Poco/Exception.h"
+#include <Poco/Exception.h>
 
 namespace berry {
 

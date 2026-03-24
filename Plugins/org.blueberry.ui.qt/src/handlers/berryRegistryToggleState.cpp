@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "berryRegistryToggleState.h"
 
-#include "berryObjects.h"
-#include "berryObjectString.h"
-#include "berryObjectStringMap.h"
+#include <berryObjects.h>
+#include <berryObjectString.h>
+#include <berryObjectStringMap.h>
 
 namespace berry {
 

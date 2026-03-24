@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPiecewiseFunctionCanvas.h"
+#include <QmitkPiecewiseFunctionCanvas.h>
 
 #include <QLineEdit>
 #include <QPainter>

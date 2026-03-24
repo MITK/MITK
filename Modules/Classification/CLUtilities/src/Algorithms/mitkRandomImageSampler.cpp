@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRandomImageSampler.h"
+#include <mitkRandomImageSampler.h>
 #include <itkBilateralImageFilter.h>
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "itkUnaryFunctorImageFilter.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <itkUnaryFunctorImageFilter.h>
 #include <itkImageRandomNonRepeatingIteratorWithIndex.h>
-#include "itkImageDuplicator.h"
+#include <itkImageDuplicator.h>
 
 mitk::RandomImageSampler::RandomImageSampler()
   : m_AcceptanceRate(0.1), m_SamplingMode(RandomImageSamplerMode::SINGLE_ACCEPTANCE_RATE)

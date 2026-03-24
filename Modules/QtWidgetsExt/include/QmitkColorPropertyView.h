@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkColorPropertyView_h
 #define QmitkColorPropertyView_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLabel>
 #include <mitkColorProperty.h>
 #include <mitkPropertyObserver.h>

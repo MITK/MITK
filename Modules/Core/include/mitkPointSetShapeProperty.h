@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPointSetShapeProperty_h
 #define mitkPointSetShapeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

@@ -27,15 +27,15 @@ found in the LICENSE file.
 #include <berryCommandEvent.h>
 #include <berryParameterizedCommand.h>
 #include <berryCommandExceptions.h>
-#include <berryCommandContributionItemParameter.h>
+#include "berryCommandContributionItemParameter.h"
 
-#include "../berryDisplay.h"
-#include "../berryAsyncRunnable.h"
+#include "berryDisplay.h"
+#include "berryAsyncRunnable.h"
 
-#include "../handlers/berryIHandlerService.h"
-#include "../services/berryIServiceLocator.h"
+#include "berryIHandlerService.h"
+#include "berryIServiceLocator.h"
 
-#include "../berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <QMenu>
 #include <QMenuBar>

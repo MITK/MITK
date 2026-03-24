@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseDICOMReaderService.h"
+#include <mitkBaseDICOMReaderService.h>
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
@@ -22,10 +22,10 @@ found in the LICENSE file.
 #include "legacy/mitkDicomSeriesReader.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkLocaleSwitch.h>
-#include "mitkIPropertyProvider.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkPropertyKeyPath.h"
-#include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include <mitkIPropertyProvider.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkPropertyKeyPath.h>
+#include <mitkDICOMIOMetaInformationPropertyConstants.h>
 
 #include <iostream>
 

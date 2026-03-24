@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkLevelWindow_h
 #define mitkLevelWindow_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 #include <nlohmann/json_fwd.hpp>
 

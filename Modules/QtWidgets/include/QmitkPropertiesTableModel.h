@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "mitkDataNode.h"
-#include "mitkWeakPointer.h"
+#include <mitkDataNode.h>
+#include <mitkWeakPointer.h>
 
 #include <QAbstractTableModel>
 #include <string>

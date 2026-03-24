@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeStepLinearModel.h"
+#include <mitkThreeStepLinearModel.h>
 #include <mitkIOUtil.h>
 
 const std::string mitk::ThreeStepLinearModel::NAME_PARAMETER_y_bl = "baseline";

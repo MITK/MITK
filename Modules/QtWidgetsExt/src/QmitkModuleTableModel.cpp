@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkModuleTableModel.h"
+#include <QmitkModuleTableModel.h>
 
 #include <usGetModuleContext.h>
 #include <usModule.h>

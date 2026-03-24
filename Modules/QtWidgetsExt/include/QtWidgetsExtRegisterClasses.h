@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QtWidgetsExtRegisterClasses_h
 #define QtWidgetsExtRegisterClasses_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkCommon.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkCommon.h>
 
 MITKQTWIDGETSEXT_EXPORT void QtWidgetsExtRegisterClasses();
 

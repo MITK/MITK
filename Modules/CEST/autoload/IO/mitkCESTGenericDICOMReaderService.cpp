@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTGenericDICOMReaderService.h"
+#include <mitkCESTGenericDICOMReaderService.h>
 
-#include "mitkIOMimeTypes.h"
+#include <mitkIOMimeTypes.h>
 #include <mitkExtractCESTOffset.h>
 #include <mitkCustomTagParser.h>
 #include <mitkCESTPropertyHelper.h>
@@ -20,9 +20,9 @@ found in the LICENSE file.
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMProperty.h>
 
-#include "mitkCESTImageNormalizationFilter.h"
+#include <mitkCESTImageNormalizationFilter.h>
 
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>

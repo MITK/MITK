@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkDnDDataNodeWidget_h
 #define QmitkDnDDataNodeWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // mitk core module
 #include <mitkDataNode.h>

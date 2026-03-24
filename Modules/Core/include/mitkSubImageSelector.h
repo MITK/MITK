@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSubImageSelector_h
 #define mitkSubImageSelector_h
 
-#include "mitkBaseData.h"
-#include "mitkImageDataItem.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkBaseData.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageToImageFilter.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

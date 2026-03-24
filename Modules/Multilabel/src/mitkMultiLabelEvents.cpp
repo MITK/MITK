@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelEvents.h"
+#include <mitkMultiLabelEvents.h>
 
 namespace mitk
 {

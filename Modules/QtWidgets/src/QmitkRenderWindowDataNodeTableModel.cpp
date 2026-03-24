@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRenderWindowDataNodeTableModel.h"
+#include <QmitkRenderWindowDataNodeTableModel.h>
 
 // mitk core
 #include <mitkRenderingManager.h>

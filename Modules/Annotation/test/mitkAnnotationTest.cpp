@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 
-#include "mitkManualPlacementAnnotationRenderer.h"
-#include "mitkLayoutAnnotationRenderer.h"
+#include <mitkManualPlacementAnnotationRenderer.h>
+#include <mitkLayoutAnnotationRenderer.h>
 
 class mitkAnnotationTestSuite : public mitk::TestFixture
 {

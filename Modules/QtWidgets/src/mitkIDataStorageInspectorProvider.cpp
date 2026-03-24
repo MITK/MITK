@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIDataStorageInspectorProvider.h"
+#include <mitkIDataStorageInspectorProvider.h>
 
 namespace mitk
 {

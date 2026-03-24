@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <set>
 #include <type_traits>
 
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkTemporoSpatialStringProperty.h>
 
 #include <nlohmann/json.hpp>
 

@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include "berrySlaveCommandService.h"
 
-#include "berryCommandExceptions.h"
+#include <berryCommandExceptions.h>
 #include "berryElementReference.h"
-#include "berryCommand.h"
-#include "berryParameterizedCommand.h"
-#include "berryCommandCategory.h"
+#include <berryCommand.h>
+#include <berryParameterizedCommand.h>
+#include <berryCommandCategory.h>
 
-#include "berryObjectString.h"
+#include <berryObjectString.h>
 
 #include <QStringList>
 

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkFloatPropertySerializer_h_included
 #define mitkFloatPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
-#include "mitkProperties.h"
-#include "mitkStringsToNumbers.h"
+#include <mitkProperties.h>
+#include <mitkStringsToNumbers.h>
 #include <mitkLocaleSwitch.h>
 #include <tinyxml2.h>
 

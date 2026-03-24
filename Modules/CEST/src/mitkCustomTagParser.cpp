@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCustomTagParser.h"
+#include <mitkCustomTagParser.h>
 
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 
-#include "mitkCESTPropertyHelper.h"
-#include "mitkIPropertyPersistence.h"
+#include <mitkCESTPropertyHelper.h>
+#include <mitkIPropertyPersistence.h>
 
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleContext.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -814,7 +814,7 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   // replace multiple spaces by a single space
   std::string::iterator newEnditerator =
     std::unique(resultString.begin(), resultString.end(),
-      [=](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+      [](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
   );
   resultString.erase(newEnditerator, resultString.end());
 

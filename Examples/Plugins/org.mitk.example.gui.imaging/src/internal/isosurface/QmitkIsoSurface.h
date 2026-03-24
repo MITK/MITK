@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkIsoSurface_h
 #define QmitkIsoSurface_h
 
-#include "QmitkAbstractView.h"
-#include "mitkColorSequenceRainbow.h"
-#include "mitkDataStorage.h"
+#include <QmitkAbstractView.h>
+#include <mitkColorSequenceRainbow.h>
+#include <mitkDataStorage.h>
 #include <memory>
 
 namespace Ui

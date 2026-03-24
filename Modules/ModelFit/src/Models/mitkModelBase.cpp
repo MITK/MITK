@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelBase.h"
-#include "itkMacro.h"
+#include <mitkModelBase.h>
+#include <itkMacro.h>
 
 #include <algorithm>
 

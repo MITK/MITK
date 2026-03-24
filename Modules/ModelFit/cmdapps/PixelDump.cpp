@@ -14,21 +14,21 @@ found in the LICENSE file.
 #include <string>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkCastImageFilter.h"
-#include "itkExtractImageFilter.h"
+#include <itksys/SystemTools.hxx>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkCastImageFilter.h>
+#include <itkExtractImageFilter.h>
 
 // CTK includes
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
 // MITK includes
 #include <mitkIOUtil.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 
 #include <mitkImageTimeSelector.h>
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 
 mitkCommandLineParser::StringContainerType inFilenames;
 std::string outFileName;

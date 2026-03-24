@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
-#define __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
+#define itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter_h
 
-#include "itkDataObjectDecorator.h"
+#include <itkDataObjectDecorator.h>
 
-#include "itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h"
-#include "itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.h"
+#include <itkEnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter.h>
+#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.h>
 
 namespace itk
 {
@@ -235,7 +235,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.hxx"
+#include <itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter.tpp>
 #endif
 
 #endif

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkSimpleTextOverlayWidget_h
 #define QmitkSimpleTextOverlayWidget_h
 
-#include "QmitkOverlayWidget.h"
+#include <QmitkOverlayWidget.h>
 #include <MitkQtWidgetsExports.h>
 
 /** Simple overlay that renders a passed string.

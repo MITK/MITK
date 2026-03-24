@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkVtkPropRenderer.h"
-#include "vtkRenderWindow.h"
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkVtkPropRenderer.h>
+#include <vtkRenderWindow.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 #include <vtkCubeSource.h>
 
 // Propertylist Test

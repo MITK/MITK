@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkCheckboxQuestionWidget_h
-#define QmitkCheckboxQuestionWidget_h
+#ifndef QmitkCheckboxesQuestionWidget_h
+#define QmitkCheckboxesQuestionWidget_h
 
 #include <QmitkQuestionWidget.h>
 #include <mitkCheckboxesQuestion.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeOpacityAction.h>
+#include "QmitkDataNodeOpacityAction.h"
 
 #include <mitkRenderingManager.h>
 

@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToSizeZoneMatrixFilter_h
-#define __itkEnhancedScalarImageToSizeZoneMatrixFilter_h
+#ifndef itkEnhancedScalarImageToSizeZoneMatrixFilter_h
+#define itkEnhancedScalarImageToSizeZoneMatrixFilter_h
 
-#include "itkImage.h"
-#include "itkHistogram.h"
-#include "itkNumericTraits.h"
-#include "itkVectorContainer.h"
+#include <itkImage.h>
+#include <itkHistogram.h>
+#include <itkNumericTraits.h>
+#include <itkVectorContainer.h>
 
 namespace itk
 {
@@ -273,7 +273,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToSizeZoneMatrixFilter.hxx"
+#include <itkEnhancedScalarImageToSizeZoneMatrixFilter.tpp>
 #endif
 
 #endif

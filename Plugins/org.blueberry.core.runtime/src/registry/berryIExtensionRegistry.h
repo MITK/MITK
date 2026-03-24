@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef BERRYIEXTENSIONREGISTRY_H
 #define BERRYIEXTENSIONREGISTRY_H
 
-#include "org_blueberry_core_runtime_Export.h"
+#include <org_blueberry_core_runtime_Export.h>
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QList>
 #include <QtPlugin>

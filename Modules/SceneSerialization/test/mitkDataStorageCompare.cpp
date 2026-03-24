@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataStorageCompare.h"
-#include "mitkBaseDataCompare.h"
+#include <mitkDataStorageCompare.h>
+#include <mitkBaseDataCompare.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkMapper.h>
 
-#include "usGetModuleContext.h"
-#include "usLDAPFilter.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usLDAPFilter.h>
+#include <usModuleContext.h>
 
 mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage *reference,
                                              const mitk::DataStorage *test,

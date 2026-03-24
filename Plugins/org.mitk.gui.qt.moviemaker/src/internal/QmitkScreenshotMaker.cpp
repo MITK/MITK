@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "QmitkScreenshotMaker.h"
 #include <ui_QmitkScreenshotMakerControls.h>
 
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 
@@ -24,23 +24,23 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-#include "vtkImageWriter.h"
-#include "vtkJPEGWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkRenderLargeImage.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
-#include "vtkTestUtilities.h"
+#include <vtkImageWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkPNGWriter.h>
+#include <vtkRenderLargeImage.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+#include <vtkTestUtilities.h>
 
 #include <vtkActor.h>
-#include "vtkMitkRenderProp.h"
+#include <vtkMitkRenderProp.h>
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include "vtkRenderWindowInteractor.h"
+#include <vtkRenderWindowInteractor.h>
 
-#include "mitkSliceNavigationController.h"
-#include "mitkPlanarFigure.h"
+#include <mitkSliceNavigationController.h>
+#include <mitkPlanarFigure.h>
 #include <mitkWorkbenchUtil.h>
 #include <mitkImage.h>
 #include <itksys/SystemTools.hxx>

@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef qclickablelabelhincluded
-#define qclickablelabelhincluded
+#ifndef qclickablelabel_h
+#define qclickablelabel_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLabel>
 
 #include <map>
 #include <vector>
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 
 /**
   \brief A QLabel with multiple hotspots, that can be clicked

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkInteractionSchemeToolBar_h
 #define QmitkInteractionSchemeToolBar_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // mitk core
-#include "mitkInteractionSchemeSwitcher.h"
+#include <mitkInteractionSchemeSwitcher.h>
 
 #include <QActionGroup>
 #include <QToolBar>

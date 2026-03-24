@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 
-#include "itkPoint.h"
-#include "mitkNumericConstants.h"
-#include "mitkNumericTypes.h" // for Equal method
-#include "mitkPoint.h"
-#include "mitkTestingMacros.h"
-#include "vtkPoints.h"
-#include "vtkSmartPointer.h"
+#include <itkPoint.h>
+#include <mitkNumericConstants.h>
+#include <mitkNumericTypes.h> // for Equal method
+#include <mitkPoint.h>
+#include <mitkTestingMacros.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
 
 #include <iostream>
 

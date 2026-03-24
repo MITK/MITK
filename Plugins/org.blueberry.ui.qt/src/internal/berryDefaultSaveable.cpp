@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPart.h"
 #include "berryIWorkbenchPage.h"
 #include "berryUIException.h"
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include <QIcon>
 

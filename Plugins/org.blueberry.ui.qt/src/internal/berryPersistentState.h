@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPERSISTENTSTATE_H
 #define BERRYPERSISTENTSTATE_H
 
-#include "berryState.h"
+#include <berryState.h>
 #include <string>
 
 namespace mitk

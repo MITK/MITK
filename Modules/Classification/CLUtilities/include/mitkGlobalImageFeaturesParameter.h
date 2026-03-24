@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkGlobalImageFeaturesParameter_h
 #define mitkGlobalImageFeaturesParameter_h
 
-#include "MitkCLUtilitiesExports.h"
-#include "mitkCommandLineParser.h"
+#include <MitkCLUtilitiesExports.h>
+#include <mitkCommandLineParser.h>
 
 #include <string>
 

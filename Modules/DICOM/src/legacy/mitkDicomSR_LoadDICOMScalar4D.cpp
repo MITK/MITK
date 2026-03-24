@@ -62,4 +62,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#include <legacy/mitkDicomSeriesReader.tpp>
+#include "legacy/mitkDicomSeriesReader.tpp"

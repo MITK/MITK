@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationStackWriterBase.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkMultiLabelIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
+#include <mitkMultiLabelSegmentationStackWriterBase.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkMultiLabelIOHelper.h>
+#include <mitkLabelSetImageConverter.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkItkImageIO.h>
 

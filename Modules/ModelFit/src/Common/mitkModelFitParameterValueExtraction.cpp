@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitParameterValueExtraction.h"
-#include "mitkModelFitException.h"
+#include <mitkModelFitParameterValueExtraction.h>
+#include <mitkModelFitException.h>
 
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>

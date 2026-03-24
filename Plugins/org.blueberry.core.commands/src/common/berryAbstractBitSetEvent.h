@@ -14,8 +14,8 @@ found in the LICENSE file.
 #ifndef BERRYABSTRACTBITSETEVENT_H_
 #define BERRYABSTRACTBITSETEVENT_H_
 
-#include "berryObject.h"
-#include "berryMacros.h"
+#include <berryObject.h>
+#include <berryMacros.h>
 
 #include <org_blueberry_core_commands_Export.h>
 

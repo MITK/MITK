@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDICOMGenericTagCache_h
 #define mitkDICOMGenericTagCache_h
 
-#include "mitkDICOMTagCache.h"
-#include "mitkDICOMGenericImageFrameInfo.h"
+#include <mitkDICOMTagCache.h>
+#include <mitkDICOMGenericImageFrameInfo.h>
 
 namespace mitk
 {

@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkException.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkException.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkDataStorageCompare.h"
-#include "mitkIOUtil.h"
-#include "mitkSceneIO.h"
-#include "mitkSceneIOTestScenarioProvider.h"
+#include <mitkDataStorageCompare.h>
+#include <mitkIOUtil.h>
+#include <mitkSceneIO.h>
+#include <mitkSceneIOTestScenarioProvider.h>
 
 /**
   \brief Test cases for SceneIO.

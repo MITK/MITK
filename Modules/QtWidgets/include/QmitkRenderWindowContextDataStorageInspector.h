@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkRenderWindowContextDataStorageInspector_h
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>

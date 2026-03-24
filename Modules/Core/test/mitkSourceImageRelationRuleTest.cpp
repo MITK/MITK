@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSourceImageRelationRule.h"
+#include <mitkSourceImageRelationRule.h>
 
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkStringProperty.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkPropertyNameHelper.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkPropertyNameHelper.h>
 
 #include <regex>
 

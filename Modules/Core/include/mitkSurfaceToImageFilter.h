@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkSurfaceToImageFilter_h
 #define mitkSurfaceToImageFilter_h
 
-#include "MitkCoreExports.h"
-#include "mitkCommon.h"
-#include "mitkImageSource.h"
-#include "mitkSurface.h"
+#include <MitkCoreExports.h>
+#include <mitkCommon.h>
+#include <mitkImageSource.h>
+#include <mitkSurface.h>
 
 class vtkPolyData;
 

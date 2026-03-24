@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGridVolumeMapperProperty.h"
+#include <mitkGridVolumeMapperProperty.h>
 #include <vtkProperty.h>
 
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty()

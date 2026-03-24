@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCameraRotationController.h"
+#include <mitkCameraRotationController.h>
 
 #include <itkCommand.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 
-#include "mitkRenderingManager.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkRenderingManager.h>
+#include <mitkVtkPropRenderer.h>
 
 mitk::CameraRotationController::CameraRotationController()
   : BaseController(), m_LastStepperValue(180), m_Camera(nullptr), m_RenderWindow(nullptr)

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMCodeSequence.h"
+#include <mitkDICOMCodeSequence.h>
 
 namespace mitk
 {

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationStackNiftiWriter.h"
+#include <mitkMultiLabelSegmentationStackNiftiWriter.h>
 
-#include "mitkMultilabelIOMimeTypes.h"
+#include <mitkMultilabelIOMimeTypes.h>
 
 // itk
-#include "itkNiftiImageIO.h"
+#include <itkNiftiImageIO.h>
 
 namespace mitk
 {

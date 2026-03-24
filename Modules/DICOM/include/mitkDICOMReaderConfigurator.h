@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDICOMReaderConfigurator_h
 #define mitkDICOMReaderConfigurator_h
 
-#include "mitkClassicDICOMSeriesReader.h"
-#include "mitkDICOMTagBasedSorter.h"
+#include <mitkClassicDICOMSeriesReader.h>
+#include <mitkDICOMTagBasedSorter.h>
 
 namespace tinyxml2
 {

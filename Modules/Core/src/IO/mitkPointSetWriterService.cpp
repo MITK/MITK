@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "mitkPointSetWriterService.h"
 #include "mitkGeometry3DToXML.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkLocaleSwitch.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
 #include <fstream>
 #include <iostream>

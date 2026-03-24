@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyRelationRuleBase.h"
+#include <mitkPropertyRelationRuleBase.h>
 
 #include <mitkDataNode.h>
 #include <mitkExceptionMacro.h>

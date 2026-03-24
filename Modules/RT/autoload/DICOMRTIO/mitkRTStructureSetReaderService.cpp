@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRTStructureSetReaderService.h"
+#include <mitkRTStructureSetReaderService.h>
 
 #include <mitkDICOMRTMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 
-#include "dcmtk/dcmrt/drtstrct.h"
+#include <dcmtk/dcmrt/drtstrct.h>
 
 namespace mitk
 {

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSortByImagePositionPatient_h
 #define mitkSortByImagePositionPatient_h
 
-#include "mitkDICOMSortCriterion.h"
+#include <mitkDICOMSortCriterion.h>
 
-#include "mitkVector.h"
+#include <mitkVector.h>
 
 namespace mitk
 {

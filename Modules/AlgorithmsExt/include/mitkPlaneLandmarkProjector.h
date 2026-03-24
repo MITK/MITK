@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlaneLandmarkProjector_h
 #define mitkPlaneLandmarkProjector_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkLandmarkProjector.h"
-#include "mitkPointSet.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkLandmarkProjector.h>
+#include <mitkPointSet.h>
 
 namespace mitk
 {

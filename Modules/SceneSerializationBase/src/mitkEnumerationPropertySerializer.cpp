@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEnumerationPropertySerializer.h"
+#include <mitkEnumerationPropertySerializer.h>
 #include <tinyxml2.h>
 
 namespace mitk

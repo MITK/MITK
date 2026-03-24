@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkResliceMethodProperty_h
 #define mitkResliceMethodProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

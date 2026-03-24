@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include "mitkPlanarFigureIO.h"
+#include <mitkPlanarFigureIO.h>
 
 namespace mitk
 {

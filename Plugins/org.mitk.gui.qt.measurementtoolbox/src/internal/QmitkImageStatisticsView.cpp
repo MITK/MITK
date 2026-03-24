@@ -32,11 +32,11 @@ found in the LICENSE file.
 #include <mitkSliceNavigationController.h>
 #include <mitkStatusBar.h>
 #include <mitkPlanarFigure.h>
-#include "mitkPlanarFigureMaskGenerator.h"
+#include <mitkPlanarFigureMaskGenerator.h>
 
-#include "QmitkImageStatisticsDataGenerator.h"
+#include <QmitkImageStatisticsDataGenerator.h>
 
-#include "mitkImageStatisticsContainerManager.h"
+#include <mitkImageStatisticsContainerManager.h>
 #include <mitkPlanarFigureInteractor.h>
 
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";

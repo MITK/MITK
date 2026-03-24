@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
 
-#include <mitkMimeTypeProvider.h>
-#include <mitkNodeSelectionService.h>
+#include "mitkMimeTypeProvider.h"
+#include "mitkNodeSelectionService.h"
 #include <mitkPlanePositionManager.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include <mitkPropertyFilters.h>
 #include <mitkPropertyPersistence.h>
 #include <mitkPropertyRelations.h>
-#include <mitkPreferencesService.h>
+#include "mitkPreferencesService.h"
 
 // Micro Services
 #include <usModuleActivator.h>

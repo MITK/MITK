@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkRestorePlanePositionOperation_h
 #define mitkRestorePlanePositionOperation_h
 
-#include "mitkCommon.h"
-#include "mitkNumericTypes.h"
-#include "mitkPointOperation.h"
+#include <mitkCommon.h>
+#include <mitkNumericTypes.h>
+#include <mitkPointOperation.h>
 
 namespace mitk
 {

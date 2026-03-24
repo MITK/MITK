@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRenderingController_h
 #define mitkRenderingController_h
 
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStorageThreadDispatcherBase.h>
 #include <httplib.h>
 

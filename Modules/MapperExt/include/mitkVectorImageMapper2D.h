@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkVectorImageMapper2D_h
 #define mitkVectorImageMapper2D_h
 
-#include "MitkMapperExtExports.h"
+#include <MitkMapperExtExports.h>
 
-#include "mitkCommon.h"
-#include "mitkGLMapper.h"
-#include "mitkImage.h"
+#include <mitkCommon.h>
+#include <mitkGLMapper.h>
+#include <mitkImage.h>
 
 class vtkLookupTable;
 class vtkScalarsToColors;

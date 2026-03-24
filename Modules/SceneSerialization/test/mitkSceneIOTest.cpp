@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingConfig.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestingConfig.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkSceneIO.h"
+#include <mitkSceneIO.h>
 
-#include "Poco/File.h"
-#include "Poco/TemporaryFile.h"
-#include "mitkBaseData.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkGeometryData.h"
-#include "mitkIOUtil.h"
-#include "mitkImage.h"
-#include "mitkPointSet.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkStandardFileLocations.h"
-#include "mitkSurface.h"
+#include <Poco/File.h>
+#include <Poco/TemporaryFile.h>
+#include <mitkBaseData.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkGeometryData.h>
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkPointSet.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkStandardFileLocations.h>
+#include <mitkSurface.h>
 
 #ifndef WIN32
 #include <cerrno>

@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef mitkStateMachineTransition_h
 #define mitkStateMachineTransition_h
 
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineCondition.h"
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineCondition.h>
 #include <itkLightObject.h>
 #include <string>
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

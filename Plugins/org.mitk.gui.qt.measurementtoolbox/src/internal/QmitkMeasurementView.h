@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "usServiceRegistration.h"
+#include <usServiceRegistration.h>
 
 /// forward declarations
 struct QmitkMeasurementViewData;

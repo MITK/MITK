@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <ctkXnatTreeModel.h>
 
 // MITK includes
-#include "MitkXNATExports.h"
+#include <MitkXNATExports.h>
 
 namespace mitk
 {

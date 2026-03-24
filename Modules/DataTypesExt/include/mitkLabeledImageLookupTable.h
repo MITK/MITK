@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkLabeledImageLookupTable_h
 #define mitkLabeledImageLookupTable_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkLevelWindow.h"
-#include "mitkLookupTable.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkLevelWindow.h>
+#include <mitkLookupTable.h>
 #include <iostream>
 #include <string>
 

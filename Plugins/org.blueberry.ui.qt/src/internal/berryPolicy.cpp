@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryPolicy.h"
 
 #include <berryPlatform.h>
-#include <berryPlatformUI.h>
+#include "berryPlatformUI.h"
 
 #include <QString>
 

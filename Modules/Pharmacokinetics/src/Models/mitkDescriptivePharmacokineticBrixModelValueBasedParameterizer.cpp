@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <mitkImageAccessByItk.h>
 
-#include "mitkDescriptivePharmacokineticBrixModel.h"
-#include "mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h"
+#include <mitkDescriptivePharmacokineticBrixModel.h>
+#include <mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h>
 
 mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::StaticParameterMapType
 mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::GetGlobalStaticParameters() const

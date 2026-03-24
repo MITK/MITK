@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericParamModelFactory.h"
-#include "mitkGenericParamModelParameterizer.h"
+#include <mitkGenericParamModelFactory.h>
+#include <mitkGenericParamModelParameterizer.h>
 
 mitk::GenericParamModelFactory::GenericParamModelFactory()
 = default;

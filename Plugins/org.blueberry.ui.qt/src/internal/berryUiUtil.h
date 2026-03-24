@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef BERRYUIUTIL_H
 #define BERRYUIUTIL_H
 
-#include "berryIAdaptable.h"
-#include "berryIAdapterManager.h"
-#include "berryPlatformObject.h"
-#include "berryPlatform.h"
+#include <berryIAdaptable.h>
+#include <berryIAdapterManager.h>
+#include <berryPlatformObject.h>
+#include <berryPlatform.h>
 
 namespace berry {
 

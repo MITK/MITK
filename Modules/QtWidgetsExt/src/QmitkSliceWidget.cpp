@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSliceWidget.h"
+#include <QmitkSliceWidget.h>
 #include <ui_QmitkSliceWidget.h>
-#include "QmitkStepperAdapter.h"
-#include "mitkCameraController.h"
-#include "mitkImage.h"
-#include "mitkNodePredicateDataType.h"
+#include <QmitkStepperAdapter.h>
+#include <mitkCameraController.h>
+#include <mitkImage.h>
+#include <mitkNodePredicateDataType.h>
 #include <QMenu>
 #include <QMouseEvent>
 #include <mitkCameraController.h>

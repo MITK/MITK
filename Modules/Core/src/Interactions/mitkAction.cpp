@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAction.h"
+#include <mitkAction.h>
 
 namespace mitk
 {

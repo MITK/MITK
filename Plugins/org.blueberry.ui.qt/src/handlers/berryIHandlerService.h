@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "services/berryIServiceWithSources.h"
 
-#include "common/berryCommandExceptions.h"
+#include <common/berryCommandExceptions.h>
 
 namespace berry {
 

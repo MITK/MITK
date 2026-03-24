@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 #include <memory>
 
-#include "mitkIDataStorageInspectorProvider.h"
+#include <mitkIDataStorageInspectorProvider.h>
 
 /*
  * This is the module activator for the "QtWidgets" module.

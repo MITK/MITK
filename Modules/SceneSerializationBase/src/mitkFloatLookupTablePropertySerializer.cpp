@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkFloatLookupTablePropertySerializer_h_included
 #define mitkFloatLookupTablePropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkProperties.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkProperties.h>
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
 #include <tinyxml2.h>

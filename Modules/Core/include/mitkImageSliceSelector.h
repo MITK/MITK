@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageSliceSelector_h
 #define mitkImageSliceSelector_h
 
-#include "mitkSubImageSelector.h"
+#include <mitkSubImageSelector.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

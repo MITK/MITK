@@ -14,13 +14,13 @@ found in the LICENSE file.
 #define _BERRY_WORKER_H
 
 #include <Poco/Thread.h>
-#include "berryObject.h"
+#include <berryObject.h>
 #include <org_blueberry_core_jobs_Export.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include "berryInternalJob.h"
-#include "berryIStatus.h"
-#include "berryStatus.h"
+#include <berryIStatus.h>
+#include <berryStatus.h>
 
 namespace berry
 {

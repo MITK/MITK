@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStepper.h"
-#include "mitkTestingMacros.h"
+#include <mitkStepper.h>
+#include <mitkTestingMacros.h>
 
 int mitkStepperTest(int /*argc*/, char * /*argv*/ [])
 {

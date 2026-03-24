@@ -14,8 +14,8 @@ found in the LICENSE file.
 #include "berryJobManager.h"
 
 #include "berryJob.h"
-#include "berryOperationCanceledException.h"
-#include "berryLog.h"
+#include <berryOperationCanceledException.h>
+#include <berryLog.h>
 
 #include <typeinfo>
 

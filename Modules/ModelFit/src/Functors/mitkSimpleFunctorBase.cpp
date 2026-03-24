@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSimpleFunctorBase.h"
+#include <mitkSimpleFunctorBase.h>
 
 mitk::SimpleFunctorBase::SimpleFunctorBase() = default;
 mitk::SimpleFunctorBase::~SimpleFunctorBase() = default;

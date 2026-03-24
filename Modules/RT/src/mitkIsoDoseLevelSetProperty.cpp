@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkIsoDoseLevelSetProperty.h"
+#include <mitkIsoDoseLevelSetProperty.h>
 
 
 mitk::IsoDoseLevelSetProperty::IsoDoseLevelSetProperty()

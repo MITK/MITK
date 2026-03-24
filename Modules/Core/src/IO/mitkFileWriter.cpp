@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileWriter.h"
+#include <mitkFileWriter.h>
 
 bool mitk::FileWriter::CanWriteDataType(DataNode *node)
 {

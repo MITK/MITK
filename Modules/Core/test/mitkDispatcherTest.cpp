@@ -11,18 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 // MITK includes
 #include <mitkCoreServices.h>
-#include "mitkBaseRenderer.h"
-#include "mitkDataInteractor.h"
-#include "mitkDataNode.h"
-#include "mitkDispatcher.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDataInteractor.h>
+#include <mitkDataNode.h>
+#include <mitkDispatcher.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkVtkPropRenderer.h>
 // ITK includes
-#include "itkLightObject.h"
+#include <itkLightObject.h>
 
 class mitkDispatcherTestSuite : public mitk::TestFixture
 {

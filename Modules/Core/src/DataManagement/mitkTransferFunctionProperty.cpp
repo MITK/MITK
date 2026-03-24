@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunctionProperty.h"
+#include <mitkTransferFunctionProperty.h>
 #include <nlohmann/json.hpp>
 
 namespace mitk

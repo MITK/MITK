@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 #include "berrySwitchToWindowMenu.h"
 
-#include <berryMenuManager.h>
-#include <berryShell.h>
+#include "berryMenuManager.h"
+#include "berryShell.h"
 
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchWindow.h>
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchWindow.h"
 
 #include <QAction>
 #include <QActionGroup>

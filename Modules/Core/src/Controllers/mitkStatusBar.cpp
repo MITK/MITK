@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStatusBar.h"
+#include <mitkStatusBar.h>
 #include <itkObjectFactory.h>
 #include <itkOutputWindow.h>
 

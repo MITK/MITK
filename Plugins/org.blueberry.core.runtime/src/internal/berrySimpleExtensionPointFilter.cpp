@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berrySimpleExtensionPointFilter.h"
 
-#include <berryIExtensionPoint.h>
+#include "berryIExtensionPoint.h"
 
 namespace berry {
 

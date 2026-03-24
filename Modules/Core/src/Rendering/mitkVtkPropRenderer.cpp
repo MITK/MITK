@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 
 // MAPPERS
-#include "mitkCameraController.h"
-#include "mitkImageVtkMapper2D.h"
-#include "mitkMapper.h"
-#include "mitkPlaneGeometryDataVtkMapper3D.h"
-#include "mitkVtkMapper.h"
+#include <mitkCameraController.h>
+#include <mitkImageVtkMapper2D.h>
+#include <mitkMapper.h>
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
+#include <mitkVtkMapper.h>
 
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkGeometry3D.h>

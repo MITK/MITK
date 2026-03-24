@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <string>
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 namespace mitk
 {
   /** returns the correct property name for a simple DICOM tag. The tag is defined

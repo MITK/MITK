@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYISAFERUNNABLE_H_
 #define BERRYISAFERUNNABLE_H_
 
-#include <berryObject.h>
-#include <berryMacros.h>
+#include "berryObject.h"
+#include "berryMacros.h"
 
 #include <org_blueberry_core_runtime_Export.h>
 

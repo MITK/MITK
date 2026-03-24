@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExpDecayOffsetModel.h"
+#include <mitkExpDecayOffsetModel.h>
 
 
 const std::string mitk::ExpDecayOffsetModel::NAME_PARAMETER_y0 = "y-intercept";

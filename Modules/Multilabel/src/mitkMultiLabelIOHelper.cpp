@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelIOHelper.h"
+#include <mitkMultiLabelIOHelper.h>
 
-#include "mitkLabelSetImage.h"
+#include <mitkLabelSetImage.h>
 #include <mitkBasePropertySerializer.h>
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
+#include <itkMetaDataDictionary.h>
+#include <itkMetaDataObject.h>
 
 #include <tinyxml2.h>
 

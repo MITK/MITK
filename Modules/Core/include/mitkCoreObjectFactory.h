@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <set>
 
-#include "mitkCoreObjectFactoryBase.h"
-#include "mitkFileWriterWithInformation.h"
+#include <mitkCoreObjectFactoryBase.h>
+#include <mitkFileWriterWithInformation.h>
 #include <MitkCoreExports.h>
 namespace mitk
 {

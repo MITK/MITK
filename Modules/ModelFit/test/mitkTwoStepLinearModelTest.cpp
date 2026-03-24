@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
  //Testing
-#include "mitkModelTestFixture.h"
+#include <mitkModelTestFixture.h>
 
 //MITK includes
-#include "mitkTwoStepLinearModel.h"
+#include <mitkTwoStepLinearModel.h>
 
 
   class mitkTwoStepLinearModelTestSuite : public mitk::mitkModelTestFixture

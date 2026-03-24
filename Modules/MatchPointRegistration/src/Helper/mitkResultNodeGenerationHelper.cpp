@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkResultNodeGenerationHelper.h"
+#include <mitkResultNodeGenerationHelper.h>
 
 #include <mitkProperties.h>
 #include <mitkMatchPointPropertyTags.h>

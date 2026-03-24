@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYCOREEXCEPTION_H
 #define BERRYCOREEXCEPTION_H
 
-#include <berryIStatus.h>
+#include "berryIStatus.h"
 
 #include <ctkException.h>
 

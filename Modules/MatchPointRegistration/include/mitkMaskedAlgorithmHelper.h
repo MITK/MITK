@@ -14,16 +14,16 @@ found in the LICENSE file.
 #ifndef mitkMaskedAlgorithmHelper_h
 #define mitkMaskedAlgorithmHelper_h
 
-#include "itkSpatialObject.h"
+#include <itkSpatialObject.h>
 
 //MatchPoint
-#include "mapRegistrationAlgorithmBase.h"
+#include <mapRegistrationAlgorithmBase.h>
 
 //MITK
 #include <mitkImage.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

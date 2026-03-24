@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFourPointAngle_h
 #define mitkPlanarFourPointAngle_h
 
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

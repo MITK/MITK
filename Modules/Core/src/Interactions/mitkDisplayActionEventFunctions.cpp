@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDisplayActionEventFunctions.h"
+#include <mitkDisplayActionEventFunctions.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkDICOMExports.h>
 
-#include "mitkPropertyKeyPath.h"
+#include <mitkPropertyKeyPath.h>
 
 namespace mitk
 {

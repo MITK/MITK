@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 
-#include "mitkRegEvaluationObject.h"
+#include <mitkRegEvaluationObject.h>
 
 #include <mapExceptionObjectMacros.h>
 

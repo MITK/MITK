@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include "berryExpressionAuthority.h"
 
-#include <berryIPropertyChangeListener.h>
+#include "berryIPropertyChangeListener.h"
 
 #include <QHash>
 

@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include <QObject>
 
-#include "mitkMAPAlgorithmInfoSelection.h"
+#include <mitkMAPAlgorithmInfoSelection.h>
 
 namespace mitk
 {

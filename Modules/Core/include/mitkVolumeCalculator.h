@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkVolumeCalculator_h
 #define mitkVolumeCalculator_h
 
-#include "itkImage.h"
-#include "itkObject.h"
-#include "itkObjectFactory.h"
+#include <itkImage.h>
+#include <itkObject.h>
+#include <itkObjectFactory.h>
 
-#include "mitkImage.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkImage.h>
+#include <mitkImageTimeSelector.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

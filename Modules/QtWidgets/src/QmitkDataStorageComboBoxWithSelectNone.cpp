@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataStorageComboBoxWithSelectNone.h"
+#include <QmitkDataStorageComboBoxWithSelectNone.h>
 #include <QDebug>
 
 const QString QmitkDataStorageComboBoxWithSelectNone::ZERO_ENTRY_STRING = "--";

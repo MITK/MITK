@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
-#include "mitkInteractionEvent.h"
+#include <mitkInteractionEvent.h>
 
 // itk
 #include <itkEventObject.h>

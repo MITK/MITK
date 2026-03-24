@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <cstdlib>
 #include <string>
 
-#include "mitkBaseProperty.h"
-#include "mitkNumericTypes.h"
+#include <mitkBaseProperty.h>
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

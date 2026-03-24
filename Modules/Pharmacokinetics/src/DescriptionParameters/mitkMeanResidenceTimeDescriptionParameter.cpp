@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMeanResidenceTimeDescriptionParameter.h"
+#include <mitkMeanResidenceTimeDescriptionParameter.h>
 
 const std::string mitk::MeanResidenceTimeDescriptionParameter::PARAMETER_NAME = "MeanResidenceTime";
 

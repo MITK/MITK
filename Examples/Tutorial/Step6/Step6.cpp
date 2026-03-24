@@ -10,20 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "Step6.h"
+#include <Step6.h>
 
-#include "QmitkRenderWindow.h"
-#include "QmitkSliceWidget.h"
+#include <QmitkRenderWindow.h>
+#include <QmitkSliceWidget.h>
 
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 
-#include "mitkPointSet.h"
-#include "mitkPointSetDataInteractor.h"
+#include <mitkPointSet.h>
+#include <mitkPointSetDataInteractor.h>
 
-#include "mitkImageAccessByItk.h"
+#include <mitkImageAccessByItk.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
 
 #include <QHBoxLayout>

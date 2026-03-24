@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkGenericIDRelationRule_h
 #define mitkGenericIDRelationRule_h
 
-#include "mitkPropertyRelationRuleBase.h"
+#include <mitkPropertyRelationRuleBase.h>
 
 namespace mitk
 {

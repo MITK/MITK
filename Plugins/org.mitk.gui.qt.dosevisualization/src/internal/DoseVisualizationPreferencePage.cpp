@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 
 #include "DoseVisualizationPreferencePage.h"
-#include "mitkRTUIConstants.h"
+#include <mitkRTUIConstants.h>
 
 #include <QWidget>
 #include <QMessageBox>
@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include <QmitkDoseVisualStyleDelegate.h>
 #include <QmitkIsoDoseLevelSetModel.h>
 
-#include "mitkIsoLevelsGenerator.h"
+#include <mitkIsoLevelsGenerator.h>
 
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 

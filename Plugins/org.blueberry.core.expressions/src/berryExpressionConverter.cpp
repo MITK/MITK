@@ -12,21 +12,21 @@ found in the LICENSE file.
 
 #include "berryExpressionConverter.h"
 
-#include "berryPlatformException.h"
-#include "berryIConfigurationElement.h"
-#include "berryIExtension.h"
-#include "berryIContributor.h"
+#include <berryPlatformException.h>
+#include <berryIConfigurationElement.h>
+#include <berryIExtension.h>
+#include <berryIContributor.h>
 
-#include "berryCoreException.h"
+#include <berryCoreException.h>
 #include "berryElementHandler.h"
 #include "berryExpression.h"
-#include "berryStatus.h"
+#include <berryStatus.h>
 
 #include "internal/berryExpressionPlugin.h"
 #include "internal/berryCompositeExpression.h"
 
-#include "Poco/DOM/Node.h"
-#include "Poco/DOM/Element.h"
+#include <Poco/DOM/Node.h>
+#include <Poco/DOM/Element.h>
 
 
 namespace berry {

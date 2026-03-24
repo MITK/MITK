@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkBindDispatcherInteractor_h
 #define mitkBindDispatcherInteractor_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkCoreExports.h>
 
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkDispatcher.h"
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkDispatcher.h>
 
 namespace mitk
 {

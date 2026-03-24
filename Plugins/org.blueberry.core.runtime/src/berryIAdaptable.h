@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#include <berryObject.h>
+#include "berryObject.h"
 
-#include <berryLog.h>
+#include "berryLog.h"
 
 #include <typeinfo>
 

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkBaseController_h
 #define mitkBaseController_h
 
-#include "mitkEventStateMachine.h"
-#include "mitkOperationActor.h"
-#include "mitkStepper.h"
+#include <mitkEventStateMachine.h>
+#include <mitkOperationActor.h>
+#include <mitkStepper.h>
 #include <MitkCoreExports.h>
 #include <itkObjectFactory.h>
 

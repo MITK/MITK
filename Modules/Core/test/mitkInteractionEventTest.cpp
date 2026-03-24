@@ -11,16 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 // MITK includes
 #include <mitkCoreServices.h>
-#include "mitkInteractionEventConst.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkMousePressEvent.h"
-#include "mitkMouseReleaseEvent.h"
+#include <mitkInteractionEventConst.h>
+#include <mitkMouseMoveEvent.h>
+#include <mitkMousePressEvent.h>
+#include <mitkMouseReleaseEvent.h>
 // VTK includes
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 
 class mitkInteractionEventTestSuite : public mitk::TestFixture
 {

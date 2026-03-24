@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <itkIndex.h>
 #include <mitkVector.h>
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

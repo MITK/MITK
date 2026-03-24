@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itSmoothedClassProbabilites_h
-#define itSmoothedClassProbabilites_h
+#ifndef itkSmoothedClassProbabilites_h
+#define itkSmoothedClassProbabilites_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -53,7 +53,7 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <../src/Algorithms/itkSmoothedClassProbabilites.cpp>
+#include "../src/Algorithms/itkSmoothedClassProbabilites.cpp"
 #endif
 
 

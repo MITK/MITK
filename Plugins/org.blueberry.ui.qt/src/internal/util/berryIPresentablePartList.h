@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIPRESENTABLEPARTLIST_H_
 #define BERRYIPRESENTABLEPARTLIST_H_
 
-#include <berryIPresentablePart.h>
+#include "berryIPresentablePart.h"
 #include <vector>
 
 #include <org_blueberry_ui_qt_Export.h>

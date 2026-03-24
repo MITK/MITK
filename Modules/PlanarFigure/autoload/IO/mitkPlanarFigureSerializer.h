@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureSerializer_h
 #define mitkPlanarFigureSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {

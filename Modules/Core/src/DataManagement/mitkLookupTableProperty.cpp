@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTableProperty.h"
+#include <mitkLookupTableProperty.h>
 #include <iomanip>
 #include <nlohmann/json.hpp>
 

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkBoundingObjectWidget_h
 
 // includes
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QComboBox>
 #include <QPushButton>
 #include <QTreeWidget>

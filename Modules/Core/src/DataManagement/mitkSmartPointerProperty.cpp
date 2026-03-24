@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSmartPointerProperty.h"
+#include <mitkSmartPointerProperty.h>
 
 mitk::SmartPointerProperty::ReferenceCountMapType mitk::SmartPointerProperty::m_ReferenceCount;
 mitk::SmartPointerProperty::ReferencesUIDMapType mitk::SmartPointerProperty::m_ReferencesUID;

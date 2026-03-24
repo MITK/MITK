@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkImageDataItem_h
 #define mitkImageDataItem_h
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 #include <MitkCoreExports.h>
-#include "mitkImageDescriptor.h"
+#include <mitkImageDescriptor.h>
 
 class vtkImageData;
 

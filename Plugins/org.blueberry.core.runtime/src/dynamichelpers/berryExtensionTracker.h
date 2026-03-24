@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYEXTENSIONTRACKER_H
 #define BERRYEXTENSIONTRACKER_H
 
-#include <berryIExtensionTracker.h>
+#include "berryIExtensionTracker.h"
 
 namespace berry {
 

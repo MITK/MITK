@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkExtActionBarAdvisor.h"
 
-#include "QmitkFileOpenAction.h"
-#include "QmitkFileSaveAction.h"
+#include <QmitkFileOpenAction.h>
+#include <QmitkFileSaveAction.h>
 #include "QmitkExtFileSaveProjectAction.h"
-#include "QmitkCloseProjectAction.h"
+#include <QmitkCloseProjectAction.h>
 #include <QmitkFileExitAction.h>
 
 #include <mitkWorkbenchCommandConstants.h>

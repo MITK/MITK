@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAIFBasedModelBase.h"
-#include "mitkTimeGridHelper.h"
-#include "mitkAIFParametrizerHelper.h"
+#include <mitkAIFBasedModelBase.h>
+#include <mitkTimeGridHelper.h>
+#include <mitkAIFParametrizerHelper.h>
 
-#include "itkArray2D.h"
+#include <itkArray2D.h>
 
 const unsigned int mitk::AIFBasedModelBase::NUMBER_OF_STATIC_PARAMETERS = 2;
 

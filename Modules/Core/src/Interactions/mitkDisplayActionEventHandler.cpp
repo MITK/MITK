@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDisplayActionEventHandler.h"
+#include <mitkDisplayActionEventHandler.h>
 
 mitk::DisplayActionEventHandler::~DisplayActionEventHandler()
 {

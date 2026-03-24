@@ -177,6 +177,7 @@ public:
   bool operator<(const ServiceRegistrationBase& o) const;
 
   bool operator==(const ServiceRegistrationBase& registration) const;
+  bool operator==(std::nullptr_t) const noexcept;
 
   ServiceRegistrationBase& operator=(const ServiceRegistrationBase& registration);
 

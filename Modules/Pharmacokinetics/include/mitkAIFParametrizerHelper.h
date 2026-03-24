@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkAIFParametrizerHelper_h
 #define mitkAIFParametrizerHelper_h
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

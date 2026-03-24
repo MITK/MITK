@@ -13,9 +13,9 @@ found in the LICENSE file.
 
 #include "berryContributionRoot.h"
 
-#include <berryIContributionItem.h>
-#include <berryIEvaluationReference.h>
-#include <berryAbstractContributionFactory.h>
+#include "berryIContributionItem.h"
+#include "berryIEvaluationReference.h"
+#include "berryAbstractContributionFactory.h"
 
 #include "berryAlwaysEnabledExpression.h"
 #include "berryInternalMenuService.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialSaturationModel.h"
-#include "mitkNumericConstants.h"
+#include <mitkExponentialSaturationModel.h>
+#include <mitkNumericConstants.h>
 
 const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_BAT = "onset";
 const std::string mitk::ExponentialSaturationModel::NAME_PARAMETER_y_bl = "baseline";

@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkParamapPresetsParser.h"
+#include <mitkParamapPresetsParser.h>
 #include <vtkObjectFactory.h>
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usModule.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk {
 

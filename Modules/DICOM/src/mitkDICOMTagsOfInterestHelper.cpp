@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagsOfInterestHelper.h"
+#include <mitkDICOMTagsOfInterestHelper.h>
 
 #include <mitkIDICOMTagsOfInterest.h>
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
 mitk::DICOMTagPathMapType::value_type MakeLegacyEntry(const std::string& propName, const mitk::DICOMTag& tag)
 {

@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkBoundingShapeUtil.h"
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
-#include "vtkDoubleArray.h"
-#include "vtkMath.h"
+#include <vtkDoubleArray.h>
+#include <vtkMath.h>
 #include <vtkSmartPointer.h>
 
 #include <algorithm>

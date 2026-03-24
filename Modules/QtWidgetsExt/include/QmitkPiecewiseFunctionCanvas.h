@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkPiecewiseFunctionCanvas_h
 #define QmitkPiecewiseFunctionCanvas_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "QmitkTransferFunctionCanvas.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <QmitkTransferFunctionCanvas.h>
 
 #include <vtkPiecewiseFunction.h>
 

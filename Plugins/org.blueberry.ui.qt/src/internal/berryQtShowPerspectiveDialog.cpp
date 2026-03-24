@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryQtShowPerspectiveDialog.h"
 #include <ui_berryQtShowPerspectiveDialog.h>
 
-#include <berryPerspectiveListModel.h>
+#include "berryPerspectiveListModel.h"
 
 #include <QSortFilterProxyModel>
 

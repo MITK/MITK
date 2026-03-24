@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkBaseGeometry_h
 #define mitkBaseGeometry_h
 
-#include "mitkOperationActor.h"
+#include <mitkOperationActor.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
-#include "itkScalableAffineTransform.h"
-#include "mitkNumericTypes.h"
+#include <itkScalableAffineTransform.h>
+#include <mitkNumericTypes.h>
 #include <itkBoundingBox.h>
 #include <itkIndex.h>
 #include <itkQuaternionRigidTransform.h>

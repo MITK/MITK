@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeResetGeometryAction.h>
+#include "QmitkDataNodeResetGeometryAction.h"
 
 // mitk core
 #include <mitkImage.h>

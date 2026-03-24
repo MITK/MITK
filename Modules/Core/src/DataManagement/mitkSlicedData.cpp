@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSlicedData.h"
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkBaseProcess.h"
+#include <mitkSlicedData.h>
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkBaseProcess.h>
 #include <mitkProportionalTimeGeometry.h>
 
 mitk::SlicedData::SlicedData() : m_RequestedRegionInitialized(false), m_UseLargestPossibleRegion(false)

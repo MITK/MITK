@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationVtkMapper3D.h"
+#include <mitkMultiLabelSegmentationVtkMapper3D.h>
 
 // MITK
 #include <mitkDataNode.h>

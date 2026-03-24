@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkUndoController_h
 #define mitkUndoController_h
 
-#include "mitkOperationEvent.h"
-#include "mitkUndoModel.h"
+#include <mitkOperationEvent.h>
+#include <mitkUndoModel.h>
 #include <MitkCoreExports.h>
 #include <map>
 

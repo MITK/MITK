@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabeledImageToSurfaceFilter.h"
-#include "mitkReferenceCountWatcher.h"
+#include <mitkLabeledImageToSurfaceFilter.h>
+#include <mitkReferenceCountWatcher.h>
 #include <itksys/SystemTools.hxx>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 #include <cmath>
 

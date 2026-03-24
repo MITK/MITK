@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDisplayActionEventHandlerDesynchronized.h"
+#include <mitkDisplayActionEventHandlerDesynchronized.h>
 
 // mitk core
-#include "mitkDisplayActionEventFunctions.h"
+#include <mitkDisplayActionEventFunctions.h>
 
 // itk
 #include <itkEventObject.h>

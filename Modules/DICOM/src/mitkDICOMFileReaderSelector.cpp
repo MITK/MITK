@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMFileReaderSelector.h"
-#include "mitkDICOMReaderConfigurator.h"
-#include "mitkDICOMGDCMTagScanner.h"
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMReaderConfigurator.h>
+#include <mitkDICOMGDCMTagScanner.h>
 
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>

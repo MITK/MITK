@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkEditPointDialog_h
 #define QmitkEditPointDialog_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <QDialog>
 #include <mitkPointSet.h>

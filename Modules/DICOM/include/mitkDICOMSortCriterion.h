@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMSortCriterion_h
 #define mitkDICOMSortCriterion_h
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "mitkDICOMDatasetAccess.h"
+#include <mitkDICOMDatasetAccess.h>
 
 namespace mitk
 {

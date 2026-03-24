@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCommon.h"
-#include "mitkNumericTypes.h"
-#include "mitkSurface.h"
-#include "mitkSurfaceToSurfaceFilter.h"
-#include "mitkTestingMacros.h"
+#include <mitkCommon.h>
+#include <mitkNumericTypes.h>
+#include <mitkSurface.h>
+#include <mitkSurfaceToSurfaceFilter.h>
+#include <mitkTestingMacros.h>
 
-#include "vtkPolyData.h"
-#include "vtkSphereSource.h"
+#include <vtkPolyData.h>
+#include <vtkSphereSource.h>
 
 int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char * /*argv*/ [])
 {

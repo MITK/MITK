@@ -9,23 +9,23 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "mitkBaseProperty.h"
-#include "mitkDataNode.h"
-#include "mitkGeometry3D.h"
-#include "mitkImage.h"
-#include "mitkInteractionConst.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlanePositionManager.h"
-#include "mitkRotationOperation.h"
-#include "mitkSliceNavigationController.h"
-#include "mitkStandaloneDataStorage.h"
-#include "mitkStringProperty.h"
-#include "mitkSurface.h"
-#include "mitkTestingMacros.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usServiceReference.h"
-#include "vnl/vnl_vector.h"
+#include <mitkBaseProperty.h>
+#include <mitkDataNode.h>
+#include <mitkGeometry3D.h>
+#include <mitkImage.h>
+#include <mitkInteractionConst.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlanePositionManager.h>
+#include <mitkRotationOperation.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkStringProperty.h>
+#include <mitkSurface.h>
+#include <mitkTestingMacros.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
+#include <vnl/vnl_vector.h>
 
 std::vector<mitk::PlaneGeometry::Pointer> m_Geometries;
 std::vector<unsigned int> m_SliceIndices;

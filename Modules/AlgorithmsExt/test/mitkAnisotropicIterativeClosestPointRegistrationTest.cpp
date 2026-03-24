@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
 
-#include "mitkAnisotropicIterativeClosestPointRegistration.h"
-#include "mitkAnisotropicRegistrationCommon.h"
-#include "mitkCovarianceMatrixCalculator.h"
+#include <mitkAnisotropicIterativeClosestPointRegistration.h>
+#include <mitkAnisotropicRegistrationCommon.h>
+#include <mitkCovarianceMatrixCalculator.h>
 
 /**
  * Test to verify the results of the A-ICP registration.

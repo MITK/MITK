@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationPreferencePage_h
 #define QmitkSegmentationPreferencePage_h
 
-#include "org_mitk_gui_qt_segmentation_Export.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include <berryIQtPreferencePage.h>
 #include <memory>

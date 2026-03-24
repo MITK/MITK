@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <org_mitk_core_jobs_Export.h>
 
-#include "berryISchedulingRule.h"
-#include "berryObject.h"
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkStandaloneDataStorage.h"
+#include <berryISchedulingRule.h>
+#include <berryObject.h>
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
+#include <mitkStandaloneDataStorage.h>
 
 namespace mitk {
 

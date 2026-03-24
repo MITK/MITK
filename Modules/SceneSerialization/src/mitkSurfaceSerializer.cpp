@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkSurfaceSerializer.h"
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 MITK_REGISTER_SERIALIZER(SurfaceSerializer)
 

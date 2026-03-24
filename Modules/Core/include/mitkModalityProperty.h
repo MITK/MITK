@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkModalityProperty_h
 #define mitkModalityProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 #include <MitkCoreExports.h>
 #include <itkObjectFactory.h>
 

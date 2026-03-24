@@ -14,13 +14,13 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelSegmentationMappingHelper_h
 #define mitkMultiLabelSegmentationMappingHelper_h
 
-#include "mapRegistrationBase.h"
-#include "mitkLabelSetImage.h"
-#include "mitkGeometry3D.h"
+#include <mapRegistrationBase.h>
+#include <mitkLabelSetImage.h>
+#include <mitkGeometry3D.h>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

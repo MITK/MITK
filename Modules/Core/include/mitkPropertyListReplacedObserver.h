@@ -13,7 +13,7 @@ found in the LICENSE file.
 #define mitkPropertyListReplacedObserver_h
 
 // mitk
-#include "mitkPropertyList.h"
+#include <mitkPropertyList.h>
 #include <MitkCoreExports.h>
 #include <string>
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "Step7.h"
+#include <Step7.h>
 
 #include <QmitkRenderWindow.h>
 #include <QmitkSliceWidget.h>

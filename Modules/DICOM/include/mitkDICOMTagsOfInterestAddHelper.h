@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include <memory>
 #include <mutex>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace us
 {

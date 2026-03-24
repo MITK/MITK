@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultRelationRule.h"
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitResultRelationRule.h>
+#include <mitkModelFitConstants.h>
 
 #include <mitkDataNode.h>
 

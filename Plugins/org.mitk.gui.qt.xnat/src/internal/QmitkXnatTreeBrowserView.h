@@ -15,16 +15,16 @@ found in the LICENSE file.
 
 #include <QmitkAbstractView.h>
 
-#include "QmitkHttpStatusCodeHandler.h"
+#include <QmitkHttpStatusCodeHandler.h>
 
 // ctkXnatCore
-#include "ctkXnatSession.h"
+#include <ctkXnatSession.h>
 
 // ctkXnatWidget
-#include "QmitkXnatTreeModel.h"
+#include <QmitkXnatTreeModel.h>
 
 // MitkXNAT Module
-#include "mitkXnatSessionTracker.h"
+#include <mitkXnatSessionTracker.h>
 
 #include <QFileInfo>
 #include <memory>

@@ -1,3 +1,14 @@
+set(H_FILES
+  itkMultiGaussianImageSource.h
+  mitkHotspotMaskGenerator.h
+  mitkLabelStatisticsImageFilter.h
+  mitkMaskUtilities.h
+  mitkMinMaxImageFilterWithIndex.h
+  mitkMinMaxLabelmageFilterWithIndex.h
+  mitkStatisticsImageFilter.h
+  mitkitkMaskImageFilter.h
+)
+
 set(CPP_FILES
   mitkImageStatisticsCalculator.cpp
   mitkImageStatisticsContainer.cpp
@@ -18,14 +29,4 @@ set(CPP_FILES
   mitkStatisticsToImageRelationRule.cpp
   mitkStatisticsToMaskRelationRule.cpp
   mitkImageStatisticsConstants.cpp
-)
-
-set(H_FILES
-  mitkStatisticsImageFilter.h
-  mitkLabelStatisticsImageFilter.h
-  mitkHotspotMaskGenerator.h
-  mitkMaskUtilities.h
-  mitkitkMaskImageFilter.h
-  mitkMinMaxImageFilterWithIndex.h
-  mitkMinMaxLabelmageFilterWithIndex.h
 )

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkOneTissueCompartmentModelParameterizer_h
 #define mitkOneTissueCompartmentModelParameterizer_h
 
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkOneTissueCompartmentModel.h"
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkOneTissueCompartmentModel.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

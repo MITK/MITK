@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSurface_h
 #define mitkSurface_h
 
-#include "itkImageRegion.h"
-#include "mitkBaseData.h"
+#include <itkImageRegion.h>
+#include <mitkBaseData.h>
 #include <vtkSmartPointer.h>
 
 class vtkPolyData;

@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDisplayActionEventBroadcast.h"
+#include <mitkDisplayActionEventBroadcast.h>
 
  // us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 // mitk core module
 #include <mitkDisplayActionEvents.h>

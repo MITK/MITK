@@ -15,7 +15,7 @@ found in the LICENSE file.
 #define mitkRegVisPropertyTags_h
 
 // MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

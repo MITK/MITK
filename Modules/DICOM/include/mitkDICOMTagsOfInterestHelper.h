@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <mitkDICOMTagPath.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractCESTOffset.h"
-#include "mitkCESTPropertyHelper.h"
+#include <mitkExtractCESTOffset.h>
+#include <mitkCESTPropertyHelper.h>
 
 #include <iterator>
 #include <regex>

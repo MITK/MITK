@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_h
 #define mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_h
 
-#include "mapDiscreteElements.h"
-#include "mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h"
-#include "mapConfigure.h"
+#include <mapDiscreteElements.h>
+#include <mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h>
+#include <mapConfigure.h>
 
-#include "mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_ProfileResource.h"
+#include <mitkRigidClosedFormPointsDefaultRegistrationAlgorithm_ProfileResource.h>
 
 namespace mitk
 {

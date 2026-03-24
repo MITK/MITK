@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define NOMINMAX
 #endif
 
-#include "QmitkPropertyDelegate.h"
+#include <QmitkPropertyDelegate.h>
 
-#include "QmitkCustomVariants.h"
+#include <QmitkCustomVariants.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 #include <QApplication>
 #include <QCheckBox>

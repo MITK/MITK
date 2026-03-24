@@ -1,17 +1,17 @@
 set(CPP_FILES
-  Internal/mitkIOExtActivator.cpp
-  Internal/mitkIOExtObjectFactory.cpp
-  Internal/mitkObjFileReaderService.cpp
-  Internal/mitkPlyFileWriterService.cpp
-  Internal/mitkPlyFileReaderService.cpp
-  Internal/mitkParRecFileIOFactory.cpp
-  Internal/mitkParRecFileReader.cpp
-  Internal/mitkSceneFileReader.cpp
-  Internal/mitkStlVolumeTimeSeriesIOFactory.cpp
-  Internal/mitkStlVolumeTimeSeriesReader.cpp
-  Internal/mitkUnstructuredGridVtkWriter.cpp
-  Internal/mitkUnstructuredGridVtkWriterFactory.cpp
-  Internal/mitkVtkUnstructuredGridReader.cpp
-  Internal/mitkVtkVolumeTimeSeriesIOFactory.cpp
-  Internal/mitkVtkVolumeTimeSeriesReader.cpp
+  mitkIOExtActivator.cpp
+  mitkIOExtObjectFactory.cpp
+  mitkObjFileReaderService.cpp
+  mitkPlyFileWriterService.cpp
+  mitkPlyFileReaderService.cpp
+  mitkParRecFileIOFactory.cpp
+  mitkParRecFileReader.cpp
+  mitkSceneFileReader.cpp
+  mitkStlVolumeTimeSeriesIOFactory.cpp
+  mitkStlVolumeTimeSeriesReader.cpp
+  mitkUnstructuredGridVtkWriter.cpp
+  mitkUnstructuredGridVtkWriterFactory.cpp
+  mitkVtkUnstructuredGridReader.cpp
+  mitkVtkVolumeTimeSeriesIOFactory.cpp
+  mitkVtkVolumeTimeSeriesReader.cpp
 )

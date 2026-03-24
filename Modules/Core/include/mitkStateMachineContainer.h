@@ -13,16 +13,16 @@ found in the LICENSE file.
 #ifndef mitkStateMachineContainer_h
 #define mitkStateMachineContainer_h
 
-#include "itkObject.h"
+#include <itkObject.h>
 #include <iostream>
 #include <vtkXMLParser.h>
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineState.h"
-#include "mitkStateMachineTransition.h"
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineState.h>
+#include <mitkStateMachineTransition.h>
 
 namespace us
 {

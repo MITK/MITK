@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYEXPRESSIONS_H_
 #define BERRYEXPRESSIONS_H_
 
-#include "Poco/Any.h"
-#include "Poco/DOM/Element.h"
+#include <Poco/Any.h>
+#include <Poco/DOM/Element.h>
 
 #include "berryExpression.h"
 #include "berryIIterable.h"

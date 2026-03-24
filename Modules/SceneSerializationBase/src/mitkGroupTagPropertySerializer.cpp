@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkGroupTagPropertySerializer_h_included
 #define mitkGroupTagPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkGroupTagProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkGroupTagProperty.h>
 #include <tinyxml2.h>
 
 namespace mitk

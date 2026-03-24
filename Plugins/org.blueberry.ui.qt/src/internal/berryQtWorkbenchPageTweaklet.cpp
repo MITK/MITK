@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryQtWorkbenchPageTweaklet.h"
 #include <memory>
 
-#include <internal/berryQtControlWidget.h>
+#include "internal/berryQtControlWidget.h"
 
 #include <ui_berryQtStatusPart.h>
 

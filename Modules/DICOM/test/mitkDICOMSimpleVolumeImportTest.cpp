@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMFileReaderSelector.h"
-#include "mitkDICOMFileReaderTestHelper.h"
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMFileReaderTestHelper.h>
 
 #include <usModuleContext.h>
 #include <usModuleResource.h>
@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <usModule.h>
 #include <usModuleRegistry.h>
 
-#include "mitkImageToItk.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
+#include <mitkImageToItk.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 /**
   \brief Verify single block reading of SimpleDICOMvolumeImport for sloppily tagged data.

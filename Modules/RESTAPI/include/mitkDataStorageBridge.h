@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <mitkNodePredicateBase.h>
 #include <mitkStorageThreadDispatcherBase.h>
-#include "mitkNodeUidMapper.h"
-#include "mitkNodeQueryParams.h"
+#include <mitkNodeUidMapper.h>
+#include <mitkNodeQueryParams.h>
 
 #include <nlohmann/json.hpp>
 

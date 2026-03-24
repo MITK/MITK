@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <QDialog>
 
-#include "MitkXNATExports.h"
+#include <MitkXNATExports.h>
 #include <mitkDataNode.h>
 #include <memory>
 

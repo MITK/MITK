@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkImageSource_h
 #define mitkImageSource_h
 
-#include "mitkBaseDataSource.h"
-#include "mitkImage.h"
+#include <mitkBaseDataSource.h>
+#include <mitkImage.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
-#include "mitkPointSetMappingHelper.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkPointSetMappingHelper.h>
+#include <mitkRegistrationHelper.h>
 
 
-#include "mapPointSetMappingTask.h"
+#include <mapPointSetMappingTask.h>
 
 ::map::core::continuous::Elements<3>::InternalPointSetType::Pointer mitk::PointSetMappingHelper::ConvertPointSetMITKtoMAP(const mitk::PointSet::DataType* mitkSet)
 {

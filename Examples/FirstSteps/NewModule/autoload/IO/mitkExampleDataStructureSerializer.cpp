@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExampleDataStructureSerializer.h"
-#include "mitkExampleDataStructure.h"
-#include "mitkIOUtil.h"
+#include <mitkExampleDataStructureSerializer.h>
+#include <mitkExampleDataStructure.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 

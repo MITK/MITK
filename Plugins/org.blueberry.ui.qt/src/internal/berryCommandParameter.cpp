@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 #include "berryCommandParameter.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryIParameterValues.h"
-#include "berryCoreException.h"
-#include "berryCommandExceptions.h"
-#include "berryParameterType.h"
+#include <berryIConfigurationElement.h>
+#include <berryIParameterValues.h>
+#include <berryCoreException.h>
+#include <berryCommandExceptions.h>
+#include <berryParameterType.h>
 
 namespace berry {
 

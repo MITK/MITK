@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGETOITK_TPP_INCLUDED_C1C2FCD2
-#define IMAGETOITK_TPP_INCLUDED_C1C2FCD2
+#ifndef mitkImageToItk_tpp
+#define mitkImageToItk_tpp
 
-#include "itkImportMitkImageContainer.h"
-#include "mitkBaseProcess.h"
-#include "mitkException.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageToItk.h"
-#include "mitkImageWriteAccessor.h"
+#include <itkImportMitkImageContainer.h>
+#include <mitkBaseProcess.h>
+#include <mitkException.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageToItk.h>
+#include <mitkImageWriteAccessor.h>
 
 #include <memory>
 
@@ -287,4 +287,4 @@ void mitk::ImageToItk<TOutputImage>::PrintSelf(std::ostream &os, itk::Indent ind
   Superclass::PrintSelf(os, indent);
 }
 
-#endif // IMAGETOITK_TPP_INCLUDED_C1C2FCD2
+#endif // mitkImageToItk_tpp

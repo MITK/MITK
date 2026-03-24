@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef __DOSE_VISUALIZATION_PREFERENCE_PAGE_H
 #define __DOSE_VISUALIZATION_PREFERENCE_PAGE_H
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 #include <mitkIsoDoseLevelCollections.h>
 #include "mitkDoseVisPreferenceHelper.h"

@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkOperationEvent_h
 #define mitkOperationEvent_h
 
-#include "mitkOperation.h"
-#include "mitkOperationActor.h"
-#include "mitkUndoModel.h"
+#include <mitkOperation.h>
+#include <mitkOperationActor.h>
+#include <mitkUndoModel.h>
 
 #include <mitkITKEventObserverGuard.h>
 

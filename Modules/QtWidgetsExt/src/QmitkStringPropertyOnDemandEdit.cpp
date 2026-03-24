@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "QmitkStringPropertyOnDemandEdit.h"
+#include <QmitkStringPropertyOnDemandEdit.h>
 #include <QInputDialog>
 
 QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit(mitk::StringProperty *property, QWidget *parent)

@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include <itkSpatialOrientationAdapter.h>
 
-#include "mitkSlicedGeometry3D.h"
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkApplyTransformMatrixOperation.h"
-#include "mitkInteractionConst.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneOperation.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkRotationOperation.h"
-#include "mitkSliceNavigationController.h"
+#include <mitkSlicedGeometry3D.h>
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkApplyTransformMatrixOperation.h>
+#include <mitkInteractionConst.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneOperation.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkRotationOperation.h>
+#include <mitkSliceNavigationController.h>
 
 const mitk::ScalarType PI = 3.14159265359;
 

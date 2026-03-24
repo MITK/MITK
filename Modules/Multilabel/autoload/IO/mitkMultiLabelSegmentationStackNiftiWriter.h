@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMultiLabelSegmentationStackNNiftiWriter_h
-#define mitkMultiLabelSegmentationStackNNiftiWriter_h
+#ifndef mitkMultiLabelSegmentationStackNiftiWriter_h
+#define mitkMultiLabelSegmentationStackNiftiWriter_h
 
 #include <mitkMultiLabelSegmentationStackWriterBase.h>
 

@@ -147,6 +147,16 @@ public:
     vtkAlgorithmOutput* m_TargetScalarOutput = nullptr;
     vtkAlgorithmOutput* m_MappedScalarOutput = nullptr;
 
+    /** \brief Extract filters for color output path (always 3-component RGB). */
+    vtkSmartPointer<vtkImageExtractComponents> m_TargetColorExtractFilter;
+    vtkSmartPointer<vtkImageExtractComponents> m_MappedColorExtractFilter;
+
+    /** Cached output ports for color-capable evaluation modes (blend, checker, wipe).
+     *  Always 3-component RGB: for grayscale images R=G=B (neutral gray);
+     *  for RGB images the actual hue and saturation are preserved. */
+    vtkAlgorithmOutput* m_TargetColorOutput = nullptr;
+    vtkAlgorithmOutput* m_MappedColorOutput = nullptr;
+
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */

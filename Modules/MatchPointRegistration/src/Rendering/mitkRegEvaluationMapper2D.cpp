@@ -54,11 +54,11 @@ found in the LICENSE file.
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkImageCheckerboard.h>
-#include <vtkImageWeightedSum.h>
 #include <vtkImageMathematics.h>
 #include <vtkImageRectilinearWipe.h>
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkImageCast.h>
 #include <vtkImageLuminance.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -371,6 +371,20 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
       localStorage->m_MappedScalarOutput = localStorage->m_MappedExtractFilter->GetOutputPort();
     }
 
+    // Color output path: 3-component RGB extracted from the RGBA level window filter output.
+    // vtkMitkLevelWindowFilter processes RGB images via HSI, preserving hue and saturation.
+    // For single-component images it outputs R=G=B, so extracting [0,1,2] gives neutral gray-as-RGB.
+    // This path is used by blend, checkerboard, and wipe which can meaningfully display color.
+    localStorage->m_TargetColorExtractFilter->SetInputConnection(
+      localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+    localStorage->m_TargetColorExtractFilter->SetComponents(0, 1, 2);
+    localStorage->m_TargetColorOutput = localStorage->m_TargetColorExtractFilter->GetOutputPort();
+
+    localStorage->m_MappedColorExtractFilter->SetInputConnection(
+      localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+    localStorage->m_MappedColorExtractFilter->SetComponents(0, 1, 2);
+    localStorage->m_MappedColorOutput = localStorage->m_MappedColorExtractFilter->GetOutputPort();
+
     updated = true;
   }
 
@@ -543,8 +557,8 @@ void mitk::RegEvaluationMapper2D::PrepareWipe(mitk::DataNode* datanode, LocalSto
 
   vtkSmartPointer<vtkImageRectilinearWipe> wipedFilter =
     vtkSmartPointer<vtkImageRectilinearWipe>::New();
-  wipedFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  wipedFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+  wipedFilter->SetInputConnection(0, localStorage->m_TargetColorOutput);
+  wipedFilter->SetInputConnection(1, localStorage->m_MappedColorOutput);
   wipedFilter->SetPosition(currentIndex2D[0], currentIndex2D[1]);
 
   if (evalWipeStyleProp->GetValueAsId() == 0)
@@ -572,8 +586,8 @@ void mitk::RegEvaluationMapper2D::PrepareCheckerBoard( mitk::DataNode* datanode,
 
   vtkSmartPointer<vtkImageCheckerboard> checkerboardFilter =
     vtkSmartPointer<vtkImageCheckerboard>::New();
-  checkerboardFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  checkerboardFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+  checkerboardFilter->SetInputConnection(0, localStorage->m_TargetColorOutput);
+  checkerboardFilter->SetInputConnection(1, localStorage->m_MappedColorOutput);
   checkerboardFilter->SetNumberOfDivisions(checkerCount, checkerCount, 1);
 
   // Clamp divisions to avoid integer division-by-zero in vtkImageCheckerboard.
@@ -622,16 +636,40 @@ void mitk::RegEvaluationMapper2D::PrepareBlend( mitk::DataNode* datanode, LocalS
   int blendfactor = 50;
   datanode->GetIntProperty(mitk::nodeProp_RegEvalBlendFactor,blendfactor);
 
-  vtkSmartPointer<vtkImageWeightedSum> blendFilter =
-    vtkSmartPointer<vtkImageWeightedSum>::New();
+  const double w0 = (100 - blendfactor) / 100.0;
+  const double w1 = blendfactor / 100.0;
 
-  blendFilter->AddInputConnection(localStorage->m_TargetScalarOutput);
-  blendFilter->AddInputConnection(localStorage->m_MappedScalarOutput);
-  blendFilter->SetWeight(0, (100 - blendfactor) / 100.);
-  blendFilter->SetWeight(1,blendfactor/100.);
-  blendFilter->Update();
+  // Use vtkImageMathematics (MULTIPLYBYK + ADD) instead of vtkImageWeightedSum.
+  // vtkImageWeightedSum computes output extent as the intersection of its inputs,
+  // which can produce a narrower image than the target when the mapped image has
+  // even a 1-pixel smaller extent (rounding in ImageMappingHelper::map).
+  // vtkImageMathematics::ADD uses port-0's extent as the output extent, so the
+  // result always matches the target image dimensions exactly.
+  // Both MULTIPLYBYK and ADD operate element-wise over all components, so
+  // 3-component (RGB) inputs are handled correctly without per-channel extraction.
+  vtkSmartPointer<vtkImageMathematics> scaledTarget = vtkSmartPointer<vtkImageMathematics>::New();
+  scaledTarget->SetOperationToMultiplyByK();
+  scaledTarget->SetConstantK(w0);
+  scaledTarget->SetInputConnection(0, localStorage->m_TargetColorOutput);
 
-  localStorage->m_EvaluationImage = blendFilter->GetOutput();
+  vtkSmartPointer<vtkImageMathematics> scaledMapped = vtkSmartPointer<vtkImageMathematics>::New();
+  scaledMapped->SetOperationToMultiplyByK();
+  scaledMapped->SetConstantK(w1);
+  scaledMapped->SetInputConnection(0, localStorage->m_MappedColorOutput);
+
+  // Port 0 (target) determines the output extent.
+  vtkSmartPointer<vtkImageMathematics> blend = vtkSmartPointer<vtkImageMathematics>::New();
+  blend->SetOperationToAdd();
+  blend->SetInputConnection(0, scaledTarget->GetOutputPort());
+  blend->SetInputConnection(1, scaledMapped->GetOutputPort());
+
+  vtkSmartPointer<vtkImageCast> result = vtkSmartPointer<vtkImageCast>::New();
+  result->SetInputConnection(blend->GetOutputPort());
+  result->SetOutputScalarTypeToUnsignedChar();
+  result->ClampOverflowOn();
+  result->Update();
+
+  localStorage->m_EvaluationImage = result->GetOutput();
 }
 
 void mitk::RegEvaluationMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter)
@@ -854,6 +892,9 @@ mitk::RegEvaluationMapper2D::LocalStorage::LocalStorage()
 
   m_TargetLuminanceFilter = vtkSmartPointer<vtkImageLuminance>::New();
   m_MappedLuminanceFilter = vtkSmartPointer<vtkImageLuminance>::New();
+
+  m_TargetColorExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+  m_MappedColorExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
 
   m_mmPerPixel = nullptr;
 

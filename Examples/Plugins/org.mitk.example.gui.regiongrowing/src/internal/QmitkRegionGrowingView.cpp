@@ -20,15 +20,15 @@ found in the LICENSE file.
 
 //! [cpp-includes]
 // Qmitk
-#include "QmitkPointListWidget.h"
-#include "QmitkRenderWindow.h"
+#include <QmitkPointListWidget.h>
+#include <QmitkRenderWindow.h>
 
 // MITK
-#include "mitkColorProperty.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkProperties.h"
+#include <mitkColorProperty.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkProperties.h>
 
 // ITK
 #include <itkConnectedThresholdImageFilter.h>

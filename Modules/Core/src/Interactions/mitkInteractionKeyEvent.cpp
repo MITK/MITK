@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionKeyEvent.h"
+#include <mitkInteractionKeyEvent.h>
 
 mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer *baseRenderer,
                                                const std::string &key,

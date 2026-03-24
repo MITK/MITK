@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkDataStorageHistoryModel.h>
 
-#include "mitkWeakPointer.h"
+#include <mitkWeakPointer.h>
 #include <deque>
 #include <algorithm>
 #include <mutex>

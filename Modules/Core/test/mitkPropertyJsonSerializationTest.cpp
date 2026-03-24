@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>

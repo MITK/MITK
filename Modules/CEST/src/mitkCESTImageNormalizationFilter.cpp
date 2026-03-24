@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTImageNormalizationFilter.h"
+#include <mitkCESTImageNormalizationFilter.h>
 
 #include <mitkCESTPropertyHelper.h>
 #include <mitkExtractCESTOffset.h>

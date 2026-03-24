@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageTimeSelector.h"
+#include <mitkImageTimeSelector.h>
 
 mitk::ImageTimeSelector::ImageTimeSelector() : m_TimeNr(0), m_ChannelNr(0)
 {

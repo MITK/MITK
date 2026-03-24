@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QWebEngineView>
 #include <QmitkChartWidget.h>
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 #include <QmitkChartData.h>
 #include <QmitkChartxyData.h>
 

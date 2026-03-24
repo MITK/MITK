@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetSource.h"
+#include <mitkPointSetSource.h>
 
 mitk::PointSetSource::PointSetSource()
 {

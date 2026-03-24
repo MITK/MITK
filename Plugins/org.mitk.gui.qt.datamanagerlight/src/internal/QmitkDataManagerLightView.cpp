@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkDataManagerLightView.h"
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 #include <QApplication>
 #include <QFileDialog>
 #include <QGridLayout>

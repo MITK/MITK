@@ -15,15 +15,15 @@ found in the LICENSE file.
 
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
 
-#include "mitkIOUtil.h"
-#include "mitkIDataStorageService.h"
-#include "mitkImage.h"
+#include <mitkIOUtil.h>
+#include <mitkIDataStorageService.h>
+#include <mitkImage.h>
 
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
 
-#include "QDockWidget"
+#include <QDockWidget>
 
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 

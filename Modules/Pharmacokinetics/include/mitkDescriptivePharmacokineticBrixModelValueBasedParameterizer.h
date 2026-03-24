@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
 #define mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkConcreteModelParameterizerBase.h>
 
 namespace mitk
 {

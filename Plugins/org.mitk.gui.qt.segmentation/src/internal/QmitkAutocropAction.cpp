@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 #include "QmitkAutocropAction.h"
 
-#include "mitkAutoCropImageFilter.h"
-#include "mitkImageCast.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkRenderingManager.h"
-#include "mitkProgressBar.h"
+#include <mitkAutoCropImageFilter.h>
+#include <mitkImageCast.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkRenderingManager.h>
+#include <mitkProgressBar.h>
 
 #include <itkConstantPadImageFilter.h>
 

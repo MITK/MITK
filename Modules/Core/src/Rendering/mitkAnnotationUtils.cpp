@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAnnotationUtils.h"
-#include "mitkAnnotation.h"
-#include "vtkCallbackCommand.h"
-#include "vtkCommand.h"
+#include <mitkAnnotationUtils.h>
+#include <mitkAnnotation.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk

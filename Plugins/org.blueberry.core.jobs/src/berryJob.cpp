@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "berryJob.h"
 #include "berryIJobManager.h"
 #include "internal/berryJobManager.h"
-#include "berryIStatus.h"
-#include "berryStatus.h"
+#include <berryIStatus.h>
+#include <berryStatus.h>
 
 #include <string>
 

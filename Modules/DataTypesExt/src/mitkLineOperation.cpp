@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLineOperation.h"
+#include <mitkLineOperation.h>
 
 mitk::LineOperation::LineOperation(OperationType operationType, int cellId, Vector3D vector, int pIdA, int pIdB, int id)
   : mitk::CellOperation(operationType, cellId, vector), m_PIdA(pIdA), m_PIdB(pIdB), m_Id(id)

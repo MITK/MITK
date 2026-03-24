@@ -15,7 +15,7 @@ found in the LICENSE file.
 #define BERRYPARTINFO_H_
 
 #include <QIcon>
-#include <berryIPresentablePart.h>
+#include "berryIPresentablePart.h"
 
 namespace berry {
 

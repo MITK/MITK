@@ -12,10 +12,10 @@ found in the LICENSE file.
 #ifndef mitkTestDICOMLoading_h
 #define mitkTestDICOMLoading_h
 
-#include "mitkDICOMFileReader.h"
-#include "mitkPropertyKeyPath.h"
+#include <mitkDICOMFileReader.h>
+#include <mitkPropertyKeyPath.h>
 
-#include "MitkDICOMTestingExports.h"
+#include <MitkDICOMTestingExports.h>
 
 namespace mitk
 {

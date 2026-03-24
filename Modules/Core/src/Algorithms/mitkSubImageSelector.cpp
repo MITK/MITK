@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSubImageSelector.h"
+#include <mitkSubImageSelector.h>
 
 void mitk::SubImageSelector::SetPosNr(int /*p*/)
 {

@@ -12,14 +12,14 @@ found in the LICENSE file.
 #ifndef mitkMaskAndCutRoiImageFilter_h
 #define mitkMaskAndCutRoiImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkImageToImageFilter.h>
 
-#include "itkRegionOfInterestImageFilter.h"
-#include "mitkAutoCropImageFilter.h"
-#include "mitkBoundingObject.h"
-#include "mitkDataNode.h"
-#include "mitkMaskImageFilter.h"
+#include <itkRegionOfInterestImageFilter.h>
+#include <mitkAutoCropImageFilter.h>
+#include <mitkBoundingObject.h>
+#include <mitkDataNode.h>
+#include <mitkMaskImageFilter.h>
 
 namespace mitk
 {

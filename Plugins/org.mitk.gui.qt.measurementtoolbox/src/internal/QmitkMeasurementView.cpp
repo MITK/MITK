@@ -49,12 +49,12 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkSingleNodeSelectionWidget.h>
 
-#include "ctkDoubleSpinBox.h"
+#include <ctkDoubleSpinBox.h>
 
 #include "mitkPluginActivator.h"
-#include "usModuleRegistry.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
+#include <usModuleRegistry.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <usModuleInitialization.h>
 
 US_INITIALIZE_MODULE

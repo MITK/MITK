@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkApplicationCursor.h"
+#include <mitkApplicationCursor.h>
 #include <mitkLog.h>
 
 #include <iostream>

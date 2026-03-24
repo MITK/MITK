@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMFilenameSorter.h"
+#include <mitkDICOMFilenameSorter.h>
 
 #include <algorithm>
 

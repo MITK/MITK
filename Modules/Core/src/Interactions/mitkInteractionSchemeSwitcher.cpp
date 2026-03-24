@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionSchemeSwitcher.h"
+#include <mitkInteractionSchemeSwitcher.h>
 
 // mitk core
 #include <mitkInteractionEventObserver.h>

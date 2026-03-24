@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkScalarModeProperty_h
 #define mitkVtkScalarModeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

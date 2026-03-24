@@ -13,18 +13,18 @@ found in the LICENSE file.
 #ifndef mitkUnstructuredGridVtkMapper3D_h
 #define mitkUnstructuredGridVtkMapper3D_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkUnstructuredGrid.h"
-#include "mitkVtkMapper.h"
+#include <MitkMapperExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkUnstructuredGrid.h>
+#include <mitkVtkMapper.h>
 
 #include <vtkActor.h>
 #include <vtkAssembly.h>
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkVolume.h>
 
-#include "vtkUnstructuredGridMapper.h"
+#include <vtkUnstructuredGridMapper.h>
 #include <vtkUnstructuredGridVolumeRayCastMapper.h>
 
 #include <vtkProjectedTetrahedraMapper.h>

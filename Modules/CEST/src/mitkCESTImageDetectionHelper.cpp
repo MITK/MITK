@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCESTImageDetectionHelper.h"
+#include <mitkCESTImageDetectionHelper.h>
 
-#include "mitkCESTPropertyHelper.h"
-#include "mitkImage.h"
-#include "mitkDataNode.h"
-#include "mitkNodePredicateFunction.h"
+#include <mitkCESTPropertyHelper.h>
+#include <mitkImage.h>
+#include <mitkDataNode.h>
+#include <mitkNodePredicateFunction.h>
 
 bool mitk::IsAnyCESTImage(const Image* cestImage)
 {

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkCoreObjectFactory.h"
+#include <mitkCoreObjectFactory.h>
 
-#include "mitkBaseProperty.h"
-#include "mitkProperties.h"
+#include <mitkBaseProperty.h>
+#include <mitkProperties.h>
 #include <mitkAnnotationProperty.h>
 #include <mitkClippingProperty.h>
 #include <mitkColorProperty.h>
@@ -32,9 +32,9 @@ found in the LICENSE file.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkVtkScalarModeProperty.h>
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkPropertyList.h"
-#include "mitkPropertyListSerializer.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkPropertyList.h>
+#include <mitkPropertyListSerializer.h>
 
 #include <mitkImage.h>
 #include <mitkPointSet.h>

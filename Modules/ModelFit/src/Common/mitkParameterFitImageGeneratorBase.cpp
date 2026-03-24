@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkParameterFitImageGeneratorBase.h"
+#include <mitkParameterFitImageGeneratorBase.h>
 
 bool
   mitk::ParameterFitImageGeneratorBase::HasOutdatedResult() const

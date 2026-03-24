@@ -14,16 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef SUVFUNCTOR_POLICY_H
-#define SUVFUNCTOR_POLICY_H
+#ifndef mitkSUVFunctorPolicy_h
+#define mitkSUVFunctorPolicy_h
 
 #include <vector>
 #include <functional>
 
-#include "itkIndex.h"
-#include "mitkNumericConstants.h"
+#include <itkIndex.h>
+#include <mitkNumericConstants.h>
 
-#include "MitkPETExports.h"
+#include <MitkPETExports.h>
 
 namespace mitk
 {

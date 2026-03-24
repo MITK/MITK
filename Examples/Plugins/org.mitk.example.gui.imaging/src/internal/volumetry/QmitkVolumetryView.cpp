@@ -14,8 +14,8 @@ found in the LICENSE file.
 
 #include <ui_QmitkVolumetryViewControls.h>
 
-#include "mitkImageStatisticsHolder.h"
-#include "mitkVolumeCalculator.h"
+#include <mitkImageStatisticsHolder.h>
+#include <mitkVolumeCalculator.h>
 
 #include <QDir>
 #include <QFileDialog>

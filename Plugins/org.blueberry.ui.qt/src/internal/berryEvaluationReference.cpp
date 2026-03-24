@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "berryEvaluationReference.h"
 
-#include <berryIPropertyChangeListener.h>
+#include "berryIPropertyChangeListener.h"
 
 namespace berry {
 

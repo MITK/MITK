@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkNormalDirectionConsistencySorter_h
 #define mitkNormalDirectionConsistencySorter_h
 
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkGantryTiltInformation.h"
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkGantryTiltInformation.h>
 
 namespace mitk
 {

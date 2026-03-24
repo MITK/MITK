@@ -28,19 +28,19 @@ found in the LICENSE file.
 
 //MITK
 #include <mitkStatusBar.h>
-#include "MatchPointBrowserConstants.h"
+#include <MatchPointBrowserConstants.h>
 #include "mitkAlgorithmInfoSelectionProvider.h"
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 // MatchPoint
-#include "mapRegistrationAlgorithmInterface.h"
-#include "mapAlgorithmEvents.h"
-#include "mapAlgorithmWrapperEvent.h"
-#include "mapExceptionObjectMacros.h"
-#include "mapDeploymentDLLDirectoryBrowser.h"
-#include "mapDeploymentEvents.h"
+#include <mapRegistrationAlgorithmInterface.h>
+#include <mapAlgorithmEvents.h>
+#include <mapAlgorithmWrapperEvent.h>
+#include <mapExceptionObjectMacros.h>
+#include <mapDeploymentDLLDirectoryBrowser.h>
+#include <mapDeploymentEvents.h>
 
 const std::string QmitkMatchPointBrowser::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 

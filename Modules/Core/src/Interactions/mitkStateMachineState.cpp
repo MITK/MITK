@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineState.h"
+#include <mitkStateMachineState.h>
 
 mitk::StateMachineState::StateMachineState(const std::string &stateName, const std::string &stateMode)
   : m_Name(stateName), m_StateMode(stateMode)

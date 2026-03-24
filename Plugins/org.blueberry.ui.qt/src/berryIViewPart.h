@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define BERRYIVIEWPART_H_
 
 #include <org_blueberry_ui_qt_Export.h>
-#include "berryMacros.h"
+#include <berryMacros.h>
 
 #include "berryIMemento.h"
 #include "berryIWorkbenchPart.h"

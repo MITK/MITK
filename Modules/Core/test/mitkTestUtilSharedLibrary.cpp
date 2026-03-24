@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <stdexcept>
 #include <string>
 
-#include "mitkTestingConfig.h"
+#include <mitkTestingConfig.h>
 
 #if defined(__APPLE__)
 #define PLATFORM_APPLE

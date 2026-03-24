@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkGeometryData_h
 #define mitkGeometryData_h
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 namespace mitk
 {

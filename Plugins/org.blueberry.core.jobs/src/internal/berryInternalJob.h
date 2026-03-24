@@ -26,7 +26,7 @@ found in the LICENSE file.
 
 #include <berryIStatus.h>
 #include <berryStatus.h>
-#include <berryQualifiedName.h>
+#include "berryQualifiedName.h"
 
 #include <string>
 #include <map>

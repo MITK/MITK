@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 // MITK
-#include "mitkDataNode.h"
-#include "mitkIOUtil.h"
-#include "mitkRenderingTestHelper.h"
-#include "mitkTestingMacros.h"
+#include <mitkDataNode.h>
+#include <mitkIOUtil.h>
+#include <mitkRenderingTestHelper.h>
+#include <mitkTestingMacros.h>
 #include <mitkNodePredicateDataType.h>
 
 // VTK

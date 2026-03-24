@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMGenericTagCache.h"
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMGenericImageFrameInfo.h"
+#include <mitkDICOMGenericTagCache.h>
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMGenericImageFrameInfo.h>
 
 mitk::DICOMGenericTagCache::DICOMGenericTagCache()
 {

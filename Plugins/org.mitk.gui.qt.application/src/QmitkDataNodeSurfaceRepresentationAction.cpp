@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeSurfaceRepresentationAction.h>
+#include "QmitkDataNodeSurfaceRepresentationAction.h"
 
 // mitk core
 #include <mitkEnumerationProperty.h>

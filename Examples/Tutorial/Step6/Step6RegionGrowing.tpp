@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "Step6.h"
+#include <Step6.h>
 
 #include <mitkPointSet.h>
 #include <mitkProperties.h>

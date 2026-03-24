@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkCallbackFromGUIThread_h
 #define QmitkCallbackFromGUIThread_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkCallbackFromGUIThread.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkCallbackFromGUIThread.h>
 
 #include <QObject>
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYWORKBENCHINTROMANAGER_H_
 #define BERRYWORKBENCHINTROMANAGER_H_
 
-#include <intro/berryIIntroManager.h>
+#include "intro/berryIIntroManager.h"
 
 #include "berryIWorkbenchPart.h"
 

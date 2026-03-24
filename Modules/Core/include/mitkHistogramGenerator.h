@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkHistogramGenerator_h
 #define mitkHistogramGenerator_h
 
-#include "mitkImage.h"
+#include <mitkImage.h>
 #include <itkHistogram.h>
 #include <itkImage.h>
 #include <itkObject.h>

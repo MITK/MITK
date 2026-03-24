@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef mitkImage_h
 #define mitkImage_h
 
-#include "mitkBaseData.h"
-#include "mitkImageAccessorBase.h"
-#include "mitkImageDataItem.h"
-#include "mitkImageDescriptor.h"
-#include "mitkImageVtkWriteAccessor.h"
-#include "mitkLevelWindow.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkSlicedData.h"
+#include <mitkBaseData.h>
+#include <mitkImageAccessorBase.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageDescriptor.h>
+#include <mitkImageVtkWriteAccessor.h>
+#include <mitkLevelWindow.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkSlicedData.h>
 #include <MitkCoreExports.h>
 #include <mitkProportionalTimeGeometry.h>
 

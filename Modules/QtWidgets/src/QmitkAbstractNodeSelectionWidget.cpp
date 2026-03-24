@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAbstractNodeSelectionWidget.h"
-#include "QmitkModelViewSelectionConnector.h"
+#include <QmitkAbstractNodeSelectionWidget.h>
+#include <QmitkModelViewSelectionConnector.h>
 
 QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent)
   : QWidget(parent)

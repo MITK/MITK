@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyNameHelper.h"
+#include <mitkPropertyNameHelper.h>
 #include <iomanip>
 #include <mitkPropertyList.h>
 #include <sstream>

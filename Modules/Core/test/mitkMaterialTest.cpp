@@ -10,15 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseProperty.h"
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
-#include "mitkMaterial.h"
-#include "mitkTestingMacros.h"
+#include <mitkBaseProperty.h>
+#include <mitkBaseRenderer.h>
+#include <mitkDataNode.h>
+#include <mitkMaterial.h>
+#include <mitkTestingMacros.h>
 #include <mitkColorProperty.h>
 #include <mitkVtkPropRenderer.h>
 
 #include <iostream>
+
+namespace
+{
+  bool ColorEqual(const mitk::Color& a, const mitk::Color& b)
+  {
+    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
+  }
+}
 
 /**
  *  Simple example for a test for the () class "ClassName".
@@ -48,7 +56,7 @@ public:
     double opacity = 1.0f;
     myMP = mitk::Material::New(color, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(), "Testing instantiation")
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a Color object was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a Color object was set correctly")
     MITK_TEST_CONDITION(opacity == myMP->GetOpacity(), "Testing if a Opacity object was set correctly")
   }
 
@@ -61,7 +69,7 @@ public:
 
     myMP = mitk::Material::New(rgb, rgb, rgb, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(), "Testing instantiation")
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a Color object was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a Color object was set correctly")
     MITK_TEST_CONDITION(opacity == myMP->GetOpacity(), "Testing if a Opacity object was set correctly")
   }
 
@@ -77,7 +85,7 @@ public:
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient, specularCoefficient, specularPower, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(), "Testing instantiation")
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a Color object was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a Color object was set correctly")
     MITK_TEST_CONDITION(opacity == myMP->GetOpacity(), "Testing if a Opacity object was set correctly")
     MITK_TEST_CONDITION(specularCoefficient == myMP->GetSpecularCoefficient(),
                         "Testing if a Coefficient object was set correctly")
@@ -99,7 +107,7 @@ public:
 
     myMP = mitk::Material::New(rgb, rgb, rgb, colorCoefficient, specularCoefficient, specularPower, opacity);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(), "Testing instantiation")
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a Color object was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a Color object was set correctly")
     MITK_TEST_CONDITION(opacity == myMP->GetOpacity(), "Testing if a Opacity object was set correctly")
     MITK_TEST_CONDITION(specularCoefficient == myMP->GetSpecularCoefficient(),
                         "Testing if a Coefficient object was set correctly")
@@ -126,10 +134,10 @@ public:
     myMP = mitk::Material::New();
     myMP->SetColor(color);
     MITK_TEST_CONDITION_REQUIRED(myMP.IsNotNull(), "Testing instantiation")
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a color was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a color was set correctly")
     color.Set(0, 0, 0);
     myMP->SetColor(color);
-    MITK_TEST_CONDITION(color == myMP->GetColor(), "Testing if a color was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetColor()), "Testing if a color was set correctly")
   }
 
   void testSetColorCoefficient()
@@ -146,7 +154,7 @@ public:
     color.Set(0, 0, 0);
     myMP = mitk::Material::New();
     myMP->SetSpecularColor(color);
-    MITK_TEST_CONDITION(color == myMP->GetSpecularColor(), "Testing if a SpecularColor was set correctly")
+    MITK_TEST_CONDITION(ColorEqual(color, myMP->GetSpecularColor()), "Testing if a SpecularColor was set correctly")
   }
 
   void testSetSpecularCoefficient()

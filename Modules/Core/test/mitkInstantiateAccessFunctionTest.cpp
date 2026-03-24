@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <mitkInstantiateAccessFunctions.h>
 

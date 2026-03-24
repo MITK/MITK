@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkModelFitException_h
 #define mitkModelFitException_h
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {

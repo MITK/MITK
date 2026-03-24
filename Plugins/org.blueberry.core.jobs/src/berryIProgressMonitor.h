@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define  BERRY_IPROGRESS_MONITOR_H
 
 #include <org_blueberry_core_jobs_Export.h>
-#include "berryObject.h"
+#include <berryObject.h>
 #include <string>
 
 namespace berry

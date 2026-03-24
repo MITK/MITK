@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #ifndef mitkTimeToPeakCurveDescriptionParameter_h
 #define mitkTimeToPeakCurveDescriptionParameter_h
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
 namespace mitk {
 

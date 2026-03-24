@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkNumberPropertySlider_h
 #define QmitkNumberPropertySlider_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <QSlider>
 

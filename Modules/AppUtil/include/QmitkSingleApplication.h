@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <qtsingleapplication.h>
 
-#include "QmitkSafeNotify.h"
+#include <QmitkSafeNotify.h>
 
 class MITKAPPUTIL_EXPORT QmitkSingleApplication : public QtSingleApplication
 {

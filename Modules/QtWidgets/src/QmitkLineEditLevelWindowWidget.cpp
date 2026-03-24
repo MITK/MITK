@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLineEditLevelWindowWidget.h"
+#include <QmitkLineEditLevelWindowWidget.h>
 
 // mitk core
 #include <mitkRenderingManager.h>

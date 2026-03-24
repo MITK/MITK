@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseRendererHelper.h"
+#include <mitkBaseRendererHelper.h>
 
 #include <mitkSliceNavigationHelper.h>
 

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
-#include "mitkDisplayActionEventHandler.h"
+#include <mitkDisplayActionEventHandler.h>
 
 namespace mitk
 {

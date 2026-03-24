@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingObjectCutter.h"
-#include "mitkBoundingObject.h"
-#include "mitkBoundingObjectCutter.tpp"
-#include "mitkGeometry3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkTimeHelper.h"
+#include <mitkBoundingObjectCutter.h>
+#include <mitkBoundingObject.h>
+#include <mitkBoundingObjectCutter.tpp>
+#include <mitkGeometry3D.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkTimeHelper.h>
 
 #include <cmath>
 

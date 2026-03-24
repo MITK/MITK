@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "org_mitk_gui_qt_fit_inspector_Activator.h"
 
 #include "ModelFitInspectorView.h"
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitConstants.h>
 
 #include <QmitkNodeDescriptorManager.h>
 #include <mitkNodePredicateProperty.h>

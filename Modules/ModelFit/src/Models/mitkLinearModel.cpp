@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLinearModel.h"
+#include <mitkLinearModel.h>
 
 const std::string mitk::LinearModel::NAME_PARAMETER_b = "slope";
 const std::string mitk::LinearModel::NAME_PARAMETER_y0 = "y-intercept";

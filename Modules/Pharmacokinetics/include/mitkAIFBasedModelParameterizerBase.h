@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef mitkAIFBasedModelParameterizerBase_h
 #define mitkAIFBasedModelParameterizerBase_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkAIFParametrizerHelper.h"
-#include "mitkAIFBasedModelBase.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkAIFParametrizerHelper.h>
+#include <mitkAIFBasedModelBase.h>
 
 namespace mitk
 {

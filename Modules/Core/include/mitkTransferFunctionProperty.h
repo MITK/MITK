@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkTransferFunctionProperty_h
 #define mitkTransferFunctionProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkTransferFunction.h"
+#include <mitkBaseProperty.h>
+#include <mitkTransferFunction.h>
 
 namespace mitk
 {

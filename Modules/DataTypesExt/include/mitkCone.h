@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkCone_h
 #define mitkCone_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkBoundingObject.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkBoundingObject.h>
 
 namespace mitk
 {

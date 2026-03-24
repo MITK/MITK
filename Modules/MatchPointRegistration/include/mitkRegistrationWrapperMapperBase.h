@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkVtkMapper.h>
 #include <mitkLocalStorageHandler.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 class vtkPropAssembly;
 class vtkPolyDataMapper;

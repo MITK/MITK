@@ -14,11 +14,11 @@ found in the LICENSE file.
 
 #include "berryHandlerAuthority.h"
 #include "berryHandlerPersistence.h"
-#include "berryIHandler.h"
+#include <berryIHandler.h>
 #include "berryHandlerActivation.h"
-#include "berryExpression.h"
-#include "berryExecutionEvent.h"
-#include "berryParameterizedCommand.h"
+#include <berryExpression.h>
+#include <berryExecutionEvent.h>
+#include <berryParameterizedCommand.h>
 #include "berryICommandService.h"
 #include "berryUIElement.h"
 

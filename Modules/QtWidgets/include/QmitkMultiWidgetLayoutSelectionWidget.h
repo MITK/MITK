@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef QmitkMultiWidgetLayoutSelectionWidget_h
 #define QmitkMultiWidgetLayoutSelectionWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <QmitkAutomatedLayoutWidget.h>
 
 #include <nlohmann/json.hpp>
 
 // qt
-#include "QWidget"
+#include <QWidget>
 #include <memory>
 
 namespace Ui

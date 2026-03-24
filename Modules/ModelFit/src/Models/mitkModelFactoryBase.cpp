@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFactoryBase.h"
+#include <mitkModelFactoryBase.h>
 
 mitk::ModelParameterizerBase::Pointer mitk::ModelFactoryBase::CreateParameterizer(
   const mitk::modelFit::ModelFitInfo* fit) const

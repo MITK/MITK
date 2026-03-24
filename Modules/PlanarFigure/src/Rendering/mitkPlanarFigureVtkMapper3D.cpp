@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureVtkMapper3D.h"
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkImage.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarFigureVtkMapper3D.h>
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkImage.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkPlanarFigure.h>
 #include <vtkCellArray.h>
 #include <vtkIdList.h>

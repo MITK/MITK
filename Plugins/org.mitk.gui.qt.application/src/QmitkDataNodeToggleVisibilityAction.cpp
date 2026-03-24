@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeToggleVisibilityAction.h>
-#include <QmitkDataNodeGlobalReinitAction.h>
+#include "QmitkDataNodeToggleVisibilityAction.h"
+#include "QmitkDataNodeGlobalReinitAction.h"
 
 // mitk core
 #include <mitkRenderingManager.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkHotkeyLineEdit.h"
+#include <QmitkHotkeyLineEdit.h>
 
 #include <QGridLayout>
 #include <QKeyEvent>

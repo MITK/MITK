@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkExtDefaultPerspective.h"
-#include "berryIViewLayout.h"
+#include <berryIViewLayout.h>
 
 QmitkExtDefaultPerspective::QmitkExtDefaultPerspective()
 {

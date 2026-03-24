@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkMovieGeneratorWin32_h
 #define mitkMovieGeneratorWin32_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkMovieGenerator.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkMovieGenerator.h>
 #include <comdef.h>
 #include <memory.h>
 #include <string.h>

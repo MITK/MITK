@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCommandLineParser.h"
-#include "mitkIOUtil.h"
+#include <mitkCommandLineParser.h>
+#include <mitkIOUtil.h>
 #include <mitkImageCast.h>
 #include <typeinfo>
 

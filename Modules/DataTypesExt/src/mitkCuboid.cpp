@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCuboid.h"
-#include "mitkNumericTypes.h"
-#include "vtkCubeSource.h"
-#include "vtkLinearTransform.h"
+#include <mitkCuboid.h>
+#include <mitkNumericTypes.h>
+#include <vtkCubeSource.h>
+#include <vtkLinearTransform.h>
 
 #include <vtkSTLReader.h>
 

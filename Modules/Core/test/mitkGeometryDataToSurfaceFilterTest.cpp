@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneGeometryDataToSurfaceFilter.h"
+#include <mitkPlaneGeometryDataToSurfaceFilter.h>
 
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneGeometryData.h"
-#include "mitkSurface.h"
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneGeometryData.h>
+#include <mitkSurface.h>
 
-#include "vtkPolyData.h"
+#include <vtkPolyData.h>
 
 #include <fstream>
 

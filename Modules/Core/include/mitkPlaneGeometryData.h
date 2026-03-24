@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlaneGeometryData_h
 #define mitkPlaneGeometryData_h
 
-#include "mitkBaseData.h"
-#include "mitkGeometryData.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkBaseData.h>
+#include <mitkGeometryData.h>
+#include <mitkPlaneGeometry.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

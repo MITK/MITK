@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultRelationRule.h"
+#include <mitkModelFitResultRelationRule.h>
 
-#include "mitkDataNode.h"
-#include "mitkPointSet.h"
-#include "mitkStringProperty.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkStringProperty.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkModelFitConstants.h"
-#include "mitkUIDGenerator.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkModelFitConstants.h>
+#include <mitkUIDGenerator.h>
 
 #include <regex>
 

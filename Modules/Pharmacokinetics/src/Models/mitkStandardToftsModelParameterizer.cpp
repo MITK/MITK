@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStandardToftsModelParameterizer.h"
+#include <mitkStandardToftsModelParameterizer.h>
 
 mitk::StandardToftsModelParameterizer::ParametersType
 mitk::StandardToftsModelParameterizer::GetDefaultInitialParameterization() const

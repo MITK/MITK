@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include <vector>
 #include <mitkDataNode.h>
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 namespace mitk
 {

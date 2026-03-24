@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "berryShowPerspectiveHandler.h"
 
-#include <berryIWorkbenchCommandConstants.h>
-#include <berryIWorkbenchWindow.h>
+#include "berryIWorkbenchCommandConstants.h"
+#include "berryIWorkbenchWindow.h"
 
-#include <berryHandlerUtil.h>
+#include "berryHandlerUtil.h"
 #include <berryObjects.h>
 
 #include "internal/berryPreferenceConstants.h"

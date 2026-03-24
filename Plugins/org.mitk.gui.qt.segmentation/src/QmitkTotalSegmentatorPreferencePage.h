@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkTotalSegmentatorPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
-#include "mitkIPreferences.h"
+#include <mitkIPreferences.h>
 #include "QmitkTotalSegmentatorToolInstaller.h"
 #include <QMessageBox>
 #include <QmitknnUNetGPU.h>

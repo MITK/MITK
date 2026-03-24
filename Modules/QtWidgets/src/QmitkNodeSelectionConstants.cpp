@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNodeSelectionConstants.h"
+#include <QmitkNodeSelectionConstants.h>
 
 const std::string mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID = "/NODESELECTION/UI";
 const std::string mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID = "visibleInspectors";

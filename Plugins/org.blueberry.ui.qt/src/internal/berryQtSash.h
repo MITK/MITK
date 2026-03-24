@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QWidget>
 #include <QRubberBand>
 
-#include <berryGuiTkISelectionListener.h>
+#include "berryGuiTkISelectionListener.h"
 
 namespace berry {
 

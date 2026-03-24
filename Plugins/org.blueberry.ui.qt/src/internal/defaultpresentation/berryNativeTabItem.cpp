@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryQCTabBar.h"
 #include "berryQtStyleManager.h"
 
-#include <berryConstants.h>
+#include "berryConstants.h"
 
 #include <QToolButton>
 

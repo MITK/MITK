@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkThinPlateSplineCurvedGeometry.h"
+#include <mitkGeometry3D.h>
+#include <mitkProportionalTimeGeometry.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkThinPlateSplineCurvedGeometry.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

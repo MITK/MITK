@@ -13,16 +13,16 @@ found in the LICENSE file.
 #ifndef mitkEnumerationSubclassesSerializer_h_included
 #define mitkEnumerationSubclassesSerializer_h_included
 
-#include "mitkEnumerationPropertySerializer.h"
+#include <mitkEnumerationPropertySerializer.h>
 
-#include "mitkModalityProperty.h"
-#include "mitkPlaneOrientationProperty.h"
-#include "mitkPointSetShapeProperty.h"
-#include "mitkRenderingModeProperty.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkVtkScalarModeProperty.h"
+#include <mitkModalityProperty.h>
+#include <mitkPlaneOrientationProperty.h>
+#include <mitkPointSetShapeProperty.h>
+#include <mitkRenderingModeProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkResliceInterpolationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
 
 #include <tinyxml2.h>
 

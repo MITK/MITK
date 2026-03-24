@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkImageGenerationHelper_h
 #define mitkImageGenerationHelper_h
 
-#include "itkImage.h"
-#include "itkImageRegionIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
 
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 
 
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

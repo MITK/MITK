@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarDoubleEllipse.h"
+#include <mitkPlanarDoubleEllipse.h>
 #include <mitkProperties.h>
 
 #include <algorithm>

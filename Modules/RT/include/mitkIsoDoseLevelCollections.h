@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <set>
 #include <itkVectorContainer.h>
 
-#include "mitkIsoDoseLevel.h"
+#include <mitkIsoDoseLevel.h>
 
 namespace mitk
 {

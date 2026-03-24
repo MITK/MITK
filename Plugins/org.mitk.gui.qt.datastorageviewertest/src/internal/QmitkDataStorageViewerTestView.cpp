@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "QmitkDataStorageViewerTestView.h"
 #include <ui_QmitkDataStorageViewerTestControls.h>
 
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 
 // berry
 #include <berryIWorkbenchWindow.h>

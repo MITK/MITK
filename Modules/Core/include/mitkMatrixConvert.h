@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkMatrixConvert_h
 #define mitkMatrixConvert_h
 
-#include "mitkBaseGeometry.h"
-#include "mitkItkMatrixHack.h"
+#include <mitkBaseGeometry.h>
+#include <mitkItkMatrixHack.h>
 #include <vtkMatrix4x4.h>
 
 namespace mitk

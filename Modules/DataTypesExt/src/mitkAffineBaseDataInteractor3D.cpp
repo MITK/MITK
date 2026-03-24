@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAffineBaseDataInteractor3D.h"
+#include <mitkAffineBaseDataInteractor3D.h>
 
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>

@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeContextMenu.h>
+#include "QmitkDataNodeContextMenu.h"
 
 #include <QmitkCustomVariants.h>
-#include <QmitkFileSaveAction.h>
+#include "QmitkFileSaveAction.h"
 #include <QmitkNodeDescriptorManager.h>
 
 #include <mitkDataNodeSelection.h>
-#include <mitkIContextMenuAction.h>
+#include "mitkIContextMenuAction.h"
 
 #include <berryAbstractUICTKPlugin.h>
 #include <berryIContributor.h>

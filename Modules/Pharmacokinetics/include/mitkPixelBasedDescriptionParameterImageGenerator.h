@@ -17,10 +17,10 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-#include "mitkCurveParameterFunctor.h"
-#include "mitkDescriptionParameterImageGeneratorBase.h"
+#include <mitkCurveParameterFunctor.h>
+#include <mitkDescriptionParameterImageGeneratorBase.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

@@ -13,19 +13,19 @@ found in the LICENSE file.
 #include "PETDynamicView.h"
 #include <ui_PETDynamicViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 
-#include "mitkAterialInputFunctionGenerator.h"
+#include <mitkAterialInputFunctionGenerator.h>
 
-#include "mitkOneTissueCompartmentModelFactory.h"
-#include "mitkOneTissueCompartmentModelParameterizer.h"
-#include "mitkExtendedOneTissueCompartmentModelFactory.h"
-#include "mitkExtendedOneTissueCompartmentModelParameterizer.h"
-#include "mitkTwoTissueCompartmentFDGModelFactory.h"
-#include "mitkTwoTissueCompartmentFDGModelParameterizer.h"
-#include "mitkTwoTissueCompartmentModelFactory.h"
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
+#include <mitkOneTissueCompartmentModelFactory.h>
+#include <mitkOneTissueCompartmentModelParameterizer.h>
+#include <mitkExtendedOneTissueCompartmentModelFactory.h>
+#include <mitkExtendedOneTissueCompartmentModelParameterizer.h>
+#include <mitkTwoTissueCompartmentFDGModelFactory.h>
+#include <mitkTwoTissueCompartmentFDGModelParameterizer.h>
+#include <mitkTwoTissueCompartmentModelFactory.h>
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
 #include <mitkLabelSetImageConverter.h>
 
 #include <mitkNodePredicateAnd.h>
@@ -33,7 +33,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
@@ -58,8 +58,8 @@ found in the LICENSE file.
 
 // Includes for image casting between ITK and MITK
 #include <mitkImage.h>
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 #include <iostream>

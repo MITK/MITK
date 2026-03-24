@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunctionInitializer.h"
+#include <mitkTransferFunctionInitializer.h>
 
 static const char *presetNames[] = {"CT Generic",
                                     "CT Black & White",

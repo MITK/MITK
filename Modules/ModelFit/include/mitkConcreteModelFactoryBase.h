@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkConcreteModelFactoryBase_h
 #define mitkConcreteModelFactoryBase_h
 
-#include "mitkModelFactoryBase.h"
+#include <mitkModelFactoryBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

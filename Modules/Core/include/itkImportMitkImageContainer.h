@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkImportMitkImageContainer_h
-#define __itkImportMitkImageContainer_h
+#ifndef itkImportMitkImageContainer_h
+#define itkImportMitkImageContainer_h
 
 #include <itkImportImageContainer.h>
 #include <mitkImageAccessorBase.h>
@@ -92,7 +92,7 @@ namespace itk
   }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkImportMitkImageContainer.tpp"
+#include <itkImportMitkImageContainer.tpp>
 #endif
 
 #endif

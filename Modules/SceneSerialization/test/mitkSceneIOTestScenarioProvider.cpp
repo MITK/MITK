@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSceneIOTestScenarioProvider.h"
+#include <mitkSceneIOTestScenarioProvider.h>
 
-#include "mitkGeometryData.h"
-#include "mitkImage.h"
-#include "mitkImageGenerator.h"
-#include "mitkPointSet.h"
-#include "mitkProperties.h"
-#include "mitkSurface.h"
+#include <mitkGeometryData.h>
+#include <mitkImage.h>
+#include <mitkImageGenerator.h>
+#include <mitkPointSet.h>
+#include <mitkProperties.h>
+#include <mitkSurface.h>
 
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>

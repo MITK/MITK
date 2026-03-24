@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "ExtendedPerspective.h"
 
 // berry includes
-#include "berryIViewLayout.h"
+#include <berryIViewLayout.h>
 
 void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

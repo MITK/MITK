@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkMeanResidenceTimeDescriptionParameter_h
 
 
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
 namespace  mitk
 {

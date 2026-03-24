@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include "berryIVariableResolver.h"
 #include <org_blueberry_core_expressions_Export.h>
 
-#include "Poco/Any.h"
+#include <Poco/Any.h>
 
 #include <vector>
 

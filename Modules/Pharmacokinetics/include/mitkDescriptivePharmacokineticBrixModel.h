@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "mitkModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

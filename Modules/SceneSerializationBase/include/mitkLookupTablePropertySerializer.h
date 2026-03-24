@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLookupTablePropertySerializer_h
 #define mitkLookupTablePropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 #include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk

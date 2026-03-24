@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkStandardToftsModel_h
 #define mitkStandardToftsModel_h
 
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

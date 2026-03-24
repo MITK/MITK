@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStepper.h"
+#include <mitkStepper.h>
 
 mitk::Stepper::Stepper()
   : m_Pos(0),

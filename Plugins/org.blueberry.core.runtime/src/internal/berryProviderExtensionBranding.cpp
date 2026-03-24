@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryProviderExtensionBranding.h"
 
-#include <berryIProduct.h>
+#include "berryIProduct.h"
 
 namespace berry {
 

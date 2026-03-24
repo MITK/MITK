@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "IChangeText.h"
+#include <IChangeText.h>
 
 IChangeText::~IChangeText()
 {

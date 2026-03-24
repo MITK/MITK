@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkModelFitProviderBase_tpp
+#define mitkModelFitProviderBase_tpp
+
 #include <mitkModelFitProviderBase.h>
 #include <mitkExceptionMacro.h>
 
@@ -143,3 +146,5 @@ namespace mitk
   ModelFitProviderBase<TModelFactory>::GetRanking() const { return d->GetRanking(); }
 
 }
+
+#endif

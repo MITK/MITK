@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMultiModalRigidDefaultRegistrationAlgorithm_h
 #define mitkMultiModalRigidDefaultRegistrationAlgorithm_h
 
-#include "mapDiscreteElements.h"
-#include "mapITKEuler3DMattesMIMultiResRegistrationAlgorithmTemplate.h"
-#include "mapConfigure.h"
+#include <mapDiscreteElements.h>
+#include <mapITKEuler3DMattesMIMultiResRegistrationAlgorithmTemplate.h>
+#include <mapConfigure.h>
 
-#include "mitkMultiModalRigidDefaultRegistrationAlgorithm_ProfileResource.h"
+#include <mitkMultiModalRigidDefaultRegistrationAlgorithm_ProfileResource.h>
 
 namespace mitk
 {

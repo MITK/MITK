@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkExampleDataStructureReaderService_h
 #define mitkExampleDataStructureReaderService_h
 
-#include "mitkCommon.h"
-#include "mitkExampleDataStructure.h"
+#include <mitkCommon.h>
+#include <mitkExampleDataStructure.h>
 #include <mitkAbstractFileReader.h>
 #include <mitkBaseData.h>
 #include <mitkMimeType.h>

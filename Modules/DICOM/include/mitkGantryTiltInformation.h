@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkGantryTiltInformation_h
 #define mitkGantryTiltInformation_h
 
-#include "mitkPoint.h"
-#include "mitkVector.h"
-#include "mitkPoint.h"
+#include <mitkPoint.h>
+#include <mitkVector.h>
+#include <mitkPoint.h>
 
 namespace mitk
 {

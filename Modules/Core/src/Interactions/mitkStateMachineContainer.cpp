@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineContainer.h"
+#include <mitkStateMachineContainer.h>
 #include <algorithm>
 #include <mitkStandardFileLocations.h>
 #include <vtkObjectFactory.h>
 #include <vtkXMLDataElement.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 /**
  * @brief This class builds up all the necessary structures for a statemachine.

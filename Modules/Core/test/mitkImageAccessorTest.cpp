@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOUtil.h"
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImagePixelWriteAccessor.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageWriteAccessor.h"
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageWriteAccessor.h>
 #include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>

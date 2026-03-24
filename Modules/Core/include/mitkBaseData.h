@@ -15,12 +15,12 @@ found in the LICENSE file.
 
 #include <itkDataObject.h>
 
-#include "mitkBaseProcess.h"
-#include "mitkIdentifiable.h"
-#include "mitkIPropertyOwner.h"
-#include "mitkOperationActor.h"
-#include "mitkPropertyList.h"
-#include "mitkTimeGeometry.h"
+#include <mitkBaseProcess.h>
+#include <mitkIdentifiable.h>
+#include <mitkIPropertyOwner.h>
+#include <mitkOperationActor.h>
+#include <mitkPropertyList.h>
+#include <mitkTimeGeometry.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

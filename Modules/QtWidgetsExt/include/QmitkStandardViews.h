@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef QmitkStandardViews_h
 #define QmitkStandardViews_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkCameraController.h"
-#include "mitkCommon.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkCameraController.h>
+#include <mitkCommon.h>
 
 #include <QWidget>
 

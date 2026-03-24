@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunction.h"
-#include "mitkHistogramGenerator.h"
-#include "mitkImageToItk.h"
+#include <mitkTransferFunction.h>
+#include <mitkHistogramGenerator.h>
+#include <mitkImageToItk.h>
 
 #include <itkRGBPixel.h>
 

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigure_h
 #define mitkPlanarFigure_h
 
-#include "mitkBaseData.h"
-#include "mitkCommon.h"
+#include <mitkBaseData.h>
+#include <mitkCommon.h>
 #include <MitkPlanarFigureExports.h>
 
 #include <deque>

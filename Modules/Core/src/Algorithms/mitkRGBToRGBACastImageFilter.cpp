@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRGBToRGBACastImageFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToItk.h"
-#include "mitkProperties.h"
+#include <mitkRGBToRGBACastImageFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToItk.h>
+#include <mitkProperties.h>
 
 #include <itkImageIOBase.h>
 #include <itkImageRegionConstIterator.h>

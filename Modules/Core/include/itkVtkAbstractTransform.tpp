@@ -10,7 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkVtkAbstractTransform.h"
+#ifndef itkVtkAbstractTransform_tpp
+#define itkVtkAbstractTransform_tpp
+
+#include <itkVtkAbstractTransform.h>
 #include <mitkNumericTypes.h>
 #include <vtkAbstractTransform.h>
 
@@ -234,3 +237,5 @@ namespace itk
   }
 
 } // namespace itk
+
+#endif

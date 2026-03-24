@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iostream>
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "mitkSimpleBarrierConstraintChecker.h"
-#include "mitkMVConstrainedCostFunctionDecorator.h"
-#include "mitkLinearModel.h"
+#include <mitkSimpleBarrierConstraintChecker.h>
+#include <mitkMVConstrainedCostFunctionDecorator.h>
+#include <mitkLinearModel.h>
 
 class TestCostFunction : public mitk::MVModelFitCostFunction
 {

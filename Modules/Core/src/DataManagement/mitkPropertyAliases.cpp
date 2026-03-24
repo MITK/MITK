@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyAliases.h"
+#include <mitkPropertyAliases.h>
 #include <algorithm>
 #include <utility>
 

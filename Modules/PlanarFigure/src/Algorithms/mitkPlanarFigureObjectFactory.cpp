@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureObjectFactory.h"
+#include <mitkPlanarFigureObjectFactory.h>
 
-#include "mitkCoreObjectFactory.h"
+#include <mitkCoreObjectFactory.h>
 
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureMapper2D.h"
-#include "mitkPlanarFigureVtkMapper3D.h"
-#include "mitkVtkGLMapperWrapper.h"
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureMapper2D.h>
+#include <mitkPlanarFigureVtkMapper3D.h>
+#include <mitkVtkGLMapperWrapper.h>
 
 typedef std::multimap<std::string, std::string> MultimapType;
 

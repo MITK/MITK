@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureControlPointStyleProperty_h
 #define mitkPlanarFigureControlPointStyleProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 #include <MitkPlanarFigureExports.h>
 

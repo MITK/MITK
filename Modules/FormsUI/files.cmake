@@ -1,8 +1,3 @@
-set(UI_FILES
-  src/QmitkForm.ui
-  src/QmitkScreenshotWidget.ui
-)
-
 set(CPP_FILES
   mitkIQuestionWidgetFactory.cpp
   mitkModuleActivator.cpp
@@ -17,4 +12,9 @@ set(CPP_FILES
   QmitkScreenshotQuestionWidget.cpp
   QmitkScreenshotWidget.cpp
   QmitkShortAnswerQuestionWidget.cpp
+)
+
+set(UI_FILES
+  QmitkForm.ui
+  QmitkScreenshotWidget.ui
 )

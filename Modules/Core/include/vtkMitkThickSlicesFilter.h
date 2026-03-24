@@ -18,12 +18,12 @@ found in the LICENSE file.
 // two dimensional XY gradient.  OutputScalarType is always
 // double. Gradient is computed using central differences.
 
-#ifndef __vtkMitkThickSlicesFilter_h
-#define __vtkMitkThickSlicesFilter_h
+#ifndef vtkMitkThickSlicesFilter_h
+#define vtkMitkThickSlicesFilter_h
 
 #include <MitkCoreExports.h>
 
-#include "vtkThreadedImageAlgorithm.h"
+#include <vtkThreadedImageAlgorithm.h>
 
 class MITKCORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorithm
 {

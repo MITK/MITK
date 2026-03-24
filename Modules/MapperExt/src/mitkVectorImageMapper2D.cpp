@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVectorImageMapper2D.h"
+#include <mitkVectorImageMapper2D.h>
 
 // vtk related includes
 #include <vtkCellArray.h>
@@ -47,11 +47,11 @@ found in the LICENSE file.
 #include <fstream>
 
 // mitk related includes
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkBaseRenderer.h"
-#include "mitkColorProperty.h"
-#include "mitkGL.h"
-#include "mitkProperties.h"
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkBaseRenderer.h>
+#include <mitkColorProperty.h>
+#include <mitkGL.h>
+#include <mitkProperties.h>
 #include <mitkLookupTableProperty.h>
 
 const mitk::Image *mitk::VectorImageMapper2D::GetInput(void)

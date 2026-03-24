@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <limits>
 

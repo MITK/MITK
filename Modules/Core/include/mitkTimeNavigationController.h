@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TimeNavigationController_h
-#define TimeNavigationController_h
+#ifndef mitkTimeNavigationController_h
+#define mitkTimeNavigationController_h
 
 #include <MitkCoreExports.h>
 

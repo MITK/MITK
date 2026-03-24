@@ -71,8 +71,8 @@ found in the LICENSE file.
 // UGLYYY
 #include "QmitkFlowApplicationWorkbenchWindowAdvisorHack.h"
 #include "QmitkFlowApplicationPlugin.h"
-#include "mitkUndoController.h"
-#include "mitkVerboseLimitedLinearUndo.h"
+#include <mitkUndoController.h>
+#include <mitkVerboseLimitedLinearUndo.h>
 #include <QToolBar>
 #include <QToolButton>
 #include <QMessageBox>

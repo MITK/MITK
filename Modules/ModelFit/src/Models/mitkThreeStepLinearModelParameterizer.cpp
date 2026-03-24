@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkThreeStepLinearModelParameterizer.h>
 
 mitk::ThreeStepLinearModelParameterizer::ParametersType
 mitk::ThreeStepLinearModelParameterizer::GetDefaultInitialParameterization() const

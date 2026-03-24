@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryWorkbenchPlugin.h"
 
 #include "berryEditorPart.h"
-#include "berryIContributor.h"
+#include <berryIContributor.h>
 
 namespace berry
 {

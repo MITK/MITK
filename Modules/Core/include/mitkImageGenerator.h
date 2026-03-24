@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageGenerator_h
 #define mitkImageGenerator_h
 
-#include "mitkImageWriteAccessor.h"
+#include <mitkImageWriteAccessor.h>
 #include <MitkCoreExports.h>
 #include <itkImageRegionIterator.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>

@@ -14,8 +14,8 @@ found in the LICENSE file.
 #include <ui_berryQtStylePreferencePage.h>
 
 #include "berryWorkbenchPlugin.h"
-#include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include "berryQtPreferences.h"
+#include "berryQtStyleManager.h"
 
 #include <QFileDialog>
 #include <QDirIterator>

@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModelFactory_h
 #define mitkTwoCompartmentExchangeModelFactory_h
 
-#include "mitkTwoCompartmentExchangeModelFactoryBase.h"
-#include "mitkTwoCompartmentExchangeModelParameterizer.h"
+#include <mitkTwoCompartmentExchangeModelFactoryBase.h>
+#include <mitkTwoCompartmentExchangeModelParameterizer.h>
 
 namespace mitk
 {

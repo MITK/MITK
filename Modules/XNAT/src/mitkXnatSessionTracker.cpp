@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkXnatSessionTracker.h"
+#include <mitkXnatSessionTracker.h>
 
-#include "ctkXnatLoginProfile.h"
+#include <ctkXnatLoginProfile.h>
 
 namespace mitk
 {

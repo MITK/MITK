@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 #include "QmitkConvertSurfaceToLabelAction.h"
 
-#include "mitkRenderingManager.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolManagerProvider.h"
+#include <mitkRenderingManager.h>
+#include <mitkLabelSetImage.h>
+#include <mitkToolManagerProvider.h>
 #include <mitkSurface.h>
 
 #include <QApplication>

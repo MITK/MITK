@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkHeightFieldSurfaceClipImageFilter.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkProperties.h"
-#include "mitkTimeHelper.h"
+#include <mitkHeightFieldSurfaceClipImageFilter.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkProperties.h>
+#include <mitkTimeHelper.h>
 
-#include "mitkImageAccessByItk.h"
-#include "mitkImageToItk.h"
+#include <mitkImageAccessByItk.h>
+#include <mitkImageToItk.h>
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>

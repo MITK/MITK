@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeColorMapAction.h>
+#include "QmitkDataNodeColorMapAction.h"
 
 // mitk core
 #include <mitkImage.h>

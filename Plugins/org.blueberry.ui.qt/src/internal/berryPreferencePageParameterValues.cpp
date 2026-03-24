@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "berryPreferencePageParameterValues.h"
 
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 #include "berryPlatformUI.h"
 #include "berryWorkbenchRegistryConstants.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryIExtensionRegistry.h"
+#include <berryIConfigurationElement.h>
+#include <berryIExtensionRegistry.h>
 #include "berryIWorkbench.h"
 
 namespace berry {

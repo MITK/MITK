@@ -14,13 +14,13 @@ found in the LICENSE file.
 #include "berryNativeTabItem.h"
 #include "berryQCTabBar.h"
 
-#include <internal/berryQtControlWidget.h>
-#include <berryWorkbenchPlugin.h>
+#include "internal/berryQtControlWidget.h"
+#include "berryWorkbenchPlugin.h"
 
-#include <berryIQtStyleManager.h>
-#include <berryShell.h>
-#include <berryConstants.h>
-#include <berryPlatformUI.h>
+#include "berryIQtStyleManager.h"
+#include "berryShell.h"
+#include "berryConstants.h"
+#include "berryPlatformUI.h"
 
 #include <berryLog.h>
 

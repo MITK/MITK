@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSortCriterion.h"
+#include <mitkDICOMSortCriterion.h>
 
 mitk::DICOMSortCriterion
 ::DICOMSortCriterion(DICOMSortCriterion::Pointer secondaryCriterion)

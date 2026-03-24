@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkProperties_h
 #define mitkProperties_h
 
-#include "mitkGenericProperty.h"
-#include "mitkLookupTables.h"
-#include "mitkNumericTypes.h"
+#include <mitkGenericProperty.h>
+#include <mitkLookupTables.h>
+#include <mitkNumericTypes.h>
 
 namespace mitk
 {

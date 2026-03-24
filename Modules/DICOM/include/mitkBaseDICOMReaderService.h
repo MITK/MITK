@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkAbstractFileReader.h>
 #include <mitkDICOMFileReader.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk {
 

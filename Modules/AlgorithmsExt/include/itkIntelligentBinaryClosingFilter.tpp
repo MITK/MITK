@@ -9,10 +9,10 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef _itkIntelligentBinaryClosingFilter_tpp
-#define _itkIntelligentBinaryClosingFilter_tpp
+#ifndef itkIntelligentBinaryClosingFilter_tpp
+#define itkIntelligentBinaryClosingFilter_tpp
 
-#include "itkIntelligentBinaryClosingFilter.h"
+#include <itkIntelligentBinaryClosingFilter.h>
 #include <vector>
 
 namespace itk

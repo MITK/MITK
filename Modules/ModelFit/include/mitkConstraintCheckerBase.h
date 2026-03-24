@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkMacro.h>
 
-#include "mitkConstraintCheckerInterface.h"
+#include <mitkConstraintCheckerInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

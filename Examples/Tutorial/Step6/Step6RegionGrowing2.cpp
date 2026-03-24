@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "Step6RegionGrowing.tpp"
+#include <Step6RegionGrowing.tpp>
 
 #include <mitkInstantiateAccessFunctions.h>
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYWORKBENCHWINDOWEXPRESSION_H
 #define BERRYWORKBENCHWINDOWEXPRESSION_H
 
-#include "berryExpression.h"
+#include <berryExpression.h>
 
 namespace berry {
 

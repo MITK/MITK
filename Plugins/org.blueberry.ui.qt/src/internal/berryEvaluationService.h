@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYEVALUATIONSERVICE_H
 #define BERRYEVALUATIONSERVICE_H
 
-#include <berryIEvaluationService.h>
+#include "berryIEvaluationService.h"
 
 namespace berry {
 

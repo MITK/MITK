@@ -39,7 +39,7 @@ namespace mitk
   {
   public:
     /** Default constructor has nothing to do. */
-    explicit Point<TCoordRep, NPointDimension>() : itk::Point<TCoordRep, NPointDimension>() {}
+    explicit Point() : itk::Point<TCoordRep, NPointDimension>() {}
     /** Pass-through constructors for the Array base class. */
     template <typename TPointValueType>
     explicit Point(const Point<TPointValueType, NPointDimension> &r) : itk::Point<TCoordRep, NPointDimension>(r)
@@ -56,13 +56,13 @@ namespace mitk
     {
     }
 
-    Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension> &r)
+    Point(const mitk::Point<TCoordRep, NPointDimension> &r)
       : itk::Point<TCoordRep, NPointDimension>(r)
     {
     }
-    Point<TCoordRep, NPointDimension>(const TCoordRep r[NPointDimension]) : itk::Point<TCoordRep, NPointDimension>(r) {}
-    Point<TCoordRep, NPointDimension>(const TCoordRep &v) : itk::Point<TCoordRep, NPointDimension>(v) {}
-    Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> &p)
+    Point(const TCoordRep r[NPointDimension]) : itk::Point<TCoordRep, NPointDimension>(r) {}
+    Point(const TCoordRep &v) : itk::Point<TCoordRep, NPointDimension>(v) {}
+    Point(const itk::Point<TCoordRep, NPointDimension> &p)
       : itk::Point<TCoordRep, NPointDimension>(p)
     {
     }

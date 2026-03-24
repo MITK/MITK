@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "qclickablelabel.h"
+#include <qclickablelabel.h>
 
 #include <QMouseEvent>
 

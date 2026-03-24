@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkStandaloneDataStorage_h
 #define mitkStandaloneDataStorage_h
 
-#include "itkVectorContainer.h"
-#include "mitkDataStorage.h"
-#include "mitkMessage.h"
+#include <itkVectorContainer.h>
+#include <mitkDataStorage.h>
+#include <mitkMessage.h>
 #include <map>
 #include <mutex>
 

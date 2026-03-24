@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYQTWORKBENCHPRESENTATIONFACTORY_H_
 #define BERRYQTWORKBENCHPRESENTATIONFACTORY_H_
 
-#include <berryIPresentationFactory.h>
+#include "berryIPresentationFactory.h"
 
 namespace berry
 {

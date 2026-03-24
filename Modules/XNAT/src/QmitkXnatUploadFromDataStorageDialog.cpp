@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatUploadFromDataStorageDialog.h"
+#include <QmitkXnatUploadFromDataStorageDialog.h>
 #include <ui_QmitkXnatUploadFromDataStorageDialog.h>
 
 #include <mitkDataStorage.h>

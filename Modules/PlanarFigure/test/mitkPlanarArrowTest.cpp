@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarArrow.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkTestingMacros.h"
+#include <mitkPlanarArrow.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkTestingMacros.h>
 
 class mitkPlanarArrowTestClass
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkAbstractFileIO_h
 #define mitkAbstractFileIO_h
 
-#include "mitkAbstractFileReader.h"
-#include "mitkAbstractFileWriter.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkAbstractFileWriter.h>
 
 namespace mitk
 {

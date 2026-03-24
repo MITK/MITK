@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkModulesDialog.h"
+#include <QmitkModulesDialog.h>
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QSortFilterProxyModel>
 #include <QTableView>
 
-#include "QmitkModuleTableModel.h"
+#include <QmitkModuleTableModel.h>
 
 QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {

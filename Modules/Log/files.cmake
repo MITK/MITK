@@ -1,5 +1,5 @@
 set(H_FILES
-  include/mitkLogLevel.h
+  mitkLogLevel.h
 )
 
 set(CPP_FILES

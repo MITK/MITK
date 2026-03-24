@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
 #include "mitkDataStorageController.h"
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <nlohmann/json.hpp>

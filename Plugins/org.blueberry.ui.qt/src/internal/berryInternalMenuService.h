@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYINTERNALMENUSERVICE_H
 #define BERRYINTERNALMENUSERVICE_H
 
-#include <berryIMenuService.h>
+#include "berryIMenuService.h"
 
 #include <QUrl>
 

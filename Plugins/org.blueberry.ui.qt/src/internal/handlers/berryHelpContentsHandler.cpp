@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "berryHelpContentsHandler.h"
 
-#include <berryHandlerUtil.h>
-#include <berryPlatformUI.h>
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
+#include "berryHandlerUtil.h"
+#include "berryPlatformUI.h"
+#include "berryIWorkbench.h"
+#include "berryIWorkbenchPage.h"
 
 
 namespace berry {

@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define mitkCompareImageDataFilter_h
 
 // MITK
-#include "mitkImage.h"
-#include "mitkImageToImageFilter.h"
+#include <mitkImage.h>
+#include <mitkImageToImageFilter.h>
 
 // ITK
 #include <itkImage.h>

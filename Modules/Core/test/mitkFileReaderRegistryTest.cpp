@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAbstractFileReader.h"
-#include "mitkFileReaderRegistry.h"
-#include "mitkIFileReader.h"
-#include "mitkTestingMacros.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkFileReaderRegistry.h>
+#include <mitkIFileReader.h>
+#include <mitkTestingMacros.h>
 #include <mitkBaseData.h>
 #include <mitkCustomMimeType.h>
 #include <mitkImage.h>

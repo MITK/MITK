@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <functional>
 #include <memory>
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace itk
 {

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkIndexedUnaryFunctorImageFilter_h
-#define __itkIndexedUnaryFunctorImageFilter_h
+#ifndef itkIndexedUnaryFunctorImageFilter_h
+#define itkIndexedUnaryFunctorImageFilter_h
 
-#include "itkUnaryFunctorImageFilter.h"
+#include <itkUnaryFunctorImageFilter.h>
 
 namespace itk
 {
@@ -122,7 +122,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkIndexedUnaryFunctorImageFilter.tpp"
+#include <itkIndexedUnaryFunctorImageFilter.tpp>
 #endif
 
 #endif

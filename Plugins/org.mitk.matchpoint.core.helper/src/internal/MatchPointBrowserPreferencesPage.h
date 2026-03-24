@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef __MATCHPOINT_BROWSER_PREFERENCE_PAGE_H
 #define __MATCHPOINT_BROWSER_PREFERENCE_PAGE_H
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 class QWidget;
 class QCheckBox;

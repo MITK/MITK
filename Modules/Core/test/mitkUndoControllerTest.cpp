@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkUndoController.h"
-#include "mitkVerboseLimitedLinearUndo.h"
+#include <mitkUndoController.h>
+#include <mitkVerboseLimitedLinearUndo.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 

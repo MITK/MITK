@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialDecayModelParameterizer.h"
+#include <mitkExponentialDecayModelParameterizer.h>
 
 mitk::ExponentialDecayModelParameterizer::ParametersType
 mitk::ExponentialDecayModelParameterizer::GetDefaultInitialParameterization() const

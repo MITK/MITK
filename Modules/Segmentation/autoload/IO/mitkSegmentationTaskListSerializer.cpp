@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationTaskListSerializer.h"
-#include "mitkSegmentationTaskList.h"
+#include <mitkSegmentationTaskListSerializer.h>
+#include <mitkSegmentationTaskList.h>
 
 #include <mitkIOUtil.h>
 

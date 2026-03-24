@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkMRNormTwoRegionBasedFilter_h
 #define mitkMRNormTwoRegionBasedFilter_h
 
-#include "mitkCommon.h"
-#include "MitkCLMRUtilitiesExports.h"
-#include "mitkImageToImageFilter.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkCommon.h>
+#include <MitkCLMRUtilitiesExports.h>
+#include <mitkImageToImageFilter.h>
+#include <mitkImageTimeSelector.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 namespace mitk {
   //##Documentation

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkAreaUnderTheCurveDescriptionParameter_h
 #define mitkAreaUnderTheCurveDescriptionParameter_h
 
-#include "mitkCurveDescriptionParameterBase.h"
+#include <mitkCurveDescriptionParameterBase.h>
 
 namespace  mitk
 {

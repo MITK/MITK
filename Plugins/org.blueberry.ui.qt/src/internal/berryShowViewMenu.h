@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYSHOWVIEWMENU_H
 #define BERRYSHOWVIEWMENU_H
 
-#include <berryContributionItem.h>
+#include "berryContributionItem.h"
 
 #include <QPair>
 

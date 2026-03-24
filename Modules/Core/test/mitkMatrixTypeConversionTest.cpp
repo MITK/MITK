@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include <string>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkMatrix.h"
+#include <mitkMatrix.h>
 
 class mitkMatrixTypeConversionTestSuite : public mitk::TestFixture
 

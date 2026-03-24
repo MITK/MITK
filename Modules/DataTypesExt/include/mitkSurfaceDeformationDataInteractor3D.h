@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkSurfaceDeformationDataInteractor3D_h
 #define mitkSurfaceDeformationDataInteractor3D_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkDataInteractor.h"
-#include "mitkSurface.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkDataInteractor.h>
+#include <mitkSurface.h>
 
 namespace mitk
 {

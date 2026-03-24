@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegisterClasses.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkSliceWidget.h"
+#include <QmitkRegisterClasses.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkSliceWidget.h>
 
-#include "mitkNodePredicateDataType.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkNodePredicateDataType.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkIOUtil.h>
 
 #include <QApplication>

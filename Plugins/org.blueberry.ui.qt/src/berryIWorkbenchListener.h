@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include "berryMessage.h"
+#include <berryMessage.h>
 
 namespace berry
 {

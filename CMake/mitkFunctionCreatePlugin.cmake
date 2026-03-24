@@ -246,6 +246,8 @@ function(mitk_create_plugin)
       mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-function-type" plugin_c_flags plugin_cxx_flags)
       mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" plugin_c_flags plugin_cxx_flags)
       mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-volatile" plugin_c_flags plugin_cxx_flags)
+      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=volatile" plugin_c_flags plugin_cxx_flags)
     endif()
   endif()
 

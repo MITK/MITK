@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryIPropertyTester.h"
 
-#include "Poco/Any.h"
+#include <Poco/Any.h>
 
 namespace berry
 {

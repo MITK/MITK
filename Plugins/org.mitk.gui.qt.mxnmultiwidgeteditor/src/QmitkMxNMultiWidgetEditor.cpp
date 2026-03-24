@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <berryUIException.h>
 
 // mxn multi widget editor plugin
-#include "QmitkMultiWidgetDecorationManager.h"
+#include <QmitkMultiWidgetDecorationManager.h>
 
 // mitk qt widgets module
 #include <QmitkMxNMultiWidget.h>

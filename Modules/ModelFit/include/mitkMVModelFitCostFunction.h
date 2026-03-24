@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <itkMultipleValuedCostFunction.h>
 #include <itkMacro.h>
 
-#include "mitkModelFitCostFunctionInterface.h"
+#include <mitkModelFitCostFunctionInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

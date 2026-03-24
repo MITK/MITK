@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCameraController_h
 #define mitkCameraController_h
 
-#include "mitkBaseController.h"
+#include <mitkBaseController.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

@@ -17,10 +17,10 @@ found in the LICENSE file.
 
 #include <mitkVector.h>
 
-#include "mitkModelBase.h"
-#include "mitkSVModelFitCostFunction.h"
+#include <mitkModelBase.h>
+#include <mitkSVModelFitCostFunction.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 #include <mutex>
 

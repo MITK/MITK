@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkImageCast.h>
 
-#include "mitkDescriptivePharmacokineticBrixModelFactory.h"
-#include "mitkDescriptivePharmacokineticBrixModelParameterizer.h"
-#include "mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h"
+#include <mitkDescriptivePharmacokineticBrixModelFactory.h>
+#include <mitkDescriptivePharmacokineticBrixModelParameterizer.h>
+#include <mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer.h>
 
 mitk::DescriptivePharmacokineticBrixModelFactory::DescriptivePharmacokineticBrixModelFactory()
 {

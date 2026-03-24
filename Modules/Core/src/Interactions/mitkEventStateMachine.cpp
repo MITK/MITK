@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEventStateMachine.h"
-#include "mitkApplicationCursor.h"
-#include "mitkInteractionEvent.h"
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineCondition.h"
-#include "mitkStateMachineContainer.h"
-#include "mitkStateMachineState.h"
-#include "mitkStateMachineTransition.h"
-#include "mitkUndoController.h"
+#include <mitkEventStateMachine.h>
+#include <mitkApplicationCursor.h>
+#include <mitkInteractionEvent.h>
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineCondition.h>
+#include <mitkStateMachineContainer.h>
+#include <mitkStateMachineState.h>
+#include <mitkStateMachineTransition.h>
+#include <mitkUndoController.h>
 
 mitk::EventStateMachine::EventStateMachine()
   : m_IsActive(true),

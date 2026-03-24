@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMVConstrainedCostFunctionDecorator.h"
+#include <mitkMVConstrainedCostFunctionDecorator.h>
 
 #include <iostream>
 

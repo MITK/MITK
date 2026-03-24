@@ -10,20 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseRenderer.h"
-#include "mitkBaseRendererHelper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkBaseRendererHelper.h>
 
-#include "mitkMapper.h"
-#include "mitkResliceMethodProperty.h"
+#include <mitkMapper.h>
+#include <mitkResliceMethodProperty.h>
 
 // Geometries
-#include "mitkSlicedGeometry3D.h"
+#include <mitkSlicedGeometry3D.h>
 
-#include "mitkVtkLayerController.h"
+#include <mitkVtkLayerController.h>
 
-#include "mitkInteractionConst.h"
-#include "mitkProperties.h"
-#include "mitkWeakPointerProperty.h"
+#include <mitkInteractionConst.h>
+#include <mitkProperties.h>
+#include <mitkWeakPointerProperty.h>
 
 // VTK
 #include <vtkCamera.h>

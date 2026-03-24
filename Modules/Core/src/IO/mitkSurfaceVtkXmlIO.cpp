@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "mitkSurfaceVtkXmlIO.h"
 
-#include "mitkIOMimeTypes.h"
-#include "mitkSurface.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkSurface.h>
 
 #include <vtkErrorCode.h>
 #include <vtkSmartPointer.h>

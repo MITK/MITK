@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabeledImageVolumeCalculator.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkLabeledImageVolumeCalculator.h>
+#include <mitkImageAccessByItk.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 

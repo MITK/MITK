@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-#include "mitkIsoDoseLevelCollections.h"
-#include "mitkExceptionMacro.h"
+#include <mitkIsoDoseLevelCollections.h>
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {

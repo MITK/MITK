@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitResultHelper.h"
+#include <mitkModelFitResultHelper.h>
 
 #include <mitkDataStorage.h>
 #include <mitkUIDGenerator.h>
 
-#include "mitkModelTraitsInterface.h"
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitInfo.h"
+#include <mitkModelTraitsInterface.h>
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitInfo.h>
 #include <mitkModelFitResultRelationRule.h>
 
 #include <mitkDICOMPMPropertyHelper.h>

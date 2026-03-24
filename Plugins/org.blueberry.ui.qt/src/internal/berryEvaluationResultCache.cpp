@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "berryEvaluationResultCache.h"
 
 #include "berrySourcePriorityNameMapping.h"
-#include "berryEvaluationResult.h"
+#include <berryEvaluationResult.h>
 
 #include <berryCoreException.h>
 

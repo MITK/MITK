@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoStepLinearModel.h"
+#include <mitkTwoStepLinearModel.h>
 #include <mitkIOUtil.h>
 
 

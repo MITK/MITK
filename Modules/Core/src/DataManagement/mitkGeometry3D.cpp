@@ -13,14 +13,14 @@ found in the LICENSE file.
 #include <iomanip>
 #include <sstream>
 
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
-#include "mitkApplyTransformMatrixOperation.h"
-#include "mitkInteractionConst.h"
-#include "mitkMatrixConvert.h"
-#include "mitkPointOperation.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkRotationOperation.h"
+#include <mitkApplyTransformMatrixOperation.h>
+#include <mitkInteractionConst.h>
+#include <mitkMatrixConvert.h>
+#include <mitkPointOperation.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkRotationOperation.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMatrixToLinearTransform.h>
 

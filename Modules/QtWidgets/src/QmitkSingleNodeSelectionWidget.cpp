@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSingleNodeSelectionWidget.h"
+#include <QmitkSingleNodeSelectionWidget.h>
 
 #include <ui_QmitkSingleNodeSelectionWidget.h>
 

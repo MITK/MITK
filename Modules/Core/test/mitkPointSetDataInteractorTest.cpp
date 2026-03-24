@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
 
-#include "mitkInteractionTestHelper.h"
+#include <mitkInteractionTestHelper.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkIOUtil.h>
 #include <mitkPointSet.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointLocator.h"
+#include <mitkPointLocator.h>
 #include <ANN/ANN.h>
 #include <vtkPointSet.h>
 

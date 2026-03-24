@@ -161,6 +161,11 @@ bool ServiceReferenceBase::operator==(const ServiceReferenceBase& reference) con
   return d->registration == reference.d->registration;
 }
 
+bool ServiceReferenceBase::operator==(std::nullptr_t) const noexcept
+{
+  return d->registration == nullptr;
+}
+
 ServiceReferenceBase& ServiceReferenceBase::operator=(const ServiceReferenceBase& reference)
 {
   ServiceReferenceBasePrivate* curr_d = d;

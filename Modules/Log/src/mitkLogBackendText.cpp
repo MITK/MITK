@@ -133,7 +133,7 @@ protected:
     return a + "." + b;
   }
 
-  bool search2p2(char *a, char *b, bool optimize = true)
+  bool search2p2(const char *a, const char *b, bool optimize = true)
   {
     int size = static_cast<int>(path.size()) - 3;
     for (int r = 0; r < size; r++)
@@ -146,7 +146,7 @@ protected:
     return false;
   }
 
-  bool search2p1(char *a, char *b)
+  bool search2p1(const char *a, const char *b)
   {
     int size = static_cast<int>(path.size()) - 2;
     for (int r = 0; r < size; r++)
@@ -159,7 +159,7 @@ protected:
     return false;
   }
 
-  bool search1p2(char *a, bool optimize = true)
+  bool search1p2(const char *a, bool optimize = true)
   {
     int size = static_cast<int>(path.size()) - 2;
     for (int r = 0; r < size; r++)

@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEnhancedPointSetVtkMapper3D.h"
+#include <mitkEnhancedPointSetVtkMapper3D.h>
 
 //#include <sstream>
 #include <algorithm>
 
-#include "mitkDataNode.h"
-#include "mitkLookupTables.h"
-#include "mitkProperties.h"
+#include <mitkDataNode.h>
+#include <mitkLookupTables.h>
+#include <mitkProperties.h>
 
-#include "mitkColorProperty.h"
+#include <mitkColorProperty.h>
 //#include "mitkVtkPropRenderer.h"
 
 #include <vtkActor.h>

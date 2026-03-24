@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mapRegistrationKernelBase.h>
 
 // MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 
 namespace mitk

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #ifndef mitkStatusBar_h
 #define mitkStatusBar_h
-#include "mitkStatusBarImplementation.h"
+#include <mitkStatusBarImplementation.h>
 #include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <mitkPoint.h>

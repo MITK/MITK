@@ -15,8 +15,8 @@ found in the LICENSE file.
 #include <QmitkNodeDescriptorManager.h>
 
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 QmitkDataStorageSimpleTreeModel::QmitkDataStorageSimpleTreeModel(QObject *parent)
   : QmitkAbstractDataStorageModel(parent)

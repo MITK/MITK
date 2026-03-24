@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataInteractor.h"
-#include "mitkDataNode.h"
-#include "mitkStateMachineState.h"
+#include <mitkDataInteractor.h>
+#include <mitkDataNode.h>
+#include <mitkStateMachineState.h>
 
 namespace mitk
 {

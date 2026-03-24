@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryCommandStateProxy.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryStatus.h"
+#include <berryIConfigurationElement.h>
+#include <berryStatus.h>
 #include "berryPlatformUI.h"
 #include "berryWorkbenchPlugin.h"
 

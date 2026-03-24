@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <ctkXnatDataModel.h>
 #include <ctkXnatException.h>
 #include <ctkXnatExperiment.h>
-#include "ctkXnatFile.h"
+#include <ctkXnatFile.h>
 #include <ctkXnatProject.h>
 #include <ctkXnatReconstruction.h>
 #include <ctkXnatReconstructionFolder.h>

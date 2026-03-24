@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertiesTableModel.h"
+#include <QmitkPropertiesTableModel.h>
 
 //# Own includes
-#include "QmitkCustomVariants.h"
-#include "mitkColorProperty.h"
-#include "mitkEnumerationProperty.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkStringProperty.h"
+#include <QmitkCustomVariants.h>
+#include <mitkColorProperty.h>
+#include <mitkEnumerationProperty.h>
+#include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkStringProperty.h>
 
 //# Toolkit includes
 #include <QBrush>

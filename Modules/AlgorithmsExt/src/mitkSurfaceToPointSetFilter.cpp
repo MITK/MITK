@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceToPointSetFilter.h"
+#include <mitkSurfaceToPointSetFilter.h>
 
 // mitk headers
-#include "mitkPointSet.h"
+#include <mitkPointSet.h>
 
 // itk headers
-#include "itkMatrix.h"
-#include "itkVector.h"
+#include <itkMatrix.h>
+#include <itkVector.h>
 
 // vtk headers
 #include <vtkCleanPolyData.h>

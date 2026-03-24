@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkLogoRepresentation_h
 #define mitkVtkLogoRepresentation_h
 
-#include "vtkLogoRepresentation.h"
+#include <vtkLogoRepresentation.h>
 
 class mitkVtkLogoRepresentation : public vtkLogoRepresentation
 {

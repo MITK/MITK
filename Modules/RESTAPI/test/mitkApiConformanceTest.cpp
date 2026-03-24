@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
-#include "mitkDataStorageController.h"
-#include "mitkHealthController.h"
-#include "mitkRenderingController.h"
-#include "mitkRenderWindowBridge.h"
-#include "mitkDataStorageBridge.h"
-#include "mitkErrorResponse.h"
+#include <mitkDataStorageController.h>
+#include <mitkHealthController.h>
+#include <mitkRenderingController.h>
+#include <mitkRenderWindowBridge.h>
+#include <mitkDataStorageBridge.h>
+#include <mitkErrorResponse.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>

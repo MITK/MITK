@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDICOMTagBasedSorter_h
 #define mitkDICOMTagBasedSorter_h
 
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkDICOMSortCriterion.h"
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkDICOMSortCriterion.h>
 
 namespace mitk
 {

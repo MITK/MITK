@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _lut_PET20_h_
-#define _lut_PET20_h_
+#ifndef PET20_h
+#define PET20_h
 
 static const int PET20[256][3] = {
   {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},       {0, 0, 0},

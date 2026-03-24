@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingShapeObjectFactory.h"
-#include "mitkBoundingShapeVtkMapper2D.h"
-#include "mitkBoundingShapeVtkMapper3D.h"
+#include <mitkBoundingShapeObjectFactory.h>
+#include <mitkBoundingShapeVtkMapper2D.h>
+#include <mitkBoundingShapeVtkMapper3D.h>
 #include <mitkCoreObjectFactory.h>
 
 mitk::BoundingShapeObjectFactory::BoundingShapeObjectFactory()

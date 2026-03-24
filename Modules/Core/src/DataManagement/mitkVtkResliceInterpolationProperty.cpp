@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkVtkResliceInterpolationProperty.h>
 #include <vtkProperty.h>
 
 mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty()

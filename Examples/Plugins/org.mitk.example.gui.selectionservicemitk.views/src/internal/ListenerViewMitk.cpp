@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <ui_ListenerViewMitkControls.h>
 
 // Mitk includes
-#include "mitkDataNodeObject.h"
+#include <mitkDataNodeObject.h>
 
 const std::string ListenerViewMitk::VIEW_ID = "org.mitk.views.listenerviewmitk";
 

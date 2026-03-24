@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef itkStitchImageFilter_h
 #define itkStitchImageFilter_h
 
-#include "itkFixedArray.h"
-#include "itkTransform.h"
-#include "itkImageRegionIterator.h"
-#include "itkImageToImageFilter.h"
-#include "itkLinearInterpolateImageFunction.h"
-#include "itkSize.h"
-#include "itkDefaultConvertPixelTraits.h"
-#include "itkDataObjectDecorator.h"
+#include <itkFixedArray.h>
+#include <itkTransform.h>
+#include <itkImageRegionIterator.h>
+#include <itkImageToImageFilter.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <itkSize.h>
+#include <itkDefaultConvertPixelTraits.h>
+#include <itkDataObjectDecorator.h>
 
 
 namespace itk
@@ -324,7 +324,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkStitchImageFilter.tpp"
+#include <itkStitchImageFilter.tpp>
 #endif
 
 #endif

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkException.h"
+#include <mitkException.h>
 
 void mitk::Exception::AddRethrowData(const char *file, unsigned int lineNumber, const char *message)
 {

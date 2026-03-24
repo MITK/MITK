@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mapDeploymentDLLHelper.h"
-#include "mapContinuousElements.h"
-#include "mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h"
-#include "mapConfigure.h"
+#include <mapDeploymentDLLHelper.h>
+#include <mapContinuousElements.h>
+#include <mapITKRigid3DClosedFormRegistrationAlgorithmTemplate.h>
+#include <mapConfigure.h>
 
-#include "mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h"
+#include <mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h>
 
 typedef map::core::continuous::Elements<3>::InternalPointSetType PointSetType;
 

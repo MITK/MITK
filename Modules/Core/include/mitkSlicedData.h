@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkSlicedData_h
 #define mitkSlicedData_h
 
-#include "itkImageRegion.h"
-#include "itkIndex.h"
-#include "itkOffset.h"
-#include "itkSize.h"
-#include "mitkBaseData.h"
-#include "mitkSlicedGeometry3D.h"
+#include <itkImageRegion.h>
+#include <itkIndex.h>
+#include <itkOffset.h>
+#include <itkSize.h>
+#include <mitkBaseData.h>
+#include <mitkSlicedGeometry3D.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

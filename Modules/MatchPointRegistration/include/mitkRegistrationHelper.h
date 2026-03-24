@@ -15,11 +15,11 @@ found in the LICENSE file.
 #define mitkRegistrationHelper_h
 
 //ITK
-#include "itkScalableAffineTransform.h"
+#include <itkScalableAffineTransform.h>
 
 //MatchPoint
-#include "mapRegistrationAlgorithmBase.h"
-#include "mapRegistration.h"
+#include <mapRegistrationAlgorithmBase.h>
+#include <mapRegistration.h>
 
 //MITK
 #include <mitkImage.h>
@@ -27,8 +27,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateBase.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <MitkMatchPointRegistrationExports.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 namespace mitk
 {

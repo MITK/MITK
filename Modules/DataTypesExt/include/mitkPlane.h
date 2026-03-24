@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlane_h
 #define mitkPlane_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkBoundingObject.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkBoundingObject.h>
 
 class vtkPlaneSource;
 class vtkDoubleArray;

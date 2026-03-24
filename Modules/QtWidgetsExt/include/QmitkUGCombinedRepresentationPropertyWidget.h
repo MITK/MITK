@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkUGCombinedRepresentationPropertyWidget_h
 #define QmitkUGCombinedRepresentationPropertyWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <QComboBox>
 

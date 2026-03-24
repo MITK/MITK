@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagsOfInterestService.h"
+#include <mitkDICOMTagsOfInterestService.h>
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
-#include "mitkIPropertyDescriptions.h"
-#include "mitkIPropertyPersistence.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyPersistence.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 mitk::IPropertyDescriptions*
 GetDescriptionsService()

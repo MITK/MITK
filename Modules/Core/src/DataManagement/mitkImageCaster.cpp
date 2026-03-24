@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageCaster.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkImageCaster.h>
+#include <mitkImageAccessByItk.h>
 
 vtkRenderer *mitk::RendererAccess::m_3DRenderer = nullptr;
 

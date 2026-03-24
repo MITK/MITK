@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYHANDLE_H
 #define BERRYHANDLE_H
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 namespace berry {
 

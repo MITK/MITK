@@ -11,8 +11,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExampleDataStructure.h"
-#include "mitkGeometry3D.h"
+#include <mitkExampleDataStructure.h>
+#include <mitkGeometry3D.h>
 
 // implementation of virtual methods
 

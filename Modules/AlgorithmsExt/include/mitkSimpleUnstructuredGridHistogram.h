@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkAlgorithmsExtExports.h>
 
-#include "mitkSimpleHistogram.h"
+#include <mitkSimpleHistogram.h>
 
 #include <itkListSample.h>
 

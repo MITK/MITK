@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSurfaceSource_h
 #define mitkSurfaceSource_h
 
-#include "mitkBaseDataSource.h"
+#include <mitkBaseDataSource.h>
 
 namespace mitk
 {

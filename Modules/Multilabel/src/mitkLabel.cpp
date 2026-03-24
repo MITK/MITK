@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabel.h"
+#include <mitkLabel.h>
 
-#include "itkProcessObject.h"
+#include <itkProcessObject.h>
 #include <itkCommand.h>
 #include <mitkProperties.h>
 #include <mitkDICOMSegmentationConstants.h>

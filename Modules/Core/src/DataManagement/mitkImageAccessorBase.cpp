@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageAccessorBase.h"
-#include "mitkImage.h"
+#include <mitkImageAccessorBase.h>
+#include <mitkImage.h>
 
 mitk::ImageAccessorBase::ThreadIDType mitk::ImageAccessorBase::CurrentThreadHandle()
 {

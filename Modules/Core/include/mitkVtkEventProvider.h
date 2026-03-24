@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkVtkEventProvider_h
 #define mitkVtkEventProvider_h
 
-#include "mitkRenderWindow.h"
+#include <mitkRenderWindow.h>
 #include <MitkCoreExports.h>
 
-#include "vtkInteractorObserver.h"
+#include <vtkInteractorObserver.h>
 
 namespace mitk
 {

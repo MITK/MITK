@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarCircle.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarCircle.h>
+#include <mitkPlaneGeometry.h>
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 mitk::PlanarCircle::PlanarCircle()
   : FEATURE_ID_RADIUS(this->AddFeature("Radius", "mm")),

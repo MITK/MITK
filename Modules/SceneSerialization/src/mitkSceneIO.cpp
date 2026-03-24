@@ -16,15 +16,15 @@ found in the LICENSE file.
 #include <Poco/Zip/Compress.h>
 #include <Poco/Zip/Decompress.h>
 
-#include "mitkBaseDataSerializer.h"
-#include "mitkPropertyListSerializer.h"
-#include "mitkSceneIO.h"
-#include "mitkSceneReader.h"
+#include <mitkBaseDataSerializer.h>
+#include <mitkPropertyListSerializer.h>
+#include <mitkSceneIO.h>
+#include <mitkSceneReader.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkProgressBar.h"
-#include "mitkRenderingManager.h"
-#include "mitkStandaloneDataStorage.h"
+#include <mitkBaseRenderer.h>
+#include <mitkProgressBar.h>
+#include <mitkRenderingManager.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkUIDGenerator.h>
@@ -35,7 +35,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <sstream>
 
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 #include <tinyxml2.h>
 

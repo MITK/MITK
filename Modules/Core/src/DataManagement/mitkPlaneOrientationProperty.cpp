@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneOrientationProperty.h"
+#include <mitkPlaneOrientationProperty.h>
 
 namespace mitk
 {

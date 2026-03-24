@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialSaturationModelParameterizer.h"
+#include <mitkExponentialSaturationModelParameterizer.h>
 
 mitk::ExponentialSaturationModelParameterizer::ParametersType
 mitk::ExponentialSaturationModelParameterizer::GetDefaultInitialParameterization() const

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageVtkLegacyIO_h
 #define mitkImageVtkLegacyIO_h
 
-#include "mitkAbstractFileIO.h"
+#include <mitkAbstractFileIO.h>
 
 namespace mitk
 {

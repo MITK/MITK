@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkHealthController_h
 #define mitkHealthController_h
 
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkRestServerConfig.h>
 #include <httplib.h>
 

@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __itkIndexedUnaryFunctorImageFilter_tpp
-#define __itkIndexedUnaryFunctorImageFilter_tpp
+#ifndef itkIndexedUnaryFunctorImageFilter_tpp
+#define itkIndexedUnaryFunctorImageFilter_tpp
 
-#include "itkIndexedUnaryFunctorImageFilter.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageRegionIterator.h"
-#include "itkProgressReporter.h"
+#include <itkIndexedUnaryFunctorImageFilter.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIterator.h>
+#include <itkProgressReporter.h>
 
 namespace itk
 {

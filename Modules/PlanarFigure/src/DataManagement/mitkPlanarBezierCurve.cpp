@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarBezierCurve.h"
+#include <mitkPlanarBezierCurve.h>
 #include <mitkProperties.h>
 
 #include <limits>

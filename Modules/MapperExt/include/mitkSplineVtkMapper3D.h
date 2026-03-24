@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSplineVtkMapper3D_h
 #define mitkSplineVtkMapper3D_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkPointSetVtkMapper3D.h"
+#include <MitkMapperExtExports.h>
+#include <mitkPointSetVtkMapper3D.h>
 
 class vtkActor;
 class vtkAssembly;

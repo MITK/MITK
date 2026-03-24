@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkAnnotation3D.h"
+#include <mitkVtkAnnotation3D.h>
 
 mitk::VtkAnnotation3D::VtkAnnotation3D()
 {

@@ -16,7 +16,7 @@ found in the LICENSE file.
 // ITK
 #include <itkObject.h>
 // MITK
-#include "mitkOperationActor.h"
+#include <mitkOperationActor.h>
 #include <MitkCoreExports.h>
 #include <mitkBaseGeometry.h>
 #include <mitkCommon.h>

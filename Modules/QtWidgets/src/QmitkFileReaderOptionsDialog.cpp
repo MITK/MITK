@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFileReaderOptionsDialog.h"
+#include <QmitkFileReaderOptionsDialog.h>
 #include <ui_QmitkFileReaderOptionsDialog.h>
 
-#include "QmitkFileReaderWriterOptionsWidget.h"
-#include "mitkIFileReader.h"
+#include <QmitkFileReaderWriterOptionsWidget.h>
+#include <mitkIFileReader.h>
 
 QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo &loadInfo, QWidget *parent)
   : QDialog(parent, Qt::WindowStaysOnTopHint), ui(std::make_unique<Ui::QmitkFileReaderOptionsDialog>()), m_LoadInfo(loadInfo)

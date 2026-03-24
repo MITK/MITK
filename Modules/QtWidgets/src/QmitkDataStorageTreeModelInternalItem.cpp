@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataStorageTreeModelInternalItem.h"
+#include <QmitkDataStorageTreeModelInternalItem.h>
 
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkNodeDescriptorManager.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 #include <QmitkMimeTypes.h>

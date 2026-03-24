@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineAction.h"
+#include <mitkStateMachineAction.h>
 
 mitk::StateMachineAction::StateMachineAction(const std::string &actionName) : m_ActionName(actionName)
 {

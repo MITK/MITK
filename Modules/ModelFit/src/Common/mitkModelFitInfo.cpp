@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitInfo.h"
+#include <mitkModelFitInfo.h>
 
 #include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkUIDGenerator.h>
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
+#include <mitkDataNode.h>
+#include <mitkDataStorage.h>
 
-#include "mitkScalarListLookupTableProperty.h"
-#include "mitkModelFitException.h"
-#include "mitkModelFitResultRelationRule.h"
+#include <mitkScalarListLookupTableProperty.h>
+#include <mitkModelFitException.h>
+#include <mitkModelFitResultRelationRule.h>
 
 void mitk::modelFit::ModelFitInfo::AddParameter(Parameter::Pointer p)
 {

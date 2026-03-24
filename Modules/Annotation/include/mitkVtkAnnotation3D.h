@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkAnnotation3D_h
 #define mitkVtkAnnotation3D_h
 
-#include "mitkVtkAnnotation.h"
+#include <mitkVtkAnnotation.h>
 #include <MitkAnnotationExports.h>
 #include <vtkSmartPointer.h>
 

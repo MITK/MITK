@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 #include <algorithm>
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
 mitk::SimpleBarrierConstraintChecker::PenaltyArrayType
 mitk::SimpleBarrierConstraintChecker::GetPenalties(const ParametersType& parameters) const

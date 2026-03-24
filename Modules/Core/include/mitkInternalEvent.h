@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkInternalEvent_h
 #define mitkInternalEvent_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
 #include <string>
 
 #include <MitkCoreExports.h>

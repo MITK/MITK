@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkObjectFactory.h"
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkImageData.h>
 #include <vtkImageIterator.h>

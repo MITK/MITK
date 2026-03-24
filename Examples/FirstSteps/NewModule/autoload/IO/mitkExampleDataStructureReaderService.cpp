@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExampleDataStructureReaderService.h"
+#include <mitkExampleDataStructureReaderService.h>
 
 // mitk includes
-#include "mitkExampleIOMimeTypes.h"
-#include "mitkGeometry3D.h"
+#include <mitkExampleIOMimeTypes.h>
+#include <mitkGeometry3D.h>
 #include <mitkCustomMimeType.h>
 
 // itk includes
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 namespace mitk
 {

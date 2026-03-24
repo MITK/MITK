@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <berryMessage.h>
 
-#include "berryObject.h"
+#include <berryObject.h>
 #include "berryIDropTarget.h"
 
 namespace berry {

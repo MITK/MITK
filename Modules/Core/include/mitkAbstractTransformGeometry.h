@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkAbstractTransformGeometry_h
 #define mitkAbstractTransformGeometry_h
 
-#include "mitkPlaneGeometry.h"
+#include <mitkPlaneGeometry.h>
 #include <MitkCoreExports.h>
 
-#include "itkVtkAbstractTransform.h"
+#include <itkVtkAbstractTransform.h>
 
 class vtkAbstractTransform;
 

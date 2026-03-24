@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define QmitkVideoBackground_h
 
 // MITK
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkVideoSource.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkVideoSource.h>
 
 // Qt
 #include <QObject>

@@ -1,4 +1,4 @@
-SET(CPP_FILES
+set(CPP_FILES
   QmitkCustomWidgetOverlay.cpp
   QmitkOverlay.cpp
   QmitkOverlayContainerWidget.cpp

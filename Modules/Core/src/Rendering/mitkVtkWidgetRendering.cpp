@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkWidgetRendering.h"
+#include <mitkVtkWidgetRendering.h>
 
-#include "mitkVtkLayerController.h"
+#include <mitkVtkLayerController.h>
 
 #include <itkMacro.h>
 #include <itkObject.h>

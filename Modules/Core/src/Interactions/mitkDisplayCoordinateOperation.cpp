@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDisplayCoordinateOperation.h"
+#include <mitkDisplayCoordinateOperation.h>
 
 mitk::DisplayCoordinateOperation::DisplayCoordinateOperation(mitk::OperationType operationType,
                                                              mitk::BaseRenderer *renderer,

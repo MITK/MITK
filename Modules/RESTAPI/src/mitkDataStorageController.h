@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDataStorageController_h
 #define mitkDataStorageController_h
 
-#include "mitkDataStorageBridge.h"
-#include "mitkNodeQueryParams.h"
-#include "mitkRestServerConfig.h"
+#include <mitkDataStorageBridge.h>
+#include <mitkNodeQueryParams.h>
+#include <mitkRestServerConfig.h>
 #include <httplib.h>
 #include <mitkFileSystem.h>
 

@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkBasePropertyView_h
 #define QmitkBasePropertyView_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLabel>
 #include <mitkProperties.h>
 #include <mitkPropertyObserver.h>

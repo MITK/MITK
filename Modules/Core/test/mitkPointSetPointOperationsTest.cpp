@@ -17,8 +17,8 @@ found in the LICENSE file.
  *      Author: wirkert
  */
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <mitkInteractionConst.h>
 #include <mitkPointOperation.h>

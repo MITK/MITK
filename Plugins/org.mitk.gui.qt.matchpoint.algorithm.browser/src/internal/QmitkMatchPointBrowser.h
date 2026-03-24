@@ -25,8 +25,8 @@ found in the LICENSE file.
 #include <mapRegistrationAlgorithmBase.h>
 #include <mapMetaPropertyAlgorithmInterface.h>
 
-#include "QmitkMAPAlgorithmModel.h"
-#include "QmitkAlgorithmListModel.h"
+#include <QmitkMAPAlgorithmModel.h>
+#include <QmitkAlgorithmListModel.h>
 #include "mitkAlgorithmInfoSelectionProvider.h"
 #include <memory>
 

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkApplicationCursor_h
 #define mitkApplicationCursor_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

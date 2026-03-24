@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImageToSurfaceFilter_h
 #define mitkLabelSetImageToSurfaceFilter_h
 
-#include "MitkMultilabelExports.h"
-#include "mitkLabelSetImage.h"
-#include "mitkSurface.h"
+#include <MitkMultilabelExports.h>
+#include <mitkLabelSetImage.h>
+#include <mitkSurface.h>
 #include <mitkSurfaceSource.h>
 
 #include <vtkMatrix4x4.h>

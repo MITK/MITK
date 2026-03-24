@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkSurfaceVtkIO.h"
 
-#include "mitkSurface.h"
+#include <mitkSurface.h>
 #include <mitkUtf8Util.h>
 
 #include <vtkLinearTransform.h>

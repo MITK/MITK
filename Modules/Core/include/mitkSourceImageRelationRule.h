@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSourceImageRelationRule_h
 #define mitkSourceImageRelationRule_h
 
-#include "mitkPropertyRelationRuleBase.h"
-#include "mitkImage.h"
+#include <mitkPropertyRelationRuleBase.h>
+#include <mitkImage.h>
 
 namespace mitk
 {

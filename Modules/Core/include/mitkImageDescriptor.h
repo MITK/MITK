@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <string>
 #include <vector>
 
-#include "mitkChannelDescriptor.h"
-#include "mitkCommon.h"
+#include <mitkChannelDescriptor.h>
+#include <mitkCommon.h>
 
 /// Defines the maximum of 8 dimensions per image channel
 #define MAX_IMAGE_DIMENSIONS 8

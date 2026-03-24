@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCropTimestepsImageFilter.h"
+#include <mitkCropTimestepsImageFilter.h>
 
 #include <mitkImage.h>
 #include <mitkArbitraryTimeGeometry.h>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkValueBasedParameterizationDelegate.h"
+#include <mitkValueBasedParameterizationDelegate.h>
 
 
 mitk::ValueBasedParameterizationDelegate::ValueBasedParameterizationDelegate()

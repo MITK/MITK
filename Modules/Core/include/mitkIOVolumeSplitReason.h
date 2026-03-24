@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <nlohmann/json.hpp>
 #include <mitkCommon.h>
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

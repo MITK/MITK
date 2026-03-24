@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImage.h"
+#include <mitkLabelSetImage.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>

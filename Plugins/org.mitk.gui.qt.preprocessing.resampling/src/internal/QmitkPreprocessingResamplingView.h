@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_preprocessing_resampling_Export.h>
 
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 
 #include <mitkDataStorageSelection.h>
 #include <memory>

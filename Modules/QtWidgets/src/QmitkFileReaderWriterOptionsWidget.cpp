@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFileReaderWriterOptionsWidget.h"
+#include <QmitkFileReaderWriterOptionsWidget.h>
 
 #include <QFormLayout>
 

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkNodeTableViewKeyFilter.h"
-#include "../QmitkDataManagerView.h"
+#include "QmitkDataManagerView.h"
 
 // mitk gui qt application plugin
 #include <QmitkDataNodeGlobalReinitAction.h>

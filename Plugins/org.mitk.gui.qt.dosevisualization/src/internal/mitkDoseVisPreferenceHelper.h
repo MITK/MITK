@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef mitkDoseVisPreferenceHelper_h
 #define mitkDoseVisPreferenceHelper_h
 
-#include "mitkIsoDoseLevelCollections.h"
+#include <mitkIsoDoseLevelCollections.h>
 
 class ctkPluginContext;
 

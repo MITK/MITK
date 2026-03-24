@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm_h
 #define mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm_h
 
-#include "mapDiscreteElements.h"
-#include "mapITKFastSymmetricForcesDemonsMultiResRegistrationAlgorithm.h"
-#include "mapConfigure.h"
+#include <mapDiscreteElements.h>
+#include <mapITKFastSymmetricForcesDemonsMultiResRegistrationAlgorithm.h>
+#include <mapConfigure.h>
 
-#include "mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm_ProfileResource.h"
+#include <mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm_ProfileResource.h>
 
 namespace mitk
 {

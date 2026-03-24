@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef BERRYQTPLATFORMLOGMODEL_H_
 #define BERRYQTPLATFORMLOGMODEL_H_
 
-#include "berryLog.h"
+#include <berryLog.h>
 
-#include "ctkPluginFrameworkEvent.h"
+#include <ctkPluginFrameworkEvent.h>
 
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QDateTime>
@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <ctime>
 #include <sstream>
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include <QMutex>
 

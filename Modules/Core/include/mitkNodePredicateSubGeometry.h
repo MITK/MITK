@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateSubGeometry_h
 #define mitkNodePredicateSubGeometry_h
 
-#include "mitkNodePredicateBase.h"
-#include "mitkBaseGeometry.h"
-#include "mitkTimeGeometry.h"
+#include <mitkNodePredicateBase.h>
+#include <mitkBaseGeometry.h>
+#include <mitkTimeGeometry.h>
 
 namespace mitk
 {

@@ -12,11 +12,11 @@ found in the LICENSE file.
 #ifndef QmitkUploadToXNATAction_h
 #define QmitkUploadToXNATAction_h
 
-#include "mitkIContextMenuAction.h"
+#include <mitkIContextMenuAction.h>
 
-#include "org_mitk_gui_qt_xnat_Export.h"
+#include <org_mitk_gui_qt_xnat_Export.h>
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
 class XNAT_EXPORT QmitkUploadToXNATAction : public QObject, public mitk::IContextMenuAction
 {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkImageVtkWriteAccessor_h
 #define mitkImageVtkWriteAccessor_h
 
-#include "mitkImageAccessorBase.h"
+#include <mitkImageAccessorBase.h>
 
 class vtkImageData;
 

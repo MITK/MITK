@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QDirIterator>
 #include <QFileDialog>
-#include "QmitkStyleManager.h"
+#include <QmitkStyleManager.h>
 #include "QmitkToolInstallDialog.h"
 #include <QtConcurrent/QtConcurrentRun>
 #include <QProcess>
@@ -174,10 +174,10 @@ void QmitkTotalSegmentatorPreferencePage::CreateQtControl(QWidget *parent)
   connect(m_Ui->overrideBox, SIGNAL(stateChanged(int)), this, SLOT(OnOverrideBoxChecked(int)));
   connect(m_Ui->customEnvComboBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnPythonPathChanged(m_Ui->customEnvComboBox->itemText(index)); });
+          [=, this](int index) { OnPythonPathChanged(m_Ui->customEnvComboBox->itemText(index)); });
   connect(m_Ui->sysPythonComboBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
+          [=, this](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
 
   this->UpdateStatusLabel(); 
   this->UpdateLicenseBox();

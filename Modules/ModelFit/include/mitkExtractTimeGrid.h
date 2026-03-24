@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkTimeGeometry.h>
 
-#include "mitkModelBase.h"
+#include <mitkModelBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCommon.h"
-#include "mitkTestingMacros.h"
+#include <mitkCommon.h>
+#include <mitkTestingMacros.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkLogBackend.h>
 #include <mitkStandardFileLocations.h>

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryCompositeExpression.h"
 
-#include "Poco/DOM/Node.h"
+#include <Poco/DOM/Node.h>
 
 namespace berry {
 

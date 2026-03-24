@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <string>
 #include <map>
 
-#include "mitkExceptionMacro.h"
+#include <mitkExceptionMacro.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

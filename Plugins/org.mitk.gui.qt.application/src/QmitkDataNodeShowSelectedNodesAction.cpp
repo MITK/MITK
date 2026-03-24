@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeShowSelectedNodesAction.h>
+#include "QmitkDataNodeShowSelectedNodesAction.h"
 
 // mitk core
 #include <mitkRenderingManager.h>

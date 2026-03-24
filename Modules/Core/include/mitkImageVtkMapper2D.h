@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 
 // MITK Rendering
-#include "mitkBaseRenderer.h"
-#include "mitkExtractSliceFilter.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkExtractSliceFilter.h>
+#include <mitkVtkMapper.h>
 
 // VTK
 #include <vtkPropAssembly.h>

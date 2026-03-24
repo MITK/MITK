@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatSubjectWidget.h"
+#include <QmitkXnatSubjectWidget.h>
 #include <ui_QmitkXnatSubjectWidgetControls.h>
 
 #include <ctkXnatSubject.h>

@@ -105,10 +105,10 @@
       #define US_THREADS_LONG             long
       #undef US_ATOMIC_OPTIMIZATION
       #define US_ATOMIC_INCREMENT(x)      m_AtomicMtx.Lock();  \
-                                          IntType n = ++(*x);  \
+                                          IntType n = ++(const_cast<IntType&>(*x));  \
                                           m_AtomicMtx.Unlock()
       #define US_ATOMIC_DECREMENT(x)      m_AtomicMtx.Lock();  \
-                                          IntType n = --(*x);  \
+                                          IntType n = --(const_cast<IntType&>(*x));  \
                                           m_AtomicMtx.Unlock()
       #define US_ATOMIC_ASSIGN(l, v)      m_AtomicMtx.Lock();  \
                                           *l = v;              \
@@ -128,8 +128,8 @@
   #define US_THREADS_MUTEX_UNLOCK(x)
   #define US_THREADS_LONG int
 
-  #define US_ATOMIC_INCREMENT(x)        IntType n = ++(*x);
-  #define US_ATOMIC_DECREMENT(x)        IntType n = --(*x);
+  #define US_ATOMIC_INCREMENT(x)        IntType n = ++(const_cast<IntType&>(*x));
+  #define US_ATOMIC_DECREMENT(x)        IntType n = --(const_cast<IntType&>(*x));
   #define US_ATOMIC_ASSIGN(l, r)        *l = r;
 
 #endif

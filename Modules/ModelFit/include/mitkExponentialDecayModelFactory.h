@@ -15,10 +15,10 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkExponentialDecayModel.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkExponentialDecayModel.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

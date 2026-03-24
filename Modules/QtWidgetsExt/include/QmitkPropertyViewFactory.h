@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkPropertyViewFactory_h
 #define QmitkPropertyViewFactory_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <mitkProperties.h>
 
 class QWidget;

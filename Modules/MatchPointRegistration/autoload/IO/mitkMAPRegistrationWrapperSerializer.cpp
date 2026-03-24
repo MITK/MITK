@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkMAPRegistrationWrapperSerializer.h"
-#include "mitkMAPRegistrationWrapperIO.h"
+#include <mitkMAPRegistrationWrapperSerializer.h>
+#include <mitkMAPRegistrationWrapperIO.h>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
 #include <itksys/SystemTools.hxx>
 

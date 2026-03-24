@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageGenerationHelper.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkImageCast.h"
+#include <mitkImageGenerationHelper.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkImageCast.h>
 
 
   typedef itk::Image<double,3> FrameITKImageType;

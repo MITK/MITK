@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderingController.h"
-#include "mitkRenderWindowBridge.h"
-#include "mitkErrorResponse.h"
+#include <mitkRenderingController.h>
+#include <mitkRenderWindowBridge.h>
+#include <mitkErrorResponse.h>
 #include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkRenderingManager.h>

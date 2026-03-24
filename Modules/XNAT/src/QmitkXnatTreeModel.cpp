@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatTreeModel.h"
+#include <QmitkXnatTreeModel.h>
 #include <QmitkHttpStatusCodeHandler.h>
 
 #include <QmitkMimeTypes.h>

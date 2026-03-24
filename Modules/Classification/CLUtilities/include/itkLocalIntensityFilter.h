@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef itkLocalIntensityFilter_h
 #define itkLocalIntensityFilter_h
 
-#include "itkImageToImageFilter.h"
-#include "itkNumericTraits.h"
-#include "itkArray.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkImageToImageFilter.h>
+#include <itkNumericTraits.h>
+#include <itkArray.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 namespace itk
 {
@@ -151,7 +151,7 @@ namespace itk
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLocalIntensityFilter.hxx"
+#include <itkLocalIntensityFilter.tpp>
 #endif
 
 #endif

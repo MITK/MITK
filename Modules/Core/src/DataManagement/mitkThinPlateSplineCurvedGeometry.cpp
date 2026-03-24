@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkThinPlateSplineCurvedGeometry.h"
+#include <mitkThinPlateSplineCurvedGeometry.h>
 #include <vtkPoints.h>
 #include <vtkThinPlateSplineTransform.h>
 

@@ -11,19 +11,19 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk includes
-#include "mitkException.h"
-#include "mitkIOUtil.h"
-#include "mitkImageGenerator.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkPixelTypeMultiplex.h"
+#include <mitkException.h>
+#include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkImageDataItem.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkTestingMacros.h>
 
-#include "mitkImageSliceSelector.h"
+#include <mitkImageSliceSelector.h>
 
 // itk includes
 #include <itkImage.h>

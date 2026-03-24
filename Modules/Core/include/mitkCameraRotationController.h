@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCameraRotationController_h
 #define mitkCameraRotationController_h
 
-#include "mitkBaseController.h"
+#include <mitkBaseController.h>
 #include <MitkCoreExports.h>
 
 class vtkCamera;

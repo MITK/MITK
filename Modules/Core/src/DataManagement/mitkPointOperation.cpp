@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointOperation.h"
+#include <mitkPointOperation.h>
 
 mitk::PointOperation::PointOperation(
   OperationType operationType, Point3D point, int index, bool selected, PointSpecificationType type)

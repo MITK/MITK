@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef mitkTwoCompartmentExchangeModelFactoryBase_h
 #define mitkTwoCompartmentExchangeModelFactoryBase_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkSimpleBarrierConstraintChecker.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkSimpleBarrierConstraintChecker.h>
 
 namespace mitk
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef itkNeighborhoodFunctorImageFilter_cpp
 #define itkNeighborhoodFunctorImageFilter_cpp
 
-#include "itkNeighborhoodFunctorImageFilter.h"
-#include "itkNeighborhoodAlgorithm.h"
+#include <itkNeighborhoodFunctorImageFilter.h>
+#include <itkNeighborhoodAlgorithm.h>
 #include <itkVectorImageToImageAdaptor.h>
 
 namespace itk

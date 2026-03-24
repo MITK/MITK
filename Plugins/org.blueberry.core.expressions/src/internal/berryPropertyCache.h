@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPROPERTYCACHE_H_
 #define BERRYPROPERTYCACHE_H_
 
-#include "Poco/LRUCache.h"
+#include <Poco/LRUCache.h>
 
 #include "berryProperty.h"
 

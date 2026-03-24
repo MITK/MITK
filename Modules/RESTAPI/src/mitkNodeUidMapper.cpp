@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodeUidMapper.h"
+#include <mitkNodeUidMapper.h>
 #include <mitkStringProperty.h>
 
 #include <stdexcept>

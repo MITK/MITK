@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetDataInteractor.h"
-#include "mitkMouseMoveEvent.h"
+#include <mitkPointSetDataInteractor.h>
+#include <mitkMouseMoveEvent.h>
 
-#include "mitkInteractionConst.h" // TODO: refactor file
-#include "mitkInternalEvent.h"
-#include "mitkOperationEvent.h"
-#include "mitkRenderingManager.h"
+#include <mitkInteractionConst.h> // TODO: refactor file
+#include <mitkInternalEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkRenderingManager.h>
 #include <mitkPointOperation.h>
 //
-#include "mitkBaseRenderer.h"
-#include "mitkDispatcher.h"
+#include <mitkBaseRenderer.h>
+#include <mitkDispatcher.h>
 
-#include "mitkUndoController.h"
+#include <mitkUndoController.h>
 
 void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 {

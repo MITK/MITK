@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 // mitk headers
 #include "mitkTargetPointsCalculator.h"
-#include "mitkSurfaceToPointSetFilter.h"
+#include <mitkSurfaceToPointSetFilter.h>
 #include <mitkImageCast.h>
 #include <mitkSurfaceToImageFilter.h>
 

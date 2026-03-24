@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkHotkeyLineEdit_h
 #define QmitkHotkeyLineEdit_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 // qt
 #include <QKeySequence>

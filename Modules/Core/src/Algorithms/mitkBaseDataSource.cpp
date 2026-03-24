@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseDataSource.h"
-#include "mitkBaseData.h"
+#include <mitkBaseDataSource.h>
+#include <mitkBaseData.h>
 
 mitk::BaseDataSource::BaseDataSource()
 {

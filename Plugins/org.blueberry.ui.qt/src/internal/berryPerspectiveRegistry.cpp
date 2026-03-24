@@ -20,8 +20,8 @@ found in the LICENSE file.
 #include "berryPerspectiveRegistryReader.h"
 #include "berryPlatformUI.h"
 #include "handlers/berryClosePerspectiveHandler.h"
-#include "berryIExtension.h"
-#include "berryIExtensionTracker.h"
+#include <berryIExtension.h>
+#include <berryIExtensionTracker.h>
 
 #include <mitkIPreferences.h>
 

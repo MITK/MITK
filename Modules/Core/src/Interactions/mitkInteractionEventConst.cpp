@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionEventConst.h"
+#include <mitkInteractionEventConst.h>
 
 namespace mitk
 {

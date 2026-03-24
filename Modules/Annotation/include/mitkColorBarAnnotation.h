@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkColorBarAnnotation_h
 #define mitkColorBarAnnotation_h
 
-#include "MitkAnnotationExports.h"
+#include <MitkAnnotationExports.h>
 #include <mitkLocalStorageHandler.h>
 #include <mitkVtkAnnotation.h>
 #include <vtkLookupTable.h>

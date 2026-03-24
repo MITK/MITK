@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMDCMTKTagScanner.h"
-#include "mitkDICOMFileReaderTestHelper.h"
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMFileReaderTestHelper.h>
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 
 class mitkDICOMDCMTKTagScannerTestSuite : public mitk::TestFixture
 {

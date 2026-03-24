@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegisterClasses.h"
-#include "Step6.h"
+#include <QmitkRegisterClasses.h>
+#include <Step6.h>
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
 #include <QApplication>
 #include <itksys/SystemTools.hxx>

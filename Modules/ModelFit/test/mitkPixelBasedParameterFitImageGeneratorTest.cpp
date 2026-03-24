@@ -12,18 +12,18 @@ found in the LICENSE file.
 
 #include <iostream>
 
-#include "itkImageRegionIterator.h"
+#include <itkImageRegionIterator.h>
 
-#include "mitkTestingMacros.h"
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkTestingMacros.h>
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 
-#include "mitkPixelBasedParameterFitImageGenerator.h"
-#include "mitkLinearModelParameterizer.h"
+#include <mitkPixelBasedParameterFitImageGenerator.h>
+#include <mitkLinearModelParameterizer.h>
 
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
 
-#include "mitkTestDynamicImageGenerator.h"
+#include <mitkTestDynamicImageGenerator.h>
 
 int mitkPixelBasedParameterFitImageGeneratorTest(int  /*argc*/, char*[] /*argv[]*/)
 {

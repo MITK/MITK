@@ -10,24 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkException.h"
+#include <mitkException.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 #include <mitkUtf8Util.h>
-#include "mitkITKImageImport.h"
+#include <mitkITKImageImport.h>
 #include <mitkExtractSliceFilter.h>
 
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 #include <itkImageRegionIterator.h>
 
 #include <fstream>
 #include <iostream>
 
 #ifdef WIN32
-#include "process.h"
+#include <process.h>
 #else
 #include <unistd.h>
 #endif

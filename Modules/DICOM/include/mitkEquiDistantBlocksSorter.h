@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkEquiDistantBlocksSorter_h
 #define mitkEquiDistantBlocksSorter_h
 
-#include "mitkDICOMDatasetSorter.h"
-#include "mitkDICOMSortCriterion.h"
-#include "mitkGantryTiltInformation.h"
+#include <mitkDICOMDatasetSorter.h>
+#include <mitkDICOMSortCriterion.h>
+#include <mitkGantryTiltInformation.h>
 
-#include "mitkVector.h"
+#include <mitkVector.h>
 
 namespace mitk
 {

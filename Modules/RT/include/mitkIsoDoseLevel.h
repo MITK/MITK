@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
-#include "mitkCommon.h"
-#include "mitkDoseValueType.h"
-#include "MitkRTExports.h"
+#include <mitkCommon.h>
+#include <mitkDoseValueType.h>
+#include <MitkRTExports.h>
 
 namespace mitk
 {

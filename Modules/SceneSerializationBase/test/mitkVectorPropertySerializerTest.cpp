@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkVectorProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkVectorProperty.h>
 #include <mitkLexicalCast.h>
 
 #include <limits>
 #include <cmath>
 
-#include "mitkEqual.h"
+#include <mitkEqual.h>
 
 #include <tinyxml2.h>
 

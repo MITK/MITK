@@ -17,8 +17,8 @@ https://github.com/BIDS/colormap/blob/master/colormaps.py
 
 ============================================================================*/
 
-#ifndef _lut_Plasma_h_
-#define _lut_Plasma_h_
+#ifndef Plasma_h
+#define Plasma_h
 
 static const int Plasma[256][3] =
 { { 13, 8, 135 },{ 16, 7, 136 },{ 19, 7, 137 },{ 22, 7, 138 },{ 25, 6, 140 },{ 27, 6, 141 },{ 29, 6, 142 },{ 32, 6, 143 },

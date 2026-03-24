@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOUtil.h"
-#include "mitkImage.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkSurface.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkSurface.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 #include <vtkPolyData.h>
 #include <vtkSTLReader.h>
 #include <vtkSmartPointer.h>

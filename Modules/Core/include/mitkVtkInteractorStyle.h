@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkInteractorStyle_h
 #define mitkVtkInteractorStyle_h
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 #include <vtkInteractorStyleUser.h>
 
 namespace mitk

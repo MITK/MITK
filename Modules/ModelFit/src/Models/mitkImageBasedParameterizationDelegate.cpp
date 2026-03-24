@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageBasedParameterizationDelegate.h"
+#include <mitkImageBasedParameterizationDelegate.h>
 
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkPixelTypeMultiplex.h"
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 
 mitk::ImageBasedParameterizationDelegate::ImageBasedParameterizationDelegate()
 {

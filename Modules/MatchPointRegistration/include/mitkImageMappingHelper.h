@@ -14,14 +14,14 @@ found in the LICENSE file.
 #ifndef mitkImageMappingHelper_h
 #define mitkImageMappingHelper_h
 
-#include "mapImageMappingTask.h"
-#include "mapRegistrationBase.h"
-#include "mitkImage.h"
-#include "mitkGeometry3D.h"
+#include <mapImageMappingTask.h>
+#include <mapRegistrationBase.h>
+#include <mitkImage.h>
+#include <mitkGeometry3D.h>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

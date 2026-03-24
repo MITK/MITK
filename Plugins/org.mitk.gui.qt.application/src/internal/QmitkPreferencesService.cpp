@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkPreferencesService.h"
-#include <QmitkPreferencesDialog.h>
+#include "QmitkPreferencesDialog.h"
 
 #include <mitkCoreServices.h>
 

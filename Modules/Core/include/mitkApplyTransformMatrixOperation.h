@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkApplyTransformMatrixOperation_h
 #define mitkApplyTransformMatrixOperation_h
 
-#include "mitkCommon.h"
-#include "mitkPointOperation.h"
+#include <mitkCommon.h>
+#include <mitkPointOperation.h>
 
 #include <vtkMatrix4x4.h>
 #include <vtkSmartPointer.h>

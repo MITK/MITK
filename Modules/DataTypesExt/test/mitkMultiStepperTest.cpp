@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiStepper.h"
-#include "mitkStepper.h"
-#include "mitkTestingMacros.h"
+#include <mitkMultiStepper.h>
+#include <mitkStepper.h>
+#include <mitkTestingMacros.h>
 
 int mitkMultiStepperTest(int /*argc*/, char * /*argv*/ [])
 {

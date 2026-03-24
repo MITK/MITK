@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkNodeDescriptorManager.h>
 #include <memory>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>

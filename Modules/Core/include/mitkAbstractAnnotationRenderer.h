@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkAbstractAnnotationRenderer_h
 #define mitkAbstractAnnotationRenderer_h
 
-#include "mitkAnnotation.h"
-#include "mitkServiceInterface.h"
-#include "usGetModuleContext.h"
-#include "usServiceTracker.h"
+#include <mitkAnnotation.h>
+#include <mitkServiceInterface.h>
+#include <usGetModuleContext.h>
+#include <usServiceTracker.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 

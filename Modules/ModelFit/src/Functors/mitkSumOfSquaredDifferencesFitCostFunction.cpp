@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSumOfSquaredDifferencesFitCostFunction.h"
+#include <mitkSumOfSquaredDifferencesFitCostFunction.h>
 
 mitk::SumOfSquaredDifferencesFitCostFunction::MeasureType mitk::SumOfSquaredDifferencesFitCostFunction::CalcMeasure(const ParametersType & /*parameters*/, const SignalType &signal) const
 {

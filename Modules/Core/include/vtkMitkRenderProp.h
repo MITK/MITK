@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
-#define VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
+#ifndef vtkMitkRenderProp_h
+#define vtkMitkRenderProp_h
 
-#include "mitkVtkPropRenderer.h"
-#include "vtkProp.h"
+#include <mitkVtkPropRenderer.h>
+#include <vtkProp.h>
 
 /*!
 \brief vtkMitkRenderProp
@@ -75,4 +75,4 @@ protected:
   mitk::VtkPropRenderer::Pointer m_VtkPropRenderer;
 };
 
-#endif /* VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723 */
+#endif /* vtkMitkRenderProp_h */

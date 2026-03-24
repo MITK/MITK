@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkPlaneGeometryDataToSurfaceFilter_h
 #define mitkPlaneGeometryDataToSurfaceFilter_h
 
-#include "mitkGeometry3D.h"
-#include "mitkSurfaceSource.h"
-#include "vtkSystemIncludes.h"
+#include <mitkGeometry3D.h>
+#include <mitkSurfaceSource.h>
+#include <vtkSystemIncludes.h>
 
 class vtkPlaneSource;
 class vtkTransformPolyDataFilter;

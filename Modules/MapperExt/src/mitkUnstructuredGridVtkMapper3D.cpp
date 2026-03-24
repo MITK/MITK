@@ -10,20 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkUnstructuredGridVtkMapper3D.h"
-#include "mitkColorProperty.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
-#include "mitkTransferFunctionProperty.h"
+#include <mitkUnstructuredGridVtkMapper3D.h>
+#include <mitkColorProperty.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
+#include <mitkTransferFunctionProperty.h>
 //#include "mitkLookupTableProperty.h"
-#include "mitkGridRepresentationProperty.h"
-#include "mitkGridVolumeMapperProperty.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkScalarModeProperty.h"
+#include <mitkGridRepresentationProperty.h>
+#include <mitkGridVolumeMapperProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
 
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 
-#include "mitkSurfaceVtkMapper3D.h"
+#include <mitkSurfaceVtkMapper3D.h>
 
 #include <vtkProperty.h>
 #include <vtkUnstructuredGrid.h>

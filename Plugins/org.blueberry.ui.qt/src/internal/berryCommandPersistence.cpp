@@ -12,19 +12,19 @@ found in the LICENSE file.
 
 #include "berryCommandPersistence.h"
 
-#include "berryHandleObject.h"
-#include "berryStatus.h"
+#include <berryHandleObject.h>
+#include <berryStatus.h>
 #include "berryICommandService.h"
-#include "berryIConfigurationElement.h"
-#include "berryCommandCategory.h"
-#include "berryCommand.h"
+#include <berryIConfigurationElement.h>
+#include <berryCommandCategory.h>
+#include <berryCommand.h>
 #include "berryCommandParameter.h"
-#include "berryParameterType.h"
+#include <berryParameterType.h>
 #include "berryParameterValueConverterProxy.h"
 #include "berryCommandStateProxy.h"
-#include "berryIExtensionRegistry.h"
-#include "berryIExtension.h"
-#include "berryPlatform.h"
+#include <berryIExtensionRegistry.h>
+#include <berryIExtension.h>
+#include <berryPlatform.h>
 #include "berryPlatformUI.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryCommandService.h"

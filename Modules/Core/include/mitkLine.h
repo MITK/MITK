@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLine_h
 #define mitkLine_h
 
-#include "mitkNumericTypes.h"
+#include <mitkNumericTypes.h>
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_cross.h>

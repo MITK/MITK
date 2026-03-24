@@ -14,12 +14,12 @@ found in the LICENSE file.
 #ifndef mitkPointSetMappingHelper_h
 #define mitkPointSetMappingHelper_h
 
-#include "mapRegistrationBase.h"
+#include <mapRegistrationBase.h>
 #include <mitkPointSet.h>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

@@ -43,7 +43,7 @@ found in the LICENSE file.
 
 #include "berryPlatformUI.h"
 
-#include "berryDebugUtil.h"
+#include <berryDebugUtil.h>
 
 #include <QMainWindow>
 #include <QHBoxLayout>

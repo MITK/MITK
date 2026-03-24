@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef QmitkNodeSelectionPreferencePage_h
 #define QmitkNodeSelectionPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
-#include "mitkDataStorageInspectorGenerator.h"
+#include <mitkDataStorageInspectorGenerator.h>
 
 #include <memory>
 

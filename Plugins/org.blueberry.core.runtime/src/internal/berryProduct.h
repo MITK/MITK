@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPRODUCT_H
 #define BERRYPRODUCT_H
 
-#include <berryIProduct.h>
+#include "berryIProduct.h"
 
 namespace berry {
 

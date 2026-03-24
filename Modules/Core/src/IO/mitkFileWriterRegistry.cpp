@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileWriterRegistry.h"
+#include <mitkFileWriterRegistry.h>
 
 // MITK
-#include "mitkBaseData.h"
-#include "mitkCoreServices.h"
-#include "mitkIMimeTypeProvider.h"
+#include <mitkBaseData.h>
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
 
 // Microservices
 #include <usGetModuleContext.h>

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkColorBarAnnotation.h"
-#include "mitkLookupTable.h"
-#include "mitkLookupTableProperty.h"
+#include <mitkColorBarAnnotation.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <vtkScalarBarActor.h>
 
 mitk::ColorBarAnnotation::ColorBarAnnotation()

@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "berryExtensionFactory.h"
 
-#include "berryIConfigurationElement.h"
+#include <berryIConfigurationElement.h>
 
-#include "berryCoreException.h"
-#include "berryObjectString.h"
+#include <berryCoreException.h>
+#include <berryObjectString.h>
 #include "berryPlatformUI.h"
-#include "berryStatus.h"
+#include <berryStatus.h>
 
 #include "internal/berryQtStylePreferencePage.h"
 #include "internal/dialogs/berryPerspectivesPreferencePage.h"

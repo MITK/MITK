@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSet.h"
-#include "mitkInteractionConst.h"
-#include "mitkPointOperation.h"
+#include <mitkPointSet.h>
+#include <mitkInteractionConst.h>
+#include <mitkPointOperation.h>
 
 #include <iomanip>
 #include <mitkNumericTypes.h>

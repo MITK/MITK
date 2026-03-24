@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkCLResultWriter_h
 #define mitkCLResultWriter_h
 
-#include "MitkCLUtilitiesExports.h"
+#include <MitkCLUtilitiesExports.h>
 
 #include <sstream>
 #include <fstream>

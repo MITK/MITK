@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarPolygon.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarPolygon.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 // stl related includes
 #include <algorithm>

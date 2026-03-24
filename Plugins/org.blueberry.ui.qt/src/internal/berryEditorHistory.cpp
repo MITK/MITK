@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "berryIEditorDescriptor.h"
 #include "berryIMemento.h"
 
-#include "berryStatus.h"
+#include <berryStatus.h>
 
 #include "berryEditorHistoryItem.h"
 #include "berryWorkbenchConstants.h"

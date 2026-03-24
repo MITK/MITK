@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkCLResultXMLWriter_h
 #define mitkCLResultXMLWriter_h
 
-#include "MitkCLUtilitiesExports.h"
+#include <MitkCLUtilitiesExports.h>
 
-#include "mitkImage.h"
-#include "mitkAbstractGlobalImageFeature.h"
+#include <mitkImage.h>
+#include <mitkAbstractGlobalImageFeature.h>
 
 namespace mitk
 {

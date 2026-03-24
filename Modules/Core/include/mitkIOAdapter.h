@@ -12,9 +12,9 @@ found in the LICENSE file.
 #ifndef mitkIOAdapter_h
 #define mitkIOAdapter_h
 
-#include "mitkBaseProcess.h"
+#include <mitkBaseProcess.h>
 
-#include "itkObject.h"
+#include <itkObject.h>
 
 namespace mitk
 {

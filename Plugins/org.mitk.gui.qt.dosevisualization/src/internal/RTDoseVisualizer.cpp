@@ -46,12 +46,12 @@ found in the LICENSE file.
 #include <QmitkDoseVisualStyleDelegate.h>
 #include <QmitkIsoDoseLevelSetModel.h>
 #include <QmitkFreeIsoDoseLevelWidget.h>
-#include "QmitkRenderWindow.h"
+#include <QmitkRenderWindow.h>
 
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 #include <vtkMath.h>
-#include "vtkDecimatePro.h"
+#include <vtkDecimatePro.h>
 
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 

@@ -11,14 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 // MITK includes
 #include <mitkCoreServices.h>
-#include "mitkImage.h"
-#include "mitkImageGenerator.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkImageStatisticsHolder.h"
+#include <mitkImage.h>
+#include <mitkImageGenerator.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageStatisticsHolder.h>
 
 class mitkImageGeneratorTestSuite : public mitk::TestFixture
 {

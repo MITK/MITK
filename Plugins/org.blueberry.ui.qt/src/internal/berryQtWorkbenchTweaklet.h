@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYQTWORKBENCHTWEAKLET_H_
 #define BERRYQTWORKBENCHTWEAKLET_H_
 
-#include <berryWorkbenchTweaklet.h>
+#include "berryWorkbenchTweaklet.h"
 
 #include <org_blueberry_ui_qt_Export.h>
 

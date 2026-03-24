@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef _BERRYIJOBSTATUS_H
 #define _BERRYIJOBSTATUS_H
 
-#include "berryIStatus.h"
-#include "berryObject.h"
+#include <berryIStatus.h>
+#include <berryObject.h>
 #include "berryJob.h"
 
  namespace berry {

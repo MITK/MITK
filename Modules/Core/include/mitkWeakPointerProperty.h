@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkWeakPointerProperty_h
 #define mitkWeakPointerProperty_h
 
-#include "itkWeakPointer.h"
-#include "mitkBaseProperty.h"
+#include <itkWeakPointer.h>
+#include <mitkBaseProperty.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

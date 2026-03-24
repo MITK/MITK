@@ -13,14 +13,14 @@ found in the LICENSE file.
 #ifndef mitkDICOMFileReader_h
 #define mitkDICOMFileReader_h
 
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
-#include "mitkDICOMTagCache.h"
+#include <mitkDICOMTagCache.h>
 
-#include "mitkDICOMImageBlockDescriptor.h"
+#include <mitkDICOMImageBlockDescriptor.h>
 
 #include <unordered_map>
 

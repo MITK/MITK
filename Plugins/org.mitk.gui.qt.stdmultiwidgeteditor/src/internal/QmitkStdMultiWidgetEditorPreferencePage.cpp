@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
 #include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
-#include <QmitkStdMultiWidgetEditor.h>
+#include "QmitkStdMultiWidgetEditor.h"
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

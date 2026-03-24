@@ -12,11 +12,11 @@ found in the LICENSE file.
 
 #include "berryViewDescriptor.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryCoreException.h"
-#include "berryIExtension.h"
-#include "berryIContributor.h"
-#include "berryStatus.h"
+#include <berryIConfigurationElement.h>
+#include <berryCoreException.h>
+#include <berryIExtension.h>
+#include <berryIContributor.h>
+#include <berryStatus.h>
 
 #include "berryRegistryReader.h"
 #include "berryWorkbenchRegistryConstants.h"

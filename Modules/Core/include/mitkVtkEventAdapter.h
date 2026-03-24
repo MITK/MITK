@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef mitkVtkEventAdapter_h
 #define mitkVtkEventAdapter_h
 
-#include "mitkInteractionKeyEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkMousePressEvent.h"
-#include "mitkMouseReleaseEvent.h"
-#include "mitkMouseWheelEvent.h"
+#include <mitkInteractionKeyEvent.h>
+#include <mitkMouseMoveEvent.h>
+#include <mitkMousePressEvent.h>
+#include <mitkMouseReleaseEvent.h>
+#include <mitkMouseWheelEvent.h>
 
-#include "vtkRenderWindowInteractor.h"
+#include <vtkRenderWindowInteractor.h>
 
 //##Documentation
 //## @brief Generates MITK events from VTK

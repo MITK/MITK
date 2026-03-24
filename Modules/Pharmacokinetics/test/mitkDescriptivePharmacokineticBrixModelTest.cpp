@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
  //Testing
-#include "mitkModelTestFixture.h"
+#include <mitkModelTestFixture.h>
 
 //MITK includes
-#include "mitkDescriptivePharmacokineticBrixModel.h"
+#include <mitkDescriptivePharmacokineticBrixModel.h>
 
 
   class mitkDescriptivePharmacokineticBrixModelTestSuite : public mitk::mitkModelTestFixture

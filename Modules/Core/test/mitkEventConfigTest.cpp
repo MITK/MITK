@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEventConfig.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
-#include "mitkInteractionKeyEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkMousePressEvent.h"
-#include "mitkMouseReleaseEvent.h"
-#include "mitkMouseWheelEvent.h"
-#include "mitkPropertyList.h"
-#include "mitkTestingMacros.h"
-#include "usGetModuleContext.h"
-#include "usModule.h"
+#include <mitkEventConfig.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
+#include <mitkInteractionKeyEvent.h>
+#include <mitkMouseMoveEvent.h>
+#include <mitkMousePressEvent.h>
+#include <mitkMouseReleaseEvent.h>
+#include <mitkMouseWheelEvent.h>
+#include <mitkPropertyList.h>
+#include <mitkTestingMacros.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
 #include <fstream>
 #include <iostream>
 #include <string>

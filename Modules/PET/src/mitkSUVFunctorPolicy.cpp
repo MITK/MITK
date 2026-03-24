@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkSUVFunctorPolicy.h"
+#include <mitkSUVFunctorPolicy.h>
 
-#include "mitkSUVCalculation.h"
+#include <mitkSUVCalculation.h>
 
 
     mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy()

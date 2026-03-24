@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef BERRYAPPLICATIONHANDLE_H
 #define BERRYAPPLICATIONHANDLE_H
 
-#include <berryIApplicationContext.h>
+#include "berryIApplicationContext.h"
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include "berryApplicationDescriptor.h"
 

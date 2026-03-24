@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkRenderWindowUtilityWidget_h
 #define QmitkRenderWindowUtilityWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // qt widgets module
 #include <QmitkSynchronizedNodeSelectionWidget.h>

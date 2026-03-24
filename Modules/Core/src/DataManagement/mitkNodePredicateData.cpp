@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateData.h"
+#include <mitkNodePredicateData.h>
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 
 mitk::NodePredicateData::NodePredicateData(mitk::BaseData *d) : NodePredicateBase()
 {

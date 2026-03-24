@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertiesTableEditor.h"
+#include <QmitkPropertiesTableEditor.h>
 
-#include "QmitkPropertiesTableModel.h"
-#include "QmitkPropertyDelegate.h"
+#include <QmitkPropertiesTableModel.h>
+#include <QmitkPropertyDelegate.h>
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 #include <QHBoxLayout>
 #include <QHeaderView>

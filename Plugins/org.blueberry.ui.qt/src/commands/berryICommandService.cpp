@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryICommandService.h"
 
-#include "berryCommandManager.h"
+#include <berryCommandManager.h>
 
 namespace berry {
 

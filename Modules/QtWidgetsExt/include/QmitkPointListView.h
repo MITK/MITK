@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkPointListView_h
 #define QmitkPointListView_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <QmitkPointListModel.h>
 

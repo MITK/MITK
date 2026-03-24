@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkFileWriterWithInformation_h
 #define mitkFileWriterWithInformation_h
 
-#include "mitkBaseData.h"
-#include "mitkFileWriter.h"
+#include <mitkBaseData.h>
+#include <mitkFileWriter.h>
 
 namespace mitk
 {

@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 // render window manager UI module
-#include "QmitkRenderWindowDataStorageInspector.h"
+#include <QmitkRenderWindowDataStorageInspector.h>
 #include <ui_QmitkRenderWindowDataStorageInspector.h>
 
-#include "QmitkCustomVariants.h"
+#include <QmitkCustomVariants.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>

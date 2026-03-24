@@ -22,7 +22,7 @@ found in the LICENSE file.
 
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-#include "QmitkSelectionServiceConnector.h"
+#include <QmitkSelectionServiceConnector.h>
 #include <memory>
 
 namespace Ui

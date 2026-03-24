@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkCovarianceMatrixCalculator_h
 
 // exports
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 #include <mitkCommon.h>
 

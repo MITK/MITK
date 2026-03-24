@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiWidgetConfigurationToolBar.h"
+#include <QmitkMultiWidgetConfigurationToolBar.h>
 
 // mitk qt widgets module
-#include "QmitkAbstractMultiWidget.h"
-#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+#include <QmitkAbstractMultiWidget.h>
+#include <QmitkMultiWidgetLayoutSelectionWidget.h>
 
 QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget)
   : QToolBar(multiWidget)

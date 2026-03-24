@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMSortByTag_h
 #define mitkDICOMSortByTag_h
 
-#include "mitkDICOMSortCriterion.h"
+#include <mitkDICOMSortCriterion.h>
 
 namespace mitk
 {

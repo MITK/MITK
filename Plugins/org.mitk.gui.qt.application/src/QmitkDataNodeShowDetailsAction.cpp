@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeShowDetailsAction.h>
+#include "QmitkDataNodeShowDetailsAction.h"
 
-#include "QmitkNodeDetailsDialog.h"
+#include <QmitkNodeDetailsDialog.h>
 
 namespace ShowDetailsAction
 {

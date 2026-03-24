@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVectorPropertySerializer.h"
+#include <mitkVectorPropertySerializer.h>
 
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(DoubleVectorPropertySerializer)

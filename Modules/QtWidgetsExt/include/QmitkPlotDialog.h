@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkPlotDialog_h
 #define QmitkPlotDialog_h
 
-#include "MitkQtWidgetsExtExports.h"
-#include "mitkCommon.h"
+#include <MitkQtWidgetsExtExports.h>
+#include <mitkCommon.h>
 #include <QmitkPlotWidget.h>
 #include <QDialog>
 

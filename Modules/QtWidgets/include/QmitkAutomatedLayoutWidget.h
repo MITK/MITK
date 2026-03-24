@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkAutomatedLayoutDialog_h
-#define QmitkAutomatedLayoutDialog_h
+#ifndef QmitkAutomatedLayoutWidget_h
+#define QmitkAutomatedLayoutWidget_h
 
 #include <MitkQtWidgetsExports.h>
 

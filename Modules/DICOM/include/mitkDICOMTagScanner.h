@@ -16,10 +16,10 @@ found in the LICENSE file.
 #include <stack>
 #include <mutex>
 
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMTagPath.h"
-#include "mitkDICOMTagCache.h"
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMTagPath.h>
+#include <mitkDICOMTagCache.h>
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
 namespace mitk
 {

@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __vtkMaskedGlyph3D_h
-#define __vtkMaskedGlyph3D_h
+#ifndef vtkMaskedGlyph3D_h
+#define vtkMaskedGlyph3D_h
 
-#include "MitkMapperExtExports.h"
+#include <MitkMapperExtExports.h>
 
-#include "vtkGlyph3D.h"
+#include <vtkGlyph3D.h>
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 
 class vtkMaskPoints;
 /**

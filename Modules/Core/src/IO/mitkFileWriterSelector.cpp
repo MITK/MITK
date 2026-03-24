@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileWriterSelector.h"
+#include <mitkFileWriterSelector.h>
 
 #include <mitkBaseData.h>
 #include <mitkCoreServices.h>

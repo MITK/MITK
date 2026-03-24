@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInitialParameterizationDelegateBase.h"
+#include <mitkInitialParameterizationDelegateBase.h>
 
 
 mitk::InitialParameterizationDelegateBase::InitialParameterizationDelegateBase()

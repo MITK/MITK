@@ -16,10 +16,10 @@ found in the LICENSE file.
 #include <itkIndex.h>
 #include <vnl/vnl_quaternion.h>
 
-#include "mitkMatrix.h"
-#include "mitkNumericConstants.h"
-#include "mitkPoint.h"
-#include "mitkVector.h"
+#include <mitkMatrix.h>
+#include <mitkNumericConstants.h>
+#include <mitkPoint.h>
+#include <mitkVector.h>
 
 template <class T>
 class VectorTraits

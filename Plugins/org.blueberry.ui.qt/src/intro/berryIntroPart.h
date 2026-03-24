@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 #include <berryIConfigurationElement.h>
 #include <berryIExecutableExtension.h>
-#include <berryIPropertyChangeListener.h>
+#include "berryIPropertyChangeListener.h"
 
 #include <QIcon>
 

@@ -11,9 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk includes
-#include "mitkMultiComponentImageDataComparisonFilter.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkMultiComponentImageDataComparisonFilter.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageReadAccessor.h>
 
 namespace mitk
 {

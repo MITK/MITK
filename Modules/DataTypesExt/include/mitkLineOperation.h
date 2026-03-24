@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkLineOperation_h
 #define mitkLineOperation_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCellOperation.h"
-#include "mitkCommon.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCellOperation.h>
+#include <mitkCommon.h>
 
 namespace mitk
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPlaneOperation_h
 #define mitkPlaneOperation_h
 
-#include "mitkNumericTypes.h"
-#include "mitkPointOperation.h"
+#include <mitkNumericTypes.h>
+#include <mitkPointOperation.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

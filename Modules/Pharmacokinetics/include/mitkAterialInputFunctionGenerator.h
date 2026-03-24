@@ -14,8 +14,8 @@ found in the LICENSE file.
 #define mitkAterialInputFunctionGenerator_h
 
 #include <mitkImage.h>
-#include "mitkAIFBasedModelBase.h"
-#include "MitkPharmacokineticsExports.h"
+#include <mitkAIFBasedModelBase.h>
+#include <MitkPharmacokineticsExports.h>
 
 
 namespace mitk

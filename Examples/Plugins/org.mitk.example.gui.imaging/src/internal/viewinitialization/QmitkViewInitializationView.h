@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
 
-#include "vtkRenderWindow.h"
+#include <vtkRenderWindow.h>
 #include <string>
 #include <memory>
 

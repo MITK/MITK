@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "berryPerspectivesPreferencePage.h"
 #include <ui_berryPerspectivesPreferencePage.h>
 
-#include <berryIWorkbenchPage.h>
+#include "berryIWorkbenchPage.h"
 
 #include "internal/berryPerspective.h"
 #include "internal/berryPerspectiveRegistry.h"

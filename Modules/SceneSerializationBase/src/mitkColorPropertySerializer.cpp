@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkColorPropertySerializer_h_included
 #define mitkColorPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkColorProperty.h"
-#include "mitkStringsToNumbers.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkColorProperty.h>
+#include <mitkStringsToNumbers.h>
 #include <mitkLocaleSwitch.h>
 
 #include <array>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkXnatCreateObjectDialog.h"
+#include <QmitkXnatCreateObjectDialog.h>
 
 // XNAT
 #include <QmitkXnatExperimentWidget.h>

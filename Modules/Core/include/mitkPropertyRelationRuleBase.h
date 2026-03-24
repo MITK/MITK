@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkPropertyRelationRuleBase_h
 #define mitkPropertyRelationRuleBase_h
 
-#include "mitkIPropertyOwner.h"
-#include "mitkIdentifiable.h"
+#include <mitkIPropertyOwner.h>
+#include <mitkIdentifiable.h>
 
-#include "mitkException.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkPropertyKeyPath.h"
+#include <mitkException.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkPropertyKeyPath.h>
 
 #include <MitkCoreExports.h>
 

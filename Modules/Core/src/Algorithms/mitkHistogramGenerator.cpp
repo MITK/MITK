@@ -14,9 +14,9 @@ found in the LICENSE file.
 #include <itkFixedCenterOfRotationAffineTransform.h>
 #endif
 
-#include "mitkHistogramGenerator.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageTimeSelector.h"
+#include <mitkHistogramGenerator.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageTimeSelector.h>
 
 //
 // The new ITK Statistics framework has
@@ -24,9 +24,9 @@ found in the LICENSE file.
 // MITKScalarImageToHistogramGenerator.h, but
 // no longer has the classis the MITK class depends on.
 #if !defined(ITK_USE_REVIEW_STATISTICS)
-#include "itkMITKScalarImageToHistogramGenerator.h"
+#include <itkMITKScalarImageToHistogramGenerator.h>
 #else
-#include "itkScalarImageToHistogramGenerator.h"
+#include <itkScalarImageToHistogramGenerator.h>
 #endif
 
 mitk::HistogramGenerator::HistogramGenerator() : m_Image(nullptr), m_Size(256), m_Histogram(nullptr)

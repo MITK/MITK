@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGeometry3D.h"
-#include "mitkBaseDataTestImplementation.h"
-#include "mitkNodePredicateDataProperty.h"
-#include "mitkDataNode.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
-#include "mitkStringProperty.h"
+#include <mitkGeometry3D.h>
+#include <mitkBaseDataTestImplementation.h>
+#include <mitkNodePredicateDataProperty.h>
+#include <mitkDataNode.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
+#include <mitkStringProperty.h>
 
 
 class mitkNodePredicateDataPropertyTestSuite : public mitk::TestFixture

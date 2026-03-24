@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCurveDescriptionParameterBase.h"
-#include "itkMacro.h"
+#include <mitkCurveDescriptionParameterBase.h>
+#include <itkMacro.h>
 
 #include <algorithm>
 

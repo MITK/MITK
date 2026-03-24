@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLimitedLinearUndo.h"
+#include <mitkLimitedLinearUndo.h>
 #include <mitkRenderingManager.h>
 
 namespace mitk

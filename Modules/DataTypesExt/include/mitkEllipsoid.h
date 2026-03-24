@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkEllipsoid_h
 #define mitkEllipsoid_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkBoundingObject.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkBoundingObject.h>
 
 namespace mitk
 {

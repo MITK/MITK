@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMProperty.h"
+#include <mitkDICOMProperty.h>
 
 
 mitk::BaseProperty::Pointer

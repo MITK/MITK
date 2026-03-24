@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkAlgorithmInfoSelectionProvider.h"
-#include "mitkMAPAlgorithmInfoSelection.h"
+#include <mitkMAPAlgorithmInfoSelection.h>
 
 namespace mitk {
 

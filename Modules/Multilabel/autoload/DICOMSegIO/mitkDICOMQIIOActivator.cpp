@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceEvent.h>
 
-#include "mitkDICOMSegmentationIO.h"
+#include <mitkDICOMSegmentationIO.h>
 
 #include <mitkDICOMSegIOMimeTypes.h>
 

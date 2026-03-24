@@ -11,12 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk includes
-#include "mitkIOUtil.h"
-#include "mitkImageReadAccessor.h"
-#include "mitkMultiComponentImageDataComparisonFilter.h"
-#include "mitkTestingMacros.h"
+#include <mitkIOUtil.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkMultiComponentImageDataComparisonFilter.h>
+#include <mitkTestingMacros.h>
 
-#include "itkNumericTraits.h"
+#include <itkNumericTraits.h>
 
 int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char *argv[])
 {

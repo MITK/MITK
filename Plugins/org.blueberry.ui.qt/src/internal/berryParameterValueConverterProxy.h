@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPARAMETERVALUECONVERTERPROXY_H
 #define BERRYPARAMETERVALUECONVERTERPROXY_H
 
-#include "berryIParameterValueConverter.h"
+#include <berryIParameterValueConverter.h>
 
 #include <QSharedPointer>
 

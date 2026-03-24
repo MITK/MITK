@@ -5,10 +5,10 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitknnInteractiveInstallDialog.ui
-  src/QmitknnInteractiveToolGUI.ui
+  QmitknnInteractiveInstallDialog.ui
+  QmitknnInteractiveToolGUI.ui
 )
 
 set(QRC_FILES
-  Resources/nnInteractive/nnInteractive.qrc
+  nnInteractive/nnInteractive.qrc
 )

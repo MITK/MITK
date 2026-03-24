@@ -13,8 +13,8 @@ found in the LICENSE file.
 
 #include "berryPerspectiveListModel.h"
 
-#include <berryIPerspectiveRegistry.h>
-#include <berryIPerspectiveDescriptor.h>
+#include "berryIPerspectiveRegistry.h"
+#include "berryIPerspectiveDescriptor.h"
 
 #include <QIcon>
 

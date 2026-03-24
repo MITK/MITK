@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYIEVALUATIONSERVICE_H
 #define BERRYIEVALUATIONSERVICE_H
 
-#include <berryIServiceWithSources.h>
+#include "berryIServiceWithSources.h"
 
 #include <org_blueberry_ui_qt_Export.h>
 

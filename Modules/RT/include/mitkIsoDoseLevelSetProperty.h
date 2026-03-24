@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef mitkIsoDoseLevelSetProperty_h
 #define mitkIsoDoseLevelSetProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkIsoDoseLevelCollections.h"
-#include "MitkRTExports.h"
+#include <mitkBaseProperty.h>
+#include <mitkIsoDoseLevelCollections.h>
+#include <MitkRTExports.h>
 
 namespace mitk {
 

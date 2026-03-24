@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPointSet_h
 #define mitkPointSet_h
 
-#include "mitkBaseData.h"
+#include <mitkBaseData.h>
 
 #include <itkDefaultDynamicMeshTraits.h>
 #include <itkMesh.h>

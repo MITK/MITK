@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkClippingPropertySerializer_h_included
 #define mitkClippingPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkClippingProperty.h"
-#include "mitkNumericTypes.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkClippingProperty.h>
+#include <mitkNumericTypes.h>
 #include <mitkLocaleSwitch.h>
 
-#include "mitkStringsToNumbers.h"
+#include <mitkStringsToNumbers.h>
 
 #include <array>
 

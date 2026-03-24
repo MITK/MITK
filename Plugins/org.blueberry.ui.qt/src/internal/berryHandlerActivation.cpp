@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "berryHandlerActivation.h"
 
 #include "berryISources.h"
-#include "berryIHandler.h"
-#include "berryExpression.h"
+#include <berryIHandler.h>
+#include <berryExpression.h>
 
 namespace berry {
 

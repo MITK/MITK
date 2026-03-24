@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkInterpolationProperty_h
 #define mitkVtkInterpolationProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

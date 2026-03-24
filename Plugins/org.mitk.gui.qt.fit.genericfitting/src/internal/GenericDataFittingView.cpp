@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "GenericDataFittingView.h"
 #include <ui_GenericDataFittingViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkLinearModelFactory.h>
 #include <mitkLinearModelParameterizer.h>
@@ -24,10 +24,10 @@ found in the LICENSE file.
 #include <mitkExponentialSaturationModel.h>
 #include <mitkExponentialSaturationModelFactory.h>
 #include <mitkExponentialSaturationModelParameterizer.h>
-#include "mitkTwoStepLinearModelFactory.h"
-#include "mitkTwoStepLinearModelParameterizer.h"
-#include "mitkThreeStepLinearModelFactory.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkTwoStepLinearModelFactory.h>
+#include <mitkTwoStepLinearModelParameterizer.h>
+#include <mitkThreeStepLinearModelFactory.h>
+#include <mitkThreeStepLinearModelParameterizer.h>
 #include <mitkLabelSetImageConverter.h>
 
 #include <mitkValueBasedParameterizationDelegate.h>
@@ -37,7 +37,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkPixelBasedParameterFitImageGenerator.h>
 #include <mitkROIBasedParameterFitImageGenerator.h>
@@ -56,8 +56,8 @@ found in the LICENSE file.
 
 // Includes for image casting between ITK and MITK
 #include <mitkImage.h>
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 #include <iostream>

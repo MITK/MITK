@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoTissueCompartmentFDGModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkTwoTissueCompartmentFDGModel.h>
+#include <mitkConvolutionHelper.h>
 #include <fstream>
 const std::string mitk::TwoTissueCompartmentFDGModel::MODEL_DISPLAY_NAME = "Two Tissue Compartment Model for FDG (Sokoloff Model)";
 

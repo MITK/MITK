@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaximumCurveDescriptionParameter.h"
+#include <mitkMaximumCurveDescriptionParameter.h>
 #include <algorithm>
 
 const std::string mitk::MaximumCurveDescriptionParameter::PARAMETER_NAME = "MaximumConcentrationUptake";

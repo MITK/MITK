@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include <QmitkApplicationConstants.h>
+#include "QmitkApplicationConstants.h"
 
 #include <berryPlatformUI.h>
 

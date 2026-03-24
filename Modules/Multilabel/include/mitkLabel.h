@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkLabel_h
 #define mitkLabel_h
 
-#include "MitkMultilabelExports.h"
+#include <MitkMultilabelExports.h>
 #include <mitkColorProperty.h>
 #include <mitkPropertyList.h>
 #include <mitkPoint.h>

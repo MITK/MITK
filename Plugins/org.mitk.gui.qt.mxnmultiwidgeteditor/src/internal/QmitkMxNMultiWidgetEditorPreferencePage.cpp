@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 #include <ui_QmitkMxNMultiWidgetEditorPreferencePage.h>
-#include <QmitkMxNMultiWidgetEditor.h>
+#include "QmitkMxNMultiWidgetEditor.h"
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

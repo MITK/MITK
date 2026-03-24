@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkManualSelectingDICOMReaderService.h"
+#include <mitkManualSelectingDICOMReaderService.h>
 
 mitk::ManualSelectingDICOMReaderService::ManualSelectingDICOMReaderService()
   : BaseDICOMReaderService("MITK DICOM Reader v2 (manual)"), m_Selector(DICOMFileReaderSelector::New())

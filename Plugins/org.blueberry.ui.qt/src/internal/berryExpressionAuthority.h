@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYEXPRESSIONAUTHORITY_H
 #define BERRYEXPRESSIONAUTHORITY_H
 
-#include <berryISourceProviderListener.h>
+#include "berryISourceProviderListener.h"
 
 namespace berry {
 

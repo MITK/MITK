@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDispatcher.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventObserver.h"
-#include "mitkInternalEvent.h"
-#include "usGetModuleContext.h"
+#include <mitkDispatcher.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventObserver.h>
+#include <mitkInternalEvent.h>
+#include <usGetModuleContext.h>
 
 namespace
 {

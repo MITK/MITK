@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiLabelSegmentationMappingHelper.h"
+#include <mitkMultiLabelSegmentationMappingHelper.h>
 
 
 #include <mitkGeometry3D.h>
 
-#include "mapRegistration.h"
+#include <mapRegistration.h>
 
-#include "mitkImageMappingHelper.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkImageMappingHelper.h>
+#include <mitkRegistrationHelper.h>
 
 
 

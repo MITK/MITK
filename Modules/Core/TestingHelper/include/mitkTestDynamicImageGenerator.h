@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkTestDynamicImageGenerator_h
 #define mitkTestDynamicImageGenerator_h
 
-#include "itkImage.h"
-#include "itkImageRegionIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
 
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 
 #include <MitkTestingHelperExports.h>
 

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkCESTPropertyHelper_h
 #define mitkCESTPropertyHelper_h
 
-#include "mitkIPropertyProvider.h"
-#include "mitkIPropertyOwner.h"
+#include <mitkIPropertyProvider.h>
+#include <mitkIPropertyOwner.h>
 
-#include "MitkCESTExports.h"
+#include <MitkCESTExports.h>
 
 namespace mitk
 {

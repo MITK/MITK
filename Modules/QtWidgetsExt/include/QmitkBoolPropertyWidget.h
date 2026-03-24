@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkBoolPropertyWidget_h
 #define QmitkBoolPropertyWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QCheckBox>
 #include <mitkProperties.h>
 

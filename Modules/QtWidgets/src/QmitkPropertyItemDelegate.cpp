@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPropertyItemDelegate.h"
-#include "QmitkPropertyItemModel.h"
+#include <QmitkPropertyItemDelegate.h>
+#include <QmitkPropertyItemModel.h>
 #include <QApplication>
 #include <QColorDialog>
 #include <QComboBox>

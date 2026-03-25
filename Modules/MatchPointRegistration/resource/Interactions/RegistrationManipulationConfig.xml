@@ -37,6 +37,19 @@
     <attribute name="ButtonState" value="LeftMouseButton"/>
   </event_variant>
 
+  <!-- Hover preview: modifier held, no mouse button — foreshadow the gesture cursor.
+       No ButtonState attribute means "no button held". Listed before HoverNeutral so the
+       more-specific Shift/Ctrl variants are matched first. -->
+  <event_variant name="HoverTranslate" class="MouseMoveEvent">
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant name="HoverRotate" class="MouseMoveEvent">
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="HoverNeutral" class="MouseMoveEvent">
+    <!-- no restrictions: catch-all, must be listed last in state machine transitions -->
+  </event_variant>
+
   <!-- End interactions: release left mouse button.
        Four variants cover every modifier state that may be held at release time.
        MITK's event matching requires an exact match on the Modifiers attribute,

@@ -17,6 +17,18 @@
         <!-- Plain LeftMouse: position selection (drag or click) -->
         <transition event_class="MousePressEvent" event_variant="StartSelectPosition" target="selectingPosition">
         </transition>
+        <!-- Cursor foreshadowing: update hint cursor while hovering with a modifier held.
+             Self-transitions (target=start) so drag state is unaffected.
+             Order matters: Shift and Ctrl variants must come before the catch-all HoverNeutral. -->
+        <transition event_class="MouseMoveEvent" event_variant="HoverTranslate" target="start">
+            <action name="HintTranslate"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="HoverRotate" target="start">
+            <action name="HintRotate"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="HoverNeutral" target="start">
+            <action name="HintNeutral"/>
+        </transition>
     </state>
 
     <state name="translating">

@@ -88,6 +88,10 @@ void mitk::RegistrationManipulationInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_CONDITION("ScalingEnabled", ScalingEnabled);
 
+  CONNECT_FUNCTION("HintTranslate", HintTranslate);
+  CONNECT_FUNCTION("HintRotate",    HintRotate);
+  CONNECT_FUNCTION("HintNeutral",   HintNeutral);
+
   CONNECT_FUNCTION("InitTranslation", InitTranslation);
   CONNECT_FUNCTION("Translate", Translate);
   CONNECT_FUNCTION("EndTranslation", EndTranslation);
@@ -108,6 +112,36 @@ bool mitk::RegistrationManipulationInteractor::ScalingEnabled(const InteractionE
   return m_ScalingEnabled;
 }
 
+// --- Hover cursor foreshadowing ---
+
+void mitk::RegistrationManipulationInteractor::HintTranslate(StateMachineAction*, InteractionEvent*)
+{
+  if (m_CurrentHintMode == HintMode::Translate)
+    return;
+  if (m_CurrentHintMode != HintMode::None)
+    this->PopCursorSafe();
+  this->PushCursorFromResource("Cursors/RegManip_Translate_Cursor.svg");
+  m_CurrentHintMode = HintMode::Translate;
+}
+
+void mitk::RegistrationManipulationInteractor::HintRotate(StateMachineAction*, InteractionEvent*)
+{
+  if (m_CurrentHintMode == HintMode::Rotate)
+    return;
+  if (m_CurrentHintMode != HintMode::None)
+    this->PopCursorSafe();
+  this->PushCursorFromResource("Cursors/RegManip_Rotate_Cursor.svg");
+  m_CurrentHintMode = HintMode::Rotate;
+}
+
+void mitk::RegistrationManipulationInteractor::HintNeutral(StateMachineAction*, InteractionEvent*)
+{
+  if (m_CurrentHintMode == HintMode::None)
+    return;
+  this->PopCursorSafe();
+  m_CurrentHintMode = HintMode::None;
+}
+
 // --- Translation ---
 
 void mitk::RegistrationManipulationInteractor::InitTranslation(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -116,7 +150,11 @@ void mitk::RegistrationManipulationInteractor::InitTranslation(StateMachineActio
   if (positionEvent == nullptr)
     return;
 
-  this->PushCursorFromResource("Cursors/RegManip_Translate_Cursor.svg");
+  // If the translate hint cursor is already showing, reuse it (don't push again).
+  // Otherwise push the mode cursor fresh. Either way, ownership transfers to the drag.
+  if (m_CurrentHintMode != HintMode::Translate)
+    this->PushCursorFromResource("Cursors/RegManip_Translate_Cursor.svg");
+  m_CurrentHintMode = HintMode::None;
 
   m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
 
@@ -178,7 +216,10 @@ void mitk::RegistrationManipulationInteractor::InitRotation(StateMachineAction*,
   if (positionEvent == nullptr)
     return;
 
-  this->PushCursorFromResource("Cursors/RegManip_Rotate_Cursor.svg");
+  // If the rotate hint cursor is already showing, reuse it (don't push again).
+  if (m_CurrentHintMode != HintMode::Rotate)
+    this->PushCursorFromResource("Cursors/RegManip_Rotate_Cursor.svg");
+  m_CurrentHintMode = HintMode::None;
 
   m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
 

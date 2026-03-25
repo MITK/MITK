@@ -127,7 +127,12 @@ namespace mitk
     // State machine conditions
     bool ScalingEnabled(const InteractionEvent*);
 
-    // State machine actions
+    // State machine actions: hover cursor foreshadowing
+    void HintTranslate(StateMachineAction*, InteractionEvent*);
+    void HintRotate(StateMachineAction*, InteractionEvent*);
+    void HintNeutral(StateMachineAction*, InteractionEvent*);
+
+    // State machine actions: drag gestures
     void InitTranslation(StateMachineAction*, InteractionEvent*);
     void Translate(StateMachineAction*, InteractionEvent*);
     void EndTranslation(StateMachineAction*, InteractionEvent*);
@@ -162,6 +167,10 @@ namespace mitk
     void PushCursorFromResource(const std::string& resourceName);
     void PopCursorSafe();
     int m_NumPushedCursors = 0;
+
+    // Hover hint cursor tracking
+    enum class HintMode { None, Translate, Rotate };
+    HintMode m_CurrentHintMode = HintMode::None;
 
     // Saved DisplayActionEventBroadcast configs for restore on EnableOriginalInteraction()
     bool m_OriginalInteractionDisabled = false;

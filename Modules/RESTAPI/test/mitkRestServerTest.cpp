@@ -18,9 +18,6 @@ found in the LICENSE file.
 
 #include <httplib.h>
 
-#include <thread>
-#include <chrono>
-
 // Platform socket headers for PortOccupier
 #ifdef _WIN32
 #  include <winsock2.h>
@@ -165,10 +162,6 @@ public:
 
     bool started = m_Server->Start();
     CPPUNIT_ASSERT(started);
-
-    // Give the server thread time to start
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
     CPPUNIT_ASSERT(m_Server->IsRunning());
 
     m_Server->Stop();
@@ -186,8 +179,6 @@ public:
     m_Server->SetConfig(config);
 
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
     CPPUNIT_ASSERT(m_Server->IsRunning());
 
     m_Server->Stop();
@@ -207,7 +198,6 @@ public:
     m_Server->SetConfig(config);
 
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     auto url = m_Server->GetServerUrl();
     CPPUNIT_ASSERT(url.has_value());
@@ -253,7 +243,6 @@ public:
 
     // Start server
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // After start: both configs exist and should be the same
     pending = m_Server->GetPendingConfig();
@@ -354,6 +343,7 @@ public:
     config.port = 18102;
     config.enabled = true;
     m_Server->SetConfig(config);
+
     const bool started = m_Server->Start();
 
     CPPUNIT_ASSERT_MESSAGE("Start() must succeed on a free port after a previous port conflict", started);
@@ -427,7 +417,6 @@ public:
 
     const auto versionBeforeStart = m_Server->GetRequestLogVersion();
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeStart);
 
     const auto versionBeforeStop = m_Server->GetRequestLogVersion();
@@ -443,7 +432,6 @@ public:
     m_Server->SetConfig(config);
 
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     const auto versionBefore = m_Server->GetRequestLogVersion();
 
@@ -464,7 +452,6 @@ public:
     m_Server->SetConfig(config);
 
     m_Server->Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // Populate the log with several requests
     httplib::Client client("127.0.0.1", 18092);

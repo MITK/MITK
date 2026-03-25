@@ -274,8 +274,44 @@ bool RestServer::Start()
     m_Running = true;
     m_ServerThread = std::make_unique<std::thread>(&RestServer::ServerThreadFunc, this);
 
+    // Wait for httplib to actually enter its listening loop before returning.
+    // Without this, a caller could immediately invoke Stop(), which calls
+    // httplib::Server::stop(). If the server thread has not yet entered
+    // listen_after_bind(), stop() is a no-op (httplib only acts when its
+    // internal is_running_ flag is true), and the thread will then block in
+    // accept() forever, causing Stop()'s join() to deadlock.
+    //
+    // wait_until_ready() blocks until httplib sets either is_running_ (success)
+    // or is_decommissioned (listen failure). Since bind_to_port() already
+    // succeeded, the only delay is OS thread scheduling, which is bounded.
+    lock.unlock();
+    m_Server->wait_until_ready();
+    lock.lock();
+
+    // wait_until_ready() can also return because listen failed (is_decommissioned).
+    // Check is_running() to distinguish success from failure.
+    if (!m_Server->is_running())
+    {
+      m_Running = false;
+      m_RunningConfig = std::nullopt;
+      m_StartTime = std::nullopt;
+
+      // The server thread is exiting — join it before returning.
+      if (m_ServerThread && m_ServerThread->joinable())
+      {
+        auto failedThread = std::move(m_ServerThread);
+        lock.unlock();
+        failedThread->join();
+        lock.lock();
+      }
+
+      m_LastError = "Server listen failed after successful port bind";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+
     const std::string protocol = m_PendingConfig.httpsEnabled ? "HTTPS" : "HTTP";
-    MITK_INFO << "REST API server starting (" << protocol << ") on "
+    MITK_INFO << "REST API server started (" << protocol << ") on "
               << SanitizeForLog(m_PendingConfig.host) << ":" << m_PendingConfig.port;
 
     return true;

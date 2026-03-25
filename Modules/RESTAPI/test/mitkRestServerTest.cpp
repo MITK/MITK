@@ -18,9 +18,6 @@ found in the LICENSE file.
 
 #include <httplib.h>
 
-#include <chrono>
-#include <iostream>
-
 // Platform socket headers for PortOccupier
 #ifdef _WIN32
 #  include <winsock2.h>
@@ -137,43 +134,24 @@ class mitkRestServerTestSuite : public mitk::TestFixture
 
 private:
   std::unique_ptr<mitk::RestServer> m_Server;
-  std::chrono::steady_clock::time_point m_TestStart;
-  const char* m_CurrentTest = nullptr;
-
-  void T(const char* label, std::chrono::steady_clock::time_point since)
-  {
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-      std::chrono::steady_clock::now() - since).count();
-    std::cerr << "[TIMING] " << (m_CurrentTest ? m_CurrentTest : "?")
-              << " " << label << ": " << ms << "ms" << std::endl;
-  }
 
 public:
   void setUp() override
   {
-    m_TestStart = std::chrono::steady_clock::now();
-    auto t0 = m_TestStart;
     m_Server = std::make_unique<mitk::RestServer>();
-    T("setUp", t0);
   }
 
   void tearDown() override
   {
-    auto t0 = std::chrono::steady_clock::now();
     if (m_Server)
     {
       m_Server->Stop();
     }
     m_Server.reset();
-    T("tearDown", t0);
-    T("TOTAL", m_TestStart);
-    std::cerr << std::endl;
   }
 
   void StartsAndStops()
   {
-    m_CurrentTest = "StartsAndStops";
-
     // Configure to use a test port
     mitk::RestServerConfig config;
     config.port = 18080;  // Use non-standard port for testing
@@ -182,22 +160,17 @@ public:
 
     CPPUNIT_ASSERT(!m_Server->IsRunning());
 
-    auto t0 = std::chrono::steady_clock::now();
     bool started = m_Server->Start();
-    T("Start()", t0);
     CPPUNIT_ASSERT(started);
     CPPUNIT_ASSERT(m_Server->IsRunning());
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
 
     CPPUNIT_ASSERT(!m_Server->IsRunning());
   }
 
   void ReportsRunningState()
   {
-    m_CurrentTest = "ReportsRunningState";
     CPPUNIT_ASSERT(!m_Server->IsRunning());
 
     mitk::RestServerConfig config;
@@ -205,21 +178,16 @@ public:
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
     CPPUNIT_ASSERT(m_Server->IsRunning());
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
 
     CPPUNIT_ASSERT(!m_Server->IsRunning());
   }
 
   void ReportsServerUrl()
   {
-    m_CurrentTest = "ReportsServerUrl";
     // Not running - should return nullopt
     CPPUNIT_ASSERT(!m_Server->GetServerUrl().has_value());
 
@@ -229,22 +197,17 @@ public:
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
 
     auto url = m_Server->GetServerUrl();
     CPPUNIT_ASSERT(url.has_value());
     CPPUNIT_ASSERT_EQUAL(std::string("http://127.0.0.1:18082"), url.value());
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
   }
 
   void ConfigurationPersists()
   {
-    m_CurrentTest = "ConfigurationPersists";
     mitk::RestServerConfig config;
     config.host = "0.0.0.0";
     config.port = 9999;
@@ -266,8 +229,6 @@ public:
 
   void PendingVsRunningConfig()
   {
-    m_CurrentTest = "PendingVsRunningConfig";
-
     // Set up initial config
     mitk::RestServerConfig config;
     config.host = "127.0.0.1";
@@ -275,14 +236,13 @@ public:
     config.enabled = true;
     m_Server->SetConfig(config);
 
+    // Before start: pending config exists, running config does not
     auto pending = m_Server->GetPendingConfig();
     CPPUNIT_ASSERT_EQUAL(18083, pending.port);
     CPPUNIT_ASSERT(!m_Server->GetRunningConfig().has_value());
 
     // Start server
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
 
     // After start: both configs exist and should be the same
     pending = m_Server->GetPendingConfig();
@@ -304,9 +264,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(18083, running.value().port);
 
     // Stop server
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
 
     // After stop: running config should be nullopt
     CPPUNIT_ASSERT(!m_Server->GetRunningConfig().has_value());
@@ -317,7 +275,6 @@ public:
 
   void HandlesDataStorageConnection()
   {
-    m_CurrentTest = "HandlesDataStorageConnection";
     // Initially no DataStorage
     CPPUNIT_ASSERT(m_Server->GetDataStorage() == nullptr);
 
@@ -335,7 +292,6 @@ public:
 
   void DisabledConfigPreventsStart()
   {
-    m_CurrentTest = "DisabledConfigPreventsStart";
     mitk::RestServerConfig config;
     config.enabled = false;
     m_Server->SetConfig(config);
@@ -350,8 +306,6 @@ public:
 
   void PortAlreadyInUseReturnsFalse()
   {
-    m_CurrentTest = "PortAlreadyInUseReturnsFalse";
-
     // Occupy port 18100 with a raw socket. SO_EXCLUSIVEADDRUSE (Windows) prevents
     // httplib's SO_REUSEADDR socket from binding to the same address:port.
     PortOccupier occupier(18100);
@@ -362,9 +316,7 @@ public:
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     const bool started = m_Server->Start();
-    T("Start() [expect fail]", t0);
 
     CPPUNIT_ASSERT_MESSAGE("Start() must return false when port is already in use", !started);
     CPPUNIT_ASSERT_MESSAGE("IsRunning() must be false after failed start", !m_Server->IsRunning());
@@ -373,8 +325,6 @@ public:
 
   void CanRestartOnDifferentPortAfterPortConflict()
   {
-    m_CurrentTest = "CanRestartOnDifferentPortAfterPortConflict";
-
     // Occupy port 18101 with a raw socket.
     {
       PortOccupier occupier(18101);
@@ -384,10 +334,7 @@ public:
       config.port = 18101;
       config.enabled = true;
       m_Server->SetConfig(config);
-
-      auto t0 = std::chrono::steady_clock::now();
       CPPUNIT_ASSERT(!m_Server->Start());
-      T("Start() [expect fail]", t0);
       // occupier goes out of scope here, releasing the port
     }
 
@@ -397,16 +344,12 @@ public:
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     const bool started = m_Server->Start();
-    T("Start()", t0);
 
     CPPUNIT_ASSERT_MESSAGE("Start() must succeed on a free port after a previous port conflict", started);
     CPPUNIT_ASSERT(m_Server->IsRunning());
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
     CPPUNIT_ASSERT(!m_Server->IsRunning());
   }
 
@@ -414,7 +357,6 @@ public:
 
   void LogLimitDefaultsToUnlimited()
   {
-    m_CurrentTest = "LogLimitDefaultsToUnlimited";
     // Default log limit should be nullopt (unlimited)
     CPPUNIT_ASSERT(!m_Server->GetLogLimit().has_value());
 
@@ -425,7 +367,6 @@ public:
 
   void LogLimitCanBeSet()
   {
-    m_CurrentTest = "LogLimitCanBeSet";
     // Set a limit
     m_Server->SetLogLimit(100);
     auto limit = m_Server->GetLogLimit();
@@ -445,7 +386,6 @@ public:
 
   void ClearRequestLogWorks()
   {
-    m_CurrentTest = "ClearRequestLogWorks";
     // The log is managed internally, but we can test the clear interface
     // Note: Actual request recording happens during HTTP requests, which
     // we can't easily simulate in this unit test. We test the clear interface.
@@ -458,13 +398,11 @@ public:
 
   void LogVersionStartsAtZero()
   {
-    m_CurrentTest = "LogVersionStartsAtZero";
     CPPUNIT_ASSERT_EQUAL(uint64_t(0), m_Server->GetRequestLogVersion());
   }
 
   void LogVersionIncrementsOnClearLog()
   {
-    m_CurrentTest = "LogVersionIncrementsOnClearLog";
     const auto versionBefore = m_Server->GetRequestLogVersion();
     m_Server->ClearRequestLog();
     CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBefore);
@@ -472,74 +410,54 @@ public:
 
   void LogVersionIncrementsOnStartAndStop()
   {
-    m_CurrentTest = "LogVersionIncrementsOnStartAndStop";
-
     mitk::RestServerConfig config;
     config.port = 18090;
     config.enabled = true;
     m_Server->SetConfig(config);
 
     const auto versionBeforeStart = m_Server->GetRequestLogVersion();
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
     CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeStart);
 
     const auto versionBeforeStop = m_Server->GetRequestLogVersion();
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
     CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBeforeStop);
   }
 
   void LogVersionIncrementsOnRequest()
   {
-    m_CurrentTest = "LogVersionIncrementsOnRequest";
-
     mitk::RestServerConfig config;
     config.port = 18091;
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
 
     const auto versionBefore = m_Server->GetRequestLogVersion();
 
-    t0 = std::chrono::steady_clock::now();
     httplib::Client client("127.0.0.1", 18091);
     auto result = client.Get("/api/v1/health");
-    T("HTTP GET", t0);
     CPPUNIT_ASSERT(result != nullptr);
 
     CPPUNIT_ASSERT(m_Server->GetRequestLogVersion() > versionBefore);
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
   }
 
   void LogVersionIncrementsOnSetLogLimitTrim()
   {
-    m_CurrentTest = "LogVersionIncrementsOnSetLogLimitTrim";
-
     mitk::RestServerConfig config;
     config.port = 18092;
     config.enabled = true;
     m_Server->SetConfig(config);
 
-    auto t0 = std::chrono::steady_clock::now();
     m_Server->Start();
-    T("Start()", t0);
 
     // Populate the log with several requests
-    t0 = std::chrono::steady_clock::now();
     httplib::Client client("127.0.0.1", 18092);
     client.Get("/api/v1/health");
     client.Get("/api/v1/health");
     client.Get("/api/v1/health");
-    T("HTTP GET x3", t0);
 
     const auto versionBeforeTrim = m_Server->GetRequestLogVersion();
 
@@ -552,9 +470,7 @@ public:
     m_Server->SetLogLimit(100);
     CPPUNIT_ASSERT_EQUAL(versionAfterTrim, m_Server->GetRequestLogVersion());
 
-    t0 = std::chrono::steady_clock::now();
     m_Server->Stop();
-    T("Stop()", t0);
   }
 };
 

@@ -137,20 +137,9 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
 
   connect(m_Controls->comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(int)));
   connect(m_Controls->manipulationWidget, SIGNAL(RegistrationChanged(map::core::RegistrationBase*)), this, SLOT(OnRegistrationChanged()));
-  connect(m_Controls->pbReinitMoving, &QPushButton::clicked, this, &QmitkMatchPointRegistrationManipulator::OnReinitMovingPerspective);
-  connect(m_Controls->pbReinitTarget, &QPushButton::clicked, this, &QmitkMatchPointRegistrationManipulator::OnReinitTargetPerspective);
   connect(m_Controls->pbTranslateToNavigator, &QPushButton::clicked, this, &QmitkMatchPointRegistrationManipulator::OnTranslateMovingCenterToNavigator);
   connect(m_Controls->pbInteractionTool, SIGNAL(toggled(bool)), this, SLOT(OnInteractionToolToggled(bool)));
   connect(m_Controls->checkPreview3D, &QCheckBox::toggled, this, &QmitkMatchPointRegistrationManipulator::OnPreview3DToggled);
-  connect(m_Controls->checkLockMovingPerspective, &QCheckBox::toggled, this, [this](bool checked) {
-    if (m_activeManipulation)
-    {
-      if (checked)
-        this->OnReinitMovingPerspective();
-      else
-        this->OnReinitTargetPerspective();
-    }
-  });
 
   connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
   connect(m_Controls->movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
@@ -312,10 +301,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   m_Controls->lblInteractionInfo->setVisible(m_activeManipulation && m_InteractionToolActive);
 
   m_Controls->pbTranslateToNavigator->setEnabled(m_activeManipulation);
-  m_Controls->pbReinitMoving->setEnabled(m_activeManipulation);
-  m_Controls->pbReinitTarget->setEnabled(m_activeManipulation);
   m_Controls->checkPreview3D->setEnabled(m_activeManipulation);
-  m_Controls->checkLockMovingPerspective->setEnabled(m_activeManipulation);
 
   if (!m_activeManipulation)
   {
@@ -346,7 +332,6 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   m_Controls->comboCenter->setCurrentIndex(0);
   this->OnCenterTypeChanged(0);
 
-  //reinit view
   mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeGeometry());
 
   //generate evaluation node
@@ -374,12 +359,6 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
-  if (m_Controls->checkLockMovingPerspective->isChecked())
-  {
-    m_Controls->checkLockMovingPerspective->setChecked(false);
-    this->OnReinitTargetPerspective();
-  }
-
   this->Stop3DPreview();
 
   if (m_InteractionToolActive)
@@ -424,11 +403,6 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
   if (m_3DPreviewActive)
   {
     this->Update3DPreviewGeometry();
-  }
-
-  if (m_Controls->checkLockMovingPerspective->isChecked())
-  {
-    this->OnReinitMovingPerspective();
   }
 
   // Update indicator position: for "Moving image center" mode the center moves with the image
@@ -852,51 +826,6 @@ void QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition()
   {
     rwPart->SetSelectedPosition(m_Interactor->GetSelectPosition(), nullptr);
   }
-}
-
-void QmitkMatchPointRegistrationManipulator::OnReinitMovingPerspective()
-{
-  if (!m_activeManipulation || m_SelectedMovingNode.IsNull() || m_CurrentRegistrationWrapper.IsNull())
-    return;
-
-  const auto* movingData = m_SelectedMovingNode->GetData();
-  if (nullptr == movingData)
-    return;
-
-  // Clone the moving image's TimeGeometry so we don't modify the original
-  auto composedTimeGeometry = movingData->GetTimeGeometry()->Clone();
-
-  // Get the direct (moving->target) transform from the interim registration
-  const auto inverseAffine =
-    mitk::MITKRegistrationHelper::getAffineMatrix(m_CurrentRegistrationWrapper, true);
-  if (inverseAffine.IsNull())
-    return;
-
-  mitk::MITKRegistrationHelper::Affine3DTransformType::Pointer directTransform =
-    mitk::MITKRegistrationHelper::Affine3DTransformType::New();
-  if (!inverseAffine->GetInverse(directTransform))
-    return;
-
-  // Compose the registration transform onto each timestep geometry
-  for (unsigned int i = 0; i < composedTimeGeometry->CountTimeSteps(); ++i)
-  {
-    composedTimeGeometry->GetGeometryForTimeStep(i)->Compose(directTransform);
-  }
-  composedTimeGeometry->Update();
-
-  mitk::RenderingManager::GetInstance()->InitializeViews(composedTimeGeometry.GetPointer());
-}
-
-void QmitkMatchPointRegistrationManipulator::OnReinitTargetPerspective()
-{
-  if (!m_activeManipulation || m_SelectedTargetNode.IsNull())
-    return;
-
-  const auto* targetData = m_SelectedTargetNode->GetData();
-  if (nullptr == targetData)
-    return;
-
-  mitk::RenderingManager::GetInstance()->InitializeViews(targetData->GetTimeGeometry());
 }
 
 void QmitkMatchPointRegistrationManipulator::OnTranslateMovingCenterToNavigator()

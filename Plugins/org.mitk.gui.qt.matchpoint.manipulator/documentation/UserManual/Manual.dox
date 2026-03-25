@@ -30,7 +30,7 @@ for the manipulation, which will be "on top" of the existing registration.
 (5) <b>Target image slot</b>: To allow for visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
 
 (6) <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
-switch to the visual inspection mode. The views will be reinitialized to the field of view of the target image.\n\n\n
+switch to the visual inspection mode and will be reinitialized once to the field of view of the target image.\n\n\n
 
 \imageMacro{map_view_manipulator_started.png, "Controls after the manipulation session is started.", 14}
 
@@ -86,23 +86,6 @@ Typical use:\n
 - Navigate the crosshair in the target image to a recognizable anatomical landmark.
 - Press <em>Translate moving center to navigator</em> to shift the moving image so its center overlaps that landmark.
 - Fine-tune the alignment using the sliders, spinboxes, or the mouse interaction tool (\ref MAP_REGMANIP_MouseInteraction).
-
-\subsection MAP_REGMANIP_ReinitViews Reinitializing the render window perspective
-Two buttons and a lock checkbox give you control over the viewing perspective during a session:\n
-- <b>Reinit to moving image</b>: Reinitializes the render windows to the current transformed position of the moving
-  image, i.e. the position the moving image occupies after the registration is applied. Use this to inspect how the
-  moving image aligns with structures in the target image after a manipulation step.
-- <b>Reinit to target image</b>: Reinitializes the render windows to the geometry of the target image. Use this to
-  return to the target-image field of view at any time.
-- <b>Lock to moving</b>: When this checkbox is active, the render windows automatically follow the moving image's
-  current transformed geometry after every change to the registration. This is especially useful when the moving
-  image is thin (e.g. a single slice) and would otherwise disappear from view once it is rotated out of the
-  target image's slice plane. Unchecking the box returns the render windows to the target image perspective.
-
-\remark The automatic reinit triggered by <em>Lock to moving</em> uses the same mechanism as the <em>Reinit to
-moving image</em> button, which means the camera and slice position are reset to the center of the moving image on
-each update. If you need to zoom into a specific region while simultaneously rotating the moving image, use the
-manual <em>Reinit to moving image</em> button instead of the lock, and reinitialize only when needed.
 
 \section MAP_REGMANIP_MouseInteraction Mouse-based interaction
 \imageMacro{map_view_manipulator_mouse_interaction.png, "Transform tab showing the mouse interaction controls.", 10}

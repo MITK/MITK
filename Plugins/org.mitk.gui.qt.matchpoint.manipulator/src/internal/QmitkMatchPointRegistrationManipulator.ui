@@ -273,40 +273,6 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="reinitLayout">
-     <item>
-      <widget class="QPushButton" name="pbReinitMoving">
-       <property name="toolTip">
-        <string>Reinitialize render windows to the current transformed moving image geometry (moving image perspective).</string>
-       </property>
-       <property name="text">
-        <string>Reinit to moving image</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbReinitTarget">
-       <property name="toolTip">
-        <string>Reinitialize render windows to the target image geometry.</string>
-       </property>
-       <property name="text">
-        <string>Reinit to target image</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkLockMovingPerspective">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatically keep 2D render windows aligned with the moving image. Useful for thin moving images that would otherwise disappear when rotated out-of-plane.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Lock to moving</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

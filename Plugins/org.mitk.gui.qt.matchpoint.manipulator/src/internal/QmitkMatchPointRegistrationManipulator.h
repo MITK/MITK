@@ -79,9 +79,6 @@ public:
 
   void OnSliceChanged();
 
-  void OnReinitMovingPerspective();
-  void OnReinitTargetPerspective();
-
   void OnInteractionToolToggled(bool checked);
   void OnPreview3DToggled(bool checked);
   void OnTranslateMovingCenterToNavigator();

@@ -141,7 +141,6 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   connect(m_Controls->pbReinitTarget, &QPushButton::clicked, this, &QmitkMatchPointRegistrationManipulator::OnReinitTargetPerspective);
   connect(m_Controls->pbTranslateToNavigator, &QPushButton::clicked, this, &QmitkMatchPointRegistrationManipulator::OnTranslateMovingCenterToNavigator);
   connect(m_Controls->pbInteractionTool, SIGNAL(toggled(bool)), this, SLOT(OnInteractionToolToggled(bool)));
-  connect(m_Controls->checkScaling, SIGNAL(toggled(bool)), this, SLOT(OnScalingCheckboxToggled(bool)));
   connect(m_Controls->checkPreview3D, &QCheckBox::toggled, this, &QmitkMatchPointRegistrationManipulator::OnPreview3DToggled);
   connect(m_Controls->checkLockMovingPerspective, &QCheckBox::toggled, this, [this](bool checked) {
     if (m_activeManipulation)
@@ -310,9 +309,7 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 
   // Interaction tool controls: only available during active manipulation
   m_Controls->pbInteractionTool->setEnabled(m_activeManipulation);
-  m_Controls->checkScaling->setEnabled(m_activeManipulation);
   m_Controls->lblInteractionInfo->setVisible(m_activeManipulation && m_InteractionToolActive);
-  m_Controls->checkScaling->setVisible(m_activeManipulation);
 
   m_Controls->pbTranslateToNavigator->setEnabled(m_activeManipulation);
   m_Controls->pbReinitMoving->setEnabled(m_activeManipulation);
@@ -671,14 +668,6 @@ void QmitkMatchPointRegistrationManipulator::OnInteractionToolToggled(bool check
   this->ConfigureControls();
 }
 
-void QmitkMatchPointRegistrationManipulator::OnScalingCheckboxToggled(bool checked)
-{
-  if (m_Interactor.IsNotNull())
-  {
-    m_Interactor->SetScalingEnabled(checked);
-  }
-}
-
 void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
 {
   if (m_InteractionToolActive)
@@ -693,7 +682,6 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   m_Interactor->LoadStateMachine("RegistrationManipulationStates.xml", regModule);
   m_Interactor->SetEventConfig("RegistrationManipulationConfig.xml", regModule);
   m_Interactor->SetDataNode(m_SelectedMovingNode);
-  m_Interactor->SetScalingEnabled(m_Controls->checkScaling->isChecked());
 
   // Set current center of rotation
   this->ConfigureTransformCenter(m_Controls->comboCenter->currentIndex());
@@ -706,10 +694,6 @@ void QmitkMatchPointRegistrationManipulator::ActivateInteractionTool()
   auto rotationCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
   rotationCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorRotation);
   m_RotationObserverTag = m_Interactor->AddObserver(mitk::RegistrationRotationEvent(), rotationCmd);
-
-  auto scaleCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
-  scaleCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorScale);
-  m_ScaleObserverTag = m_Interactor->AddObserver(mitk::RegistrationScaleEvent(), scaleCmd);
 
   auto selectPosCmd = itk::SimpleMemberCommand<QmitkMatchPointRegistrationManipulator>::New();
   selectPosCmd->SetCallbackFunction(this, &QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition);
@@ -739,7 +723,6 @@ void QmitkMatchPointRegistrationManipulator::DeactivateInteractionTool()
     m_Interactor->PopManipulationCursor();
     m_Interactor->RemoveObserver(m_TranslationObserverTag);
     m_Interactor->RemoveObserver(m_RotationObserverTag);
-    m_Interactor->RemoveObserver(m_ScaleObserverTag);
     m_Interactor->RemoveObserver(m_SelectPositionObserverTag);
     m_Interactor->EnableOriginalInteraction();
     m_Interactor->SetDataNode(nullptr);
@@ -857,12 +840,6 @@ void QmitkMatchPointRegistrationManipulator::OnInteractorRotation()
 
   const auto& rotDelta = m_Interactor->GetRotationDelta();
   m_Controls->manipulationWidget->ApplyRotationDelta(rotDelta.Axis, rotDelta.AngleDeg);
-}
-
-void QmitkMatchPointRegistrationManipulator::OnInteractorScale()
-{
-  // Scaling not yet implemented in widget - reserved for Phase 2
-  // Will call m_Controls->manipulationWidget->ApplyScaleDelta(m_Interactor->GetScaleFactor());
 }
 
 void QmitkMatchPointRegistrationManipulator::OnInteractorSelectPosition()

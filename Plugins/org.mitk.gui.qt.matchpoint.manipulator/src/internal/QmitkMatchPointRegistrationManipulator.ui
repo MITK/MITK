@@ -220,25 +220,12 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QCheckBox" name="checkScaling">
-           <property name="toolTip">
-            <string>If checked, uniform scaling via Shift+Ctrl+Drag is enabled.</string>
-           </property>
-           <property name="text">
-            <string>Allow scaling</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
         <widget class="QLabel" name="lblInteractionInfo">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;Shift + Drag&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Translate in-plane&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;Ctrl + Drag&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Rotate in-plane&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;Shift+Ctrl + Drag&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Scale (if enabled)&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;Shift + Drag&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Translate in-plane&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;b&gt;Ctrl + Drag&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Rotate in-plane&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

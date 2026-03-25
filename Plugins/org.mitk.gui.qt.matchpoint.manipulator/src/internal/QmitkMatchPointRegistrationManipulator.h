@@ -83,7 +83,6 @@ public:
   void OnReinitTargetPerspective();
 
   void OnInteractionToolToggled(bool checked);
-  void OnScalingCheckboxToggled(bool checked);
   void OnPreview3DToggled(bool checked);
   void OnTranslateMovingCenterToNavigator();
 
@@ -150,9 +149,6 @@ private:
   /** Called by ITK observer when the interactor emits a rotation delta. */
   void OnInteractorRotation();
 
-  /** Called by ITK observer when the interactor emits a scale delta. */
-  void OnInteractorScale();
-
   /** Called by ITK observer when the interactor emits a position-select event. */
   void OnInteractorSelectPosition();
 
@@ -207,7 +203,6 @@ private:
   // ITK observer tags for interactor event connections
   unsigned long m_TranslationObserverTag = 0;
   unsigned long m_RotationObserverTag = 0;
-  unsigned long m_ScaleObserverTag = 0;
   unsigned long m_SelectPositionObserverTag = 0;
 
 };

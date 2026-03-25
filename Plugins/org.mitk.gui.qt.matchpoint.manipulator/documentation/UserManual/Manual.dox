@@ -120,7 +120,6 @@ restore the standard navigation behaviour.\n\n
 |---------|--------|
 | Shift + Drag | Translate the moving image in the current view plane |
 | Ctrl + Drag | Rotate the moving image around the current center of rotation, within the current view plane |
-| Shift + Ctrl + Drag | Scale the moving image uniformly (only if <em>Allow scaling</em> is checked) |
 
 \remark All gestures act relative to the plane of the render window in which you drag. Working in different 2D views
 therefore lets you constrain the manipulation to the desired anatomical plane.
@@ -128,10 +127,6 @@ therefore lets you constrain the manipulation to the desired anatomical plane.
 \remark The center of rotation used for Ctrl + Drag is exactly the one selected in the <em>Center of rotation</em>
 combo box. The yellow diamond-shaped indicator (\ref MAP_REGMANIP_CoRIndicator) always shows the current pivot
 point in the render windows, regardless of which center mode is active.
-
-<b>Allow scaling:</b> Check the <em>Allow scaling</em> checkbox to allow uniform scaling of the moving image via
-Shift + Ctrl + Drag. Scaling is disabled by default because it changes the physical size of the data and is
-typically not appropriate for rigid registration tasks.
 
 \section MAP_REGMANIP_3DPreview 3D preview
 \imageMacro{map_view_manipulator_3d_preview.png, "3D render window showing the wireframe preview of the moving image.", 10}

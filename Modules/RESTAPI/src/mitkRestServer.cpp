@@ -215,6 +215,15 @@ bool RestServer::Start()
     m_Server->set_read_timeout(m_PendingConfig.readTimeoutSeconds);
     m_Server->set_write_timeout(m_PendingConfig.writeTimeoutSeconds);
 
+    // httplib's default idle_interval is (0, 0) on non-Windows platforms,
+    // which causes listen_internal() to skip select() and call accept()
+    // directly. When stop() closes the socket from another thread, accept()
+    // on a closed fd is POSIX-undefined and can take tens of seconds to
+    // return on macOS. Setting a small idle interval ensures select() is
+    // called before accept(), allowing the listen loop to detect the
+    // closed socket promptly via the svr_sock_ == INVALID_SOCKET check.
+    m_Server->set_idle_interval(0, 10000); // 10 ms
+
     // Apply payload size limit
     m_Server->set_payload_max_length(
       static_cast<size_t>(m_PendingConfig.maxPayloadSizeMB) * 1024 * 1024);

@@ -1,4 +1,5 @@
 pybind11_add_module(mitk_python_bindings
+  CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp
   Image.cpp

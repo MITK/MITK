@@ -75,6 +75,28 @@ def test_pixel_type():
     print("  PixelType OK")
 
 
+def test_autoload_modules():
+    import mitk
+
+    modules = mitk.get_autoloaded_modules()
+
+    # MitkCore must always be loaded (it's a direct dependency of the bindings)
+    assert "MitkCore" in modules, f"MitkCore not loaded. Loaded: {modules}"
+
+    # Auto-load IO modules should be loaded via CppMicroServices auto-loading.
+    # These are installed into MitkCore/ subdirectory in the wheel.
+    expected_autoloads = [
+        "MitkDICOMImageIO",
+        "MitkIOExt",
+        "MitkMultilabelIO",
+    ]
+
+    missing = [m for m in expected_autoloads if m not in modules]
+    assert not missing, f"Auto-load modules not loaded: {missing}. Loaded: {modules}"
+
+    print(f"  Auto-load OK ({len(modules)} modules loaded: {', '.join(sorted(modules))})")
+
+
 def main():
     tests = [
         test_import,
@@ -82,6 +104,7 @@ def main():
         test_numpy_roundtrip,
         test_point_vector_types,
         test_pixel_type,
+        test_autoload_modules,
     ]
 
     passed = 0

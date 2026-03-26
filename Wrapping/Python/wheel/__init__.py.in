@@ -2,7 +2,13 @@ import os as _os
 import sys as _sys
 
 _pkg_dir = _os.path.dirname(_os.path.abspath(__file__))
+
+# Detect wheel install by looking for bundled native libraries.
+# delvewheel (Windows) places them at mitk/.libs/ (inside the package),
+# auditwheel (Linux) places them at mitk.libs/ (sibling of the package).
 _libs_dir = _os.path.join(_pkg_dir, ".libs")
+if not _os.path.isdir(_libs_dir):
+    _libs_dir = _os.path.join(_os.path.dirname(_pkg_dir), "mitk.libs")
 _is_wheel = _os.path.isdir(_libs_dir)
 
 if _is_wheel:

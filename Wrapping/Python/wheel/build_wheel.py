@@ -33,14 +33,23 @@ from pathlib import Path
 
 
 def get_platform_tag():
-    """Return the wheel platform tag for the current platform."""
+    """Return the wheel platform tag for the current platform.
+
+    On Linux, detects the system glibc version and uses the corresponding
+    manylinux tag (e.g., glibc 2.39 -> manylinux_2_39). When building in
+    a manylinux container, this automatically produces the correct tag.
+    """
     system = platform.system()
     machine = platform.machine().lower()
 
     if system == "Windows":
         return f"win_{machine}"
     elif system == "Linux":
-        return f"manylinux_2_28_{machine}"
+        libc_name, libc_ver = platform.libc_ver()
+        if libc_name == "glibc" and libc_ver:
+            major, minor = libc_ver.split(".")[:2]
+            return f"manylinux_{major}_{minor}_{machine}"
+        return f"linux_{machine}"
     elif system == "Darwin":
         ver = platform.mac_ver()[0]
         major, minor = ver.split(".")[:2]
@@ -194,12 +203,16 @@ def get_library_search_paths(build_dir):
     build_dir = Path(build_dir)
     paths = []
 
-    # MITK build output
+    # MITK build output (Windows: bin/, Linux/macOS: lib/)
     bin_dir = build_dir / "bin"
     if (bin_dir / "Release").is_dir():
         paths.append(str(bin_dir / "Release"))
     elif bin_dir.is_dir():
         paths.append(str(bin_dir))
+
+    lib_dir = build_dir / "lib"
+    if lib_dir.is_dir():
+        paths.append(str(lib_dir))
 
     # SuperBuild external project libraries
     superbuild_dir = build_dir.parent

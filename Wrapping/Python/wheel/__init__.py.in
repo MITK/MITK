@@ -19,8 +19,11 @@ if _is_wheel:
     _os.environ["US_AUTOLOAD_PATHS"] = _pkg_dir
 
     # Windows: register DLL search directory for bundled native libraries.
+    # add_dll_directory covers Python extension loading (pyd files), while
+    # PATH is needed for CppMicroServices auto-load which uses LoadLibrary.
     if _sys.platform == "win32":
         _os.add_dll_directory(_libs_dir)
+        _os.environ["PATH"] = _libs_dir + _os.pathsep + _os.environ.get("PATH", "")
     # Linux: auditwheel sets RPATH to $ORIGIN/../mitk.libs
     # macOS: delocate rewrites @loader_path references
 

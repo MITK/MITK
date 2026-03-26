@@ -247,6 +247,7 @@ def repair_wheel(wheel_path, output_dir, search_paths):
             str(wheel_path),
             "--add-path", add_path,
             "--no-mangle-all",  # CppMicroServices appends zip resources to DLLs (overlay)
+            "--analyze-existing",  # trace deps of auto-load DLLs already in the wheel
             "--wheel-dir", str(output_dir),
         ]
     elif system == "Linux":

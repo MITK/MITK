@@ -20,7 +20,7 @@ namespace py = pybind11;
 
 void InitCppMicroServices(py::module_& m)
 {
-  m.def("get_autoloaded_modules", []() {
+  m.def("get_loaded_modules", []() {
     std::vector<std::string> names;
     for (auto* module : us::ModuleRegistry::GetLoadedModules())
       names.push_back(module->GetName());

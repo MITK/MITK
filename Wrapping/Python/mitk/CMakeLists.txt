@@ -66,11 +66,11 @@ install(TARGETS mitk_python_bindings
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/__init__.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/wheel/__init__.py"
+  "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
   @ONLY
 )
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel/__init__.py"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
   DESTINATION mitk
   COMPONENT wheel
   EXCLUDE_FROM_ALL
@@ -94,3 +94,34 @@ foreach(_target IN LISTS _mitk_module_targets)
     )
   endif()
 endforeach()
+
+# ---------------------------------------------------------------------------
+# Wheel build target (PythonWheel configuration only)
+# ---------------------------------------------------------------------------
+
+if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
+  set(_wheel_script "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/build_wheel.py")
+  set(_wheel_output_dir "${CMAKE_BINARY_DIR}")
+
+  if(WIN32)
+    set(_wheel_pip_deps wheel delvewheel)
+  elseif(APPLE)
+    set(_wheel_pip_deps wheel delocate)
+  else()
+    set(_wheel_pip_deps wheel auditwheel patchelf)
+  endif()
+
+  add_custom_target(mitk_python_wheel ALL
+    COMMAND ${Python3_EXECUTABLE} -m pip install --quiet ${_wheel_pip_deps}
+    COMMAND ${Python3_EXECUTABLE} ${_wheel_script}
+      --build-dir ${CMAKE_BINARY_DIR}
+      --config $<CONFIG>
+      --output-dir ${_wheel_output_dir}
+    COMMENT "Building MITK Python wheel"
+    DEPENDS mitk_python_bindings
+  )
+
+  set_target_properties(mitk_python_wheel PROPERTIES
+    FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
+  )
+endif()

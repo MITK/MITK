@@ -78,7 +78,7 @@ def test_pixel_type():
 def test_autoload_modules():
     import mitk
 
-    modules = mitk.get_autoloaded_modules()
+    modules = mitk.get_loaded_modules()
 
     # MitkCore must always be loaded (it's a direct dependency of the bindings)
     assert "MitkCore" in modules, f"MitkCore not loaded. Loaded: {modules}"

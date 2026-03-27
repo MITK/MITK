@@ -7,10 +7,10 @@ into a wheel-compatible layout, generates wheel metadata, packs the wheel,
 and runs a platform-specific delocator to bundle all native dependencies.
 
 Usage:
-  python build_wheel.py --build-dir <MITK-build> --output-dir dist/
+  python build_wheel.py --build-dir <MITK-build>
 
 Prerequisites:
-  - MITK must be fully built (SuperBuild completed)
+  - MITK must be fully built (SuperBuild completed, PythonWheel configuration)
   - The 'wheel' package must be installed: pip install wheel
   - Platform delocator must be installed:
       Windows: pip install delvewheel
@@ -84,7 +84,7 @@ def pep440_version(version_string):
     return version_string
 
 
-def cmake_install_wheel_component(build_dir, staging_dir, config="Release"):
+def cmake_install_wheel_component(build_dir, staging_dir):
     """Run cmake --install to stage the wheel component."""
     cmd = [
         "cmake",
@@ -93,7 +93,7 @@ def cmake_install_wheel_component(build_dir, staging_dir, config="Release"):
         "--prefix", str(staging_dir),
     ]
     if platform.system() == "Windows":
-        cmd.extend(["--config", config])
+        cmd.extend(["--config", "Release"])
 
     print(f"Staging wheel component: {' '.join(cmd)}")
     subprocess.check_call(cmd)
@@ -293,13 +293,8 @@ def main():
     )
     parser.add_argument(
         "--output-dir",
-        default="dist",
-        help="Directory for the output wheel (default: dist/)",
-    )
-    parser.add_argument(
-        "--config",
-        default="Release",
-        help="Build configuration (default: Release)",
+        default=None,
+        help="Directory for the output wheel (default: build-dir)",
     )
     parser.add_argument(
         "--skip-repair",
@@ -309,7 +304,7 @@ def main():
     args = parser.parse_args()
 
     build_dir = Path(args.build_dir).resolve()
-    output_dir = Path(args.output_dir).resolve()
+    output_dir = Path(args.output_dir).resolve() if args.output_dir else build_dir
 
     if not build_dir.is_dir():
         print(f"Error: build directory not found: {build_dir}", file=sys.stderr)
@@ -324,7 +319,7 @@ def main():
         staging_dir.mkdir()
 
         # Stage wheel component
-        cmake_install_wheel_component(build_dir, staging_dir, args.config)
+        cmake_install_wheel_component(build_dir, staging_dir)
 
         # Verify staging
         mitk_pkg = staging_dir / "mitk"

@@ -1,15 +1,24 @@
 """Smoke tests for the MITK wheel.
 
-Run in a clean virtual environment after pip install:
+Usage:
+  python test_wheel.py --build-dir <MITK-build>     # discover wheel in build dir
+  python test_wheel.py                               # discover wheel in CWD
 
-  python -m venv test_env
-  test_env/Scripts/activate  (or source test_env/bin/activate)
-  pip install dist/mitk-*.whl
-  python Wrapping/Python/wheel/test_wheel.py
+The script creates a temporary virtual environment, installs the wheel,
+runs the tests, and cleans up automatically.
 """
 
+import argparse
+import glob
+import os
+import subprocess
 import sys
+import tempfile
 
+
+# ---------------------------------------------------------------------------
+# Test functions (run inside the clean venv via --run-tests)
+# ---------------------------------------------------------------------------
 
 def test_import():
     import mitk
@@ -97,7 +106,8 @@ def test_autoload_modules():
     print(f"  Auto-load OK ({len(modules)} modules loaded: {', '.join(sorted(modules))})")
 
 
-def main():
+def run_tests():
+    """Execute all test functions and return exit code."""
     tests = [
         test_import,
         test_create_image,
@@ -121,6 +131,70 @@ def main():
 
     print(f"\n{passed} passed, {failed} failed")
     return 1 if failed else 0
+
+
+# ---------------------------------------------------------------------------
+# Driver: discover wheel, create venv, install, run tests in subprocess
+# ---------------------------------------------------------------------------
+
+def find_wheel(search_dir):
+    """Find the MITK wheel in the given directory."""
+    pattern = os.path.join(search_dir, "mitk-*.whl")
+    wheels = sorted(glob.glob(pattern))
+    if not wheels:
+        return None
+    return wheels[-1]  # latest by name
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Smoke-test the MITK wheel.")
+    parser.add_argument(
+        "--build-dir",
+        default=None,
+        help="Path to MITK-build directory to discover the wheel (default: CWD)",
+    )
+    parser.add_argument(
+        "--run-tests",
+        action="store_true",
+        help=argparse.SUPPRESS,  # internal: run test functions directly
+    )
+    args = parser.parse_args()
+
+    # Inner mode: run test functions directly (called from the venv subprocess)
+    if args.run_tests:
+        return run_tests()
+
+    # Outer mode: discover wheel, create venv, run tests in subprocess
+    search_dir = os.path.abspath(args.build_dir) if args.build_dir else os.getcwd()
+    wheel_path = find_wheel(search_dir)
+
+    if not wheel_path:
+        print(f"Error: no mitk-*.whl found in {search_dir}", file=sys.stderr)
+        return 1
+
+    print(f"Wheel: {wheel_path}")
+
+    with tempfile.TemporaryDirectory() as venv_dir:
+        venv_path = os.path.join(venv_dir, "venv")
+
+        # Create venv
+        subprocess.check_call([sys.executable, "-m", "venv", venv_path])
+
+        # Find the venv Python
+        if sys.platform == "win32":
+            venv_python = os.path.join(venv_path, "Scripts", "python.exe")
+        else:
+            venv_python = os.path.join(venv_path, "bin", "python")
+
+        # Install the wheel
+        subprocess.check_call(
+            [venv_python, "-m", "pip", "install", "--quiet", wheel_path]
+        )
+
+        # Run tests inside the venv
+        test_script = os.path.abspath(__file__)
+        result = subprocess.run([venv_python, test_script, "--run-tests"])
+        return result.returncode
 
 
 if __name__ == "__main__":

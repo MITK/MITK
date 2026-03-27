@@ -1,6 +1,13 @@
 # Build configuration for creating a standalone Python wheel.
-# Headless: no Qt, no BlueBerry, no plugins.
+# Headless: no Qt, no BlueBerry, no plugins. Release only.
 # Usage: cmake -DMITK_BUILD_CONFIGURATION=PythonWheel ...
+
+if(CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_CONFIGURATION_TYPES "Release" CACHE STRING "" FORCE)
+else()
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Release")
+endif()
 
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 

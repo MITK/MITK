@@ -101,7 +101,6 @@ endforeach()
 
 if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
   set(_wheel_script "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/build_wheel.py")
-  set(_wheel_output_dir "${CMAKE_BINARY_DIR}")
 
   if(WIN32)
     set(_wheel_pip_deps wheel delvewheel)
@@ -113,10 +112,7 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
 
   add_custom_target(mitk_python_wheel ALL
     COMMAND ${Python3_EXECUTABLE} -m pip install --quiet ${_wheel_pip_deps}
-    COMMAND ${Python3_EXECUTABLE} ${_wheel_script}
-      --build-dir ${CMAKE_BINARY_DIR}
-      --config $<CONFIG>
-      --output-dir ${_wheel_output_dir}
+    COMMAND ${Python3_EXECUTABLE} ${_wheel_script} --build-dir ${CMAKE_BINARY_DIR}
     COMMENT "Building MITK Python wheel"
     DEPENDS mitk_python_bindings
   )

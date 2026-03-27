@@ -1736,6 +1736,7 @@ Returns the current time step and time point from the global `TimeNavigationCont
 | Status | Code | Description |
 |--------|------|-------------|
 | 500 | `INTERNAL_ERROR` | Unexpected error reading time navigation state |
+| 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 
 ---
 
@@ -1776,6 +1777,8 @@ Content-Type: application/json
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Body missing, not valid JSON, both fields present, neither field present, wrong type, or negative timestep |
 | 422 | `RENDERING_ERROR` | Unexpected rendering framework error |
+| 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
+| 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 
 ---
 
@@ -1788,8 +1791,8 @@ Captures a screenshot of the active application window. Requires the Qt workbenc
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `format` | string | `"png"` | Image encoding: `"png"` or `"jpeg"` |
-| `width` | integer | (native) | Output width in pixels; must be positive |
-| `height` | integer | (native) | Output height in pixels; must be positive |
+| `width` | integer | (native) | Output width in pixels; must be between 1 and 8192 |
+| `height` | integer | (native) | Output height in pixels; must be between 1 and 8192 |
 
 `width` and `height` must always be provided together.
 
@@ -1809,7 +1812,7 @@ GET /api/v1/rendering/screenshot?format=jpeg&width=1280&height=720
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Invalid `format` value, non-positive or non-integer `width`/`height`, or only one of `width`/`height` provided |
+| 400 | `INVALID_REQUEST` | Invalid `format` value, non-positive or non-integer `width`/`height`, dimensions exceeding 8192, or only one of `width`/`height` provided |
 | 500 | `INTERNAL_ERROR` | Screenshot capture failed |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No screenshot provider connected (headless mode or Qt plugin not loaded) |
 
@@ -1862,8 +1865,10 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Unexpected server error |
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
+| 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | Qt workbench plugin not loaded or StdMultiWidgetEditor not open |
+| 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 | 503 | `SERVICE_UNAVAILABLE` | Server temporarily unavailable |
 
 ### 9.3 Validation Errors

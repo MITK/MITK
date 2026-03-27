@@ -280,4 +280,24 @@ namespace mitk
       503,
       instance);
   }
+
+  ErrorResponse::Json ErrorResponse::TimeNavigationNotAvailable(const std::string& instance)
+  {
+    return Create(
+      CODE_TIME_NAVIGATION_NOT_AVAILABLE,
+      "Time Navigation Not Available",
+      "Time navigation controller is not available.",
+      503,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::TimeStepperNotAvailable(const std::string& instance)
+  {
+    return Create(
+      CODE_TIME_STEPPER_NOT_AVAILABLE,
+      "Time Stepper Not Available",
+      "Time stepper is not available.",
+      500,
+      instance);
+  }
 }

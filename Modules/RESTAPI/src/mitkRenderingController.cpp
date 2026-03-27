@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -425,7 +426,7 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
 
   if (tncNull)
   {
-    const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
+    const auto error = ErrorResponse::TimeNavigationNotAvailable(req.path);
     this->SendErrorResponse(res, 503, error);
     return;
   }
@@ -507,82 +508,60 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
 
   try
   {
+    std::function<unsigned int(TimeNavigationController*)> computeStep;
     if (hasTimestep)
     {
       const auto ts = static_cast<unsigned int>(body["timestep"].get<int>());
-      bool tncNull = false;
-      bool stepperNull = false;
-      this->Dispatch([ts, &tncNull, &stepperNull]()
-      {
-        auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
-        if (tnc == nullptr)
-        {
-          tncNull = true;
-          return;
-        }
-        auto* const stepper = tnc->GetStepper();
-        if (stepper == nullptr)
-        {
-          stepperNull = true;
-          return;
-        }
-        stepper->SetPos(ts);
-        tnc->SendTime();
-      });
-      if (tncNull)
-      {
-        const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
-        this->SendErrorResponse(res, 503, error);
-        return;
-      }
-      if (stepperNull)
-      {
-        const auto error = ErrorResponse::InternalError("Time stepper is not available.", req.path);
-        this->SendErrorResponse(res, 500, error);
-        return;
-      }
+      computeStep = [ts](TimeNavigationController*) { return ts; };
     }
     else
     {
       const double tp = body["timepoint_ms"].get<double>();
-      bool tncNull = false;
-      bool stepperNull = false;
-      this->Dispatch([tp, &tncNull, &stepperNull]()
+      computeStep = [tp](TimeNavigationController* tnc)
       {
-        auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
-        if (tnc == nullptr)
-        {
-          tncNull = true;
-          return;
-        }
-        auto* const stepper = tnc->GetStepper();
-        if (stepper == nullptr)
-        {
-          stepperNull = true;
-          return;
-        }
         const auto tg = tnc->GetInputWorldTimeGeometry();
         unsigned int ts = 0;
         if (nullptr != tg)
         {
           ts = static_cast<unsigned int>(tg->TimePointToTimeStep(tp));
         }
-        stepper->SetPos(ts);
-        tnc->SendTime();
-      });
-      if (tncNull)
-      {
-        const auto error = ErrorResponse::InternalError("Time navigation controller is not available.", req.path);
-        this->SendErrorResponse(res, 503, error);
-        return;
-      }
-      if (stepperNull)
-      {
-        const auto error = ErrorResponse::InternalError("Time stepper is not available.", req.path);
-        this->SendErrorResponse(res, 500, error);
-        return;
-      }
+        return ts;
+      };
     }
+
+    bool tncNull = false;
+    bool stepperNull = false;
+    this->Dispatch([&computeStep, &tncNull, &stepperNull]()
+    {
+      auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
+      if (tnc == nullptr)
+      {
+        tncNull = true;
+        return;
+      }
+      auto* const stepper = tnc->GetStepper();
+      if (stepper == nullptr)
+      {
+        stepperNull = true;
+        return;
+      }
+      stepper->SetPos(computeStep(tnc));
+      tnc->SendTime();
+    });
+
+    if (tncNull)
+    {
+      const auto error = ErrorResponse::TimeNavigationNotAvailable(req.path);
+      this->SendErrorResponse(res, 503, error);
+      return;
+    }
+    if (stepperNull)
+    {
+      const auto error = ErrorResponse::TimeStepperNotAvailable(req.path);
+      this->SendErrorResponse(res, 500, error);
+      return;
+    }
+
     res.status = 204;
   }
   catch (const mitk::Exception& e)
@@ -666,6 +645,15 @@ void RenderingController::HandleGET_screenshot(const httplib::Request& req, http
     {
       const auto error = ErrorResponse::InvalidRequest(
         "'width' and 'height' must be positive integers.", req.path);
+      this->SendErrorResponse(res, 400, error);
+      return;
+    }
+
+    static constexpr int maxDimension = 8192;
+    if (width > maxDimension || height > maxDimension)
+    {
+      const auto error = ErrorResponse::InvalidRequest(
+        "'width' and 'height' must not exceed " + std::to_string(maxDimension) + ".", req.path);
       this->SendErrorResponse(res, 400, error);
       return;
     }

@@ -70,6 +70,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetScreenshotWithoutProviderReturns503);
   MITK_TEST(GetScreenshotWithInvalidFormatReturns400);
   MITK_TEST(GetScreenshotWithNonPositiveWidthReturns400);
+  MITK_TEST(GetScreenshotWithExcessiveDimensionsReturns400);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -601,6 +602,26 @@ public:
     req.path = "/api/v1/rendering/screenshot";
     req.params.emplace("width", "0");
     req.params.emplace("height", "100");
+    httplib::Response res;
+
+    m_Controller->HandleGET_screenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  void GetScreenshotWithExcessiveDimensionsReturns400()
+  {
+    m_RenderWindowBridge->SetScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) {
+        return std::vector<unsigned char>{};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/screenshot";
+    req.params.emplace("width", "10000");
+    req.params.emplace("height", "10000");
     httplib::Response res;
 
     m_Controller->HandleGET_screenshot(req, res);

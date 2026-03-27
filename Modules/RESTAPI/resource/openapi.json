@@ -2176,7 +2176,8 @@
               }
             }
           },
-          "500": { "$ref": "#/components/responses/InternalError" }
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
         }
       },
       "put": {
@@ -2225,7 +2226,9 @@
                 "schema": { "$ref": "#/components/schemas/Error" }
               }
             }
-          }
+          },
+          "500": { "$ref": "#/components/responses/TimeStepperNotAvailable" },
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
         }
       }
     },
@@ -2247,14 +2250,14 @@
             "name": "width",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "minimum": 1 },
+            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
             "description": "Output width in pixels. Must be provided together with 'height'."
           },
           {
             "name": "height",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "minimum": 1 },
+            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
             "description": "Output height in pixels. Must be provided together with 'width'."
           }
         ],
@@ -2967,6 +2970,44 @@
                 "code": "INTERNAL_ERROR",
                 "title": "Internal Server Error",
                 "message": "An unexpected error occurred",
+                "status": 500
+              }
+            }
+          }
+        }
+      },
+      "TimeNavigationNotAvailable": {
+        "description": "Time navigation controller is not available",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/TIME_NAVIGATION_NOT_AVAILABLE",
+                "code": "TIME_NAVIGATION_NOT_AVAILABLE",
+                "title": "Time Navigation Not Available",
+                "message": "Time navigation controller is not available.",
+                "status": 503
+              }
+            }
+          }
+        }
+      },
+      "TimeStepperNotAvailable": {
+        "description": "Time stepper is not available",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/TIME_STEPPER_NOT_AVAILABLE",
+                "code": "TIME_STEPPER_NOT_AVAILABLE",
+                "title": "Time Stepper Not Available",
+                "message": "Time stepper is not available.",
                 "status": 500
               }
             }

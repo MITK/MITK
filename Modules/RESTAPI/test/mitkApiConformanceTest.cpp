@@ -459,7 +459,9 @@ private:
       mitk::ErrorResponse::CODE_UNAUTHORIZED,
       mitk::ErrorResponse::CODE_RATE_LIMIT_EXCEEDED,
       mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED,
-      mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_AVAILABLE
+      mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_TIME_NAVIGATION_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE
     };
   }
 

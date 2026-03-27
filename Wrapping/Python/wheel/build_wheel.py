@@ -84,10 +84,10 @@ def pep440_version(version_string):
     return version_string
 
 
-def cmake_install_wheel_component(build_dir, staging_dir):
+def cmake_install_wheel_component(build_dir, staging_dir, cmake_command="cmake"):
     """Run cmake --install to stage the wheel component."""
     cmd = [
-        "cmake",
+        cmake_command,
         "--install", str(build_dir),
         "--component", "wheel",
         "--prefix", str(staging_dir),
@@ -264,7 +264,7 @@ def repair_wheel(wheel_path, output_dir, search_paths):
         env = os.environ.copy()
         env["DYLD_LIBRARY_PATH"] = ":".join(search_paths) + ":" + env.get("DYLD_LIBRARY_PATH", "")
         cmd = [
-            sys.executable, "-m", "delocate", "repair",
+            sys.executable, "-m", "delocate.cmd.delocate_wheel",
             str(wheel_path),
             "-w", str(output_dir),
         ]
@@ -297,6 +297,11 @@ def main():
         help="Directory for the output wheel (default: build-dir)",
     )
     parser.add_argument(
+        "--cmake",
+        default="cmake",
+        help="Path to cmake executable (default: cmake)",
+    )
+    parser.add_argument(
         "--skip-repair",
         action="store_true",
         help="Skip the delocator step (for debugging)",
@@ -319,7 +324,7 @@ def main():
         staging_dir.mkdir()
 
         # Stage wheel component
-        cmake_install_wheel_component(build_dir, staging_dir)
+        cmake_install_wheel_component(build_dir, staging_dir, args.cmake)
 
         # Verify staging
         mitk_pkg = staging_dir / "mitk"

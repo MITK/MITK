@@ -12,7 +12,7 @@ pybind11_add_module(mitk_python_bindings
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore Python3::Python
+  PRIVATE MitkCore Python3::Module
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES
@@ -51,7 +51,11 @@ endif()
 #   python Wrapping/Python/wheel/build_wheel.py --build-dir <build-dir>
 # ---------------------------------------------------------------------------
 
-if(NOT WIN32)
+if(APPLE)
+  set_target_properties(mitk_python_bindings PROPERTIES
+    INSTALL_RPATH "@loader_path"
+  )
+elseif(NOT WIN32)
   set_target_properties(mitk_python_bindings PROPERTIES
     INSTALL_RPATH "$ORIGIN"
   )
@@ -82,6 +86,8 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
 
 get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
 
+set(_wheel_autoload_targets "")
+
 foreach(_target IN LISTS _mitk_module_targets)
   get_target_property(_autoload_dir ${_target} MITK_AUTOLOAD_DIRECTORY)
 
@@ -92,6 +98,7 @@ foreach(_target IN LISTS _mitk_module_targets)
       RUNTIME DESTINATION mitk/${_autoload_dir}
       LIBRARY DESTINATION mitk/${_autoload_dir}
     )
+    list(APPEND _wheel_autoload_targets ${_target})
   endif()
 endforeach()
 
@@ -112,9 +119,9 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
 
   add_custom_target(mitk_python_wheel ALL
     COMMAND ${Python3_EXECUTABLE} -m pip install --quiet ${_wheel_pip_deps}
-    COMMAND ${Python3_EXECUTABLE} ${_wheel_script} --build-dir ${CMAKE_BINARY_DIR}
+    COMMAND ${Python3_EXECUTABLE} ${_wheel_script} --build-dir ${CMAKE_BINARY_DIR} --cmake ${CMAKE_COMMAND}
     COMMENT "Building MITK Python wheel"
-    DEPENDS mitk_python_bindings
+    DEPENDS mitk_python_bindings ${_wheel_autoload_targets}
   )
 
   set_target_properties(mitk_python_wheel PROPERTIES

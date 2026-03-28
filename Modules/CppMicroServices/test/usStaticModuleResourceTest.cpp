@@ -98,10 +98,11 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   assert(GetModuleContext());
 
-
-
 #ifdef US_PLATFORM_WINDOWS
   const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
+#else
+  const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
+#endif
 
   SharedLibrary libB(LIB_PATH, "TestModuleB");
 
@@ -113,7 +114,6 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
   {
     US_TEST_FAILED_MSG(<< "Load module exception: " << e.what())
   }
-#endif
 
   Module* module = ModuleRegistry::GetModule("TestModuleB");
   US_TEST_CONDITION_REQUIRED(module != nullptr, "Test for existing module TestModuleB")

@@ -102,7 +102,7 @@ void ModuleRegistry::Register(ModuleInfo* info)
       module = new Module();
       countLock()->Lock();
       info->id = ++regCount;
-      assert(info->id == 1 ? info->name == "CppMicroServices" : true);
+      assert(info->id == 1 ? info->name == "MitkCppMicroServices" : true);
       countLock()->Unlock();
 
       module->Init(coreModuleContext(), info);

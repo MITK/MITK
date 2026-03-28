@@ -26,13 +26,9 @@ found in the LICENSE file.
     #define US_ATOMIC_OPTIMIZATION_APPLE
   #endif
 
-#elif defined(__GLIBCPP__) || defined(__GLIBCXX__)
+#elif defined(__GNUC__)
 
-  #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2))
-    # include <ext/atomicity.h>
-  #else
-    # include <bits/atomicity.h>
-  #endif
+  #include <ext/atomicity.h>
   #define US_ATOMIC_OPTIMIZATION_GNUC
 
 #endif

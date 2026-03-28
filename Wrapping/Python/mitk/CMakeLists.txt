@@ -15,6 +15,13 @@ target_link_libraries(mitk_python_bindings
   PRIVATE MitkCore Python3::Module
 )
 
+# pybind11 extension modules resolve Python C API symbols at runtime from
+# the Python interpreter. Counteract MITK's global -Wl,--no-undefined
+# (in CMAKE_MODULE_LINKER_FLAGS) for this target; last --unresolved-symbols wins.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT APPLE)
+  target_link_options(mitk_python_bindings PRIVATE "-Wl,--unresolved-symbols=ignore-all")
+endif()
+
 set_target_properties(mitk_python_bindings PROPERTIES
   FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
   OUTPUT_NAME "mitk"

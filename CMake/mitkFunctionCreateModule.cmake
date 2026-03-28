@@ -1,3 +1,13 @@
+# CppMicroServices resource and module init helpers
+include(usFunctionCheckCompilerFlags)
+include(usFunctionCheckResourceLinking)
+include(usFunctionGenerateModuleInit)
+include(usFunctionAddResources)
+include(usFunctionEmbedResources)
+include(usFunctionGetResourceSource)
+
+usFunctionCheckResourceLinking()
+
 ##################################################################
 #
 # mitk_create_module
@@ -369,9 +379,6 @@ function(mitk_create_module)
     endif(MODULE_FORCE_STATIC)
 
     if(NOT MODULE_HEADERS_ONLY)
-      if(NOT MODULE_NO_INIT OR RESOURCE_FILES)
-        find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
-      endif()
       if(NOT MODULE_NO_INIT)
         usFunctionGenerateModuleInit(CPP_FILES)
       endif()
@@ -603,7 +610,7 @@ function(mitk_create_module)
     if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
       # Add a CppMicroServices dependency implicitly, since it is
       # needed for the generated "module initialization" code.
-      set(DEPENDS "CppMicroServices;${DEPENDS}")
+      set(DEPENDS "MitkCppMicroServices;${DEPENDS}")
     endif()
     if(DEPENDS OR MODULE_PACKAGE_DEPENDS)
       mitk_use_modules(TARGET ${MODULE_TARGET}

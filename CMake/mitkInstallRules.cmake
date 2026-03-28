@@ -5,21 +5,6 @@ if(WIN32)
     DESTINATION bin)
 endif()
 
-# Install CppMicroServices - it uses usMacroCreateModule() (not mitk_create_module())
-# so it is not tracked in MITK_MODULE_TARGETS, and US_NO_INSTALL disables its own
-# install rules.
-
-if(TARGET CppMicroServices)
-  foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
-    install(TARGETS CppMicroServices
-      RUNTIME_DEPENDENCY_SET ${_depset}
-      RUNTIME DESTINATION ${_bindir}
-      LIBRARY DESTINATION ${_bindir}
-      PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
-      PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
-  endforeach()
-endif()
-
 # Install Python3 with MITK Python module
 
 if(MITK_USE_Python3)

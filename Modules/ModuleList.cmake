@@ -3,6 +3,7 @@
 
 set(MITK_MODULES
   Log
+  CppMicroServices
   Core
   Forms
   FormsUI

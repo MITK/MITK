@@ -270,4 +270,34 @@ namespace mitk
       403,
       instance);
   }
+
+  ErrorResponse::Json ErrorResponse::RenderWindowNotAvailable(const std::string& instance)
+  {
+    return Create(
+      CODE_RENDER_WINDOW_NOT_AVAILABLE,
+      "Render Window Not Available",
+      "No screenshot provider is connected. The Qt workbench plugin must be running.",
+      503,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::TimeNavigationNotAvailable(const std::string& instance)
+  {
+    return Create(
+      CODE_TIME_NAVIGATION_NOT_AVAILABLE,
+      "Time Navigation Not Available",
+      "Time navigation controller is not available.",
+      503,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::TimeStepperNotAvailable(const std::string& instance)
+  {
+    return Create(
+      CODE_TIME_STEPPER_NOT_AVAILABLE,
+      "Time Stepper Not Available",
+      "Time stepper is not available.",
+      500,
+      instance);
+  }
 }

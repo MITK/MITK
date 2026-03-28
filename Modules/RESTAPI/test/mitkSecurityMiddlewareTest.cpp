@@ -27,30 +27,10 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
-#include <chrono>
-#include <thread>
-
 namespace
 {
   /** Port used for security integration tests. Chosen to be unlikely to conflict. */
   constexpr int kTestPort = 59001;
-
-  /** Wait until the server is accepting connections or the timeout expires. */
-  bool WaitForServer(int port, int timeoutMs = 2000)
-  {
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeoutMs);
-    while (std::chrono::steady_clock::now() < deadline)
-    {
-      httplib::Client probe("127.0.0.1", port);
-      probe.set_connection_timeout(0, 50000); // 50 ms
-      if (const auto res = probe.Get("/api/v1/health"))
-      {
-        return true;
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
-    return false;
-  }
 
   /** Build a minimal enabled RestServerConfig for integration tests. */
   mitk::RestServerConfig MakeTestConfig()
@@ -238,7 +218,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
     const auto res = client.Get("/api/v1/datastorage/nodes");
@@ -259,7 +238,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
     httplib::Headers headers = {{"Authorization", "Bearer wrong-token"}};
@@ -279,7 +257,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
     httplib::Headers headers = {{"Authorization", "Bearer super-secret-token"}};
@@ -299,7 +276,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
     // /health and /info are exempt from auth
@@ -327,7 +303,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
 
@@ -358,7 +333,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
 
@@ -384,7 +358,6 @@ public:
     server.SetConfig(cfg);
 
     CPPUNIT_ASSERT_MESSAGE("Server failed to start", server.Start());
-    CPPUNIT_ASSERT_MESSAGE("Server did not become ready", WaitForServer(kTestPort));
 
     httplib::Client client("127.0.0.1", kTestPort);
     const auto res = client.Get("/api/v1/health");

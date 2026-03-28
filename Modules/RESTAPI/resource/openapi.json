@@ -1527,7 +1527,7 @@
         }
       }
     },
-    "/datastorage/nodes/{uid}/properties/{key}": {
+    "/datastorage/nodes/{uid}/properties/{property_key}": {
       "get": {
         "tags": [
           "Properties"
@@ -2009,6 +2009,292 @@
           }
         }
       }
+    },
+    "/rendering/selected-position": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get crosshair position and scene bounds",
+        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "operationId": "getRenderingSelectedPosition",
+        "responses": {
+          "200": {
+            "description": "Current crosshair position and scene bounds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["position", "bounds"],
+                  "properties": {
+                    "position": {
+                      "type": "array",
+                      "items": { "type": "number" },
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "description": "Crosshair position in world coordinates [x, y, z]",
+                      "example": [10.0, 20.0, 30.0]
+                    },
+                    "bounds": {
+                      "type": "object",
+                      "required": ["min", "max"],
+                      "properties": {
+                        "min": {
+                          "oneOf": [
+                            { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                            { "type": "null" }
+                          ],
+                          "description": "World-space minimum corner of the scene AABB, or null if no geometry"
+                        },
+                        "max": {
+                          "oneOf": [
+                            { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                            { "type": "null" }
+                          ],
+                          "description": "World-space maximum corner of the scene AABB, or null if no geometry"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "position": [10.0, 20.0, 30.0],
+                  "bounds": { "min": [-50.0, -50.0, -50.0], "max": [50.0, 50.0, 50.0] }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": {
+            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "StdMultiWidgetEditor is not open — cannot read crosshair position.",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/selected-position"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Set crosshair position",
+        "description": "Moves the crosshair to the given 3D world position via IRenderWindowPart::SetSelectedPosition() on the StdMultiWidgetEditor. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "operationId": "putRenderingSelectedPosition",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["position"],
+                "properties": {
+                  "position": {
+                    "type": "array",
+                    "items": { "type": "number" },
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "description": "New crosshair position in world coordinates [x, y, z]"
+                  }
+                }
+              },
+              "example": { "position": [10.0, 20.0, 30.0] }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Crosshair position updated" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": {
+            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "StdMultiWidgetEditor is not open — cannot set crosshair position.",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/selected-position"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rendering/selected-time": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get current time step and time bounds",
+        "description": "Returns the active time step and time point from the global TimeNavigationController, together with the time geometry bounds.",
+        "operationId": "getRenderingSelectedTime",
+        "responses": {
+          "200": {
+            "description": "Current time navigation state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["timepoint_ms", "timestep", "bounds"],
+                  "properties": {
+                    "timepoint_ms": {
+                      "type": "number",
+                      "description": "Selected time point in milliseconds"
+                    },
+                    "timestep": {
+                      "type": "integer",
+                      "description": "Selected time step index (zero-based)"
+                    },
+                    "bounds": {
+                      "type": "object",
+                      "required": ["min_timepoint_ms", "max_timepoint_ms", "steps"],
+                      "properties": {
+                        "min_timepoint_ms": { "type": "number", "description": "Start of the time range in ms" },
+                        "max_timepoint_ms": { "type": "number", "description": "End of the time range in ms" },
+                        "steps": { "type": "integer", "description": "Total number of time steps" }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "timepoint_ms": 1500.0,
+                  "timestep": 3,
+                  "bounds": { "min_timepoint_ms": 0.0, "max_timepoint_ms": 4500.0, "steps": 10 }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Set active time step or time point",
+        "description": "Sets the active time in the global TimeNavigationController. Exactly one of 'timepoint_ms' or 'timestep' must be provided.",
+        "operationId": "putRenderingSelectedTime",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "timepoint_ms": {
+                    "type": "number",
+                    "description": "Target time point in milliseconds"
+                  },
+                  "timestep": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Target time step index (zero-based)"
+                  }
+                }
+              },
+              "examples": {
+                "by-timepoint": {
+                  "summary": "Set by time point",
+                  "value": { "timepoint_ms": 1500.0 }
+                },
+                "by-timestep": {
+                  "summary": "Set by time step",
+                  "value": { "timestep": 3 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Time navigation state updated" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "422": {
+            "description": "Unexpected error in the rendering framework",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/TimeStepperNotAvailable" },
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
+        }
+      }
+    },
+    "/rendering/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of the active application window",
+        "description": "Captures a screenshot of the active Qt application window. Requires the Qt workbench plugin to be running. Returns binary image data in PNG or JPEG format.",
+        "operationId": "getRenderingScreenshot",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["png", "jpeg"], "default": "png" },
+            "description": "Image encoding format"
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+            "description": "Output width in pixels. Must be provided together with 'height'."
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+            "description": "Output height in pixels. Must be provided together with 'width'."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Screenshot image",
+            "content": {
+              "image/png": {
+                "schema": { "type": "string", "format": "binary" }
+              },
+              "image/jpeg": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": {
+            "description": "No screenshot provider connected (headless mode or Qt plugin not loaded)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/screenshot"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2467,7 +2753,7 @@
         "example": "node_1"
       },
       "PropertyKey": {
-        "name": "key",
+        "name": "property_key",
         "in": "path",
         "required": true,
         "description": "Property key name",
@@ -2684,6 +2970,44 @@
                 "code": "INTERNAL_ERROR",
                 "title": "Internal Server Error",
                 "message": "An unexpected error occurred",
+                "status": 500
+              }
+            }
+          }
+        }
+      },
+      "TimeNavigationNotAvailable": {
+        "description": "Time navigation controller is not available",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/TIME_NAVIGATION_NOT_AVAILABLE",
+                "code": "TIME_NAVIGATION_NOT_AVAILABLE",
+                "title": "Time Navigation Not Available",
+                "message": "Time navigation controller is not available.",
+                "status": 503
+              }
+            }
+          }
+        }
+      },
+      "TimeStepperNotAvailable": {
+        "description": "Time stepper is not available",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/TIME_STEPPER_NOT_AVAILABLE",
+                "code": "TIME_STEPPER_NOT_AVAILABLE",
+                "title": "Time Stepper Not Available",
+                "message": "Time stepper is not available.",
                 "status": 500
               }
             }

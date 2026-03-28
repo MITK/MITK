@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMapper_h
 #define mitkMapper_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkLevelWindow.h"
-#include "mitkLocalStorageHandler.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkLevelWindow.h>
+#include <mitkLocalStorageHandler.h>
+#include <mitkVtkPropRenderer.h>
 #include <MitkCoreExports.h>
 
 #include <itkObject.h>

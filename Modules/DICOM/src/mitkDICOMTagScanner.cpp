@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMTagScanner.h"
+#include <mitkDICOMTagScanner.h>
 
 std::mutex mitk::DICOMTagScanner::s_LocaleMutex;
 

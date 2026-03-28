@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <string>
 #include <map>
 
-#include "MitkModelFitExports.h"
-#include "mitkModelBase.h"
+#include <MitkModelFitExports.h>
+#include <mitkModelBase.h>
 
 namespace mitk
 {

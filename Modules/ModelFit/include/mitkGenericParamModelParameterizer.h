@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkGenericParamModelParameterizer_h
 #define mitkGenericParamModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkGenericParamModel.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkGenericParamModel.h>
 
 namespace mitk
 {

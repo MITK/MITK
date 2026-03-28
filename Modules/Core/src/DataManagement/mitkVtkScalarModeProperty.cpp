@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkScalarModeProperty.h"
+#include <mitkVtkScalarModeProperty.h>
 #include <vtkAbstractMapper.h>
 
 mitk::VtkScalarModeProperty::VtkScalarModeProperty()

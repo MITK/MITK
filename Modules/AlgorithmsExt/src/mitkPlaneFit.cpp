@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneFit.h"
+#include <mitkPlaneFit.h>
 
-#include "mitkGeometryData.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkGeometryData.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkProportionalTimeGeometry.h>
 
 #include <vnl/algo/vnl_svd.h>

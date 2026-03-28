@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCurveParameterFunctor.h"
+#include <mitkCurveParameterFunctor.h>
 
 mitk::SimpleFunctorBase::OutputPixelVectorType
 mitk::CurveParameterFunctor::Compute(const mitk::SimpleFunctorBase::InputPixelVectorType& value)

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkSliceNavigationWidget_h
 #define QmitkSliceNavigationWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 #include <mitkStepper.h>
 

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <itkConfigure.h>
 
-#include "mitkBaseProperty.h"
+#include <mitkBaseProperty.h>
 #include <MitkCoreExports.h>
 
 #include <string>

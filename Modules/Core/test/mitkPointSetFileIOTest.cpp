@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileWriterRegistry.h"
-#include "mitkIOUtil.h"
-#include "mitkPointSet.h"
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkTestingMacros.h"
+#include <mitkFileWriterRegistry.h>
+#include <mitkIOUtil.h>
+#include <mitkPointSet.h>
+#include <mitkProportionalTimeGeometry.h>
+#include <mitkTestingMacros.h>
 
 #include <itksys/SystemTools.hxx>
 #include <random>

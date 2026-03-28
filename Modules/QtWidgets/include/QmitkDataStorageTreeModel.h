@@ -21,8 +21,8 @@ found in the LICENSE file.
 
 #include <QAbstractListModel>
 
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 #include <QList>
 #include <string>

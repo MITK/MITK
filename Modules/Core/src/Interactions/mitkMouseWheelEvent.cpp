@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMouseWheelEvent.h"
+#include <mitkMouseWheelEvent.h>
 
 mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer *baseRenderer,
                                        const Point2D &mousePosition,

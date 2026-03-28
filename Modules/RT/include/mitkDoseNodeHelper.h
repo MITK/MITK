@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef mitkDoseNodeHelper_h
 #define mitkDoseNodeHelper_h
 
-#include "mitkIsoDoseLevelCollections.h"
-#include "mitkDataNode.h"
-#include "MitkRTExports.h"
+#include <mitkIsoDoseLevelCollections.h>
+#include <mitkDataNode.h>
+#include <MitkRTExports.h>
 
 namespace mitk
 {

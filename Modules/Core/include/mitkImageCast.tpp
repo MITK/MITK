@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifndef DOXYGEN_SKIP
+#ifndef mitkImageCast_tpp
 
   template <typename ItkOutputImageType>
   void CastToItkImage(const mitk::Image *mitkImage, itk::SmartPointer<ItkOutputImageType> &itkOutputImage)
@@ -67,5 +67,5 @@ namespace mitk
     itkOutputImage = castImageFilter->GetOutput();
   }
 
-#endif // DOXYGEN_SKIP
+#endif // mitkImageCast_tpp
 }

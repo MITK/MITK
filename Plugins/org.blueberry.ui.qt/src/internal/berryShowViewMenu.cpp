@@ -13,14 +13,14 @@ found in the LICENSE file.
 
 #include "berryShowViewMenu.h"
 
-#include <berryMenuManager.h>
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
-#include <berryCommandContributionItem.h>
-#include <berrySeparator.h>
-#include <berryIPluginContribution.h>
-#include <berryIViewRegistry.h>
-#include <berryIWorkbenchCommandConstants.h>
+#include "berryMenuManager.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryIWorkbenchPage.h"
+#include "berryCommandContributionItem.h"
+#include "berrySeparator.h"
+#include "berryIPluginContribution.h"
+#include "berryIViewRegistry.h"
+#include "berryIWorkbenchCommandConstants.h"
 #include <berryObjectString.h>
 
 #include "berryCommandContributionItemParameter.h"

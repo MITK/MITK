@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryLeftToRightTabOrder.h"
 
-#include <internal/berryWorkbenchConstants.h>
+#include "internal/berryWorkbenchConstants.h"
 
 namespace berry
 {

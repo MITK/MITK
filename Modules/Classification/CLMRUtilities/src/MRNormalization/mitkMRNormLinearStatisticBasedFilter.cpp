@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMRNormLinearStatisticBasedFilter.h"
+#include <mitkMRNormLinearStatisticBasedFilter.h>
 
-#include "mitkImageToItk.h"
-#include "mitkImageAccessByItk.h"
+#include <mitkImageToItk.h>
+#include <mitkImageAccessByItk.h>
 
-#include "itkImageRegionIterator.h"
+#include <itkImageRegionIterator.h>
 // MITK
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>

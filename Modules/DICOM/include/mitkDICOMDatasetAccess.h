@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMDatasetAccess_h
 #define mitkDICOMDatasetAccess_h
 
-#include "mitkDICOMTag.h"
-#include "mitkDICOMTagPath.h"
+#include <mitkDICOMTag.h>
+#include <mitkDICOMTagPath.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

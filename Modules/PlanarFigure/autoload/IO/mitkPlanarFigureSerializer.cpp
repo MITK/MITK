@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureSerializer.h"
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigureSerializer.h>
+#include <mitkPlanarFigure.h>
 
 #include <mitkIOUtil.h>
 

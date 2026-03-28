@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
 #include "mitkDataStorageController.h"
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
@@ -522,7 +522,7 @@ public:
     std::string uid = this->GetFirstNodeUid();
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/opacity", "",
-                                   {{"uid", uid}, {"key", "opacity"}});
+                                   {{"uid", uid}, {"property_key", "opacity"}});
     httplib::Response res;
 
     m_Controller->HandleGET_nodes_uid_properties_key(req, res);
@@ -552,7 +552,7 @@ public:
     std::string uid = this->GetFirstNodeUid();
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/nonexistent", "",
-                                   {{"uid", uid}, {"key", "nonexistent"}});
+                                   {{"uid", uid}, {"property_key", "nonexistent"}});
     httplib::Response res;
 
     m_Controller->HandleGET_nodes_uid_properties_key(req, res);
@@ -575,7 +575,7 @@ public:
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/opacity",
                                    body.dump(),
-                                   {{"uid", uid}, {"key", "opacity"}});
+                                   {{"uid", uid}, {"property_key", "opacity"}});
     httplib::Response res;
 
     m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
@@ -603,7 +603,7 @@ public:
     std::string uid = this->GetFirstNodeUid();
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/customProp", "",
-                                   {{"uid", uid}, {"key", "customProp"}});
+                                   {{"uid", uid}, {"property_key", "customProp"}});
     httplib::Response res;
 
     m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
@@ -623,7 +623,7 @@ public:
     std::string uid = this->GetFirstNodeUid();
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/nonExistentProp", "",
-                                   {{"uid", uid}, {"key", "nonExistentProp"}});
+                                   {{"uid", uid}, {"property_key", "nonExistentProp"}});
     httplib::Response res;
 
     m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
@@ -643,7 +643,7 @@ public:
     std::string uid = this->GetFirstNodeUid();
 
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties/name", "",
-                                   {{"uid", uid}, {"key", "name"}});
+                                   {{"uid", uid}, {"property_key", "name"}});
     httplib::Response res;
 
     m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
@@ -729,7 +729,7 @@ public:
     auto req = this->CreateRequest(
       "/api/v1/datastorage/nodes/" + uid + "/properties/my%20property",
       body.dump(),
-      {{"uid", uid}, {"key", keyWithSpace}});  // Decoded key
+      {{"uid", uid}, {"property_key", keyWithSpace}});  // Decoded key
     httplib::Response res;
 
     m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
@@ -738,7 +738,7 @@ public:
     // Verify we can get the property back
     auto getReq = this->CreateRequest(
       "/api/v1/datastorage/nodes/" + uid + "/properties/my%20property", "",
-      {{"uid", uid}, {"key", keyWithSpace}});
+      {{"uid", uid}, {"property_key", keyWithSpace}});
     httplib::Response getRes;
 
     m_Controller->HandleGET_nodes_uid_properties_key(getReq, getRes);
@@ -767,7 +767,7 @@ public:
     auto req = this->CreateRequest(
       "/api/v1/datastorage/nodes/" + uid + "/properties/" + keyWithDot,
       body.dump(),
-      {{"uid", uid}, {"key", keyWithDot}});
+      {{"uid", uid}, {"property_key", keyWithDot}});
     httplib::Response res;
 
     m_Controller->HandlePUT_nodes_uid_properties_key(req, res);
@@ -776,7 +776,7 @@ public:
     // Verify we can get the property back
     auto getReq = this->CreateRequest(
       "/api/v1/datastorage/nodes/" + uid + "/properties/" + keyWithDot, "",
-      {{"uid", uid}, {"key", keyWithDot}});
+      {{"uid", uid}, {"property_key", keyWithDot}});
     httplib::Response getRes;
 
     m_Controller->HandleGET_nodes_uid_properties_key(getReq, getRes);

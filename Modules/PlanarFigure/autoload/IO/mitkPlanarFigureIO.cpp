@@ -12,25 +12,25 @@ found in the LICENSE file.
 
 #include <mitkPlanarFigureIO.h>
 
-#include "mitkCustomMimeType.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkExceptionMacro.h"
+#include <mitkCustomMimeType.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkExceptionMacro.h>
 
-#include "mitkPlanarAngle.h"
-#include "mitkPlanarArrow.h"
-#include "mitkPlanarBezierCurve.h"
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarCross.h"
-#include "mitkPlanarDoubleEllipse.h"
-#include "mitkPlanarEllipse.h"
-#include "mitkPlanarFourPointAngle.h"
-#include "mitkPlanarLine.h"
-#include "mitkPlanarPolygon.h"
-#include "mitkPlanarRectangle.h"
-#include "mitkPlanarSubdivisionPolygon.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarArrow.h>
+#include <mitkPlanarBezierCurve.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarCross.h>
+#include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
+#include <mitkPlaneGeometry.h>
 
-#include "mitkBasePropertySerializer.h"
+#include <mitkBasePropertySerializer.h>
 
 #include <mitkLocaleSwitch.h>
 

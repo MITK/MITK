@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk includes
-#include "mitkTestingConfig.h"
+#include <mitkTestingConfig.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>

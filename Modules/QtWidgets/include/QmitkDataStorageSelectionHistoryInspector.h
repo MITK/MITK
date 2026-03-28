@@ -15,9 +15,9 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "QmitkAbstractDataStorageInspector.h"
+#include <QmitkAbstractDataStorageInspector.h>
 #include <QSortFilterProxyModel>
-#include "QmitkSimpleTextOverlayWidget.h"
+#include <QmitkSimpleTextOverlayWidget.h>
 #include <memory>
 
 namespace Ui

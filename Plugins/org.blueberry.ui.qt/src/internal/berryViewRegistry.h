@@ -22,7 +22,7 @@ found in the LICENSE file.
 #include "berryViewRegistryReader.h"
 #include "berryStickyViewDescriptor.h"
 
-#include "berryIExtensionPoint.h"
+#include <berryIExtensionPoint.h>
 
 
 namespace berry

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoTissueCompartmentModel.h"
-#include "mitkConvolutionHelper.h"
+#include <mitkTwoTissueCompartmentModel.h>
+#include <mitkConvolutionHelper.h>
 #include <fstream>
 const std::string mitk::TwoTissueCompartmentModel::MODEL_DISPLAY_NAME = "Two Tissue Compartment Model";
 

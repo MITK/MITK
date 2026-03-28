@@ -69,7 +69,7 @@ namespace mitk
     static const char *GetStaticNameOfClass()
     {
       // concatenate a prefix dependent on the template type and our own classname
-      static std::string nameOfClass = std::string(VectorPropertyDataType<DATATYPE>::prefix()) + "VectorProperty";
+      static std::string nameOfClass = std::string(VectorPropertyDataType<DATATYPE>::prefix()).append("VectorProperty");
       return nameOfClass.c_str();
     }
 

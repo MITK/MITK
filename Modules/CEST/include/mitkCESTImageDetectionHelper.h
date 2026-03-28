@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <MitkCESTExports.h>
 
-#include "mitkNodePredicateBase.h"
+#include <mitkNodePredicateBase.h>
 
 namespace mitk
 {

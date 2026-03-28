@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkSegmentationSink_h
 #define mitkSegmentationSink_h
 
-#include "mitkNonBlockingAlgorithm.h"
+#include <mitkNonBlockingAlgorithm.h>
 #include <MitkAlgorithmsExtExports.h>
 
 namespace mitk

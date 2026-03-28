@@ -14,25 +14,25 @@ found in the LICENSE file.
 #include <ui_PerfusionCurveDescriptionParameterViewControls.h>
 #include <QThreadPool>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include "PerfusionCurveDescriptionParameterView.h"
-#include "QmitkDescriptionParameterBackgroundJob.h"
-#include "mitkAreaUnderTheCurveDescriptionParameter.h"
-#include "mitkAreaUnderFirstMomentDescriptionParameter.h"
-#include "mitkMeanResidenceTimeDescriptionParameter.h"
-#include "mitkTimeToPeakCurveDescriptionParameter.h"
-#include "mitkMaximumCurveDescriptionParameter.h"
-#include "mitkPixelBasedDescriptionParameterImageGenerator.h"
-#include "mitkCurveParameterFunctor.h"
-#include "mitkExtractTimeGrid.h"
+#include <QmitkDescriptionParameterBackgroundJob.h>
+#include <mitkAreaUnderTheCurveDescriptionParameter.h>
+#include <mitkAreaUnderFirstMomentDescriptionParameter.h>
+#include <mitkMeanResidenceTimeDescriptionParameter.h>
+#include <mitkTimeToPeakCurveDescriptionParameter.h>
+#include <mitkMaximumCurveDescriptionParameter.h>
+#include <mitkPixelBasedDescriptionParameterImageGenerator.h>
+#include <mitkCurveParameterFunctor.h>
+#include <mitkExtractTimeGrid.h>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkMultiLabelPredicateHelper.h>
 
 #include <iostream>

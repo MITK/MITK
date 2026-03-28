@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMAPRegistrationWrapperObjectFactory.h"
+#include <mitkMAPRegistrationWrapperObjectFactory.h>
 
 #include <mitkProperties.h>
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 
-#include "mitkRegistrationWrapperMapper2D.h"
-#include "mitkRegistrationWrapperMapper3D.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkRegistrationWrapperMapper2D.h>
+#include <mitkRegistrationWrapperMapper3D.h>
+#include <mitkMAPRegistrationWrapper.h>
 
 typedef std::multimap<std::string, std::string> MultimapType;
 

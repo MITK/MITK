@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkOperationEvent.h"
+#include <mitkOperationEvent.h>
 #include <itkCommand.h>
 
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkMxNMultiWidget_h
 #define QmitkMxNMultiWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // qt widgets module
-#include "QmitkAbstractMultiWidget.h"
+#include <QmitkAbstractMultiWidget.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 

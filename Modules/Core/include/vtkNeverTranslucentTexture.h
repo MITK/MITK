@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkNeverTranslucentTexture_h
-#define mitkNeverTranslucentTexture_h
+#ifndef vtkNeverTranslucentTexture_h
+#define vtkNeverTranslucentTexture_h
 
 #include <MitkCoreExports.h>
 

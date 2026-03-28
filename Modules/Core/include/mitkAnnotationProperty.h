@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkAnnotationProperty_h
 #define mitkAnnotationProperty_h
 
-#include "mitkBaseProperty.h"
-#include "mitkNumericTypes.h"
+#include <mitkBaseProperty.h>
+#include <mitkNumericTypes.h>
 #include <MitkCoreExports.h>
 
 #include <itkConfigure.h>

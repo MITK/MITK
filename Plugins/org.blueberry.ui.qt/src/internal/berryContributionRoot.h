@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYCONTRIBUTIONROOT_H
 #define BERRYCONTRIBUTIONROOT_H
 
-#include <berryIContributionRoot.h>
+#include "berryIContributionRoot.h"
 
 #include <QSet>
 

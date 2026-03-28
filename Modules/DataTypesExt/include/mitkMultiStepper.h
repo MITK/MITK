@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkMultiStepper_h
 #define mitkMultiStepper_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
-#include "mitkStepper.h"
-#include "mitkVector.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCommon.h>
+#include <mitkStepper.h>
+#include <mitkVector.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include <set>

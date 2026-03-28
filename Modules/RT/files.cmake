@@ -1,4 +1,6 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  mitkDoseValueType.h
+)
 
 SET(CPP_FILES
   mitkRTConstants.cpp
@@ -11,4 +13,3 @@ SET(CPP_FILES
   mitkDoseNodeHelper.cpp
   mitkDICOMRTMimeTypes.cpp
 )
-

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkITKEventObserverGuard.h"
+#include <mitkITKEventObserverGuard.h>
 
 #include <itkObject.h>
 #include <itkEventObject.h>

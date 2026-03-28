@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkDataStorage_h
 #define mitkDataStorage_h
 
-#include "itkObject.h"
-#include "itkVectorContainer.h"
-#include "mitkDataNode.h"
-#include "mitkGeometry3D.h"
-#include "mitkMessage.h"
+#include <itkObject.h>
+#include <itkVectorContainer.h>
+#include <mitkDataNode.h>
+#include <mitkGeometry3D.h>
+#include <mitkMessage.h>
 #include <MitkCoreExports.h>
 #include <map>
 #include <mutex>

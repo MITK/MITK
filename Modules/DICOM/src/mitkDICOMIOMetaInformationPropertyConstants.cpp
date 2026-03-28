@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include <mitkDICOMIOMetaInformationPropertyConstants.h>
 
 namespace mitk
 {

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCovarianceMatrixCalculator.h"
+#include <mitkCovarianceMatrixCalculator.h>
 #include <mitkExceptionMacro.h>
 #include <mitkSurface.h>
 #include <vtkCell.h>

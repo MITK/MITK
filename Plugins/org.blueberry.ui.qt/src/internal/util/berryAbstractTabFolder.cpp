@@ -13,8 +13,8 @@ found in the LICENSE file.
 #include "berryAbstractTabFolder.h"
 #include "berryAbstractTabItem.h"
 
-#include <berryConstants.h>
-#include <berryIStackPresentationSite.h>
+#include "berryConstants.h"
+#include "berryIStackPresentationSite.h"
 
 #include <QWidget>
 

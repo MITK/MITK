@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneGeometry.h"
-#include "mitkInteractionConst.h"
-#include "mitkLine.h"
-#include "mitkPlaneOperation.h"
+#include <mitkPlaneGeometry.h>
+#include <mitkInteractionConst.h>
+#include <mitkLine.h>
+#include <mitkPlaneOperation.h>
 
 #include <itkSpatialOrientationAdapter.h>
 

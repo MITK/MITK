@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSimpleHistogram.h"
+#include <mitkSimpleHistogram.h>
 
-#include "mitkImageReadAccessor.h"
-#include "mitkSimpleUnstructuredGridHistogram.h"
-#include "mitkUnstructuredGrid.h"
+#include <mitkImageReadAccessor.h>
+#include <mitkSimpleUnstructuredGridHistogram.h>
+#include <mitkUnstructuredGrid.h>
 #include <mitkHistogramGenerator.h>
 
 namespace mitk

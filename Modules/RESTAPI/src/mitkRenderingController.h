@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRenderingController_h
 #define mitkRenderingController_h
 
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStorageThreadDispatcherBase.h>
 #include <httplib.h>
 
@@ -23,6 +23,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class RenderWindowBridge;
+
   /**
    * @brief Handles all /api/v1/rendering endpoints.
    *
@@ -31,8 +33,13 @@ namespace mitk
    * tasks execute directly on the calling thread.
    *
    * Endpoints:
-   * - POST /rendering/update   -> HandlePOST_update()
-   * - POST /rendering/reinit   -> HandlePOST_reinit()
+   * - POST /rendering/update              -> HandlePOST_update()
+   * - POST /rendering/reinit              -> HandlePOST_reinit()
+   * - GET  /rendering/selected-position   -> HandleGET_selectedPosition()
+   * - PUT  /rendering/selected-position   -> HandlePUT_selectedPosition()
+   * - GET  /rendering/selected-time       -> HandleGET_selectedTime()
+   * - PUT  /rendering/selected-time       -> HandlePUT_selectedTime()
+   * - GET  /rendering/screenshot          -> HandleGET_screenshot()
    */
   class MITKRESTAPI_EXPORT RenderingController
   {
@@ -55,6 +62,14 @@ namespace mitk
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
     /**
+     * @brief Set or clear the RenderWindowBridge for interactions with the rendering stack of
+     * the application.
+     *
+     * @param bridge The bridge, or nullptr to clear (screenshot endpoint returns 503).
+     */
+    void SetRenderWindowBridge(RenderWindowBridge* bridge);
+
+    /**
      * @brief Handle POST /rendering/update request.
      *
      * Triggers RenderingManager::RequestUpdateAll() with optional type filter.
@@ -63,7 +78,7 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandlePOST_update(const httplib::Request& req, httplib::Response& res);
+    void HandlePOST_update(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * @brief Handle POST /rendering/reinit request.
@@ -86,7 +101,85 @@ namespace mitk
      * @param req The HTTP request.
      * @param res The HTTP response to populate.
      */
-    void HandlePOST_reinit(const httplib::Request& req, httplib::Response& res);
+    void HandlePOST_reinit(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * @brief Handle GET /rendering/selected-position request.
+     *
+     * Returns the current crosshair position and the world-space AABB
+     * (i.e. the reinit geometry). If no input geometry is available,
+     * bounds.min and bounds.max are null.
+     *
+     * Returns 503 if no render window bridge or position getter is connected.
+     *
+     * Response 200: {"position": [x, y, z], "bounds": {"min": [...], "max": [...]}}
+     *
+     * @param req The HTTP request.
+     * @param res The HTTP response to populate.
+     */
+    void HandleGET_selectedPosition(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * @brief Handle PUT /rendering/selected-position request.
+     *
+     * Moves the global application crosshair to the given 3D world position.
+     * No bounds checking is performed. Out of bounds values will be ignored.
+     *
+     * Required body: {"position": [x, y, z]} — exactly 3 numbers.
+     *
+     * Response 204 on success. Returns 503 if no render window bridge or
+     * position setter is connected.
+     *
+     * @param req The HTTP request (must contain a JSON body with "position").
+     * @param res The HTTP response to populate.
+     */
+    void HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * @brief Handle GET /rendering/selected-time request.
+     *
+     * Returns the current time step and time point from the global
+     * TimeNavigationController, together with the time geometry bounds.
+     *
+     * Response 200: {"timepoint_ms": ..., "timestep": ..., "bounds": {...}}
+     *
+     * @param req The HTTP request.
+     * @param res The HTTP response to populate.
+     */
+    void HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * @brief Handle PUT /rendering/selected-time request.
+     *
+     * Sets the active time step or time point in the global TimeNavigationController.
+     * Exactly one of "timepoint_ms" (number) or "timestep" (non-negative integer)
+     * must be present in the body.
+     * No bounds checking is performed. Out of bounds values will be ignored.
+     *
+     * Response 204 on success.
+     *
+     * @param req The HTTP request (must contain a JSON body with exactly one of the fields).
+     * @param res The HTTP response to populate.
+     */
+    void HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * @brief Handle GET /rendering/screenshot request.
+     *
+     * Captures a screenshot of the active application window.
+     *
+     * Query parameters:
+     * - format: "png" (default) or "jpeg"
+     * - width, height: optional positive integers; both must be given together.
+     *
+     * Response 200 with binary image body (Content-Type: image/png or image/jpeg).
+     *
+     * @pre RenderWindowBridge must be set and have a screenshot provider (503 otherwise).
+     *
+     * @param req The HTTP request.
+     * @param res The HTTP response to populate.
+     */
+    void HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const;
 
   private:
     /**
@@ -96,9 +189,10 @@ namespace mitk
      */
     void Dispatch(std::function<void()> task) const;
 
-    void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error);
+    void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const;
 
     DataStorageBridge& m_Bridge;
+    RenderWindowBridge* m_RenderWindowBridge = nullptr;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
   };
 }

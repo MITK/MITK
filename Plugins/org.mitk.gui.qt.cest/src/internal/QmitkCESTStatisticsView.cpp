@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 // itk
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 #include <ui_QmitkCESTStatisticsViewControls.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>

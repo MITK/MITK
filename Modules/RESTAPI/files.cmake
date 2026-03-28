@@ -13,6 +13,7 @@ set(CPP_FILES
   mitkDataStorageController.cpp
   mitkSwaggerController.cpp
   mitkRenderingController.cpp
+  mitkRenderWindowBridge.cpp
 )
 
 set(RESOURCE_FILES

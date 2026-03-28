@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYEXPRESSIONPLUGIN_H
 #define BERRYEXPRESSIONPLUGIN_H
 
-#include "berryPlugin.h"
+#include <berryPlugin.h>
 
 namespace berry {
 

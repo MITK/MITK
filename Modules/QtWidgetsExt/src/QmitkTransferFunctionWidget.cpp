@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkTransferFunctionWidget.h"
+#include <QmitkTransferFunctionWidget.h>
 #include <ui_QmitkTransferFunctionWidget.h>
-#include "mitkImageTimeSelector.h"
+#include <mitkImageTimeSelector.h>
 
 #include <mitkTransferFunctionProperty.h>
 

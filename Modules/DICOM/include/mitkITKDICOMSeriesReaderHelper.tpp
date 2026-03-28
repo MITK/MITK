@@ -10,7 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkITKDICOMSeriesReaderHelper.h"
+#ifndef mitkITKDICOMSeriesReaderHelper_tpp
+#define mitkITKDICOMSeriesReaderHelper_tpp
+
+#include <mitkITKDICOMSeriesReaderHelper.h>
 
 #include <itkImageSeriesReader.h>
 #include <itkResampleImageFilter.h>
@@ -18,7 +21,7 @@ found in the LICENSE file.
 //#include <itkLinearInterpolateImageFunction.h>
 //#include <itkTimeProbesCollectorBase.h>
 
-#include "dcmtk/ofstd/ofdatime.h"
+#include <dcmtk/ofstd/ofdatime.h>
 
 template <typename PixelType, unsigned int TDim>
 mitk::Image::Pointer
@@ -300,3 +303,5 @@ mitk::ITKDICOMSeriesReaderHelper
 }
 
 
+
+#endif

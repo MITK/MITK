@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYCHANGETOPERSPECTIVEMENU_H
 #define BERRYCHANGETOPERSPECTIVEMENU_H
 
-#include <berryContributionItem.h>
+#include "berryContributionItem.h"
 
 namespace berry {
 

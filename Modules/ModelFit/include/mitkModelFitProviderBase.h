@@ -78,7 +78,7 @@ namespace mitk
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "mitkModelFitProviderBase.tpp"
+#include <mitkModelFitProviderBase.tpp>
 #endif
 
 #endif

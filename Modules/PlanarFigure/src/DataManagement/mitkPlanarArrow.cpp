@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarArrow.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarArrow.h>
+#include <mitkPlaneGeometry.h>
 
 mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {

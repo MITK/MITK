@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMapper.h"
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
+#include <mitkMapper.h>
+#include <mitkBaseRenderer.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
 
 mitk::Mapper::Mapper() : m_DataNode(nullptr), m_TimeStep(0)
 {

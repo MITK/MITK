@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkModelDataGenerationFunctor_h
 #define mitkModelDataGenerationFunctor_h
 
-#include "mitkSimpleFunctorBase.h"
-#include "mitkModelBase.h"
-#include "mitkModelParameterizerBase.h"
+#include <mitkSimpleFunctorBase.h>
+#include <mitkModelBase.h>
+#include <mitkModelParameterizerBase.h>
 
 #include <MitkModelFitExports.h>
 

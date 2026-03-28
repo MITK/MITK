@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkBoundingObjectWidget.h"
+#include <QmitkBoundingObjectWidget.h>
 
 #include <mitkCone.h>
 #include <mitkCuboid.h>

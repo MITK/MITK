@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCoreObjectFactoryBase.h"
+#include <mitkCoreObjectFactoryBase.h>
 
 void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensionsMap, std::string &fileExtensions)
 {

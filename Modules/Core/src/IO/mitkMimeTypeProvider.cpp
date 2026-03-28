@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkMimeTypeProvider.h"
 
-#include "mitkLog.h"
+#include <mitkLog.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>

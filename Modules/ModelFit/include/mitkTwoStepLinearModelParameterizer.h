@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTwoStepLinearModelParameterizer_h
 #define mitkTwoStepLinearModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkTwoStepLinearModel.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkTwoStepLinearModel.h>
 
 namespace mitk
 {

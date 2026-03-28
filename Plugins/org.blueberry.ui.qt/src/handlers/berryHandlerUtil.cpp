@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include "berryISources.h"
 #include "berryRegistryToggleState.h"
 #include "berryRadioState.h"
-#include "berryObjects.h"
-#include "berryObjectString.h"
+#include <berryObjects.h>
+#include <berryObjectString.h>
 
 namespace berry
 {

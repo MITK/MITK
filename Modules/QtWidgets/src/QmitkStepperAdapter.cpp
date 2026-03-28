@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkStepperAdapter.h"
+#include <QmitkStepperAdapter.h>
 
 #include <itkCommand.h>
 

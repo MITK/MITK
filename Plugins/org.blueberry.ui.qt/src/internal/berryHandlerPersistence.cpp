@@ -12,17 +12,17 @@ found in the LICENSE file.
 
 #include "berryHandlerPersistence.h"
 
-#include "berryIExtension.h"
-#include "berryIExtensionRegistry.h"
-#include "berryIConfigurationElement.h"
-#include "berryIHandler.h"
+#include <berryIExtension.h>
+#include <berryIExtensionRegistry.h>
+#include <berryIConfigurationElement.h>
+#include <berryIHandler.h>
 #include "berryIHandlerService.h"
 #include "berryIHandlerActivation.h"
 
 #include "berryHandlerProxy.h"
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 #include "berryWorkbenchPlugin.h"
-#include "berryExpression.h"
+#include <berryExpression.h>
 
 namespace berry {
 

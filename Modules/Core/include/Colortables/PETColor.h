@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _lut_PETColor_h_
-#define _lut_PETColor_h_
+#ifndef PETColor_h
+#define PETColor_h
 
 static const int PETColor[256][3] = {
   {0, 0, 0},       {0, 2, 1},       {0, 4, 3},       {0, 6, 5},       {0, 8, 7},       {0, 10, 9},

@@ -15,14 +15,14 @@ found in the LICENSE file.
 
 #include <mitkDataStorage.h>
 
-#include "mitkModelFitConstants.h"
-#include "mitkModelFitParameter.h"
-#include "mitkModelFitStaticParameterMap.h"
-#include "mitkScalarListLookupTable.h"
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelTraitsInterface.h"
+#include <mitkModelFitConstants.h>
+#include <mitkModelFitParameter.h>
+#include <mitkModelFitStaticParameterMap.h>
+#include <mitkScalarListLookupTable.h>
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelTraitsInterface.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

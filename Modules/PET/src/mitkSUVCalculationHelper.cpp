@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkSUVCalculationHelper.h"
+#include <mitkSUVCalculationHelper.h>
 
 #include <algorithm>
 

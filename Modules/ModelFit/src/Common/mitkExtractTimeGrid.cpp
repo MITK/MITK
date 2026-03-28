@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractTimeGrid.h"
+#include <mitkExtractTimeGrid.h>
 
 mitk::ModelBase::TimeGridType mitk::ExtractTimeGrid(const Image* image)
 {

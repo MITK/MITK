@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingConfig.h>
 
@@ -293,7 +293,7 @@ public:
 
   void TestUtf8()
   {
-    const std::string utf8Path = u8"UTF-8/\u00c4.nrrd"; // LATIN CAPITAL LETTER A WITH DIAERESIS (U+00C4)
+    const std::string utf8Path = reinterpret_cast<const char*>(u8"UTF-8/\u00c4.nrrd"); // LATIN CAPITAL LETTER A WITH DIAERESIS (U+00C4)
     const std::string local8BitPath = mitk::Utf8Util::Utf8ToLocal8Bit(utf8Path);
 
     CPPUNIT_ASSERT(utf8Path == mitk::Utf8Util::Local8BitToUtf8(local8BitPath));

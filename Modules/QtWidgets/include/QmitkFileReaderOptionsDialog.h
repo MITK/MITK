@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkFileReaderOptionsDialog_h
 #define QmitkFileReaderOptionsDialog_h
 
-#include "mitkIOUtil.h"
+#include <mitkIOUtil.h>
 
 #include <QDialog>
 #include <memory>

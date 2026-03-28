@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkThreeStepLinearModel.h"
-#include "mitkThreeStepLinearModelParameterizer.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkThreeStepLinearModel.h>
+#include <mitkThreeStepLinearModelParameterizer.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 namespace mitk
 {
 

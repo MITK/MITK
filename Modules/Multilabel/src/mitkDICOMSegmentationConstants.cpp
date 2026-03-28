@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSegmentationConstants.h"
+#include <mitkDICOMSegmentationConstants.h>
 
 namespace mitk
 {

@@ -6,5 +6,5 @@ set(CPP_FILES
 )
 
 set(QRC_FILES
-  resource/Chart.qrc
+  Chart.qrc
 )

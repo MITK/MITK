@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScaleLegendAnnotation.h"
+#include <mitkScaleLegendAnnotation.h>
 #include <vtkAxisActor2D.h>
 #include <vtkLegendScaleActor.h>
 #include <vtkTextProperty.h>

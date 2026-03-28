@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk gui qt common plugin
-#include "QmitkModelViewSelectionConnector.h"
+#include <QmitkModelViewSelectionConnector.h>
 
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 QmitkModelViewSelectionConnector::QmitkModelViewSelectionConnector()
   : m_Model(nullptr)

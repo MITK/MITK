@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkDataStorageListModel.h"
+#include <QmitkDataStorageListModel.h>
 
 //# Own includes
 // mitk
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 
 //# Toolkit includes
 // itk
-#include "itkCommand.h"
+#include <itkCommand.h>
 
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage *dataStorage,
                                                      mitk::NodePredicateBase::Pointer pred,

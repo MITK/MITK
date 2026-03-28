@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "mitkMultilabelObjectFactory.h"
 
-#include "mitkBaseRenderer.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkDataNode.h"
-#include "mitkProperties.h"
+#include <mitkBaseRenderer.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkDataNode.h>
+#include <mitkProperties.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkLabelSetImageVtkMapper2D.h>

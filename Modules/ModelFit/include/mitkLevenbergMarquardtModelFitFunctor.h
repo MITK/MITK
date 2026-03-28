@@ -16,11 +16,11 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkLevenbergMarquardtOptimizer.h>
 
-#include "mitkModelBase.h"
-#include "mitkModelFitFunctorBase.h"
-#include "mitkMVConstrainedCostFunctionDecorator.h"
+#include <mitkModelBase.h>
+#include <mitkModelFitFunctorBase.h>
+#include <mitkMVConstrainedCostFunctionDecorator.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

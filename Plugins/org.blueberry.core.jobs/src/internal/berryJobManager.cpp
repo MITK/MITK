@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryIProgressMonitor.h"
 #include "berryNullProgressMonitor.h"
-#include "berryIStatus.h"
+#include <berryIStatus.h>
 #include "berryJobStatus.h"
 
 #include <iostream>

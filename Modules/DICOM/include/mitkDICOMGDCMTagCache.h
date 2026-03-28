@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDICOMGDCMTagCache_h
 #define mitkDICOMGDCMTagCache_h
 
-#include "mitkDICOMTagCache.h"
+#include <mitkDICOMTagCache.h>
 
 #include <set>
 #include <memory>

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileReaderRegistry.h"
+#include <mitkFileReaderRegistry.h>
 
-#include "mitkCoreServices.h"
-#include "mitkIMimeTypeProvider.h"
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
 
 // Microservices
 #include <usGetModuleContext.h>
@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceProperties.h>
 
-#include "itksys/SystemTools.hxx"
+#include <itksys/SystemTools.hxx>
 
 mitk::FileReaderRegistry::FileReaderRegistry()
 {

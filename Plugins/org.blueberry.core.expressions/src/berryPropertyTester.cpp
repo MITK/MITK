@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryPropertyTester.h"
 
-#include "berryPlatform.h"
-#include "berryIContributor.h"
+#include <berryPlatform.h>
+#include <berryIContributor.h>
 
 #include <ctkPlugin.h>
 

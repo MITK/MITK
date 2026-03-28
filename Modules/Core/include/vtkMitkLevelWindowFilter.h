@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __vtkMitkLevelWindowFilter_h
-#define __vtkMitkLevelWindowFilter_h
+#ifndef vtkMitkLevelWindowFilter_h
+#define vtkMitkLevelWindowFilter_h
 
 class vtkScalarsToColors;
 class vtkPiecewiseFunction;

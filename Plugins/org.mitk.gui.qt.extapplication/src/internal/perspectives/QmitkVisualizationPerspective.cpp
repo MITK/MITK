@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkVisualizationPerspective.h"
-#include "berryIViewLayout.h"
+#include <berryIViewLayout.h>
 
 void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

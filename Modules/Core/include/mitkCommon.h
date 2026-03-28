@@ -20,11 +20,11 @@ found in the LICENSE file.
 #endif
 
 // add only those headers here that are really necessary for all classes!
-#include "itkObject.h"
-#include "mitkConfig.h"
-#include "mitkExceptionMacro.h"
-#include "mitkGetClassHierarchy.h"
-#include "mitkLog.h"
+#include <itkObject.h>
+#include <mitkConfig.h>
+#include <mitkExceptionMacro.h>
+#include <mitkGetClassHierarchy.h>
+#include <mitkLog.h>
 
 typedef unsigned int MapperSlotId;
 

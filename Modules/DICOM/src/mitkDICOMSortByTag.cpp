@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMSortByTag.h"
+#include <mitkDICOMSortByTag.h>
 
-#include "dcmtk/ofstd/ofstd.h"
+#include <dcmtk/ofstd/ofstd.h>
 
 mitk::DICOMSortByTag
 ::DICOMSortByTag(const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion)

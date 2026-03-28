@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRenderingModeProperty_h
 #define mitkRenderingModeProperty_h
 
-#include "mitkEnumerationProperty.h"
+#include <mitkEnumerationProperty.h>
 
 namespace mitk
 {

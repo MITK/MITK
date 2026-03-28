@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPointSetVtkMapper3D_h
 #define mitkPointSetVtkMapper3D_h
 
-#include "mitkBaseRenderer.h"
-#include "mitkVtkMapper.h"
+#include <mitkBaseRenderer.h>
+#include <mitkVtkMapper.h>
 #include <MitkCoreExports.h>
 #include <vtkSmartPointer.h>
 

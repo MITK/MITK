@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMNullFileReader.h"
+#include <mitkDICOMNullFileReader.h>
 
 mitk::DICOMNullFileReader
 ::DICOMNullFileReader()

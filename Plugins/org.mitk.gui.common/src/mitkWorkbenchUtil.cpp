@@ -17,14 +17,14 @@ found in the LICENSE file.
 #include <berryCoreException.h>
 
 #include "mitkDataStorageEditorInput.h"
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 #include "mitkIRenderingManager.h"
 
-#include "mitkProperties.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkCoreObjectFactory.h"
+#include <mitkProperties.h>
+#include <mitkNodePredicateData.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkCoreObjectFactory.h>
 #include <mitkCoreServices.h>
 #include <mitkDataStorageReference.h>
 #include <mitkIDataStorageService.h>
@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIOMimeTypes.h>
 
-#include "QmitkIOUtil.h"
+#include <QmitkIOUtil.h>
 
 #include <QMessageBox>
 #include <QApplication>

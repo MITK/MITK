@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultilabelIOMimeTypes.h"
+#include <mitkMultilabelIOMimeTypes.h>
 
 #include <mitkFileSystem.h>
 #include <mitkIOMimeTypes.h>

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
 #include <QAction>
 #include <QIcon>
 #include <QList>

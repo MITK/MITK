@@ -14,10 +14,10 @@ found in the LICENSE file.
 #ifndef mitkResultNodeGenerationHelper_h
 #define mitkResultNodeGenerationHelper_h
 
-#include "mitkDataNode.h"
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkDataNode.h>
+#include <mitkMAPRegistrationWrapper.h>
 
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

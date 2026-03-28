@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <qwt_interval_symbol.h>
 #include <qwt_point_data.h>
 
-#include "QmitkPlotWidget.h"
+#include <QmitkPlotWidget.h>
 
 QmitkPlotWidget::QmitkPlotWidget(QWidget *parent, const char *title, const char *, Qt::WindowFlags f)
   : QWidget(parent, f)

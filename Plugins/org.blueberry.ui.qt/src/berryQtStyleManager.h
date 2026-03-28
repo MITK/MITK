@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYQTSTYLEMANAGER_H_
 #define BERRYQTSTYLEMANAGER_H_
 
-#include <berryIQtStyleManager.h>
+#include "berryIQtStyleManager.h"
 #include <org_blueberry_ui_qt_Export.h>
 
 #include <QHash>

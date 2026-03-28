@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkDICOMGDCMTagScanner_h
 #define mitkDICOMGDCMTagScanner_h
 
-#include "mitkDICOMTagScanner.h"
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMGDCMTagCache.h"
+#include <mitkDICOMTagScanner.h>
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMGDCMTagCache.h>
 
 namespace mitk
 {

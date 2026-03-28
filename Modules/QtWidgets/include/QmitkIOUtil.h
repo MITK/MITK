@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkIOUtil_h
 #define QmitkIOUtil_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 
 // std
 #include <string>

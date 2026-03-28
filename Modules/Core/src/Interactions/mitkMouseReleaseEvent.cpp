@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMouseReleaseEvent.h"
-#include "mitkException.h"
+#include <mitkMouseReleaseEvent.h>
+#include <mitkException.h>
 
 mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer *baseRenderer,
                                            const mitk::Point2D &mousePosition,

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_common_Export.h>
 
 // org mitk gui qt common plugin
-#include <QmitkAbstractRenderEditor.h>
+#include "QmitkAbstractRenderEditor.h"
 
 // mitk core
 #include <mitkInteractionSchemeSwitcher.h>

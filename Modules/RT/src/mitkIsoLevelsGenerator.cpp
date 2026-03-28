@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkIsoLevelsGenerator.h"
+#include <mitkIsoLevelsGenerator.h>
 
 mitk::IsoDoseLevelSet::Pointer mitk::GenerateIsoLevels_Virtuos()
 {

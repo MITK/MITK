@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkIndex.h>
 
-#include "mitkInitialParameterizationDelegateBase.h"
+#include <mitkInitialParameterizationDelegateBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

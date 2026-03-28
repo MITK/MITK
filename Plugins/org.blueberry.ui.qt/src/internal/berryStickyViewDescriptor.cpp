@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "berryWorkbenchRegistryConstants.h"
 
-#include <berryIPageLayout.h>
+#include "berryIPageLayout.h"
 #include <berryCoreException.h>
 #include <berryStatus.h>
 #include <berryIContributor.h>

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkLandmarkProjector_h
 #define mitkLandmarkProjector_h
 
-#include "itkObject.h"
+#include <itkObject.h>
 #include <MitkCoreExports.h>
 
-#include "mitkPlaneGeometry.h"
-#include "mitkPointSet.h"
+#include <mitkPlaneGeometry.h>
+#include <mitkPointSet.h>
 
 class vtkAbstractTransform;
 

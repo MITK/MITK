@@ -15,10 +15,10 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkPropertyList.h"
-#include "usSharedData.h"
+#include <mitkPropertyList.h>
+#include <usSharedData.h>
 
-#include "itkSmartPointer.h"
+#include <itkSmartPointer.h>
 
 namespace us
 {
@@ -85,9 +85,9 @@ namespace mitk
      * one Event.
      * <b> Example </b>
      \code
-      #include "mitkEventConfig.h"
-      #include "mitkInteractionEventConst.h"
-      #include "mitkPropertyList.h"
+      #include <mitkEventConfig.h>
+      #include <mitkInteractionEventConst.h>
+      #include <mitkPropertyList.h>
 
       // First event
       mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();

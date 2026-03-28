@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include <mapContinuousElements.h>
 
 //MITK
-#include "MitkMatchPointRegistrationExports.h"
+#include <MitkMatchPointRegistrationExports.h>
 
 namespace mitk
 {

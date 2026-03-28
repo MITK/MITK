@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkSlicedGeometry3D_h
 #define mitkSlicedGeometry3D_h
 
-#include "mitkBaseGeometry.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkBaseGeometry.h>
+#include <mitkPlaneGeometry.h>
 
 namespace mitk
 {

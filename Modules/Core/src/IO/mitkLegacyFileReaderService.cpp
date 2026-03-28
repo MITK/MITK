@@ -35,7 +35,7 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::vector<std::st
   {
     if (!extension.empty() && extension[0] == '.')
     {
-      extension.assign(extension.begin() + 1, extension.end());
+      extension.erase(0, 1);
     }
     customMimeType.AddExtension(extension);
   }

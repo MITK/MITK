@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPlanarArrow_h
 #define mitkPlanarArrow_h
 
-#include "mitkPlanarFigure.h"
+#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
 
 namespace mitk

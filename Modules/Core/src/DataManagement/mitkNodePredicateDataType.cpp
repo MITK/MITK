@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 
-#include "mitkBaseData.h"
-#include "mitkDataNode.h"
+#include <mitkBaseData.h>
+#include <mitkDataNode.h>
 
 mitk::NodePredicateDataType::NodePredicateDataType(const char *datatype) : NodePredicateBase()
 {

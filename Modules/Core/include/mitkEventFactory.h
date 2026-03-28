@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkEventFactory_h
 #define mitkEventFactory_h
 
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkPropertyList.h"
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkPropertyList.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

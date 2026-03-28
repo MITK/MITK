@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkEnumerationPropertyWidget_h
 #define QmitkEnumerationPropertyWidget_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <QComboBox>
 #include <QHash>

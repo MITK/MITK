@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 // Testing
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 // std includes
 #include <string>
 
 // MITK includes
-#include "mitkStringProperty.h"
+#include <mitkStringProperty.h>
 #include <mitkNumericTypes.h>
 
 // itksys
-#include "itkImage.h"
+#include <itkImage.h>
 
 // VTK includes
 #include <vtkDebugLeaks.h>

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegVisColorStyleProperty.h"
+#include <mitkRegVisColorStyleProperty.h>
 
 
 mitk::RegVisColorStyleProperty::RegVisColorStyleProperty( )

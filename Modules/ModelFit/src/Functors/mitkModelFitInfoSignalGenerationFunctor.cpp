@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkModelFitInfoSignalGenerationFunctor.h"
+#include <mitkModelFitInfoSignalGenerationFunctor.h>
 
 
 mitk::IndexedValueFunctorBase::OutputPixelVectorType

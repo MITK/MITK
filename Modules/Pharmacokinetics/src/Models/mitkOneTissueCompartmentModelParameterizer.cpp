@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkOneTissueCompartmentModelParameterizer.h"
+#include <mitkOneTissueCompartmentModelParameterizer.h>
 
 mitk::OneTissueCompartmentModelParameterizer::ParametersType
 mitk::OneTissueCompartmentModelParameterizer::GetDefaultInitialParameterization() const

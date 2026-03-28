@@ -12,20 +12,20 @@ found in the LICENSE file.
 
 #define PLANARFIGUREINTERACTOR_DBG MITK_DEBUG("PlanarFigureInteractor") << __LINE__ << ": "
 
-#include "mitkPlanarFigureInteractor.h"
-#include "mitkPlanarBezierCurve.h"
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarPolygon.h"
+#include <mitkPlanarFigureInteractor.h>
+#include <mitkPlanarBezierCurve.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarPolygon.h>
 
-#include "mitkInteractionPositionEvent.h"
-#include "mitkInternalEvent.h"
+#include <mitkInteractionPositionEvent.h>
+#include <mitkInternalEvent.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
+#include <mitkBaseRenderer.h>
+#include <mitkRenderingManager.h>
 
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkPlaneGeometry.h>
 
 namespace mitk
 {

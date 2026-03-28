@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSuggestionHelper.h"
+#include <mitkLabelSuggestionHelper.h>
 
 #include <algorithm>
 
@@ -25,8 +25,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace
 {

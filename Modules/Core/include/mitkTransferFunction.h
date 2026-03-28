@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkTransferFunction_h
 #define mitkTransferFunction_h
 
-#include "mitkHistogramGenerator.h"
-#include "mitkImage.h"
+#include <mitkHistogramGenerator.h>
+#include <mitkImage.h>
 #include <MitkCoreExports.h>
 
 #include <itkHistogram.h>

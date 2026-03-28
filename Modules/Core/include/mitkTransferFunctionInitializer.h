@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <vtkPiecewiseFunction.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkTransferFunction.h"
+#include <mitkTransferFunction.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>

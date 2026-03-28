@@ -9,7 +9,7 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "QmitkStringPropertyView.h"
+#include <QmitkStringPropertyView.h>
 
 QmitkStringPropertyView::QmitkStringPropertyView(const mitk::StringProperty *property, QWidget *parent)
   : QLabel(parent), PropertyView(property), m_StringProperty(property)

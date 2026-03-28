@@ -1,5 +1,12 @@
 set(H_FILES
-  DataManagement/mitkSegmentationTaskListMacros.h
+  itkAdaptiveThresholdIterator.h
+  itkConnectedAdaptiveThresholdImageFilter.h
+  itkContourExtractor2DImageFilter.h
+  itkImageToPathFilter.h
+  mitkSegmentationInterpolationAlgorithm.h
+  mitkSegmentationTaskListMacros.h
+  mitkToolEvents.h
+  mitkToolFactoryMacro.h
 )
 
 set(CPP_FILES

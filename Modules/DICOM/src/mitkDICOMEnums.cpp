@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMEnums.h"
+#include <mitkDICOMEnums.h>
 
 std::string
 mitk::PixelSpacingInterpretationToString(const PixelSpacingInterpretation& value)

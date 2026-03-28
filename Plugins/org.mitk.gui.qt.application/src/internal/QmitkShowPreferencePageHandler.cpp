@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <berryHandlerUtil.h>
 
-#include <QmitkPreferencesDialog.h>
+#include "QmitkPreferencesDialog.h"
 
 #include <QApplication>
 

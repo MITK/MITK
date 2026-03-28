@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkChartExampleTestHelper.h"
+#include <mitkChartExampleTestHelper.h>
 
 // std includes
 #include <string>

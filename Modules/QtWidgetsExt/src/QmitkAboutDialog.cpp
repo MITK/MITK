@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAboutDialog.h"
+#include <QmitkAboutDialog.h>
 #include <ui_QmitkAboutDialogGUI.h>
-#include "QmitkModulesDialog.h"
+#include <QmitkModulesDialog.h>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <itkConfigure.h>

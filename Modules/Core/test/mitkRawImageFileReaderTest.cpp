@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOConstants.h"
-#include "mitkIOUtil.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkIOConstants.h>
+#include <mitkIOUtil.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 class mitkRawImageFileReaderTestSuite : public mitk::TestFixture
 {

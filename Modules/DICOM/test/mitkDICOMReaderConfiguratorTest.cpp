@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMReaderConfigurator.h"
-#include "mitkDICOMFileReaderSelector.h"
+#include <mitkDICOMReaderConfigurator.h>
+#include <mitkDICOMFileReaderSelector.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 /**
   \brief Verify serialization ability of DICOMReaderConfigurator.

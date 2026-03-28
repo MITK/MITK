@@ -13,12 +13,12 @@ found in the LICENSE file.
 #define mitkIPersistenceService_h
 
 // mitk
-#include "mitkPropertyListReplacedObserver.h"
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usServiceReference.h"
+#include <mitkPropertyListReplacedObserver.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
 // for microservices
-#include "mitkDataStorage.h"
+#include <mitkDataStorage.h>
 #include <mitkServiceInterface.h>
 
 namespace mitk

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkAffineBaseDataInteractor3D_h
 #define mitkAffineBaseDataInteractor3D_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <mitkDataInteractor.h>
 #include <mitkGeometry3D.h>
 

@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 
 // mitk qt widgets
-#include "QmitkLevelWindowPresetDefinitionDialog.h"
-#include "QmitkLevelWindowRangeChangeDialog.h"
+#include <QmitkLevelWindowPresetDefinitionDialog.h>
+#include <QmitkLevelWindowRangeChangeDialog.h>
 
 // qt
 #include <QCursor>

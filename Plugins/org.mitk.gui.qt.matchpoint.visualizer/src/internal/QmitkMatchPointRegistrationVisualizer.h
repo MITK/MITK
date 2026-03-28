@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 #include <QSortFilterProxyModel>
 
-#include "mitkMAPRegistrationWrapper.h"
+#include <mitkMAPRegistrationWrapper.h>
 
 #include <memory>
 

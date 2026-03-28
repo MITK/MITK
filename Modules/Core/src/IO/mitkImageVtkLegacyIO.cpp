@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "mitkImageVtkLegacyIO.h"
 
-#include "mitkIOMimeTypes.h"
-#include "mitkImage.h"
-#include "mitkImageVtkReadAccessor.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkImage.h>
+#include <mitkImageVtkReadAccessor.h>
 
 #include <vtkErrorCode.h>
 #include <vtkSmartPointer.h>

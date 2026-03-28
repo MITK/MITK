@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkXML2EventParser.h"
+#include <mitkXML2EventParser.h>
 
-#include "mitkEventFactory.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
-#include "mitkInteractionKeyEvent.h"
-#include "mitkInternalEvent.h"
+#include <mitkEventFactory.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
+#include <mitkInteractionKeyEvent.h>
+#include <mitkInternalEvent.h>
 
 // VTK
 #include <vtkXMLDataElement.h>
 
 // us
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleResource.h"
-#include "usModuleResourceStream.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk
 {

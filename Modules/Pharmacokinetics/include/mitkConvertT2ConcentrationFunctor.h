@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkConvertT2ConcentrationFunctor_h
 #define mitkConvertT2ConcentrationFunctor_h
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk {
 

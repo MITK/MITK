@@ -15,22 +15,22 @@ found in the LICENSE file.
 #include "berryISources.h"
 #include "berryIServiceLocator.h"
 #include "berryIEvaluationService.h"
-#include "berryIEvaluationContext.h"
+#include <berryIEvaluationContext.h>
 #include "berryIEvaluationReference.h"
 #include "berryICommandService.h"
-#include "berryIHandler.h"
+#include <berryIHandler.h>
 #include "berryISourceProvider.h"
 #include "services/berryISourceProviderService.h"
 
-#include "berryObjects.h"
+#include <berryObjects.h>
 #include "berryHandlerActivation.h"
-#include "berryMultiStatus.h"
+#include <berryMultiStatus.h>
 #include "berryPlatformUI.h"
 #include "berryWorkbenchPlugin.h"
-#include "berryCommandTracing.h"
-#include "berryCommand.h"
-#include "berryEvaluationContext.h"
-#include "berryExpression.h"
+#include <berryCommandTracing.h>
+#include <berryCommand.h>
+#include <berryEvaluationContext.h>
+#include <berryExpression.h>
 
 #include <QElapsedTimer>
 

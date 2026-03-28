@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
-#include "mitkCommandLineParser.h"
-#include "mitkIOUtil.h"
+#include <mitkCommandLineParser.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkIOVolumeSplitReason.h>
 #include <mitkIFileIO.h>
-#include "mitkPropertyKeyPath.h"
+#include <mitkPropertyKeyPath.h>
 
 #include <nlohmann/json.hpp>
 

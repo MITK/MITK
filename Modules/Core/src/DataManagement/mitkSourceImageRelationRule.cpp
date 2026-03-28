@@ -13,12 +13,12 @@ found in the LICENSE file.
 #include <regex>
 #include <mutex>
 
-#include "mitkSourceImageRelationRule.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkStringProperty.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkDataNode.h"
-#include "mitkIdentifiable.h"
+#include <mitkSourceImageRelationRule.h>
+#include <mitkPropertyNameHelper.h>
+#include <mitkStringProperty.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkDataNode.h>
+#include <mitkIdentifiable.h>
 
 std::string mitk::SourceImageRelationRule::GenerateRuleID(const std::string& purpose) const
 {

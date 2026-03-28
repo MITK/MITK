@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkImageSerializer.h"
-#include "mitkIOUtil.h"
-#include "mitkImage.h"
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
 #include <Poco/Path.h>
 
 MITK_REGISTER_SERIALIZER(ImageSerializer)

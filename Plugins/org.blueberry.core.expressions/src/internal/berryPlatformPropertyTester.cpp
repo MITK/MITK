@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berryPlatformPropertyTester.h"
 
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 #include <berryObjectString.h>
 #include <berryObjectTypeInfo.h>
 

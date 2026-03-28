@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYINTERNALPLATFORM_H_
 #define BERRYINTERNALPLATFORM_H_
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <ctkServiceTracker.h>
 

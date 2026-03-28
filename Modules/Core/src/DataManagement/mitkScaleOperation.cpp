@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScaleOperation.h"
+#include <mitkScaleOperation.h>
 
 mitk::ScaleOperation::ScaleOperation(mitk::OperationType operationType,
                                      mitk::Point3D scaleFactor,

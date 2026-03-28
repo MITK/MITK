@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTimeGridHelper.h"
+#include <mitkTimeGridHelper.h>
 
-#include "itkMacro.h"
+#include <itkMacro.h>
 
 bool mitk::TimeGridIsMonotonIncreasing(const mitk::ModelBase::TimeGridType timeGrid)
 {

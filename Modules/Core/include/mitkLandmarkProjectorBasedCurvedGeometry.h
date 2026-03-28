@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkLandmarkProjectorBasedCurvedGeometry_h
 #define mitkLandmarkProjectorBasedCurvedGeometry_h
 
-#include "mitkLandmarkProjector.h"
+#include <mitkLandmarkProjector.h>
 
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkPointSet.h"
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkPointSet.h>
 
 #include <vtkSmartPointer.h>
 

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkGeometryDataSource_h
 #define mitkGeometryDataSource_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkBaseDataSource.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkBaseDataSource.h>
 
 namespace mitk
 {

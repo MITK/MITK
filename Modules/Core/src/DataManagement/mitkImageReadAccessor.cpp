@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageReadAccessor.h"
+#include <mitkImageReadAccessor.h>
 
-#include "mitkImage.h"
+#include <mitkImage.h>
 
 mitk::ImageReadAccessor::ImageReadAccessor(ImageConstPointer image, const mitk::ImageDataItem *iDI, int OptionFlags)
   : ImageAccessorBase(image, iDI, OptionFlags), m_Image(image)

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 mitkDefineGenericProperty(BoolProperty, bool, false);
 

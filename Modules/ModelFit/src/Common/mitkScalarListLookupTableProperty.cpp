@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScalarListLookupTableProperty.h"
+#include <mitkScalarListLookupTableProperty.h>
 
 mitkDefineGenericProperty(ScalarListLookupTableProperty, ScalarListLookupTable,
 						  ScalarListLookupTable());

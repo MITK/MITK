@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkLayoutAnnotationRenderer_h
 #define mitkLayoutAnnotationRenderer_h
 
-#include "MitkAnnotationExports.h"
-#include "mitkAbstractAnnotationRenderer.h"
+#include <MitkAnnotationExports.h>
+#include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk
 {

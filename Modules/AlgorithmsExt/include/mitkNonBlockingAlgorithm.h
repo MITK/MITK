@@ -13,20 +13,20 @@ found in the LICENSE file.
 #ifndef mitkNonBlockingAlgorithm_h
 #define mitkNonBlockingAlgorithm_h
 
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 #include <itkImage.h>
 #include <itkMacro.h>
 #include <itkObjectFactory.h>
 
-#include "mitkCommon.h"
-#include "mitkDataStorage.h"
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkWeakPointer.h"
+#include <mitkCommon.h>
+#include <mitkDataStorage.h>
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkWeakPointer.h>
 
-#include "mitkImage.h"
-#include "mitkSurface.h"
+#include <mitkImage.h>
+#include <mitkSurface.h>
 
 #include <mutex>
 #include <stdexcept>
@@ -236,6 +236,6 @@ namespace mitk
 
 } // namespace
 
-#include "mitkNonBlockingAlgorithmEvents.h"
+#include <mitkNonBlockingAlgorithmEvents.h>
 
 #endif

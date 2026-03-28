@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPropertyListReplacedObserver.h"
+#include <mitkPropertyListReplacedObserver.h>
 
 void mitk::PropertyListReplacedObserver::BeforePropertyListReplaced(const std::string & /*id*/,
                                                                     mitk::PropertyList * /*propertyList*/)

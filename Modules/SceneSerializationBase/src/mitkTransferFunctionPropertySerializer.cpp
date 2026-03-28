@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTransferFunctionPropertySerializer.h"
+#include <mitkTransferFunctionPropertySerializer.h>
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
 #include <tinyxml2.h>

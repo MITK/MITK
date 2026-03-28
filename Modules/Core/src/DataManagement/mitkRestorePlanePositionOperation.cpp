@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRestorePlanePositionOperation.h"
+#include <mitkRestorePlanePositionOperation.h>
 
 namespace mitk
 {

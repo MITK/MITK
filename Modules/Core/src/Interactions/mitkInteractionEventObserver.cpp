@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionEventObserver.h"
+#include <mitkInteractionEventObserver.h>
 
 mitk::InteractionEventObserver::InteractionEventObserver() : m_IsEnabled(true)
 {

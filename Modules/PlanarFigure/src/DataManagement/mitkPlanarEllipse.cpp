@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarEllipse.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarEllipse.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 #include <algorithm>
 

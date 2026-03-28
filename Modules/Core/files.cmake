@@ -1,4 +1,77 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  Colortables/HotIron.h
+  Colortables/Inferno.h
+  Colortables/Jet.h
+  Colortables/Magma.h
+  Colortables/Multilabel.h
+  Colortables/PET20.h
+  Colortables/PETColor.h
+  Colortables/Plasma.h
+  Colortables/Turbo.h
+  Colortables/Viridis.h
+  itkImportMitkImageContainer.h
+  itkMITKScalarImageToHistogramGenerator.h
+  itkVtkAbstractTransform.h
+  mitkAnatomicalPlanes.h
+  mitkAntiAliasing.h
+  mitkArray.h
+  mitkBaseDataTestImplementation.h
+  mitkBaseProcess.h
+  mitkCommon.h
+  mitkDisplayActionEvents.h
+  mitkEqual.h
+  mitkEventInformer.h
+  mitkExceptionMacro.h
+  mitkFileSystem.h
+  mitkFileWriterWithInformation.h
+  mitkGenericLookupTable.h
+  mitkGenericProperty.h
+  mitkGetClassHierarchy.h
+  mitkINodeSelectionListener.h
+  mitkIOAdapter.h
+  mitkITKImageImport.h
+  mitkImageAccessByItk.h
+  mitkImageCast.h
+  mitkImageGenerator.h
+  mitkImagePixelAccessor.h
+  mitkImagePixelReadAccessor.h
+  mitkImagePixelWriteAccessor.h
+  mitkImageToItk.h
+  mitkInstantiateAccessFunctions.h
+  mitkInteractionConst.h
+  mitkItkMatrixHack.h
+  mitkLexicalCast.h
+  mitkLine.h
+  mitkLocalStorageHandler.h
+  mitkLogMacros.h
+  mitkMatrix.h
+  mitkMatrixConvert.h
+  mitkMessage.h
+  mitkMoveSurfaceInteractor.h
+  mitkNumericTypes.h
+  mitkOperationActor.h
+  mitkPPArgCount.h
+  mitkPixelTypeList.h
+  mitkPixelTypeMultiplex.h
+  mitkPixelTypeTraits.h
+  mitkPlaneClipping.h
+  mitkPoint.h
+  mitkProgressBarImplementation.h
+  mitkQuaternion.h
+  mitkReferenceCountWatcher.h
+  mitkRenderingManagerFactory.h
+  mitkServiceInterface.h
+  mitkStatusBarImplementation.h
+  mitkStdFunctionCommand.h
+  mitkStorageThreadDispatcherBase.h
+  mitkTimeHelper.h
+  mitkUndoModel.h
+  mitkVector.h
+  mitkVectorDeprecated.h
+  mitkVtkMapper2D.h
+  mitkVtkMapper3D.h
+  mitkWeakPointer.h
+)
 
 set(CPP_FILES
   mitkCoreActivator.cpp
@@ -315,25 +388,26 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-Interactions/globalConfig.xml
-Interactions/DisplayInteraction.xml
-Interactions/DisplayConfigMITKBase.xml
-Interactions/DisplayConfigPACSBase.xml
-Interactions/DisplayConfigCrosshair.xml
-Interactions/DisplayConfigRotation.xml
-Interactions/DisplayConfigActivateCoupling.xml
-Interactions/DisplayConfigSwivel.xml
-Interactions/DisplayConfigPACSPan.xml
-Interactions/DisplayConfigPACSScroll.xml
-Interactions/DisplayConfigPACSZoom.xml
-Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigBlockLMB.xml
-Interactions/PointSet.xml
-Interactions/PointSetConfig.xml
-Interactions/PointSetConfigLMB.xml
+  Interactions/globalConfig.xml
+  Interactions/DisplayInteraction.xml
+  Interactions/DisplayConfigMITKBase.xml
+  Interactions/DisplayConfigPACSBase.xml
+  Interactions/DisplayConfigCrosshair.xml
+  Interactions/DisplayConfigRotation.xml
+  Interactions/DisplayConfigActivateCoupling.xml
+  Interactions/DisplayConfigSwivel.xml
+  Interactions/DisplayConfigPACSPan.xml
+  Interactions/DisplayConfigPACSScroll.xml
+  Interactions/DisplayConfigPACSZoom.xml
+  Interactions/DisplayConfigPACSLevelWindow.xml
+  Interactions/DisplayConfigBlockLMB.xml
+  Interactions/PointSet.xml
+  Interactions/PointSetConfig.xml
+  Interactions/PointSetConfigLMB.xml
 
-mitkLevelWindowPresets.xml
-mitkAnatomicalStructureColorPresets.xml
-LabelSuggestions/mitk_classic.json
-LabelSuggestions/EUCAIM.json
+  LabelSuggestions/mitk_classic.json
+  LabelSuggestions/EUCAIM.json
+
+  mitkLevelWindowPresets.xml
+  mitkAnatomicalStructureColorPresets.xml
 )

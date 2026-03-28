@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkEventRecorder_h
 #define mitkEventRecorder_h
 
-#include "iostream"
-#include "mitkInteractionEventObserver.h"
+#include <iostream>
+#include <mitkInteractionEventObserver.h>
 #include <MitkCoreExports.h>
 
 namespace mitk

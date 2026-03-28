@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMimeTypeProvider_h
 #define mitkMimeTypeProvider_h
 
-#include "mitkCustomMimeType.h"
-#include "mitkIMimeTypeProvider.h"
+#include <mitkCustomMimeType.h>
+#include <mitkIMimeTypeProvider.h>
 
-#include "usServiceTracker.h"
-#include "usServiceTrackerCustomizer.h"
+#include <usServiceTracker.h>
+#include <usServiceTrackerCustomizer.h>
 
 #include <set>
 

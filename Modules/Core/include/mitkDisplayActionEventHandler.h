@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 // mitk core
-#include "mitkDisplayActionEventBroadcast.h"
-#include "mitkDisplayActionEvents.h"
-#include "mitkStdFunctionCommand.h"
+#include <mitkDisplayActionEventBroadcast.h>
+#include <mitkDisplayActionEvents.h>
+#include <mitkStdFunctionCommand.h>
 
 namespace mitk
 {

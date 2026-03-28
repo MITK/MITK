@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkLevelWindowPropertySerializer_h_included
 #define mitkLevelWindowPropertySerializer_h_included
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkLevelWindowProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
 #include <tinyxml2.h>

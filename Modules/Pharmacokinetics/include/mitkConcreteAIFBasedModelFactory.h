@@ -12,8 +12,8 @@ found in the LICENSE file.
 #ifndef mitkConcreteAIFBasedModelFactory_h
 #define mitkConcreteAIFBasedModelFactory_h
 
-#include "mitkConcreteModelFactoryBase.h"
-#include "mitkAIFParametrizerHelper.h"
+#include <mitkConcreteModelFactoryBase.h>
+#include <mitkAIFParametrizerHelper.h>
 
 namespace mitk
 {

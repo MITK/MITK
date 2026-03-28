@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkRegVisStyleProperty.h"
+#include <mitkRegVisStyleProperty.h>
 
 
 mitk::RegVisStyleProperty::RegVisStyleProperty( )

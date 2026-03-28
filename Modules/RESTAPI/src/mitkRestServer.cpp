@@ -11,12 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRestServer.h>
-#include "mitkDataStorageBridge.h"
-#include "mitkHealthController.h"
-#include "mitkDataStorageController.h"
-#include "mitkSwaggerController.h"
-#include "mitkRenderingController.h"
-#include "mitkErrorResponse.h"
+#include <mitkDataStorageBridge.h>
+#include <mitkHealthController.h>
+#include <mitkDataStorageController.h>
+#include <mitkSwaggerController.h>
+#include <mitkRenderingController.h>
+#include <mitkRenderWindowBridge.h>
+#include <mitkErrorResponse.h>
 
 #ifndef CPPHTTPLIB_OPENSSL_SUPPORT
 #define CPPHTTPLIB_OPENSSL_SUPPORT
@@ -107,6 +108,7 @@ namespace
            path == "/api/v1/info" ||
            path == "/api/v1/" ||
            path == "/api/v1/docs" ||
+           path == "/api/v1/docs/" ||
            path == "/api/v1/docs/swagger-ui.css" ||
            path == "/api/v1/docs/swagger-ui-bundle.js" ||
            path == "/api/v1/openapi.json";
@@ -124,6 +126,7 @@ namespace
 
 RestServer::RestServer()
   : m_Bridge(std::make_unique<DataStorageBridge>())
+  , m_RenderWindowBridge(std::make_unique<RenderWindowBridge>())
 {
 }
 
@@ -134,11 +137,23 @@ RestServer::~RestServer()
 
 bool RestServer::Start()
 {
-  std::lock_guard<std::mutex> lock(m_Mutex);
+  std::unique_lock<std::mutex> lock(m_Mutex);
 
   if (m_Running)
   {
     return true;  // Already running
+  }
+
+  // Join any stale server thread from a previous failed start.
+  // When listen() fails asynchronously the thread exits but m_ServerThread is never
+  // joined. Destroying a joinable std::thread is undefined behaviour (terminate or
+  // resource_deadlock_would_occur on MSVC), so we must join it before proceeding.
+  if (m_ServerThread)
+  {
+    std::unique_ptr<std::thread> staleThread = std::move(m_ServerThread);
+    lock.unlock();
+    staleThread->join();
+    lock.lock();
   }
 
   m_RequestLog.clear();
@@ -204,6 +219,18 @@ bool RestServer::Start()
     m_Server->set_payload_max_length(
       static_cast<size_t>(m_PendingConfig.maxPayloadSizeMB) * 1024 * 1024);
 
+    // Bind to the port synchronously so failures (port already in use, permission
+    // denied) are detected here and reported before the server thread is launched.
+    // listen_after_bind() is called from ServerThreadFunc once the thread starts.
+    if (!m_Server->bind_to_port(m_PendingConfig.host, m_PendingConfig.port))
+    {
+      m_LastError = "Port " + std::to_string(m_PendingConfig.port) +
+                    " on " + SanitizeForLog(m_PendingConfig.host) +
+                    " is already in use or cannot be bound";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+
     // Setup temp directory for data serialization
     if (!this->SetupTempDirectory())
     {
@@ -218,6 +245,7 @@ bool RestServer::Start()
     m_DataStorageController->SetTempDirectory(m_TempDirectory);
     m_SwaggerController = std::make_unique<SwaggerController>();
     m_RenderingController = std::make_unique<RenderingController>(*m_Bridge);
+    m_RenderingController->SetRenderWindowBridge(m_RenderWindowBridge.get());
     this->SyncDispatcherToController();
 
     // Pass file access config to controllers
@@ -246,8 +274,44 @@ bool RestServer::Start()
     m_Running = true;
     m_ServerThread = std::make_unique<std::thread>(&RestServer::ServerThreadFunc, this);
 
+    // Wait for httplib to actually enter its listening loop before returning.
+    // Without this, a caller could immediately invoke Stop(), which calls
+    // httplib::Server::stop(). If the server thread has not yet entered
+    // listen_after_bind(), stop() is a no-op (httplib only acts when its
+    // internal is_running_ flag is true), and the thread will then block in
+    // accept() forever, causing Stop()'s join() to deadlock.
+    //
+    // wait_until_ready() blocks until httplib sets either is_running_ (success)
+    // or is_decommissioned (listen failure). Since bind_to_port() already
+    // succeeded, the only delay is OS thread scheduling, which is bounded.
+    lock.unlock();
+    m_Server->wait_until_ready();
+    lock.lock();
+
+    // wait_until_ready() can also return because listen failed (is_decommissioned).
+    // Check is_running() to distinguish success from failure.
+    if (!m_Server->is_running())
+    {
+      m_Running = false;
+      m_RunningConfig = std::nullopt;
+      m_StartTime = std::nullopt;
+
+      // The server thread is exiting — join it before returning.
+      if (m_ServerThread && m_ServerThread->joinable())
+      {
+        auto failedThread = std::move(m_ServerThread);
+        lock.unlock();
+        failedThread->join();
+        lock.lock();
+      }
+
+      m_LastError = "Server listen failed after successful port bind";
+      MITK_ERROR << *m_LastError;
+      return false;
+    }
+
     const std::string protocol = m_PendingConfig.httpsEnabled ? "HTTPS" : "HTTP";
-    MITK_INFO << "REST API server starting (" << protocol << ") on "
+    MITK_INFO << "REST API server started (" << protocol << ") on "
               << SanitizeForLog(m_PendingConfig.host) << ":" << m_PendingConfig.port;
 
     return true;
@@ -360,6 +424,7 @@ void RestServer::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
   std::lock_guard<std::mutex> lock(m_Mutex);
   m_Dispatcher = dispatcher;
   m_Bridge->SetDispatcher(dispatcher);
+  m_RenderWindowBridge->SetDispatcher(dispatcher);
   this->SyncDispatcherToController();
 }
 
@@ -367,6 +432,12 @@ void RestServer::SyncDispatcherToController()
 {
   if (m_RenderingController)
     m_RenderingController->SetDispatcher(m_Dispatcher.Lock());
+}
+
+RenderWindowBridge* RestServer::GetRenderWindowBridge()
+{
+  std::lock_guard<std::mutex> lock(m_Mutex);
+  return m_RenderWindowBridge.get();
 }
 
 DataStorage::Pointer RestServer::GetDataStorage() const
@@ -829,19 +900,19 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Get(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandleGET_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Put(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Put(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandlePUT_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
     });
 
-  m_Server->Delete(apiBase + "/datastorage/nodes/:uid/properties/:key",
+  m_Server->Delete(apiBase + "/datastorage/nodes/:uid/properties/:property_key",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_DataStorageController->HandleDELETE_nodes_uid_properties_key(req, res);
       this->RecordRequest(req.path, "DELETE", res.status, req.remote_addr);
@@ -872,8 +943,47 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "POST", res.status, req.remote_addr);
     });
 
+  m_Server->Get(apiBase + "/rendering/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_selectedPosition(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_selectedPosition(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/selected-time",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_selectedTime(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/selected-time",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_selectedTime(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_screenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
   // Documentation endpoints (Swagger UI and OpenAPI spec)
+  // Redirect /docs to /docs/ so relative URLs in the HTML resolve correctly
+  // regardless of any reverse-proxy prefix (proxy-agnostic relative redirect).
   m_Server->Get(apiBase + "/docs",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      res.status = 302;
+      res.set_header("Location", "docs/");
+      this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/docs/",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_SwaggerController->HandleGET_docs(req, res);
       this->RecordRequest(req.path, req.method, res.status, req.remote_addr);
@@ -900,34 +1010,25 @@ void RestServer::RegisterRoutes()
 
 void RestServer::ServerThreadFunc()
 {
-  std::string host;
-  int port;
-
-  {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-    // m_RunningConfig is guaranteed to have a value here because Start() sets it
-    // before launching this thread
-    host = m_RunningConfig->host;
-    port = m_RunningConfig->port;
-  }
-
-  // This blocks until server is stopped (either via stop() or error)
-  bool result = m_Server->listen(host, port);
+  // The port is already bound via bind_to_port() in Start(). This call blocks
+  // until the server is stopped (via Stop()) or an unexpected error occurs.
+  const bool result = m_Server->listen_after_bind();
 
   {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    // Check if this was an unexpected failure (not triggered by Stop())
-    // m_Running being true here means Stop() hasn't been called yet
+    // Check if this was an unexpected failure (not triggered by Stop()).
+    // m_Running being true here means Stop() has not been called yet.
     if (!result && m_Running)
     {
-      // listen() failed to start or returned unexpectedly
-      m_LastError = "Server failed to listen on " + SanitizeForLog(host) + ":" + std::to_string(port);
+      const std::string host = m_RunningConfig ? m_RunningConfig->host : "?";
+      const int port = m_RunningConfig ? m_RunningConfig->port : 0;
+      m_LastError = "Server stopped unexpectedly on " + SanitizeForLog(host) + ":" + std::to_string(port);
       MITK_ERROR << *m_LastError;
     }
 
-    // Server is no longer running regardless of how listen() returned
-    // This ensures IsRunning() returns the correct state
+    // Server is no longer running regardless of how listen_after_bind() returned.
+    // This ensures IsRunning() returns the correct state.
     m_Running = false;
     m_RunningConfig = std::nullopt;
   }

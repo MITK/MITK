@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkColorTransferFunctionCanvas.h"
+#include <QmitkColorTransferFunctionCanvas.h>
 
 #include <QColorDialog>
 #include <QLineEdit>

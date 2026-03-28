@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkGeometry3DToXML_h
 
 // MITK
-#include "mitkGeometry3D.h"
+#include <mitkGeometry3D.h>
 
 namespace tinyxml2
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDataNodeSource_h
 #define mitkDataNodeSource_h
 
-#include "itkProcessObject.h"
-#include "mitkDataNode.h"
+#include <itkProcessObject.h>
+#include <mitkDataNode.h>
 
 namespace mitk
 {

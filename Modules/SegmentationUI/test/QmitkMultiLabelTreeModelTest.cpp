@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QColor>
-#include "QmitkMultiLabelTreeModel.h"
+#include <QmitkMultiLabelTreeModel.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

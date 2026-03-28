@@ -42,6 +42,7 @@ namespace mitk
   class DataStorageController;
   class SwaggerController;
   class RenderingController;
+  class RenderWindowBridge;
 
   /**
    * @brief HTTP REST server implementation.
@@ -82,6 +83,8 @@ namespace mitk
      */
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
+    RenderWindowBridge* GetRenderWindowBridge() override;
+
     std::optional<std::string> GetServerUrl() const override;
     std::optional<std::string> GetLastError() const override;
 
@@ -105,8 +108,6 @@ namespace mitk
     /** @brief Propagate the current dispatcher to the rendering controller if it exists.
      *  @pre m_Mutex is held by the caller. */
     void SyncDispatcherToController();
-
-    // --- Security middleware (Phase 4) ---
 
     /**
      * @brief Check if the client IP is allowed to access the server.
@@ -148,6 +149,7 @@ namespace mitk
 
     // Business logic
     std::unique_ptr<DataStorageBridge> m_Bridge;
+    std::unique_ptr<RenderWindowBridge> m_RenderWindowBridge;
     std::unique_ptr<HealthController> m_HealthController;
     std::unique_ptr<DataStorageController> m_DataStorageController;
     std::unique_ptr<SwaggerController> m_SwaggerController;

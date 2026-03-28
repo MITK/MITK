@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVerboseLimitedLinearUndo.h"
-#include "mitkOperationEvent.h"
+#include <mitkVerboseLimitedLinearUndo.h>
+#include <mitkOperationEvent.h>
 
 mitk::VerboseLimitedLinearUndo::VerboseLimitedLinearUndo()
 {

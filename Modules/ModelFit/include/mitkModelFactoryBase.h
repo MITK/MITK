@@ -15,13 +15,13 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 
-#include "mitkModelBase.h"
-#include "mitkModelTraitsInterface.h"
-#include "mitkModelParameterizerBase.h"
-#include "mitkModelFitInfo.h"
-#include "mitkConstraintCheckerBase.h"
+#include <mitkModelBase.h>
+#include <mitkModelTraitsInterface.h>
+#include <mitkModelParameterizerBase.h>
+#include <mitkModelFitInfo.h>
+#include <mitkConstraintCheckerBase.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

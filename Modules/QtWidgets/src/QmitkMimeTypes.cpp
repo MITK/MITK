@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMimeTypes.h"
+#include <QmitkMimeTypes.h>
 
 const QString QmitkMimeTypes::DataNodePtrs = "application/x-qmitk-datanode-ptrs";
 const QString QmitkMimeTypes::DataStorageTreeItemPtrs = "application/x-qmitk-datastorage-treeitem-ptrs";

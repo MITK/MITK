@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkInteractionPositionEvent_h
 #define mitkInteractionPositionEvent_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
-#include "mitkInteractionEvent.h"
-#include "mitkInteractionEventConst.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
+#include <mitkInteractionEvent.h>
+#include <mitkInteractionEventConst.h>
 #include <MitkCoreExports.h>
 #include <string>
 

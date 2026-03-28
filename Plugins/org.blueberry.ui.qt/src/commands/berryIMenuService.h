@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYIMENUSERVICE_H_
 #define BERRYIMENUSERVICE_H_
 
-#include <berryIServiceWithSources.h>
+#include "berryIServiceWithSources.h"
 
 namespace berry {
 

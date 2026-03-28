@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkEnumerationProperty.h"
-#include "mitkVtkInterpolationProperty.h"
-#include "mitkVtkRepresentationProperty.h"
+#include <mitkEnumerationProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
 #include <vtkProperty.h>
 
 int mitkEnumerationPropertyTest(int /*argc*/, char * /*argv*/ [])

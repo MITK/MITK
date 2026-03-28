@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYAPPLICATIONCONTAINER_H
 #define BERRYAPPLICATIONCONTAINER_H
 
-#include <berryIRegistryEventListener.h>
+#include "berryIRegistryEventListener.h"
 
 #include <ctkServiceTracker.h>
 #include <ctkServiceTrackerCustomizer.h>

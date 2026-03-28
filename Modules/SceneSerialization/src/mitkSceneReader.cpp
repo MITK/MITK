@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSceneReader.h"
+#include <mitkSceneReader.h>
 #include <tinyxml2.h>
 
 bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage)

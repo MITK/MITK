@@ -108,7 +108,7 @@ void QmitkSegmentAnythingPreferencePage::CreateQtControl(QWidget *parent)
   connect(m_Ui->clearSAMButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
   connect(m_Ui->sysPythonComboBox,
           QOverload<int>::of(&QComboBox::activated),
-          [=](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
+          [=, this](int index) { OnSystemPythonChanged(m_Ui->sysPythonComboBox->itemText(index)); });
 
   this->WriteStatusMessage(welcomeText);
   this->SetDeviceInfo();

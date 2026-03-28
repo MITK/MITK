@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAIFParametrizerHelper.h"
+#include <mitkAIFParametrizerHelper.h>
 
 mitk::ModelBase::StaticParameterValuesType mitk::convertArrayToParameter(itk::Array<double> array)
 {

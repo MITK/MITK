@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkAterialInputFunctionGenerator.h"
+#include <mitkAterialInputFunctionGenerator.h>
 
-#include "mitkMaskedDynamicImageStatisticsGenerator.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageCast.h"
-#include "itkArray2D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkExtractTimeGrid.h"
-#include "mitkAIFBasedModelBase.h"
-#include "mitkImageCast.h"
+#include <mitkMaskedDynamicImageStatisticsGenerator.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageCast.h>
+#include <itkArray2D.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkExtractTimeGrid.h>
+#include <mitkAIFBasedModelBase.h>
+#include <mitkImageCast.h>
 
 #include <iostream>
 #include <fstream>

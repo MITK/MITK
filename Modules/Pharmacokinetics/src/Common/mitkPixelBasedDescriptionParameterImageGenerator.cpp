@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkCommand.h"
-#include "itkMultiOutputNaryFunctorImageFilter.h"
+#include <itkCommand.h>
+#include <itkMultiOutputNaryFunctorImageFilter.h>
 
-#include "mitkPixelBasedDescriptionParameterImageGenerator.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkSimpleFunctorPolicy.h"
-#include "mitkModelBase.h"
+#include <mitkPixelBasedDescriptionParameterImageGenerator.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkSimpleFunctorPolicy.h>
+#include <mitkModelBase.h>
 
 void
   mitk::PixelBasedDescriptionParameterImageGenerator::

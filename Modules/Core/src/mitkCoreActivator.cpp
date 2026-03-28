@@ -21,16 +21,16 @@ found in the LICENSE file.
 #include <mitkGeometryDataWriterService.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkIOUtil.h>
-#include <mitkImageVtkLegacyIO.h>
-#include <mitkImageVtkXmlIO.h>
+#include "mitkImageVtkLegacyIO.h"
+#include "mitkImageVtkXmlIO.h"
 #include <mitkItkImageIO.h>
-#include <mitkMimeTypeProvider.h>
-#include <mitkPointSetReaderService.h>
-#include <mitkPointSetWriterService.h>
-#include <mitkRawImageFileReader.h>
-#include <mitkSurfaceStlIO.h>
-#include <mitkSurfaceVtkLegacyIO.h>
-#include <mitkSurfaceVtkXmlIO.h>
+#include "mitkMimeTypeProvider.h"
+#include "mitkPointSetReaderService.h"
+#include "mitkPointSetWriterService.h"
+#include "mitkRawImageFileReader.h"
+#include "mitkSurfaceStlIO.h"
+#include "mitkSurfaceVtkLegacyIO.h"
+#include "mitkSurfaceVtkXmlIO.h"
 
 #include "mitkLegacyFileWriterService.h"
 #include <mitkFileWriter.h>

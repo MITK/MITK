@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
-#include "QmitkModelViewSelectionConnector.h"
-#include "QmitkSelectionServiceConnector.h"
+#include <QmitkModelViewSelectionConnector.h>
+#include <QmitkSelectionServiceConnector.h>
 #include <memory>
 
 namespace Ui

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkVtkPropRenderer_h
 #define mitkVtkPropRenderer_h
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 #include <MitkCoreExports.h>
 #include <itkCommand.h>
 #include <mitkDataStorage.h>

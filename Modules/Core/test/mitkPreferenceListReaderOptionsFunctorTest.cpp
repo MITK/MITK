@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPreferenceListReaderOptionsFunctor.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 #include <mitkAbstractFileReader.h>
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>

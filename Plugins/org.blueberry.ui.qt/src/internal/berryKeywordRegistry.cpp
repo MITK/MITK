@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include "berryKeywordRegistry.h"
 
-#include "berryIConfigurationElement.h"
-#include "berryIExtension.h"
-#include "berryIExtensionPoint.h"
-#include "berryIExtensionPointFilter.h"
-#include "berryIExtensionRegistry.h"
+#include <berryIConfigurationElement.h>
+#include <berryIExtension.h>
+#include <berryIExtensionPoint.h>
+#include <berryIExtensionPointFilter.h>
+#include <berryIExtensionRegistry.h>
 
-#include "berryExtensionTracker.h"
-#include "berryObjectString.h"
-#include "berryPlatform.h"
+#include <berryExtensionTracker.h>
+#include <berryObjectString.h>
+#include <berryPlatform.h>
 #include "berryPlatformUI.h"
 #include "berryWorkbenchRegistryConstants.h"
 

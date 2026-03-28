@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryIntroPartAdapterSite.h"
 
-#include <berryIWorkbenchPage.h>
-#include <berryISelectionProvider.h>
+#include "berryIWorkbenchPage.h"
+#include "berryISelectionProvider.h"
 
 namespace berry
 {

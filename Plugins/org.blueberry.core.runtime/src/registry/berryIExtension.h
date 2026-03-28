@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define BERRYIEXTENSION_H_
 
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 #include <QList>
 

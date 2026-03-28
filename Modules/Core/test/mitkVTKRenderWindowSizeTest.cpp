@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 void CheckRWSize(int width, int height)
 {

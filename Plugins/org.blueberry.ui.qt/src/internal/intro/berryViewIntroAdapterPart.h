@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef BERRYVIEWINTROADAPTERPART_H_
 #define BERRYVIEWINTROADAPTERPART_H_
 
-#include <berryViewPart.h>
+#include "berryViewPart.h"
 
-#include <intro/berryIIntroPart.h>
-#include <intro/berryIIntroSite.h>
+#include "intro/berryIIntroPart.h"
+#include "intro/berryIIntroSite.h"
 
 namespace berry
 {

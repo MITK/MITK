@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYQTDISPLAY_H_
 #define BERRYQTDISPLAY_H_
 
-#include <berryDisplay.h>
+#include "berryDisplay.h"
 
 #include <QObject>
 #include <QThread>

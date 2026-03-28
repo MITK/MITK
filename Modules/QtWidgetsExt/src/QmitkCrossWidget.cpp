@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkCrossWidget.h"
+#include <QmitkCrossWidget.h>
 
 #include <QCursor>
 #include <QMouseEvent>

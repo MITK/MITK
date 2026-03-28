@@ -15,8 +15,8 @@ found in the LICENSE file.
 #include "internal/QmitkDataNodeSelection.h"
 
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 // blueberry ui qt plugin
 #include <berryINullSelectionListener.h>

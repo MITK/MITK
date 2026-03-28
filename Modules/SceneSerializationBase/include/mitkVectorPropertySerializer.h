@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkVectorPropertySerializer_h
 #define mitkVectorPropertySerializer_h
 
-#include "mitkBasePropertySerializer.h"
-#include "mitkVectorProperty.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkVectorProperty.h>
 #include <mitkLexicalCast.h>
 #include <tinyxml2.h>
 

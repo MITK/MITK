@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkIndexedValueFunctorPolicy.h"
+#include <mitkIndexedValueFunctorPolicy.h>
 
 mitk::IndexedValueFunctorPolicy::IndexedValueFunctorPolicy()
 {};

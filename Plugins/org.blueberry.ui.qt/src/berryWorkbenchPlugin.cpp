@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryWorkbenchPlugin.h"
 
 #include "internal/berryWorkbenchRegistryConstants.h"
 #include "internal/berryWorkbench.h"
-#include "berryPlatform.h"
+#include <berryPlatform.h>
 
 #include "internal/intro/berryEditorIntroAdapterPart.h"
 #include "internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h"
@@ -34,8 +34,8 @@ found in the LICENSE file.
 #include "internal/berryMenuServiceFactory.h"
 #include "internal/berryCommandServiceFactory.h"
 #include "internal/berryWorkbenchSourceProvider.h"
-#include "berryObjectString.h"
-#include "berryObjects.h"
+#include <berryObjectString.h>
+#include <berryObjects.h>
 #include "internal/berryPolicy.h"
 #include "internal/berryHandlerAuthority.h"
 
@@ -56,11 +56,11 @@ found in the LICENSE file.
 #include "internal/handlers/berryShowViewHandler.h"
 
 #include "berryIQtStyleManager.h"
-#include "berryIContributor.h"
-#include "berryILog.h"
+#include <berryIContributor.h>
+#include <berryILog.h>
 #include "berryIElementFactory.h"
 
-#include "berryIExtension.h"
+#include <berryIExtension.h>
 
 #include <QDebug>
 #include <QPrinterInfo>

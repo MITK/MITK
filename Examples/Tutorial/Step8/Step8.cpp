@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "Step8.h"
+#include <Step8.h>
 
-#include "QmitkLevelWindowWidget.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkStdMultiWidget.h"
+#include <QmitkLevelWindowWidget.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkStdMultiWidget.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

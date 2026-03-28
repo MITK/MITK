@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itkStitchImageFilter_hxx
-#define itkStitchImageFilter_hxx
+#ifndef itkStitchImageFilter_tpp
+#define itkStitchImageFilter_tpp
 
-#include "itkStitchImageFilter.h"
-#include "itkObjectFactory.h"
-#include "itkIdentityTransform.h"
-#include "itkProgressReporter.h"
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkImageScanlineIterator.h"
-#include "itkSpecialCoordinatesImage.h"
-#include "itkDefaultConvertPixelTraits.h"
-#include "itkSimpleDataObjectDecorator.h"
+#include <itkStitchImageFilter.h>
+#include <itkObjectFactory.h>
+#include <itkIdentityTransform.h>
+#include <itkProgressReporter.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageScanlineIterator.h>
+#include <itkSpecialCoordinatesImage.h>
+#include <itkDefaultConvertPixelTraits.h>
+#include <itkSimpleDataObjectDecorator.h>
 
 #include <numeric>
 

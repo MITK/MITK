@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "berryQtWorkbenchAdvisor.h"
 #include "internal/berryQtGlobalEventFilter.h"
 #include "berryWorkbenchPlugin.h"
-#include <berryIQtStyleManager.h>
-#include <berryQtPreferences.h>
-#include <berryQtStyleManager.h>
+#include "berryIQtStyleManager.h"
+#include "berryQtPreferences.h"
+#include "berryQtStyleManager.h"
 
 #include <QApplication>
 #include <QString>

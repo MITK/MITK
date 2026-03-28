@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIPERSISTABLEEDITOR_H
 #define BERRYIPERSISTABLEEDITOR_H
 
-#include <berryIPersistable.h>
+#include "berryIPersistable.h"
 
 namespace berry {
 

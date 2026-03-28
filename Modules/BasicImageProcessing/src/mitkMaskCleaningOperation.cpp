@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMaskCleaningOperation.h"
+#include <mitkMaskCleaningOperation.h>
 
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <itkBinaryFunctorImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 
-#include "itkCastImageFilter.h"
+#include <itkCastImageFilter.h>
 
 namespace mitk
 {

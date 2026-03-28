@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include "berryAbstractTabFolder.h"
 #include "berryPartInfo.h"
 
-#include <berryIShellListener.h>
-#include <berryIPropertyChangeListener.h>
-#include <berryGuiTkIControlListener.h>
+#include "berryIShellListener.h"
+#include "berryIPropertyChangeListener.h"
+#include "berryGuiTkIControlListener.h"
 #include <list>
 
 namespace berry

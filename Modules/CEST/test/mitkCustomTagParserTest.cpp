@@ -11,15 +11,15 @@ found in the LICENSE file.
 ============================================================================*/
 
 // Testing
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 // std includes
 #include <string>
 
 // MITK includes
-#include "mitkCustomTagParser.h"
-#include "mitkCESTPropertyHelper.h"
+#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
 #include <mitkTemporoSpatialStringProperty.h>
 
 //itksys
@@ -27,9 +27,9 @@ found in the LICENSE file.
 #include <itkFileTools.h>
 
 // microservice includes
-#include "usGetModuleContext.h"
-#include "usModule.h"
-#include "usModuleContext.h"
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
 
 // VTK includes
 #include <vtkDebugLeaks.h>

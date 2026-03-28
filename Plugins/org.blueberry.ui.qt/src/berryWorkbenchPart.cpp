@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "berryIWorkbenchPartConstants.h"
 #include <berryIContributor.h>
 #include <berrySafeRunner.h>
-#include <util/berrySafeRunnable.h>
+#include "util/berrySafeRunnable.h"
 
 #include "berryWorkbenchPlugin.h"
 

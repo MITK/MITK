@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPLATFORMPROPERTYTESTER_H
 #define BERRYPLATFORMPROPERTYTESTER_H
 
-#include <berryPropertyTester.h>
+#include "berryPropertyTester.h"
 
 #include <ctkPlugin.h>
 

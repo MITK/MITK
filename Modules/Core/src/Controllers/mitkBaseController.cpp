@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBaseController.h"
-#include "mitkBaseRenderer.h"
+#include <mitkBaseController.h>
+#include <mitkBaseRenderer.h>
 
 mitk::BaseController::BaseController()
   : m_LastUpdateTime(0)

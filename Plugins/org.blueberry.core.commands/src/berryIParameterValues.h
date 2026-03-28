@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYIPARAMETERVALUES_H
 #define BERRYIPARAMETERVALUES_H
 
-#include "berryObject.h"
+#include <berryObject.h>
 
 #include <org_blueberry_core_commands_Export.h>
 

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _VTKPOINTSETSLICER_H_
-#define _VTKPOINTSETSLICER_H_
+#ifndef vtkPointSetSlicer_h
+#define vtkPointSetSlicer_h
 
 #include <iostream>
 
-#include "vtkVersion.h"
+#include <vtkVersion.h>
 
 class vtkCutter;
 class vtkPlane;
@@ -26,9 +26,9 @@ class vtkCellArray;
 class vtkPointData;
 class vtkCellData;
 
-#include "mitkCommon.h"
+#include <mitkCommon.h>
 
-#include "vtkPolyDataAlgorithm.h"
+#include <vtkPolyDataAlgorithm.h>
 
 class vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
@@ -114,4 +114,4 @@ private:
   static POLY_CASES polyCases[256];
 };
 
-#endif /* _VTKPOINTSETSLICER_H_ */
+#endif /* vtkPointSetSlicer_h */

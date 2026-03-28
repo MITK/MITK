@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkTransferFunctionCanvas_h
 #define QmitkTransferFunctionCanvas_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <mitkRenderingManager.h>
 #include <mitkSimpleHistogram.h>

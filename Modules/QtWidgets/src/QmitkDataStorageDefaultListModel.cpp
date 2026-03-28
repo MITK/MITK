@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include <QmitkDataStorageDefaultListModel.h>
 
 // qt widgets module
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
+#include <QmitkNodeDescriptorManager.h>
 
 QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent)
   : QmitkAbstractDataStorageModel(parent)

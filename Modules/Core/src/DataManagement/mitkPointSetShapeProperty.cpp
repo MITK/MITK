@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetShapeProperty.h"
+#include <mitkPointSetShapeProperty.h>
 
 mitk::PointSetShapeProperty::PointSetShapeProperty()
 {

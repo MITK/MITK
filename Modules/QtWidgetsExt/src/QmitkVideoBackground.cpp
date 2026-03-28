@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkVideoBackground.h"
+#include <QmitkVideoBackground.h>
 
 // MITK includes
-#include "mitkRenderingManager.h"
-#include "mitkVtkLayerController.h"
+#include <mitkRenderingManager.h>
+#include <mitkVtkLayerController.h>
 
 // QT includes
 #include <QTimer>

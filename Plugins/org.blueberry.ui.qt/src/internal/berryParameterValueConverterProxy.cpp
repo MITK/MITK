@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "berryParameterValueConverterProxy.h"
 
 #include "berryWorkbenchRegistryConstants.h"
-#include "berryCommandExceptions.h"
-#include "berryIConfigurationElement.h"
-#include "berryCoreException.h"
+#include <berryCommandExceptions.h>
+#include <berryIConfigurationElement.h>
+#include <berryCoreException.h>
 
 namespace berry {
 

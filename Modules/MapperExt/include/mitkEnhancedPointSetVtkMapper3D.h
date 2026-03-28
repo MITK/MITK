@@ -13,12 +13,12 @@ found in the LICENSE file.
 #ifndef mitkEnhancedPointSetVtkMapper3D_h
 #define mitkEnhancedPointSetVtkMapper3D_h
 
-#include "MitkMapperExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkPointSet.h"
-#include "mitkVector.h"
-#include "mitkVtkMapper.h"
+#include <MitkMapperExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkPointSet.h>
+#include <mitkVector.h>
+#include <mitkVtkMapper.h>
 
 class vtkActor;
 class vtkAssembly;

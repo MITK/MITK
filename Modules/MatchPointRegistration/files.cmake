@@ -1,4 +1,7 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  itkStitchImageFilter.h
+  mitkMatchPointPropertyTags.h
+)
 
 set(CPP_FILES
   mitkMAPRegistrationWrapper.cpp
@@ -27,4 +30,3 @@ set(CPP_FILES
   Rendering/mitkRegEvalStyleProperty.cpp
   Rendering/mitkRegEvalWipeStyleProperty.cpp
 )
-

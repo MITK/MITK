@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImageVtkMapper2D.h"
+#include <mitkLabelSetImageVtkMapper2D.h>
 
 // MITK
 #include <mitkAbstractTransformGeometry.h>
@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 
 // MITK Rendering
-#include "vtkNeverTranslucentTexture.h"
+#include <vtkNeverTranslucentTexture.h>
 
 // VTK
 #include <vtkCamera.h>

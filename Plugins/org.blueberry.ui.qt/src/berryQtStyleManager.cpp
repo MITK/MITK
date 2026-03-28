@@ -24,8 +24,8 @@ found in the LICENSE file.
 #include <QIcon>
 
 #include <berryLog.h>
-#include <berryPlatformUI.h>
-#include <berryQtPreferences.h>
+#include "berryPlatformUI.h"
+#include "berryQtPreferences.h"
 
 #include "berryWorkbenchPlugin.h"
 

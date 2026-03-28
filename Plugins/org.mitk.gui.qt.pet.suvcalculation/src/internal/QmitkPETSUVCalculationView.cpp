@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPETSUVCalculationView.h"
 #include <ui_QmitkPETSUVCalculationViewControls.h>
 
-#include "itkIndexedUnaryFunctorImageFilter.h"
-#include "mitkITKImageImport.h"
-#include "mitkImageCast.h"
-#include "mitkSUVCalculation.h"
-#include "mitkSUVFunctorPolicy.h"
-#include "mitkWorkbenchUtil.h"
+#include <itkIndexedUnaryFunctorImageFilter.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
+#include <mitkSUVCalculation.h>
+#include <mitkSUVFunctorPolicy.h>
+#include <mitkWorkbenchUtil.h>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <iostream>
@@ -34,9 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSUVCalculationHelper.h>
 
 const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
-
-const std::string PROPERTY_NAME_DICOM_SERIES_MODALITY = "dicom.series.Modality";
-const std::string PROPERTY_NAME_DICOM_PET_RADIOACTIVITYUNITS = "dicom.pet.RadioactivityUnits";
 
 void QmitkPETSUVCalculationView::SetFocus()
 {

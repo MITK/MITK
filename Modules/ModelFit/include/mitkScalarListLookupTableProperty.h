@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkScalarListLookupTableProperty_h
 #define mitkScalarListLookupTableProperty_h
 
-#include "MitkModelFitExports.h"
-#include "mitkGenericProperty.h"
-#include "mitkScalarListLookupTable.h"
+#include <MitkModelFitExports.h>
+#include <mitkGenericProperty.h>
+#include <mitkScalarListLookupTable.h>
 
 namespace mitk
 {

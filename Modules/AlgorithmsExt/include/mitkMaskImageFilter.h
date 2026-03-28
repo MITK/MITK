@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkMaskImageFilter_h
 #define mitkMaskImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkImageToImageFilter.h>
 
-#include "itkImage.h"
+#include <itkImage.h>
 
 namespace mitk
 {

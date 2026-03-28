@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <qwt_plot.h>
 #include <qwt_scale_map.h>
 
-#include "QmitkHistogram.h"
+#include <QmitkHistogram.h>
 
 class QmitkHistogram::HistogramData
 {

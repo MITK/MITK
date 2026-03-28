@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <org_blueberry_ui_qt_Export.h>
 
-#include <berryISelectionProvider.h>
+#include "berryISelectionProvider.h"
 
 #include <QItemSelectionModel>
 #include <QItemSelection>

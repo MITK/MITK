@@ -14,16 +14,16 @@ found in the LICENSE file.
 #ifndef mitkRTPlanReaderService_h
 #define mitkRTPlanReaderService_h
 
-#include "mitkAbstractFileReader.h"
+#include <mitkAbstractFileReader.h>
 
 #include <vector>
 
-#include "mitkIDICOMTagsOfInterest.h"
-#include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+#include <mitkIDICOMTagsOfInterest.h>
+#include <mitkDICOMDatasetAccessingImageFrameInfo.h>
 
 #include <usModuleContext.h>
 
-#include "MitkDICOMRTIOExports.h"
+#include <MitkDICOMRTIOExports.h>
 
 namespace mitk
 {

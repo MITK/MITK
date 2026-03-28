@@ -1,5 +1,3 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
-
 set(CPP_FILES
   qclickablelabel.cpp
   QmitkAboutDialog.cpp
@@ -43,13 +41,13 @@ set(CPP_FILES
 )
 
 set(UI_FILES
-  src/QmitkAboutDialogGUI.ui
-  src/QmitkPrimitiveMovieNavigatorWidget.ui
-  src/QmitkSliceWidget.ui
-  src/QmitkTransferFunctionGeneratorWidget.ui
-  src/QmitkTransferFunctionWidget.ui
+  QmitkAboutDialogGUI.ui
+  QmitkPrimitiveMovieNavigatorWidget.ui
+  QmitkSliceWidget.ui
+  QmitkTransferFunctionGeneratorWidget.ui
+  QmitkTransferFunctionWidget.ui
 )
 
 set(QRC_FILES
-  resource/QtWidgetsExt.qrc
+  QtWidgetsExt.qrc
 )

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageSource.h"
+#include <mitkImageSource.h>
 
-#include "mitkImageVtkReadAccessor.h"
-#include "mitkImageVtkWriteAccessor.h"
+#include <mitkImageVtkReadAccessor.h>
+#include <mitkImageVtkWriteAccessor.h>
 
 #include <itkMultiThreaderBase.h>
 

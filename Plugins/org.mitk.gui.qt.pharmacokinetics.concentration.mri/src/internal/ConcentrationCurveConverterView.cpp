@@ -13,15 +13,15 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <ui_ConcentrationCurveConverterViewControls.h>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
 #include "ConcentrationCurveConverterView.h"
-#include "mitkConcentrationCurveGenerator.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkConvertToConcentrationAbsoluteFunctor.h"
-#include "mitkConvertToConcentrationRelativeFunctor.h"
-#include "itkBinaryFunctorImageFilter.h"
-#include "boost/math/constants/constants.hpp"
+#include <mitkConcentrationCurveGenerator.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkConvertToConcentrationAbsoluteFunctor.h>
+#include <mitkConvertToConcentrationRelativeFunctor.h>
+#include <itkBinaryFunctorImageFilter.h>
+#include <boost/math/constants/constants.hpp>
 
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
@@ -29,14 +29,14 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateDimension.h>
-#include "mitkNodePredicateFunction.h"
+#include <mitkNodePredicateFunction.h>
 #include <mitkModelFitResultRelationRule.h>
 
 #include <mitkModelFitConstants.h>
 // Includes for image casting between ITK and MITK
-#include "mitkImageTimeSelector.h"
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
+#include <mitkImageTimeSelector.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
 #include <mitkImagePixelReadAccessor.h>
 
 #include <iostream>

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkClippingPlaneInteractor3D_h
 #define mitkClippingPlaneInteractor3D_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 #include <mitkBaseRenderer.h>
 #include <mitkDataInteractor.h>
 #include <mitkGeometry3D.h>

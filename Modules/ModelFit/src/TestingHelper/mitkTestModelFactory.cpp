@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestModelFactory.h"
-#include "mitkConcreteModelParameterizerBase.h"
+#include <mitkTestModelFactory.h>
+#include <mitkConcreteModelParameterizerBase.h>
 
 mitk::TestModelFactory::TestModelFactory()
 {

@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "mitkSurfaceStlIO.h"
 
-#include "mitkIOMimeTypes.h"
-#include "mitkLocaleSwitch.h"
-#include "mitkSurface.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
+#include <mitkSurface.h>
 
 #include <vtkCleanPolyData.h>
 #include <vtkErrorCode.h>

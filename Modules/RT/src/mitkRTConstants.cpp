@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRTConstants.h"
+#include <mitkRTConstants.h>
 
 const std::string mitk::RTConstants::DOSE_PROPERTY_NAME = "dose";
 const std::string mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME = "dose.PrescribedDose";

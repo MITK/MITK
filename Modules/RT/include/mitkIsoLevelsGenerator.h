@@ -14,9 +14,9 @@ found in the LICENSE file.
 #ifndef mitkIsoLevelsGenerator_h
 #define mitkIsoLevelsGenerator_h
 
-#include "mitkIsoDoseLevelCollections.h"
+#include <mitkIsoDoseLevelCollections.h>
 
-#include "MitkRTExports.h"
+#include <MitkRTExports.h>
 
 namespace mitk
 {

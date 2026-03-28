@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef BERRYICOMMANDIMAGESERVICE_H_
 #define BERRYICOMMANDIMAGESERVICE_H_
 
-#include "../services/berryIDisposable.h"
+#include "berryIDisposable.h"
 
 #include <QIcon>
 

@@ -24,13 +24,13 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateFunction.h>
-#include "mitkRegVisDirectionProperty.h"
-#include "mitkRegVisStyleProperty.h"
-#include "mitkRegVisColorStyleProperty.h"
-#include "mitkRegVisPropertyTags.h"
-#include "mitkRegVisHelper.h"
-#include "mitkMatchPointPropertyTags.h"
-#include "mitkRegistrationHelper.h"
+#include <mitkRegVisDirectionProperty.h>
+#include <mitkRegVisStyleProperty.h>
+#include <mitkRegVisColorStyleProperty.h>
+#include <mitkRegVisPropertyTags.h>
+#include <mitkRegVisHelper.h>
+#include <mitkMatchPointPropertyTags.h>
+#include <mitkRegistrationHelper.h>
 
 // Qmitk
 #include "QmitkMatchPointRegistrationVisualizer.h"

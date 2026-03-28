@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNodeSelectionPreferenceHelper.h"
+#include <QmitkNodeSelectionPreferenceHelper.h>
 
 #include <QmitkNodeSelectionConstants.h>
 
@@ -21,8 +21,8 @@ found in the LICENSE file.
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>
 
-#include "mitkExceptionMacro.h"
-#include "mitkDataStorageInspectorGenerator.h"
+#include <mitkExceptionMacro.h>
+#include <mitkDataStorageInspectorGenerator.h>
 
 void mitk::PutVisibleDataStorageInspectors(const VisibleDataStorageInspectorMapType &inspectors)
 {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMDCMTKTagScanner.h"
-#include "mitkDICOMGenericImageFrameInfo.h"
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkDICOMGenericImageFrameInfo.h>
 
 #include <mitkFileSystem.h>
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVectorProperty.h"
+#include <mitkVectorProperty.h>
 #include <nlohmann/json.hpp>
 
 namespace mitk

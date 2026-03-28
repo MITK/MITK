@@ -15,17 +15,17 @@ found in the LICENSE file.
 
 #include <vector>
 
-#include "mitkPoint.h"
-#include "mitkPointSet.h"
-#include "mitkModelBase.h"
-#include "mitkWeakPointer.h"
-#include "mitkCommon.h"
+#include <mitkPoint.h>
+#include <mitkPointSet.h>
+#include <mitkModelBase.h>
+#include <mitkWeakPointer.h>
+#include <mitkCommon.h>
 
-#include "mitkModelFitInfo.h"
+#include <mitkModelFitInfo.h>
 
-#include "itkMapContainer.h"
+#include <itkMapContainer.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

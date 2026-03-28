@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLandmarkProjector.h"
+#include <mitkLandmarkProjector.h>
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjector::LandmarkProjector()

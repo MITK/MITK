@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkFileChooser.h"
+#include <QmitkFileChooser.h>
 
 #include <QApplication>
 #include <QFileDialog>

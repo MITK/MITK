@@ -13,18 +13,18 @@ found in the LICENSE file.
 #ifndef mitkDICOMImageBlockDescriptor_h
 #define mitkDICOMImageBlockDescriptor_h
 
-#include "mitkDICOMEnums.h"
-#include "mitkDICOMImageFrameInfo.h"
-#include "mitkDICOMTag.h"
-#include "mitkDICOMTagCache.h"
-#include "mitkIOVolumeSplitReason.h"
+#include <mitkDICOMEnums.h>
+#include <mitkDICOMImageFrameInfo.h>
+#include <mitkDICOMTag.h>
+#include <mitkDICOMTagCache.h>
+#include <mitkIOVolumeSplitReason.h>
 
-#include "mitkImage.h"
-#include "mitkProperties.h"
-#include "mitkWeakPointer.h"
-#include "mitkIPropertyProvider.h"
+#include <mitkImage.h>
+#include <mitkProperties.h>
+#include <mitkWeakPointer.h>
+#include <mitkIPropertyProvider.h>
 
-#include "mitkGantryTiltInformation.h"
+#include <mitkGantryTiltInformation.h>
 
 #include <unordered_map>
 

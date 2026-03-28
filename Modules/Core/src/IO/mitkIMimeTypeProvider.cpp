@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIMimeTypeProvider.h"
+#include <mitkIMimeTypeProvider.h>
 
 namespace mitk
 {

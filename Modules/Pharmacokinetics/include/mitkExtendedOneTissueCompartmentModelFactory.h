@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkExtendedOneTissueCompartmentModelFactory_h
 #define mitkExtendedOneTissueCompartmentModelFactory_h
 
-#include "mitkConcreteAIFBasedModelFactory.h"
-#include "mitkExtendedOneTissueCompartmentModel.h"
-#include "mitkExtendedOneTissueCompartmentModelParameterizer.h"
+#include <mitkConcreteAIFBasedModelFactory.h>
+#include <mitkExtendedOneTissueCompartmentModel.h>
+#include <mitkExtendedOneTissueCompartmentModelParameterizer.h>
 
 namespace mitk
 {

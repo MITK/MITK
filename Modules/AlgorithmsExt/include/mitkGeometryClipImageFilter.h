@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkGeometryClipImageFilter_h
 #define mitkGeometryClipImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkGeometryData.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageToImageFilter.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkGeometryData.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToImageFilter.h>
 
 namespace itk
 {

@@ -10,18 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLevelWindowManager.h"
+#include <mitkLevelWindowManager.h>
 
-#include "mitkImage.h"
-#include "mitkMessage.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateBase.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProperties.h"
-#include "mitkRenderingModeProperty.h"
+#include <mitkImage.h>
+#include <mitkMessage.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateBase.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
+#include <mitkRenderingModeProperty.h>
 #include <itkCommand.h>
 
 mitk::LevelWindowManager::LevelWindowManager()

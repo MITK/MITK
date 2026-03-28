@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMxNMultiWidget.h"
+#include <QmitkMxNMultiWidget.h>
 
 // mitk core
 #include <mitkDisplayActionEventFunctions.h>

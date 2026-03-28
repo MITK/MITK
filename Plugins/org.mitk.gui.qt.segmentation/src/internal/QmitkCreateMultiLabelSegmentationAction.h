@@ -12,12 +12,12 @@ found in the LICENSE file.
 #ifndef QmitkCreateMultiLabelSegmentationAction_h
 #define QmitkCreateMultiLabelSegmentationAction_h
 
-#include "mitkIContextMenuAction.h"
+#include <mitkIContextMenuAction.h>
 
 #include <org_mitk_gui_qt_segmentation_Export.h>
 
-#include "vector"
-#include "mitkDataNode.h"
+#include <vector>
+#include <mitkDataNode.h>
 
 class MITK_QT_SEGMENTATION QmitkCreateMultiLabelSegmentationAction : public QObject, public mitk::IContextMenuAction
 {

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkAnnotation_h
 #define mitkAnnotation_h
 
-#include "mitkServiceInterface.h"
-#include "usServiceRegistration.h"
+#include <mitkServiceInterface.h>
+#include <usServiceRegistration.h>
 #include <MitkCoreExports.h>
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>

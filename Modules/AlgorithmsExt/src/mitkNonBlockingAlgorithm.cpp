@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNonBlockingAlgorithm.h"
-#include "mitkCallbackFromGUIThread.h"
-#include "mitkDataStorage.h"
+#include <mitkNonBlockingAlgorithm.h>
+#include <mitkCallbackFromGUIThread.h>
+#include <mitkDataStorage.h>
 #include <itkCommand.h>
 
 namespace mitk

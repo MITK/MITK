@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _lut_Turbo_h_
-#define _lut_Turbo_h_
+#ifndef Turbo_h
+#define Turbo_h
 
 // The Turbo Colormap was developed by Anton Mikhailov at Google in 2019.
 // It has been released unter the Apache 2.0 license.

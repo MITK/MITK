@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkStepperAdapter_h
 #define QmitkStepperAdapter_h
 
-#include "MitkQtWidgetsExports.h"
-#include "mitkStepper.h"
+#include <MitkQtWidgetsExports.h>
+#include <mitkStepper.h>
 #include <QObject>
 
 

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoTissueCompartmentModelFactory.h"
+#include <mitkTwoTissueCompartmentModelFactory.h>
 
-#include "mitkTwoTissueCompartmentModelParameterizer.h"
-#include "mitkAIFParametrizerHelper.h"
+#include <mitkTwoTissueCompartmentModelParameterizer.h>
+#include <mitkAIFParametrizerHelper.h>
 
 mitk::TwoTissueCompartmentModelFactory::TwoTissueCompartmentModelFactory()
 {

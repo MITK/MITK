@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <berryIWorkbenchListener.h>
 #include <QmitkAbstractView.h>
 
-#include "mitkNodePredicateBase.h"
+#include <mitkNodePredicateBase.h>
 #include <memory>
 
 namespace Ui

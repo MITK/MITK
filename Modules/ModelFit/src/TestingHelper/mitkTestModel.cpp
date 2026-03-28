@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestModel.h"
+#include <mitkTestModel.h>
 
 mitk::TestModel::ParamterScaleMapType
 mitk::TestModel::GetParameterScales() const

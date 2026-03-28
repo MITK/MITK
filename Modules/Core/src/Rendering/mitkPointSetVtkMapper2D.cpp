@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPointSetVtkMapper2D.h"
+#include <mitkPointSetVtkMapper2D.h>
 
 // mitk includes
-#include "mitkVtkPropRenderer.h"
+#include <mitkVtkPropRenderer.h>
 #include <mitkDataNode.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkPointSet.h>

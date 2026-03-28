@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkMovieGenerator_h
 #define mitkMovieGenerator_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCommon.h"
-#include "mitkStepper.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCommon.h>
+#include <mitkStepper.h>
 
 namespace mitk
 {

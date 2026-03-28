@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageWriteAccessor.h"
+#include <mitkImageWriteAccessor.h>
 
 mitk::ImageWriteAccessor::ImageWriteAccessor(ImagePointer image, const mitk::ImageDataItem *iDI, int OptionFlags)
   : ImageAccessorBase(image.GetPointer(), iDI, OptionFlags), m_Image(image)

@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDicomSeriesReader_h
 #define mitkDicomSeriesReader_h
 
-#include "mitkConfig.h"
-#include "mitkDataNode.h"
+#include <mitkConfig.h>
+#include <mitkDataNode.h>
 
 #include <itkGDCMImageIO.h>
 

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "berrySlaveMenuService.h"
 
-#include "berryIEvaluationContext.h"
+#include <berryIEvaluationContext.h>
 #include "berryIEvaluationReference.h"
 #include "berryISourceProvider.h"
 

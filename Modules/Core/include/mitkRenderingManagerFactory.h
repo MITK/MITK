@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkRenderingManagerFactory_h
 #define mitkRenderingManagerFactory_h
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 namespace mitk
 {

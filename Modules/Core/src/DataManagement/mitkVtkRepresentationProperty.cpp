@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkRepresentationProperty.h"
+#include <mitkVtkRepresentationProperty.h>
 #include <vtkProperty.h>
 
 mitk::VtkRepresentationProperty::VtkRepresentationProperty()

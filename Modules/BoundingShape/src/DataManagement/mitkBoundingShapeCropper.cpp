@@ -10,21 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkBoundingShapeCropper.h"
-#include "mitkGeometry3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageToItk.h"
-#include "mitkStatusBar.h"
-#include "mitkTimeHelper.h"
+#include <mitkBoundingShapeCropper.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
+#include <mitkStatusBar.h>
+#include <mitkTimeHelper.h>
 
 #include <cmath>
 
-#include "vtkMatrix4x4.h"
-#include "vtkSmartPointer.h"
-#include "vtkTransform.h"
+#include <vtkMatrix4x4.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
-#include "itkImageRegionIteratorWithIndex.h"
+#include <itkImageRegionIteratorWithIndex.h>
 #include <itkImageIOBase.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkRGBAPixel.h>

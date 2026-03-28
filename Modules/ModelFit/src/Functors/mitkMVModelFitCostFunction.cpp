@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMVModelFitCostFunction.h"
+#include <mitkMVModelFitCostFunction.h>
 
 #include <iostream>
 

@@ -17,12 +17,12 @@ found in the LICENSE file.
 #include <berryObjectTypeInfo.h>
 #include <berryPlatform.h>
 
-#include "berryEvaluationContext.h"
+#include <berryEvaluationContext.h>
 #include "berryIEvaluationResultCache.h"
 
-#include <berryISourceProvider.h>
-#include <berryISources.h>
-#include <berryIStructuredSelection.h>
+#include "berryISourceProvider.h"
+#include "berryISources.h"
+#include "berryIStructuredSelection.h"
 
 namespace berry {
 

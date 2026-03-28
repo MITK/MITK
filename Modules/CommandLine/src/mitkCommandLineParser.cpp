@@ -34,8 +34,8 @@ found in the LICENSE file.
 #include <stdexcept>
 
 // MITK includes
-#include "mitkCommandLineParser.h"
-#include "mitkVersion.h"
+#include <mitkCommandLineParser.h>
+#include <mitkVersion.h>
 
 using namespace std;
 

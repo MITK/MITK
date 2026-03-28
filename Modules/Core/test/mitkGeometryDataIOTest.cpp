@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkGeometry3D.h"
-#include "mitkGeometryData.h"
-#include "mitkProportionalTimeGeometry.h"
+#include <mitkGeometry3D.h>
+#include <mitkGeometryData.h>
+#include <mitkProportionalTimeGeometry.h>
 
-#include "mitkIOMimeTypes.h"
-#include "mitkIOUtil.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkIOUtil.h>
 /**
  \brief Reader/Writer test for GeometryData (via IOUtil).
 

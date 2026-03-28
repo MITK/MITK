@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkFileReaderRegistry.h"
-#include "mitkMimeType.h"
-#include "mitkPointSet.h"
-#include "mitkTestingMacros.h"
+#include <mitkFileReaderRegistry.h>
+#include <mitkMimeType.h>
+#include <mitkPointSet.h>
+#include <mitkTestingMacros.h>
 
 /**
  *  Test for the class "mitkPointSetReader".

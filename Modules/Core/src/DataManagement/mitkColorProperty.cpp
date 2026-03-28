@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkColorProperty.h"
+#include <mitkColorProperty.h>
 #include <sstream>
 #include <nlohmann/json.hpp>
 

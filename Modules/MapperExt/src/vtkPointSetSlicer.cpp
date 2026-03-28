@@ -14,25 +14,25 @@ found in the LICENSE file.
 
 #include "vtkPointSetSlicer.h"
 
-#include "vtkCellArray.h"
-#include "vtkCellArrayIterator.h"
-#include "vtkCellData.h"
-#include "vtkCutter.h"
-#include "vtkDataSet.h"
-#include "vtkDoubleArray.h"
-#include "vtkFloatArray.h"
-#include "vtkGenericCell.h"
-#include "vtkMergePoints.h"
-#include "vtkObjectFactory.h"
-#include "vtkPlane.h"
-#include "vtkPointData.h"
-#include "vtkPolyData.h"
+#include <vtkCellArray.h>
+#include <vtkCellArrayIterator.h>
+#include <vtkCellData.h>
+#include <vtkCutter.h>
+#include <vtkDataSet.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkGenericCell.h>
+#include <vtkMergePoints.h>
+#include <vtkObjectFactory.h>
+#include <vtkPlane.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
 
-#include "vtkUnstructuredGrid.h"
+#include <vtkUnstructuredGrid.h>
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 vtkStandardNewMacro(vtkPointSetSlicer);
 

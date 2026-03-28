@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkStartupDialog.h>
+#include "QmitkStartupDialog.h"
 #include <ui_QmitkStartupDialog.h>
 
 #include <mitkCoreServices.h>

@@ -12,12 +12,12 @@ found in the LICENSE file.
 #ifndef mitkCLPolyToNrrd_cpp
 #define mitkCLPolyToNrrd_cpp
 
-#include "time.h"
+#include <time.h>
 #include <sstream>
 #include <fstream>
 
 #include <mitkIOUtil.h>
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 
 #include <mitkSplitParameterToVector.h>
 #include <mitkGlobalImageFeaturesParameter.h>
@@ -54,15 +54,15 @@ found in the LICENSE file.
 #include <itkImageRegionIterator.h>
 
 
-#include "itkNearestNeighborInterpolateImageFunction.h"
-#include "itkResampleImageFilter.h"
+#include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkResampleImageFilter.h>
 
 #include <QApplication>
 #include <mitkStandaloneDataStorage.h>
-#include "QmitkRegisterClasses.h"
-#include "QmitkRenderWindow.h"
-#include "vtkRenderLargeImage.h"
-#include "vtkPNGWriter.h"
+#include <QmitkRegisterClasses.h>
+#include <QmitkRenderWindow.h>
+#include <vtkRenderLargeImage.h>
+#include <vtkPNGWriter.h>
 
 
 

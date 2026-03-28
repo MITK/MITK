@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkClippingProperty.h"
+#include <mitkClippingProperty.h>
 
 namespace mitk
 {

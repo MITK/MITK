@@ -14,7 +14,7 @@ found in the LICENSE file.
 #ifndef QmitkXnatConnectionPreferencePage_h
 #define QmitkXnatConnectionPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 #include <memory>
 
 class QWidget;

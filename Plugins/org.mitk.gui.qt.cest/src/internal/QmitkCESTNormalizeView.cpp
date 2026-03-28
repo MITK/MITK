@@ -15,18 +15,18 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
-#include "mitkWorkbenchUtil.h"
+#include <mitkWorkbenchUtil.h>
 
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateDataProperty.h"
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataProperty.h>
+#include <mitkNodePredicateDataType.h>
 
-#include "QmitkDataStorageComboBoxWithSelectNone.h"
+#include <QmitkDataStorageComboBoxWithSelectNone.h>
 
 #include <mitkImage.h>
-#include "mitkCESTImageNormalizationFilter.h"
-#include "mitkCESTPropertyHelper.h"
-#include "mitkCESTImageDetectionHelper.h"
+#include <mitkCESTImageNormalizationFilter.h>
+#include <mitkCESTPropertyHelper.h>
+#include <mitkCESTImageDetectionHelper.h>
 
 const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.views.cest.normalization";
 

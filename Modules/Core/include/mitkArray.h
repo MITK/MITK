@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <itkFixedArray.h>
 
-#include "mitkEqual.h"
-#include "mitkNumericConstants.h"
+#include <mitkEqual.h>
+#include <mitkNumericConstants.h>
 
 namespace mitk
 {

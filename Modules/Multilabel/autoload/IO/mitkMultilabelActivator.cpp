@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include "mitkLegacyLabelSetImageIO.h"
-#include "mitkMultiLabelSegmentationIO.h"
-#include "mitkMultiLabelSegmentationStackNiftiWriter.h"
-#include "mitkMultiLabelSegmentationStackReader.h"
-#include "mitkMultilabelIOMimeTypes.h"
+#include <mitkLegacyLabelSetImageIO.h>
+#include <mitkMultiLabelSegmentationIO.h>
+#include <mitkMultiLabelSegmentationStackNiftiWriter.h>
+#include <mitkMultiLabelSegmentationStackReader.h>
+#include <mitkMultilabelIOMimeTypes.h>
 
 #include <memory>
 #include <vector>

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTwoStepLinearModelParameterizer.h"
+#include <mitkTwoStepLinearModelParameterizer.h>
 
 mitk::TwoStepLinearModelParameterizer::ParametersType
 mitk::TwoStepLinearModelParameterizer::GetDefaultInitialParameterization() const

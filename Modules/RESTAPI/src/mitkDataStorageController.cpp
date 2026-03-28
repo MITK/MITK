@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkDataStorageController.h"
-#include "mitkErrorResponse.h"
-#include "mitkNodeQueryParams.h"
+#include <mitkErrorResponse.h>
+#include <mitkNodeQueryParams.h>
 #include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 
@@ -1765,7 +1765,7 @@ void DataStorageController::HandleGET_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  const std::string key = req.path_params.at("key");
+  const std::string key = req.path_params.at("property_key");
   if (!ValidatePropertyKey(key))
   {
     this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
@@ -1826,7 +1826,7 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
     return;
   }
 
-  const std::string key = req.path_params.at("key");
+  const std::string key = req.path_params.at("property_key");
   if (!ValidatePropertyKey(key))
   {
     this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));
@@ -1915,7 +1915,7 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
-  const std::string key = req.path_params.at("key");
+  const std::string key = req.path_params.at("property_key");
   if (!ValidatePropertyKey(key))
   {
     this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest("Invalid property key", req.path));

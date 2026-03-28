@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkClippingPlaneInteractor3D.h"
+#include <mitkClippingPlaneInteractor3D.h>
 
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>

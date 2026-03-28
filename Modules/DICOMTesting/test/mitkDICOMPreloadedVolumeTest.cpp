@@ -11,10 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkTestDICOMLoading.h"
-#include "mitkTestingMacros.h"
+#include <mitkTestDICOMLoading.h>
+#include <mitkTestingMacros.h>
 
-#include "mitkDICOMTagCache.h"
+#include <mitkDICOMTagCache.h>
 
 bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk::PropertyList* otherList)
 {

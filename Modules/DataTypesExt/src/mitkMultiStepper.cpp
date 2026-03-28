@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMultiStepper.h"
-#include "mitkStepper.h"
+#include <mitkMultiStepper.h>
+#include <mitkStepper.h>
 
 mitk::MultiStepper::MultiStepper()
 {

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkBaseApplication.h>
 
-#include "BlueBerryExampleLauncherDialog.h"
+#include <BlueBerryExampleLauncherDialog.h>
 
 #include <QFileInfo>
 #include <QVariant>

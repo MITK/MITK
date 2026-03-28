@@ -54,6 +54,9 @@ namespace mitk
     static constexpr const char* CODE_UNAUTHORIZED = "UNAUTHORIZED";
     static constexpr const char* CODE_RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED";
     static constexpr const char* CODE_FILE_ACCESS_DENIED = "FILE_ACCESS_DENIED";
+    static constexpr const char* CODE_RENDER_WINDOW_NOT_AVAILABLE = "RENDER_WINDOW_NOT_AVAILABLE";
+    static constexpr const char* CODE_TIME_NAVIGATION_NOT_AVAILABLE = "TIME_NAVIGATION_NOT_AVAILABLE";
+    static constexpr const char* CODE_TIME_STEPPER_NOT_AVAILABLE = "TIME_STEPPER_NOT_AVAILABLE";
 
     /**
      * @brief Create an RFC 7807 error response.
@@ -273,6 +276,37 @@ namespace mitk
      * @return JSON error response with status 403
      */
     static Json FileAccessDenied(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * @brief Create a "Render window not available" error response.
+     *
+     * Used when the screenshot provider is not connected (headless mode or
+     * Qt plugin not loaded).
+     *
+     * @param instance Request path
+     * @return JSON error response with status 503
+     */
+    static Json RenderWindowNotAvailable(const std::string& instance = "");
+
+    /**
+     * @brief Create a "Time navigation not available" error response.
+     *
+     * Used when the TimeNavigationController is null (e.g. no rendering manager active).
+     *
+     * @param instance Request path
+     * @return JSON error response with status 503
+     */
+    static Json TimeNavigationNotAvailable(const std::string& instance = "");
+
+    /**
+     * @brief Create a "Time stepper not available" error response.
+     *
+     * Used when the TimeNavigationController's stepper is null.
+     *
+     * @param instance Request path
+     * @return JSON error response with status 500
+     */
+    static Json TimeStepperNotAvailable(const std::string& instance = "");
   };
 }
 

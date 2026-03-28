@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkBaseProcess_h
 #define mitkBaseProcess_h
 
-#include "mitkBaseDataSource.h"
+#include <mitkBaseDataSource.h>
 
 namespace mitk
 {

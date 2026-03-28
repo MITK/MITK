@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkPropertyList.h"
+#include <mitkPropertyList.h>
 
 #include <vtkXMLParser.h>
 
-#include "mitkInteractionEvent.h"
+#include <mitkInteractionEvent.h>
 
 namespace us
 {

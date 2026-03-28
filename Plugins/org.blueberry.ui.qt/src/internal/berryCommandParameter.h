@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYCOMMANDPARAMETER_H
 #define BERRYCOMMANDPARAMETER_H
 
-#include "berryIParameter.h"
-#include "berryITypedParameter.h"
+#include <berryIParameter.h>
+#include <berryITypedParameter.h>
 
 namespace berry {
 

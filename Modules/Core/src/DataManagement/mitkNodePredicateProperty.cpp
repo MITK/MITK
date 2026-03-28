@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateProperty.h"
-#include "mitkDataNode.h"
+#include <mitkNodePredicateProperty.h>
+#include <mitkDataNode.h>
 
 mitk::NodePredicateProperty::NodePredicateProperty(const char *propertyName,
                                                    mitk::BaseProperty *p,

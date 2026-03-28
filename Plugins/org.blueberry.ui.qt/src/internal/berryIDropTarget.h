@@ -15,7 +15,7 @@ found in the LICENSE file.
 #define BERRYIDROPTARGET_H_
 
 #include <berryMacros.h>
-#include <berryConstants.h>
+#include "berryConstants.h"
 #include <berryObject.h>
 
 #include <org_blueberry_ui_qt_Export.h>

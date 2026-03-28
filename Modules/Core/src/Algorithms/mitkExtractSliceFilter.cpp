@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExtractSliceFilter.h"
+#include <mitkExtractSliceFilter.h>
 
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkPlaneClipping.h>

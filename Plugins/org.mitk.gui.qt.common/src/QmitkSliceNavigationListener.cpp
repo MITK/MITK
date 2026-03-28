@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkRenderWindow.h>
-#include <QmitkSliceNavigationListener.h>
+#include "QmitkSliceNavigationListener.h"
 
 #include <mitkIRenderWindowPart.h>
 #include <mitkTimeNavigationController.h>

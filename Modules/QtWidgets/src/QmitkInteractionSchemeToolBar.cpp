@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkInteractionSchemeToolBar.h"
+#include <QmitkInteractionSchemeToolBar.h>
 
 #include <QActionGroup>
 

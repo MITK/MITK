@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itkCooccurenceMatrixFeatureFunctor_h
-#define itkCooccurenceMatrixFeatureFunctor_h
+#ifndef itkCoocurenceMatrixFeatureFunctor_h
+#define itkCoocurenceMatrixFeatureFunctor_h
 
-#include "itkConstNeighborhoodIterator.h"
+#include <itkConstNeighborhoodIterator.h>
 
 #include <itkHistogramToTextureFeaturesFilter.h>
 #include <itkHistogram.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkScalarListLookupTableProperty.h"
-#include "mitkScalarListLookupTablePropertySerializer.h"
+#include <mitkScalarListLookupTableProperty.h>
+#include <mitkScalarListLookupTablePropertySerializer.h>
 #include <tinyxml2.h>
 
 tinyxml2::XMLElement* mitk::ScalarListLookupTablePropertySerializer::Serialize(tinyxml2::XMLDocument& doc)

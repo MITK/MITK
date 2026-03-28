@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
-#define ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_H
+#ifndef itkLineHistogramBasedMassImageFilter_h
+#define itkLineHistogramBasedMassImageFilter_h
 
 #include <itkImageToImageFilter.h>
 

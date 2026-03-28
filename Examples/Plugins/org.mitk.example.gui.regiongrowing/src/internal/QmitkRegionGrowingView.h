@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 //! [includes]
-#include "mitkIRenderWindowPartListener.h"
-#include "mitkPointSet.h"
+#include <mitkIRenderWindowPartListener.h>
+#include <mitkPointSet.h>
 #include <itkImage.h>
 #include <memory>
 

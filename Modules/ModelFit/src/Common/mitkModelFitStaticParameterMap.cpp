@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-#include "mitkModelFitStaticParameterMap.h"
-#include "mitkModelFitException.h"
+#include <mitkModelFitStaticParameterMap.h>
+#include <mitkModelFitException.h>
 
 void mitk::modelFit::StaticParameterMap::Add(const std::string& name, const ValueType& newList)
 {

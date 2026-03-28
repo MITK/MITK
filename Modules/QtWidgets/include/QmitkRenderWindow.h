@@ -13,16 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkRenderWindow_h
 #define QmitkRenderWindow_h
 
-#include "mitkRenderWindowBase.h"
+#include <mitkRenderWindowBase.h>
 
-#include "QmitkRenderWindowMenu.h"
+#include <QmitkRenderWindowMenu.h>
 #include <MitkQtWidgetsExports.h>
 
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <QVTKOpenGLNativeWidget.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkInteractionEventConst.h"
+#include <mitkBaseRenderer.h>
+#include <mitkInteractionEventConst.h>
 
 #include <QmitkButtonOverlayWidget.h>
 

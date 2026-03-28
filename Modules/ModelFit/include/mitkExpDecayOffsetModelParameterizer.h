@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef mitkExpDecayOffsetModelParameterizer_h
 #define mitkExpDecayOffsetModelParameterizer_h
 
-#include "mitkConcreteModelParameterizerBase.h"
-#include "mitkExpDecayOffsetModel.h"
-#include "MitkModelFitExports.h"
+#include <mitkConcreteModelParameterizerBase.h>
+#include <mitkExpDecayOffsetModel.h>
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

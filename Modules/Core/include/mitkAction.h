@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkAction_h
 #define mitkAction_h
 
-#include "mitkPropertyList.h"
+#include <mitkPropertyList.h>
 #include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>

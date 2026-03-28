@@ -13,14 +13,14 @@ found in the LICENSE file.
 #include "QmitkViewInitializationView.h"
 #include <ui_QmitkViewInitializationViewControls.h>
 
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 
-#include "QmitkDataStorageComboBox.h"
-#include "mitkCameraController.h"
+#include <QmitkDataStorageComboBox.h>
+#include <mitkCameraController.h>
 #include <mitkBaseRenderer.h>
 #include <mitkSliceNavigationController.h>
 
-#include "itkCommand.h"
+#include <itkCommand.h>
 
 #include <QMessageBox>
 

@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkITKImageImport_tpp
-#define __mitkITKImageImport_tpp
-#include "mitkITKImageImport.h"
-#include "mitkImageReadAccessor.h"
+#ifndef mitkITKImageImport_tpp
+#define mitkITKImageImport_tpp
+#include <mitkITKImageImport.h>
+#include <mitkImageReadAccessor.h>
 
 template <class TInputImage>
 mitk::ITKImageImport<TInputImage>::ITKImageImport()
@@ -222,4 +222,4 @@ mitk::Image::Pointer mitk::GrabItkImageMemoryChannel(ItkOutputImageType* itkimag
   return resultImage;
 }
 
-#endif //__mitkITKImageImport_tpp
+#endif //mitkITKImageImport_tpp

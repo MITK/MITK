@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkLesionPropagation_h
 
 // registration ontology module
-#include "MitkRegistrationOntologyExports.h"
+#include <MitkRegistrationOntologyExports.h>
 
 // mitk core
 #include <mitkDataNode.h>

@@ -19,9 +19,9 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
 
-#include "QmitkDataStorageFilterProxyModel.h"
-#include "QmitkDataStorageTreeModel.h"
-#include "QmitkNodeDescriptorManager.h"
+#include <QmitkDataStorageFilterProxyModel.h>
+#include <QmitkDataStorageTreeModel.h>
+#include <QmitkNodeDescriptorManager.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 

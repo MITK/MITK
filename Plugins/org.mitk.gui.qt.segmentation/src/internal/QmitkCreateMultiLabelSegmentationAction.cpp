@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetImageHelper.h"
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
 
-#include "QMessageBox"
+#include <QMessageBox>
 
 QmitkCreateMultiLabelSegmentationAction::QmitkCreateMultiLabelSegmentationAction()
 {

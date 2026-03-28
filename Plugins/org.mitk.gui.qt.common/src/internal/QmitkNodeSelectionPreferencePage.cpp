@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionPreferencePage.h"
 
-#include "QmitkNodeSelectionPreferenceHelper.h"
+#include <QmitkNodeSelectionPreferenceHelper.h>
 
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>

@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkStandardViews.h"
+#include <QmitkStandardViews.h>
 
-#include "mitkBaseRenderer.h"
+#include <mitkBaseRenderer.h>
 
 #include <QHBoxLayout>
 #include <QPixmap>

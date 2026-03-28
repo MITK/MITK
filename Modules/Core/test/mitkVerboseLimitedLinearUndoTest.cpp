@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkInteractionConst.h"
-#include "mitkOperation.h"
-#include "mitkUndoController.h"
-#include "mitkVerboseLimitedLinearUndo.h"
+#include <mitkInteractionConst.h>
+#include <mitkOperation.h>
+#include <mitkUndoController.h>
+#include <mitkVerboseLimitedLinearUndo.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 

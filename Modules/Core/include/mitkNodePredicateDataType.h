@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateDataType_h
 #define mitkNodePredicateDataType_h
 
-#include "mitkDataNode.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkDataNode.h>
+#include <mitkNodePredicateBase.h>
 #include <string>
 
 namespace mitk

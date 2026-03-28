@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef QmitkStringPropertyOnDemandEdit_h
 #define QmitkStringPropertyOnDemandEdit_h
 
-#include "MitkQtWidgetsExtExports.h"
+#include <MitkQtWidgetsExtExports.h>
 #include <QLabel>
 #include <QLayout>
 #include <mitkPropertyObserver.h>

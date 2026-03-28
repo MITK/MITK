@@ -13,7 +13,7 @@ found in the LICENSE file.
 // uncomment for learning more about the internal sorting mechanisms
 //#define MBILOG_ENABLE_DEBUG
 
-#include <legacy/mitkDicomSeriesReader.h>
+#include "legacy/mitkDicomSeriesReader.h"
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <gdcmStringFilter.h>
 #include <gdcmUIDs.h>
 
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 
 namespace mitk
 {

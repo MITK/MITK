@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryIBranding.h"
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 namespace berry {
 

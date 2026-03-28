@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkCoreExports.h>
 
-#include "mitkRenderWindowBase.h"
+#include <mitkRenderWindowBase.h>
 
 namespace mitk
 {

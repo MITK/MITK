@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define BERRYREGISTRYTOGGLESTATE_H
 
 #include "berryToggleState.h"
-#include "berryIExecutableExtension.h"
+#include <berryIExecutableExtension.h>
 
 namespace berry {
 

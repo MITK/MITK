@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkVideoSource_h
 #define mitkVideoSource_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
+#include <MitkDataTypesExtExports.h>
+#include <mitkCommon.h>
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include <mitkMessage.h>

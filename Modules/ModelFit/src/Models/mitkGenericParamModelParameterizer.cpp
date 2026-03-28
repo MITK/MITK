@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGenericParamModelParameterizer.h"
+#include <mitkGenericParamModelParameterizer.h>
 
 mitk::ModelBase::FunctionStringType mitk::GenericParamModelParameterizer::GetFunctionString() const
 {

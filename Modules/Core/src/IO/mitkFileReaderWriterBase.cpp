@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "mitkFileReaderWriterBase.h"
 
-#include "mitkCoreServices.h"
-#include "mitkIMimeTypeProvider.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkLog.h"
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkLog.h>
 
 #include <usGetModuleContext.h>
 #include <usLDAPProp.h>

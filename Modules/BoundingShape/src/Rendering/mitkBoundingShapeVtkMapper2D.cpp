@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "../DataManagement/mitkBoundingShapeUtil.h"
+#include "mitkBoundingShapeUtil.h"
 #include <mitkBaseProperty.h>
 #include <mitkBoundingShapeVtkMapper2D.h>
 

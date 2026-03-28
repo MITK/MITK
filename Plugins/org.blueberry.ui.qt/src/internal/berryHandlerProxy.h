@@ -13,9 +13,9 @@ found in the LICENSE file.
 #ifndef BERRYHANDLERPROXY_H
 #define BERRYHANDLERPROXY_H
 
-#include "berryAbstractHandlerWithState.h"
+#include <berryAbstractHandlerWithState.h>
 #include "berryIElementUpdater.h"
-#include "berryIHandlerListener.h"
+#include <berryIHandlerListener.h>
 #include "berryIPropertyChangeListener.h"
 
 namespace berry {

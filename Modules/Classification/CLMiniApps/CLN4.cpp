@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCommandLineParser.h"
-#include "mitkIOUtil.h"
+#include <mitkCommandLineParser.h>
+#include <mitkIOUtil.h>
 #include <mitkImageCast.h>
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 #include <itkN4BiasFieldCorrectionImageFilter.h>
 
 #include <itkSTAPLEImageFilter.h>

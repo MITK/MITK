@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef mitkModelGenerator_h
 #define mitkModelGenerator_h
 
-#include "mitkModelBase.h"
-#include "mitkModelFactoryBase.h"
-#include "mitkModelParameterizerBase.h"
+#include <mitkModelBase.h>
+#include <mitkModelFactoryBase.h>
+#include <mitkModelParameterizerBase.h>
 
-#include "mitkModelFitInfo.h"
+#include <mitkModelFitInfo.h>
 
-#include "mitkIModelFitProvider.h"
+#include <mitkIModelFitProvider.h>
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 namespace mitk
 {

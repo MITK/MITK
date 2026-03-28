@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPropertyListDeserializerV1.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkSerializerMacros.h"
+#include <mitkBasePropertySerializer.h>
+#include <mitkSerializerMacros.h>
 #include <tinyxml2.h>
 
 MITK_REGISTER_SERIALIZER(PropertyListDeserializerV1)

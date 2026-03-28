@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSliceNavigationWidget.h"
+#include <QmitkSliceNavigationWidget.h>
 
 #include <ui_QmitkSliceNavigationWidget.h>
 

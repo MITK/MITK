@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkAutoCropImageFilter_h
 #define mitkAutoCropImageFilter_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkCommon.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkSubImageSelector.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkCommon.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkSubImageSelector.h>
 
 #include <itkImage.h>
 #include <itkImageRegion.h>

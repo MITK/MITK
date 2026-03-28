@@ -14,10 +14,10 @@ found in the LICENSE file.
 #define mitkTemporalJoinImagesFilter_h
 
 
-#include "mitkImageToImageFilter.h"
-#include "mitkCommon.h"
+#include <mitkImageToImageFilter.h>
+#include <mitkCommon.h>
 
-#include "MitkCoreExports.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

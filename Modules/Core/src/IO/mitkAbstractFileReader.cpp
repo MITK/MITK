@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkIOUtil.h>
 #include <mitkUtf8Util.h>
 
-#include <mitkFileReaderWriterBase.h>
+#include "mitkFileReaderWriterBase.h"
 #include <mitkVersion.h>
 #include <mitkIOMetaInformationPropertyConstants.h>
 

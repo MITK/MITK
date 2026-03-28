@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlaneGeometryDataVtkMapper3D.h"
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
 
-#include "mitkImageVtkMapper2D.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkSmartPointerProperty.h"
-#include "mitkSurface.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "mitkWeakPointerProperty.h"
-#include "vtkMitkLevelWindowFilter.h"
-#include "vtkNeverTranslucentTexture.h"
+#include <mitkImageVtkMapper2D.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkSurface.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkWeakPointerProperty.h>
+#include <vtkMitkLevelWindowFilter.h>
+#include <vtkNeverTranslucentTexture.h>
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>

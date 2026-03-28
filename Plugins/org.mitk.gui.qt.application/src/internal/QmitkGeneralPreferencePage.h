@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkGeneralPreferencePage_h
 #define QmitkGeneralPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
+#include <berryIQtPreferencePage.h>
 
 class QWidget;
 class QCheckBox;

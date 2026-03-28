@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkApplicationCursor.h"
+#include <QmitkApplicationCursor.h>
 
 #include <QApplication>
 #include <QCursor>

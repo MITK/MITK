@@ -158,7 +158,7 @@ found in the LICENSE file.
 
 #include <org_blueberry_core_runtime_Export.h>
 
-#include <berrySmartPointer.h>
+#include "berrySmartPointer.h"
 
 #include <QDir>
 #include <QSharedPointer>

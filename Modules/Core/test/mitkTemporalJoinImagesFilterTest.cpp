@@ -10,16 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImagePixelReadAccessor.h"
+#include <mitkImagePixelReadAccessor.h>
 
-#include "mitkTemporalJoinImagesFilter.h"
-#include "mitkTestFixture.h"
-#include "mitkTestingMacros.h"
+#include <mitkTemporalJoinImagesFilter.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 #include <limits>
-#include "mitkTestDynamicImageGenerator.h"
-#include "mitkStringProperty.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkTestDynamicImageGenerator.h>
+#include <mitkStringProperty.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 class mitkTemporalJoinImagesFilterTestSuite : public mitk::TestFixture
 {

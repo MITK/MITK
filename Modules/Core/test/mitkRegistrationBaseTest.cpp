@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImage.h"
-#include "mitkRegistrationBase.h"
+#include <mitkImage.h>
+#include <mitkRegistrationBase.h>
 
 int mitkRegistrationBaseTest(int /*argc*/, char * /*argv*/ [])
 {

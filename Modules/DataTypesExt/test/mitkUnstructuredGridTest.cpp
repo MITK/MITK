@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 // mitk includes
-#include "mitkTestingMacros.h"
-#include "mitkUnstructuredGrid.h"
+#include <mitkTestingMacros.h>
+#include <mitkUnstructuredGrid.h>
 
 // vtk includes
-#include "vtkUnstructuredGrid.h"
+#include <vtkUnstructuredGrid.h>
 
 /**
  *Unit test for the UnstructuredGríd class

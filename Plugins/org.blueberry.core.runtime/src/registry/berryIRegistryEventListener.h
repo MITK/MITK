@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef BERRYIREGISTRYEVENTLISTENER_H
 #define BERRYIREGISTRYEVENTLISTENER_H
 
-#include <berryMessage.h>
-#include <berrySmartPointer.h>
+#include "berryMessage.h"
+#include "berrySmartPointer.h"
 
 #include <QList>
 

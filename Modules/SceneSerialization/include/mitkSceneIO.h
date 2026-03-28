@@ -15,8 +15,8 @@ found in the LICENSE file.
 
 #include <MitkSceneSerializationExports.h>
 
-#include "mitkDataStorage.h"
-#include "mitkNodePredicateBase.h"
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateBase.h>
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
 

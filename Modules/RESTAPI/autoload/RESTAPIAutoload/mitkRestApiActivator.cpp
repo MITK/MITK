@@ -70,8 +70,6 @@ public:
 
     m_RestServer.reset();
     m_Context = nullptr;
-
-    MITK_INFO << "REST API module unloaded";
   }
 
 private:
@@ -345,7 +343,7 @@ private:
     auto dataStorage = service->GetActiveDataStorage();
     if (dataStorage.IsNotNull())
     {
-      MITK_INFO << "Connecting DataStorage to REST server";
+      MITK_DEBUG << "Connecting DataStorage to REST server";
       m_RestServer->SetDataStorage(dataStorage);
 
       StorageThreadDispatcherBase::Pointer dispatcher = service->GetDispatcher();

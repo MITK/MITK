@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef BERRYPERSPECTIVESPREFERENCEPAGE_H
 #define BERRYPERSPECTIVESPREFERENCEPAGE_H
 
-#include <berryIQtPreferencePage.h>
+#include "berryIQtPreferencePage.h"
 #include <memory>
 
 namespace Ui {

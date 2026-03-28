@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitkDnDDataNodeWidget.h>
 
 // mitk qt widgets module
-#include "QmitkMimeTypes.h"
+#include <QmitkMimeTypes.h>
 
 // qt
 #include <QMimeData>

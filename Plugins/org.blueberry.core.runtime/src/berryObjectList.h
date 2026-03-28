@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "berryMacros.h"
 
-#include <berryObject.h>
+#include "berryObject.h"
 
 #include <QList>
 

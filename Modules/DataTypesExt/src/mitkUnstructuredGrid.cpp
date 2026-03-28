@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkUnstructuredGrid.h"
+#include <mitkUnstructuredGrid.h>
 
 #include <algorithm>
 #include <vtkUnstructuredGrid.h>

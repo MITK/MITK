@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#include "mitkModelFitParameter.h"
-#include "mitkModelFitConstants.h"
+#include <mitkModelFitParameter.h>
+#include <mitkModelFitConstants.h>
 
 mitk::modelFit::Parameter::Parameter() :
   name (""), type(Parameter::ParameterType), unit(""), scale(1.0f)

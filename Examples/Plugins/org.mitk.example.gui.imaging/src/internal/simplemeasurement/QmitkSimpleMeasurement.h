@@ -16,8 +16,8 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIZombieViewPart.h>
 
-#include "mitkDataNode.h"
-#include "mitkPointSetDataInteractor.h"
+#include <mitkDataNode.h>
+#include <mitkPointSetDataInteractor.h>
 #include <memory>
 
 namespace Ui

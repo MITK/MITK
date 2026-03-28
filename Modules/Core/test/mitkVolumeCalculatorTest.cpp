@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIOUtil.h"
-#include "mitkImage.h"
-#include "mitkTestingMacros.h"
-#include "mitkVolumeCalculator.h"
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
+#include <mitkTestingMacros.h>
+#include <mitkVolumeCalculator.h>
 #include <mitkStandaloneDataStorage.h>
 
 int mitkVolumeCalculatorTest(int /*argc*/, char *argv[])

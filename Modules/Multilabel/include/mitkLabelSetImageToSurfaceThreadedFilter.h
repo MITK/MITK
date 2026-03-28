@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkLabelSetImageToSurfaceThreadedFilter_h
 #define mitkLabelSetImageToSurfaceThreadedFilter_h
 
-#include "mitkSegmentationSink.h"
-#include "mitkSurface.h"
+#include <mitkSegmentationSink.h>
+#include <mitkSurface.h>
 #include <MitkMultilabelExports.h>
 
 namespace mitk

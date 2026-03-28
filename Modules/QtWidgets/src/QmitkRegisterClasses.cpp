@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkRegisterClasses.h"
+#include <QmitkRegisterClasses.h>
 
-#include "QmitkApplicationCursor.h"
-#include "QmitkRenderingManagerFactory.h"
+#include <QmitkApplicationCursor.h>
+#include <QmitkRenderingManagerFactory.h>
 
 #include <iostream>
 

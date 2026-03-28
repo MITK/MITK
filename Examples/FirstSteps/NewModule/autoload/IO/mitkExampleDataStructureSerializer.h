@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkExampleDataStructureSerializer_h
 #define mitkExampleDataStructureSerializer_h
 
-#include "mitkBaseDataSerializer.h"
+#include <mitkBaseDataSerializer.h>
 
 namespace mitk
 {

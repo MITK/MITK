@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImageToSurfaceThreadedFilter.h"
+#include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetImageToSurfaceFilter.h"
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageToSurfaceFilter.h>
 
 namespace mitk
 {

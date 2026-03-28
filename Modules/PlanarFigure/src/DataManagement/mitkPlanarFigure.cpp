@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigure.h"
-#include "mitkPlaneGeometry.h"
+#include <mitkPlanarFigure.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
 

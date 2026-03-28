@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkAddNewPropertyDialog.h"
-#include "QmitkPropertyItemDelegate.h"
-#include "QmitkPropertyItemModel.h"
+#include <QmitkPropertyItemDelegate.h>
+#include <QmitkPropertyItemModel.h>
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
 #include <ui_QmitkPropertyTreeView.h>

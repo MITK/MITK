@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkNodePredicateDimension.h"
-#include "mitkDataNode.h"
-#include "mitkImage.h"
+#include <mitkNodePredicateDimension.h>
+#include <mitkDataNode.h>
+#include <mitkImage.h>
 
 mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, int pixelComponents)
   : m_Dimension(dimension), m_PixelComponents(pixelComponents)

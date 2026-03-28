@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "usModuleContext.h"
-#include "usGetModuleContext.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
 
-#include "mitkLog.h"
-#include "mitkDataStorageInspectorGenerator.h"
+#include <mitkLog.h>
+#include <mitkDataStorageInspectorGenerator.h>
 
 mitk::IDataStorageInspectorProvider* mitk::DataStorageInspectorGenerator::GetProvider(const IDType& id)
 {

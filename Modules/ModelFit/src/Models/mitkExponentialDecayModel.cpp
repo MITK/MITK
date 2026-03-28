@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkExponentialDecayModel.h"
-#include "mitkNumericConstants.h"
+#include <mitkExponentialDecayModel.h>
+#include <mitkNumericConstants.h>
 
 const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_y0 = "y-intercept";
 const std::string mitk::ExponentialDecayModel::NAME_PARAMETER_lambda = "lambda";

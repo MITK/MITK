@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkGridRepresentationProperty.h"
+#include <mitkGridRepresentationProperty.h>
 #include <vtkProperty.h>
 
 mitk::GridRepresentationProperty::GridRepresentationProperty()

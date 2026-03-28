@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef mitkPlanarFigureMapper2D_h
 #define mitkPlanarFigureMapper2D_h
 
-#include "mitkCommon.h"
-#include "mitkMapper.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureControlPointStyleProperty.h"
+#include <mitkCommon.h>
+#include <mitkMapper.h>
+#include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureControlPointStyleProperty.h>
 #include <MitkPlanarFigureExports.h>
-#include "vtkNew.h"
-#include "vtkPen.h"
+#include <vtkNew.h>
+#include <vtkPen.h>
 
 class vtkContext2D;
 

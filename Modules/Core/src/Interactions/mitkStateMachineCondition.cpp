@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineCondition.h"
+#include <mitkStateMachineCondition.h>
 
 mitk::StateMachineCondition::StateMachineCondition(const std::string &conditionName, const bool inverted)
   : m_ConditionName(conditionName), m_Inverted(inverted)

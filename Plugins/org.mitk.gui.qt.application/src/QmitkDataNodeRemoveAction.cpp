@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkDataNodeRemoveAction.h>
-#include <QmitkDataNodeGlobalReinitAction.h>
+#include "QmitkDataNodeRemoveAction.h"
+#include "QmitkDataNodeGlobalReinitAction.h"
 
 // qt
 #include <QMessageBox>

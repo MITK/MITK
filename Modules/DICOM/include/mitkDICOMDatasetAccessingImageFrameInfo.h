@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMDatasetAccessingImageFrameInfo_h
 #define mitkDICOMDatasetAccessingImageFrameInfo_h
 
-#include "mitkDICOMImageFrameInfo.h"
-#include "mitkDICOMDatasetAccess.h"
+#include <mitkDICOMImageFrameInfo.h>
+#include <mitkDICOMDatasetAccess.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkDICOMTag_h
 #define mitkDICOMTag_h
 
-#include "mitkPoint.h"
-#include "mitkVector.h"
+#include <mitkPoint.h>
+#include <mitkVector.h>
 
-#include "MitkDICOMExports.h"
+#include <MitkDICOMExports.h>
 
 namespace mitk
 {

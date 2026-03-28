@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkVector.h>
 
 // EXPORTS
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // STL
 #include <vector>

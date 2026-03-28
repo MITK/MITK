@@ -15,9 +15,9 @@ found in the LICENSE file.
 #include <mitkImageWriteAccessor.h>
 #include <mitkTestingMacros.h>
 
-#include "mitkSurfaceToImageFilter.h"
+#include <mitkSurfaceToImageFilter.h>
 
-#include "mitkTestFixture.h"
+#include <mitkTestFixture.h>
 #include <vtkPolyData.h>
 
 class mitkSurfaceToImageFilterTestSuite : public mitk::TestFixture

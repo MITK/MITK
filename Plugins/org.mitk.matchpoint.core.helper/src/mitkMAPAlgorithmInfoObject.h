@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <mapDeploymentDLLInfo.h>
 
-#include "org_mitk_matchpoint_core_helper_Export.h"
+#include <org_mitk_matchpoint_core_helper_Export.h>
 
 namespace mitk
 {

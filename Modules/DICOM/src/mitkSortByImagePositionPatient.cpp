@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSortByImagePositionPatient.h"
-#include "mitkDICOMTag.h"
+#include <mitkSortByImagePositionPatient.h>
+#include <mitkDICOMTag.h>
 
 mitk::SortByImagePositionPatient
 ::SortByImagePositionPatient(DICOMSortCriterion::Pointer secondaryCriterion)

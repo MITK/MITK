@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLookupTables.h"
+#include <mitkLookupTables.h>
 
 template class mitk::GenericLookupTable<bool>;
 template class mitk::GenericLookupTable<float>;

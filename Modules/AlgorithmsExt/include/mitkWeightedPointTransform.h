@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkWeightedPointTransform_h
 
 // EXPORTS
-#include "MitkAlgorithmsExtExports.h"
+#include <MitkAlgorithmsExtExports.h>
 
 // ITK
 #include <itkMatrix.h>

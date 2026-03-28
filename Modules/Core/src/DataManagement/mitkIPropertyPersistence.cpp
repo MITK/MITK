@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkIPropertyPersistence.h"
+#include <mitkIPropertyPersistence.h>
 
 mitk::IPropertyPersistence::~IPropertyPersistence()
 {

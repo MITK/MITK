@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDataStorageBridge.h"
+#include <mitkDataStorageBridge.h>
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
 #include <mitkNodePredicateAnd.h>

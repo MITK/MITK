@@ -13,16 +13,16 @@ found in the LICENSE file.
 
 #include "berryWorkbenchMenuService.h"
 
-#include <berryIPropertyChangeListener.h>
-#include <berryIServiceLocator.h>
-#include <berryIEvaluationService.h>
-#include <berryIEvaluationReference.h>
+#include "berryIPropertyChangeListener.h"
+#include "berryIServiceLocator.h"
+#include "berryIEvaluationService.h"
+#include "berryIEvaluationReference.h"
 #include <berryIEvaluationContext.h>
 #include <berrySafeRunner.h>
-#include <berryAbstractContributionFactory.h>
+#include "berryAbstractContributionFactory.h"
 #include <berryObjects.h>
-#include <berryMenuUtil.h>
-#include <berryWorkbenchActionConstants.h>
+#include "berryMenuUtil.h"
+#include "berryWorkbenchActionConstants.h"
 
 #include "berryAbstractGroupMarker.h"
 #include "berryAbstractMenuAdditionCacheEntry.h"

@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAbstractNodeSelectionWidget.h"
+#include <QmitkAbstractNodeSelectionWidget.h>
 #include <QApplication>
 #include <mitkNodePredicateFunction.h>
 #include <mitkStandaloneDataStorage.h>
-#include "QmitkModelViewSelectionConnector.h"
+#include <QmitkModelViewSelectionConnector.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>

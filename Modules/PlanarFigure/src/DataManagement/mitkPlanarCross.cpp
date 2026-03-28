@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarCross.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkPlanarCross.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
 
 mitk::PlanarCross::PlanarCross()
   : FEATURE_ID_LONGESTDIAMETER(this->AddFeature("Longest Axis", "mm")),

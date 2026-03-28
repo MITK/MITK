@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "berryPerspectiveParameterValues.h"
 
-#include <berryPlatformUI.h>
-#include <berryIPerspectiveDescriptor.h>
+#include "berryPlatformUI.h"
+#include "berryIPerspectiveDescriptor.h"
 
 #include <QHash>
 

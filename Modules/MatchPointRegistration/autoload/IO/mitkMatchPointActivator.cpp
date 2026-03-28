@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkMAPRegistrationWrapperIO.h"
+#include <mitkMAPRegistrationWrapperIO.h>
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>

@@ -12,15 +12,15 @@ found in the LICENSE file.
 
 #include "mitkDICOMImageIOActivator.h"
 
-#include "mitkAutoSelectingDICOMReaderService.h"
-#include "mitkManualSelectingDICOMReaderService.h"
-#include "mitkDICOMTagsOfInterestService.h"
-#include "mitkSimpleVolumeDICOMSeriesReaderService.h"
-#include "mitkCoreServices.h"
-#include "mitkPropertyPersistenceInfo.h"
-#include "mitkDICOMIOMetaInformationPropertyConstants.h"
-#include "mitkIPropertyPersistence.h"
-#include "mitkTemporoSpatialStringProperty.h"
+#include <mitkAutoSelectingDICOMReaderService.h>
+#include <mitkManualSelectingDICOMReaderService.h>
+#include <mitkDICOMTagsOfInterestService.h>
+#include <mitkSimpleVolumeDICOMSeriesReaderService.h>
+#include <mitkCoreServices.h>
+#include <mitkPropertyPersistenceInfo.h>
+#include <mitkDICOMIOMetaInformationPropertyConstants.h>
+#include <mitkIPropertyPersistence.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 #include <usModuleContext.h>
 #include <usModuleRegistry.h>

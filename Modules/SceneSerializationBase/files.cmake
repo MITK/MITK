@@ -1,4 +1,7 @@
-file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+set(H_FILES
+  mitkSerializerMacros.h
+  mitkStringsToNumbers.h
+)
 
 set(CPP_FILES
   mitkAnnotationPropertySerializer.cpp
@@ -31,4 +34,3 @@ set(CPP_FILES
   mitkVector3DPropertySerializer.cpp
   mitkVectorPropertySerializer.cpp
 )
-

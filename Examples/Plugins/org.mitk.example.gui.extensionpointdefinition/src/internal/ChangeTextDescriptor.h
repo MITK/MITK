@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <berryIConfigurationElement.h>
 #include <berryObject.h>
 
-#include "IChangeText.h"
+#include <IChangeText.h>
 
 class ChangeTextDescriptor : public berry::Object
 {

@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef mitkExtendedToftsModelParameterizer_h
 #define mitkExtendedToftsModelParameterizer_h
 
-#include "mitkAIFBasedModelParameterizerBase.h"
-#include "mitkExtendedToftsModel.h"
+#include <mitkAIFBasedModelParameterizerBase.h>
+#include <mitkExtendedToftsModel.h>
 
-#include "MitkPharmacokineticsExports.h"
+#include <MitkPharmacokineticsExports.h>
 
 namespace mitk
 {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkModelTraitsInterface_h
 #define mitkModelTraitsInterface_h
 
-#include "MitkModelFitExports.h"
+#include <MitkModelFitExports.h>
 
 #include <itkArray.h>
 #include <itkArray2D.h>

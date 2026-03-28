@@ -10,13 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
-#include "mitkRTPlanReader.h"
-#include "mitkImage.h"
-#include "mitkTemporoSpatialStringProperty.h"
-#include "mitkBaseProperty.h"
+#include <mitkRTPlanReader.h>
+#include <mitkImage.h>
+#include <mitkTemporoSpatialStringProperty.h>
+#include <mitkBaseProperty.h>
 
 class mitkRTPlanReaderTestSuite : public mitk::TestFixture
 {

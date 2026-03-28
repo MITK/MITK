@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkDataStorageSelection_h
 #define mitkDataStorageSelection_h
 
-#include "MitkDataTypesExtExports.h"
+#include <MitkDataTypesExtExports.h>
 
 #include <mitkCommon.h>
 #include <mitkDataStorage.h>

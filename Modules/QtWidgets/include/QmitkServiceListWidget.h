@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkServiceListWidget_h
 #define QmitkServiceListWidget_h
 
-#include "MitkQtWidgetsExports.h"
+#include <MitkQtWidgetsExports.h>
 #include <vector>
 
 // QT headers
@@ -22,10 +22,10 @@ found in the LICENSE file.
 #include <QWidget>
 
 // Microservices
-#include "mitkServiceInterface.h"
-#include "usModuleContext.h"
-#include "usServiceEvent.h"
-#include "usServiceReference.h"
+#include <mitkServiceInterface.h>
+#include <usModuleContext.h>
+#include <usServiceEvent.h>
+#include <usServiceReference.h>
 #include <memory>
 
 namespace Ui { class QmitkServiceListWidgetControls; }

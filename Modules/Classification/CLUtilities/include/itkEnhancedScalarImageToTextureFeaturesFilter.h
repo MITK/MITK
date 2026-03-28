@@ -27,13 +27,13 @@ found in the LICENSE file.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToTextureFeaturesFilter_h
-#define __itkEnhancedScalarImageToTextureFeaturesFilter_h
+#ifndef itkEnhancedScalarImageToTextureFeaturesFilter_h
+#define itkEnhancedScalarImageToTextureFeaturesFilter_h
 
-#include "itkDataObjectDecorator.h"
+#include <itkDataObjectDecorator.h>
 
-#include "itkEnhancedHistogramToTextureFeaturesFilter.h"
-#include "itkScalarImageToCooccurrenceMatrixFilter.h"
+#include <itkEnhancedHistogramToTextureFeaturesFilter.h>
+#include <itkScalarImageToCooccurrenceMatrixFilter.h>
 
 namespace itk
 {
@@ -239,7 +239,7 @@ namespace itk
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToTextureFeaturesFilter.hxx"
+#include <itkEnhancedScalarImageToTextureFeaturesFilter.tpp>
 #endif
 
 #endif

@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLayoutAnnotationRenderer.h"
-#include "mitkBaseRenderer.h"
+#include <mitkLayoutAnnotationRenderer.h>
+#include <mitkBaseRenderer.h>
 
-#include "mitkAnnotationUtils.h"
-#include "mitkEnumerationProperty.h"
+#include <mitkAnnotationUtils.h>
+#include <mitkEnumerationProperty.h>
 #include <mitkVtkLayerController.h>
 
 namespace mitk

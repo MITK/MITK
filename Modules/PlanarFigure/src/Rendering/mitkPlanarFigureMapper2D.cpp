@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPlanarFigureMapper2D.h"
+#include <mitkPlanarFigureMapper2D.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkColorProperty.h"
-#include "vtkContext2D.h"
-#include "vtkContextDevice2D.h"
-#include "vtkOpenGLContextDevice2D.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
-#include "vtkTextProperty.h"
-#include "vtkOpenGLRenderWindow.h"
+#include <mitkBaseRenderer.h>
+#include <mitkColorProperty.h>
+#include <vtkContext2D.h>
+#include <vtkContextDevice2D.h>
+#include <vtkOpenGLContextDevice2D.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
+#include <vtkTextProperty.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #define _USE_MATH_DEFINES
 #include <cmath>

@@ -17,8 +17,8 @@ https://github.com/BIDS/colormap/blob/master/colormaps.py
 
 ============================================================================*/
 
-#ifndef _lut_Inferno_h_
-#define _lut_Inferno_h_
+#ifndef Inferno_h
+#define Inferno_h
 
 static const int Inferno[256][3] =
 {

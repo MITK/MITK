@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usServiceEvent.h>
 
-#include "mitkDICOMPMIO.h"
+#include <mitkDICOMPMIO.h>
 
-#include "mitkDICOMPMIOMimeTypes.h"
+#include <mitkDICOMPMIOMimeTypes.h>
 
 namespace mitk
 {

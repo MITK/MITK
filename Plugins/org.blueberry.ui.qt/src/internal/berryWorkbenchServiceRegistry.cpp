@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryWorkbenchServiceRegistry.h"
 
@@ -25,7 +25,7 @@ found in the LICENSE file.
 #include "berryWorkbenchRegistryConstants.h"
 #include "berrySourcePriorityNameMapping.h"
 #include "berryAbstractSourceProvider.h"
-#include "berryStatus.h"
+#include <berryStatus.h>
 #include "berryPlatformUI.h"
 
 namespace berry

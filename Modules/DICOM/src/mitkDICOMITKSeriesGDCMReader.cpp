@@ -15,11 +15,11 @@ found in the LICENSE file.
 
 #include <itkTimeProbesCollectorBase.h>
 #include <gdcmUIDs.h>
-#include "mitkDICOMITKSeriesGDCMReader.h"
-#include "mitkITKDICOMSeriesReaderHelper.h"
-#include "mitkGantryTiltInformation.h"
-#include "mitkDICOMTagBasedSorter.h"
-#include "mitkDICOMGDCMTagScanner.h"
+#include <mitkDICOMITKSeriesGDCMReader.h>
+#include <mitkITKDICOMSeriesReaderHelper.h>
+#include <mitkGantryTiltInformation.h>
+#include <mitkDICOMTagBasedSorter.h>
+#include <mitkDICOMGDCMTagScanner.h>
 
 std::mutex mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex;
 
@@ -83,7 +83,7 @@ bool mitk::DICOMITKSeriesGDCMReader::operator==( const DICOMFileReader& other ) 
   if ( const auto* otherSelf = dynamic_cast<const Self*>( &other ) )
   {
     if ( this->m_FixTiltByShearing == otherSelf->m_FixTiltByShearing
-         && *( this->m_EquiDistantBlocksSorter ) == *( otherSelf->m_EquiDistantBlocksSorter )
+         && static_cast<const DICOMDatasetSorter&>(*(this->m_EquiDistantBlocksSorter)) == static_cast<const DICOMDatasetSorter&>(*(otherSelf->m_EquiDistantBlocksSorter))
          && ( fabs( this->m_DecimalPlacesForOrientation - otherSelf->m_DecimalPlacesForOrientation ) < eps ) )
     {
       // test sorters for equality

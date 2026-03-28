@@ -11,14 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <iostream>
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
-#include "itkImage.h"
-#include "itkImageRegionIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
 
-#include "mitkLevenbergMarquardtModelFitFunctor.h"
+#include <mitkLevenbergMarquardtModelFitFunctor.h>
 
-#include "mitkLinearModel.h"
+#include <mitkLinearModel.h>
 
 int mitkLevenbergMarquardtModelFitFunctorTest(int  /*argc*/, char*[] /*argv[]*/)
 {

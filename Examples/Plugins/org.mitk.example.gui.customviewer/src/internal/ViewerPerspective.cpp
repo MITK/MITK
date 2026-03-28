@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "ViewerPerspective.h"
-#include "berryIFolderLayout.h"
+#include <berryIFolderLayout.h>
 
 ViewerPerspective::ViewerPerspective()
 {

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QmitkRenderWindowDataStorageInspector_h
 
 // render window manager UI module
-#include "MitkRenderWindowManagerUIExports.h"
+#include <MitkRenderWindowManagerUIExports.h>
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>

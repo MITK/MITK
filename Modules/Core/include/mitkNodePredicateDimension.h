@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkNodePredicateDimension_h
 #define mitkNodePredicateDimension_h
 
-#include "mitkNodePredicateBase.h"
+#include <mitkNodePredicateBase.h>
 
 namespace mitk
 {

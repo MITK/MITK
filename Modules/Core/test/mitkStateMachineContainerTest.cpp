@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkStateMachineAction.h"
-#include "mitkStateMachineContainer.h"
-#include "mitkStateMachineState.h"
-#include "mitkStateMachineTransition.h"
-#include "mitkTestingMacros.h"
+#include <mitkStateMachineAction.h>
+#include <mitkStateMachineContainer.h>
+#include <mitkStateMachineState.h>
+#include <mitkStateMachineTransition.h>
+#include <mitkTestingMacros.h>
 #include <string>
 
 int mitkStateMachineContainerTest(int /*argc*/, char * /*argv*/ [])

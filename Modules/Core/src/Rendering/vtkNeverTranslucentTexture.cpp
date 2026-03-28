@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "vtkNeverTranslucentTexture.h"
+#include <vtkNeverTranslucentTexture.h>
 
-#include "vtkVersion.h"
+#include <vtkVersion.h>
 
 // Replacement texture code -------------------------------------------------------------
 

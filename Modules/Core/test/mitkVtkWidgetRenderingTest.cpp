@@ -10,11 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkWidgetRendering.h"
+#include <mitkVtkWidgetRendering.h>
 #include <vtkRenderWindow.h>
 #include <vtkScalarBarWidget.h>
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 

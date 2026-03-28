@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef itLabelSampler_h
-#define itLabelSampler_h
+#ifndef itkLabelSampler_h
+#define itkLabelSampler_h
 
-#include "itkImageToImageFilter.h"
+#include <itkImageToImageFilter.h>
 
 namespace itk
 {
@@ -71,8 +71,8 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <../src/Algorithms/itkLabelSampler.cpp>
+#include "../src/Algorithms/itkLabelSampler.cpp"
 #endif
 
 
-#endif // itLabelSampler_h
+#endif // itkLabelSampler_h

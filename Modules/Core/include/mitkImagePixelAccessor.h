@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkImagePixelAccessor_h
 #define mitkImagePixelAccessor_h
 
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
+#include <mitkImage.h>
+#include <mitkImageDataItem.h>
 
 #include <typeinfo>
 

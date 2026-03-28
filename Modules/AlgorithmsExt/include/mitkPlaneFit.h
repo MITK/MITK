@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef mitkPlaneFit_h
 #define mitkPlaneFit_h
 
-#include "MitkAlgorithmsExtExports.h"
-#include "mitkGeometryDataSource.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPointSet.h"
-#include "mitkTimeGeometry.h"
+#include <MitkAlgorithmsExtExports.h>
+#include <mitkGeometryDataSource.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPointSet.h>
+#include <mitkTimeGeometry.h>
 
 namespace mitk
 {

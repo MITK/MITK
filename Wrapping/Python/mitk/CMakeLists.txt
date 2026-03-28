@@ -1,3 +1,9 @@
+# pybind11 extension modules resolve Python C API symbols at runtime from
+# the hosting Python interpreter, not from a linked libpython. Strip MITK's
+# global -Wl,--no-undefined from CMAKE_MODULE_LINKER_FLAGS at directory scope
+# so the linker allows unresolved Python C API symbols in this target.
+string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
+
 pybind11_add_module(mitk_python_bindings
   CppMicroServices.cpp
   Exception.cpp
@@ -14,13 +20,6 @@ pybind11_add_module(mitk_python_bindings
 target_link_libraries(mitk_python_bindings
   PRIVATE MitkCore Python3::Module
 )
-
-# pybind11 extension modules resolve Python C API symbols at runtime from
-# the Python interpreter. Counteract MITK's global -Wl,--no-undefined
-# (in CMAKE_MODULE_LINKER_FLAGS) for this target; last --unresolved-symbols wins.
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT APPLE)
-  target_link_options(mitk_python_bindings PRIVATE "-Wl,--unresolved-symbols=ignore-all")
-endif()
 
 set_target_properties(mitk_python_bindings PROPERTIES
   FOLDER "${MITK_ROOT_FOLDER}/Wrapping"

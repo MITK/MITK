@@ -27,40 +27,105 @@ namespace Ui
 }
 
 /**
-* \class QmitkFreeIsoDoseLevelWidget
-* \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
-*/
+ * \class QmitkFreeIsoDoseLevelWidget
+ * \brief Widget for displaying and editing a single free (user-defined) iso dose level.
+ *
+ * Provides UI controls for adjusting the dose value (absolute and relative spin boxes
+ * and a slider), the iso line color, and the iso line visibility of an mitk::IsoDoseLevel
+ * instance. Changes are communicated via signals.
+ *
+ * \sa mitk::IsoDoseLevel
+ * \sa QmitkIsoDoseLevelSetModel
+ * \ingroup MitkRTUIModule
+ */
 class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructor.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkFreeIsoDoseLevelWidget(QWidget* parent=nullptr);
+
+  /** \brief Destructor. */
   ~QmitkFreeIsoDoseLevelWidget() override;
 
+  /**
+   * \brief Returns the currently set reference dose.
+   * \return The reference dose value in Gy.
+   */
   mitk::DoseValueAbs getReferenceDose() const;
+
+  /**
+   * \brief Returns the iso dose level currently managed by this widget.
+   * \return Pointer to the current IsoDoseLevel instance.
+   */
   mitk::IsoDoseLevel* getIsoDoseLevel() const;
 
 signals:
-  void ValueChanged(mitk::IsoDoseLevel*, mitk::DoseValueRel oldValue);
-  void ColorChanged(mitk::IsoDoseLevel*);
-  void VisualizationStyleChanged(mitk::IsoDoseLevel*);
+  /**
+   * \brief Emitted when the dose value of the iso dose level changes.
+   * \param[in] level Pointer to the modified IsoDoseLevel.
+   * \param[in] oldValue The previous relative dose value before the change.
+   */
+  void ValueChanged(mitk::IsoDoseLevel* level, mitk::DoseValueRel oldValue);
+
+  /**
+   * \brief Emitted when the color of the iso dose level changes.
+   * \param[in] level Pointer to the modified IsoDoseLevel.
+   */
+  void ColorChanged(mitk::IsoDoseLevel* level);
+
+  /**
+   * \brief Emitted when the iso line visibility of the iso dose level changes.
+   * \param[in] level Pointer to the modified IsoDoseLevel.
+   */
+  void VisualizationStyleChanged(mitk::IsoDoseLevel* level);
 
   public Q_SLOTS:
     /**
-    * \brief Slot that can be used to set the reference dose.
-    */
+     * \brief Sets the reference dose used for absolute/relative conversion.
+     * \param[in] newReferenceDose The new reference dose in Gy.
+     */
     void setReferenceDose(double newReferenceDose);
 
     /**
-    * \brief Slot that can be used to set the dose level instance that should be handled by the widget.
-    */
+     * \brief Sets the iso dose level instance managed by this widget.
+     * \param[in] level The IsoDoseLevel to display and edit. Must not be nullptr.
+     * \throw mitk::Exception if level is nullptr.
+     */
     void setIsoDoseLevel(mitk::IsoDoseLevel* level);
 
+    /**
+     * \brief Handles changes from the relative dose value spin box.
+     * \param[in] newValue The new relative dose value in percent.
+     */
     void OnRelValueChanged(double newValue);
+
+    /**
+     * \brief Handles changes from the absolute dose value spin box.
+     * \param[in] newValue The new absolute dose value in Gy.
+     */
     void OnAbsValueChanged(double newValue);
+
+    /**
+     * \brief Handles changes from the dose slider.
+     * \param[in] newValue The new slider value (interpreted as percentage).
+     */
     void OnSliderChanged(int newValue);
+
+    /**
+     * \brief Handles clicks on the visibility checkbox.
+     * \param[in] checked Whether the iso line should be visible.
+     */
     void OnVisibleClicked(bool checked);
+
+    /**
+     * \brief Handles color changes from the color button.
+     * \param[in] color The newly selected QColor.
+     */
     void OnColorChanged(QColor color);
 
 protected:

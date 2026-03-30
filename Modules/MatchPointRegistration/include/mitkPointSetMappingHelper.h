@@ -24,33 +24,48 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \brief Namespace providing helper functions for mapping MITK point sets using MatchPoint registrations.
+   *
+   * \sa mitk::ImageMappingHelper, mitk::MAPRegistrationWrapper
+   */
   namespace PointSetMappingHelper
   {
+    /** \brief MatchPoint registration base type. */
     typedef ::map::core::RegistrationBase RegistrationType;
+    /** \brief MITK wrapper type for MatchPoint registrations. */
     typedef ::mitk::MAPRegistrationWrapper MITKRegistrationType;
 
-    /**Helper that converts the data of an mitk point set into the default point set type of matchpoint.*/
+    /**
+     * \brief Converts an MITK point set to the MatchPoint internal point set type.
+     *
+     * \param[in] mitkSet Pointer to the ITK point set data underlying the MITK PointSet.
+     * \return Smart pointer to the converted MatchPoint internal point set.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT ::map::core::continuous::Elements<3>::InternalPointSetType::Pointer ConvertPointSetMITKtoMAP(const mitk::PointSet::DataType* mitkSet);
 
-    /**Helper that maps a given input point set
-     * @param input Point set that should be mapped.
-     * @param registration Pointer to the registration instance that should be used for mapping
-     * @param timeStep Indicates which time step of the point set should be mapped (the rest will just be copied). -1 (default) indicates that all time steps should be mapped.
-     * @param throwOnMappingError Indicates if mapping should fail with an exception (true), if the registration does not cover/support the whole requested region for mapping into the result image.
-     * if set to false, points that cause an mapping error will be transferred without mapping but get the passed errorPointValue as data to indicate unmappable points;
-     * @param errorPointValue Indicates the point data that should be used if an mapping error occurs (and throwOnMappingError is false).
-     * @pre input must be valid
-     * @pre registration must be valid
-     * @pre timeStep must be a valid time step of input or -1
-     * @pre Dimensionality of the registration must match with the input imageinput must be valid
-     * @remark Depending in the settings of throwOnMappingError it may also throw
-     * due to inconsistencies in the mapping process. See parameter description.
-     * @result Pointer to the resulting mapped point set*/
+    /**
+     * \brief Maps a given input point set using a MatchPoint registration.
+     *
+     * \param[in] input Point set that should be mapped.
+     * \param[in] registration Pointer to the MatchPoint registration to use.
+     * \param[in] timeStep The time step to map (-1 maps all time steps, default). Other time steps are copied unmodified.
+     * \param[in] throwOnMappingError If true, throws an exception when a point cannot be mapped.
+     *            If false, unmappable points are transferred without mapping and tagged with \p errorPointValue.
+     * \param[in] errorPointValue Point data value assigned to unmappable points (when not throwing).
+     * \return Smart pointer to the resulting mapped point set.
+     * \pre \p input must be valid.
+     * \pre \p registration must be valid.
+     * \pre \p timeStep must be a valid time step of \p input or -1.
+     * \pre Dimensionality of the registration must match the point set (3D).
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const RegistrationType* registration, int timeStep = -1,
       bool throwOnMappingError = true, const ::mitk::PointSet::PointDataType& errorPointValue = ::mitk::PointSet::PointDataType());
 
-    /**Helper that maps a given input point set
-     * @overload*/
+    /**
+     * \brief Maps a given input point set using a MITK registration wrapper.
+     * \overload
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT ::mitk::PointSet::Pointer map(const ::mitk::PointSet* input, const MITKRegistrationType* registration, int timeStep = -1,
       bool throwOnMappingError = true, const ::mitk::PointSet::PointDataType& errorPointValue = ::mitk::PointSet::PointDataType());
   }

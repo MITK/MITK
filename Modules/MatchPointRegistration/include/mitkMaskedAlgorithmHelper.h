@@ -27,28 +27,53 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /*!
-    \brief MaskedAlgorithmHelper
-    Helper class as an easy bridge to set mitk images as masks for registration algorithms. It is assumed that the
-    Image indicates the mask by pixel values != 0.
-    \remark Currently only 2D-2D and 3D-3D algorithms are supported.
-    \remark Current implementation is not thread-save. Just use one Helper class per registration task.
-  */
+  /**
+   * \brief Helper class for setting MITK images as masks on MatchPoint registration algorithms.
+   *
+   * MaskedAlgorithmHelper bridges MITK mask images to the MatchPoint MaskedRegistrationAlgorithm
+   * interface. Mask pixels with values != 0 are treated as inside the mask region.
+   *
+   * \note Currently only 2D-2D and 3D-3D algorithms are supported.
+   * \note Current implementation is not thread-safe. Use one helper instance per registration task.
+   *
+   * \sa mitk::MAPAlgorithmHelper
+   */
   class MITKMATCHPOINTREGISTRATION_EXPORT MaskedAlgorithmHelper
   {
   public:
 
+    /**
+     * \brief Constructs a helper for the given registration algorithm.
+     * \param[in] algorithm Pointer to the MatchPoint registration algorithm that should receive masks.
+     */
     MaskedAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm);
 
-    /** Set one or both masks to an algorithm.
-     * If the algorithm does not support masks it will be ignored.
-     * @remark Set a mask to nullptr if you don't want to set it.
-     * @return Indicates if the masks could be set/was supported by algorithm.*/
+    /**
+     * \brief Sets one or both masks on the algorithm.
+     *
+     * If the algorithm does not support the masked registration interface, the masks are ignored.
+     * The mask images are converted to spatial objects internally.
+     *
+     * \param[in] movingMask Pointer to the mask image for the moving data, or nullptr to skip.
+     * \param[in] targetMask Pointer to the mask image for the target data, or nullptr to skip.
+     * \return True if the masks were successfully set (algorithm supports masks), false otherwise.
+     */
     bool SetMasks(const mitk::Image* movingMask, const mitk::Image* targetMask);
 
-    /** Checks if the algorithm supports masks of the passed type.*/
+    /**
+     * \brief Checks whether the algorithm supports masks of the given types.
+     *
+     * \param[in] movingMask Pointer to the moving mask image to check compatibility for.
+     * \param[in] targetMask Pointer to the target mask image to check compatibility for.
+     * \return True if the algorithm supports the given mask types, false otherwise.
+     */
     bool CheckSupport(const mitk::Image* movingMask, const mitk::Image* targetMask) const;
 
+    /**
+     * \brief Checks whether the given algorithm implements the MaskedRegistrationAlgorithm interface.
+     * \param[in] algorithm Pointer to the algorithm to check.
+     * \return True if the algorithm supports masks, false otherwise.
+     */
     static bool HasMaskedRegistrationAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm);
 
     ~MaskedAlgorithmHelper() {}

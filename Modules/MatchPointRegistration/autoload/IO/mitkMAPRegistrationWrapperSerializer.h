@@ -28,6 +28,7 @@ class MAPRegistrationWrapperSerializer : public BaseDataSerializer
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Serialize the MAPRegistrationWrapper to a temporary file and return the file path. */
     std::string Serialize() override;
 
   protected:

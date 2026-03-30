@@ -29,9 +29,15 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for direction for the registration visualization. Valid values are:
- * 0/Direct, 1/Inverse
- * Default is "Inverse"
+ * \brief Enumeration property defining the mapping direction for registration visualization.
+ *
+ * Valid values are:
+ * - 0: Direct (visualize the direct mapping kernel)
+ * - 1: Inverse (visualize the inverse mapping kernel)
+ *
+ * Default is "Inverse".
+ *
+ * \sa mitk::MITKRegistrationWrapperMapperBase, mitk::RegVisStyleProperty
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegVisDirectionProperty : public EnumerationProperty
 {
@@ -41,8 +47,10 @@ public:
 
   itkNewMacro(RegVisDirectionProperty);
 
+  /** \brief Constructs a RegVisDirectionProperty from a numeric ID. */
   mitkNewMacro1Param(RegVisDirectionProperty, const IdType&);
 
+  /** \brief Constructs a RegVisDirectionProperty from a string name. */
   mitkNewMacro1Param(RegVisDirectionProperty, const std::string&);
 
 

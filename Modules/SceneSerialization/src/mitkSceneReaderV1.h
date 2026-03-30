@@ -23,6 +23,12 @@ namespace tinyxml2
 
 namespace mitk
 {
+  /**
+   * \brief Version 1 implementation of the MITK scene reader.
+   *
+   * Reads MITK scene files (version 1 format) from an XML document
+   * and populates a DataStorage with the deserialized nodes, data, and properties.
+   */
   class SceneReaderV1 : public SceneReader
   {
   public:
@@ -30,6 +36,14 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Load a scene from an XML document into the given DataStorage.
+     *
+     * \param document The XML document containing the scene definition.
+     * \param workingDirectory The directory containing serialized data files.
+     * \param storage The DataStorage to populate with loaded nodes.
+     * \return true if the scene was loaded successfully.
+     */
     bool LoadScene(tinyxml2::XMLDocument &document,
                              const std::string &workingDirectory,
                              DataStorage *storage) override;

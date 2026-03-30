@@ -31,6 +31,27 @@ namespace mitk
   class BaseData;
   class PropertyList;
 
+  /**
+   * \brief Provides functionality to load and save MITK scene files (.mitk).
+   *
+   * SceneIO handles the complete scene serialization pipeline:
+   * - Loading: Unzips a .mitk scene file, parses index.xml, and reconstructs
+   *   DataNodes with their data, properties, and parent/child relationships
+   *   into a DataStorage.
+   * - Saving: Serializes DataNodes from a DataStorage into temporary files,
+   *   writes an index.xml, and packages everything into a ZIP archive.
+   *
+   * Scene files (.mitk) are ZIP archives containing:
+   * - An index.xml file describing all nodes, their relationships, and references
+   *   to serialized data and property files.
+   * - Serialized BaseData files (images, surfaces, etc.).
+   * - Serialized PropertyList XML files.
+   *
+   * After loading or saving, failed nodes and properties can be queried to
+   * determine what could not be processed.
+   *
+   * \sa SceneReader, BaseDataSerializer, PropertyListSerializer
+   */
   class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
   {
   public:
@@ -38,80 +59,100 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief Type for a list of DataNodes whose BaseData failed to serialize/deserialize. */
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
 
     /**
-     * \brief Load a scene of objects from file
-     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
-     * GetFailedProperties() for more detail.
+     * \brief Loads a scene from a .mitk scene file (ZIP archive).
      *
-     * Attempts to read the provided file and create objects with
-     * parent/child relations into a DataStorage.
+     * Unzips the archive to a temporary directory, reads the index.xml,
+     * and reconstructs all DataNodes with their data, properties, and
+     * parent/child relationships into a DataStorage.
      *
-     * \param filename full filename of the scene file
-     * \param storage If given, this DataStorage is used instead of a newly created one
-     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
-     * objects
+     * \param[in] filename         Full path to the .mitk scene file.
+     * \param[in] storage          If non-null, this DataStorage is populated instead of
+     *                             creating a new StandaloneDataStorage.
+     * \param[in] clearStorageFirst If true, the provided DataStorage is cleared before
+     *                             loading new objects into it.
+     *
+     * \return A DataStorage containing all successfully loaded scene objects and
+     *         their relationships. If loading partially or completely failed,
+     *         query GetFailedNodes() and GetFailedProperties() for details.
+     *
+     * \post The temporary directory is deleted after loading.
      */
     virtual DataStorage::Pointer LoadScene(const std::string &filename,
                                            DataStorage *storage = nullptr,
                                            bool clearStorageFirst = false);
 
     /**
-    * \brief Load a scene of objects from directory.
-    * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
-    * GetFailedProperties() for more detail.
-    *
-    * Does the same like LoadScene, but assumes that the given filename is the index.xml of the scene and the working directory
-    * is the directory of the given filename. This function can be used to load an already unpacked scene and create objects with
-    * parent/child relations into a DataStorage.
-    *
-    * \param indexfilename full filename of the scene index file
-    * \param storage If given, this DataStorage is used instead of a newly created one
-    * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
-    * objects
-    */
+     * \brief Loads a scene from an already-unpacked directory.
+     *
+     * Similar to LoadScene(), but operates on an unpacked scene directory
+     * rather than a ZIP archive. Assumes the given file is the index.xml
+     * of the scene and uses its parent directory as the working directory.
+     *
+     * \param[in] indexfilename    Full path to the scene's index.xml file.
+     * \param[in] storage          If non-null, this DataStorage is populated instead of
+     *                             creating a new StandaloneDataStorage.
+     * \param[in] clearStorageFirst If true, the provided DataStorage is cleared before
+     *                             loading new objects into it.
+     *
+     * \return A DataStorage containing all successfully loaded scene objects and
+     *         their relationships. If loading partially or completely failed,
+     *         query GetFailedNodes() and GetFailedProperties() for details.
+     */
     virtual DataStorage::Pointer LoadSceneUnzipped(const std::string &indexfilename,
       DataStorage *storage = nullptr,
       bool clearStorageFirst = false);
 
 
     /**
-     * \brief Save a scene of objects to file
-     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if
-     false is returned,
-               it just will not contain every node/property. If writing failed, query GetFailedNodes() and
-     GetFailedProperties() for more detail.
+     * \brief Saves a scene of DataNodes to a .mitk scene file (ZIP archive).
      *
-     * Attempts to write a scene file, which contains the nodes of the
-     * provided DataStorage, their parent/child relations, and properties.
+     * Serializes the given set of DataNodes (including their data, properties,
+     * and parent/child relationships from the DataStorage) into a temporary
+     * directory, creates an index.xml, and packages everything into a ZIP archive
+     * at the specified filename.
      *
-     * \param sceneNodes
-     * \param storage a DataStorage containing all nodes that should be saved
-     * \param filename
+     * \param[in] sceneNodes The set of DataNodes to save.
+     * \param[in] storage    The DataStorage containing the nodes and their relationships.
+     * \param[in] filename   Full path for the output .mitk scene file.
+     *
+     * \return True if the scene was saved completely and successfully. False if
+     *         any problem occurred. Note that a partial scene file may still be
+     *         written. Query GetFailedNodes() and GetFailedProperties() for details.
+     *
+     * \pre \p sceneNodes must not be null.
+     * \pre \p storage must not be null.
+     * \pre \p filename must not be empty.
      */
     virtual bool SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes,
                            const DataStorage *storage,
                            const std::string &filename);
 
     /**
-     * \brief Get a list of nodes (BaseData containers) that failed to be read/written.
+     * \brief Returns DataNodes whose BaseData failed to be read or written.
      *
-     * FailedBaseDataListType hold all those nodes that contain BaseData objects
-     * which could not be read or written during the last call to LoadScene or SaveScene.
+     * After a call to LoadScene() or SaveScene(), this method returns all
+     * DataNodes containing BaseData objects that could not be serialized
+     * or deserialized.
+     *
+     * \return Pointer to the list of failed nodes, or nullptr if none failed.
      */
     const FailedBaseDataListType *GetFailedNodes();
 
     /**
-     * \brief Get a list of properties that failed to be read/written.
+     * \brief Returns properties that failed to be read or written.
      *
-     * Each entry corresponds to a property which could not
-     * be (de)serialized. The properties may come from either of
-     * <ul>
-     *   <li> The BaseData's PropertyList
-     *   <li> The DataNodes's PropertyList
-     *   <li> Any of a DataNodes's render window specific PropertyLists
-     * </ul>
+     * After a call to LoadScene() or SaveScene(), this method returns a
+     * PropertyList containing all properties that could not be (de)serialized.
+     * The properties may originate from:
+     * - The BaseData's PropertyList
+     * - The DataNode's PropertyList
+     * - Any of a DataNode's render-window-specific PropertyLists
+     *
+     * \return Pointer to the PropertyList of failed properties, or nullptr if none failed.
      */
     const PropertyList *GetFailedProperties();
 

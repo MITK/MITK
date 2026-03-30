@@ -18,7 +18,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief Serializes mitk::Surface for mitk::SceneIO
+    \brief Serializes mitk::PointSet for mitk::SceneIO.
   */
   class PointSetSerializer : public BaseDataSerializer
   {

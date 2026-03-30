@@ -29,6 +29,12 @@ namespace mitk
   */
   mitk::Point3D CalcAvgPoint(mitk::Point3D a, mitk::Point3D b);
 
+  /**
+   * \brief Return the four corner-point indices that define the face associated with the given handle index.
+   *
+   * \param index The handle index (0-5), corresponding to a face of the bounding box.
+   * \return A vector of four indices into the corner points array.
+   */
   std::vector<int> GetHandleIndices(int index);
 
   /**
@@ -38,18 +44,43 @@ namespace mitk
   class Handle final
   {
   public:
+    /** \brief Default constructor. Creates an inactive handle at the origin. */
     Handle();
+
+    /**
+     * \brief Construct a handle with a given position, index, and associated face indices.
+     *
+     * \param pos The 3D position of the handle.
+     * \param index The handle index (0-5).
+     * \param faceIndices Indices of the four corner points forming the associated face.
+     * \param active Whether the handle is initially active.
+     */
     Handle(mitk::Point3D pos, int index, std::vector<int> faceIndices, bool active = false);
 
     ~Handle();
 
+    /** \brief Return true if the handle is currently active (selected). */
     bool IsActive();
+
+    /** \brief Return true if the handle is not active. */
     bool IsNotActive();
+
+    /** \brief Set the active (selected) state of the handle. */
     void SetActive(bool status);
+
+    /** \brief Set the index identifying this handle. */
     void SetIndex(int index);
+
+    /** \brief Return the index identifying this handle. */
     int GetIndex();
+
+    /** \brief Return the corner-point indices of the face associated with this handle. */
     std::vector<int> GetFaceIndices();
+
+    /** \brief Set the 3D world position of the handle. */
     void SetPosition(mitk::Point3D pos);
+
+    /** \brief Return the 3D world position of the handle. */
     mitk::Point3D GetPosition();
 
   private:

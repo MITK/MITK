@@ -28,13 +28,19 @@ namespace mitk
   itkEventMacroDeclaration(BoundingShapeInteractionEvent, itk::AnyEvent);
 #pragma GCC visibility pop
 
-  /**
-    * @brief Basic interaction methods for mitk::GeometryData
-    *
-    * Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-    *
-    * \ingroup Interaction
-    */
+  /** \brief Interactor for manipulating bounding shapes (GeometryData).
+   *
+   * Provides interactive translation and scaling of a bounding box through
+   * mouse-based handle manipulation. Inherits from DataInteractor, providing
+   * state machine and configurable input support.
+   *
+   * The interactor manages 6 face handles that can be dragged to resize the
+   * bounding box, and supports translating the entire box by dragging the body.
+   * Visual feedback is provided through color changes on hover and selection.
+   *
+   * \sa BoundingShapeCropper, BoundingShapeVtkMapper2D, BoundingShapeVtkMapper3D, DataInteractor
+   * \ingroup Interaction
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeInteractor : public DataInteractor
   {
   public:
@@ -42,7 +48,19 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Set the data node this interactor operates on.
+     *
+     * Initializes default bounding shape properties on the node and sets up
+     * the interaction geometry.
+     *
+     * \param[in] dataNode The data node containing GeometryData to interact with.
+     */
     void SetDataNode(DataNode *dataNode) override;
+
+    /** \brief Enable or disable rotation interaction.
+     *
+     * \param[in] rotationEnabled If \c true, rotation of the bounding shape is allowed.
+     */
     void SetRotationEnabled(bool rotationEnabled);
 
   protected:

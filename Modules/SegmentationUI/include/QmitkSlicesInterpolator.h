@@ -75,28 +75,18 @@ public:
     */
   void Initialize(mitk::ToolManager *toolManager, const QList<QmitkRenderWindow*>& windows);
 
-  /**
-   * @brief
-   *
-   */
+  /** \brief Releases resources and disconnects from the tool manager and render windows. */
   void Uninitialize();
 
   ~QmitkSlicesInterpolator() override;
 
-  /**
-   * @brief Set the Data Storage object
-   *
-   * @param storage
-   */
+  /** \brief Sets the data storage used for interpolation feedback nodes. */
   void SetDataStorage(mitk::DataStorage::Pointer storage);
 
-  /**
-   * @brief Get the Data Storage object
-   *
-   * @return mitk::DataStorage*
-   */
+  /** \brief Returns the current data storage. */
   mitk::DataStorage *GetDataStorage();
 
+  /** \brief Sets the active label value for which interpolation is performed. */
   void SetActiveLabelValue(mitk::MultiLabelSegmentation::LabelValueType labelValue);
 
   /**
@@ -109,21 +99,14 @@ public:
   */
   void OnToolManagerReferenceDataModified();
 
-  /**
-   * @brief Reacts to the time changed event.
-   *
-   * @param sender
-   */
+  /** \brief Reacts to the time changed event. Public for itk::Command callbacks. */
   void OnTimeChanged(itk::Object *sender, const itk::EventObject &);
 
-  /**
-   * @brief Reacts to the slice changed event
-   *
-   * @param sender
-   */
+  /** \brief Reacts to the slice changed event. Public for itk::Command callbacks. */
   void OnSliceChanged(itk::Object *sender, const itk::EventObject &);
 
 
+  /** \brief Handles deletion of a SliceNavigationController. Public for itk::Command callbacks. */
   void OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject &);
 
   /**
@@ -143,15 +126,10 @@ public:
 
 
 private:
-  /**
-   * @brief Set the visibility of the 3d interpolation
-   */
+  /** \brief Sets the visibility of the 3D interpolation result in the render windows. */
   void Show3DInterpolationResult(bool);
 
-  /**
-   * @brief Function that reacts to a change in the activeLabel of the working segmentation image.
-   *
-   */
+  /** \brief Reacts to a change in the active label of the working segmentation image. */
   void OnActiveLabelChanged(mitk::Label::PixelType);
 
 signals:
@@ -167,6 +145,7 @@ public slots:
   */
   void EnableInterpolation(bool);
 
+  /** \brief Enables or disables 3D surface interpolation. */
   void Enable3DInterpolation(bool);
 
   /**
@@ -191,11 +170,7 @@ protected slots:
   */
   void OnAccept3DInterpolationClicked();
 
-  /**
-   * @brief Reaction to reinit 3D Interpolation. Re-reads the plane geometries of the image
-   *         that should have generated the
-   *
-   */
+  /** \brief Reinitializes 3D interpolation by re-reading the plane geometries of the segmentation image. */
   void OnReinit3DInterpolation();
 
   /*
@@ -209,30 +184,39 @@ protected slots:
   */
   void OnInterpolationActivated(bool);
 
+  /** \brief Called when 3D interpolation is activated or deactivated. */
   void On3DInterpolationActivated(bool);
 
+  /** \brief Called when the interpolation method combo box selection changes. */
   void OnInterpolationMethodChanged(int index);
 
-  // Enhancement for 3D interpolation
+  /** \brief Called when the 2D interpolation radio button is toggled. */
   void On2DInterpolationEnabled(bool);
+  /** \brief Called when the 3D interpolation radio button is toggled. */
   void On3DInterpolationEnabled(bool);
+  /** \brief Called when the "no interpolation" radio button is toggled. */
   void OnInterpolationDisabled(bool);
+  /** \brief Called when the "show position markers" checkbox is toggled. */
   void OnShowMarkers(bool);
 
+  /** \brief Triggers 3D surface interpolation in a background thread. */
   void Run3DInterpolation();
 
   /**
-   * @brief Function triggers when the surface interpolation thread completes running.
-   *        It is responsible for retrieving the data, rendering it in the active color label,
-   *        storing the surface information in the feedback node.
+   * \brief Called when the surface interpolation thread completes.
    *
+   * Retrieves the interpolated surface data, renders it in the active color label,
+   * and stores the surface information in the feedback node.
    */
   void OnSurfaceInterpolationFinished();
 
+  /** \brief Starts the timer that periodically triggers interpolation updates. */
   void StartUpdateInterpolationTimer();
 
+  /** \brief Stops the interpolation update timer. */
   void StopUpdateInterpolationTimer();
 
+  /** \brief Updates the surface color to match the active label color. */
   void ChangeSurfaceColor();
 
 protected:

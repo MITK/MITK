@@ -33,9 +33,12 @@ class MITKSEGMENTATIONUI_EXPORT QmitkStaticDynamicSegmentationDialog : public QM
 
 public:
 
+  /** \brief Constructs the dialog. */
   QmitkStaticDynamicSegmentationDialog(QWidget* parent = nullptr);
 
+  /** \brief Sets the reference image used to derive the segmentation template geometry. */
   void SetReferenceImage(const mitk::Image* referenceImage);
+  /** \brief Returns the segmentation template image based on the user's choice (static or dynamic). */
   mitk::Image::ConstPointer GetSegmentationTemplate() const;
   
 private Q_SLOTS:

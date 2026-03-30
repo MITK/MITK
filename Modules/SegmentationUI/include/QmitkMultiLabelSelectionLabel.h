@@ -26,72 +26,77 @@ namespace Ui
   class QmitkMultiLabelSelectionLabel;
 }
 
-/*
-* @brief This is a widget that behaves like a QLabel widget and displays the selected labels of
-* a segmentation with name and color.
-* It also allows label highlighting in render windows if the node is set and
-* mouse hovers over the widget.
+/**
+* \brief Widget that behaves like a QLabel and displays selected labels of a segmentation with name and color.
+*
+* Also allows label highlighting in render windows if the node is set and
+* the mouse hovers over the widget.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSelectionLabel : public QWidget
 {
   Q_OBJECT
 
 public:
+  /** \brief Constructs the multi-label selection label widget. */
   QmitkMultiLabelSelectionLabel(QWidget* parent = nullptr);
   ~QmitkMultiLabelSelectionLabel();
 
+  /** \brief Returns whether label highlighting in render windows is activated. */
   bool GetHighlightingActivated() const;
+  /** \brief Returns the currently set segmentation. */
   mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
+  /** \brief Returns the segmentation data node. */
   mitk::DataNode* GetMultiLabelNode() const;
+  /** \brief Returns the info text displayed when no label is selected. */
   QString GetEmptyInfo() const;
 
   using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
   using LabelValueVectorType = mitk::MultiLabelSegmentation::LabelValueVectorType;
 
   /**
-  * @brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
+  * \brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
   */
   LabelValueVectorType GetSelectedLabels() const;
 
 Q_SIGNALS:
   /**
-  * @brief A signal that will be emitted if the selected labels change.
+  * \brief A signal that will be emitted if the selected labels change.
   *
-  * @param labels A list of label values that are now selected.
+  * \param labels A list of label values that are now selected.
   */
   void CurrentSelectionChanged(LabelValueVectorType labels) const;
 
 public Q_SLOTS:
 
   /**
-  * @brief Transform a list of label values into the new selection of the inspector.
-  * @param selectedLabels A list of selected label values.
-  * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
+  * \brief Transform a list of label values into the new selection of the inspector.
+  * \param selectedLabels A list of selected label values.
+  * \remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
   * should regard that to avoid signal loops.
   */
   void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
   /**
-  * @brief The passed label will be used as new selection in the widget
-  * @param selectedLabel Value of the selected label.
-  * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
+  * \brief The passed label will be used as new selection in the widget
+  * \param selectedLabel Value of the selected label.
+  * \remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
   * should regard that to avoid signal loops.
   */
   void SetSelectedLabel(mitk::MultiLabelSegmentation::LabelValueType selectedLabel);
 
-  /** @brief Sets the segmentation that will be used and monitored by the widget.
-  * @param segmentation      A pointer to the segmentation to set.
-  * @remark You cannot set the segmentation directly if a segmentation node is
+  /** \brief Sets the segmentation that will be used and monitored by the widget.
+  * \param segmentation      A pointer to the segmentation to set.
+  * \remark You cannot set the segmentation directly if a segmentation node is
   * also set. Reset the node (nullptr) if you want to change to direct segmentation
   * setting.
-  * @pre Segmentation node is nullptr.
+  * \pre Segmentation node is nullptr.
   */
   void SetMultiLabelSegmentation(mitk::MultiLabelSegmentation* segmentation);
 
   /**
-  * @brief Sets the segmentation node that will be used /monitored by the widget.
+  * \brief Sets the segmentation node that will be used /monitored by the widget.
   *
-  * @param node A pointer to the segmentation node.
-  * @remark If not set, highlighting in render windows will not work.
+  * \param node A pointer to the segmentation node.
+  * \remark If not set, highlighting in render windows will not work.
   */
   void SetMultiLabelNode(mitk::DataNode* node);
 

@@ -51,6 +51,17 @@ public:
   }
 };
 
+/**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief GUI for mitk::nnUNetTool providing nnU-Net inference controls.
+
+  Provides controls for selecting nnU-Net models, configurations, trainers, planners,
+  and folds. Supports ensemble mode, multi-modal inputs, model downloading,
+  and result caching.
+
+  \sa mitk::nnUNetTool
+  \sa QmitkMultiLabelSegWithPreviewToolGUIBase
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
   Q_OBJECT
@@ -63,7 +74,7 @@ public:
   QCache<size_t, nnUNetCache> m_Cache;
 
   /**
-   * @brief The hash map stores all bifurcating processes' ID.
+   * \brief The hash map stores all bifurcating processes' ID.
    *
    */
   std::unordered_map<std::string, mitk::ProcessExecutor::Pointer> m_Processes;
@@ -71,99 +82,99 @@ public:
 protected slots:
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnPreviewRequested();
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnDirectoryChanged(const QString&);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnModelChanged(const QString&);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnTaskChanged(const QString &);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnTrainerChanged(const QString&);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnCheckBoxChanged(int);
 
   /**
-   * @brief Qthread slot to capture failures from thread worker and
+   * \brief Qthread slot to capture failures from thread worker and
    * shows error message
    *
    */
   void SegmentationProcessFailed();
 
   /**
-   * @brief Qthread to capture successful nnUNet segmentation.
+   * \brief Qthread to capture successful nnUNet segmentation.
    * Further, renders the LabelSet image
    */
   void SegmentationResultHandler(mitk::nnUNetTool *, bool forceRender = false);
 
   /**
-   * @brief Qt Slot
+   * \brief Qt Slot
    *
    */
   void OnModalitiesNumberChanged(int);
 
   /**
-   * @brief Qt Slot
+   * \brief Qt Slot
    *
    */
   void OnPythonPathChanged(const QString&);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnRefreshPresssed();
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnClearCachePressed();
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnDownloadModel();
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnDownloadWorkerExit(bool, const QString);
 
   /**
-   * @brief Qt slot
+   * \brief Qt slot
    *
    */
   void OnStopDownload();
 
 signals:
   /**
-   * @brief signal for starting the segmentation which is caught by a worker thread.
+   * \brief signal for starting the segmentation which is caught by a worker thread.
    */
   void Operate(QString, QString, mitk::ProcessExecutor::Pointer, mitk::ProcessExecutor::ArgumentListType);
 
@@ -177,176 +188,176 @@ protected:
 
 private:
   /**
-  * @brief Adds an element and hides it so that the ctkCheckableComboBox shows "None".
+  * \brief Adds an element and hides it so that the ctkCheckableComboBox shows "None".
   */
   void SetComboBoxToNone(ctkCheckableComboBox*);
 
   /**
-   * @brief Parses the available_models.json file from RESULTS_FOLDER and loads
+   * \brief Parses the available_models.json file from RESULTS_FOLDER and loads
    * the task names to the Download combobox in Advanced.
    */
   void FillAvailableModelsInfoFromJSON(const QString&);
 
   /**
-   * @brief Exports available models to download from nnUNet_print_available_pretrained_models
+   * \brief Exports available models to download from nnUNet_print_available_pretrained_models
    * output.
    */
   void ExportAvailableModelsAsJSON(const QString&);
 
   /**
-   * @brief Clears all displayed modal labels and widgets from GUI.
+   * \brief Clears all displayed modal labels and widgets from GUI.
    *
    */
   void ClearAllModalities();
 
   /**
-   * @brief Parses Json file containing modality info and populates
+   * \brief Parses Json file containing modality info and populates
    * labels and selection widgets accordingly on the GUI.
    */
   void DisplayMultiModalInfoFromJSON(const QString&);
 
   /**
-   * @brief Clears all modality labels previously populated from GUI.
+   * \brief Clears all modality labels previously populated from GUI.
    *
    */
   void ClearAllModalLabels();
 
   /**
-   * @brief Runs a set of python commands to read "plans.pkl" and extract
+   * \brief Runs a set of python commands to read "plans.pkl" and extract
    * modality information required for inferencing. This information is exported
    * as json file : "mitk_export.json".
    *
-   * @return QString
+   * \return QString
    */
   void DumpJSONfromPickle(const QString&);
 
   /**
-   * @brief Searches RESULTS_FOLDER environment variable. If not found,
+   * \brief Searches RESULTS_FOLDER environment variable. If not found,
    * returns from the QSettings stored last used path value.
-   * @return QString
+   * \return QString
    */
   QString FetchResultsFolderFromEnv();
 
   /**
-   * @brief Returns GPU id of the selected GPU from the Combo box.
+   * \brief Returns GPU id of the selected GPU from the Combo box.
    *
-   * @return unsigned int
+   * \return unsigned int
    */
   unsigned int FetchSelectedGPUFromUI();
 
   /**
-   * @brief Adds GPU information to the gpu combo box.
+   * \brief Adds GPU information to the gpu combo box.
    * In case, there aren't any GPUs available, the combo box will be
    * rendered editable.
    */
   void SetGPUInfo();
 
   /**
-   * @brief Inserts the hash and segmentation into cache and
+   * \brief Inserts the hash and segmentation into cache and
    * updates count on UI.
    */
   void AddToCache(size_t&, mitk::MultiLabelSegmentation::ConstPointer);
 
   /**
-   * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
+   * \brief Checks all the entries of the ctkCheckableComboBox ui widget.
    * This feature is not present in ctkCheckableComboBox API.
    */
   void CheckAllInCheckableComboBox(ctkCheckableComboBox*);
 
   /**
-   * @brief Parses the folder names containing trainer and planner together and,
+   * \brief Parses the folder names containing trainer and planner together and,
    * returns it as separate lists.
-   * @return std::pair<QStringList, QStringList>
+   * \return std::pair<QStringList, QStringList>
    */
 
   std::pair<QStringList, QStringList> ExtractTrainerPlannerFromString(QStringList);
   /**
-   * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
+   * \brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
    *
    */
   void ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer);
 
   /**
-   * @brief Parses the UI elements and sets to nnUNetTool object pointer.
+   * \brief Parses the UI elements and sets to nnUNetTool object pointer.
    *
    */
   void ProcessModelParams(mitk::nnUNetTool::Pointer);
 
   /**
-   * @brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.
+   * \brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.
    */
   void ShowEnsembleLayout(bool visible = true);
 
   /**
-   * @brief Creates a QMessage object and shows on screen.
+   * \brief Creates a QMessage object and shows on screen.
    */
   void ShowErrorMessage(const std::string&, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Writes any message in white on the tool pane.
+   * \brief Writes any message in white on the tool pane.
    */
   void WriteStatusMessage(const QString&);
 
   /**
-   * @brief Writes any message in red on the tool pane.
+   * \brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString&);
 
   /**
-   * @brief Searches and parses paths of python virtual environments
+   * \brief Searches and parses paths of python virtual environments
    * from predefined lookout locations
    */
   void AutoParsePythonPaths();
 
   /**
-   * @brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
+   * \brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
    */
   bool IsModelExists(const QString&, const QString&, const QString&);
 
   /**
-   * @brief Clears all combo boxes
+   * \brief Clears all combo boxes
    * Any new combo box added in the future can be featured here for clearance.
    *
    */
   void ClearAllComboBoxes();
 
   /**
-   * @brief Disable/deactivates the nnUNet GUI.
+   * \brief Disable/deactivates the nnUNet GUI.
    * Clears any multi modal labels and selection widgets, as well.
    */
   void DisableEverything();
 
   /**
-   * @brief Checks if nnUNet_predict command is valid in the selected python virtual environment.
+   * \brief Checks if nnUNet_predict command is valid in the selected python virtual environment.
    *
-   * @return bool
+   * \return bool
    */
   bool IsNNUNetInstalled(const QString&);
 
   /**
-   * @brief Mapper function to map QString entries from UI to ModelParam attributes.
+   * \brief Mapper function to map QString entries from UI to ModelParam attributes.
    *
-   * @return mitk::ModelParams
+   * \return mitk::ModelParams
    */
   mitk::ModelParams MapToRequest(
     const QString&, const QString&, const QString&, const QString&, const std::vector<std::string>&);
 
   /**
-   * @brief Returns checked fold names from the ctk-Checkable-ComboBox.
+   * \brief Returns checked fold names from the ctk-Checkable-ComboBox.
    *
-   * @return std::vector<std::string>
+   * \return std::vector<std::string>
    */
   std::vector<std::string> FetchSelectedFoldsFromUI(ctkCheckableComboBox*);
 
   /**
-   * @brief Returns all paths from the dynamically generated ctk-path-line-edit boxes.
+   * \brief Returns all paths from the dynamically generated ctk-path-line-edit boxes.
    *
-   * @return std::vector<std::string>
+   * \return std::vector<std::string>
    */
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
   /**
-   * @brief Updates cache count on UI.
+   * \brief Updates cache count on UI.
    *
    */
   void UpdateCacheCountOnUI();
@@ -355,7 +366,7 @@ private:
   QmitkGPULoader m_GpuLoader;
 
   /**
-   * @brief Stores all dynamically added ctk-path-line-edit UI elements.
+   * \brief Stores all dynamically added ctk-path-line-edit UI elements.
    *
    */
   std::vector<QmitkSingleNodeSelectionWidget*> m_Modalities;
@@ -368,7 +379,7 @@ private:
   QString m_PythonPath;
 
   /**
-   * @brief Stores row count of the "advancedSettingsLayout" layout element. This value helps dynamically add
+   * \brief Stores row count of the "advancedSettingsLayout" layout element. This value helps dynamically add
    * ctk-path-line-edit UI elements at the right place. Forced to initialize in the InitializeUI method since there is
    * no guarantee of retrieving exact row count anywhere else.
    *
@@ -376,13 +387,13 @@ private:
   int m_UI_ROWS;
 
   /**
-   * @brief Stores path of the model director (RESULTS_FOLDER appended by "nnUNet").
+   * \brief Stores path of the model director (RESULTS_FOLDER appended by "nnUNet").
    *
    */
   std::shared_ptr<QmitknnUNetFolderParser> m_ParentFolder = nullptr;
 
   /**
-   * @brief Valid list of models supported by nnUNet
+   * \brief Valid list of models supported by nnUNet
    *
    */
   const QStringList m_VALID_MODELS = {"2d", "3d_lowres", "3d_fullres", "3d_cascade_fullres", "ensembles"};
@@ -396,7 +407,7 @@ private:
   const QString m_PICKLE_FILENAME = "plans.pkl";
 
   /**
-   * @brief For storing values across sessions. Currently, RESULTS_FOLDER value is cached using this.
+   * \brief For storing values across sessions. Currently, RESULTS_FOLDER value is cached using this.
    */
   QSettings m_Settings;
 

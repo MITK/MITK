@@ -43,12 +43,12 @@ public:
 
 protected slots:
   /**
-   * @brief Qt Slot
+   * \brief Qt Slot
    */
   void OnResetPicksClicked();
 
   /**
-   * @brief Qt Slot
+   * \brief Qt Slot
    */
   void OnActivateBtnClicked();
 
@@ -59,59 +59,59 @@ protected:
   void InitializeUI(QBoxLayout *mainLayout) override;
   
   /**
-   * @brief Writes any message in white on the tool pane.
+   * \brief Writes any message in white on the tool pane.
    */
   void WriteStatusMessage(const QString&);
 
   /**
-   * @brief Writes any message in red on the tool pane.
+   * \brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString&);
 
   /**
-   * @brief Function to listen to tool class status emitters.
+   * \brief Function to listen to tool class status emitters.
    */
   void StatusMessageListener(const std::string&);
 
   /**
-   * @brief Function to listen to preference emitters.
+   * \brief Function to listen to preference emitters.
    */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
   /**
-   * @brief Creates a QMessage object and shows on screen.
+   * \brief Creates a QMessage object and shows on screen.
    */
   void ShowErrorMessage(const std::string&, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Enable (or Disable) GUI elements. Currently, on the activate button 
+   * \brief Enable (or Disable) GUI elements. Currently, on the activate button 
    * is affected.
    */
   void EnableAll(bool);
 
   /**
-   * @brief Enable (or Disable) progressbar on GUI
+   * \brief Enable (or Disable) progressbar on GUI
    * 
    */
   void ShowProgressBar(bool);
 
   /**
-   * @brief Requests the tool class to spawn the SAM python daemon 
+   * \brief Requests the tool class to spawn the SAM python daemon 
    * process. Waits until the daemon is started.
    * 
-   * @return bool 
+   * \return bool 
    */
   bool ActivateSAMDaemon();
 
   /**
-   * @brief Checks if the preferences are correctly set by the user.
+   * \brief Checks if the preferences are correctly set by the user.
    * 
-   * @return bool 
+   * \return bool 
    */
   bool ValidatePrefences();
 
    /**
-   * @brief Checks if the preferences are correctly set and displays appropriate
+   * \brief Checks if the preferences are correctly set and displays appropriate
    * status message appending to the initial string provided as argument.
    */
   void UpdateSAMStatusMessage(QString &initText);

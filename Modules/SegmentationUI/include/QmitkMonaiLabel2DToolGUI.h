@@ -16,6 +16,12 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 #include <QmitkMonaiLabelToolGUI.h>
 
+/**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief GUI for mitk::MonaiLabel2DTool providing 2D MONAI Label segmentation.
+  \sa mitk::MonaiLabel2DTool
+  \sa QmitkMonaiLabelToolGUI
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabel2DToolGUI : public QmitkMonaiLabelToolGUI
 {
   Q_OBJECT

@@ -25,12 +25,13 @@ namespace Ui
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::OtsuTool3D.
-  \sa mitk::
+  \brief GUI for mitk::OtsuTool3D providing controls for Otsu multi-threshold segmentation.
 
-  This GUI shows ...
+  Provides a spin box for the number of regions, a preview button, and advanced settings
+  for adjusting the Otsu algorithm parameters.
 
-  Last contributor: $Author$
+  \sa mitk::OtsuTool3D
+  \sa QmitkMultiLabelSegWithPreviewToolGUIBase
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {

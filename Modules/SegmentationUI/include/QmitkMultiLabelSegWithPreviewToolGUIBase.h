@@ -48,7 +48,7 @@ protected:
   void ActualizePreviewLabelVisibility();
 
   /**
-   * @brief To toggle visibility of "Transfer all labels" and
+   * \brief Toggles visibility of "Transfer all labels" and
    * "Transfer selected labels" radio buttons.
    */
   void DisplayTransferWidgets(bool enabled);

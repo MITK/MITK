@@ -20,7 +20,7 @@ found in the LICENSE file.s
 #include <functional>
 
 /**
- * @brief Abstract Class to Setup a python virtual environment and pip install required packages.
+ * \brief Abstract Class to Setup a python virtual environment and pip install required packages.
  * Derive this class for creating installer for the respective tool.
  */
 class MITKSEGMENTATIONUI_EXPORT QmitkSetupVirtualEnvUtil
@@ -32,12 +32,12 @@ public:
   QmitkSetupVirtualEnvUtil();
 
   /**
-   * @brief Sets up a python virtual environment in the DKFZ directory with given
-   * @param venvName : Name of the virtual env folder
-   * @param packages : List of packages to be installed except Pytorch
-   * @param validator : Functor to run and validate the virtual env setup
-   * @param printCallback : ITK functor to custom print the virtual en setup log.
-   * @param torchVersion: Exact version of pytorch version (optional)
+   * \brief Sets up a python virtual environment in the DKFZ directory with given
+   * \param venvName : Name of the virtual env folder
+   * \param packages : List of packages to be installed except Pytorch
+   * \param validator : Functor to run and validate the virtual env setup
+   * \param printCallback : ITK functor to custom print the virtual en setup log.
+   * \param torchVersion: Exact version of pytorch version (optional)
    */
   bool SetupVirtualEnv(const QString &venvName,
                        const QStringList &packages,
@@ -46,22 +46,22 @@ public:
                        const QString &torchVersion = "");
 
   /**
-   * @brief Get the Virtual Env Path object. Override this method in the respective
+   * \brief Get the Virtual Env Path object. Override this method in the respective
    * tool installer class.
    * 
-   * @return QString 
+   * \return QString 
    */
   virtual QString GetVirtualEnvPath();
 
   /**
-   * @brief Function to Pip install a library package given the location of 
+   * \brief Function to Pip install a library package given the location of 
    * pip3 executable.
    * Any callback function can be passed to process the output.
    * 
-   * @param library 
-   * @param workingDir 
-   * @param callback 
-   * @param command 
+   * \param library 
+   * \param workingDir 
+   * \param callback 
+   * \param command 
    */
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
@@ -69,24 +69,24 @@ public:
                   const std::string &command = "pip3");
 
   /**
-   * @brief Overloaded function to Pip install a library function.
+   * \brief Overloaded function to Pip install a library function.
    * 
-   * @param library 
-   * @param callback 
-   * @param command 
+   * \param library 
+   * \param callback 
+   * \param command 
    */
   void PipInstall(const std::string &library, CallbackType callback,
                   const std::string &command = "pip3");
 
 
   /**
-   * @brief Function to execute any python code given a python path.
+   * \brief Function to execute any python code given a python path.
    * Any callback function can be passed to process the output.
    * 
-   * @param args 
-   * @param pythonPath 
-   * @param callback 
-   * @param command 
+   * \param args 
+   * \param pythonPath 
+   * \param callback 
+   * \param command 
    */
   void ExecutePython(const std::string &args,
                      const std::string &pythonPath,
@@ -94,133 +94,133 @@ public:
                      const std::string &command = "python");
 
   /**
-   * @brief Overloaded function to Execute Python code.
+   * \brief Overloaded function to Execute Python code.
    * Any callback function can be passed to process the output.
    * 
-   * @param args 
-   * @param callback 
-   * @param command 
+   * \param args 
+   * \param callback 
+   * \param command 
    */
   void ExecutePython(const std::string &args, CallbackType callback,
                      const std::string &command = "python");
 
   /**
-   * @brief Installs pytorch using light-the-torch package, correctly identifying cuda version.
+   * \brief Installs pytorch using light-the-torch package, correctly identifying cuda version.
    * Requires location of pip3 executable.
    * Any callback function can be passed to process the output.
    * 
-   * @param workingDir 
-   * @param callback 
-   * @param torchVersion 
+   * \param workingDir 
+   * \param callback 
+   * \param torchVersion 
    */
   void InstallPytorch(const QString &workingDir, CallbackType callback, const QString &torchVersion = "");
 
   /**
-   * @brief Overloaded function to install pytorch using light-the-torch package, correctly 
+   * \brief Overloaded function to install pytorch using light-the-torch package, correctly 
    * identifying cuda version.
    */
   void InstallPytorch(const QString& torchVersion = "");
 
   /**
-   * @brief Overloaded function to install pytorch using light-the-torch package, correctly
+   * \brief Overloaded function to install pytorch using light-the-torch package, correctly
    * identifying cuda version.
    */
   void InstallPytorch(CallbackType callback, const QString& torchVersion = "");
 
 
   /**
-   * @brief Get the Base Dir object
+   * \brief Get the Base Dir object
    * 
-   * @return QString& 
+   * \return QString& 
    */
   QString& GetBaseDir();
 
   /**
-   * @brief Get the System Python Path object
+   * \brief Get the System Python Path object
    * 
-   * @return QString& 
+   * \return QString& 
    */
   QString& GetSystemPythonPath();
 
   /**
-   * @brief Get the Python Path object
+   * \brief Get the Python Path object
    * 
-   * @return QString& 
+   * \return QString& 
    */
   QString& GetPythonPath();
 
   /**
-   * @brief Get the Pip Path object
+   * \brief Get the Pip Path object
    * 
-   * @return QString& 
+   * \return QString& 
    */
   QString& GetPipPath();
 
   /**
-   * @brief Set the System Python Path object
+   * \brief Set the System Python Path object
    * 
-   * @param path 
+   * \param path 
    */
   void SetSystemPythonPath(const QString& path);
 
   /**
-   * @brief Set the Python Path object
+   * \brief Set the Python Path object
    * 
-   * @param path 
+   * \param path 
    */
   void SetPythonPath(const QString& path);
 
   /**
-   * @brief Set the Pip Path object
+   * \brief Set the Pip Path object
    * 
-   * @param path 
+   * \param path 
    */
   void SetPipPath(const QString& path);
 
   /**
-   * @brief Set the Virtual Env Path object
+   * \brief Set the Virtual Env Path object
    * 
-   * @param path 
+   * \param path 
    */
   void SetVirtualEnvPath(const QString &path);
 
   /**
-   * @brief Check if the path provide has python executable or not.
+   * \brief Check if the path provide has python executable or not.
    * 
-   * @param pythonPath 
-   * @return true 
-   * @return false 
+   * \param pythonPath 
+   * \return true 
+   * \return false 
    */
   bool IsPythonPath(const QString &pythonPath);
 
   /**
-   * @brief Checks if venv module is available for the python.
+   * \brief Checks if venv module is available for the python.
    * 
    */
   static bool IsVenvInstalled(const QString &pythonPath);
 
   /**
-   * @brief Returns version of the pip installed package
+   * \brief Returns version of the pip installed package
    *
    */
   static QString GetPipPackageVersion(const QString &pythonPath, const QString &packageName);
 
   /**
-   * @brief Function can be used as callback to simply print out all the process execution output
+   * \brief Function can be used as callback to simply print out all the process execution output
    * parsed out from itk::EventObject.
    * 
    */
   static void PrintProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 
   /**
-  * @brief Get the exact Python path and version for any OS from the virtual environment path.
-  * @return A pair of the exact python path and its Python version or empty, if an supported
+  * \brief Get the exact Python path and version for any OS from the virtual environment path.
+  * \return A pair of the exact python path and its Python version or empty, if an supported
   * version of Python could not be found.
   */
   static std::pair<QString, QString> GetExactPythonPath(const QString &pyEnv);
   
   /**
-   * @brief Searches and parses paths of python virtual environments
+   * \brief Searches and parses paths of python virtual environments
    * from predefined lookout locations
    */
   static QStringList AutoParsePythonPaths();

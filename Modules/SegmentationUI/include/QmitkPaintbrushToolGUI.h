@@ -27,8 +27,6 @@ class QFrame;
   \sa mitk::PaintbrushTool
 
   This GUI shows a slider to change the pen's size.
-
-  Last contributor: $Author$
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 {
@@ -37,6 +35,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 public:
   mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
 
+  /** \brief Called when the paintbrush size changes in the tool. Updates the slider. */
   void OnSizeChanged(int current);
 
 signals:

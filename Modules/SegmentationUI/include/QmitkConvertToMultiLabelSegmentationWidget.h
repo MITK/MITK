@@ -34,28 +34,34 @@ namespace mitk
   class MultiLabelSegmentation;
 }
 
-/*!
-  \brief QmitkConvertToMultiLabelSegmentationWidget
-
-  Widget that offers the GUI and logic to convert different inputs (images, surfaces and contour models)
-  into a multi label segmentation (by generating a new or adding the converted inputs to an existing
-  segmentation).
-*/
+/**
+ * \brief Widget for converting images, surfaces, and contour models into multi-label segmentations.
+ *
+ * Provides a GUI for selecting input data nodes (images, surfaces, contour models) and either
+ * generating a new multi-label segmentation or adding the converted inputs to an existing one.
+ * The user can also specify a reference image for geometry alignment.
+ *
+ * \sa mitk::MultiLabelSegmentation
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkConvertToMultiLabelSegmentationWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
+  /**
+   * \brief Constructs the widget with GUI elements and signal/slot connections.
+   * \param[in] dataStorage Pointer to the data storage for node selection.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkConvertToMultiLabelSegmentationWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Default destructor. */
+  /** \brief Destructor. */
   ~QmitkConvertToMultiLabelSegmentationWidget() override;
 
 private slots:
 
-  /** @brief This slot is called if the selection in the workbench is changed. */
+  /** \brief Called when the input node selection in the workbench changes. */
   void OnInputSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
   void OnOutputSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
@@ -63,7 +69,7 @@ private slots:
   void OnRefSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
 
-  /** @brief This slot is called if user activates the button to convert a surface into a binary image. */
+  /** \brief Called when the user clicks the convert button. */
   void OnConvertPressed();
 
 private:
@@ -72,7 +78,7 @@ private:
   bool m_InternalEvent = false;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-  /** @brief Enable buttons if data selection is valid. */
+  /** \brief Enables or disables buttons based on the current data selection validity. */
   void ConfigureWidgets();
 
   std::unique_ptr<Ui::QmitkConvertToMultiLabelSegmentationWidgetControls> m_Controls;

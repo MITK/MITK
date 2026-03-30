@@ -17,19 +17,21 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-/**@brief Helper function to save the label information of a passed segmentation as preset.
+/**
+* \brief Saves the label information of a segmentation as a preset file.
 *
-* Helper function triggers a file dialog to specify the location where to store the preset.
-* @pre segmentation must be a valid pointer.
-* @param segmentation pointer to the segmentation that serves as template for the preset.
+* Triggers a file dialog to specify the location where to store the preset.
+* \pre segmentation must be a valid pointer.
+* \param segmentation Pointer to the segmentation that serves as template for the preset.
 */
 void MITKSEGMENTATIONUI_EXPORT QmitkSaveMultiLabelPreset(const mitk::MultiLabelSegmentation* segmentation);
 
-/**@brief Helper function to loads a label preset and imposes it on all passed segmentations.
+/**
+* \brief Loads a label preset and imposes it on all passed segmentations.
 *
-* Helper function triggers a file dialog to specify the location where to load the preset.
-* @param segmentations vector of pointers to the segmentations that should be modified according to the preset.
-* Invalid segmentations (nullptr) will be ignored.
+* Triggers a file dialog to specify the location where to load the preset.
+* \param segmentations Vector of pointers to the segmentations that should be modified according to the preset.
+*        Invalid segmentations (nullptr) will be ignored.
 */
 void MITKSEGMENTATIONUI_EXPORT QmitkLoadMultiLabelPreset(const std::vector<mitk::MultiLabelSegmentation::Pointer>& segmentations);
 

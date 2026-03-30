@@ -57,12 +57,16 @@ namespace mitk::nnInteractive
   class MITKPYTHONSEGMENTATION_EXPORT Interactor
   {
   public:
+    /** \brief Destructor.
+     */
     virtual ~Interactor();
 
     /** \brief Returns the interaction type associated with this interactor.
      *
      * The interaction type serves as a unique identifier for each interactor,
      * allowing them to be easily distinguished or mapped in data structures.
+     *
+     * \return The InteractionType that was assigned during construction.
      */
     InteractionType GetType() const;
 
@@ -72,6 +76,14 @@ namespace mitk::nnInteractive
      * potentially used by derived classes. This method should be called as
      * early as possible to ensure that derived classes have access to the
      * tool manager (and data storage) if needed.
+     *
+     * If the provided ToolManager is the same as the currently set one,
+     * this method is a no-op.
+     *
+     * \param[in] toolManager Pointer to the ToolManager to associate with
+     *                        this interactor.
+     *
+     * \sa OnSetToolManager(), GetToolManager(), GetDataStorage()
      */
     void SetToolManager(ToolManager* toolManager);
 
@@ -80,6 +92,14 @@ namespace mitk::nnInteractive
      * This method forwards input events to enabled interactors. If a derived
      * class uses a segmentation tool class, override OnHandleEvent() to
      * call Tool::HandleEvent().
+     *
+     * Events are only forwarded when the interactor is enabled.
+     *
+     * \param[in] event The interaction event to handle.
+     *
+     * \pre The interactor must be enabled for the event to be processed.
+     *
+     * \sa OnHandleEvent(), IsEnabled()
      */
     void HandleEvent(InteractionEvent* event);
 
@@ -94,7 +114,10 @@ namespace mitk::nnInteractive
      * the crosshair navigation via left click will be blocked while the
      * interactor is enabled.
      *
-     * \see OnEnable()
+     * \param[in] promptType The prompt type (positive or negative) to enable
+     *                       this interactor for.
+     *
+     * \sa OnEnable(), Disable(), GetCurrentPromptType()
      */
     void Enable(PromptType promptType);
 
@@ -110,6 +133,11 @@ namespace mitk::nnInteractive
     void Disable();
 
     /** \brief Checks whether the interactor is currently enabled.
+     *
+     * \return \c true if the interactor has been enabled via Enable() and has
+     *         not yet been disabled, \c false otherwise.
+     *
+     * \sa Enable(), Disable()
      */
     bool IsEnabled() const;
 
@@ -127,8 +155,10 @@ namespace mitk::nnInteractive
     /** \brief Retrieves the SVG icon as a string from module resources.
      *
      * The icon path is automatically determined based on the InteractionType,
-     * e.g., "nnInteractive/Point.svg". Returns an empty string if the icon is
-     * not found in the resources.
+     * e.g., "nnInteractive/Point.svg".
+     *
+     * \return The SVG icon data as a string, or an empty string if the icon
+     *         is not found in the resources.
      */
     std::string GetIcon() const;
 
@@ -136,7 +166,11 @@ namespace mitk::nnInteractive
      *
      * The cursor path is automatically determined using the InteractionType
      * and the specified PromptType, e.g., "nnInteractive/PositivePointCursor.svg".
-     * Returns an empty string if the cursor is not found in the resources.
+     *
+     * \param[in] promptType The prompt type used to determine the cursor variant.
+     *
+     * \return The SVG cursor data as a string, or an empty string if the
+     *         cursor is not found in the resources.
      */
     std::string GetCursor(PromptType promptType) const;
 
@@ -144,12 +178,19 @@ namespace mitk::nnInteractive
      *
      * Derived classes must implement this method to determine whether the
      * interactor has processed any interactions.
+     *
+     * \return \c true if at least one interaction has been recorded,
+     *         \c false otherwise.
      */
     virtual bool HasInteractions() const = 0;
 
     /** \brief Event triggered after an interaction has occurred.
      *
-     * The signature matches SegWithPreviewTool::UpdatePreview().
+     * Observers of this event are notified whenever a new interaction is
+     * completed (e.g., a point is placed, a box is drawn). The boolean
+     * parameter signature matches SegWithPreviewTool::UpdatePreview().
+     *
+     * \sa mitk::nnInteractiveTool
      */
     Message1<bool> UpdatePreviewEvent;
 
@@ -185,9 +226,11 @@ namespace mitk::nnInteractive
      * Derived classes can override this method to forward the event to their
      * tool.
      *
+     * \param[in] event The interaction event to handle.
+     *
      * \see HandleEvent(), Tool::HandleEvent()
      */
-    virtual void OnHandleEvent(InteractionEvent* /*event*/) {};
+    virtual void OnHandleEvent(InteractionEvent* event) {};
 
     /** \brief Called when the interactor is enabled.
      *
@@ -221,25 +264,36 @@ namespace mitk::nnInteractive
 
     /** \brief Returns the ToolManager associated with this interactor.
      *
-     * SetToolManager() must be called beforehand.
+     * \pre SetToolManager() must have been called beforehand.
      *
-     * \see SetToolManager()
+     * \return Pointer to the associated ToolManager, or \c nullptr if none
+     *         has been set.
+     *
+     * \sa SetToolManager()
      */
     ToolManager* GetToolManager() const;
 
     /** \brief Convenience method for accessing the DataStorage.
      *
-     * SetToolManager() must be called beforehand.
+     * Retrieves the DataStorage from the associated ToolManager.
      *
-     * \see SetToolManager()
+     * \pre SetToolManager() must have been called beforehand.
+     *
+     * \return Pointer to the DataStorage, or \c nullptr if no ToolManager
+     *         has been set.
+     *
+     * \sa SetToolManager(), GetToolManager()
      */
     DataStorage* GetDataStorage() const;
 
     /** \brief Returns the currently active prompt type.
      *
      * The active prompt type is determined by the most recent call to Enable().
+     * Before the first call to Enable(), the default is PromptType::Positive.
      *
-     * \see Enable()
+     * \return The currently active PromptType.
+     *
+     * \sa Enable()
      */
     PromptType GetCurrentPromptType() const;
 

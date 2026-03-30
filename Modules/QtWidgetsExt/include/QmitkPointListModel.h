@@ -19,44 +19,108 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
 
+/**
+ * \brief Qt list model providing access to points in a mitk::PointSet.
+ *
+ * Wraps a mitk::PointSet (referenced via a mitk::DataNode) as a
+ * QAbstractListModel. Each row represents a point with its ID and
+ * coordinates. Observes the point set for modifications and deletions,
+ * resetting the model accordingly. Provides methods to move and remove
+ * the currently selected point.
+ *
+ * \note The mitk::PointSet uses a map container where point IDs are not
+ *       necessarily contiguous. This model translates between row indices
+ *       and point IDs.
+ *
+ * \sa QmitkPointListView, QmitkPointListWidget
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkPointListModel : public QAbstractListModel
 {
   Q_OBJECT
 
 public:
-  QmitkPointListModel(mitk::DataNode * = nullptr, int t = 0, QObject *parent = nullptr);
+  /**
+   * \brief Construct the model.
+   * \param[in] pointSetNode Data node containing the mitk::PointSet. May be nullptr.
+   * \param[in] t The time step to use.
+   * \param[in] parent The parent QObject.
+   */
+  QmitkPointListModel(mitk::DataNode *pointSetNode = nullptr, int t = 0, QObject *parent = nullptr);
+
+  /** \brief Destructor. Removes observers from the point set. */
   ~QmitkPointListModel() override;
 
-  Qt::ItemFlags flags(const QModelIndex &) const override;
+  /**
+   * \brief Return item flags (selectable and enabled).
+   * \param[in] index The model index (unused).
+   * \return Qt::ItemIsSelectable | Qt::ItemIsEnabled.
+   */
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-  /// interface of QAbstractListModel
+  /**
+   * \brief Return the number of points in the current time step.
+   * \param[in] parent The parent index (unused for list models).
+   * \return The number of points.
+   */
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-  /// interface of QAbstractListModel
+  /**
+   * \brief Return the display data for a point (ID and coordinates).
+   * \param[in] index The model index.
+   * \param[in] role The data role (only Qt::DisplayRole is supported).
+   * \return The point string in format "ID: (x, y, z)".
+   */
   QVariant data(const QModelIndex &index, int role) const override;
 
-  /// interface of QAbstractListModel
+  /**
+   * \brief Return header data.
+   * \param[in] section The section index.
+   * \param[in] orientation The header orientation.
+   * \param[in] role The data role.
+   * \return The header label.
+   */
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
-  /// which point set to work on
+  /**
+   * \brief Set the data node containing the point set to model.
+   * \param[in] pointSetNode The data node. May be nullptr to clear.
+   */
   void SetPointSetNode(mitk::DataNode *pointSetNode);
 
-  /// which point set to work on
+  /**
+   * \brief Get the modeled point set.
+   * \return Pointer to the mitk::PointSet, or nullptr.
+   */
   mitk::PointSet *GetPointSet() const;
 
-  // which point set to work on
+  /**
+   * \brief Get the data node containing the point set.
+   * \return Pointer to the mitk::DataNode, or nullptr.
+   */
   mitk::DataNode *GetPointSetNode() const;
 
-  /// which time step to display/model
+  /**
+   * \brief Set the time step to display.
+   * \param[in] t The time step index.
+   */
   void SetTimeStep(int t);
 
-  /// which time step to display/model
+  /**
+   * \brief Get the current time step.
+   * \return The time step index.
+   */
   int GetTimeStep() const;
 
-  /// itk observer for point set "modified" events
+  /**
+   * \brief ITK observer callback for point set modification events.
+   * \param[in] e The ITK event object.
+   */
   void OnPointSetChanged(const itk::EventObject &e);
 
-  /// itk observer for point set "delete" events
+  /**
+   * \brief ITK observer callback for point set deletion events.
+   * \param[in] e The ITK event object.
+   */
   void OnPointSetDeleted(const itk::EventObject &e);
 
   /**

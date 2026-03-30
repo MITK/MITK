@@ -18,25 +18,55 @@ found in the LICENSE file.
 #include <mitkPropertyObserver.h>
 #include <mitkStringProperty.h>
 
+/**
+ * \brief A simple clickable QLabel helper used by QmitkStringPropertyOnDemandEdit.
+ *
+ * Emits a clicked() signal on mouse release.
+ */
 class MITKQTWIDGETSEXT_EXPORT QClickableLabel2 : public QLabel
 {
   Q_OBJECT
 
 signals:
+  /** \brief Emitted when the label is clicked. */
   void clicked();
 
 public:
+  /**
+   * \brief Construct the clickable label.
+   * \param[in] parent The parent widget.
+   * \param[in] f Window flags.
+   */
   QClickableLabel2(QWidget *parent, Qt::WindowFlags f = {}) : QLabel(parent, f) {}
+
+  /** \brief Emit clicked() on mouse release. */
   void mouseReleaseEvent(QMouseEvent *) override { emit clicked(); }
 };
 
-/// @ingroup Widgets
+/**
+ * \brief An on-demand string property editor that shows the value as a label
+ *        with a "..." button to open an input dialog.
+ * \ingroup Widgets
+ *
+ * Displays the current string property value as a QLabel. Clicking the "..."
+ * button opens a QInputDialog to edit the text. The property is updated only
+ * when the dialog is accepted. If the property is removed, "n/a" is shown.
+ *
+ * \sa QmitkStringPropertyEditor, QmitkStringPropertyView, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
 {
   Q_OBJECT
 
 public:
-  QmitkStringPropertyOnDemandEdit(mitk::StringProperty *, QWidget *parent);
+  /**
+   * \brief Construct an on-demand editor for the given string property.
+   * \param[in] property The mitk::StringProperty to edit.
+   * \param[in] parent The parent widget.
+   */
+  QmitkStringPropertyOnDemandEdit(mitk::StringProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkStringPropertyOnDemandEdit() override;
 
 protected:

@@ -18,30 +18,54 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Interface for log backends that can be registered in the MITK log mechanism.
+  /** \brief Abstract interface for log backends that can be registered in the MITK log mechanism.
+   *
+   * Subclasses implement ProcessMessage() to handle log events (e.g. writing to console,
+   * file, or a remote logging service). Backends are registered and unregistered via
+   * mitk::RegisterBackend() and mitk::UnregisterBackend(). Backends of a given OutputType
+   * can be collectively enabled or disabled via EnableBackends() / DisableBackends().
+   *
+   * If no backend is registered when a log message is emitted, a default LogBackendCout
+   * instance is created automatically. This default backend is removed as soon as a
+   * user-registered backend is added.
+   *
+   * \sa RegisterBackend(), UnregisterBackend(), LogBackendText, LogBackendCout
    */
   class MITKLOG_EXPORT LogBackendBase
   {
   public:
-    /** Type of the output of a backend.
+    /** \brief Classification of the output destination of a backend.
+     *
+     * Used by EnableBackends() / DisableBackends() to selectively enable or disable
+     * groups of backends by their output type.
      */
     enum class OutputType
     {
-      Console,
-      File,
-      Other = 100
+      Console,    /**< \brief Backend writes to the console (stdout/stderr). */
+      File,       /**< \brief Backend writes to a file. */
+      Other = 100 /**< \brief Backend writes to another destination (e.g. network, GUI widget). */
     };
 
     virtual ~LogBackendBase();
 
-    /** \brief Called by the MITK log mechanism if the object is registered and a log message is emitted.
+    /** \brief Process a log message.
      *
-     * \param message Logging message which was emitted.
+     * Called by the MITK log mechanism for each registered and enabled backend
+     * whenever a log message is emitted. Implementations should format and output
+     * the message according to their destination.
+     *
+     * \param[in] message The log message to process. The message text has already
+     *                    been trimmed of trailing whitespace.
+     *
+     * \pre The backend is registered via RegisterBackend() and its OutputType is enabled.
      */
     virtual void ProcessMessage(const LogMessage& message) = 0;
 
-    /**
-     * \return The type of this backend.
+    /** \brief Return the output type of this backend.
+     *
+     * Used by the log mechanism to determine whether this backend is enabled.
+     *
+     * \return The OutputType classification of this backend.
      */
     virtual OutputType GetOutputType() const = 0;
   };

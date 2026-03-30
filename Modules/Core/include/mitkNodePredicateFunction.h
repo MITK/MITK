@@ -36,11 +36,21 @@ namespace mitk
     mitkClassMacro(NodePredicateFunction, NodePredicateBase);
     mitkNewMacro1Param(NodePredicateFunction, const FunctionType&);
 
+    /** \brief Standard Destructor. */
     ~NodePredicateFunction() override;
 
+    /** \brief Delegates the check to the stored callable.
+     *
+     * \param node The DataNode to check.
+     * \return The result of invoking the stored function with the given node.
+     */
     bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
+    /** \brief Protected constructor, use static instantiation functions instead.
+     *
+     * \param function The callable to use for node checking.
+     */
     explicit NodePredicateFunction(const FunctionType &function);
 
     FunctionType m_Function;

@@ -26,91 +26,142 @@ namespace mitk
   /**
    * \ingroup MicroServices_Interfaces
    *
-   * The central service for the persistence module
-   * Basic idea is to create PropertyLists with a unique id using AddPropertyList(). A consumer
-   * of this interface can write arbitrary information into this propertylist
-   * Calling Save() and Load() will cause the Service to save and load the current set of propertlists from
+   * \brief The central service for the persistence module.
+   *
+   * Basic idea is to create PropertyLists with a unique id using GetPropertyList(). A consumer
+   * of this interface can write arbitrary information into this PropertyList.
+   * Calling Save() and Load() will cause the service to save and load the current set of PropertyLists from
    * a file in the user directory.
-   * Using SetAutoLoadAndSave(true) will cause the service to load/save the property lists at application
+   * Using SetAutoLoadAndSave(true) will cause the service to load/save the PropertyLists at application
    * start/stop.
    * Moreover, depending on the backend type, the service is connected to the SceneSerialization module, i.e.
-   * the user will be asked whether to save/load the propertlists in/from the current ".mitk" file that is selected
+   * the user will be asked whether to save/load the PropertyLists in/from the current ".mitk" file that is selected
    * by the user.
+   *
+   * \sa PropertyList
+   * \sa PropertyListReplacedObserver
    */
   class MITKCORE_EXPORT IPersistenceService
   {
   public:
     /**
-    * If PropertyList with the given id exists, returns it. Otherwise creates a new one and returns it.
-    * If id is empty a UUID will be created and set on the variable
-    * If existed was passed, it is true if the PropertyList with that id existed, false otherwise
-    * \return a valid PropertyList with a StringProperty "Id" containing the passed id
-    */
+     * \brief Get or create a PropertyList with the given id.
+     *
+     * If a PropertyList with the given id exists, returns it. Otherwise creates a new one and returns it.
+     * If id is empty, a UUID will be created and set on the variable.
+     * If existed was passed, it is set to \c true if the PropertyList with that id existed, \c false otherwise.
+     *
+     * \param id The unique identifier for the PropertyList. May be modified if empty.
+     * \param existed Optional output parameter indicating whether the PropertyList already existed.
+     * \return A valid PropertyList with a StringProperty "Id" containing the passed id.
+     */
     virtual mitk::PropertyList::Pointer GetPropertyList(std::string &id, bool *existed = nullptr) = 0;
+
     /**
-    * removes the PropertyList with the given id
-    * \return true if PropertyList existed and could be removed, false otherwise
-    */
+     * \brief Remove the PropertyList with the given id.
+     *
+     * \param id The identifier of the PropertyList to remove.
+     * \return \c true if the PropertyList existed and could be removed, \c false otherwise.
+     */
     virtual bool RemovePropertyList(std::string &id) = 0;
+
     /**
-    * Get the default name of the PersistenceFile (the one that is loaded at startup)
-    */
+     * \brief Get the default name of the persistence file (the one that is loaded at startup).
+     *
+     * \return The default persistence file path.
+     */
     virtual std::string GetDefaultPersistenceFile() = 0;
+
     /**
-    * \return The name of the Bool Property that specifies whether a DataNode is a Node carrying Persistence
-    * PropertyLists
-    */
+     * \brief Get the name of the BoolProperty that marks persistence DataNodes.
+     *
+     * \return The property name string.
+     */
     virtual std::string GetPersistenceNodePropertyName() = 0;
+
     /**
-    * Creates a vector of DataNodes that contain all PropertyLists. Additionally, the DataNodes
-    * will have the property name set to the PropertyList's id and a BoolProperty equal to
-    * GetPersistenceNodePropertyName() set to true. If ds is set the returned DataNodes will also be added to that DS.
-    * \return vector of DataNodes with the described attributes
-    */
+     * \brief Create DataNodes containing all PropertyLists.
+     *
+     * The DataNodes will have the property name set to the PropertyList's id and a BoolProperty equal to
+     * GetPersistenceNodePropertyName() set to \c true. If \p ds is set, the returned DataNodes will also
+     * be added to that DataStorage.
+     *
+     * \param ds Optional DataStorage to add the nodes to.
+     * \return A set of DataNodes with the described attributes.
+     */
     virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage *ds = nullptr) = 0;
+
     /**
-    * Searches storage for persistent DataNodes, extracts and inserts the appended property lists to this service
-    * \return true if at least one node was found from which a PropertyList could be restored
-    */
+     * \brief Restore PropertyLists from persistent DataNodes in the given storage.
+     *
+     * Searches the storage for persistent DataNodes, extracts and inserts the appended
+     * PropertyLists to this service.
+     *
+     * \param storage The DataStorage to search for persistent DataNodes.
+     * \return \c true if at least one node was found from which a PropertyList could be restored.
+     */
     virtual bool RestorePropertyListsFromPersistentDataNodes(const DataStorage *storage) = 0;
+
     /**
-    * Save the current PropertyLists to fileName. If fileName is empty, a special file in the users home directory will
-    * be
-    * used.
-    * if appendchanges is true, the file will not replaced but first loaded, then overwritten and then replaced
-    * \return false if an error occurred (cannot write to file), true otherwise
-    */
+     * \brief Save the current PropertyLists to a file.
+     *
+     * If \p fileName is empty, a special file in the user's home directory will be used.
+     * If \p appendChanges is \c true, the file will not be replaced but first loaded, then
+     * overwritten and then replaced.
+     *
+     * \param fileName The file path to save to. Empty for the default location.
+     * \param appendChanges If \c true, merge changes with the existing file contents.
+     * \return \c false if an error occurred (cannot write to file), \c true otherwise.
+     */
     virtual bool Save(const std::string &fileName = "", bool appendChanges = false) = 0;
+
     /**
-    * Load PropertyLists from fileName. If fileName is empty, a special file in the users home directory will be used.
-    * If enforeReload is false, the service will take care of modified time flags, i.e. it will not load a file
-    * that was loaded before and did not change in the meantime or that was modified by the service itself
-    * *ATTENTION*: If there are PropertyLists with the same id contained in the file, existing PropertyLists will be
-    * overwritten!
-    * \see AddPropertyListReplacedObserver()
-    * \return false if an error occurred (cannot load from file), true otherwise
-    */
+     * \brief Load PropertyLists from a file.
+     *
+     * If \p fileName is empty, a special file in the user's home directory will be used.
+     * If \p enforeReload is \c false, the service will take care of modified time flags, i.e. it will not load a file
+     * that was loaded before and did not change in the meantime or that was modified by the service itself.
+     *
+     * \warning If there are PropertyLists with the same id contained in the file, existing PropertyLists will be
+     * overwritten!
+     *
+     * \param fileName The file path to load from. Empty for the default location.
+     * \param enforeReload If \c true, reload regardless of modification timestamps.
+     * \return \c false if an error occurred (cannot load from file), \c true otherwise.
+     *
+     * \sa AddPropertyListReplacedObserver()
+     */
     virtual bool Load(const std::string &fileName = "", bool enforeReload = true) = 0;
+
     /**
-    * Using SetAutoLoadAndSave(true) will cause the service to load/save the property lists at application
-    * start/stop.
-    */
+     * \brief Enable or disable automatic loading/saving of PropertyLists at application start/stop.
+     *
+     * \param autoLoadAndSave If \c true, enable automatic load and save.
+     */
     virtual void SetAutoLoadAndSave(bool autoLoadAndSave) = 0;
+
     /**
-    * \return whether AutoLoading is activated or not
-    */
+     * \brief Check whether automatic loading/saving is activated.
+     *
+     * \return \c true if auto-load and auto-save are enabled, \c false otherwise.
+     */
     virtual bool GetAutoLoadAndSave() = 0;
+
     /**
-    * adds a observer which is informed if a propertyList gets replaced during a Load() procedure
-    */
+     * \brief Add an observer that is notified when a PropertyList is replaced during Load().
+     *
+     * \param observer The observer to add.
+     */
     virtual void AddPropertyListReplacedObserver(PropertyListReplacedObserver *observer) = 0;
+
     /**
-    * removes a specific observer
-    */
+     * \brief Remove a previously added PropertyList replacement observer.
+     *
+     * \param observer The observer to remove.
+     */
     virtual void RemovePropertyListReplacedObserver(PropertyListReplacedObserver *observer) = 0;
-    /**
-    * nothing to do here
-    */
+
+    /** \brief Destructor. */
     virtual ~IPersistenceService();
   };
 }

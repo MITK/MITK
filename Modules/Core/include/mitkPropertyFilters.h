@@ -18,18 +18,32 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Implementation of the IPropertyFilters service interface.
+   *
+   * Manages PropertyFilter instances that can be associated with specific data
+   * node class names. Applying a filter first applies the global filter (empty
+   * class name), then the class-specific filter.
+   *
+   * \sa IPropertyFilters
+   */
   class PropertyFilters : public IPropertyFilters
   {
   public:
     PropertyFilters();
     ~PropertyFilters() override;
 
+    /** \copydoc IPropertyFilters::AddFilter */
     bool AddFilter(const PropertyFilter &filter, const std::string &className, bool overwrite) override;
+    /** \copydoc IPropertyFilters::ApplyFilter */
     std::map<std::string, BaseProperty::Pointer> ApplyFilter(
       const std::map<std::string, BaseProperty::Pointer> &propertyMap, const std::string &className) const override;
+    /** \copydoc IPropertyFilters::GetFilter */
     PropertyFilter GetFilter(const std::string &className) const override;
+    /** \copydoc IPropertyFilters::HasFilter */
     bool HasFilter(const std::string &className) const override;
+    /** \copydoc IPropertyFilters::RemoveAllFilters */
     void RemoveAllFilters() override;
+    /** \copydoc IPropertyFilters::RemoveFilter */
     void RemoveFilter(const std::string &className) override;
 
   private:

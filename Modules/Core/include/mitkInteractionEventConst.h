@@ -19,7 +19,12 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Constants to describe Mouse Events and special Key Events.
+   * \brief Constants to describe Mouse Events and special Key Events.
+   *
+   * Provides static methods returning XML tag names, parameter names, and event property
+   * strings used for serializing and deserializing interaction events.
+   *
+   * \ingroup Interaction
    */
   struct MITKCORE_EXPORT InteractionEventConst
   {

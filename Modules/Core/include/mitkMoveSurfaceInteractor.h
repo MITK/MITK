@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  // @deprecated Use MoveBaseDataInteractor instead.
+  /** \deprecated Use MoveBaseDataInteractor instead. */
   typedef MoveBaseDataInteractor MoveSurfaceInteractor;
 }
 

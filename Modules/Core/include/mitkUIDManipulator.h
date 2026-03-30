@@ -28,11 +28,19 @@ namespace mitk
   class MITKCORE_EXPORT UIDManipulator final
   {
   public:
+    /**
+     * \brief Construct a UIDManipulator for the given Identifiable object.
+     *
+     * \param[in] identifiable The object whose UID will be manipulated. Must not be nullptr.
+     * \throw mitk::Exception if identifiable is nullptr.
+     */
     explicit UIDManipulator(Identifiable *identifiable);
     ~UIDManipulator();
 
     /**
-     * \brief Set unique ID of an identifiable object.
+     * \brief Set the unique ID of the associated identifiable object.
+     *
+     * \param[in] uid The new unique identifier to assign.
      */
     void SetUID(const Identifiable::UIDType &uid);
 

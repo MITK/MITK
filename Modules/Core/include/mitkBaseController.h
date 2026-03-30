@@ -24,13 +24,18 @@ namespace mitk
   class BaseRenderer;
 
   /**
-   * \brief Baseclass for renderer slice-/camera-/time-control
+   * \brief Base class for renderer slice, camera, and time control.
    *
-   *        Tells the renderer (subclass of BaseRenderer) which slice (SliceNavigationController),
-   *        which direction (CameraController) or which time (TimeNavigationController) it has to render.
-   *        Contains a Stepper for stepping through the slices, through different
-   *        camera views (e.g., for the creation of a movie around the data)
-   *        and through time, if there is 3D+t data.
+   * Tells the renderer (subclass of BaseRenderer) which slice
+   * (SliceNavigationController), which camera direction (CameraController),
+   * or which time point (TimeNavigationController) to render. Contains a
+   * Stepper for stepping through slices, camera views, or time steps.
+   *
+   * \sa SliceNavigationController
+   * \sa CameraController
+   * \sa TimeNavigationController
+   * \sa Stepper
+   * \sa BaseRenderer
    */
   class MITKCORE_EXPORT BaseController : public OperationActor, public itk::Object
   {
@@ -40,28 +45,32 @@ namespace mitk
     itkFactorylessNewMacro(Self);
 
     /**
-    * \brief Get the stepper through the corresponding dimension.
-    */
+     * \brief Get the stepper for stepping through the controlled dimension.
+     * \return Pointer to the mutable Stepper.
+     */
     Stepper* GetStepper();
+
+    /**
+     * \brief Get the stepper for stepping through the controlled dimension (const).
+     * \return Pointer to the const Stepper.
+     */
     const Stepper* GetStepper() const;
 
   protected:
-    /**
-    * @brief Default Constructor
-    **/
+    /** \brief Default constructor. */
     BaseController();
 
-    /**
-    * @brief Default Destructor
-    **/
+    /** \brief Destructor. */
     ~BaseController() override;
 
+    /**
+     * \brief Execute an undo/redo operation.
+     */
     void ExecuteOperation(Operation *) override;
 
-    //## @brief Stepper through the different dimensions
-    Stepper::Pointer m_Stepper;
+    Stepper::Pointer m_Stepper; ///< Stepper through the controlled dimension.
 
-    unsigned long m_LastUpdateTime;
+    unsigned long m_LastUpdateTime; ///< Timestamp of the last update.
   };
 
 } // namespace mitk

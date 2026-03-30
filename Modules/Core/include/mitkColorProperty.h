@@ -28,15 +28,22 @@ namespace mitk
 #endif
 
   /**
-   * @brief Color Standard RGB color typedef (float)
+   * \brief Standard RGB color typedef using float components.
    *
-   * Standard RGB color typedef to get rid of template argument (float).
-   * Color range is from 0.0f to 1.0f for each component.
+   * Each color component (red, green, blue) ranges from 0.0f to 1.0f.
    *
-   * @ingroup Property
+   * \ingroup Property
    */
   typedef itk::RGBPixel<float> Color;
 
+  /**
+   * \brief Convenience function to create a Color from individual RGB components.
+   *
+   * \param[in] r Red component (0.0f to 1.0f).
+   * \param[in] g Green component (0.0f to 1.0f).
+   * \param[in] b Blue component (0.0f to 1.0f).
+   * \return A Color initialized with the given RGB values.
+   */
   inline Color MakeColor(float r, float g, float b)
   {
     Color color;
@@ -45,14 +52,20 @@ namespace mitk
   }
 
   /**
-   * @brief The ColorProperty class RGB color property
-   * @ingroup DataManagement
+   * \brief Property for storing RGB color values.
    *
-   * @note If you want to apply the mitk::ColorProperty to an mitk::Image
+   * Stores an RGB color with float precision (each component 0.0f to 1.0f).
+   * Used to associate a rendering color with a DataNode.
+   *
+   * \ingroup DataManagement
+   *
+   * \note If you want to apply the mitk::ColorProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which
-   * supports color (e.g. LEVELWINDOW_COLOR). For an example how to use
-   * the mitk::ColorProperty see mitkImageVtkMapper2DColorTest.cpp in
-   * Core/Code/Rendering.
+   * supports color (e.g. LEVELWINDOW_COLOR). For an example, see
+   * mitkImageVtkMapper2DColorTest.cpp in Core/Code/Rendering.
+   *
+   * \sa BaseProperty
+   * \sa RenderingModeProperty
    */
   class MITKCORE_EXPORT ColorProperty : public BaseProperty
   {
@@ -78,16 +91,65 @@ namespace mitk
     mitkNewMacro1Param(ColorProperty, const mitk::Color &);
     mitkNewMacro3Param(ColorProperty, const float, const float, const float);
 
+    /** \brief The type of the value stored by this property. */
     typedef mitk::Color ValueType;
 
+    /**
+     * \brief Get the color value.
+     * \return A const reference to the stored color.
+     */
     const mitk::Color &GetColor() const;
+
+    /**
+     * \brief Get the color value (alias for GetColor()).
+     * \return A const reference to the stored color.
+     */
     const mitk::Color &GetValue() const;
+
+    /**
+     * \brief Return the color as a human-readable string.
+     * \return A string representation of the RGB values.
+     */
     std::string GetValueAsString() const override;
+
+    /**
+     * \brief Set the color value.
+     *
+     * Marks the property as modified if the new color differs from the current one.
+     *
+     * \param[in] color The new color to set.
+     */
     void SetColor(const mitk::Color &color);
+
+    /**
+     * \brief Set the color value (alias for SetColor()).
+     * \param[in] color The new color to set.
+     */
     void SetValue(const mitk::Color &color);
+
+    /**
+     * \brief Set the color from individual RGB components.
+     *
+     * \param[in] red Red component (0.0f to 1.0f).
+     * \param[in] green Green component (0.0f to 1.0f).
+     * \param[in] blue Blue component (0.0f to 1.0f).
+     */
     void SetColor(float red, float green, float blue);
 
+    /**
+     * \brief Serialize the color to JSON as a three-element array [r, g, b].
+     *
+     * \param[out] j The JSON object to write the value into.
+     * \return Always \c true.
+     */
     bool ToJSON(nlohmann::json &j) const override;
+
+    /**
+     * \brief Deserialize the color from a JSON three-element array [r, g, b].
+     *
+     * \param[in] j The JSON array containing the RGB values.
+     * \return Always \c true.
+     */
     bool FromJSON(const nlohmann::json &j) override;
 
     using BaseProperty::operator=;

@@ -10,6 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkPixelTypeList.h
+ * \brief Compile-time type list infrastructure for pixel type dispatching in MITK.
+ *
+ * Provides a variadic-style type list (\c PixelTypeList), compile-time accessors
+ * (\c GetPixelType, \c PixelTypeLength), a run-time type switch (\c PixelTypeSwitch),
+ * and the \c AccessItkImageFunctor helper used by the AccessByItk macro family.
+ *
+ * \ingroup Core
+ */
+
 #ifndef mitkPixelTypeList_h
 #define mitkPixelTypeList_h
 
@@ -17,10 +28,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Sentinel type used to mark unused slots in a PixelTypeList.
+   */
   struct EmptyType
   {
   };
 
+  /**
+   * \brief Compile-time list of pixel types (up to 10 types).
+   *
+   * Recursively defines a \c head (the first type) and a \c tail (the remaining types
+   * as another PixelTypeList). The \c length enum counts the number of non-empty types.
+   *
+   * \tparam T0..T9 The pixel types stored in this list (unused slots default to EmptyType).
+   */
   template <typename T0 = EmptyType,
             typename T1 = EmptyType,
             typename T2 = EmptyType,
@@ -71,6 +93,11 @@ namespace mitk
     };
   };
 
+  /**
+   * \brief Compile-time query for the number of types in a PixelTypeList.
+   *
+   * \tparam TypeList A PixelTypeList instantiation.
+   */
   template <typename TypeList>
   struct PixelTypeLength
   {
@@ -80,6 +107,18 @@ namespace mitk
     };
   };
 
+  /**
+   * \brief Compile-time accessor that retrieves the type at position \a Index in a PixelTypeList.
+   *
+   * Recursively walks the list until the requested index is reached.
+   * A compile-time error occurs if \a Index is out of range.
+   *
+   * \tparam TypeList   A PixelTypeList instantiation.
+   * \tparam Index      Zero-based index of the desired type.
+   * \tparam Step       Current recursion depth (internal, do not specify).
+   * \tparam Stop       Recursion stop flag (internal, do not specify).
+   * \tparam OutOfRange Out-of-range flag (internal, do not specify).
+   */
   template <typename TypeList,
             int Index,                                              // requested element index
             int Step = 0,                                           // current recursion step
@@ -110,6 +149,19 @@ namespace mitk
 
   ////////////////////////////////////////////////////////////
   // run-time type switch
+
+  /**
+   * \brief Run-time type switch over a PixelTypeList.
+   *
+   * Given a run-time integer index \a i, invokes functor \a f with the corresponding
+   * compile-time type from the type list. Returns the boolean result of the functor.
+   *
+   * \tparam TypeList A PixelTypeList instantiation.
+   * \tparam Index    Current recursion index (internal, do not specify).
+   * \tparam Stop     Recursion stop flag (internal, do not specify).
+   *
+   * \throw std::out_of_range If \a i is not a valid index in the type list.
+   */
   template <typename TypeList, int Index = 0, bool Stop = (Index == PixelTypeLength<TypeList>::value)>
   struct PixelTypeSwitch;
 
@@ -141,6 +193,19 @@ namespace mitk
     }
   };
 
+  /**
+   * \brief Functor that converts a mitk::Image to an itk::Image and invokes a callback.
+   *
+   * Used internally by the AccessByItk macro family. Checks that the image's pixel type
+   * and dimension match the template parameters, then performs the conversion via
+   * mitk::ImageToItk and calls the provided callback.
+   *
+   * \tparam X          The class type on which the callback is a member function pointer.
+   * \tparam VDimension The expected image dimension.
+   * \tparam T1         Type of the first extra callback argument (or EmptyType).
+   * \tparam T2         Type of the second extra callback argument (or EmptyType).
+   * \tparam T3         Type of the third extra callback argument (or EmptyType).
+   */
   template <typename X, int VDimension, typename T1 = EmptyType, typename T2 = EmptyType, typename T3 = EmptyType>
   struct AccessItkImageFunctor
   {

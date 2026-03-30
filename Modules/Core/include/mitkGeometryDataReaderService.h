@@ -20,9 +20,9 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @internal
+   * \internal
    *
-   * @brief reads XML representations of mitk::GeometryData from a file/stream.
+   * \brief Reads XML representations of mitk::GeometryData from a file/stream.
    *
    * To be used via IOUtil.
    *
@@ -30,28 +30,39 @@ namespace mitk
    * mitk::GeometryData. If multiple mitk::GeometryData objects are stored in one file,
    * these are assigned to multiple BaseData objects.
    *
-   * @sa Geometry3DToXML
+   * \sa Geometry3DToXML
    *
-   * @ingroup IO
+   * \ingroup IO
    */
   class GeometryDataReaderService : public AbstractFileReader
   {
   public:
+    /** \brief Default constructor. Registers the reader service for geometry data MIME type. */
     GeometryDataReaderService();
+
+    /** \brief Destructor. */
     ~GeometryDataReaderService() override;
 
     using AbstractFileReader::Read;
 
     /**
-     * @brief Provides the MIME type for reader and writer.
+     * \brief Provide the MIME type for geometry data reader and writer.
+     * \return The custom MIME type for geometry data files.
      */
     static CustomMimeType GEOMETRY_DATA_MIMETYPE();
+
   protected:
+    /** \brief Read geometry data from the configured input.
+     * \return A vector of BaseData objects containing the deserialized GeometryData.
+     * \throws mitk::Exception if the input cannot be parsed or is empty.
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
+    /** \brief Copy constructor. */
     GeometryDataReaderService(const GeometryDataReaderService &other);
 
+    /** \brief Clone this reader instance. */
     GeometryDataReaderService *Clone() const override;
   };
 }

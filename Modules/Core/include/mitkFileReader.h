@@ -18,71 +18,86 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Interface class of readers that read from files
-  //## @ingroup DeprecatedIO
-  //## @deprecatedSince{2014_10} Use mitk::IFileReader instead.
+  /** \brief Interface class of readers that read from files.
+   * \ingroup DeprecatedIO
+   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
+   */
   class MITKCORE_EXPORT FileReader
   {
   public:
     mitkClassMacroNoParent(FileReader)
 
-      //##Documentation
-      //## @brief Get the specified the file to load.
-      //##
-      //## Either the FileName or FilePrefix plus FilePattern are used to read.
+      /** \brief Get the specified file to load.
+       *
+       * Either the FileName or FilePrefix plus FilePattern are used to read.
+       */
       virtual const char *GetFileName() const = 0;
 
-    //##Documentation
-    //## @brief Specify the file to load.
-    //##
-    //## Either the FileName or FilePrefix plus FilePattern are used to read.
+    /** \brief Specify the file to load.
+     *
+     * Either the FileName or FilePrefix plus FilePattern are used to read.
+     *
+     * \param aFileName Path to the file.
+     */
     virtual void SetFileName(const char *aFileName) = 0;
 
-    //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /** \brief Get the specified file prefix for the file(s) to load.
+     *
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     */
     virtual const char *GetFilePrefix() const = 0;
 
-    //##Documentation
-    //## @brief Specify file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /** \brief Specify file prefix for the file(s) to load.
+     *
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \param aFilePrefix The file prefix string.
+     */
     virtual void SetFilePrefix(const char *aFilePrefix) = 0;
 
-    //##Documentation
-    //## @brief Get the specified file pattern for the file(s) to load. The
-    //## sprintf format used to build filename from FilePrefix and number.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /** \brief Get the specified file pattern for the file(s) to load.
+     *
+     * The sprintf format used to build filename from FilePrefix and number.
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     */
     virtual const char *GetFilePattern() const = 0;
 
-    /**
-    @brief Specified file pattern for the file(s) to load. The sprintf
-    format used to build filename from FilePrefix and number.
-
-    You should specify either a FileName or FilePrefix. Use FilePrefix if
-    the data is stored in multiple files. */
+    /** \brief Specify file pattern for the file(s) to load.
+     *
+     * The sprintf format used to build filename from FilePrefix and number.
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \param aFilePattern The file pattern string.
+     */
     virtual void SetFilePattern(const char *aFilePattern) = 0;
 
-    /**
-    @brief Specifies, whether the file reader also can
-    read a file from a memory buffer */
+    /** \brief Check whether the file reader can read from a memory buffer.
+     * \return True if reading from memory is supported.
+     */
     virtual bool CanReadFromMemory();
 
-    /**
-    @brief Set/Get functions to advise the file reader to
-    use a memory array for reading a file*/
+    /** \brief Set whether the file reader should read from a memory buffer.
+     * \param read If true, reading will use the memory buffer instead of a file.
+     */
     virtual void SetReadFromMemory(bool read);
+
+    /** \brief Get whether the file reader is set to read from a memory buffer.
+     * \return True if reading from memory is enabled.
+     */
     virtual bool GetReadFromMemory();
 
-    /**
-    @brief To be used along with a call of SetReadFromMemory(true). This sets
-    the memory buffer and the size from which the reader will read.*/
+    /** \brief Set the memory buffer and its size for reading.
+     *
+     * To be used along with a call of SetReadFromMemory(true). This sets
+     * the memory buffer and the size from which the reader will read.
+     *
+     * \param dataArray Pointer to the memory buffer containing the data.
+     * \param size Size of the memory buffer in bytes.
+     */
     virtual void SetMemoryBuffer(const char *dataArray, unsigned int size);
 
   protected:

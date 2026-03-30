@@ -19,10 +19,13 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief IOAdapterBase class is an abstract adapter class for IO process objects.
+   * \brief Abstract adapter base class for IO process objects.
    *
-   * @ingroup DeprecatedIO
-   * @deprecatedSince{2014_10} Use mitk::IFileReader instead
+   * \ingroup DeprecatedIO
+   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
+   *
+   * \sa IOAdapter
+   * \sa IFileReader
    */
   class IOAdapterBase : public itk::Object
   {
@@ -33,10 +36,26 @@ namespace mitk
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
 
-    /// Create an object and return a pointer to it as a mitk::BaseProcess.
+    /**
+     * \brief Create an IO process object and return a pointer to it.
+     *
+     * \param filename The file name for the IO process object.
+     * \param filePrefix The file prefix for the IO process object.
+     * \param filePattern The file pattern for the IO process object.
+     * \return A smart pointer to the created BaseDataSource.
+     */
     virtual itk::SmartPointer<BaseDataSource> CreateIOProcessObject(const std::string filename,
                                                                     const std::string filePrefix,
                                                                     const std::string filePattern) = 0;
+
+    /**
+     * \brief Check whether this adapter can read the specified file.
+     *
+     * \param filename The file name to check.
+     * \param filePrefix The file prefix to check.
+     * \param filePattern The file pattern to check.
+     * \return \c true if the file can be read, \c false otherwise.
+     */
     virtual bool CanReadFile(const std::string filename,
                              const std::string filePrefix,
                              const std::string filePattern) = 0;
@@ -50,12 +69,18 @@ namespace mitk
   };
 
   /**
-   * @brief IOAdapter class is an adapter class for instantiation of IO process objects.
-   * Additional this interface defines the function CanReadFile().
-   * This interface allows the target (object) the access to the adaptee (IO process object).
+   * \brief Template adapter class for instantiation of IO process objects.
    *
-   * @ingroup IO
-   * @deprecatedSince{2014_10} Use mitk::IFileReader instead
+   * Additionally this interface defines the function CanReadFile().
+   * This interface allows the target (object) access to the adaptee (IO process object).
+   *
+   * \tparam T The IO process object type to adapt.
+   *
+   * \ingroup IO
+   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
+   *
+   * \sa IOAdapterBase
+   * \sa IFileReader
    */
   template <class T>
   class IOAdapter : public IOAdapterBase
@@ -67,6 +92,8 @@ namespace mitk
 
     /** Methods from mitk::BaseProcess. */
     itkFactorylessNewMacro(Self);
+
+    /** \copydoc IOAdapterBase::CreateIOProcessObject */
     mitk::BaseDataSource::Pointer CreateIOProcessObject(const std::string filename,
                                                         const std::string filePrefix,
                                                         const std::string filePattern) override
@@ -78,6 +105,7 @@ namespace mitk
       return ioProcessObject.GetPointer();
     }
 
+    /** \copydoc IOAdapterBase::CanReadFile */
     bool CanReadFile(const std::string filename,
                              const std::string filePrefix,
                              const std::string filePattern) override

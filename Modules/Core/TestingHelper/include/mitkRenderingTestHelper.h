@@ -28,14 +28,14 @@ namespace mitk
   class MITKTESTINGHELPER_EXPORT RenderingTestHelper
   {
   public:
-    /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).
-        @param width
-        @param height
-        @param argc Number of parameters. (here: Images) "Usage: [filename1 filenam2 -V referenceScreenshot
+    /** \brief Generate a rendering test helper object including a render window of the size width * height (in pixel).
+        \param width
+        \param height
+        \param argc Number of parameters. (here: Images) "Usage: [filename1 filenam2 -V referenceScreenshot
           (optional -T /directory/to/save/differenceImage)]
-        @param argv Given parameters. If no data is inserted via commandline, you can add data
+        \param argv Given parameters. If no data is inserted via commandline, you can add data
         later via AddNodeToDataStorage().
-        @param antiAliasing The anti-aliasing mode.
+        \param antiAliasing The anti-aliasing mode.
       **/
     RenderingTestHelper(
       int width,
@@ -44,7 +44,7 @@ namespace mitk
       char *argv[],
       AntiAliasing antiAliasing = AntiAliasing::None);
 
-    /** @brief Generate a rendering test helper object including a render window of the size width * height (in
+    /** \brief Generate a rendering test helper object including a render window of the size width * height (in
      * pixel).*/
     RenderingTestHelper(
       int width,
@@ -54,82 +54,82 @@ namespace mitk
     /** Default destructor */
     ~RenderingTestHelper();
 
-    /** @brief Getter for the vtkRenderer.
+    /** \brief Getter for the vtkRenderer.
       **/
     vtkRenderer *GetVtkRenderer();
 
-    /** @brief Getter for the vtkRenderWindow which should be used to call vtkRegressionTestImage.
+    /** \brief Getter for the vtkRenderWindow which should be used to call vtkRegressionTestImage.
       **/
     vtkRenderWindow *GetVtkRenderWindow();
 
-    /** @brief Method can be used to save a screenshot (e.g. reference screenshot as a .png file.
-          @param fileName The filename of the new screenshot (including path).
+    /** \brief Method can be used to save a screenshot (e.g. reference screenshot as a .png file.
+          \param fileName The filename of the new screenshot (including path).
       **/
     void SaveAsPNG(std::string fileName);
 
     /**
-     * @brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Useful for
+     * \brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Useful for
      * debugging.
-     * @param automaticallyCloseRenderWindow Flag indicating whether the renderwindow should automatically close (false, default) or stay open
+     * \param automaticallyCloseRenderWindow Flag indicating whether the renderwindow should automatically close (false, default) or stay open
      * (true). Useful for debugging.
      */
     void SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow);
 
-    /** @brief This method set the property of the member datastorage
-          @param propertyKey
-          @param property Set a property for each image in the datastorage m_DataStorage. If you want
+    /** \brief This method set the property of the member datastorage
+          \param propertyKey
+          \param property Set a property for each image in the datastorage m_DataStorage. If you want
           to set the property for a single data node, use GetDataStorage() and set the property
           yourself for the destinct node.
       **/
     void SetImageProperty(const char *propertyKey, mitk::BaseProperty *property);
 
-    /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
+    /** \brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
       **/
     void SetViewDirection(mitk::AnatomicalPlane viewDirection);
 
-    /** @brief Reorient the slice (e.g. rotation and translation like the swivel mode).
+    /** \brief Reorient the slice (e.g. rotation and translation like the swivel mode).
       **/
     void ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation);
 
-    /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
+    /** \brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
       **/
     void Render();
 
-    /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
+    /** \brief Returns the datastorage, in order to modify the data inside a rendering test.
       **/
     mitk::DataStorage::Pointer GetDataStorage();
 
     /**
-       * @brief SetMapperID Change between Standard2D and 3D mappers.
-       * @param id Enum mitk::BaseRenderer::StandardMapperSlot which defines the mapper.
+       * \brief SetMapperID Change between Standard2D and 3D mappers.
+       * \param id Enum mitk::BaseRenderer::StandardMapperSlot which defines the mapper.
        */
     void SetMapperID(mitk::BaseRenderer::StandardMapperSlot id);
 
     /**
-       * @brief AddNodeToStorage Add a node to the datastorage and perform a reinit which is necessary for rendering.
-       * @param node The data you want to add.
+       * \brief AddNodeToStorage Add a node to the datastorage and perform a reinit which is necessary for rendering.
+       * \param node The data you want to add.
        */
     void AddNodeToStorage(mitk::DataNode::Pointer node);
 
     /**
-       * @brief SetMapperIDToRender3D Convenience method to render in a 3D renderwindow.
-       * @warning Does not add helper objects like the image planes to render images in 3D.
+       * \brief SetMapperIDToRender3D Convenience method to render in a 3D renderwindow.
+       * \warning Does not add helper objects like the image planes to render images in 3D.
        */
     void SetMapperIDToRender3D();
 
     /**
-       * @brief SetMapperIDToRender2D Convenience method to render in a 2D renderwindow.
+       * \brief SetMapperIDToRender2D Convenience method to render in a 2D renderwindow.
        */
     void SetMapperIDToRender2D();
 
     /**
-       * @brief SaveReferenceScreenShot Convenience method to save a reference screen shot.
-       * @param fileName Path/to/save/the/png/file.
+       * \brief SaveReferenceScreenShot Convenience method to save a reference screen shot.
+       * \param fileName Path/to/save/the/png/file.
        */
     void SaveReferenceScreenShot(std::string fileName);
 
     /**
-     * @brief CompareRenderWindowAgainstReference Convenience method to compare the image rendered in the internal
+     * \brief CompareRenderWindowAgainstReference Convenience method to compare the image rendered in the internal
      renderwindow against a reference screen shot.
      *
       Usage of vtkTesting::Test:
@@ -140,15 +140,15 @@ namespace mitk
       first image (foo.png) it checks if there are images of the form
       foo_N.png (where N=1,2,3...) and compare against them. This allows for multiple
       valid images.
-     * @param argc Number of arguments.
-     * @param argv Arguments must(!) contain the term "-V Path/To/Valid/Image.png"
-     * @param threshold Allowed difference between two images. Default = 10.0 and was taken from VTK.
-     * @return True if the images are equal regarding the threshold. False in all other cases.
+     * \param argc Number of arguments.
+     * \param argv Arguments must(!) contain the term "-V Path/To/Valid/Image.png"
+     * \param threshold Allowed difference between two images. Default = 10.0 and was taken from VTK.
+     * \return True if the images are equal regarding the threshold. False in all other cases.
      */
     bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
     /**
-     * @brief The ArgcHelperClass class is a convenience class to convert a vector
+     * \brief The ArgcHelperClass class is a convenience class to convert a vector
      * of strings to the standard c++ argv and argc arguments. This is necessary for
      * the vtkTesting::Test, since is requires the reference image (and other
      * optional parameters) via command line.
@@ -182,26 +182,26 @@ namespace mitk
 
   protected:
     /**
-       * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
-       * @param width Height of renderwindow.
-       * @param height Width of renderwindow.
-       * @param antiAliasing The anti-aliasing mode.
+       * \brief Initialize Internal method to initialize the renderwindow and set the datastorage.
+       * \param width Height of renderwindow.
+       * \param height Width of renderwindow.
+       * \param antiAliasing The anti-aliasing mode.
        */
     void Initialize(
       int width,
       int height,
       AntiAliasing antiAliasing = AntiAliasing::None);
 
-    /** @brief This method tries to load the given file into a member datastorage, in order to render it.
-          @param filename The filename of the file to be loaded (including path).
+    /** \brief This method tries to load the given file into a member datastorage, in order to render it.
+          \param filename The filename of the file to be loaded (including path).
       **/
     void AddToStorage(const std::string &filename);
 
-    /** @brief This method tries to parse the given argv for files (e.g. images) and load them into a member
+    /** \brief This method tries to parse the given argv for files (e.g. images) and load them into a member
       datastorage,
       in order to render it.
-          @param argc Number of parameters.
-          @param argv Given parameters.
+          \param argc Number of parameters.
+          \param argv Given parameters.
       **/
     void SetInputFileNames(int argc, char *argv[]);
 

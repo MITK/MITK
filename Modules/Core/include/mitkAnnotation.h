@@ -21,9 +21,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Base class for all Annotation
-   * This class is to be implemented in order to create Annotation which are managed by a AbstractAnnotationRenderer.
-   * This class contains an internal Propertylist for configuring the appearance of the implemented Overlay. */
+  /**
+   * \brief Base class for all Annotation objects.
+   *
+   * Subclass this to create annotations that are managed by an
+   * AbstractAnnotationRenderer. Contains an internal PropertyList for
+   * configuring the appearance of the annotation. Properties can be
+   * accessed via convenience methods for common types (bool, int, float,
+   * double, string, color, opacity, visibility).
+   *
+   * \ingroup Annotation
+   * \sa AbstractAnnotationRenderer
+   * \sa PropertyList
+   */
   class MITKCORE_EXPORT Annotation : public itk::Object
   {
   public:
@@ -49,89 +59,89 @@ namespace mitk
     };
 
     /**
-    * @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
-    * of the @a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-value.
+    * \brief Set the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
+    * of the \a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-value.
     *
-    * @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
+    * \warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
     *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
     *
-    * @sa GetProperty
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa GetProperty
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     void SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &property);
 
     /**
-    * @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
-    * of the @a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-reference.
+    * \brief Replace the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
+    * of the \a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-reference.
     *
-    * If @a renderer is @a nullptr the property is set in the BaseRenderer-independent
+    * If \a renderer is \a nullptr the property is set in the BaseRenderer-independent
     * PropertyList of this Annotation.
-    * @sa GetProperty
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa GetProperty
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     void ReplaceProperty(const std::string &propertyKey, const BaseProperty::Pointer &property);
 
     /**
-    * @brief Add the property (instance of BaseProperty) if it does
+    * \brief Add the property (instance of BaseProperty) if it does
     * not exist (or always if \a overwrite is \a true)
-    * with key @a propertyKey in the PropertyList
-    * of the @a renderer (if nullptr, use BaseRenderer-independent
+    * with key \a propertyKey in the PropertyList
+    * of the \a renderer (if nullptr, use BaseRenderer-independent
     * PropertyList). This is set-by-value.
     *
     * For \a overwrite == \a false the property is \em not changed
     * if it already exists. For \a overwrite == \a true the method
     * is identical to SetProperty.
     *
-    * @sa SetProperty
-    * @sa GetProperty
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa SetProperty
+    * \sa GetProperty
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     void AddProperty(const std::string &propertyKey, const BaseProperty::Pointer &property, bool overwrite = false);
 
     /**
-    * @brief Add values from another PropertyList.
+    * \brief Add values from another PropertyList.
     *
     * Overwrites values in m_PropertyList only when possible (i.e. when types are compatible).
     * If you want to allow for object type changes (replacing a "visible":BoolProperty with "visible":IntProperty,
     * set \c replace.
     *
-    * @param pList
-    * @param replace true: if \c pList contains a property "visible" of type ColorProperty and our m_PropertyList
+    * \param pList
+    * \param replace true: if \c pList contains a property "visible" of type ColorProperty and our m_PropertyList
     * also has a "visible" property of a different type (e.g. BoolProperty), change the type, i.e. replace the objects
     * behind the pointer.
     *
-    * @sa SetProperty
-    * @sa ReplaceProperty
-    * @sa m_PropertyList
+    * \sa SetProperty
+    * \sa ReplaceProperty
+    * \sa m_PropertyList
     */
     void ConcatenatePropertyList(PropertyList *pList, bool replace = false);
 
     /**
-    * @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
-    * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+    * \brief Get the property (instance of BaseProperty) with key \a propertyKey from the PropertyList
+    * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
-    * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
+    * If \a renderer is \a nullptr or the \a propertyKey cannot be found
+    * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
-    * @sa GetPropertyList
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa GetPropertyList
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     mitk::BaseProperty *GetProperty(const std::string &propertyKey) const;
 
     /**
-    * @brief Get the property of type T with key @a propertyKey from the PropertyList
-    * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+    * \brief Get the property of type T with key \a propertyKey from the PropertyList
+    * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
-    * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
+    * If \a renderer is \a nullptr or the \a propertyKey cannot be found
+    * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
-    * @sa GetPropertyList
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa GetPropertyList
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     template <typename T>
     bool GetProperty(itk::SmartPointer<T> &property, const std::string &propertyKey) const
@@ -141,15 +151,15 @@ namespace mitk
     }
 
     /**
-    * @brief Get the property of type T with key @a propertyKey from the PropertyList
-    * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
+    * \brief Get the property of type T with key \a propertyKey from the PropertyList
+    * of the \a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
-    * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
+    * If \a renderer is \a nullptr or the \a propertyKey cannot be found
+    * in the PropertyList specific to \a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
-    * @sa GetPropertyList
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
+    * \sa GetPropertyList
+    * \sa m_PropertyList
+    * \sa m_MapOfPropertyLists
     */
     template <typename T>
     bool GetProperty(T *&property, const std::string &propertyKey) const
@@ -159,9 +169,9 @@ namespace mitk
     }
 
     /**
-    * @brief Convenience access method for GenericProperty<T> properties
+    * \brief Convenience access method for GenericProperty<T> properties
     * (T being the type of the second parameter)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     template <typename T>
     bool GetPropertyValue(const std::string &propertyKey, T &value) const
@@ -176,78 +186,73 @@ namespace mitk
     }
 
     /**
-    * @brief Convenience access method for bool properties (instances of
+    * \brief Convenience access method for bool properties (instances of
     * BoolProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetBoolProperty(const std::string &propertyKey, bool &boolValue) const;
 
     /**
-    * @brief Convenience access method for int properties (instances of
+    * \brief Convenience access method for int properties (instances of
     * IntProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetIntProperty(const std::string &propertyKey, int &intValue) const;
 
     /**
-    * @brief Convenience access method for float properties (instances of
+    * \brief Convenience access method for float properties (instances of
     * FloatProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetFloatProperty(const std::string &propertyKey, float &floatValue) const;
 
     /**
-    * @brief Convenience access method for double properties (instances of
+    * \brief Convenience access method for double properties (instances of
     * DoubleProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetDoubleProperty(const std::string &propertyKey, double &doubleValue) const;
 
     /**
-    * @brief Convenience access method for string properties (instances of
+    * \brief Convenience access method for string properties (instances of
     * StringProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetStringProperty(const std::string &propertyKey, std::string &string) const;
 
     /**
-    * @brief Convenience method for setting int properties (instances of
-    * IntProperty)
+    * \brief Convenience method for setting int properties (instances of IntProperty).
     */
     void SetIntProperty(const std::string &propertyKey, int intValue);
 
     /**
-    * @brief Convenience method for setting int properties (instances of
-    * IntProperty)
+    * \brief Convenience method for setting bool properties (instances of BoolProperty).
     */
     void SetBoolProperty(const std::string &propertyKey, bool boolValue);
 
     /**
-    * @brief Convenience method for setting int properties (instances of
-    * IntProperty)
+    * \brief Convenience method for setting float properties (instances of FloatProperty).
     */
     void SetFloatProperty(const std::string &propertyKey, float floatValue);
 
     /**
-    * @brief Convenience method for setting int properties (instances of
-    * IntProperty)
+    * \brief Convenience method for setting double properties (instances of DoubleProperty).
     */
     void SetDoubleProperty(const std::string &propertyKey, double doubleValue);
 
     /**
-    * @brief Convenience method for setting int properties (instances of
-    * IntProperty)
+    * \brief Convenience method for setting string properties (instances of StringProperty).
     */
     void SetStringProperty(const std::string &propertyKey, const std::string &string);
 
     /**
-    * @brief Convenience access method for boolean properties (instances
+    * \brief Convenience access method for boolean properties (instances
     * of BoolProperty). Return value is the value of the property. If the property is
-    * not found, the value of @a defaultIsOn is returned.
+    * not found, the value of \a defaultIsOn is returned.
     *
     * Thus, the return value has a different meaning than in the
     * GetBoolProperty method!
-    * @sa GetBoolProperty
+    * \sa GetBoolProperty
     */
     bool IsOn(const std::string &propertyKey, bool defaultIsOn = true) const
     {
@@ -256,59 +261,59 @@ namespace mitk
     }
 
     /**
-    * @brief Convenience access method for accessing the name of an object (instance of
+    * \brief Convenience access method for accessing the name of an object (instance of
     * StringProperty with property-key "name")
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetName(std::string &nodeName, const std::string &propertyKey = "name") const;
 
     /**
-    * @brief Extra convenience access method for accessing the name of an object (instance of
+    * \brief Extra convenience access method for accessing the name of an object (instance of
     * StringProperty with property-key "name").
     *
     * This method does not take the renderer specific
     * propertylists into account, because the name of an object should never be renderer specific.
-    * @returns a std::string with the name of the object (content of "name" Property).
+    * \returns a std::string with the name of the object (content of "name" Property).
     * If there is no "name" Property, an empty string will be returned.
     */
     virtual std::string GetName() const;
 
     /**
-    * @brief Extra convenience access method to set the name of an object.
+    * \brief Extra convenience access method to set the name of an object.
     *
     * The name will be stored in the non-renderer-specific PropertyList in a StringProperty named "name".
     */
     virtual void SetName(const std::string &name);
 
     /**
-    * @brief Convenience access method for color properties (instances of
+    * \brief Convenience access method for color properties (instances of
     * ColorProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetColor(float rgb[], const std::string &propertyKey = "color") const;
     /**
-    * @brief Convenience method for setting color properties (instances of
+    * \brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
     void SetColor(const mitk::Color &color, const std::string &propertyKey = "color");
     /**
-    * @brief Convenience method for setting color properties (instances of
+    * \brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
     void SetColor(float red, float green, float blue, const std::string &propertyKey = "color");
     /**
-    * @brief Convenience method for setting color properties (instances of
+    * \brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
     void SetColor(const float rgb[], const std::string &propertyKey = "color");
     /**
-    * @brief Convenience access method for opacity properties (instances of
+    * \brief Convenience access method for opacity properties (instances of
     * FloatProperty)
-    * @return @a true property was found
+    * \return \a true property was found
     */
     bool GetOpacity(float &opacity, const std::string &propertyKey = "opacity") const;
     /**
-    * @brief Convenience method for setting opacity properties (instances of
+    * \brief Convenience method for setting opacity properties (instances of
     * FloatProperty)
     */
     void SetOpacity(float opacity, const std::string &propertyKey = "opacity");
@@ -322,31 +327,31 @@ namespace mitk
     int GetFontSize() const;
 
     /**
-    * @brief Convenience access method for visibility properties (instances
+    * \brief Convenience access method for visibility properties (instances
     * of BoolProperty with property-key "visible")
-    * @return @a true property was found
-    * @sa IsVisible
+    * \return \a true property was found
+    * \sa IsVisible
     */
     bool GetVisibility(bool &visible, const std::string &propertyKey = "visible") const;
 
     /**
-    * @brief Convenience access method for visibility properties (instances
+    * \brief Convenience access method for visibility properties (instances
     * of BoolProperty). Return value is the visibility. Default is
-    * visible==true, i.e., true is returned even if the property (@a
+    * visible==true, i.e., true is returned even if the property (\a
     * propertyKey) is not found.
     *
     * Thus, the return value has a different meaning than in the
     * GetVisibility method!
-    * @sa GetVisibility
-    * @sa IsOn
+    * \sa GetVisibility
+    * \sa IsOn
     */
     bool IsVisible(const std::string &propertyKey = "visible", bool defaultIsOn = true) const;
 
     /**
-    * @brief Convenience method for setting visibility properties (instances
+    * \brief Convenience method for setting visibility properties (instances
     * of BoolProperty)
-    * @param visible If set to true, the data will be rendered. If false, the render will skip this data.
-    * @param propertyKey Can be used to specify a user defined name of the visibility property.
+    * \param visible If set to true, the data will be rendered. If false, the render will skip this data.
+    * \param propertyKey Can be used to specify a user defined name of the visibility property.
     */
     void SetVisibility(bool visible, const std::string &propertyKey = "visible");
 
@@ -420,7 +425,7 @@ namespace mitk
     ~Annotation() override;
 
     /**
-    * @brief BaseRenderer-independent PropertyList
+    * \brief BaseRenderer-independent PropertyList
     *
     * Properties herein can be overwritten specifically for each BaseRenderer
     * by the BaseRenderer-specific properties defined in m_MapOfPropertyLists.
@@ -428,7 +433,7 @@ namespace mitk
     PropertyList::Pointer m_PropertyList;
 
     /**
-    * @brief Timestamp of the last change of m_Data
+    * \brief Timestamp of the last change of m_Data
     */
     itk::TimeStamp m_DataReferenceChangedTime;
 

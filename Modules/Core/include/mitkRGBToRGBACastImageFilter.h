@@ -27,9 +27,16 @@ namespace itk
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief
-  //## @ingroup Process
+  /**
+   * \brief Image filter that casts RGB images to RGBA by adding a fully opaque alpha channel.
+   *
+   * This filter takes a mitk::Image with RGB pixel type (unsigned char, unsigned short,
+   * float, or double components) and produces an output image with an RGBA pixel type
+   * where the alpha channel is set to the maximum value for the component type.
+   *
+   * \sa ImageToImageFilter
+   * \ingroup Process
+   */
   class MITKCORE_EXPORT RGBToRGBACastImageFilter : public ImageToImageFilter
   {
   public:
@@ -39,10 +46,13 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** Static convenience method to check if the passed mitk::Image is
-       * an RGB image in the sense of this converter filter.
+      /** \brief Checks if the passed mitk::Image is an RGB image supported by this filter.
        *
-       * Returns falsefor RGBA and all other images.
+       * Supported component types are unsigned char, unsigned short, float, and double.
+       * Returns false for RGBA and all other pixel types.
+       *
+       * \param image the image to check.
+       * \return True if the image has an RGB pixel type with a supported component type.
        */
       static bool IsRGBImage(const mitk::Image *image);
 
@@ -71,8 +81,7 @@ namespace mitk
     mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
     mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
-    //##Description
-    //## @brief Time when Header was last initialized
+    /** \brief Time when the output header was last initialized. */
     itk::TimeStamp m_TimeOfHeaderInitialization;
   };
 

@@ -50,25 +50,48 @@ namespace mitk
     mitkClassMacroItkParent(StateMachineTransition, itk::LightObject);
     mitkNewMacro3Param(Self, const std::string &, const std::string &, const std::string &);
 
-    SpStateMachineState GetNextState() const;
-    std::string GetNextStateName() const;
     /**
-     * Check for equality. Equality is given if event variant is the same and
+     * \brief Return the next state that this transition leads to.
+     * \return Smart pointer to the next state.
+     */
+    SpStateMachineState GetNextState() const;
+
+    /**
+     * \brief Return the name of the next state that this transition leads to.
+     * \return The next state name.
+     */
+    std::string GetNextStateName() const;
+
+    /**
+     * \brief Check for equality with another transition.
+     *
+     * Equality is given if the event variant is the same and
      * classes are the same or the first argument is a superclass of the second.
-     * \warning Here the order of arguments matters. !
+     *
+     * \warning The order of arguments matters.
+     *
+     * \param[in] transition the transition to compare with.
+     * \return True if the transitions match.
      */
     bool operator==(const StateMachineTransition &transition) const;
 
     /**
-     * @brief Get an iterator on the first action in list.
-     **/
+     * \brief Return the list of actions associated with this transition.
+     * \return A vector of actions to execute when this transition fires.
+     */
     ActionVectorType GetActions() const;
 
+    /**
+     * \brief Return the list of conditions associated with this transition.
+     * \return A const reference to the vector of conditions.
+     */
     const ConditionVectorType &GetConditions() const;
 
     /**
-     * @brief Set the next state of this object.
-     **/
+     * \brief Set the next state of this transition.
+     *
+     * \param[in] nextState the state to transition to.
+     */
     void SetNextState(const SpStateMachineState &nextState);
 
   protected:
@@ -82,8 +105,18 @@ namespace mitk
     std::string m_EventVariant;
 
   private:
+    /**
+     * \brief Add an action to be executed when this transition fires.
+     *
+     * \param[in] action the action to add.
+     */
     void AddAction(const StateMachineAction::Pointer &action);
 
+    /**
+     * \brief Add a condition that must be fulfilled for this transition.
+     *
+     * \param[in] condition the condition to add.
+     */
     void AddCondition(const StateMachineCondition &condition);
 
     SpStateMachineState m_NextState;
@@ -93,8 +126,8 @@ namespace mitk
     InteractionEvent::Pointer m_TransitionEvent;
 
     /**
-     * @brief The list of actions, that are executed if this transition is done.
-     **/
+     * \brief The list of actions that are executed when this transition is taken.
+     */
     std::vector<StateMachineAction::Pointer> m_Actions;
 
     ConditionVectorType m_Conditions;

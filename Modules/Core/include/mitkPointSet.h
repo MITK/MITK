@@ -77,42 +77,57 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      typedef mitk::ScalarType CoordinateType;
+    /** \brief Scalar type for point coordinates. */
+    typedef mitk::ScalarType CoordinateType;
+
+    /** \brief Scalar type for interpolation weights. */
     typedef mitk::ScalarType InterpolationWeightType;
 
+    /** \brief Points are 3-dimensional. */
     static const unsigned int PointDimension = 3;
+
+    /** \brief Maximum topological dimension of mesh cells. */
     static const unsigned int MaxTopologicalDimension = 3;
 
     /**
-     * \brief struct for data of a point
+     * \brief Data associated with each point in the PointSet.
+     *
+     * Contains a unique ID, selection state, and a type specification
+     * (see mitk::PointSpecificationType).
      */
     struct MITKCORE_EXPORT PointDataType
     {
-      unsigned int id;                        // to give the point a special ID
-      bool selected;                          // information about if the point is selected
-      mitk::PointSpecificationType pointSpec; // specifies the type of the point
+      unsigned int id;                        /**< \brief Unique identifier for this point. */
+      bool selected;                          /**< \brief Whether the point is selected. */
+      mitk::PointSpecificationType pointSpec; /**< \brief Type specification of the point. */
 
+      /**
+       * \brief Equality comparison operator.
+       * \param[in] other The PointDataType to compare with.
+       * \return True if id, selected, and pointSpec are all equal.
+       */
       bool operator==(const PointDataType &other) const;
     };
 
     /**
-     * \brief cellDataType, that stores all indexes of the lines, that are
-     * selected e.g.: points A,B and C.Between A and B there is a line with
-     * index 0. If vector of cellData contains 1 and 2, then the lines between
-     * B and C and C and A is selected.
+     * \brief Type for storing indices of selected lines between points.
+     *
+     * For example, given points A, B, and C: index 0 is the line between A
+     * and B, index 1 is between B and C, and index 2 between C and A.
      */
     typedef std::vector<unsigned int> SelectedLinesType;
+
+    /** \brief Iterator for SelectedLinesType. */
     typedef SelectedLinesType::iterator SelectedLinesIter;
+
+    /**
+     * \brief Data associated with a cell in the mesh.
+     */
     struct CellDataType
     {
-      // used to set the whole cell on selected
-      bool selected;
-
-      // indexes of selected lines. 0 is between pointId 0 and 1
-      SelectedLinesType selectedLines;
-
-      // is the polygon already finished and closed
-      bool closed;
+      bool selected;                   /**< \brief Whether the entire cell is selected. */
+      SelectedLinesType selectedLines; /**< \brief Indices of selected lines within the cell. */
+      bool closed;                     /**< \brief Whether the polygon is finished and closed. */
     };
 
     typedef itk::DefaultDynamicMeshTraits<PointDataType,
@@ -134,92 +149,195 @@ namespace mitk
     typedef DataType::PointDataContainerIterator PointDataIterator;
     typedef DataType::PointDataContainerIterator PointDataConstIterator;
 
+    /**
+     * \brief Expand the PointSet to the given number of time steps.
+     *
+     * Creates new empty point containers for the additional time steps.
+     *
+     * \param[in] timeSteps The desired number of time steps.
+     */
     void Expand(unsigned int timeSteps) override;
 
-    /** \brief executes the given Operation */
+    /**
+     * \brief Execute an operation on this PointSet.
+     *
+     * Supports OpINSERT, OpMOVE, OpREMOVE, OpSELECTPOINT, OpDESELECTPOINT,
+     * OpSETPOINTTYPE, OpMOVEPOINTUP, and OpMOVEPOINTDOWN.
+     *
+     * \param[in] operation The operation to execute. Must be a PointOperation.
+     * \sa mitk::PointOperation, mitk::OperationActor
+     */
     void ExecuteOperation(Operation *operation) override;
 
-    /** \brief returns the current size of the point-list */
+    /**
+     * \brief Get the number of points at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return The number of points, or 0 if the time step is out of range.
+     */
     virtual int GetSize(unsigned int t = 0) const;
 
+    /**
+     * \brief Get the number of time steps in the point set series.
+     *
+     * \return The number of time steps.
+     */
     virtual unsigned int GetPointSetSeriesSize() const;
 
-    /** \brief returns the pointset */
+    /**
+     * \brief Get the underlying itk::Mesh at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return Smart pointer to the mesh data, or nullptr if \a t is out of range.
+     */
     virtual DataType::Pointer GetPointSet(int t = 0) const;
 
+    /**
+     * \brief Get an iterator pointing to the first point at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return A PointsIterator to the first point, or End() if the time step is
+     *         out of range.
+     */
     PointsIterator Begin(int t = 0);
 
+    /** \copydoc Begin(int) */
     PointsConstIterator Begin(int t = 0) const;
 
+    /**
+     * \brief Get an iterator pointing past the last point at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return A PointsIterator past the last point.
+     */
     PointsIterator End(int t = 0);
 
+    /** \copydoc End(int) */
     PointsConstIterator End(int t = 0) const;
 
     /**
-    * \brief Get an iterator to the max ID element if existent. Return End() otherwise.
-    */
+     * \brief Get an iterator to the element with the maximum ID at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return A PointsIterator to the max-ID element, or End() if the PointSet
+     *         is empty or the time step is out of range.
+     */
     PointsIterator GetMaxId(int t = 0);
 
     /**
-     * \brief Get the point with ID id in world coordinates
+     * \brief Get the point with the given ID in world coordinates.
      *
-     * check if the ID exists. If it doesn't exist, then return 0,0,0
+     * If the ID does not exist, returns (0, 0, 0).
+     *
+     * \param[in] id The point identifier.
+     * \param[in] t Time step (default: 0).
+     * \return The point in world coordinates.
      */
     PointType GetPoint(PointIdentifier id, int t = 0) const;
 
     /**
-     * \brief Get the point with ID id in world coordinates
+     * \brief Get the point with the given ID if it exists.
      *
-     * If a point exists for the ID id, the point is returned in the parameter point
-     * and the method returns true. If the ID does not exist, the method returns false
+     * If a point exists for the ID, it is written to \a point (in world
+     * coordinates) and the method returns true. Otherwise returns false.
+     *
+     * \param[in] id The point identifier.
+     * \param[out] point Receives the point coordinates on success.
+     * \param[in] t Time step (default: 0).
+     * \return True if the point was found, false otherwise.
      */
     bool GetPointIfExists(PointIdentifier id, PointType *point, int t = 0) const;
 
     /**
-     * \brief Set the given point in world coordinate system into the itkPointSet.
+     * \brief Set (overwrite) the point with the given ID in world coordinates.
+     *
+     * If the time step does not exist, the PointSet is expanded. The point
+     * data is initialized with default values (unselected, PTUNDEFINED).
+     *
+     * \param[in] id The point identifier.
+     * \param[in] point The point in world coordinates.
+     * \param[in] t Time step (default: 0).
      */
     void SetPoint(PointIdentifier id, PointType point, int t = 0);
 
     /**
-    * \brief Set the given  point in world coordinate system with the given PointSpecificationType
-    */
+     * \brief Set (overwrite) the point with the given ID and PointSpecificationType.
+     *
+     * \param[in] id The point identifier.
+     * \param[in] point The point in world coordinates.
+     * \param[in] spec The point specification type.
+     * \param[in] t Time step (default: 0).
+     */
     void SetPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t = 0);
 
     /**
-     * \brief Set the given point in world coordinate system into the itkPointSet.
+     * \brief Insert a point with the given ID in world coordinates.
+     *
+     * Unlike SetPoint, this uses the container's InsertElement, which
+     * preserves existing elements at other indices.
+     *
+     * \param[in] id The point identifier.
+     * \param[in] point The point in world coordinates.
+     * \param[in] t Time step (default: 0).
      */
     void InsertPoint(PointIdentifier id, PointType point, int t = 0);
 
     /**
-    * \brief Set the given point in world coordinate system with given PointSpecificationType
-    */
+     * \brief Insert a point with the given ID, world coordinates, and
+     * PointSpecificationType.
+     *
+     * \param[in] id The point identifier.
+     * \param[in] point The point in world coordinates.
+     * \param[in] spec The point specification type.
+     * \param[in] t Time step.
+     */
     void InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t);
 
     /**
-    * \brief Insert the given point in world coordinate system with incremented max id at time step t.
-    */
+     * \brief Insert a point with an automatically assigned ID (max ID + 1).
+     *
+     * \param[in] point The point in world coordinates.
+     * \param[in] t Time step (default: 0).
+     * \return The identifier assigned to the new point.
+     */
     PointIdentifier InsertPoint(PointType point, int t = 0);
 
     /**
-    * \brief Remove point with given id at timestep t, if existent
-    */
+     * \brief Remove the point with the given ID at time step \a t, if it exists.
+     *
+     * \param[in] id The point identifier.
+     * \param[in] t Time step (default: 0).
+     * \return True if the point was found and removed, false otherwise.
+     */
     bool RemovePointIfExists(PointIdentifier id, int t = 0);
 
     /**
-    * \brief Remove max id point at timestep t and return iterator to precedent point
-    */
+     * \brief Remove the point with the maximum ID at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return An iterator to the new last point, or End() if the set is empty.
+     */
     PointsIterator RemovePointAtEnd(int t = 0);
 
     /**
-    * \brief Swap a point at the given position (id) with the upper point (moveUpwards=true) or with the lower point
-    * (moveUpwards=false).
-    * If upper or lower index does not exist false is returned, if swap was successful true.
-    */
+     * \brief Swap a point with its neighbor in the ordered container.
+     *
+     * If \a moveUpwards is true, the point at \a id is swapped with the point
+     * at id-1; otherwise with the point at id+1.
+     *
+     * \param[in] id The point identifier.
+     * \param[in] moveUpwards If true, swap with the preceding point; otherwise
+     *            swap with the following point.
+     * \param[in] t Time step (default: 0).
+     * \return True if the swap was successful, false if the neighbor does not exist.
+     */
     bool SwapPointPosition(PointIdentifier id, bool moveUpwards, int t = 0);
 
     /**
-     * \brief searches a selected point and returns the id of that point.
-     * If no point is found, then -1 is returned
+     * \brief Search for a selected point and return its ID.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return The ID of the first selected point, or -1 if none is found.
      */
     virtual int SearchSelectedPoint(int t = 0) const;
 
@@ -228,43 +346,105 @@ namespace mitk
      */
     virtual void ClearSelection();
 
-    /** \brief returns true if a point exists at this position */
+    /**
+     * \brief Check whether a point exists at the given position (index).
+     *
+     * \param[in] position The point index to check.
+     * \param[in] t Time step (default: 0).
+     * \return True if a point exists at the given position.
+     */
     virtual bool IndexExists(int position, int t = 0) const;
 
-    /** \brief to get the state selected/unselected of the point on the
-     * position
+    /**
+     * \brief Get the selection state of the point at the given position.
+     *
+     * \param[in] position The point index.
+     * \param[in] t Time step (default: 0).
+     * \return True if the point is selected, false otherwise.
      */
     virtual bool GetSelectInfo(int position, int t = 0) const;
 
+    /**
+     * \brief Set the selection state of the point at the given position.
+     *
+     * \param[in] position The point index.
+     * \param[in] selected True to select, false to deselect.
+     * \param[in] t Time step (default: 0).
+     */
     virtual void SetSelectInfo(int position, bool selected, int t = 0);
 
-    /** \brief to get the type of the point at the position and the moment */
+    /**
+     * \brief Get the PointSpecificationType of the point at the given position.
+     *
+     * \param[in] position The point index.
+     * \param[in] t Time step.
+     * \return The point specification type, or PTUNDEFINED if the point does not exist.
+     */
     virtual PointSpecificationType GetSpecificationTypeInfo(int position, int t) const;
 
-    /** \brief returns the number of selected points */
+    /**
+     * \brief Get the number of selected points at time step \a t.
+     *
+     * \param[in] t Time step (default: 0).
+     * \return The number of selected points.
+     */
     virtual int GetNumberOfSelected(int t = 0) const;
 
     /**
-     * \brief searches a point in the list == point +/- distance
+     * \brief Search for the closest point within a given distance.
      *
-     * \param point is in world coordinates.
-     * \param distance is in mm.
-     * \param t
-     * returns -1 if no point is found
-     * or the position in the list of the first match
+     * \param[in] point The search position in world coordinates.
+     * \param[in] distance The search radius in mm.
+     * \param[in] t Time step (default: 0).
+     * \return The ID of the closest point within \a distance, or -1 if no
+     *         point was found.
      */
     int SearchPoint(Point3D point, ScalarType distance, int t = 0) const;
 
+    /**
+     * \brief Check whether the point set is empty at time step \a t.
+     *
+     * \param[in] t The time step to check.
+     * \return True if the PointSet is initialized and has zero points at time step \a t.
+     */
     bool IsEmptyTimeStep(unsigned int t) const override;
 
-    // virtual methods, that need to be implemented
+    /**
+     * \brief Update the output information (bounding box, geometry).
+     */
     void UpdateOutputInformation() override;
+
+    /**
+     * \brief Set the requested region to the largest possible region (no-op for PointSet).
+     */
     void SetRequestedRegionToLargestPossibleRegion() override;
+
+    /**
+     * \brief Check whether the requested region is outside the buffered region.
+     *
+     * \return Always returns false for PointSet.
+     */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+
+    /**
+     * \brief Verify that the requested region is valid.
+     *
+     * \return Always returns true for PointSet.
+     */
     bool VerifyRequestedRegion() override;
+
+    /**
+     * \brief Set the requested region from another data object (no-op for PointSet).
+     *
+     * \param[in] data The data object (unused).
+     */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
-    // Method for subclasses
+    /**
+     * \brief Hook method called when the point set content changes.
+     *
+     * Subclasses can override this to react to modifications.
+     */
     virtual void OnPointSetChange(){};
 
   protected:

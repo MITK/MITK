@@ -22,31 +22,37 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Superclass of AbstractTransformGeometry sub-classes defined
-  //## by a set of landmarks.
-  //##
-  //## @ingroup Geometry
+  /**
+   * \brief Superclass of AbstractTransformGeometry sub-classes defined
+   *        by a set of landmarks.
+   *
+   * \ingroup Geometry
+   */
   class MITKCORE_EXPORT LandmarkProjectorBasedCurvedGeometry : public AbstractTransformGeometry
   {
   public:
     mitkClassMacro(LandmarkProjectorBasedCurvedGeometry, AbstractTransformGeometry);
     itkCloneMacro(Self);
 
+    /** \brief Set the landmark projector used to project target landmarks. */
     void SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector);
+
+    /** \brief Get the landmark projector. */
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
 
+    /** \brief Set the frame geometry and forward it to the landmark projector. */
     void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry) override;
 
+    /** \brief Compute the geometry by projecting the target landmarks through the projector. */
     virtual void ComputeGeometry();
 
+    /** \brief Get the interpolating abstract transform. */
     itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform *);
 
-    //##Documentation
-    //## @brief Set the landmarks through which the geometry shall pass
+    /** \brief Set the landmarks through which the geometry shall pass. */
     itkSetConstObjectMacro(TargetLandmarks, mitk::PointSet::DataType::PointsContainer);
-    //##Documentation
-    //## @brief Get the landmarks through which the geometry shall pass
+
+    /** \brief Get the landmarks through which the geometry shall pass. */
     itkGetConstObjectMacro(TargetLandmarks, mitk::PointSet::DataType::PointsContainer);
 
   protected:
@@ -62,12 +68,12 @@ namespace mitk
 
     mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 
-    //##Documentation
-    //## @brief PreSetSpacing
-    //##
-    //## These virtual function allows a different beahiour in subclasses.
-    //## Do implement them in every subclass of BaseGeometry. If not needed, use
-    //## {Superclass::PreSetSpacing();};
+    /** \brief Pre-set spacing hook for subclasses.
+     *
+     * This virtual function allows different behavior in subclasses.
+     * Implement in every subclass of BaseGeometry. If not needed, use
+     * \c Superclass::PreSetSpacing().
+     */
     void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
 
     mitkCloneMacro(Self);

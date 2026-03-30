@@ -24,28 +24,38 @@ namespace tinyxml2
 namespace mitk
 {
   /**
-   * @internal
+   * \internal
    *
-   * @brief Helper for ProportionalTimeGeometry related I/O classes.
+   * \brief Helper for ProportionalTimeGeometry related I/O classes.
    *
-   * Creates TinyXML elements (blocks) that describe a ProportionalTimeGeometry.
+   * Creates TinyXML2 elements (blocks) that describe a ProportionalTimeGeometry.
    * Also offers a method to read such blocks and create a corresponding ProportionalTimeGeometry.
    *
-   * @sa GeometryDataWriterService, GeometryDataReaderService, Geometry3DToXML
+   * \sa GeometryDataWriterService
+   * \sa GeometryDataReaderService
+   * \sa Geometry3DToXML
    *
-   * @ingroup IO
+   * \ingroup IO
    */
   class ProportionalTimeGeometryToXML
   {
   public:
     /**
-     * @brief Serialize given geometry to XML.
+     * \brief Serialize the given ProportionalTimeGeometry to an XML element.
+     *
+     * \param[in,out] doc The XML document that owns the created element.
+     * \param[in] geometry The ProportionalTimeGeometry to serialize.
+     * \return The XML element representing the time geometry.
      */
     static tinyxml2::XMLElement *ToXML(tinyxml2::XMLDocument& doc, const ProportionalTimeGeometry *geometry);
 
     /**
-     * @brief Create a ProportionalTimeGeometry from XML.
+     * \brief Deserialize a ProportionalTimeGeometry from an XML element.
+     *
      * Interprets only the format created by ToXML().
+     *
+     * \param[in] node The XML element containing the time geometry data.
+     * \return A new ProportionalTimeGeometry instance, or nullptr on failure.
      */
     static ProportionalTimeGeometry::Pointer FromXML(const tinyxml2::XMLElement *node);
   };

@@ -135,7 +135,17 @@ namespace mitk
 
   protected:
 
+    /**
+     * \brief Construct a CrosshairManager for the given base renderer.
+     *
+     * Creates the crosshair data node, sets default properties (reslice,
+     * gap size, visibility), and associates a CrosshairVtkMapper2D.
+     *
+     * \param[in] baseRenderer  The renderer for which this crosshair is managed.
+     */
     CrosshairManager(BaseRenderer* baseRenderer);
+
+    /** \brief Destructor. */
     ~CrosshairManager();
 
     DataNode::Pointer m_CrosshairDataNode;

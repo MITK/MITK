@@ -19,8 +19,27 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief ImageWriteAccessor class to get locked write-access for a particular image part.
-   * @ingroup Data
+   * \brief Provides locked write access to a particular region of image data.
+   *
+   * ImageWriteAccessor acquires an exclusive write lock on the specified image
+   * data region upon construction and releases it upon destruction (RAII pattern).
+   * While a write accessor exists, no other read or write accessor can access an
+   * overlapping region (they will either block or throw, depending on option flags).
+   *
+   * Use GetData() to obtain a non-const pointer to the raw data for writing.
+   *
+   * \code
+   * mitk::ImageWriteAccessor accessor(image);
+   * void* data = accessor.GetData();
+   * // ... modify data ...
+   * \endcode
+   *
+   * \note After writing, you should call image->Modified() to notify the pipeline
+   * that the data has changed.
+   *
+   * \sa mitk::ImageReadAccessor, mitk::ImagePixelWriteAccessor
+   * \sa mitk::ImageAccessorBase
+   * \ingroup Data
    */
   class MITKCORE_EXPORT ImageWriteAccessor : public ImageAccessorBase
   {
@@ -28,24 +47,34 @@ namespace mitk
     friend class ImagePixelReadAccessor;
 
   public:
+    /** \brief Smart pointer type for the associated Image. */
     typedef Image::Pointer ImagePointer;
 
-    /** \brief Orders write access for a slice, volume or 4D-Image
-     *  \param image specifies the associated Image
-     *  \param iDI specifies the allocated image part
-     *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise
-     * unification.
-     *  \throws mitk::Exception if the Constructor was created inappropriately
-     *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and
-     * mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
+    /**
+     * \brief Construct a write accessor for a slice, volume, or entire image.
+     *
+     * \param[in] image The image to access (must be non-const).
+     * \param[in] iDI Optional ImageDataItem specifying the data region. If nullptr,
+     *            the entire first channel is accessed.
+     * \param[in] OptionFlags Combination of mitk::ImageAccessorBase::Options flags.
+     * \throw mitk::Exception if construction parameters are invalid.
+     * \throw mitk::MemoryIsLockedException if the region is exclusively locked
+     *        and ExceptionIfLocked is set.
      */
     ImageWriteAccessor(ImagePointer image,
                        const ImageDataItem *iDI = nullptr,
                        int OptionFlags = ImageAccessorBase::DefaultBehavior);
 
-    /** \brief Gives full data access. */
+    /**
+     * \brief Get a non-const pointer to the raw image data for writing.
+     *
+     * \return Pointer to the beginning of the writable memory region.
+     */
     inline void *GetData() { return m_AddressBegin; }
-    /** \brief informs Image to unlock the represented image part */
+
+    /**
+     * \brief Destructor releases the write lock on the image data.
+     */
     ~ImageWriteAccessor() override;
 
   protected:

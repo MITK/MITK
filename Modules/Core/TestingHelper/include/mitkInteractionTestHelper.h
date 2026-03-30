@@ -25,7 +25,7 @@ class vtkRenderer;
 
 namespace mitk
 {
-  /** @brief Creates everything needed to load and playback interaction events.
+  /** \brief Creates everything needed to load and playback interaction events.
    *
     * The interaction is loaded from an xml file and the events are created. This file is
     * usually a recorded user interaction with the GUI. This can be done with InteractionEventRecorder
@@ -51,8 +51,8 @@ namespace mitk
   {
   public:
     /**
-     * @brief InteractionTestHelper set up all neseccary objects by calling Initialize.
-     * @param interactionXmlFilePath path to xml file containing events and configuration information for the render
+     * \brief InteractionTestHelper set up all neseccary objects by calling Initialize.
+     * \param interactionXmlFilePath path to xml file containing events and configuration information for the render
      * windows.
      */
     InteractionTestHelper(const std::string &interactionXmlFilePath);
@@ -60,24 +60,24 @@ namespace mitk
     // unregisters all render windows and its renderers.
     virtual ~InteractionTestHelper();
 
-    /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
+    /** \brief Returns the datastorage, in order to modify the data inside a rendering test.
       **/
     DataStorage::Pointer GetDataStorage();
 
     /**
-       * @brief AddNodeToStorage Add a node to the datastorage and perform a reinit which is necessary for rendering.
-       * @param node The data you want to add.
+       * \brief AddNodeToStorage Add a node to the datastorage and perform a reinit which is necessary for rendering.
+       * \param node The data you want to add.
        */
     void AddNodeToStorage(DataNode::Pointer node);
 
     /**
-     * @brief PlaybackInteraction playback loaded interaction by passing events to the dispatcher.
+     * \brief PlaybackInteraction playback loaded interaction by passing events to the dispatcher.
      */
     void PlaybackInteraction();
 
     /**
-     * @brief SetTimeStep Sets timesteps of all SliceNavigationControllers to given timestep.
-     * @param newTimeStep new timestep
+     * \brief SetTimeStep Sets timesteps of all SliceNavigationControllers to given timestep.
+     * \param newTimeStep new timestep
      *
      * Does the same as using ImageNavigators Time slider. Use this if your data was modified in a timestep other than
      * 0.
@@ -88,28 +88,28 @@ namespace mitk
 
     const RenderWindowListType &GetRenderWindowList() { return m_RenderWindowList; }
     /**
-     * @brief GetRenderWindowByName Get renderWindow by the name of its renderer.
-     * @param name The name of the renderer of the desired renderWindow.
-     * @return nullptr if not found.
+     * \brief GetRenderWindowByName Get renderWindow by the name of its renderer.
+     * \param name The name of the renderer of the desired renderWindow.
+     * \return nullptr if not found.
      */
     RenderWindow *GetRenderWindowByName(const std::string &name);
 
     /**
-     * @brief Get a renderWindow by its default view direction.
-     * @param viewDirection
-     * @return nullptr if not found.
+     * \brief Get a renderWindow by its default view direction.
+     * \param viewDirection
+     * \return nullptr if not found.
      */
     RenderWindow *GetRenderWindowByDefaultViewDirection(AnatomicalPlane viewDirection);
 
     /**
-     * @brief GetRenderWindow Get renderWindow at position 'index'.
-     * @param index Position within the renderWindow list.
-     * @return nullptr if index is out of bounds.
+     * \brief GetRenderWindow Get renderWindow at position 'index'.
+     * \param index Position within the renderWindow list.
+     * \return nullptr if index is out of bounds.
      */
     RenderWindow *GetRenderWindow(unsigned int index);
 
     /**
-     * @brief AddDisplayPlaneSubTree
+     * \brief AddDisplayPlaneSubTree
      *
      * Creates DisplayPlanes that are shown in a 3D RenderWindow.
      */
@@ -119,16 +119,16 @@ namespace mitk
 
   protected:
     /**
-    * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
-    * @throws mitk::Exception if interaction xml file can not be loaded.
+    * \brief Initialize Internal method to initialize the renderwindow and set the datastorage.
+    * \throws mitk::Exception if interaction xml file can not be loaded.
     */
     void Initialize(const std::string &interactionXmlFilePath);
     /**
-    * @brief Initialize the interaction event observer / event state machine and register it as a service.
+    * \brief Initialize the interaction event observer / event state machine and register it as a service.
     */
     void InitializeDisplayActionEventHandling();
     /**
-    * @brief LoadInteraction loads events from xml file.
+    * \brief LoadInteraction loads events from xml file.
     */
     void LoadInteraction();
 

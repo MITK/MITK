@@ -33,7 +33,7 @@ namespace mitk
   class MITKCORE_EXPORT VtkInteractorStyle : public vtkInteractorStyleUser
   {
   public:
-    // default VTK c'tor
+    /** \brief VTK standard factory method. */
     static VtkInteractorStyle* New();
     vtkTypeMacro(VtkInteractorStyle, vtkInteractorStyleUser);
 

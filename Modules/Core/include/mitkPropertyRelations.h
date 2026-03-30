@@ -18,6 +18,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Concrete implementation of the IPropertyRelations service interface.
+   *
+   * Manages property relation rules in an internal map keyed by rule ID.
+   * Rules define how property providers (typically data nodes) can be related
+   * to each other via properties.
+   *
+   * \sa IPropertyRelations
+   * \sa PropertyRelationRuleBase
+   */
   class PropertyRelations : public IPropertyRelations
   {
   public:
@@ -55,7 +64,11 @@ namespace mitk
     RuleMap m_RuleMap;
   };
 
-  /**Creates an unmanaged (!) instance of PropertyRelations for testing purposes.*/
+  /** \brief Create an unmanaged instance of PropertyRelations for testing purposes.
+   *
+   * \warning The caller is responsible for the lifetime of the returned pointer.
+   * This function is intended for unit tests only.
+   */
   MITKCORE_EXPORT IPropertyRelations *CreateTestInstancePropertyRelations();
 }
 

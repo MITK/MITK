@@ -47,20 +47,32 @@ namespace mitk
   class StateMachineCondition
   {
   public:
-    StateMachineCondition(const std::string &, const bool inverted);
+    /**
+     * \brief Construct a condition with the given name and inversion flag.
+     *
+     * \param[in] conditionName the string identifier for this condition.
+     * \param[in] inverted if true, the condition result is logically inverted.
+     */
+    StateMachineCondition(const std::string &conditionName, const bool inverted);
+
     ~StateMachineCondition();
 
     /**
-     * @brief Returns the String-Id of this action.
-     **/
+     * \brief Return the string identifier of this condition.
+     * \return The condition name.
+     */
     std::string GetConditionName() const;
 
+    /**
+     * \brief Check whether this condition is inverted.
+     * \return True if the condition result should be logically negated.
+     */
     bool IsInverted() const;
 
   private:
     /**
-     * @brief The Id-Name of this action.
-     **/
+     * \brief The string identifier of this condition.
+     */
     std::string m_ConditionName;
 
     /**

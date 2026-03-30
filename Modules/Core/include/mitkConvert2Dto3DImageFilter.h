@@ -19,17 +19,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Image Filter to convert 2D MITK images to 3D MITK images.
-  *
-  * A new 3D MITK image is created and all pixel and geometry information from
-  * the given 2D input image is copied. The resulting image 3D image has just one slice.
-  *
-  * This filter can be used when before saving a 2D image with 3D geometry information.
-  * By converting it to 3D with just one slice, the common formats (e.g. nrrd) allow
-  * a 3x3 transformation matrix.
-  *
-  * @ingroup Geometry
-  */
+  /**
+   * \brief Converts a 2D MITK image to a 3D MITK image with a single slice.
+   *
+   * A new 3D MITK image is created and all pixel and geometry information from
+   * the given 2D input image is copied. The resulting 3D image has exactly one slice.
+   *
+   * This filter is useful before saving a 2D image that carries 3D geometry
+   * information. By converting it to 3D with one slice, common formats (e.g. NRRD)
+   * can store a full 3x3 transformation matrix.
+   *
+   * \ingroup Geometry
+   * \sa ImageToImageFilter
+   */
   class MITKCORE_EXPORT Convert2Dto3DImageFilter : public ImageToImageFilter
   {
   public:
@@ -37,24 +39,25 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      protected :
-      /*!
-      \brief standard constructor
-      */
-      Convert2Dto3DImageFilter();
-    /*!
-    \brief standard destructor
-    */
+  protected:
+    /** \brief Default constructor. */
+    Convert2Dto3DImageFilter();
+    /** \brief Destructor. */
     ~Convert2Dto3DImageFilter() override;
-    /*!
-    \brief Method generating the output of this filter. Called in the updated process of the pipeline.
-    This method generates the smoothed output image.
-    */
+
+    /**
+     * \brief Generate the 3D output image from the 2D input.
+     *
+     * Called during the pipeline update process. Copies all pixel data and
+     * geometry from the 2D input image into a new 3D image with one slice.
+     */
     void GenerateData() override;
 
-    /*!
-    \brief Make a 2D image to a 3D image
-    */
+    /**
+     * \brief ITK-level conversion from a 2D ITK image to a 3D MITK image.
+     * \tparam TPixel           The pixel type.
+     * \tparam VImageDimension  The image dimension (expected to be 2).
+     */
     template <typename TPixel, unsigned int VImageDimension>
     void ItkConvert2DTo3D(const itk::Image<TPixel, VImageDimension> *itkImage, mitk::Image::Pointer &mitkImage);
   };

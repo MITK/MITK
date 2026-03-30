@@ -23,8 +23,10 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //##@brief enumeration of the type a point can be
+  /** \brief Enumeration of point specification types.
+   *
+   * Describes the role of a point within a geometric structure (e.g. start, corner, edge, end).
+   */
   enum PointSpecificationType
   {
     PTUNDEFINED = 0,
@@ -34,13 +36,21 @@ namespace mitk
     PTEND
   };
 
+  /** \brief MITK point type extending itk::Point with additional constructors and utility methods.
+   *
+   * Provides constructors for various input types and utility methods for
+   * copying to/from array types.
+   *
+   * \tparam TCoordRep Coordinate representation type (e.g. double, float).
+   * \tparam NPointDimension Number of dimensions (default: 3).
+   */
   template <class TCoordRep, unsigned int NPointDimension = 3>
   class Point : public itk::Point<TCoordRep, NPointDimension>
   {
   public:
-    /** Default constructor has nothing to do. */
+    /** \brief Default constructor. */
     explicit Point() : itk::Point<TCoordRep, NPointDimension>() {}
-    /** Pass-through constructors for the Array base class. */
+    /** \brief Pass-through constructors for the Array base class. */
     template <typename TPointValueType>
     explicit Point(const Point<TPointValueType, NPointDimension> &r) : itk::Point<TCoordRep, NPointDimension>(r)
     {
@@ -76,10 +86,11 @@ namespace mitk
     }
 
     /**
-     * Copies the elements from array array to this.
+     * \brief Copy elements from an array into this point.
+     *
      * Note that this method will assign doubles to floats without complaining!
      *
-     * @param array the array whose values shall be copied. Must overload [] operator.
+     * \param[in] array The array whose values shall be copied. Must overload [] operator.
      */
     template <typename ArrayType>
     void FillPoint(const ArrayType &array)
@@ -90,9 +101,9 @@ namespace mitk
     }
 
     /**
-     * Copies the values stored in this point into the array array.
+     * \brief Copy the values stored in this point into an array.
      *
-     * @param array the array which should store the values of this.
+     * \param[out] array The array which should store the values of this point.
      */
     template <typename ArrayType>
     void ToArray(ArrayType array) const
@@ -101,6 +112,7 @@ namespace mitk
     }
   };
 
+  /** \brief Serialize a mitk::Point to a JSON array. */
   template <class TCoordRep, unsigned int NPointDimension>
   void to_json(nlohmann::json& j, const Point<TCoordRep, NPointDimension>& p)
   {
@@ -110,6 +122,7 @@ namespace mitk
       j.push_back(p[i]);
   }
 
+  /** \brief Deserialize a mitk::Point from a JSON array. */
   template <class TCoordRep, unsigned int NPointDimension>
   void from_json(const nlohmann::json& j, Point<TCoordRep, NPointDimension>& p)
   {
@@ -126,13 +139,14 @@ namespace mitk
   typedef Point<int, 4> Point4I;
 
   /**
-   * @ingroup MITKTestingAPI
+   * \ingroup MITKTestingAPI
+   * \brief Compare two itk::Point instances for equality within a tolerance.
    *
-   * @param point1 Point to compare.
-   * @param point2 Point to compare.
-   * @param eps Tolerance for floating point comparison.
-   * @param verbose Flag indicating detailed console output.
-   * @return True if points are equal.
+   * \param[in] point1 Point to compare.
+   * \param[in] point2 Point to compare.
+   * \param[in] eps Tolerance for floating point comparison.
+   * \param[in] verbose Flag indicating detailed console output.
+   * \return True if points are equal within the given tolerance.
    */
   template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const itk::Point<TCoordRep, NPointDimension> &point1,

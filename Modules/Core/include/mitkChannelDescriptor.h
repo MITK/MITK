@@ -18,28 +18,52 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief An object which holds all essential information about a single channel of an Image.
-
-    The channel descriptor is designed to be used only as a part of the ImageDescriptor. A consequence
-  to this is that the ChannelDescriptor does not hold the geometry information, only the PixelType.
-  The pixel type is the single information that can differ among an image with multiple channels.
-  */
+  /**
+   * \brief Holds essential information about a single channel of an Image.
+   *
+   * Designed to be used only as part of an ImageDescriptor. The ChannelDescriptor
+   * does not hold geometry information -- only the PixelType, which is the piece
+   * of metadata that can differ among channels of a multi-channel image.
+   *
+   * \sa ImageDescriptor, PixelType, Image
+   * \ingroup Data
+   */
   class MITKCORE_EXPORT ChannelDescriptor
   {
   public:
+    /**
+     * \brief Construct a ChannelDescriptor with a given pixel type and element count.
+     * \param[in] type           The pixel type for this channel.
+     * \param[in] numOfElements  The number of pixel elements in this channel.
+     * \param[in] allocate       Currently unused; reserved for future memory management.
+     */
     ChannelDescriptor(mitk::PixelType type, size_t numOfElements, bool allocate = false);
 
+    /** \brief Destructor. */
     ~ChannelDescriptor();
 
-    /** \brief Get the type of channel's elements */
+    /**
+     * \brief Get the pixel type of this channel's elements.
+     * \return The PixelType describing the element data type.
+     */
     PixelType GetPixelType() const { return m_PixelType; }
-    /** \brief Get the size in bytes of the channel */
-    size_t GetSize() const { return m_Size; }
-    /** \brief Get the pointer to the actual data of the channel
 
-      \warning Such access to the image's data is not safe and will be replaced
-      \todo new memory management design
-    */
+    /**
+     * \brief Get the number of elements stored in this channel.
+     * \return The element count (not the byte size).
+     */
+    size_t GetSize() const { return m_Size; }
+
+    /**
+     * \brief Get a raw pointer to the channel's data buffer.
+     *
+     * \warning Direct access to image data is unsafe. Prefer
+     *          ImageReadAccessor or ImageWriteAccessor instead.
+     *
+     * \return Pointer to the raw data, or nullptr if not allocated.
+     *
+     * \todo Replace with a safe accessor in the new memory management design.
+     */
     unsigned char *GetData() const { return m_Data; }
   protected:
     friend class Image;

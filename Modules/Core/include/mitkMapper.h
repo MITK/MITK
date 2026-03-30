@@ -32,28 +32,44 @@ namespace mitk
   class BaseData;
   class DataNode;
 
-  /** \brief Base class of all mappers, Vtk as well as OpenGL mappers
-  *
-  * By the help of mappers, the input data is transformed to tangible primitives,
-  * such as surfaces, points, lines, etc.
-  * This is the base class of all mappers, Vtk as well as OpenGL mappers.
-  * Subclasses of mitk::Mapper control the creation of rendering primitives
-  * that interface to the graphics library (e.g., OpenGL, vtk).
-  *
-  * \todo Should Mapper be a subclass of ImageSource?
-  * \ingroup Mapper
-  */
+  /**
+   * \brief Base class of all mappers, Vtk as well as OpenGL mappers.
+   *
+   * By the help of mappers, the input data is transformed to tangible primitives,
+   * such as surfaces, points, lines, etc.
+   * This is the base class of all mappers, Vtk as well as OpenGL mappers.
+   * Subclasses of mitk::Mapper control the creation of rendering primitives
+   * that interface to the graphics library (e.g., OpenGL, vtk).
+   *
+   * Each Mapper is associated with a DataNode, from which it reads the data
+   * and properties needed for rendering. The Update() method calculates the
+   * current time step and calls GenerateDataForRenderer() to produce the
+   * rendering output for a given BaseRenderer.
+   *
+   * \sa VtkMapper
+   * \sa BaseRenderer
+   * \sa DataNode
+   * \todo Should Mapper be a subclass of ImageSource?
+   * \ingroup Mapper
+   */
   class MITKCORE_EXPORT Mapper : public itk::Object
   {
   public:
     mitkClassMacroItkParent(Mapper, itk::Object);
 
-    /** \brief Set the DataNode containing the data to map */
+    /** \brief Set the DataNode containing the data to map.
+     * \param[in] _arg Pointer to the DataNode.
+     */
     itkSetObjectMacro(DataNode, DataNode);
 
-    /** \brief Get the DataNode containing the data to map.
-    * Method only returns valid DataNode Pointer if the mapper belongs to a data node.
-    * Otherwise, the returned DataNode Pointer might be invalid. */
+    /**
+     * \brief Get the DataNode containing the data to map.
+     *
+     * Returns a valid DataNode pointer only if the mapper belongs to a data node.
+     * Otherwise, the returned pointer might be invalid.
+     *
+     * \return Pointer to the associated DataNode, or nullptr.
+     */
     virtual DataNode *GetDataNode() const;
 
     /**\brief Get the data to map
@@ -112,39 +128,66 @@ namespace mitk
    */
     virtual bool IsVtkBased() const { return true; }
 
-    /** \brief Calls the time step of the input data for the specified renderer and checks
-    * whether the time step is valid and calls method GenerateDataForRenderer()
-    */
+    /**
+     * \brief Calculate the time step for the current renderer and generate rendering data.
+     *
+     * Calls CalculateTimeStep() to determine the appropriate time step from the
+     * renderer, validates it against the data's TimeGeometry, and then calls
+     * GenerateDataForRenderer(). If the time step is invalid, ResetMapper() is
+     * called instead.
+     *
+     * \param[in] renderer The renderer for which to update the mapper.
+     */
     virtual void Update(BaseRenderer *renderer);
 
-    /** \brief Responsible for calling the appropriate render functions.
-    *   To be implemented in sub-classes.
-    */
+    /**
+     * \brief Responsible for calling the appropriate render functions.
+     *
+     * To be implemented in sub-classes. Called during the rendering pipeline
+     * to dispatch to the correct render pass (opaque, translucent, overlay, volumetric).
+     *
+     * \param[in] renderer The renderer to render into.
+     * \param[in] type The render pass type.
+     */
     virtual void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
     /**
-    * \brief Apply specific color and opacity properties read from the PropertyList.
-    * Reimplemented in GLmapper (does not use the actor) and the VtkMapper class.
-    * The function is called by the individual mapper (mostly in the ApplyProperties() or ApplyAllProperties()
-    * method).
-    */
+     * \brief Apply color and opacity properties read from the PropertyList to the rendering actor.
+     *
+     * Reimplemented in GLmapper (does not use the actor) and the VtkMapper class.
+     * Called by the individual mapper, typically in ApplyProperties() or ApplyAllProperties().
+     *
+     * \param[in] renderer The renderer whose property list is queried.
+     * \param[in] actor The vtkActor to apply color/opacity to. Can be nullptr.
+     */
     virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) = 0;
 
-    /** \brief Set default values of properties used by this mapper
-    * to \a node
-    *
-    * \param node The node for which the properties are set
-    * \param overwrite overwrite existing properties (default: \a false)
-    * \param renderer defines which property list of node is used
-    * (default: \a nullptr, i.e. default property list)
-    */
+    /**
+     * \brief Set default values of properties used by this mapper on the given node.
+     *
+     * Sets "visible", "layer", and "name" properties with default values.
+     *
+     * \param[in] node The node for which the properties are set.
+     * \param[in] renderer Defines which property list of the node is used
+     *            (default: nullptr, i.e. the default property list).
+     * \param[in] overwrite If true, overwrite existing properties (default: false).
+     */
     static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    /** \brief Returns the current time step as calculated from the renderer */
+    /**
+     * \brief Return the current time step as calculated from the renderer.
+     * \return The current time step index.
+     */
     TimeStepType GetTimestep() const { return m_TimeStep; }
-    /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
+
+    /**
+     * \brief Return whether this Mapper currently allows for Level-of-Detail rendering.
+     *
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
-     * ProgressEvent on BaseRenderer. */
+     * ProgressEvent on BaseRenderer.
+     *
+     * \return true if LOD rendering is enabled, false otherwise. Default is false.
+     */
     virtual bool IsLODEnabled(BaseRenderer * /*renderer*/) const { return false; }
   protected:
     /** \brief explicit constructor which disallows implicit conversions */
@@ -185,7 +228,14 @@ namespace mitk
     Mapper &operator=(const Mapper &);
 
   public:
-    /** \brief Base class for mapper specific rendering resources.
+    /**
+     * \brief Base class for mapper-specific rendering resources.
+     *
+     * Each BaseRenderer gets its own LocalStorage instance so that mappers can
+     * store per-renderer VTK objects (actors, mappers, textures, etc.). The
+     * LocalStorage tracks whether its data is up-to-date via a timestamp.
+     *
+     * \sa LocalStorageHandler
      */
     class MITKCORE_EXPORT BaseLocalStorage
     {
@@ -196,12 +246,29 @@ namespace mitk
       BaseLocalStorage(const BaseLocalStorage &) = delete;
       BaseLocalStorage & operator=(const BaseLocalStorage &) = delete;
 
+      /**
+       * \brief Check whether GenerateDataForRenderer() needs to be called.
+       *
+       * Compares the last generate-data timestamp against the modification times
+       * of the mapper, data node, underlying data, and renderer time step.
+       *
+       * \param[in] renderer The renderer to check against.
+       * \param[in] mapper The mapper to check against.
+       * \param[in] dataNode The data node to check against.
+       * \return true if the stored data is outdated and regeneration is required.
+       */
       bool IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Mapper *mapper, mitk::DataNode *dataNode) const;
 
+      /** \brief Mark the stored data as up-to-date. */
       inline void UpdateGenerateDataTime() { m_LastGenerateDataTime.Modified(); }
+
+      /**
+       * \brief Get a reference to the last-generate-data timestamp.
+       * \return Reference to the itk::TimeStamp.
+       */
       inline itk::TimeStamp &GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
     protected:
-      /** \brief timestamp of last update of stored data */
+      /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastGenerateDataTime;
     };
   };

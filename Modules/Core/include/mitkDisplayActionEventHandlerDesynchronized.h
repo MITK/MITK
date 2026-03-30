@@ -20,20 +20,26 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Handler that connects desynchronized (per-renderer) display actions.
+   *
+   * Each renderer reacts independently to display action events such as
+   * move, zoom, and scroll -- changes are not propagated to other renderers.
+   *
+   * \sa DisplayActionEventHandler DisplayActionEventFunctions
+   */
   class MITKCORE_EXPORT DisplayActionEventHandlerDesynchronized : public DisplayActionEventHandler
   {
   protected:
 
     /**
-    * @brief Initializes common desynchronized display actions by using the desynchronized display action event functions.
-    *
-    * @pre    The class' observable (the display action event broadcast) has to be set to connect display events.
-    *
-    * @param prefixFilter The prefix of associated renderer names. Actions will only react to events from / send
-    *                     changes to renderers whose name begins with this prefix.
-    *
-    * @throw  mitk::Exception, if the class' observable is null.
-    */
+     * \brief Initialize desynchronized display actions (move, zoom, scroll per renderer).
+     *
+     * \pre The observable broadcast must have been set.
+     * \throw mitk::Exception if the observable is null.
+     *
+     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     */
     void InitActionsImpl(const std::string& prefixFilter = "") override;
   };
 } // end namespace mitk

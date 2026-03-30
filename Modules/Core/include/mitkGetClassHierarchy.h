@@ -102,11 +102,14 @@ namespace mitk
 #endif
 
   /**
-   * Get the class hierarchy for MITK classes as a list of class names.
+   * \brief Get the class hierarchy for MITK classes as a list of class names.
    *
    * This function will return the name of classes and their direct
    * super-classes as specified in the mitkClassMacro. The order is from
    * most derived class to the last base class containing the mitkClassMacro.
+   *
+   * \tparam T The MITK class type to inspect.
+   * \return A vector of class name strings from most derived to base.
    */
   template <typename T>
   std::vector<std::string> GetClassHierarchy()

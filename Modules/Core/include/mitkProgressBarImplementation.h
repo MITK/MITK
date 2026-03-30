@@ -16,34 +16,42 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief GUI independent Interface for all Gui dependent implementations of a ProgressBar.
+  /**
+   * \brief GUI-independent interface for all GUI-dependent implementations of a progress bar.
+   *
+   * Subclasses implement the actual rendering of the progress bar using the platform's
+   * GUI toolkit (e.g., Qt).
+   *
+   * \sa mitk::ProgressBar
+   */
   class MITKCORE_EXPORT ProgressBarImplementation
   {
   public:
-    //##Documentation
-    //## @brief Constructor
+    /** \brief Constructor. */
     ProgressBarImplementation(){};
 
-    //##Documentation
-    //## @brief Destructor
+    /** \brief Destructor. */
     virtual ~ProgressBarImplementation(){};
 
-    //##Documentation
-    //## @brief Sets whether the current progress value is displayed.
+    /** \brief Sets whether the current progress percentage is displayed.
+     *
+     * \param visible if true, the percentage text is shown.
+     */
     virtual void SetPercentageVisible(bool visible) = 0;
 
-    //##Documentation
-    //## @brief Explicitly reset progress bar.
+    /** \brief Explicitly resets the progress bar to zero. */
     virtual void Reset() = 0;
 
-    //##Documentation
-    //## @brief Adds steps to totalSteps.
+    /** \brief Adds steps to the total number of steps to complete.
+     *
+     * \param steps the number of steps to add to the total.
+     */
     virtual void AddStepsToDo(unsigned int steps) = 0;
 
-    //##Documentation
-    //## @brief Sets the current amount of progress to current progress + steps.
-    //## @param steps the number of steps done since last Progress(int steps) call.
+    /** \brief Advances the current progress by the given number of steps.
+     *
+     * \param steps the number of steps done since the last Progress() call.
+     */
     virtual void Progress(unsigned int steps) = 0;
   };
 

@@ -32,6 +32,8 @@ found in the LICENSE file.
  * depend on any prior information about hat the renderwindow is currently showing.
  *
  * \warning The interface attempts to look like an ITK filter but it is far from being one.
+ *
+ * \sa PlaneGeometry BaseGeometry Image
  */
 
 namespace mitk
@@ -39,18 +41,54 @@ namespace mitk
   class MITKCORE_EXPORT ClippedSurfaceBoundsCalculator
   {
   public:
+    /** \brief List of 3D world-coordinate points. */
     typedef std::vector<mitk::Point3D> PointListType;
 
+    /**
+     * \brief Construct from a PlaneGeometry and image.
+     * \param geometry The clipping plane (may be nullptr).
+     * \param image    The image whose slice bounds are computed (may be nullptr).
+     */
     ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry *geometry = nullptr, mitk::Image::Pointer image = nullptr);
+
+    /**
+     * \brief Construct from a BaseGeometry (e.g. SlicedGeometry3D) and image.
+     * \param geometry The 3D geometry defining the clipping volume.
+     * \param image    The image whose slice bounds are computed.
+     */
     ClippedSurfaceBoundsCalculator(const mitk::BaseGeometry *geometry, mitk::Image::Pointer image);
+
+    /**
+     * \brief Construct from a list of world-coordinate points and image.
+     * \param pointlist Points whose bounding slice indices are determined.
+     * \param image     The image whose slice bounds are computed.
+     */
     ClippedSurfaceBoundsCalculator(const PointListType pointlist, mitk::Image::Pointer image);
 
+    /** \brief Reset the output min/max indices to their initial (invalid) state. */
     void InitializeOutput();
 
     virtual ~ClippedSurfaceBoundsCalculator();
 
+    /**
+     * \brief Set a PlaneGeometry and image as input.
+     * \param geometry The clipping plane.
+     * \param image    The image whose slice bounds are computed.
+     */
     void SetInput(const mitk::PlaneGeometry *geometry, mitk::Image *image);
+
+    /**
+     * \brief Set a BaseGeometry and image as input.
+     * \param geometry The 3D geometry defining the clipping volume.
+     * \param image    The image whose slice bounds are computed.
+     */
     void SetInput(const mitk::BaseGeometry *geometry, mitk::Image *image);
+
+    /**
+     * \brief Set a list of world-coordinate points and image as input.
+     * \param pointlist Points whose bounding slice indices are determined.
+     * \param image     The image whose slice bounds are computed.
+     */
     void SetInput(const PointListType pointlist, mitk::Image *image);
 
     /**
@@ -72,35 +110,46 @@ namespace mitk
     typedef std::pair<int, int> OutputType;
 
     /**
-      \brief What X coordinates (slice indices) are cut/visible in given plane.
-    */
+     * \brief Get the min/max slice indices visible in the X direction.
+     * \return A pair of (minimum, maximum) slice index in X.
+     */
     OutputType GetMinMaxSpatialDirectionX();
 
     /**
-      \brief What Y coordinates (slice indices) are cut/visible in given plane.
-    */
+     * \brief Get the min/max slice indices visible in the Y direction.
+     * \return A pair of (minimum, maximum) slice index in Y.
+     */
     OutputType GetMinMaxSpatialDirectionY();
 
     /**
-      \brief What Z coordinates (slice indices) are cut/visible in given plane.
-    */
+     * \brief Get the min/max slice indices visible in the Z direction.
+     * \return A pair of (minimum, maximum) slice index in Z.
+     */
     OutputType GetMinMaxSpatialDirectionZ();
 
   protected:
+    /**
+     * \brief Calculate intersection points of the image bounding box edges with the given plane.
+     * \param geometry The plane geometry to intersect with.
+     */
     void CalculateIntersectionPoints(const mitk::PlaneGeometry *geometry);
+
+    /**
+     * \brief Calculate bounding slice indices from a list of world-coordinate points.
+     * \param pointList The points to convert to index coordinates.
+     */
     void CalculateIntersectionPoints(PointListType pointList);
 
     /**
-    * \brief Clips the resulting index-coordinates to make sure they do
-    * not exceed the imagebounds.
-    */
+     * \brief Clamp the resulting index coordinates so they do not exceed the image bounds.
+     */
     void EnforceImageBounds();
 
-    mitk::PlaneGeometry::ConstPointer m_PlaneGeometry;
-    mitk::BaseGeometry::ConstPointer m_Geometry3D;
-    mitk::Image::Pointer m_Image;
-    std::vector<mitk::Point3D> m_ObjectPointsInWorldCoordinates;
-    std::vector<OutputType> m_MinMaxOutput;
+    mitk::PlaneGeometry::ConstPointer m_PlaneGeometry;  ///< The input plane geometry (if set).
+    mitk::BaseGeometry::ConstPointer m_Geometry3D;  ///< The input 3D geometry (if set).
+    mitk::Image::Pointer m_Image;  ///< The image whose bounds are calculated.
+    std::vector<mitk::Point3D> m_ObjectPointsInWorldCoordinates;  ///< World-coordinate points (if set).
+    std::vector<OutputType> m_MinMaxOutput;  ///< Min/max slice index results for each axis.
   };
 
 } // namespace mitk

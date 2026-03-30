@@ -23,11 +23,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Create instances of VtkImageReader objects using an object factory.
-  //##
-  //## @ingroup MitkLegacyIOModule
-  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  /**
+   * \brief Create instances of VtkImageReader objects using an object factory.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   */
   class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageIOFactory : public itk::ObjectFactoryBase
   {
   public:
@@ -58,12 +59,14 @@ namespace mitk
     }
 
   protected:
+    /** \brief Default constructor. */
     VtkImageIOFactory();
+    /** \brief Destructor. */
     ~VtkImageIOFactory() override;
 
   private:
-    VtkImageIOFactory(const Self &); // purposely not implemented
-    void operator=(const Self &);    // purposely not implemented
+    VtkImageIOFactory(const Self &); ///< \brief Purposely not implemented.
+    void operator=(const Self &);    ///< \brief Purposely not implemented.
   };
 
 } // end namespace mitk

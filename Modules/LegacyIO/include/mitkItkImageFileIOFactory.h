@@ -23,32 +23,57 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Create instances of ItkImageFileReader objects using an object factory.
-  //##
-  //## @ingroup MitkLegacyIOModule
-  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  /**
+   * \brief ITK object factory for creating ItkImageFileReader instances.
+   *
+   * Registers mitk::ItkImageFileReader with the ITK object factory mechanism,
+   * enabling automatic creation of readers for file formats supported by ITK.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::ItkImageFileReader
+   */
   class DEPRECATED() MITKLEGACYIO_EXPORT ItkImageFileIOFactory : public itk::ObjectFactoryBase
   {
   public:
-    /** Standard class typedefs. */
+    /** \brief Standard ITK self type. */
     typedef ItkImageFileIOFactory Self;
+    /** \brief Standard ITK superclass type. */
     typedef itk::ObjectFactoryBase Superclass;
+    /** \brief Smart pointer type. */
     typedef itk::SmartPointer<Self> Pointer;
+    /** \brief Const smart pointer type. */
     typedef itk::SmartPointer<const Self> ConstPointer;
 
-    /** Class methods used to interface with the registered factories. */
+    /**
+     * \brief Return the ITK source version string.
+     * \return A string identifying the ITK source version.
+     */
     const char *GetITKSourceVersion(void) const override;
+
+    /**
+     * \brief Return a description of this factory.
+     * \return A human-readable description string.
+     */
     const char *GetDescription(void) const override;
 
-    /** Method for class instantiation. */
+    /** \brief Method for class instantiation. */
     itkFactorylessNewMacro(Self);
+
+    /**
+     * \brief Create a new instance of this factory.
+     * \return A raw pointer to a new ItkImageFileIOFactory instance.
+     */
     static ItkImageFileIOFactory *FactoryNew() { return new ItkImageFileIOFactory; }
-    /** Run-time type information (and related methods). */
+
+    /** \brief Run-time type information (and related methods). */
     itkTypeMacro(ItkImageFileIOFactory, ObjectFactoryBase);
 
     /**
-     * Register one factory of this type
+     * \brief Register one instance of this factory with the ITK object factory system.
+     *
+     * Ensures the factory is only registered once. Subsequent calls have no effect.
+     *
      * \deprecatedSince{2013_09}
      */
     DEPRECATED(static void RegisterOneFactory(void))

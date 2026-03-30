@@ -21,22 +21,41 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \brief ITK object factory for creating SurfaceVtkWriter instances.
+   *
+   * Registers mitk::SurfaceVtkWriter template specializations (for vtkSTLWriter,
+   * vtkPolyDataWriter, and vtkXMLPolyDataWriter) with the ITK object factory
+   * mechanism, enabling automatic creation of surface writers.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::SurfaceVtkWriter
    */
   class DEPRECATED() MITKLEGACYIO_EXPORT SurfaceVtkWriterFactory : public itk::ObjectFactoryBase
   {
   public:
     mitkClassMacroItkParent(mitk::SurfaceVtkWriterFactory, itk::ObjectFactoryBase);
 
-      /** Class methods used to interface with the registered factories. */
-      const char *GetITKSourceVersion(void) const override;
+    /**
+     * \brief Return the ITK source version string.
+     * \return A string identifying the ITK source version.
+     */
+    const char *GetITKSourceVersion(void) const override;
+
+    /**
+     * \brief Return a description of this factory.
+     * \return A human-readable description string.
+     */
     const char *GetDescription(void) const override;
 
-    /** Method for class instantiation. */
+    /** \brief Method for class instantiation. */
     itkFactorylessNewMacro(Self);
 
     /**
-     * Register one factory of this type
+     * \brief Register one instance of this factory with the ITK object factory system.
+     *
+     * Ensures the factory is only registered once. Subsequent calls have no effect.
+     *
      * \deprecatedSince{2013_09}
      */
     DEPRECATED(static void RegisterOneFactory(void))

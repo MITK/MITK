@@ -32,21 +32,25 @@ class vtkTransformPolyDataFilter;
 namespace mitk
 {
   /**
-   * @brief VTK-based writer for mitk::Surface
+   * \brief VTK-based writer for mitk::Surface objects.
    *
-   * The mitk::Surface is written using the VTK-writer-type provided as the
-   * template argument. If the mitk::Surface contains multiple points of
-   * time, multiple files are written. The life-span (time-bounds) of each
-   * each point of time is included in the filename according to the
-   * following scheme:
-   * &lt;filename&gt;_S&lt;timebounds[0]&gt;E&lt;timebounds[1]&gt;_T&lt;framenumber&gt;
-   * (S=start, E=end, T=time).
-   * Writing of multiple files according to a given filename pattern is not
-   * yet supported.
-   * @ingroup MitkLegacyIOModule
+   * Writes mitk::Surface data using the VTK writer type specified as the template
+   * argument (e.g., vtkSTLWriter, vtkPolyDataWriter, vtkXMLPolyDataWriter).
    *
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-  */
+   * If the mitk::Surface contains multiple time steps, a separate file is written
+   * for each time step. The time bounds are encoded in the filename using the scheme:
+   * \c \<filename\>_S\<start\>E\<end\>_T\<framenumber\> (S=start, E=end, T=time).
+   *
+   * \note Writing of multiple files according to a given filename pattern is not
+   *       yet supported.
+   *
+   * \tparam VTKWRITER The VTK writer class to use for output (e.g., vtkSTLWriter,
+   *         vtkPolyDataWriter, vtkXMLPolyDataWriter).
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::SurfaceVtkWriterFactory, mitk::Surface, mitk::FileWriterWithInformation
+   */
   template <class VTKWRITER>
   class MITKLEGACYIO_EXPORT SurfaceVtkWriter : public mitk::FileWriterWithInformation
   {
@@ -59,107 +63,155 @@ namespace mitk
 
       mitkWriterMacro;
 
+    /** \brief The VTK writer type used for output. */
     typedef VTKWRITER VtkWriterType;
 
     /**
-     * Sets the filename of the file to write.
-     * @param _arg the name of the file to write.
+     * \brief Set the filename of the file to write.
+     * \param[in] _arg The name of the file to write.
      */
     itkSetStringMacro(FileName);
 
     /**
-     * @returns the name of the file to be written to disk.
+     * \brief Get the filename of the file to be written.
+     * \return The output file name.
      */
     itkGetStringMacro(FileName);
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
-     * @param _arg to be added to the filename, including a "."
-     * (e.g., ".vtk").
+     * \param[in] _arg The extension including a "." (e.g., ".vtk").
      *
-     * Partial template specialization is used for some vtk-writer types
+     * Partial template specialization is used for some VTK writer types
      * to set a default extension.
      */
     itkSetStringMacro(Extension);
 
     /**
      * \brief Get the extension to be added to the filename.
-     * @returns the extension to be added to the filename (e.g.,
-     * ".vtk").
+     * \return The file extension (e.g., ".vtk").
      */
     itkGetStringMacro(Extension);
 
     /**
-     * \brief Set the extension to be added to the filename to the default
+     * \brief Reset the extension to the default for the current VTK writer type.
      *
-     * Partial template specialization is used for some vtk-writer types
-     * to define the default extension.
+     * Partial template specialization is used for some VTK writer types
+     * to define the default extension (e.g., ".stl" for vtkSTLWriter,
+     * ".vtp" for vtkXMLPolyDataWriter).
      */
     void SetDefaultExtension();
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file prefix for multi-file writing.
+     * \warning Multiple file writing is not yet supported.
      */
     itkSetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file prefix.
+     * \warning Multiple file writing is not yet supported.
      */
     itkGetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file pattern for multi-file writing.
+     * \warning Multiple file writing is not yet supported.
      */
     itkSetStringMacro(FilePattern);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file pattern.
+     * \warning Multiple file writing is not yet supported.
      */
     itkGetStringMacro(FilePattern);
 
     /**
-     * Sets the 0'th input object for the filter.
-     * @param input the first input for the filter.
+     * \brief Set the 0th input surface for the writer.
+     * \param[in] input The mitk::Surface to write.
      */
     void SetInput(mitk::Surface *input);
 
     /**
-     * @returns the 0'th input object of the filter.
+     * \brief Get the 0th input surface.
+     * \return Pointer to the input mitk::Surface, or \c nullptr if not set.
      */
     const mitk::Surface *GetInput();
 
     /**
-    * @brief Return the extension to be added to the filename.
-    */
+     * \brief Return the currently configured file extension.
+     * \return The file extension string.
+     */
     std::string GetFileExtension() override;
 
     /**
-    * @brief Check if the Writer can write the Content of the DataTreenode.
-    */
-    bool CanWriteDataType(DataNode *) override;
+     * \brief Check whether the writer can write data from the given DataNode.
+     * \param[in] node The DataNode to check. The node's data must be a mitk::Surface.
+     * \return \c true if the node contains a mitk::Surface; \c false otherwise.
+     */
+    bool CanWriteDataType(DataNode * node) override;
 
     /**
-    * @brief Return the MimeType of the saved File.
-    */
+     * \brief Return the MIME type of the file to be written.
+     * \return The MIME type string.
+     */
     std::string GetWritenMIMEType() override;
 
     using Superclass::SetInput;
-    /**
-    * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
-    */
-    virtual void SetInput(DataNode *);
 
-    VtkWriterType *GetVtkWriter() { return m_VtkWriter; }
     /**
-    * @brief Return the possible file extensions for the data type associated with the writer
-    */
+     * \brief Set a DataNode as input. Extracts the mitk::Surface from the node.
+     * \param[in] node The DataNode containing the surface to write.
+     */
+    virtual void SetInput(DataNode * node);
+
+    /**
+     * \brief Get the internal VTK writer instance.
+     * \return Pointer to the VTK writer used for output.
+     */
+    VtkWriterType *GetVtkWriter() { return m_VtkWriter; }
+
+    /**
+     * \brief Return the list of possible file extensions for surface data.
+     * \return A vector of supported file extension strings.
+     */
     std::vector<std::string> GetPossibleFileExtensions() override;
 
+    /**
+     * \brief Return the class name of the supported base data type.
+     * \return The static class name of mitk::Surface.
+     */
     std::string GetSupportedBaseData() const override { return Surface::GetStaticNameOfClass(); }
+
+    /**
+     * \brief Return the default filename for file save dialogs.
+     * \return A default filename string.
+     */
     const char *GetDefaultFilename() override;
+
+    /**
+     * \brief Return the file dialog filter pattern.
+     * \return A filter pattern string for file dialogs.
+     */
     const char *GetFileDialogPattern() override;
+
+    /**
+     * \brief Return the default file extension.
+     * \return The default extension string.
+     */
     const char *GetDefaultExtension() override;
+
+    /**
+     * \brief Check whether this writer can write the given BaseData type.
+     * \param[in] data The data object to check.
+     * \return \c true if the data is a mitk::Surface; \c false otherwise.
+     */
     bool CanWriteBaseDataType(BaseData::Pointer data) override;
+
+    /**
+     * \brief Write the given BaseData object to file.
+     * \param[in] data The data to write (must be a mitk::Surface).
+     */
     void DoWrite(BaseData::Pointer data) override;
 
   protected:

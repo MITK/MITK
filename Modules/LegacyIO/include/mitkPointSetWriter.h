@@ -22,16 +22,20 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief XML-based writer for mitk::PointSets
+   * \brief XML-based writer for mitk::PointSet objects.
    *
-   * XML-based writer for mitk::PointSets. Multiple PointSets can be written in
-   * a single XML file by simply setting multiple inputs to the filter.
-   * Writing of multiple XML files according to a given filename pattern is not
-   * yet supported.
+   * Writes one or more mitk::PointSet objects to a single XML file. Multiple
+   * point sets can be written by setting multiple inputs to this filter via
+   * SetInput(num, input). The file format uses MITK's custom XML schema with
+   * elements for point set files, time series, and individual points with
+   * their coordinates and identifiers.
    *
-   * @ingroup MitkLegacyIOModule
+   * \note Writing of multiple XML files according to a filename pattern is not
+   *       yet supported.
    *
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::PointSetReader, mitk::PointSetWriterFactory, mitk::FileWriter
    */
   class MITKLEGACYIO_EXPORT PointSetWriter : public mitk::FileWriter
   {
@@ -44,96 +48,119 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      typedef mitk::PointSet InputType;
+    /** \brief The input data type for this writer. */
+    typedef mitk::PointSet InputType;
 
+    /** \brief Smart pointer type for the input data type. */
     typedef InputType::Pointer InputTypePointer;
 
     /**
-     * Sets the filename of the file to write.
+     * \brief Set the filename of the file to write.
      */
     itkSetStringMacro(FileName);
 
     /**
-     * @returns the name of the file to be written to disk.
+     * \brief Get the filename of the file to be written.
+     * \return The output file name.
      */
     itkGetStringMacro(FileName);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file prefix for multi-file writing.
+     * \warning Multiple file writing is not yet supported.
      */
     itkSetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file prefix.
+     * \warning Multiple file writing is not yet supported.
      */
     itkGetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file pattern for multi-file writing.
+     * \warning Multiple file writing is not yet supported.
      */
     itkSetStringMacro(FilePattern);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file pattern.
+     * \warning Multiple file writing is not yet supported.
      */
     itkGetStringMacro(FilePattern);
 
     /**
-     * Sets the 0'th input object for the filter.
-     * @param input the first input for the filter.
+     * \brief Set the 0th input object for the filter.
+     * \param[in] input The first point set to write.
      */
     void SetInput(InputType *input);
 
     /**
-     * Sets the n'th input object for the filter. If num is
-     * larger than GetNumberOfInputs() the number of inputs is
+     * \brief Set the n-th input object for the filter.
+     *
+     * If \p num is larger than GetNumberOfInputs(), the number of inputs is
      * resized appropriately.
-     * @param num
-     * @param input the n'th input for the filter.
+     *
+     * \param[in] num The zero-based index of the input to set.
+     * \param[in] input The point set to assign to input slot \p num.
      */
     void SetInput(const unsigned int &num, InputType *input);
 
     /**
-     * @returns the 0'th input object of the filter.
+     * \brief Get the 0th input point set.
+     * \return Pointer to the first input point set, or \c nullptr if not set.
      */
     PointSet *GetInput();
 
     /**
-     * @param num the index of the desired output object.
-     * @returns the n'th input object of the filter.
+     * \brief Get the n-th input point set.
+     * \param[in] num The zero-based index of the desired input.
+     * \return Pointer to the n-th input point set, or \c nullptr if not set.
      */
     PointSet *GetInput(const unsigned int &num);
 
     /**
-    * @brief Return the possible file extensions for the data type associated with the writer
-    */
+     * \brief Return the list of possible file extensions for point set data.
+     * \return A vector of supported file extension strings (e.g., ".mps").
+     */
     std::vector<std::string> GetPossibleFileExtensions() override;
 
+    /**
+     * \brief Return the class name of the supported base data type.
+     * \return The static class name of mitk::PointSet.
+     */
     std::string GetSupportedBaseData() const override;
 
     /**
-    * @brief Return the extension to be added to the filename.
-    */
+     * \brief Return the file extension to be added to the filename.
+     * \return The file extension string.
+     */
     std::string GetFileExtension() override;
 
     /**
-    * @brief Check if the Writer can write the Content of the
-    */
-    bool CanWriteDataType(DataNode *) override;
+     * \brief Check whether the writer can write data from the given DataNode.
+     * \param[in] node The DataNode to check. The node's data must be a mitk::PointSet.
+     * \return \c true if the node contains a mitk::PointSet; \c false otherwise.
+     */
+    bool CanWriteDataType(DataNode * node) override;
 
     /**
-    * @brief Return the MimeType of the saved File.
-    */
+     * \brief Return the MIME type of the file to be written.
+     * \return The MIME type string.
+     */
     std::string GetWritenMIMEType() override;
 
     using mitk::FileWriter::SetInput;
-    /**
-    * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
-    */
-    virtual void SetInput(DataNode *);
 
     /**
-     * @returns whether the last write attempt was successful or not.
+     * \brief Set a DataNode as input. Extracts the mitk::PointSet from the node.
+     * \param[in] node The DataNode containing the point set to write.
+     */
+    virtual void SetInput(DataNode * node);
+
+    /**
+     * \brief Query whether the last write attempt was successful.
+     * \return \c true if the last call to Update() succeeded; \c false otherwise.
      */
     bool GetSuccess() const;
 
@@ -156,7 +183,7 @@ namespace mitk
     /**
      * Resizes the number of inputs of the writer.
      * The inputs are initialized by empty PointSets
-     * @param num the new number of inputs
+     * \param num the new number of inputs
      */
     virtual void ResizeInputs(const unsigned int &num);
 
@@ -164,8 +191,8 @@ namespace mitk
      * Converts an arbitrary type to a string. The type has to
      * support the << operator. This works fine at least for integral
      * data types as float, int, long etc.
-     * @param value the value to convert
-     * @returns the string representation of value
+     * \param value the value to convert
+     * \return the string representation of value
      */
     template <typename T>
     std::string ConvertToString(T value);
@@ -173,14 +200,14 @@ namespace mitk
     /**
      * Writes an XML representation of the given point set to
      * an outstream. The XML-Header an root node is not included!
-     * @param pointSet the point set to be converted to xml
-     * @param out the stream to write to.
+     * \param pointSet the point set to be converted to xml
+     * \param out the stream to write to.
      */
     void WriteXML(mitk::PointSet *pointSet, std::ofstream &out);
 
     /**
      * Writes an standard xml header to the given stream.
-     * @param file the stream in which the header is written.
+     * \param file the stream in which the header is written.
      */
     void WriteXMLHeader(std::ofstream &file);
 
@@ -225,29 +252,24 @@ namespace mitk
     bool m_Success;
 
   public:
-    static const char *XML_POINT_SET;
-
-    static const char *XML_TIME_SERIES;
-
-    static const char *XML_TIME_SERIES_ID;
-
-    static const char *XML_POINT_SET_FILE;
-
-    static const char *XML_FILE_VERSION;
-
-    static const char *XML_POINT;
-
-    static const char *XML_SPEC;
-
-    static const char *XML_ID;
-
-    static const char *XML_X;
-
-    static const char *XML_Y;
-
-    static const char *XML_Z;
-
-    static const char *VERSION_STRING;
+    /** \name XML Tag Name Constants
+     *  String constants for the XML element and attribute names used in the
+     *  point set file format.
+     */
+    //\{
+    static const char *XML_POINT_SET;      ///< \brief XML element name for a single point set ("point_set").
+    static const char *XML_TIME_SERIES;    ///< \brief XML element name for a time series ("time_series").
+    static const char *XML_TIME_SERIES_ID; ///< \brief XML element name for a time series identifier ("time_series_id").
+    static const char *XML_POINT_SET_FILE; ///< \brief XML root element name ("point_set_file").
+    static const char *XML_FILE_VERSION;   ///< \brief XML element name for the file version ("file_version").
+    static const char *XML_POINT;          ///< \brief XML element name for an individual point ("point").
+    static const char *XML_SPEC;           ///< \brief XML element name for point specification ("specification").
+    static const char *XML_ID;             ///< \brief XML element name for a point identifier ("id").
+    static const char *XML_X;              ///< \brief XML element name for the X coordinate ("x").
+    static const char *XML_Y;              ///< \brief XML element name for the Y coordinate ("y").
+    static const char *XML_Z;              ///< \brief XML element name for the Z coordinate ("z").
+    static const char *VERSION_STRING;     ///< \brief The current file format version string.
+    //\}
   };
 }
 

@@ -29,16 +29,24 @@ namespace mitk
   class ContourModel;
 
   /**
-  * @brief Base class for OpenGL based 2D mappers.
-  * Provides functionality to draw a contour.
-  *
-  * @ingroup MitkContourModelModule
-  */
+   * \brief Abstract base class for OpenGL-based 2D contour mappers.
+   *
+   * Provides shared functionality for drawing contour models in 2D render windows
+   * using OpenGL. Subclasses such as ContourModelGLMapper2D and ContourModelSetGLMapper2D
+   * implement the MitkRender method to handle specific data types.
+   *
+   * \sa ContourModelGLMapper2D, ContourModelSetGLMapper2D, ContourModel
+   * \ingroup MitkContourModelModule
+   */
   class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public Mapper
   {
   public:
     mitkClassMacro(ContourModelGLMapper2DBase, Mapper);
 
+    /** \brief Apply color and opacity properties from the data node to the rendering context.
+     * \param[in] renderer The base renderer providing the rendering context.
+     * \param[in] actor Optional VTK actor (unused in OpenGL rendering). Default is nullptr.
+     */
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * actor = nullptr) override;
 
   protected:

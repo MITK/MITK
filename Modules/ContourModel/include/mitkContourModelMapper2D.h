@@ -30,25 +30,37 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief VTK-based mapper to display a mitk::ContourModel in a 2D render window.
+   *
+   * Creates VTK polydata from the contour vertices projected onto the current 2D slice
+   * and renders the result using VTK actors.
+   *
+   * \sa ContourModel, ContourModelMapper3D, ContourModelGLMapper2D
+   * \ingroup MitkContourModelModule
+   */
   class MITKCONTOURMODEL_EXPORT ContourModelMapper2D : public VtkMapper
   {
   public:
-    /** Standard class typedefs. */
     mitkClassMacro(ContourModelMapper2D, VtkMapper);
 
-    /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief Return the input ContourModel data object.
+       * \return Const pointer to the ContourModel associated with this mapper's data node.
+       */
       const mitk::ContourModel *GetInput(void);
 
-    /** \brief Checks whether this mapper needs to update itself and generate
-   * data. */
+    /** \brief Check whether this mapper needs to regenerate its rendering data.
+     * \param[in] renderer The renderer to check for update necessity.
+     */
     void Update(mitk::BaseRenderer *renderer) override;
 
-    /*+++ methods of MITK-VTK rendering pipeline +++*/
+    /** \brief Return the top-level VTK prop for the given renderer.
+     * \param[in] renderer The renderer for which to retrieve the VTK prop.
+     * \return The VTK prop representing this contour in the render window.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
     class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
@@ -71,13 +83,20 @@ namespace mitk
       ~LocalStorage() override {}
     };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    /** \brief Handler that manages per-renderer LocalStorage instances. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    /** \brief Retrieve the LocalStorage for the given renderer.
+     * \param[in] renderer The renderer whose local storage is requested.
+     * \return Pointer to the corresponding LocalStorage instance.
+     */
     LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
 
-    /** \brief Set the default properties for general image rendering. */
+    /** \brief Set default rendering properties for ContourModel 2D display.
+     * \param[in] node The data node to configure.
+     * \param[in] renderer The renderer context. If nullptr, properties are set globally.
+     * \param[in] overwrite If true, existing properties are overwritten.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:

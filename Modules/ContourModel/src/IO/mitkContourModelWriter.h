@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief XML-based writer for mitk::ContourModels
+   * \brief XML-based writer for mitk::ContourModels.
    *
    * XML-based writer for mitk::ContourModels. Multiple ContourModels can be written in
    * a single XML file by simply setting multiple inputs to the filter.
@@ -50,16 +50,22 @@ namespace mitk
    *    </contourModel>
    * \endcode
    *
-   * @ingroup MitkContourModelModule
+   * \ingroup MitkContourModelModule
    */
 
   class ContourModelWriter : public mitk::AbstractFileWriter
   {
   public:
+    /**
+     * \brief Construct the writer, optionally including an XML header.
+     * \param writeXMLHeader If true (default), the XML declaration is written at the top of the file.
+     */
     explicit ContourModelWriter(bool writeXMLHeader = true);
     ~ContourModelWriter() override;
 
     using AbstractFileWriter::Write;
+
+    /** \brief Write the ContourModel to the configured output location. */
     void Write() override;
 
   protected:
@@ -68,64 +74,104 @@ namespace mitk
     mitk::ContourModelWriter *Clone() const override;
 
     /**
-     * Converts an arbitrary type to a string. The type has to
-     * support the << operator. This works fine at least for integral
-     * data types as float, int, long etc.
-     * @param value the value to convert
-     * @returns the string representation of value
+     * \brief Convert an arbitrary type to a string.
+     *
+     * The type must support the << operator. Works for integral data types
+     * such as float, int, long, etc.
+     *
+     * \tparam T The type to convert.
+     * \param value The value to convert.
+     * \return The string representation of value.
      */
     template <typename T>
     std::string ConvertToString(T value);
 
     /**
-     * Writes an XML representation of the given point set to
-     * an outstream. The XML-Header an root node is not included!
-     * @param contourModel the point set to be converted to xml
-     * @param out the stream to write to.
+     * \brief Write an XML representation of the given contour model to a stream.
+     *
+     * The XML header and root node are not included.
+     *
+     * \param contourModel The contour model to be serialized.
+     * \param out The output stream to write to.
      */
     void WriteXML(const mitk::ContourModel *contourModel, std::ostream &out);
 
     /**
-    * Writes the geometry information of the TimeGeometry to an outstream.
-    * The root tag is not included.
-    * @param geometry the TimeGeometry of the contour.
-    * @param out the stream to write to.
-    */
+     * \brief Write the geometry information of a TimeGeometry to a stream.
+     *
+     * The root tag is not included.
+     *
+     * \param geometry The TimeGeometry of the contour.
+     * \param out The output stream to write to.
+     */
     void WriteGeometryInformation(const mitk::TimeGeometry *geometry, std::ostream &out);
 
     /**
-     * Writes an standard xml header to the given stream.
-     * @param file the stream in which the header is written.
+     * \brief Write a standard XML header to the given stream.
+     * \param file The output stream.
      */
     void WriteXMLHeader(std::ostream &file);
 
-    /** Write a start element tag */
+    /**
+     * \brief Write a start element tag.
+     * \param tag The element tag name.
+     * \param file The output stream.
+     */
     void WriteStartElement(const char *const tag, std::ostream &file);
 
+    /**
+     * \brief Write a start element tag with attributes.
+     * \param tag The element tag name.
+     * \param attributes The attribute names.
+     * \param values The attribute values (parallel to attributes).
+     * \param file The output stream.
+     */
     void WriteStartElementWithAttribut(const char *const tag,
                                        std::vector<std::string> attributes,
                                        std::vector<std::string> values,
                                        std::ostream &file);
 
     /**
-     * Write an end element tag
-     * End-Elements following character data should pass indent = false.
+     * \brief Write an end element tag.
+     *
+     * End-elements following character data should pass indent = false.
+     *
+     * \param tag The element tag name.
+     * \param file The output stream.
+     * \param indent Whether to write indentation before the tag.
      */
     void WriteEndElement(const char *const tag, std::ostream &file, const bool &indent = true);
 
-    /** Write character data inside a tag. */
+    /**
+     * \brief Write character data inside a tag.
+     * \param data The character data string.
+     * \param file The output stream.
+     */
     void WriteCharacterData(const char *const data, std::ostream &file);
 
-    /** Write a start element tag */
+    /**
+     * \brief Write a start element tag (std::string overload).
+     * \param tag The element tag name.
+     * \param file The output stream.
+     */
     void WriteStartElement(std::string &tag, std::ostream &file);
 
-    /** Write an end element tag */
+    /**
+     * \brief Write an end element tag (std::string overload).
+     * \param tag The element tag name.
+     * \param file The output stream.
+     * \param indent Whether to write indentation before the tag.
+     */
     void WriteEndElement(std::string &tag, std::ostream &file, const bool &indent = true);
 
-    /** Write character data inside a tag. */
+    /**
+     * \brief Write character data inside a tag (std::string overload).
+     * \param data The character data string.
+     * \param file The output stream.
+     */
     void WriteCharacterData(std::string &data, std::ostream &file);
 
-    /** Writes empty spaces to the stream according to m_IndentDepth and m_Indent */
+    /** \brief Write indentation spaces to the stream according to m_IndentDepth and m_Indent. */
     void WriteIndent(std::ostream &file);
 
     bool m_WriteXMLHeader;

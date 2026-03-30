@@ -20,13 +20,26 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  @brief Gets a predicate for a valid multi label segmentation node
-  @details Predicate: DataType:MultiLabelSegmentation && !(Property:binary) && !(Property:helper object) && isSubGeometry(referenceGeometry; if set) 
-  */
+   * \brief Creates a predicate that matches valid multi-label segmentation data nodes.
+   *
+   * The predicate checks for:
+   * - Data type is MultiLabelSegmentation
+   * - The node is NOT a binary image
+   * - The node is NOT a helper object
+   * - Optionally: the node geometry is a sub-geometry of the given reference geometry
+   *
+   * \param[in] referenceGeometry Optional reference geometry for sub-geometry filtering.
+   *            If nullptr, no geometry check is performed.
+   * \return A NodePredicateBase smart pointer for filtering data nodes.
+   * \sa GetSegmentationReferenceImagePredicate
+   */
   mitk::NodePredicateBase::Pointer MITKMULTILABEL_EXPORT GetMultiLabelSegmentationPredicate(const mitk::BaseGeometry* referenceGeometry = nullptr);
+
   /**
-  @brief Gets a predicate for the images that can be used as reference for a segmentation.
-  */
+   * \brief Creates a predicate that matches images suitable as reference for a segmentation.
+   * \return A NodePredicateBase smart pointer for filtering reference image nodes.
+   * \sa GetMultiLabelSegmentationPredicate
+   */
   mitk::NodePredicateBase::Pointer MITKMULTILABEL_EXPORT GetSegmentationReferenceImagePredicate();
 }
 

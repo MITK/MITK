@@ -21,9 +21,28 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Helper class for setting standard DICOM Segmentation properties on a MultiLabelSegmentation.
+   *
+   * Provides a static method that populates a MultiLabelSegmentation's property list with
+   * required DICOM tags for SEG modality, including Modality (SEG), Series Description,
+   * Content Creator Name, Clinical Trial Series ID, Time Point ID, and Coordinating
+   * Center Name.
+   *
+   * \sa DICOMSegmentationConstants, MultiLabelSegmentation
+   */
   class MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHelper
   {
   public:
+    /**
+     * \brief Populates the segmentation image with standard DICOM Segmentation properties.
+     *
+     * Sets properties such as Modality="SEG", Series Description="MITK Segmentation",
+     * Content Creator Name="MITK", and related clinical trial identifiers.
+     *
+     * \param[in,out] dicomSegImage The segmentation image to populate with DICOM properties.
+     * \pre dicomSegImage must point to a valid MultiLabelSegmentation instance.
+     */
     static void DeriveDICOMSegmentationProperties(MultiLabelSegmentation* dicomSegImage);
   };
 }

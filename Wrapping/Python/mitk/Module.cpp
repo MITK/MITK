@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 namespace py = pybind11;
 
+void InitCppMicroServices(py::module_&);
 void InitException(py::module_&);
 void InitPoints(py::module_&);
 void InitVectors(py::module_&);
@@ -28,6 +29,7 @@ PYBIND11_MODULE(mitk, m)
   py::module_ os = py::module_::import("os");
   os.attr("environ")["PYMITK"] = "1";
 
+  InitCppMicroServices(m);
   InitException(m);
   InitPoints(m);
   InitVectors(m);

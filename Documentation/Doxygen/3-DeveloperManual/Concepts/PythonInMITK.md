@@ -87,8 +87,38 @@ To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
 ## Python Wrapping: The mitk Python module
 
 The Python wrapping of MITK is handled by pybind11.
+The bindings are defined in `Wrapping/Python/mitk/` and compiled into a native extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`).
 
-**Note**: Currently, only a small subset of MITK is wrapped — primarily to support data exchange, such as transferring images, between MITK and Python.
+Currently, the following types and functions are exposed:
+
+| Category | Types / Functions |
+|---|---|
+| **Image** | `Image` with `initialize()`, `as_numpy()`, `get_dimension()` |
+| **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry`, `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
+| **Pixel types** | `PixelType`, `make_pixel_type()` |
+| **Points / Vectors** | `Point2D`, `Point3D`, `Vector2D`, `Vector3D` |
+| **Exceptions** | `Exception` |
+| **CppMicroServices** | `get_loaded_modules()` |
+
+All classes are instantiated through factory methods (e.g. `mitk.Image.new()`) and managed via MITK's reference-counted smart pointers.
+
+Basic usage:
+
+```python
+import mitk
+import numpy as np
+
+img = mitk.Image.new()
+img.initialize("float32", [64, 64, 64])
+
+arr = img.as_numpy(writeable=True)
+arr[32, 32, 32] = 1.0
+del arr  # release write accessor before reading
+
+print(img.as_numpy()[32, 32, 32])  # 1.0
+```
+
+The bindings are available both within MITK applications (via the embedded Python in `MITK-build/python`) and as a standalone installable wheel (see below).
 
 ## Virtual environments
 
@@ -105,6 +135,65 @@ These virtual environments are stored in the `mitk_venvs` folder within a dedica
 To avoid interference between multiple MITK versions built or installed on the same machine, we use a hash of the application path of the currently running MITK application as the top-level folder name inside `mitk_venvs`.
 
 Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Settings** plugin in MITK.
+
+## Python Wheel
+
+The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk-*.whl`).
+This allows users to `pip install` the MITK bindings into any compatible Python environment without building MITK from source.
+
+### What is in the wheel?
+
+The wheel bundles:
+
+- The compiled pybind11 extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`)
+- All CppMicroServices auto-load modules (IO readers/writers, model fit services, etc.)
+- All native library dependencies (ITK, VTK, CppMicroServices, MITK modules, etc.), vendored via a platform-specific delocator
+
+On import, `mitk/__init__.py` sets up the environment so that CppMicroServices auto-loading works transparently — the same IO file formats are available as in a full MITK application.
+
+### Building the wheel
+
+Use the `PythonWheel` build configuration, which is a headless configuration (no Qt, BlueBerry, or plugins) locked to Release builds:
+
+```bash
+cmake -S . -B ../MITK-superbuild -DMITK_BUILD_CONFIGURATION=PythonWheel
+cmake --build ../MITK-superbuild
+cmake --build ../MITK-superbuild/MITK-build
+```
+
+The last command builds all MITK modules and then automatically produces the wheel in the `MITK-build/` directory via the `mitk_python_wheel` target, which is included in the default build.
+
+The target:
+1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
+2. Stages the bindings and auto-load modules via `cmake --install --component wheel`
+3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
+
+The platform delocators are:
+- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk.libs/`
+- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk.libs/` and patches RPATH
+- **macOS**: [delocate](https://github.com/matthew-brett/delocate) — copies dylibs into `mitk/.dylibs/` and rewrites load commands
+
+### Testing the wheel
+
+A self-contained smoke test script is provided:
+
+```bash
+python Wrapping/Python/wheel/test_wheel.py --build-dir ../MITK-superbuild/MITK-build
+```
+
+This automatically creates a temporary virtual environment, installs the wheel, runs the tests, and cleans up.
+The tests verify import, image creation, NumPy roundtrip, geometry types, and CppMicroServices auto-loading.
+
+### Standalone usage
+
+The `build_wheel.py` script can also be invoked manually outside of the CMake build:
+
+```bash
+python Wrapping/Python/wheel/build_wheel.py --build-dir <MITK-build>
+```
+
+The wheel is written to the build directory by default.
+Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocator step for debugging.
 
 ## Quirks
 

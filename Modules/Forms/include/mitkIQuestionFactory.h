@@ -35,20 +35,30 @@ namespace mitk::Forms
   {
   public:
     /** \brief Obtain a pointer to the single instance of this service.
+     *
+     * \return A pointer to the IQuestionFactory service, or \c nullptr if the service is unavailable.
      */
     static IQuestionFactory* GetInstance();
 
+    /** \brief Virtual destructor.
+     */
     virtual ~IQuestionFactory();
 
     /** \brief Register a Question subclass for the instance creation based on its type string.
      *
-     * The service takes over ownership of the passed Question pointer.
+     * The service takes over ownership of the passed Question pointer. The type string
+     * is obtained via Question::GetType() on the passed prototype.
+     *
+     * \param[in] question A prototype instance of the Question subclass. Ownership is transferred.
      *
      * \sa Question::GetType()
      */
     virtual void Register(Question* question) = 0;
 
     /** \brief Create an instance of a Question subclass based on its type string.
+     *
+     * \param[in] type The type string identifying the Question subclass to instantiate.
+     * \return A new Question instance. The caller takes ownership.
      *
      * \sa Question::GetType(), Question::CreateAnother()
      */

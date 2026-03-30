@@ -25,30 +25,51 @@ namespace mitk::Forms
 {
   /** \brief Abstract base class for all types of questions used in a Form.
    *
+   * Question defines the common interface shared by every question type in the Forms module.
+   * Concrete question types (e.g. ShortAnswerQuestion, CheckboxesQuestion) derive from this
+   * class and implement its pure virtual functions.
+   *
    * Please make sure to read the full documentation of the pure virtual functions in particular to
    * fully understand implications and requirements.
+   *
+   * \sa Form, IQuestionFactory, TextQuestion, QuestionWithOptions, LinearScaleQuestion, ScreenshotQuestion
    */
   class MITKFORMS_EXPORT Question
   {
   public:
+    /** \brief Default constructor.
+     *
+     * Initializes the question as not required with an empty question text.
+     */
     Question();
+
+    /** \brief Virtual destructor.
+     */
     virtual ~Question();
 
-    /** \brief Get the literal question.
+    /** \brief Get the literal question text.
+     *
+     * \return The question text string.
      */
     std::string GetQuestionText() const;
 
-    /** \brief Set the literal question.
+    /** \brief Set the literal question text.
+     *
+     * \param[in] question The question text to display.
      */
     void SetQuestionText(const std::string& question);
 
     /** \brief Check whether a response to this question is required to complete a form.
+     *
+     * \return \c true if the question is required, \c false otherwise.
      */
     bool IsRequired() const;
 
-    /** \brief Set whether a resonse to this question is required to complete a form.
+    /** \brief Set whether a response to this question is required to complete a form.
      *
      * A question is not required by default.
+     *
+     * \param[in] required Pass \c true to mark the question as required, \c false to mark it as optional.
      */
     void SetRequired(bool required = true);
 
@@ -58,6 +79,10 @@ namespace mitk::Forms
      * The method can be overridden to customize the default text, e.g. for more complex types
      * of questions, where specific guidance is beneficial.
      *
+     * The default implementation returns "This is a required question".
+     *
+     * \return A human-readable string describing the requirement.
+     *
      * \sa IsComplete()
      */
     virtual std::string GetRequiredText() const;
@@ -66,6 +91,8 @@ namespace mitk::Forms
      *
      * Always returns \c false - override this method only if necessary. Typically used during
      * submission to determine if any files should be attached.
+     *
+     * \return \c true if responses represent file paths, \c false otherwise.
      *
      * \sa SubmitFileResponses()
      */
@@ -77,6 +104,11 @@ namespace mitk::Forms
      * \c true. The given base path should then be used to copy any files. The returned paths
      * should be relative to the base path and are used for submission instead of the return
      * value of GetResponsesAsStrings().
+     *
+     * The default implementation returns an empty vector.
+     *
+     * \param[in] basePath The directory to which response files are copied.
+     * \return A vector of file paths relative to \p basePath.
      *
      * \sa HasFileResponses()
      */
@@ -146,10 +178,14 @@ namespace mitk::Forms
      *   return { m_Response };
      * }
      * \endcode
+     *
+     * \return A vector of response strings.
      */
     virtual std::vector<std::string> GetResponsesAsStrings() const = 0;
 
     /** \brief Clear the/all response(s).
+     *
+     * After calling this method, IsComplete() returns \c false.
      */
     virtual void ClearResponses() = 0;
 
@@ -157,6 +193,8 @@ namespace mitk::Forms
      *
      * This method is typically called when IsRequired() returns \c true to determine
      * whether the requirements are fulfilled.
+     *
+     * \return \c true if the question has a complete response, \c false otherwise.
      */
     virtual bool IsComplete() const = 0;
 
@@ -175,6 +213,8 @@ namespace mitk::Forms
      *   from_json(j, *this);
      * }
      * \endcode
+     *
+     * \param[in] j The JSON object to deserialize from.
      *
      * \sa from_json(const nlohmann::ordered_json& j, Question& q)
      */
@@ -195,6 +235,8 @@ namespace mitk::Forms
      *   to_json(j, *this);
      * }
      * \endcode
+     *
+     * \param[out] j The JSON object to serialize into.
      *
      * \sa to_json(nlohmann::ordered_json& j, const Question& q)
      */
@@ -227,6 +269,9 @@ namespace mitk::Forms
    * }
    * \endcode
    *
+   * \param[in] j The JSON object to deserialize from.
+   * \param[in,out] q The Question object to populate.
+   *
    * \sa Question::FromJSON()
    */
   MITKFORMS_EXPORT void from_json(const nlohmann::ordered_json& j, Question& q);
@@ -250,6 +295,9 @@ namespace mitk::Forms
    *   // TODO: Serialization of members exclusive to the derived class...
    * }
    * \endcode
+   *
+   * \param[out] j The JSON object to serialize into.
+   * \param[in] q The Question object to serialize.
    *
    * \sa Question::ToJSON()
    */

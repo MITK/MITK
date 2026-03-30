@@ -25,6 +25,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Find the closest segmentation mask for lesion propagation.
+   *
+   * Uses the MatchPoint registration ontology to locate the segmentation mask
+   * that is closest to the given lesion in the registration graph.
+   *
+   * \note Currently a stub/placeholder implementation.
+   */
   MITKREGISTRATIONONTOLOGY_EXPORT void FindClosestSegmentationMask();
 } // namespace mitk
 

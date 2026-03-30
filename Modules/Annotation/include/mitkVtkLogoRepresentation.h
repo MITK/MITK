@@ -15,22 +15,31 @@ found in the LICENSE file.
 
 #include <vtkLogoRepresentation.h>
 
+/**
+ * \brief Extended VTK logo representation with configurable corner placement.
+ *
+ * Extends vtkLogoRepresentation to allow positioning the logo in a specific
+ * corner of the render window (bottom-left, bottom-right, top-right, top-left,
+ * or center).
+ *
+ * \sa LogoAnnotation
+ */
 class mitkVtkLogoRepresentation : public vtkLogoRepresentation
 {
 public:
-  // Description:
-  // Instantiate this class.
+  /** \brief Instantiate this class. */
   static mitkVtkLogoRepresentation *New();
 
-  // Description:
-  // Standard VTK class methods.
   vtkTypeMacro(mitkVtkLogoRepresentation, vtkLogoRepresentation);
   void PrintSelf(ostream &os, vtkIndent indent) override;
 
-  // Description:
-  // Satisfy the superclasses' API.
+  /** \brief Build the representation geometry. */
   void BuildRepresentation() override;
 
+  /** \brief Set the corner position for the logo placement.
+   *
+   * 0 = Bottom left, 1 = Bottom right, 2 = Top right, 3 = Top left, 4 = Center.
+   */
   void SetCornerPosition(int corner) { cornerPosition = corner; }
 protected:
   mitkVtkLogoRepresentation();

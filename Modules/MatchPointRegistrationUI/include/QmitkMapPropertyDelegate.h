@@ -13,53 +13,83 @@ found in the LICENSE file.
 #ifndef QmitkMapPropertyDelegate_h
 #define QmitkMapPropertyDelegate_h
 
-/// Toolkit includes.
 #include <mitkBaseProperty.h>
 #include <QStyledItemDelegate>
 
 // MITK
 #include <MitkMatchPointRegistrationUIExports.h>
 
-/// Forward declarations.
-
-///
-/// \class QmitkPropertyDelegate
-/// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
-///
-/// \see QmitkPropertiesTableModel
+/**
+ * \class QmitkMapPropertyDelegate
+ * \brief Item delegate for rendering and editing MatchPoint algorithm meta-properties in a QTableView.
+ *
+ * This delegate creates appropriate editor widgets (QSpinBox, QDoubleSpinBox, QComboBox, or
+ * default QStyledItemDelegate editors) based on the Qt type of the property value. It handles
+ * data transfer between the editors and the underlying model (typically a QmitkMAPAlgorithmModel)
+ * and commits changes on relevant user interaction events (key release, mouse release, focus, etc.).
+ *
+ * Supported property types and their editors:
+ * - \c int: QSpinBox
+ * - \c float: QDoubleSpinBox (5 decimal places)
+ * - \c QStringList: QComboBox (non-editable)
+ * - Other types: default QStyledItemDelegate editor
+ *
+ * \sa QmitkMAPAlgorithmModel, QmitkAlgorithmSettingsConfig
+ */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapPropertyDelegate /** \cond */ : public QStyledItemDelegate /** \endcond */
 {
   Q_OBJECT
 
 public:
-  ///
-  /// Creates a new PropertyDelegate.
-  ///
+  /**
+   * \brief Constructs the property delegate.
+   * \param[in] parent Optional parent QObject.
+   */
   QmitkMapPropertyDelegate(QObject *parent = nullptr);
 
-  ///
-  /// Renders a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Paints the delegate for the given model index.
+   * \param[in] painter The painter to use.
+   * \param[in] option Style options for the item.
+   * \param[in] index The model index to paint.
+   */
   void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-  ///
-  /// Create an editor for a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Creates an appropriate editor widget for the property at the given index.
+   *
+   * The editor type is determined by the Qt meta type of the data at the index:
+   * QSpinBox for int, QDoubleSpinBox for float, QComboBox for QStringList, or
+   * the default delegate editor for other types.
+   *
+   * \param[in] parent The parent widget for the editor.
+   * \param[in] option Style options for the item.
+   * \param[in] index The model index identifying the property to edit.
+   * \return The created editor widget, or a QLabel if the data is not editable.
+   */
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-  ///
-  /// Create an editor for a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Populates the editor widget with data from the model.
+   * \param[in] editor The editor widget to populate.
+   * \param[in] index The model index providing the data.
+   */
   void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
-  ///
-  /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Commits data from the editor widget back to the model.
+   * \param[in] editor The editor widget containing the user's input.
+   * \param[in,out] model The model to receive the data.
+   * \param[in] index The model index identifying the property being edited.
+   */
   void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
-  ///
-  /// \brief Fit an editor to some geometry (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Updates the editor geometry to fit the item's bounding rectangle.
+   * \param[in] editor The editor widget to resize.
+   * \param[in] option Style options containing the geometry.
+   * \param[in] index The model index (unused).
+   */
   void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 protected:

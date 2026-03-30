@@ -27,29 +27,60 @@ namespace Ui
 
 /**
  * \class QmitkRegEvalSettingsWidget
- * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
+ * \brief Widget for configuring the visual evaluation settings of a registration result.
+ *
+ * This widget allows the user to configure how a registration evaluation object
+ * (mitk::RegEvaluationObject) is visualized. It supports several evaluation styles
+ * defined by mitk::RegEvalStyleProperty, including:
+ * - Blend: adjustable opacity blending between target and moving images
+ * - Checkerboard: configurable grid count
+ * - Wipe: cross, horizontal, or vertical wipe styles
+ * - Contour: target or moving contour overlay
+ *
+ * The widget reads and writes properties directly on the configured mitk::DataNode,
+ * and emits SettingsChanged whenever a property is modified by the user.
+ *
+ * \sa mitk::RegEvaluationObject, mitk::RegEvalStyleProperty, mitk::RegEvalWipeStyleProperty
  */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegEvalSettingsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the registration evaluation settings widget.
+   * \param[in] parent Optional parent widget.
+   */
   QmitkRegEvalSettingsWidget(QWidget *parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkRegEvalSettingsWidget() override;
 
   /**
-   * Configures the passed settings according to the current state of the
-   * widget.
-   * \pre settings must point to a valid instance..
+   * \brief Configures the UI controls according to the properties of the currently selected node.
+   *
+   * Reads the evaluation style, blend factor, checker count, and contour style from the
+   * node's properties and updates all controls accordingly. If no node is set, the
+   * style-specific control groups are hidden.
    */
   void ConfigureControls();
 
 public Q_SLOTS:
   /**
-    * \brief Slot that can be used to set the node that should be configured by the widget.*/
+   * \brief Sets the data node whose evaluation properties should be configured.
+   *
+   * If the node differs from the currently set node, the widget is reconfigured
+   * via ConfigureControls().
+   *
+   * \param[in] node Pointer to the evaluation data node. May be \c nullptr to clear.
+   */
   void SetNode(mitk::DataNode *node);
 
 signals:
+  /**
+   * \brief Emitted whenever a user-initiated change modifies an evaluation property on the node.
+   * \param[in] node Pointer to the data node whose properties were changed.
+   */
   void SettingsChanged(mitk::DataNode *node);
 
 protected Q_SLOTS:

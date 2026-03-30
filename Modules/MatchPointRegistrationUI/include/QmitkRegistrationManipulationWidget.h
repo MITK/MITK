@@ -31,49 +31,122 @@ namespace Ui
   class QmitkRegistrationManipulationWidget;
 }
 
-/*!
-\brief QmitkMatchPointRegistrationManipulator
-
-\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-\ingroup ${plugin_target}_internal
-*/
+/**
+ * \class QmitkRegistrationManipulationWidget
+ * \brief Widget for interactively manipulating a 3D rigid registration (rotation and translation).
+ *
+ * This widget provides sliders and spin boxes for adjusting the rotation (Euler angles
+ * around X, Y, Z in degrees) and translation (X, Y, Z in mm) of a 3D rigid transform
+ * based on itk::Euler3DTransform. The manipulated registration can optionally be composed
+ * with a preceding (baseline) registration.
+ *
+ * The widget maintains both direct and inverse transforms internally and emits
+ * RegistrationChanged whenever the user modifies any parameter. The interim registration
+ * can be queried at any time via GetInterimRegistration(), while GenerateRegistration()
+ * creates a finalized independent copy (optionally composed with the preceding registration).
+ *
+ * The center of rotation can be configured to be relative to the target space (in which case
+ * it is automatically updated through the inverse transform) or relative to the moving space.
+ *
+ * \sa QmitkRegistrationJob, mitk::MAPRegistrationWrapper
+ */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the registration manipulation widget.
+   * \param[in] parent Optional parent widget.
+   */
   QmitkRegistrationManipulationWidget(QWidget *parent = nullptr);
 
+  /** \brief Destructor. */
   ~QmitkRegistrationManipulationWidget() override;
 
-  /** Type of transform that can be provided as preceding transform.*/
+  /** \brief Type alias for a 3D-to-3D MatchPoint registration. */
   typedef map::core::Registration<3, 3> MAPRegistrationType;
 
-  /** Initializing/reset widget with identity transform.*/
+  /**
+   * \brief Initializes the widget with an identity transform.
+   *
+   * Resets all rotation and translation parameters to zero and clears
+   * any preceding registration.
+   */
   void Initialize();
 
-  /** Initializing/reset widget with a preceding registration.*/
+  /**
+   * \brief Initializes the widget with a preceding (baseline) registration.
+   *
+   * Resets the current manipulation transform to identity and composes it with
+   * the given preceding registration. The final registration produced by
+   * GenerateRegistration() will combine both.
+   *
+   * \param[in] precedingRegistration Pointer to the baseline registration to build upon.
+   * \pre \p precedingRegistration must not be \c nullptr.
+   */
   void Initialize(MAPRegistrationType* precedingRegistration);
 
-  /** Initializing/reset widget with an translation transform deduced by the to passed reference points.*/
+  /**
+   * \brief Initializes the widget with a translation derived from two reference points.
+   *
+   * Computes the translation offset as \p targetReference - \p movingReference and
+   * sets this as the initial transform. No preceding registration is used.
+   *
+   * \param[in] movingReference A reference point in the moving image space.
+   * \param[in] targetReference The corresponding reference point in the target image space.
+   */
   void Initialize(const mitk::Point3D& movingReference, const mitk::Point3D& targetReference);
 
-  /**This function offers access to a registration instance that represents the internal state of the
-  registration currently manipulated by the widget. It can be used for example to update the visualization.*/
+  /**
+   * \brief Returns the current interim registration reflecting the widget's transform state.
+   *
+   * The returned registration is the internal working registration and is updated
+   * live as the user manipulates the controls. It can be used for real-time
+   * visualization updates.
+   *
+   * \return Pointer to the current interim registration. Ownership remains with the widget.
+   */
   map::core::RegistrationBase* GetInterimRegistration() const;
 
-  /**This function generates a new registration instance that resembles the state when the method was called.
-  Ownership of the return goes to the caller.*/
+  /**
+   * \brief Generates a new independent registration representing the current manipulation state.
+   *
+   * Creates a new registration with both direct and inverse mapping kernels. If a preceding
+   * registration was set via Initialize(), the result is the composition of the preceding
+   * registration and the current manipulation transform.
+   *
+   * \return Smart pointer to the newly created registration. Ownership is transferred to the caller.
+   */
   map::core::RegistrationBase::Pointer GenerateRegistration()const ;
 
 public Q_SLOTS:
+  /**
+   * \brief Sets the center of rotation for the Euler transform.
+   *
+   * The center point is interpreted in either target or moving space depending on
+   * the value of SetCenterOfRotationIsRelativeToTarget().
+   *
+   * \param[in] center The 3D center of rotation point.
+   */
   void SetCenterOfRotation(const mitk::Point3D& center);
 
-  /** Sets the internal m_CenterOfRotationIsRelativeToTarget. see below.*/
+  /**
+   * \brief Controls whether the center of rotation is specified relative to the target space.
+   *
+   * If \p targetRelative is true, the center of rotation is given in target space coordinates
+   * and will be mapped through the inverse transform to obtain the moving-space center.
+   * If false, the center is used directly in moving space.
+   *
+   * \param[in] targetRelative True for target-relative center, false for moving-relative center.
+   */
   void SetCenterOfRotationIsRelativeToTarget(bool targetRelative);
 
 signals:
+  /**
+   * \brief Emitted whenever the user modifies the registration transform via the widget controls.
+   * \param[in] registration Pointer to the updated interim registration.
+   */
   void RegistrationChanged(map::core::RegistrationBase *registration);
 
 protected slots:

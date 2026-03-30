@@ -23,31 +23,35 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Read and Writes a Parametric map to a dcm file
-   * @ingroup Process
+   * \brief Read and write DICOM Parametric Map objects.
+   * \ingroup Process
    */
   class DICOMPMIO : public mitk::AbstractFileIO
   {
   public:
-
-
+    /** \brief Default constructor. Registers reader/writer for the DICOM PM MIME type. */
     DICOMPMIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a parametric map. */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
+    /** \brief Write the parametric map to a DICOM file. */
     void Write() override;
+
+    /** \brief Return the confidence level for writing the given data as a DICOM parametric map. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+
   protected:
     /**
-     * @brief Reads a DICOM parametric map from the file system
-     * @return an mitk::Image
-     * @throws an mitk::Exception if an error occurs
+     * \brief Read a DICOM parametric map from the file system.
+     * \return A vector containing the loaded mitk::Image.
+     * \throw mitk::Exception if an error occurs during reading.
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

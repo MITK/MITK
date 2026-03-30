@@ -22,19 +22,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-   /**Computes the SUV body weight scale factor.
-      @param injectedActivity Activity injected in [Bq]
-      @param bodyweight Weight of the subject in [kg]
-      @param decayTime Time between injection and measurement in [s]
-      @param halfLife Halflife of the used nuclide in [s]*/
+  /**
+   * \brief Compute the SUV body weight (SUVbw) scale factor.
+   *
+   * Calculates the multiplicative scale factor used to convert raw PET pixel values to
+   * body-weight-normalized Standardized Uptake Values (SUVbw). The formula accounts for
+   * radioactive decay between injection and measurement time:
+   *
+   * \code
+   * factor = (bodyweight * 1000) / (injectedActivity * 2^(-decayTime / halfLife))
+   * \endcode
+   *
+   * \param[in] injectedActivity Activity injected in [Bq].
+   * \param[in] bodyweight Weight of the subject in [kg].
+   * \param[in] decayTime Time between injection and measurement in [s].
+   * \param[in] halfLife Half-life of the used radionuclide in [s].
+   * \return The SUVbw scale factor (dimensionless, [g/Bq] effectively).
+   *
+   * \sa computeSUVbw, SUVbwFunctorPolicy, HALFLIFECONSTANTS
+   */
   double MITKPET_EXPORT computeSUVbwScaleFactor(double injectedActivity, double bodyweight, double decayTime, double halfLife);
 
-   /**Computes the SUV body weighted for the passed value.
-   @param value Value that should be scaled by the SUVbw factor to get the body weighted SUV.
-   @param injectedActivity Activity injected in [Bq]
-   @param bodyweight Weight of the subject in [kg]
-   @param decayTime Time between injection and measurement in [s]
-   @param halfLife Halflife of the used nuclide in [s]*/
+  /**
+   * \brief Compute the body-weight-normalized SUV (SUVbw) for a single value.
+   *
+   * Multiplies the given raw PET pixel value by the SUVbw scale factor to produce
+   * the body-weight-normalized Standardized Uptake Value.
+   *
+   * \param[in] value Raw PET pixel value to be converted (typically in [Bq/ml]).
+   * \param[in] injectedActivity Activity injected in [Bq].
+   * \param[in] bodyweight Weight of the subject in [kg].
+   * \param[in] decayTime Time between injection and measurement in [s].
+   * \param[in] halfLife Half-life of the used radionuclide in [s].
+   * \return The computed SUVbw value [g/ml].
+   *
+   * \sa computeSUVbwScaleFactor, SUVbwFunctorPolicy
+   */
   double MITKPET_EXPORT computeSUVbw(double value, double injectedActivity, double bodyweight, double decayTime, double halfLife);
 };
 

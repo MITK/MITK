@@ -17,6 +17,12 @@ found in the LICENSE file.
 
 namespace itk
 {
+  /**
+   * \brief Computes local statistics (mean, variance, etc.) for each voxel in a given neighbourhood.
+   *
+   * \tparam TInputImageType The input image type.
+   * \tparam TOuputImageType The output image type.
+   */
   template<typename TInputImageType, typename TOuputImageType >
   class LocalStatisticFilter : public ImageToImageFilter< TInputImageType, TOuputImageType>
   {

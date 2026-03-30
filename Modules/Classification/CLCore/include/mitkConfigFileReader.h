@@ -20,6 +20,25 @@ found in the LICENSE file.
 #include <vector>
 #include <iostream>
 
+/**
+ * \brief Simple INI-style configuration file reader.
+ *
+ * Reads configuration files that contain sections enclosed in square brackets,
+ * key=value pairs within those sections, and list blocks enclosed in curly braces.
+ * Comments beginning with '#' are stripped. Lookups are case-insensitive.
+ *
+ * Example file format:
+ * \code
+ * [SectionName]
+ * key = value
+ *
+ * {ListName}
+ * item1
+ * item2
+ * \endcode
+ *
+ * \sa ConfigurationHolder
+ */
 class ConfigFileReader
 
 {
@@ -81,11 +100,21 @@ protected:
 
 public:
 
+  /**
+   * \brief Construct a ConfigFileReader and immediately parse the given file.
+   *
+   * \param[in] configFile Path to the configuration file to read.
+   */
   ConfigFileReader(std::string const& configFile)
   {
     ReadFile (configFile);
   }
 
+  /**
+   * \brief Read and parse a configuration file from disk.
+   *
+   * \param[in] filePath Path to the configuration file.
+   */
   void ReadFile(std::string const& filePath)
   {
     std::ifstream file(filePath.c_str());
@@ -93,6 +122,14 @@ public:
     file.close();
   }
 
+  /**
+   * \brief Parse configuration data from an input stream.
+   *
+   * Processes sections ([...]), list blocks ({...}), and key=value pairs.
+   * Comments starting with '#' are removed.
+   *
+   * \param[in] stream The input stream to read from.
+   */
   void ReadStream (std::istream& stream)
   {
     std::string line;
@@ -134,6 +171,14 @@ public:
     }
   }
 
+  /**
+   * \brief Retrieve a string value from the configuration.
+   *
+   * \param[in] section The section name.
+   * \param[in] entry The key name within the section.
+   * \return The value associated with section::entry.
+   * \throw std::string If the entry does not exist.
+   */
   std::string Value(std::string const& section, std::string const& entry) const
   {
     std::string index = ContentIndex(section,entry);
@@ -143,6 +188,14 @@ public:
     return m_ConfigContent.find(index)->second;
   }
 
+  /**
+   * \brief Retrieve a string value, returning a default if the entry does not exist.
+   *
+   * \param[in] section The section name.
+   * \param[in] entry The key name within the section.
+   * \param[in] standard Default value to return and store if the entry is missing.
+   * \return The value associated with section::entry, or the default.
+   */
   std::string Value(const std::string & section, const std::string & entry, const std::string& standard)
   {
     try {
@@ -155,6 +208,14 @@ public:
     }
   }
 
+  /**
+   * \brief Retrieve an integer value from the configuration.
+   *
+   * \param[in] section The section name.
+   * \param[in] entry The key name within the section.
+   * \return The integer value parsed from the entry.
+   * \throw std::string If the entry does not exist.
+   */
   int IntValue(const std::string & section, const std::string & entry) const
   {
     int result;
@@ -163,6 +224,14 @@ public:
     return result;
   }
 
+  /**
+   * \brief Retrieve an integer value, returning a default if the entry does not exist.
+   *
+   * \param[in] section The section name.
+   * \param[in] entry The key name within the section.
+   * \param[in] standard Default value to return and store if the entry is missing.
+   * \return The integer value, or the default.
+   */
   int IntValue(const std::string & section, const std::string & entry, int standard)
   {
     try {
@@ -177,6 +246,14 @@ public:
     }
   }
 
+  /**
+   * \brief Retrieve a list block's content lines by section name and index.
+   *
+   * \param[in] section The list section name.
+   * \param[in] index Zero-based index of the list block (multiple blocks with the same name are indexed sequentially).
+   * \return A vector of strings, one per line in the list block.
+   * \throw std::string If the entry does not exist.
+   */
   std::vector<std::string> Vector(std::string const& section, unsigned int index) const
   {
     if (m_ListContent.find(ListIndex(section, index)) == m_ListContent.end())
@@ -186,6 +263,13 @@ public:
     return m_ListContent.find(ListIndex(section,index))->second;
   }
 
+  /**
+   * \brief Get the number of list blocks with the given section name.
+   *
+   * \param[in] section The list section name.
+   * \return The number of list blocks.
+   * \throw std::string If no list blocks with the given section exist.
+   */
   unsigned int ListSize(std::string const& section) const
   {
     if (m_ListSize.find(ListSizeIndex(section)) == m_ListSize.end())
@@ -195,6 +279,13 @@ public:
     return m_ListSize.find(ListSizeIndex(section))->second;
   }
 
+  /**
+   * \brief Get the number of list blocks, returning a default if none exist.
+   *
+   * \param[in] section The list section name.
+   * \param[in] standard Default count to return and store if no blocks exist.
+   * \return The number of list blocks, or the default.
+   */
   unsigned int ListSize(std::string const& section, unsigned int standard)
   {
     try {

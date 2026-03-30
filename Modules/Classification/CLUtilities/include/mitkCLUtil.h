@@ -26,128 +26,162 @@ found in the LICENSE file.
 namespace mitk
 {
 
+/**
+ * \brief Collection of static utility functions for classification and image processing.
+ *
+ * CLUtil provides convenience methods for voxel counting, morphological operations,
+ * image filtering (Gaussian, DoG, LoG, Hessian), label manipulation, and conversion
+ * between Eigen matrices and MITK images.
+ *
+ * \sa AbstractGlobalImageFeature
+ * \sa AbstractClassifier
+ */
 class MITKCLUTILITIES_EXPORT CLUtil
 {
 public:
-  ///
-  /// \brief The MorphologicalDimensions enum
-  ///
+  /**
+   * \brief Specifies the anatomical plane for morphological operations.
+   */
   enum MorphologicalDimensions
   {
-    Axial,Coronal,Sagittal,All
+    Axial,    ///< Axial (transverse) plane.
+    Coronal,  ///< Coronal (frontal) plane.
+    Sagittal, ///< Sagittal plane.
+    All       ///< All three dimensions (3D operation).
   };
 
-  ///
-  /// \brief CreateCheckerBoardPredictionMask
-  /// \param image
-  /// \param outimage
-  ///
+  /**
+   * \brief Create a checkerboard mask from the given image.
+   *
+   * \param[in] image The input image.
+   * \param[out] outimage The resulting checkerboard mask.
+   */
   static void CreateCheckerboardMask(mitk::Image::Pointer image, mitk::Image::Pointer & outimage);
 
-  ///
-  /// \brief InterpolateCreateCheckerboardPrediction
-  /// \param checkerboard_prediction
-  /// \param checkerboard_mask
-  /// \param outimage
-  ///
+  /**
+   * \brief Interpolate a prediction using a checkerboard pattern.
+   *
+   * \param[in] checkerboard_prediction The prediction computed on the checkerboard pattern.
+   * \param[in,out] checkerboard_mask The checkerboard mask.
+   * \param[out] outimage The interpolated full prediction.
+   */
   static void InterpolateCheckerboardPrediction(mitk::Image::Pointer checkerboard_prediction, mitk::Image::Pointer & checkerboard_mask, mitk::Image::Pointer & outimage);
 
-  ///
-  /// \brief CountVoxel
-  /// \param image
-  /// \param map
-  ///
+  /**
+   * \brief Count voxels per label in an image.
+   *
+   * \param[in] image The label image.
+   * \param[out] map Map from label value to voxel count.
+   */
   static void CountVoxel(mitk::Image::Pointer image, std::map<unsigned int, unsigned int> & map);
 
-  ///
-  /// \brief CountVoxel
-  /// \param image
-  /// \param label
-  /// \param count
-  ///
+  /**
+   * \brief Count the number of voxels with a specific label value.
+   *
+   * \param[in] image The label image.
+   * \param[in] label The label value to count.
+   * \param[out] count The number of voxels with the given label.
+   */
   static void CountVoxel(mitk::Image::Pointer image, unsigned int label, unsigned int & count);
 
-  ///
-  /// \brief CountVoxel
-  /// \param image
-  /// \param count
-  ///
+  /**
+   * \brief Count the total number of non-zero voxels.
+   *
+   * \param[in] image The input image.
+   * \param[out] count The total count of voxels with value > 0.
+   */
   static void CountVoxel(mitk::Image::Pointer image, unsigned int & count);
 
-  ///
-  /// \brief SumVoxelForLabel
-  /// \param image
-  /// \param source
-  /// \param label
-  /// \param val
-  ///
+  /**
+   * \brief Sum intensity values from a source image for voxels matching a given label.
+   *
+   * \param[in] image The label image.
+   * \param[in] source The intensity source image.
+   * \param[in] label The label value to select voxels.
+   * \param[out] val The sum of intensities for the selected voxels.
+   */
   static void SumVoxelForLabel(mitk::Image::Pointer image, const mitk::Image::Pointer & source , unsigned int label, double & val );
 
-  ///
-  /// \brief SqSumVoxelForLabel
-  /// \param image
-  /// \param source
-  /// \param label
-  /// \param val
-  ///
+  /**
+   * \brief Sum squared intensity values from a source image for voxels matching a given label.
+   *
+   * \param[in] image The label image.
+   * \param[in] source The intensity source image.
+   * \param[in] label The label value to select voxels.
+   * \param[out] val The sum of squared intensities for the selected voxels.
+   */
   static void SqSumVoxelForLabel(mitk::Image::Pointer image, const mitk::Image::Pointer & source, unsigned int label, double & val );
 
-  ///
-  /// \brief LogicalAndImages
-  /// \param image1
-  /// \param image2
-  /// \param outimage
-  ///
+  /**
+   * \brief Compute the logical AND of two binary images.
+   *
+   * \param[in] image1 First binary image.
+   * \param[in] image2 Second binary image.
+   * \param[out] outimage The resulting AND image.
+   */
   static void LogicalAndImages(const Image::Pointer &image1, const Image::Pointer &image2, Image::Pointer &outimage);
 
-
-  ///
-  /// \brief GaussianFilter
-  /// \param image
-  /// \param smoothed
-  /// \param sigma
-  ///
+  /**
+   * \brief Apply a Gaussian smoothing filter to an image.
+   *
+   * \param[in] image The input image.
+   * \param[out] smoothed The smoothed output image.
+   * \param[in] sigma Standard deviation of the Gaussian kernel.
+   */
   static void GaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed ,double sigma);
 
-  ///
-  /// \brief SubtractGaussianFilter
-  /// \param image
-  /// \param smoothed (Result is sigma1-sigma2)
-  /// \param sigma1
-  /// \param sigma2
-  ///
+  /**
+   * \brief Compute the Difference of Gaussians (DoG) of an image.
+   *
+   * The result is the difference between two Gaussian-smoothed images with sigmas sigma1 and sigma2.
+   *
+   * \param[in] image The input image.
+   * \param[out] smoothed The DoG output image.
+   * \param[in] sigma1 Standard deviation of the first Gaussian.
+   * \param[in] sigma2 Standard deviation of the second Gaussian.
+   */
   static void DifferenceOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1, double sigma2);
 
-  ///
-  /// \brief Laplacian of Gaussian
-  /// \param image
-  /// \param smoothed (Result is sigma1-sigma2)
-  /// \param sigma1
-  ///
+  /**
+   * \brief Compute the Laplacian of Gaussian (LoG) of an image.
+   *
+   * \param[in] image The input image.
+   * \param[out] smoothed The LoG output image.
+   * \param[in] sigma1 Standard deviation of the Gaussian.
+   */
   static void LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1);
 
-  ///
-  /// \brief SubtractGaussianFilter
-  /// \param image
-  /// \param out
-  /// \param sigma
-  ///
+  /**
+   * \brief Compute the Hessian of Gaussian for an image.
+   *
+   * Produces multiple output images corresponding to the Hessian matrix components.
+   *
+   * \param[in] image The input image.
+   * \param[out] out Vector of output images for each Hessian component.
+   * \param[in] sigma Standard deviation of the Gaussian.
+   */
   static void HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma);
 
-  ///
-  /// \brief Local Histogram
-  /// \param image
-  /// \param out
-  /// \param Bins
-  /// \param NeighbourhoodSize
-  ///
+  /**
+   * \brief Compute local histograms for each voxel in an image.
+   *
+   * \param[in] image The input image.
+   * \param[out] out Vector of output images, one per histogram bin.
+   * \param[in] Bins Number of histogram bins.
+   * \param[in] NeighbourhoodSize Size of the local neighbourhood.
+   */
   static void LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize);
 
-  ///
-  /// \brief transform
-  /// \param matrix
-  /// \param mask
-  ///
+  /**
+   * \brief Transform an Eigen matrix back to an MITK image using a mask.
+   *
+   * Non-zero voxels in the mask are filled with values from the matrix in order.
+   *
+   * \tparam TMatrixElementType Element type of the Eigen matrix.
+   * \param[in] matrix The Eigen matrix of shape [n_masked_voxels, 1].
+   * \param[in] mask The mask image defining which voxels to populate.
+   * \return The resulting MITK image.
+   */
   template<typename TMatrixElementType>
   static mitk::Image::Pointer Transform(const Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> & matrix, const mitk::Image::Pointer & mask)
   {
@@ -186,11 +220,17 @@ public:
     mitk::GrabItkImageMemory(itk_img,out_img);
     return out_img;
   }
-  ///
-  /// \brief TransformImageToMatrix
-  /// \param img
-  /// \param mask
-  ///
+  /**
+   * \brief Transform an MITK image into an Eigen column matrix using a mask.
+   *
+   * Extracts intensity values from masked (non-zero) voxels and stores them
+   * in a single-column Eigen matrix.
+   *
+   * \tparam TMatrixElementType Element type of the Eigen matrix.
+   * \param img The input intensity image.
+   * \param mask The mask image defining which voxels to extract.
+   * \return An Eigen matrix of shape [n_masked_voxels, 1].
+   */
   template<typename TMatrixElementType>
   static Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> Transform(const mitk::Image::Pointer & img, const mitk::Image::Pointer & mask)
   {
@@ -218,99 +258,97 @@ public:
     return out_matrix;
   }
 
-  ///
-  /// \brief DilateBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param radius Size of the StructuringElement
-  /// \param d
-  ///
+  /**
+   * \brief Dilate a binary image using a ball structuring element.
+   * \param sourceImage The input binary image.
+   * \param resultImage The dilated output image.
+   * \param radius Radius of the structuring element in voxels.
+   * \param d The anatomical dimension(s) for the operation.
+   */
   static void DilateBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius , MorphologicalDimensions d);
 
-  ///
-  /// \brief ErodeBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param radius Size of the StructuringElement
-  /// \param d
-  ///
+  /**
+   * \brief Erode a binary image using a ball structuring element.
+   * \param sourceImage The input binary image.
+   * \param resultImage The eroded output image.
+   * \param radius Radius of the structuring element in voxels.
+   * \param d The anatomical dimension(s) for the operation.
+   */
   static void ErodeBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
-  ///
-  /// \brief ClosingBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param radius Size of the StructuringElement
-  /// \param d
-  ///
+  /**
+   * \brief Perform morphological closing on a binary image.
+   * \param sourceImage The input binary image.
+   * \param resultImage The closed output image.
+   * \param radius Radius of the structuring element in voxels.
+   * \param d The anatomical dimension(s) for the operation.
+   */
   static void ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
-
-  ///
-  /// \brief MergeLabels
-  /// \param img
-  /// \param map merge instruction where each map entry defines a mapping instruction. Key \c \<sourcelabel\> - Value \c \<targetlabel\>
-  ///
+  /**
+   * \brief Merge labels in a label image according to a mapping.
+   * \param img The label image to modify in place.
+   * \param map Map of source label to target label. Each occurrence of a source label is replaced by its target.
+   */
   static void MergeLabels(mitk::Image::Pointer & img, const std::map<unsigned int, unsigned int> & map);
 
-  ///
-  /// \brief ConnectedComponentsImage
-  /// \param image
-  /// \param mask
-  /// \param outimage
-  /// \param num_components Number of components found in the image
-  ///
+  /**
+   * \brief Compute connected components of a label image.
+   * \param image The input label image.
+   * \param mask Optional mask restricting the region. Can be nullptr.
+   * \param outimage The output image with unique labels per connected component.
+   * \param num_components The number of connected components found.
+   */
   static void ConnectedComponentsImage(mitk::Image::Pointer & image, mitk::Image::Pointer& mask, mitk::Image::Pointer &outimage, unsigned int& num_components);
 
-  ///
-  /// \brief GrabLabel
-  /// \param image
-  /// \param outimage
-  /// \param label
-  ///
+  /**
+   * \brief Extract a single label from a label image into a binary mask.
+   * \param image The input label image.
+   * \param outimage The output binary image (1 where label matches, 0 otherwise).
+   * \param label The label value to extract.
+   */
   static void GrabLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage, unsigned int label);
 
-
-  ///
-  /// \brief itkInsertLabel
-  /// \param image
-  /// \param maskImage
-  /// \param label
-  ///
+  /**
+   * \brief Insert a label value into an output image at positions defined by a mask.
+   * \param image The output image to insert the label into (created if null).
+   * \param maskImage The mask defining where to insert the label.
+   * \param label The label value to insert.
+   */
   static void InsertLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & maskImage, unsigned int label);
 
-  ///
-  /// \brief ErodeGrayscale
-  /// \param image
-  /// \param outimage
-  /// \param radius
-  /// \param d
-  ///
+  /**
+   * \brief Perform grayscale erosion using a ball structuring element.
+   * \param image The input image.
+   * \param radius Radius of the structuring element in voxels.
+   * \param d The anatomical dimension(s) for the operation.
+   * \param outimage The eroded output image.
+   */
   static void ErodeGrayscale(mitk::Image::Pointer & image, unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage );
 
-  ///
-  /// \brief DilateGrayscale
-  /// \param image
-  /// \param outimage
-  /// \param radius
-  /// \param d
-  ///
+  /**
+   * \brief Perform grayscale dilation using a ball structuring element.
+   * \param image The input image.
+   * \param radius Radius of the structuring element in voxels.
+   * \param d The anatomical dimension(s) for the operation.
+   * \param outimage The dilated output image.
+   */
   static void DilateGrayscale(mitk::Image::Pointer & image, unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage );
 
-  ///
-  /// \brief FillHoleGrayscale
-  /// \param image
-  /// \param outimage
-  ///
+  /**
+   * \brief Fill holes in a grayscale image.
+   * \param image The input image.
+   * \param outimage The output image with holes filled.
+   */
   static void FillHoleGrayscale(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage);
 
-  ///
-  /// \brief ProbabilityMap
-  /// \param sourceImage
-  /// \param mean
-  /// \param std_dev
-  /// \param resultImage
-  ///
+  /**
+   * \brief Create a probability map based on Gaussian distribution parameters.
+   * \param sourceImage The input intensity image.
+   * \param mean The mean of the Gaussian distribution.
+   * \param std_dev The standard deviation of the Gaussian distribution.
+   * \param resultImage The output probability map image.
+   */
   static void ProbabilityMap(const mitk::Image::Pointer&  sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
 
   template<class TImageType>

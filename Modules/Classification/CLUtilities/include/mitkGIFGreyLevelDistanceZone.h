@@ -21,6 +21,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Data structure holding all Grey Level Distance Zone feature values.
+   *
+   * \sa GIFGreyLevelDistanceZone
+   */
   struct GreyLevelDistanceZoneFeatures
   {
     GreyLevelDistanceZoneFeatures() :
@@ -46,24 +51,24 @@ namespace mitk
     }
 
   public:
-    double SmallDistanceEmphasis;
-    double LargeDistanceEmphasis;
-    double LowGreyLevelEmphasis;
-    double HighGreyLevelEmphasis;
-    double SmallDistanceLowGreyLevelEmphasis;
-    double SmallDistanceHighGreyLevelEmphasis;
-    double LargeDistanceLowGreyLevelEmphasis;
-    double LargeDistanceHighGreyLevelEmphasis;
-    double GreyLevelNonUniformity;
-    double GreyLevelNonUniformityNormalized;
-    double ZoneDistanceNonUniformity;
-    double ZoneDistanceNoneUniformityNormalized;
-    double ZonePercentage;
-    double GreyLevelMean;
-    double GreyLevelVariance;
-    double ZoneDistanceMean;
-    double ZoneDistanceVariance;
-    double ZoneDistanceEntropy;
+    double SmallDistanceEmphasis;                   ///< Emphasis on zones with small distance to the border.
+    double LargeDistanceEmphasis;                   ///< Emphasis on zones with large distance to the border.
+    double LowGreyLevelEmphasis;                    ///< Emphasis on zones with low grey level values.
+    double HighGreyLevelEmphasis;                   ///< Emphasis on zones with high grey level values.
+    double SmallDistanceLowGreyLevelEmphasis;       ///< Combined emphasis on small distance and low grey level.
+    double SmallDistanceHighGreyLevelEmphasis;      ///< Combined emphasis on small distance and high grey level.
+    double LargeDistanceLowGreyLevelEmphasis;       ///< Combined emphasis on large distance and low grey level.
+    double LargeDistanceHighGreyLevelEmphasis;      ///< Combined emphasis on large distance and high grey level.
+    double GreyLevelNonUniformity;                  ///< Measures variability in grey level distribution.
+    double GreyLevelNonUniformityNormalized;        ///< Normalized grey level non-uniformity.
+    double ZoneDistanceNonUniformity;               ///< Measures variability in zone distance distribution.
+    double ZoneDistanceNoneUniformityNormalized;     ///< Normalized zone distance non-uniformity.
+    double ZonePercentage;                          ///< Ratio of realized zones to total voxels.
+    double GreyLevelMean;                           ///< Mean grey level of all zones.
+    double GreyLevelVariance;                       ///< Variance of grey levels across zones.
+    double ZoneDistanceMean;                        ///< Mean distance of all zones.
+    double ZoneDistanceVariance;                    ///< Variance of zone distances.
+    double ZoneDistanceEntropy;                     ///< Entropy of the zone distance distribution.
   };
 
 
@@ -155,9 +160,21 @@ namespace mitk
 
       GIFGreyLevelDistanceZone();
 
+      /**
+       * \brief Calculate grey level distance zone features for the given image and mask.
+       *
+       * \param[in] image The input intensity image.
+       * \param[in] mask The binary mask defining the region of interest.
+       * \param[in] maskNoNAN The mask with NaN voxels excluded.
+       * \return A list of computed feature name-value pairs.
+       */
       FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
       using Superclass::CalculateFeatures;
 
+      /**
+       * \brief Add command line arguments for configuring this feature class.
+       * \param[in,out] parser The command line parser to add arguments to.
+       */
       void AddArguments(mitkCommandLineParser& parser) const override;
 
     protected:

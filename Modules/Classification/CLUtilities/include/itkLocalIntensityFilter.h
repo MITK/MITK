@@ -21,6 +21,16 @@ found in the LICENSE file.
 namespace itk
 {
 
+  /**
+   * \brief Computes local and global intensity peak features within a spherical neighbourhood.
+   *
+   * For each masked voxel, the mean intensity in a spherical neighbourhood of configurable
+   * radius (Range) is computed. The filter reports the local peak (mean intensity around the
+   * voxel with maximum intensity), the global peak (highest local mean across all masked
+   * voxels), and the local maximum intensity value.
+   *
+   * \tparam TInputImage The input image type.
+   */
   template< typename TInputImage >
   class ITK_TEMPLATE_EXPORT LocalIntensityFilter :
     public ImageToImageFilter< TInputImage, TInputImage >

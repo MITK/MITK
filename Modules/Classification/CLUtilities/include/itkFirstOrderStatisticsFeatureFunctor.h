@@ -21,6 +21,12 @@ namespace itk
 namespace Functor
 {
 
+/**
+ * \brief Functor that computes first-order statistics (mean, variance, skewness, kurtosis, min, max) over a neighbourhood.
+ *
+ * \tparam TNeighborhoodType The neighbourhood iterator type.
+ * \tparam TPixelOutputType The scalar output pixel type.
+ */
 template< typename TNeighborhoodType, typename TPixelOutputType >
 struct NeighborhoodFirstOrderStatistics
 {

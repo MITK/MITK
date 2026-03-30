@@ -21,11 +21,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    * \brief Specialized interactor for clipping planes.
-    *
-    * \ingroup Interaction
-    */
-  // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
+   * \brief Specialized interactor for translating and rotating clipping planes in 3D.
+   *
+   * Provides mouse-driven translation and rotation of clipping plane surfaces
+   * in 3D render windows. Uses a state machine pattern for interaction and
+   * colorizes the surface based on selection state.
+   *
+   * \sa DataInteractor, AffineBaseDataInteractor3D
+   * \ingroup Interaction
+   */
   class MITKDATATYPESEXT_EXPORT ClippingPlaneInteractor3D : public DataInteractor
   {
   public:

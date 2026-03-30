@@ -30,27 +30,60 @@ found in the LICENSE file.
 
 #include <MitkPharmacokineticsUIExports.h>
 
+/** \brief Background job for computing description parameter images asynchronously.
+ *
+ * Runs a DescriptionParameterImageGeneratorBase in a background thread (via QRunnable)
+ * and emits Qt signals for progress updates, completion, errors, and result availability.
+ * Results are packaged as DataNode objects suitable for insertion into a DataStorage.
+ *
+ * \sa mitk::DescriptionParameterImageGeneratorBase, mitk::modelFit::ModelFitResultHelper
+ */
 class MITKPHARMACOKINETICSUI_EXPORT DescriptionParameterBackgroundJob : public QObject, public QRunnable
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
 public:
-  DescriptionParameterBackgroundJob(mitk::DescriptionParameterImageGeneratorBase* generator, mitk::DataNode* parentNode = nullptr);
+    /** \brief Construct a background job for the given generator.
+     *
+     * \param[in] generator  The description parameter image generator to execute.
+     * \param[in] parentNode Optional parent data node for organizing result nodes
+     *                       in the data storage. May be \c nullptr.
+     */
+    DescriptionParameterBackgroundJob(mitk::DescriptionParameterImageGeneratorBase* generator, mitk::DataNode* parentNode = nullptr);
     ~DescriptionParameterBackgroundJob() override;
 
-		void run() override;
+    /** \brief Execute the parameter image generation in the background thread. */
+    void run() override;
 
-    /**Returns the node (if defined), that is the parent object for the results of the job.
-    May be null.*/
+    /** \brief Get the parent node for the results of this job.
+     *
+     * \return The parent data node, or \c nullptr if none was specified.
+     */
     mitk::DataNode* GetParentNode() const;
 
 signals:
+    /** \brief Emitted when the job has finished (successfully or not). */
     void Finished();
+
+    /** \brief Emitted when an error occurs during computation.
+     * \param[in] err The error message.
+     */
     void Error(QString err);
+
+    /** \brief Emitted when result data nodes are available.
+     * \param[in] resultMap The vector of result data nodes.
+     * \param[in] pJob      Pointer to this job instance.
+     */
     void ResultsAreAvailable(mitk::modelFit::ModelFitResultNodeVectorType resultMap, const DescriptionParameterBackgroundJob* pJob);
+
+    /** \brief Emitted to report computation progress.
+     * \param[in] progress Progress value in the range [0.0, 1.0].
+     */
     void JobProgress(double progress);
+
+    /** \brief Emitted when the job status changes.
+     * \param[in] info A human-readable status message.
+     */
     void JobStatusChanged(QString info);
 
 protected:

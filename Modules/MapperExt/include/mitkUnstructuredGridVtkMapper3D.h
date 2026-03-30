@@ -32,10 +32,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Vtk-based mapper for UnstructuredGrid
-  //##
-  //## @ingroup Mapper
+  /** \brief VTK-based mapper for rendering mitk::UnstructuredGrid in 3D.
+   *
+   * Supports multiple rendering modes including surface, wireframe, and volume
+   * rendering (via ray casting, projected tetrahedra, or z-sweep mappers).
+   * The rendering mode and visual properties are controlled through DataNode properties.
+   *
+   * \sa UnstructuredGridMapper2D, UnstructuredGrid, VtkMapper
+   * \ingroup Mapper
+   */
   class MITKMAPPEREXT_EXPORT UnstructuredGridVtkMapper3D : public VtkMapper
   {
   public:
@@ -45,13 +50,33 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      virtual const mitk::UnstructuredGrid *GetInput();
+    /** \brief Get the UnstructuredGrid input data.
+     *
+     * \return The UnstructuredGrid associated with this mapper's data node.
+     */
+    virtual const mitk::UnstructuredGrid *GetInput();
 
+    /** \brief Get the VTK prop assembly for 3D rendering.
+     *
+     * \param[in] renderer The renderer context.
+     * \return The VTK prop assembly containing the grid actors and volume.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Set default rendering properties for unstructured grid 3D visualization.
+     *
+     * \param[in] node      The data node to configure.
+     * \param[in] renderer  The renderer context, or \c nullptr for all renderers.
+     * \param[in] overwrite If \c true, overwrite existing properties.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    void ApplyProperties(vtkActor * /*actor*/, mitk::BaseRenderer *renderer) override;
+    /** \brief Apply visual properties to the given actor.
+     *
+     * \param[in] actor    The VTK actor to apply properties to.
+     * \param[in] renderer The renderer context.
+     */
+    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 

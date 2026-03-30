@@ -30,45 +30,63 @@ class vtkCellData;
 
 #include <vtkPolyDataAlgorithm.h>
 
+/**
+ * \brief VTK filter that slices a point set (unstructured grid) with a plane.
+ *
+ * Produces polydata representing the intersection of the input unstructured
+ * grid with a vtkPlane. Used internally by mitk::EnhancedPointSetVtkMapper3D
+ * to visualize point set cross sections on 2D slices.
+ */
 class vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer, vtkPolyDataAlgorithm);
 
+  /** \brief Print object state to the given stream. */
   void PrintSelf(std::ostream &os, vtkIndent indent) override;
 
-  // Description:
-  // Construct with user-specified implicit function; initial value of 0.0; and
-  // generating cut scalars turned off.
+  /**
+   * \brief Construct a new vtkPointSetSlicer instance.
+   *
+   * Initial value of 0.0 and generating cut scalars turned off.
+   */
   static vtkPointSetSlicer *New();
 
-  // Description:
-  // Override GetMTime because we delegate to vtkContourValues and refer to
-  // vtkImplicitFunction.
+  /** \brief Return the modification time, considering the slice plane. */
   vtkMTimeType GetMTime() override;
 
-  // Description
-  // Specify the implicit function to perform the cutting.
-  virtual void SetSlicePlane(vtkPlane *);
+  /**
+   * \brief Set the plane used for slicing.
+   * \param plane The vtkPlane to slice with.
+   */
+  virtual void SetSlicePlane(vtkPlane *plane);
   vtkGetObjectMacro(SlicePlane, vtkPlane);
 
-  // Description:
-  // If this flag is enabled, then the output scalar values will be
-  // interpolated from the implicit function values, and not the input scalar
-  // data.
+  /**
+   * \brief Enable/disable generation of cut scalars.
+   *
+   * If enabled, output scalar values are interpolated from the implicit
+   * function values rather than the input scalar data.
+   */
   vtkSetMacro(GenerateCutScalars, int);
   vtkGetMacro(GenerateCutScalars, int);
   vtkBooleanMacro(GenerateCutScalars, int);
 
-  // Description:
-  // Specify a spatial locator for merging points. By default,
-  // an instance of vtkMergePoints is used.
+  /**
+   * \brief Set a spatial locator for merging coincident points.
+   *
+   * By default, an instance of vtkMergePoints is used.
+   *
+   * \param locator The point locator to use.
+   */
   void SetLocator(vtkPointLocator *locator);
   vtkGetObjectMacro(Locator, vtkPointLocator);
 
-  // Description:
-  // Create default locator. Used to create one when none is specified. The
-  // locator is used to merge coincident points.
+  /**
+   * \brief Create a default locator (vtkMergePoints).
+   *
+   * Used when none has been explicitly specified.
+   */
   void CreateDefaultLocator();
 
 protected:

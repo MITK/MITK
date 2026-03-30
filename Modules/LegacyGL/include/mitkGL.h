@@ -10,6 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkGL.h
+ * \brief Platform-specific include header for OpenGL.
+ *
+ * On Windows, includes \c windows.h first. On Apple, includes
+ * \c OpenGL/gl.h; on other platforms, uses \c vtk_glad.h.
+ */
 #ifndef mitkGL_h
 #define mitkGL_h
 

@@ -31,7 +31,7 @@ namespace mitk
   class UnstructuredGrid;
 
   /**
-   * @brief The PlaneProposer creates a new plane based on an input point cloud
+   * \brief The PlaneProposer creates a new plane based on an input point cloud
    *
    * The proposal is either created by using the lease squares in order to fit
    * a plane to the provided point cloud or by using the centroid of three clusters
@@ -49,7 +49,7 @@ namespace mitk
   {
   public:
     /**
-     * @brief Encapsulates the geometrical information needed to describe a PlaneInfo
+     * \brief Encapsulates the geometrical information needed to describe a PlaneInfo
      *
      * normal = the normal of the plane
      * x,y = the axes of the PlaneInfo
@@ -68,26 +68,26 @@ namespace mitk
     void SetUnstructuredGrids(std::vector<itk::SmartPointer<mitk::UnstructuredGrid>> &grids);
 
     /**
-     * @brief If true, the three clusters with the biggest mean distances are used for plane proposal
+     * \brief If true, the three clusters with the biggest mean distances are used for plane proposal
      * Required the distance for each point to be set in PointData scalars
      */
     void SetUseDistances(bool);
 
     /**
-     * @brief Tells the proposer to use least squares method for plane creating
+     * \brief Tells the proposer to use least squares method for plane creating
      *
      * This will eb chosen automatically if less than three point clusters are provided
      */
     void SetUseLeastSquares(bool);
 
     /**
-     * @brief Sets the number of the clusters to be used for plane creation (default=3)
+     * \brief Sets the number of the clusters to be used for plane creation (default=3)
      */
     void SetNumberOfClustersToUse(unsigned int);
     void SetSliceNavigationController(itk::SmartPointer<mitk::SliceNavigationController> &snc);
 
     /**
-     * @brief Creates the actual plane proposal
+     * \brief Creates the actual plane proposal
      *
      * Is less than three clusters are provide the least squares method will be chosen automatically
      * The result will either be executed on a mitk::SliceNavigationController if provided or can be
@@ -104,13 +104,13 @@ namespace mitk
     PlaneProposer &operator=(const PlaneProposer &); // not implemented on purpose
 
     /**
-     * @brief Creates a plane suggestion based on the cluster centroids
+     * \brief Creates a plane suggestion based on the cluster centroids
      */
     PlaneInfo CreatePlaneByCentroids(const std::vector<std::pair<int, int>> &sizeIDs,
                                      const std::vector<std::pair<double, int>> &avgDistances);
 
     /**
-     * @brief Creates a plane suggestion based on the least squares
+     * \brief Creates a plane suggestion based on the least squares
      */
     PlaneInfo CreatePlaneByLeastSquares(const std::vector<std::pair<int, int>> &sizeIDs,
                                         const std::vector<std::pair<double, int>> &avgDistances);

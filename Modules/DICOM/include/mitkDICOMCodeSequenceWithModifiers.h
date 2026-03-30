@@ -23,11 +23,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Represents a DICOM Code Sequence with optional modifiers.
+   * \ingroup DICOMModule
+   * \brief Represents a DICOM Code Sequence with optional modifiers.
    *
    * This class extends DICOMCodeSequence to include a sequence of modifier codes,
    * similar to DCMTK's CodeWithModifiers class. It provides a simplified
    * interface for storing a primary code along with its modifying codes.
+   *
+   * \sa DICOMCodeSequence
    */
   class MITKDICOM_EXPORT DICOMCodeSequenceWithModifiers : public DICOMCodeSequence
   {
@@ -37,16 +40,16 @@ namespace mitk
     DICOMCodeSequenceWithModifiers() = default;
 
     /**
-     * @brief Constructs a DICOMCodeSequenceWithModifiers with the specified attributes.
-     * @param value The Code Value (0008,0100), Long Code Value (0008,0119), or URN Code Value (0008,0120)
-     * @param scheme The Coding Scheme Designator (0008,0102)
-     * @param meaning The Code Meaning (0008,0104)
+     * \brief Constructs a DICOMCodeSequenceWithModifiers with the specified attributes.
+     * \param value The Code Value (0008,0100), Long Code Value (0008,0119), or URN Code Value (0008,0120)
+     * \param scheme The Coding Scheme Designator (0008,0102)
+     * \param meaning The Code Meaning (0008,0104)
      */
     DICOMCodeSequenceWithModifiers(const std::string& value, const std::string& scheme, const std::string& meaning);
 
     /**
-     * @brief Constructs from a DICOMCodeSequence.
-     * @param code The base DICOMCodeSequence
+     * \brief Constructs from a DICOMCodeSequence.
+     * \param code The base DICOMCodeSequence
      */
     explicit DICOMCodeSequenceWithModifiers(const DICOMCodeSequence& code);
     DICOMCodeSequenceWithModifiers& operator = (const DICOMCodeSequence& code);
@@ -59,75 +62,75 @@ namespace mitk
     DICOMCodeSequenceWithModifiers& operator=(DICOMCodeSequenceWithModifiers&&) = default;
 
     /**
-     * @brief Adds a modifier code.
-     * @param modifier The modifier code to add
+     * \brief Adds a modifier code.
+     * \param modifier The modifier code to add
      */
     void AddModifier(const DICOMCodeSequence& modifier);
 
     /**
-     * @brief Gets all modifier codes.
-     * @return Const reference to the vector of modifiers
+     * \brief Gets all modifier codes.
+     * \return Const reference to the vector of modifiers
      */
     const ModifierVector& GetModifiers() const;
 
     /**
-     * @brief Gets a modifier code at the specified index.
-     * @param index The index of the modifier to retrieve
-     * @return Const reference to the modifier at the given index
-     * @pre index must be valid
+     * \brief Gets a modifier code at the specified index.
+     * \param index The index of the modifier to retrieve
+     * \return Const reference to the modifier at the given index
+     * \pre index must be valid
      */
     const DICOMCodeSequence& GetModifier(std::size_t index) const;
 
     /**
-     * @brief Gets a modifier code at the specified index.
-     * @param index The index of the modifier to retrieve
-     * @return Reference to the modifier at the given index
-     * @pre index must be valid
+     * \brief Gets a modifier code at the specified index.
+     * \param index The index of the modifier to retrieve
+     * \return Reference to the modifier at the given index
+     * \pre index must be valid
      */
     DICOMCodeSequence& GetModifier(std::size_t index);
 
     /**
-     * @brief Sets a modifier code at the specified index.
-     * @param index The index where to set the modifier
-     * @param modifier The modifier code to set
-     * @pre index must be valid
+     * \brief Sets a modifier code at the specified index.
+     * \param index The index where to set the modifier
+     * \param modifier The modifier code to set
+     * \pre index must be valid
      */
     void SetModifier(std::size_t index, const DICOMCodeSequence& modifier);
 
     /**
-     * @brief Sets all modifier codes.
-     * @param modifiers The vector of modifiers to set
+     * \brief Sets all modifier codes.
+     * \param modifiers The vector of modifiers to set
      */
     void SetModifiers(const ModifierVector& modifiers);
 
     /**
-     * @brief Clears all modifier codes.
+     * \brief Clears all modifier codes.
      */
     void ClearModifiers();
 
     /**
-     * @brief Gets the number of modifiers.
-     * @return The count of modifier codes
+     * \brief Gets the number of modifiers.
+     * \return The count of modifier codes
      */
     std::size_t GetModifierCount() const;
 
     /**
-     * @brief Checks if there are any modifiers.
-     * @return true if at least one modifier exists, false otherwise
+     * \brief Checks if there are any modifiers.
+     * \return true if at least one modifier exists, false otherwise
      */
     bool HasModifiers() const;
 
     /**
-     * @brief Equality comparison operator.
-     * @param other The DICOMCodeSequenceWithModifiers to compare with
-     * @return true if base code and all modifiers are equal
+     * \brief Equality comparison operator.
+     * \param other The DICOMCodeSequenceWithModifiers to compare with
+     * \return true if base code and all modifiers are equal
      */
     bool operator==(const DICOMCodeSequenceWithModifiers& other) const;
 
     /**
-     * @brief Inequality comparison operator.
-     * @param other The DICOMCodeSequenceWithModifiers to compare with
-     * @return true if base code or modifiers differ
+     * \brief Inequality comparison operator.
+     * \param other The DICOMCodeSequenceWithModifiers to compare with
+     * \return true if base code or modifiers differ
      */
     bool operator!=(const DICOMCodeSequenceWithModifiers& other) const;
 

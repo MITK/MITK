@@ -42,10 +42,20 @@ namespace mitk
       */
     virtual void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) = 0;
 
-    /** Returns the map of all tags of interest. Key is the property name. Value is the DICOM tag.*/
+    /**
+     * \brief Returns the map of all registered tags of interest.
+     *
+     * Key is the property name. Value is the DICOM tag path.
+     *
+     * \return A DICOMTagPathMapType containing all registered tags.
+     */
     virtual DICOMTagPathMapType GetTagsOfInterest() const = 0;
 
-    /** Indicates if the given tag is already a tag of interest.*/
+    /**
+     * \brief Check whether a given tag is already registered as a tag of interest.
+     * \param[in] tag The tag path to check.
+     * \return true if the tag is already registered.
+     */
     virtual bool HasTag(const DICOMTagPath& tag) const = 0;
 
     /** \brief Remove specific tag. If it not exists the function will do nothing.

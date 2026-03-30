@@ -32,10 +32,8 @@ namespace mitk
   {
     public:
 
-      /// absolute filename
-      const std::string Filename;
-      /// frame number, starting with 0
-      const unsigned int FrameNo;
+      const std::string Filename;    ///< Absolute filename of the DICOM file.
+      const unsigned int FrameNo;    ///< Frame number within the file, starting with 0.
 
       mitkClassMacroItkParent( DICOMImageFrameInfo, itk::LightObject );
 
@@ -43,6 +41,11 @@ namespace mitk
       mitkNewMacro1Param( DICOMImageFrameInfo, const std::string&);
       mitkNewMacro2Param( DICOMImageFrameInfo, const std::string&, unsigned int );
 
+      /**
+       * \brief Equality comparison based on filename and frame number.
+       * \param[in] other The frame info to compare with.
+       * \return true if filename and frame number match.
+       */
       bool operator==(const DICOMImageFrameInfo& other) const;
 
     protected:

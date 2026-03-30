@@ -20,9 +20,25 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Helper for setting DICOM Parametric Map (PM) properties on derived images.
+   *
+   * Provides utility methods to populate DICOM PM-specific properties on
+   * BaseData objects, such as modality and SOP class information.
+   *
+   * \sa DICOMQIPropertyHelper
+   */
   class MITKDICOMQI_EXPORT DICOMPMPropertyHelper
   {
   public:
+    /** \brief Set DICOM Parametric Map properties on a derived image.
+     *
+     * Populates the derived image's property list with PM-specific DICOM
+     * tags such as Modality ("RWV") and SOP Class UID.
+     *
+     * \param[in,out] derivedDICOMImage The image to set PM properties on.
+     *
+     * \pre \p derivedDICOMImage is not null.
+     */
     static void DeriveDICOMPMProperties(BaseData *derivedDICOMImage);
 
   };

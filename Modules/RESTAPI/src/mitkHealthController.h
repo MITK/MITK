@@ -28,7 +28,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Handles health and info endpoints.
+   * \brief Handles health and info endpoints.
    *
    * Endpoints:
    * - GET /api/v1/health -> {"status": "ok"}
@@ -38,74 +38,74 @@ namespace mitk
   {
   public:
     /**
-     * @brief Callback type for retrieving server uptime.
+     * \brief Callback type for retrieving server uptime.
      *
      * Returns the server uptime in seconds, or std::nullopt if not available.
      */
     using UptimeCallback = std::function<std::optional<int64_t>()>;
 
     /**
-     * @brief Construct a HealthController.
+     * \brief Construct a HealthController.
      *
-     * @param bridge Reference to the DataStorageBridge for status checks. It is the instance
+     * \param bridge Reference to the DataStorageBridge for status checks. It is the instance
      * controlled by the REST server to ensure requests from all controllers are handled thread safe
      * and channeled towards the DataStorage.
      */
     explicit HealthController(DataStorageBridge& bridge);
 
     /**
-     * @brief Set the callback for retrieving server uptime.
+     * \brief Set the callback for retrieving server uptime.
      *
-     * @param callback Function that returns uptime in seconds, or std::nullopt if unavailable.
+     * \param callback Function that returns uptime in seconds, or std::nullopt if unavailable.
      */
     void SetUptimeCallback(UptimeCallback callback);
 
     /**
-     * @brief Handle GET /health request.
+     * \brief Handle GET /health request.
      *
      * Returns basic health status.
      *
-     * @param req The HTTP request.
-     * @param res The HTTP response to populate.
+     * \param req The HTTP request.
+     * \param res The HTTP response to populate.
      */
     void HandleGET_health(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle GET /info request.
+     * \brief Handle GET /info request.
      *
      * Returns detailed server information.
      *
-     * @param req The HTTP request.
-     * @param res The HTTP response to populate.
+     * \param req The HTTP request.
+     * \param res The HTTP response to populate.
      */
     void HandleGET_info(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle GET /config/file-access request.
+     * \brief Handle GET /config/file-access request.
      *
      * Returns the current file access configuration, including the mode
      * and, when restrictions are active, the list of allowed directories.
      *
-     * @param req The HTTP request.
-     * @param res The HTTP response to populate.
+     * \param req The HTTP request.
+     * \param res The HTTP response to populate.
      */
     void HandleGET_config_file_access(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Set the file access configuration.
+     * \brief Set the file access configuration.
      *
-     * @pre \a mode must be a valid FileAccessMode value.
-     * @pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
+     * \pre \a mode must be a valid FileAccessMode value.
+     * \pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
      *
-     * @param mode The file access mode to apply.
-     * @param allowedDirs Directories to allow when mode is AllowedDirectories.
+     * \param mode The file access mode to apply.
+     * \param allowedDirs Directories to allow when mode is AllowedDirectories.
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs);
 
     /**
-     * @brief Set the per-IP limit for concurrent file-reference temp directories.
+     * \brief Set the per-IP limit for concurrent file-reference temp directories.
      *        Reported by GET /config/file-access so clients know the eviction policy.
-     * @pre max >= 1.
+     * \pre max >= 1.
      */
     void SetMaxActiveTempDirsPerIp(size_t max);
 

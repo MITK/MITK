@@ -22,106 +22,111 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Enumeration for hierarchy filter (GET /datastorage/nodes).
+   * \brief Enumeration for hierarchy filter used in node queries.
    *
-   * Per API specification section 8.2:
-   * - all: Return all nodes
-   * - toplevel: Return only root nodes (parent_uid is null)
+   * Controls whether all nodes or only top-level (root) nodes are returned
+   * from a GET /datastorage/nodes request.
+   *
+   * \sa NodeQueryParams
    */
-  enum class MITKRESTAPI_EXPORT Hierarchy
+  enum class Hierarchy
   {
-    All,      ///< All nodes in DataStorage
-    Toplevel  ///< Only root nodes (no parent)
+    All,      ///< \brief Return all nodes in the DataStorage.
+    Toplevel  ///< \brief Return only root nodes (nodes with no parent).
   };
 
   /**
-   * @brief Enumeration for property scope.
+   * \brief Enumeration for property scope in REST API queries.
    *
-   * Per API specification section 5.3:
-   * - all: Both node and data properties (node takes precedence)
-   * - node: Only properties from DataNode's property list
-   * - data: Only properties from BaseData's property list
+   * Determines which property lists are searched when filtering or
+   * returning properties. Node properties come from the DataNode's
+   * property list; data properties come from the BaseData's property list.
+   *
+   * \sa PropertyQueryParams, NodeQueryParams
    */
-  enum class MITKRESTAPI_EXPORT PropertyScope
+  enum class PropertyScope
   {
-    All,   ///< Both node and data properties
-    Node,  ///< Only node properties
-    Data   ///< Only data properties
+    All,   ///< \brief Both node and data properties (node takes precedence on conflicts).
+    Node,  ///< \brief Only properties from the DataNode's property list.
+    Data   ///< \brief Only properties from the BaseData's property list.
   };
 
   /**
-   * @brief Property filter with value and optional negation.
+   * \brief A single property filter criterion with key, value, and optional negation.
    *
-   * Per API specification section 5.3:
-   * - Exact match: filter.name=CT_Scan
-   * - Not equal: filter.visible!=true
-   * - Wildcard prefix: filter.name=CT*
-   * - Wildcard suffix: filter.name=*Scan
+   * Supports exact match, negation (!=), and wildcard prefix/suffix patterns.
+   * For example:
+   *   - Exact match: \c filter.name=CT_Scan
+   *   - Not equal: \c filter.visible!=true
+   *   - Wildcard prefix: \c filter.name=CT*
+   *   - Wildcard suffix: \c filter.name=*Scan
+   *
+   * \sa NodeQueryParams
    */
   struct MITKRESTAPI_EXPORT PropertyFilter
   {
-    std::string key;
-    std::string value;
-    bool negated = false;  ///< true for != operator
+    std::string key;               ///< \brief The property key to filter on.
+    std::string value;             ///< \brief The value to match against (may contain wildcards).
+    bool negated = false;          ///< \brief If \c true, the filter uses != (not-equal) semantics.
   };
 
   /**
-   * @brief Sort specification.
+   * \brief Sort specification for node query results.
    *
-   * Per API specification section 5.3:
-   * - sort=name (ascending)
-   * - sort=-timestamp (descending, minus prefix)
+   * Defines the field to sort by and the sort direction. A descending sort
+   * is indicated by a minus prefix in the query string (e.g., \c sort=-timestamp).
+   *
+   * \sa NodeQueryParams
    */
   struct MITKRESTAPI_EXPORT SortSpec
   {
-    std::string field;
-    bool ascending = true;
+    std::string field;             ///< \brief The field name to sort by (e.g., "name", "timestamp").
+    bool ascending = true;         ///< \brief If \c true, sort in ascending order; otherwise descending.
   };
 
   /**
-   * @brief Query parameters for GET /datastorage/nodes.
+   * \brief Query parameters for the GET /datastorage/nodes endpoint.
    *
-   * Per API specification section 8.2.
+   * Encapsulates all supported query parameters including pagination, hierarchy
+   * filtering, system field filters, property filters, field selection, and sorting.
+   *
+   * \sa DataStorageBridge::GetNodes, PropertyFilter, SortSpec, Hierarchy
    */
   struct MITKRESTAPI_EXPORT NodeQueryParams
   {
-    // Pagination
-    int limit = 50;    ///< Maximum number of results (1-1000)
-    int offset = 0;    ///< Number of results to skip
+    int limit = 50;    ///< \brief Maximum number of results to return (valid range: 1--1000).
+    int offset = 0;    ///< \brief Number of results to skip for pagination.
 
-    // Hierarchy filter
-    Hierarchy hierarchy = Hierarchy::All;
+    Hierarchy hierarchy = Hierarchy::All;  ///< \brief Hierarchy filter mode.
 
-    // System field filters
-    std::optional<std::string> path;       ///< Path-based lookup
-    std::optional<std::string> dataType;   ///< Filter by MITK data type
-    std::optional<std::string> parentUid;  ///< Filter by parent node UID (use "null" for root)
+    std::optional<std::string> path;       ///< \brief Filter by path-based lookup.
+    std::optional<std::string> dataType;   ///< \brief Filter by MITK data type name.
+    std::optional<std::string> parentUid;  ///< \brief Filter by parent node UID (use "null" for root nodes).
 
-    // Property filters (filter.{property}=value)
-    std::vector<PropertyFilter> propertyFilters;
+    std::vector<PropertyFilter> propertyFilters;  ///< \brief Property-based filter criteria.
 
-    // Property filter context
-    std::optional<std::string> context;    ///< Renderer context for property lookup
-    PropertyScope propertyScope = PropertyScope::All;
+    std::optional<std::string> context;    ///< \brief Renderer context name for property lookups.
+    PropertyScope propertyScope = PropertyScope::All;  ///< \brief Scope for property filter evaluation.
 
-    // Field selection
-    std::vector<std::string> fields;       ///< Fields to include in response (empty = all)
+    std::vector<std::string> fields;       ///< \brief Fields to include in the response (empty means all fields).
 
-    // Sorting
-    std::optional<SortSpec> sort;
+    std::optional<SortSpec> sort;          ///< \brief Optional sort specification.
   };
 
   /**
-   * @brief Query parameters for GET /datastorage/nodes/{uid}/properties.
+   * \brief Query parameters for the GET /datastorage/nodes/{uid}/properties endpoint.
    *
-   * Per API specification section 8.5.
+   * Controls which properties are returned, including scope filtering,
+   * renderer context selection, and optional content inclusion.
+   *
+   * \sa DataStorageBridge::GetNodeProperties, PropertyScope
    */
   struct MITKRESTAPI_EXPORT PropertyQueryParams
   {
-    std::optional<std::string> context;    ///< Renderer context
-    PropertyScope scope = PropertyScope::All;
-    bool includeContent = true;            ///< Include property values (content parameter)
-    std::vector<std::string> names;        ///< Specific property names to return (empty = all)
+    std::optional<std::string> context;    ///< \brief Renderer context name for property lookup.
+    PropertyScope scope = PropertyScope::All;  ///< \brief Property scope filter.
+    bool includeContent = true;            ///< \brief If \c true, include property values in the response.
+    std::vector<std::string> names;        ///< \brief Specific property names to return (empty means all properties).
   };
 }
 

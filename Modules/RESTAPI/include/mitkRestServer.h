@@ -45,7 +45,7 @@ namespace mitk
   class RenderWindowBridge;
 
   /**
-   * @brief HTTP REST server implementation.
+   * \brief HTTP REST server implementation.
    *
    * Manages cpp-httplib server lifecycle and routes requests
    * to appropriate controllers.
@@ -74,12 +74,12 @@ namespace mitk
     DataStorage::Pointer GetDataStorage() const override;
 
     /**
-     * @brief Set the thread dispatcher for DataStorage operations.
+     * \brief Set the thread dispatcher for DataStorage operations.
      *
      * Forwards to the internal DataStorageBridge. If set, all bridge operations
      * are dispatched to the storage-owning thread.
      *
-     * @param dispatcher The dispatcher, or nullptr to clear.
+     * \param dispatcher The dispatcher, or nullptr to clear.
      */
     void SetDispatcher(StorageThreadDispatcherBase* dispatcher);
 
@@ -105,41 +105,41 @@ namespace mitk
     void RegisterRoutes();
     void ServerThreadFunc();
 
-    /** @brief Propagate the current dispatcher to the rendering controller if it exists.
-     *  @pre m_Mutex is held by the caller. */
+    /** \brief Propagate the current dispatcher to the rendering controller if it exists.
+     *  \pre m_Mutex is held by the caller. */
     void SyncDispatcherToController();
 
     /**
-     * @brief Check if the client IP is allowed to access the server.
+     * \brief Check if the client IP is allowed to access the server.
      *
      * Implements three modes: LocalhostOnly, AllowAll, Whitelist.
      * Sets 403 response if denied.
      *
-     * @pre m_RunningConfig has a value.
-     * @return true if allowed, false if denied (response already set).
+     * \pre m_RunningConfig has a value.
+     * \return true if allowed, false if denied (response already set).
      */
     bool CheckClientAccess(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Check if the request exceeds the rate limit.
+     * \brief Check if the request exceeds the rate limit.
      *
      * Per-IP sliding window rate limiter.
      * Sets 429 response with Retry-After header if exceeded.
      *
-     * @pre m_RunningConfig has a value.
-     * @return true if allowed, false if rate limited (response already set).
+     * \pre m_RunningConfig has a value.
+     * \return true if allowed, false if rate limited (response already set).
      */
     bool CheckRateLimit(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Check if the request has valid authentication.
+     * \brief Check if the request has valid authentication.
      *
      * Validates Bearer token from Authorization header.
      * Health and info endpoints are exempt.
      * Sets 401 response if unauthorized.
      *
-     * @pre m_RunningConfig has a value.
-     * @return true if allowed, false if unauthorized (response already set).
+     * \pre m_RunningConfig has a value.
+     * \return true if allowed, false if unauthorized (response already set).
      */
     bool CheckAuthentication(const httplib::Request& req, httplib::Response& res);
 
@@ -182,22 +182,22 @@ namespace mitk
     uint64_t m_RateLimitCheckCount{0};
 
     /**
-     * @brief Create and setup the temporary directory for data operations.
+     * \brief Create and setup the temporary directory for data operations.
      *
      * Called during Start(). Creates a unique temp directory for this server session.
      *
-     * @return true if successful.
+     * \return true if successful.
      */
     bool SetupTempDirectory();
 
     /**
-     * @brief Clean up the temporary directory.
+     * \brief Clean up the temporary directory.
      *
      * Called during Stop(). Removes all files and the directory itself.
      * Takes the path as a parameter to allow thread-safe cleanup after
      * the path has been copied from m_TempDirectory while holding the lock.
      *
-     * @param tempDir Path to the temporary directory to clean up.
+     * \param tempDir Path to the temporary directory to clean up.
      */
     static void CleanupTempDirectory(const std::string& tempDir);
   };

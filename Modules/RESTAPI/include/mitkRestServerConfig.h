@@ -19,62 +19,67 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** @brief Access mode for client IP filtering. */
+  /**
+   * \brief Access mode for client IP filtering.
+   *
+   * \sa RestServerConfig
+   */
   enum class ClientAccessMode
   {
-    LocalhostOnly,  ///< Only accept connections from 127.0.0.1 and ::1 (default)
-    AllowAll,        ///< Accept connections from any IP (not recommended without auth)
-    Whitelist        ///< Accept connections only from explicitly listed IPs
-  };
-
-  /** @brief Access mode for file system paths. */
-  enum class FileAccessMode
-  {
-    Unrestricted,       ///< No file path restrictions (default)
-    AllowedDirectories  ///< Only allow paths under configured directories
+    LocalhostOnly,  ///< \brief Only accept connections from 127.0.0.1 and ::1 (default).
+    AllowAll,        ///< \brief Accept connections from any IP (not recommended without authentication).
+    Whitelist        ///< \brief Accept connections only from explicitly listed IPs.
   };
 
   /**
-   * @brief Configuration for the REST API server.
+   * \brief Access mode for file system path restrictions.
    *
-   * @ingroup MicroServices_Interfaces
+   * \sa RestServerConfig
+   */
+  enum class FileAccessMode
+  {
+    Unrestricted,       ///< \brief No file path restrictions (default).
+    AllowedDirectories  ///< \brief Only allow paths under configured directories.
+  };
+
+  /**
+   * \brief Configuration parameters for the REST API server.
+   *
+   * This struct holds all configurable settings for the MITK REST API server,
+   * including network binding, security, rate limiting, and file access controls.
+   * A RestServerConfig instance represents the "pending" configuration that takes
+   * effect on the next server start.
+   *
+   * \sa IRestServerService, RestServer
    */
   struct MITKRESTAPI_EXPORT RestServerConfig
   {
-    // Server settings
-    std::string host = "127.0.0.1";
-    int port = 8080;
-    bool enabled = false;
-    int threadPoolSize = 4;
-    int readTimeoutSeconds = 30;
-    int writeTimeoutSeconds = 30;
+    std::string host = "127.0.0.1";       ///< \brief IP address or hostname to bind to.
+    int port = 8080;                       ///< \brief TCP port to listen on.
+    bool enabled = false;                  ///< \brief Whether the server should be started automatically.
+    int threadPoolSize = 4;                ///< \brief Number of worker threads for handling requests.
+    int readTimeoutSeconds = 30;           ///< \brief Socket read timeout in seconds.
+    int writeTimeoutSeconds = 30;          ///< \brief Socket write timeout in seconds.
 
-    // Client access control
-    ClientAccessMode clientAccessMode = ClientAccessMode::LocalhostOnly;
-    std::vector<std::string> allowedClientIPs;
+    ClientAccessMode clientAccessMode = ClientAccessMode::LocalhostOnly;  ///< \brief Client IP access control mode.
+    std::vector<std::string> allowedClientIPs;  ///< \brief List of allowed client IPs (used with Whitelist mode).
 
-    // Authentication
-    bool requireAuth = false;
-    std::string apiToken;
+    bool requireAuth = false;              ///< \brief If \c true, require Bearer token authentication.
+    std::string apiToken;                  ///< \brief The expected API token for Bearer authentication.
 
-    // Payload limits
-    int maxPayloadSizeMB = 512;
+    int maxPayloadSizeMB = 512;            ///< \brief Maximum request payload size in megabytes.
 
-    // File path restrictions
-    FileAccessMode fileAccessMode = FileAccessMode::Unrestricted;
-    std::vector<std::string> allowedFileDirectories;
+    FileAccessMode fileAccessMode = FileAccessMode::Unrestricted;  ///< \brief File system access restriction mode.
+    std::vector<std::string> allowedFileDirectories;  ///< \brief Allowed directories (used with AllowedDirectories mode).
 
-    // Rate limiting
-    bool rateLimitEnabled = false;
-    int rateLimitPerMinute = 120;
+    bool rateLimitEnabled = false;         ///< \brief If \c true, enable per-IP rate limiting.
+    int rateLimitPerMinute = 120;          ///< \brief Maximum number of requests per IP per minute.
 
-    // Per-IP temp dir quota for file-reference GETs
-    size_t maxActiveTempDirsPerIp = 5;
+    size_t maxActiveTempDirsPerIp = 5;     ///< \brief Maximum number of active temporary directories per client IP.
 
-    // HTTPS
-    bool httpsEnabled = false;
-    std::string sslCertPath;
-    std::string sslKeyPath;
+    bool httpsEnabled = false;             ///< \brief If \c true, enable HTTPS with TLS.
+    std::string sslCertPath;               ///< \brief Path to the SSL/TLS certificate file.
+    std::string sslKeyPath;                ///< \brief Path to the SSL/TLS private key file.
   };
 }
 

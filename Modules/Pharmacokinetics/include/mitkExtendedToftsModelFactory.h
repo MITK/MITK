@@ -20,6 +20,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the ExtendedToftsModel.
+   * \sa ExtendedToftsModel, ExtendedToftsModelParameterizer, ConcreteAIFBasedModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedToftsModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<ExtendedToftsModelParameterizer>
   {

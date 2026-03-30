@@ -18,6 +18,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the reversible one-tissue compartment model for PET pharmacokinetics.
+   *
+   * Models a single tissue compartment with parameters K1 (influx rate constant)
+   * and k2 (efflux rate constant). The concentration is computed by convolution
+   * of the AIF with an exponential residue function.
+   *
+   * \sa ExtendedOneTissueCompartmentModel, TwoTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT OneTissueCompartmentModel : public AIFBasedModelBase
   {
 

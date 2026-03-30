@@ -21,6 +21,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \brief Parameterizer for the StandardToftsModel.
+   * \sa StandardToftsModel, StandardToftsModelFactory, AIFBasedModelParameterizerBase
+   */
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::StandardToftsModel>
   {

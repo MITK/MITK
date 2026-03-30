@@ -21,6 +21,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the ExtendedOneTissueCompartmentModel.
+   * \sa ExtendedOneTissueCompartmentModel, ExtendedOneTissueCompartmentModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedOneTissueCompartmentModelFactory : public
     mitk::ConcreteAIFBasedModelFactory< ExtendedOneTissueCompartmentModelParameterizer>
   {

@@ -18,20 +18,21 @@ found in the LICENSE file.
 #include <MitkPharmacokineticsExports.h>
 
 namespace  mitk {
-/** @namespace convolution
- * @brief Helper for itk implementation of vnl fourier transformation
- * This namespace provides functions for the preparation of vnl_fft_1d, including a wrapper
- * for wrapping the convolution kernel (turning it inside out) and a function for zeropadding
- * to avoid convolution artefacts. */
+/** \brief Helper functions for 1D convolution via VNL Fourier transformation.
+ *
+ * This namespace provides utility functions for preparing arrays for convolution using
+ * vnl_fft_1d, including kernel wrapping (circular shift) and zero-padding to avoid
+ * boundary artefacts.
+ * \sa convoluteAIFWithExponential, convoluteAIFWithConstant
+ */
   namespace convolution {
 
-    /** Some typedefs concerning data structures needed for vnl_fft_1d, which has vnl_vector< vcl_complex< double > >
-     * as output typ of the forward transformation fwd_transform. Input is of type vnl_vector< vcl_complex< T > >
-     * but since itk::Array is derived from vnl_vector, this works as well*/
-
-
-
-    /** @brief Function that wraps the kernel */
+    /** \brief Wraps (circularly shifts) a 1D convolution kernel.
+     *
+     * Performs a circular shift of the kernel by half its length, which is required
+     * for proper FFT-based convolution.
+     * \param[in] kernel The input kernel array.
+     * \return The wrapped kernel array. */
 inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
         {
             int dim = kernel.GetNumberOfElements();
@@ -45,12 +46,13 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
             return wrappedKernel;
         }
 
-    /** @brief Function for zeropadding (adding zeros) of an Array/vnl_vector, so that is has size paddedDimensions
-     * @param unpaddedSpectrum
-     * @param paddedDimension Dimensions that the Array should have after padding (convolution dimensions)
-     * \remark dim = Dimensions of padded image --> PaddedDimension
-     * \remark m dimensions of larger image
-     * \remark n dimensions of image to be padded --> InitialDimension*/
+    /** \brief Zero-pads a 1D array to a specified size.
+     *
+     * Adds zeros symmetrically around the input array so it reaches the desired padded
+     * dimension. This prevents circular convolution artefacts in FFT-based convolution.
+     * \param[in] unpaddedSpectrum The input array to be padded.
+     * \param[in] paddedDimension The target size after padding (sum of both convolution operand sizes).
+     * \return The zero-padded array. */
    inline  itk::Array<double> zeropadding1d(itk::Array<double> unpaddedSpectrum, int paddedDimension)
         {
 
@@ -71,8 +73,14 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
             return paddedSpectrum;
         }
 
-     /** @brief Follow up function after back transformation from fourier space bwd_transform.
-      * removes padding and scales (transformed values have to be divided by transformation dimensions) */
+     /** \brief Removes padding and scales the result after inverse FFT.
+      *
+      * After the backward FFT transformation, this function extracts the valid portion
+      * of the result (removing padding) and divides by the transform size to correct
+      * the FFT scaling.
+      * \param[in] convolutionResult The raw inverse-FFT output.
+      * \param[in] initialDimension The original (unpadded) array size.
+      * \return The unpadded and scaled convolution result. */
   inline  itk::Array<double> unpadAndScale(itk::Array<double> convolutionResult, int initialDimension)
         {
             int transformationDimension = convolutionResult.size();
@@ -88,11 +96,14 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
             }
             return scaledResult;
         }
-    /** @brief Convenience function for preparing 2 array for convolution with each other.
-     * Takes both arrays of type itk::Array, zeropadds them to the sum of their sizes and wraps
-     * the one specified as kernel. Returns them as vnl_vector<vcl_complex<double> >, ready to
-     * be entered in fwd_transform*/
-
+    /** \brief Prepares two arrays for FFT-based convolution.
+     *
+     * Zero-pads both the kernel and spectrum arrays to the sum of their sizes so
+     * they are ready for forward FFT transformation.
+     * \param[in] kernel The convolution kernel array.
+     * \param[in] spectrum The signal array to be convolved.
+     * \param[out] preparedKernel The zero-padded kernel.
+     * \param[out] preparedSpectrum The zero-padded spectrum. */
   inline  void prepareConvolution(const itk::Array<double>& kernel, const itk::Array<double>& spectrum, itk::Array<double>& preparedKernel, itk::Array<double>& preparedSpectrum ){
         int convolutionDimensions = kernel.GetSize() + spectrum.GetSize();
 
@@ -105,10 +116,18 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
 
     }
 
+  /** \brief Convolves the AIF with an exponential residue function using an iterative formula.
+   *
+   * Computes the convolution of the arterial input function aif(t) with the exponential
+   * residue function R(t) = exp(-lambda * t) using linear interpolation between time grid
+   * points. This is used by compartment models to compute tissue concentration curves.
+   *
+   * \param[in] timeGrid The time grid in seconds.
+   * \param[in] aif The arterial input function values.
+   * \param[in] lambda The exponential decay rate constant.
+   * \return Array containing the convolution result at each time grid point. */
   inline itk::Array<double> convoluteAIFWithExponential(mitk::ModelBase::TimeGridType timeGrid, mitk::AIFBasedModelBase::AterialInputFunctionType aif, double lambda)
   {
-      /** @brief Iterative Formula to Convolve aif(t) with an exponential Residuefunction R(t) = exp(lambda*t)
-       **/
       typedef itk::Array<double> ConvolutionResultType;
       ConvolutionResultType convolution(timeGrid.GetSize());
       convolution.fill(0.0);
@@ -129,10 +148,18 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
   }
 
 
+  /** \brief Convolves the AIF with a constant value using an iterative formula.
+   *
+   * Computes the cumulative integral of the AIF multiplied by a constant factor
+   * using linear interpolation between time grid points. This is used by irreversible
+   * compartment models (e.g. FDG model).
+   *
+   * \param[in] timeGrid The time grid in seconds.
+   * \param[in] aif The arterial input function values.
+   * \param[in] constant The constant factor to multiply.
+   * \return Array containing the convolution result at each time grid point. */
   inline itk::Array<double> convoluteAIFWithConstant(mitk::ModelBase::TimeGridType timeGrid, mitk::AIFBasedModelBase::AterialInputFunctionType aif, double constant)
   {
-      /** @brief Iterative Formula to Convolve aif(t) with a constant value by linear interpolation of the Aif between sampling points
-       **/
       typedef itk::Array<double> ConvolutionResultType;
       ConvolutionResultType convolution(timeGrid.GetSize());
       convolution.fill(0.0);

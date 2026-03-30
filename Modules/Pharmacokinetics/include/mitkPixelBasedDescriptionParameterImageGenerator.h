@@ -25,11 +25,19 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /** Class for generating curve descriptor images based on a given 4D mitk image.
-   * The class uses curve parameter functor to generate the curve description image(s).
-   * Depending on the chosen functor several images may be generated as output.
-   * @remark This generator fits every pixel on its own. If you want to fit the mean value of the given mask use
-   * ROIBasedDescriptionParameterImageGenerator.
+  /**
+   * \brief Generates pixel-wise curve descriptor images from a 4D dynamic image.
+   *
+   * Uses a CurveParameterFunctor to compute curve description values for each pixel
+   * individually. Depending on the registered descriptors in the functor, multiple
+   * output parameter images may be generated.
+   *
+   * An optional mask can restrict computation to a subset of voxels.
+   *
+   * \remark This generator processes every pixel independently. For ROI-averaged descriptors,
+   * use ROIBasedDescriptionParameterImageGenerator instead.
+   *
+   * \sa DescriptionParameterImageGeneratorBase, CurveParameterFunctor
    */
   class MITKPHARMACOKINETICS_EXPORT PixelBasedDescriptionParameterImageGenerator : public DescriptionParameterImageGeneratorBase
   {

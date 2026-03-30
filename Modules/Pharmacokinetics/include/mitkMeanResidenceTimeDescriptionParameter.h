@@ -19,7 +19,14 @@ found in the LICENSE file.
 namespace  mitk
 {
 
-  /** Description parameter that computes the area under the curve */
+  /**
+   * \brief Curve description parameter that computes the Mean Residence Time (MRT).
+   *
+   * The MRT is defined as the ratio of the Area Under the First Moment Curve (AUMC) to
+   * the Area Under the Curve (AUC): MRT = AUMC / AUC.
+   *
+   * \sa AreaUnderTheCurveDescriptionParameter, AreaUnderFirstMomentDescriptionParameter, CurveDescriptionParameterBase
+   */
     class MITKPHARMACOKINETICS_EXPORT MeanResidenceTimeDescriptionParameter : public mitk::CurveDescriptionParameterBase
     {
     public:
@@ -30,6 +37,9 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
+
+        /** \brief Returns the name of the computed parameter ("MeanResidenceTime").
+         *  \return Vector containing the single parameter name. */
         DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:

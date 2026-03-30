@@ -19,6 +19,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the reversible two-tissue compartment model for PET pharmacokinetics.
+   *
+   * Models two tissue compartments with parameters K1 (plasma-to-tissue influx), k2 (tissue-to-plasma
+   * efflux), k3 (free-to-bound transfer), k4 (bound-to-free transfer), and vb (blood volume fraction).
+   *
+   * \sa OneTissueCompartmentModel, TwoTissueCompartmentFDGModel, TwoCompartmentExchangeModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentModel : public AIFBasedModelBase
   {
 

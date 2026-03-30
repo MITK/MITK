@@ -20,6 +20,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the OneTissueCompartmentModel.
+   * \sa OneTissueCompartmentModel, OneTissueCompartmentModelParameterizer, ConcreteAIFBasedModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT OneTissueCompartmentModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<OneTissueCompartmentModelParameterizer>
   {

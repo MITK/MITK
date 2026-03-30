@@ -63,24 +63,56 @@ namespace mitk
     mitkClassMacro(ExtractDirectedPlaneImageFilter, ImageToImageFilter);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /**
+     * \brief Set the world geometry describing the plane to be extracted.
+     * \param[in] _arg Pointer to the PlaneGeometry defining the slice position and orientation.
+     * \pre The geometry must be a PlaneGeometry or an AbstractTransformGeometry.
+     */
     itkSetMacro(WorldGeometry, PlaneGeometry *);
 
-    // The Reslicer is accessible to configure the desired interpolation;
-    // (See vtk::ImageReslice class for documentation).
-    // Misusage is at your own risk...
+    /**
+     * \brief Get the internal vtkImageReslice instance.
+     *
+     * The reslicer can be used to configure interpolation mode. See the
+     * vtkImageReslice documentation for available options. Misuse is at
+     * the caller's risk.
+     *
+     * \return Pointer to the vtkImageReslice object used internally.
+     */
     itkGetMacro(Reslicer, vtkImageReslice *);
 
-    // The target timestep in a 4D image from which the 2D plane is supposed
-    // to be extracted.
+    /**
+     * \brief Set/Get the target time step for extraction from a 4D image.
+     *
+     * For 3D images this parameter is ignored. For 4D images, the specified
+     * time step is extracted before reslicing. Default is 0.
+     */
     itkSetMacro(TargetTimestep, unsigned int);
     itkGetMacro(TargetTimestep, unsigned int);
 
+    /**
+     * \brief Set/Get whether the resampling extent is determined by geometry.
+     *
+     * When true, the output spacing is derived from the world geometry's
+     * extent. When false, the spacing is derived from the input image
+     * geometry. Default is true.
+     */
     itkSetMacro(InPlaneResampleExtentByGeometry, bool);
     itkGetMacro(InPlaneResampleExtentByGeometry, bool);
 
+    /**
+     * \brief Set the reslice interpolation property.
+     * \param[in] _arg Pointer to a VtkResliceInterpolationProperty defining the interpolation mode.
+     */
     setMacro(ResliceInterpolationProperty, VtkResliceInterpolationProperty *);
+
+    /** \brief Get the reslice interpolation property. */
     itkGetMacro(ResliceInterpolationProperty, VtkResliceInterpolationProperty *);
 
+    /**
+     * \brief Set/Get whether the filter operates in mapper mode.
+     */
     setMacro(IsMapperMode, bool);
     getMacro(IsMapperMode, bool);
 

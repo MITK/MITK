@@ -55,23 +55,33 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-        \brief Set macro for the current worldgeometry
+        \brief Set the current world plane geometry for slice extraction.
 
-        \a Parameter The current wordgeometry that describes the position (rotation, translation)
-           of the plane (and therefore the slice to be extracted) in our 3D(+t) image
+        \param[in] _arg The current world plane geometry that describes the position
+               (rotation, translation) of the plane (and therefore the slice to be
+               extracted) in the 3D(+t) image.
       */
       itkSetMacro(CurrentWorldPlaneGeometry, BaseGeometry *);
 
     /**
-     * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
+     * \brief Set the current world plane geometry.
+     * \deprecated Since 2014_10. Please use SetCurrentWorldPlaneGeometry instead.
+     * \param[in] geo Pointer to the BaseGeometry describing the extraction plane.
      */
     DEPRECATED(void SetCurrentWorldGeometry2D(BaseGeometry *geo)) { SetCurrentWorldPlaneGeometry(geo); };
+
+    /**
+     * \brief Set the image geometry of the input image.
+     * \param[in] _arg Pointer to the BaseGeometry of the input image.
+     */
     itkSetMacro(ImageGeometry, BaseGeometry *);
 
     /**
-      \brief Set macro for the current timestep
+      \brief Set the time step from which to extract the slice.
 
-      \a Parameter The timestep of the image from which the slice shall be extracted
+      \param[in] _arg The time step index of the 4D image from which the slice
+             shall be extracted. If the image is 3D, this parameter is ignored.
+             Defaults to 0 (first time step).
     */
     itkSetMacro(ActualInputTimestep, int);
 

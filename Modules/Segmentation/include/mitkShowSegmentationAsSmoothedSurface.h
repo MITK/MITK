@@ -19,6 +19,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Converts a segmentation image to a smoothed surface and adds it to the DataStorage.
+   *
+   * Runs the surface generation in a background thread, applying Gaussian smoothing
+   * before the marching cubes surface extraction. Uses the NonBlockingAlgorithm framework.
+   *
+   * \sa SegmentationSink, ShowSegmentationAsSurface, NonBlockingAlgorithm
+   */
   class MITKSEGMENTATION_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
   {
   public:

@@ -18,8 +18,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief MIME type definitions for segmentation I/O operations.
+   */
   namespace MitkSegmentationIOMimeTypes
   {
+    /**
+     * \brief Custom MIME type for segmentation task list files (.json).
+     *
+     * Identifies JSON files that conform to the segmentation task list format.
+     *
+     * \sa SegmentationTaskList, SegmentationTaskListIO
+     */
     class MITKSEGMENTATIONIO_EXPORT MitkSegmentationTaskListMimeType : public CustomMimeType
     {
     public:
@@ -29,9 +39,13 @@ namespace mitk
       MitkSegmentationTaskListMimeType* Clone() const override;
     };
 
+    /** \brief Returns the segmentation task list MIME type instance. */
     MITKSEGMENTATIONIO_EXPORT MitkSegmentationTaskListMimeType SEGMENTATIONTASKLIST_MIMETYPE();
+
+    /** \brief Returns the name string for the segmentation task list MIME type. */
     MITKSEGMENTATIONIO_EXPORT std::string SEGMENTATIONTASKLIST_MIMETYPE_NAME();
 
+    /** \brief Returns all registered segmentation MIME types. */
     MITKSEGMENTATIONIO_EXPORT std::vector<CustomMimeType*> Get();
   }
 }

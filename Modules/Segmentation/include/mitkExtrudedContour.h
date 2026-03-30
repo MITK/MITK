@@ -29,18 +29,17 @@ class vtkPolygon;
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Data class containing a bounding-object created by
-  //## extruding a Contour along a vector
-  //##
-  //## The m_Contour is extruded in the direction m_Vector until
-  //## reaching m_ClippingGeometry.
-  //## @ingroup Data
-
   /**
-  * \deprecatedSince{2015_05} ExtrudedContour is deprecated. It will be removed in the next release.
-  *  Becomes obsolete. Refer to https://docs.mitk.org/nightly/InteractionMigration.html .
-  */
+   * \brief Data class containing a bounding-object created by extruding a Contour along a vector.
+   *
+   * The m_Contour is extruded in the direction m_Vector until
+   * reaching m_ClippingGeometry.
+   *
+   * \ingroup Data
+   *
+   * \deprecatedSince{2015_05} ExtrudedContour is deprecated. It will be removed in the next release.
+   *  Becomes obsolete. Refer to https://docs.mitk.org/nightly/InteractionMigration.html .
+   */
 
   class MITKSEGMENTATION_EXPORT ExtrudedContour : public BoundingObject
   {
@@ -53,27 +52,27 @@ namespace mitk
     bool IsInside(const Point3D &p) const override;
     void UpdateOutputInformation() override;
 
-    //##Documentation
-    //## @brief Contour to extrude
+    /** \brief Contour to extrude. */
     itkGetConstObjectMacro(Contour, mitk::Contour);
+    /** \brief Sets the contour to extrude. */
     itkSetObjectMacro(Contour, mitk::Contour);
 
-    //##Documentation
-    //## @brief Vector to specify the direction of the extrusion
+    /** \brief Vector to specify the direction of the extrusion. */
     mitkGetVectorMacro(Vector, mitk::Vector3D);
+    /** \brief Sets the direction vector for extrusion. */
     mitkSetVectorMacro(Vector, mitk::Vector3D);
     itkGetConstMacro(AutomaticVectorGeneration, bool);
     itkSetMacro(AutomaticVectorGeneration, bool);
     itkBooleanMacro(AutomaticVectorGeneration);
 
-    //##Documentation
-    //## @brief Optional vector to specify the orientation of the bounding-box
+    /** \brief Optional vector to specify the orientation of the bounding-box. */
     mitkGetVectorMacro(RightVector, mitk::Vector3D);
+    /** \brief Sets the optional orientation vector. */
     mitkSetVectorMacro(RightVector, mitk::Vector3D);
 
-    //##Documentation
-    //## @brief Optional geometry for clipping the extruded contour
+    /** \brief Optional geometry for clipping the extruded contour. */
     itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);
+    /** \brief Sets the clipping geometry. */
     itkSetObjectMacro(ClippingGeometry, mitk::BaseGeometry);
 
     itk::ModifiedTimeType GetMTime() const override;
@@ -101,8 +100,7 @@ namespace mitk
 #endif
 
     mitk::PlaneGeometry::Pointer m_ProjectionPlane;
-    //##Documentation
-    //## @brief For fast projection on plane
+    /** \brief For fast projection on plane. */
     float m_Right[3];
     float m_Down[3];
 

@@ -13,6 +13,26 @@ found in the LICENSE file.
 #ifndef mitkToolFactoryMacro_h
 #define mitkToolFactoryMacro_h
 
+/**
+ * \file mitkToolFactoryMacro.h
+ * \brief Macros for registering MITK segmentation tools and tool GUIs via ITK object factories.
+ *
+ * These macros generate the boilerplate ITK ObjectFactory and static registration code
+ * needed to make a mitk::Tool subclass discoverable by ToolManager at runtime.
+ *
+ * \sa mitk::Tool, mitk::ToolManager
+ */
+
+/**
+ * \brief Register a mitk::Tool subclass with the ITK object factory system.
+ *
+ * Creates a factory class and a static registration object so that ToolManager
+ * can discover and instantiate the tool at runtime.
+ *
+ * \param EXPORT_SPEC DLL export macro for the module.
+ * \param CLASS_NAME  The tool class name (must derive from mitk::Tool).
+ * \param DESCRIPTION A human-readable description string.
+ */
 #define MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                          \
 class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase                                                \
 {                                                                                                                      \
@@ -70,6 +90,17 @@ class CLASS_NAME##RegistrationMethod                                            
                                                                                                                        \
 static CLASS_NAME##RegistrationMethod somestaticinitializer_##CLASS_NAME;
 
+/**
+ * \brief Register a derived segmentation-method tool wrapping a segmentation generator.
+ *
+ * Creates a tool class derived from BASE_CLASS that owns a CLASS_NAME segmentation generator
+ * and registers it with the ITK factory system.
+ *
+ * \param EXPORT_SPEC DLL export macro for the module.
+ * \param BASE_CLASS  The base tool class to derive from.
+ * \param CLASS_NAME  The segmentation generator class name.
+ * \param DESCRIPTION A human-readable description string.
+ */
 #define MITK_DERIVED_SM_TOOL_MACRO(EXPORT_SPEC, BASE_CLASS, CLASS_NAME, DESCRIPTION)                                   \
 class EXPORT_SPEC CLASS_NAME##Tool : public BASE_CLASS                                                                 \
 {                                                                                                                      \
@@ -112,6 +143,16 @@ MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME##Tool, DESCRIPTION);
 
 /* GUI classes are _not_ exported! */
 
+/**
+ * \brief Register a tool GUI class with the ITK object factory system.
+ *
+ * Similar to MITK_TOOL_MACRO but intended for tool GUI classes
+ * (QmitkToolGUI subclasses). The factory key is the class name itself.
+ *
+ * \param EXPORT_SPEC DLL export macro for the module.
+ * \param CLASS_NAME  The tool GUI class name.
+ * \param DESCRIPTION A human-readable description string.
+ */
 #define MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                      \
 class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase                                                \
 {                                                                                                                      \
@@ -169,12 +210,32 @@ class CLASS_NAME##RegistrationMethod                                            
                                                                                                                        \
 static CLASS_NAME##RegistrationMethod somestaticinitializer_##CLASS_NAME;
 
+/**
+ * \brief Header declaration for an externally loadable tool GUI factory.
+ *
+ * Declares the \c itkLoad() entry point that allows the tool GUI to be
+ * loaded as an external ITK factory plugin.
+ *
+ * \param EXPORT_SPEC DLL export macro.
+ * \param CLASS_NAME  The tool GUI class name.
+ * \param DESCRIPTION A human-readable description string.
+ */
 #define MITK_EXTERNAL_TOOL_GUI_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                      \
 extern "C"                                                                                                             \
 {                                                                                                                      \
   EXPORT_SPEC itk::ObjectFactoryBase* itkLoad();                                                                       \
 }
 
+/**
+ * \brief Implementation macro for an externally loadable tool GUI factory.
+ *
+ * Combines MITK_TOOL_GUI_MACRO with the \c itkLoad() entry point definition
+ * so that the tool GUI can be discovered and loaded by ITK at runtime.
+ *
+ * \param EXPORT_SPEC DLL export macro.
+ * \param CLASS_NAME  The tool GUI class name.
+ * \param DESCRIPTION A human-readable description string.
+ */
 #define MITK_EXTERNAL_TOOL_GUI_CPP_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                         \
 MITK_TOOL_GUI_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                              \
 extern "C"                                                                                                             \

@@ -29,8 +29,9 @@ namespace us
 namespace mitk
 {
   /**
-   * @brief nnUNet parameter request object holding all model parameters for input.
-   * Also holds output temporary directory path.
+   * \brief Holds all nnUNet model parameters for a single inference request.
+   *
+   * Also holds the output temporary directory path.
    */
   struct ModelParams
   {
@@ -120,40 +121,35 @@ namespace mitk
     itkGetConstMacro(GpuId, unsigned int);
 
     /**
-     * @brief vector of ModelParams.
-     * Size > 1 only for ensemble prediction.
+     * \brief Vector of ModelParams. Size > 1 only for ensemble prediction.
      */
     std::vector<ModelParams> m_ParamQ;
 
     /**
-     * @brief Holds paths to other input image modalities.
-     *
+     * \brief Holds pointers to other input image modalities for multi-modal inference.
      */
     std::vector<mitk::Image::ConstPointer> m_OtherModalPaths;
 
     mitk::Image::ConstPointer m_InputBuffer;
 
     /**
-     * @brief Renders the output MultiLabelSegmentation.
-     * To called in the main thread.
+     * \brief Renders the output segmentation. Must be called in the main thread.
      */
     void RenderOutputBuffer();
 
     /**
-     * @brief Get the Output Buffer object
-     *
-     * @return MultiLabelSegmentation::Pointer
+     * \brief Returns the output buffer containing the segmentation result.
+     * \return The output segmentation.
      */
     MultiLabelSegmentation::Pointer GetOutputBuffer();
 
     /**
-     * @brief Sets the outputBuffer to nullptr
-     *
+     * \brief Clears the output buffer by setting it to nullptr.
      */
     void ClearOutputBuffer();
 
     /**
-     *  @brief Returns the DataStorage from the ToolManager
+     * \brief Returns the DataStorage from the ToolManager.
      */
     mitk::DataStorage *GetDataStorage();
 
@@ -163,31 +159,22 @@ namespace mitk
 
   protected:
     /**
-     * @brief Construct a new nnUNet Tool object.
-     *
+     * \brief Default constructor.
      */
     nnUNetTool() = default;
 
     /**
-     * @brief Destroy the nnUNet Tool object and deletes the temp directory.
-     *
+     * \brief Destructor. Deletes the temporary directory.
      */
     ~nnUNetTool();
 
     /**
-     * @brief Overridden method from the tool manager to execute the segmentation
-     * Implementation:
-     * 1. Saves the inputAtTimeStep in a temporary directory.
-     * 2. Copies other modalities, renames and saves in the temporary directory, if required.
-     * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
-     * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
-     * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
-     *    MultiLabelSegmentation and sets to previewImage.
+     * \brief Executes the nnUNet segmentation pipeline.
      *
-     * @param inputAtTimeStep
-     * @param oldSegAtTimeStep
-     * @param previewImage
-     * @param timeStep
+     * Implementation: (1) saves the input image to a temporary directory;
+     * (2) copies/renames additional modalities if needed; (3) sets environment variables;
+     * (4) iterates through the parameter queue and executes nnUNet_predict;
+     * (5) loads the output from the temporary directory as the preview.
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;

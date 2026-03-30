@@ -24,14 +24,12 @@ namespace mitk
   class Image;
 
   /** \brief Base class for any operation based on a MultiLabelSegmentation instance.
-    \sa SegChangeOperationBaseApplier
 
-    The information for the operation is specified by properties:
+    \sa SegChangeOperationApplier
 
-     imageVolume            the volume where the slice was extracted from.
-     slice                  the slice to be applied.
-     timestep               the timestep in an 4D image.
-     currentWorldGeometry   specifies the axis where the slice has to be applied in the volume.
+    This Operation serves as the common base for all undo/redo operations that modify
+    a MultiLabelSegmentation. It holds a weak reference to the target segmentation
+    and provides validity checking.
 
     This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
@@ -42,10 +40,13 @@ namespace mitk
 
     ~SegChangeOperationBase() override = default;
 
-    /** \brief Check if it is a valid operation.*/
+    /** \brief Check whether the operation is still valid (i.e., the segmentation still exists). */
     bool IsValid() const override;
 
+    /** \brief Get the target segmentation (mutable). */
     mitk::MultiLabelSegmentation::Pointer GetSegmentation();
+
+    /** \brief Get the target segmentation (const). */
     const mitk::MultiLabelSegmentation::ConstPointer GetSegmentation() const;
 
   protected:

@@ -110,28 +110,32 @@ namespace mitk
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
                                                         const ContourModel *contourIn2D);
 
-    /** Helper methods that checks all precondition and if they are fulfilled does the following:
-     * 1. Gets the contour of the time point specified by positionEvent.
-     * 2. Gets the affected working slice of the time point specified by positionEvent.
-     * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active label value)
-     * to the slice.
-     * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().
-     * @param positionEvent The position event that indicates that triggers the update of the segmentation.
-     * It i.a. encodes the slice position that should be updated.
-     * @param labelValue The value of the label that should be updated.
-     * @param setInvisibleAfterSuccess Indicates if the feedback contour should be set invisible after the update of the seg result.
-     * @param addMode If false is passed the content of the contour will be set to background (thus label will be erased).
-     * if set to true, the label will be added to the slice in the provided contour.*/
+    /**
+     * \brief Checks preconditions and writes the feedback contour as a segmentation result.
+     *
+     * Steps: (1) gets the contour at the time point from positionEvent;
+     * (2) gets the affected working slice; (3) projects the contour onto the working slice
+     * and fills it; (4) writes the slice back via SegTool2D::WriteBackSegmentationResult().
+     *
+     * \param[in] positionEvent The position event that triggers the segmentation update.
+     * \param[in] labelValue The label value to be written.
+     * \param[in] addMode If false, the contour area is set to background (erased).
+     *            If true, the label is added to the slice.
+     * \param[in] setInvisibleAfterSuccess If true, hides the feedback contour after successful write.
+     */
     void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, MultiLabelSegmentation::LabelValueType labelValue, bool addMode, bool setInvisibleAfterSuccess = true);
 
-    /** Helper methods that generates an updated slice image.
-     * @param seg Pointer to the segmentation that should be the template for the updated slice (slice will be extracted from the segmentation.
-     * @param sliceGeometry Pointer to the slice geometry that defines the slice that should be extracted and updated.
-     * @param contour Pointer to the contour that should be updated in the slice.
-     * @param labelValue The value of the label that should be updated.
-     * @param timePoint The time point that should be used for slice extraction and update.
-     * @param addMode If false is passed the content of the contour will be set to background (thus label will be erased).
-     * if set to true, the label will be added to the slice in the provided contour.*/
+    /**
+     * \brief Generates an updated slice image with the contour applied.
+     *
+     * \param[in] seg The segmentation from which to extract the template slice.
+     * \param[in] sliceGeometry Defines which slice to extract and update.
+     * \param[in] contour The contour to rasterize into the slice.
+     * \param[in] labelValue The label value to write.
+     * \param[in] timePoint The time point for slice extraction.
+     * \param[in] addMode If false, the contour area is set to background. If true, the label is added.
+     * \return The updated slice image.
+     */
     mitk::Image::Pointer GenerateSliceWithContourUpdate(const MultiLabelSegmentation* seg, const PlaneGeometry* sliceGeometry,
       const ContourModel* contour, MultiLabelSegmentation::LabelValueType labelValue, TimePointType timePoint, bool addMode);
 

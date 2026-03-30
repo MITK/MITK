@@ -51,88 +51,92 @@ namespace mitk
     typedef BoundingBoxType::PointsContainerIterator PointsContainerIterator;
 
     /**
-    * sets whether the contour should be closed or open.
-    * by default the contour is closed
-    */
+     * \brief Sets whether the contour is closed or open.
+     * \param[in] _arg If true, contour is closed (default). If false, open.
+     */
     itkSetMacro(Closed, bool);
 
     /**
-    * returns if the contour is closed or opened
-    */
+     * \brief Returns whether the contour is closed.
+     * \return true if the contour is closed, false if open.
+     */
     itkGetMacro(Closed, bool);
 
+    /** \brief Sets the selection state of the contour. */
     itkSetMacro(Selected, bool);
 
+    /** \brief Returns the selection state of the contour. */
     itkGetMacro(Selected, bool);
 
+    /** \brief Sets the line width for rendering the contour. */
     itkSetMacro(Width, float);
 
+    /** \brief Returns the line width for rendering the contour. */
     itkGetMacro(Width, float);
 
     /**
-    * clean up the contour data
-    */
+     * \brief Resets the contour, removing all vertices.
+     */
     void Initialize() override;
 
     /**
-    * add a new vertex to the contour
-    */
+     * \brief Adds a new vertex to the contour.
+     * \param[in] newPoint The 3D point to add.
+     */
     void AddVertex(mitk::Point3D newPoint);
 
     /**
-    * return an itk parametric path of the contour
-    */
+     * \brief Returns an ITK parametric path representation of the contour.
+     * \return Smart pointer to the parametric path.
+     */
     PathPointer GetContourPath() const;
 
     /**
-    * set the current render window. This is helpful if one
-    * wants to draw the contour in one special window only.
-    */
+     * \brief Sets the render window in which this contour should be drawn.
+     * \param[in] rw Pointer to the VTK render window.
+     */
     void SetCurrentWindow(vtkRenderWindow *rw);
 
     /**
-    * returns the points to the current render window
-    */
+     * \brief Returns the render window associated with this contour.
+     * \return Pointer to the VTK render window, or nullptr.
+     */
     vtkRenderWindow *GetCurrentWindow() const;
 
     /**
-    * returns the number of points stored in the contour
-    */
+     * \brief Returns the number of vertices stored in the contour.
+     * \return The vertex count.
+     */
     unsigned int GetNumberOfPoints() const;
 
     /**
-    * returns the container of the contour points
-    */
+     * \brief Returns the container of contour vertices.
+     * \return Smart pointer to the points container.
+     */
     PointsContainerPointer GetPoints() const;
 
     /**
-    * set the contour points container.
-    */
+     * \brief Sets the contour points container.
+     * \param[in] points Smart pointer to the new points container.
+     */
     void SetPoints(PointsContainerPointer points);
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Updates the output information (bounding box, etc.). */
     void UpdateOutputInformation() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Sets the requested region to the largest possible region. */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Checks whether the requested region is outside the buffered region. */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Verifies that the requested region is valid. */
     bool VerifyRequestedRegion() override;
 
     /**
-    * intherited from parent
-    */
+     * \brief Sets the requested region from an itk::DataObject.
+     * \param[in] data The data object from which to copy the requested region.
+     */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
   protected:

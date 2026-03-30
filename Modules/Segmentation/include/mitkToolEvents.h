@@ -80,6 +80,14 @@ class MyTool : public Tool
   }
   \endcode
   */
+  /**
+   * \brief Tool event carrying a single typed parameter.
+   *
+   * Use the mitkToolEventMacro1Param macro to derive named event types from this template.
+   *
+   * \tparam T The type of the parameter carried by the event.
+   * \sa ToolEvent, TwoParameterToolEvent
+   */
   template <typename T>
   class ParameterToolEvent : public ToolEvent
   {
@@ -87,12 +95,23 @@ class MyTool : public Tool
     typedef ParameterToolEvent Self;
     typedef ToolEvent Superclass;
 
+    /**
+     * \brief Constructor with parameter value.
+     * \param[in] parameter The parameter value to store.
+     */
     ParameterToolEvent(const T parameter) : m_Parameter(parameter) {}
+
+    /** \brief Copy constructor. */
     ParameterToolEvent(const Self &s) : ToolEvent(s), m_Parameter(s.m_Parameter) {}
     ~ParameterToolEvent() override {}
     const char *GetEventName() const override { return "ParameterToolEvent"; }
     bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
     ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter); }
+
+    /**
+     * \brief Returns the parameter value carried by this event.
+     * \return The parameter value.
+     */
     const T GetParameter() const { return m_Parameter; }
   protected:
     const T m_Parameter;
@@ -132,6 +151,15 @@ class MyTool : public Tool
   }
   \endcode
   */
+  /**
+   * \brief Tool event carrying two typed parameters.
+   *
+   * Use the mitkToolEventMacro2Param macro to derive named event types from this template.
+   *
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \sa ToolEvent, ParameterToolEvent
+   */
   template <typename T, typename U>
   class TwoParameterToolEvent : public ToolEvent
   {
@@ -139,16 +167,26 @@ class MyTool : public Tool
     typedef TwoParameterToolEvent Self;
     typedef ToolEvent Superclass;
 
+    /**
+     * \brief Constructor with two parameter values.
+     * \param[in] parameter1 The first parameter value.
+     * \param[in] parameter2 The second parameter value.
+     */
     TwoParameterToolEvent(const T parameter1, const U parameter2) : m_Parameter1(parameter1), m_Parameter2(parameter2)
     {
     }
 
+    /** \brief Copy constructor. */
     TwoParameterToolEvent(const Self &s) : ToolEvent(s), m_Parameter1(s.m_Parameter1), m_Parameter2(s.m_Parameter2) {}
     ~TwoParameterToolEvent() override {}
     const char *GetEventName() const override { return "TwoParameterToolEvent"; }
     bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
     ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter1, m_Parameter2); }
+
+    /** \brief Returns the first parameter value. */
     const T GetParameter1() const { return m_Parameter1; }
+
+    /** \brief Returns the second parameter value. */
     const U GetParameter2() const { return m_Parameter2; }
   protected:
     const T m_Parameter1;
@@ -160,8 +198,13 @@ class MyTool : public Tool
     void operator=(const Self &);
   };
 
+  /** \brief Convenience typedef for a tool event carrying an int parameter. */
   typedef ParameterToolEvent<int> IntegerToolEvent;
+
+  /** \brief Convenience typedef for a tool event carrying a float parameter. */
   typedef ParameterToolEvent<float> FloatToolEvent;
+
+  /** \brief Convenience typedef for a tool event carrying a bool parameter. */
   typedef ParameterToolEvent<bool> BoolToolEvent;
 
 } // namespace

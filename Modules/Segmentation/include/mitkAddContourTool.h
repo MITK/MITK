@@ -24,7 +24,7 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Fill the inside of a contour with 1
+    \brief Fill the inside of a contour with the foreground pixel value.
 
     \sa ContourTool
 
@@ -39,8 +39,6 @@ namespace mitk
     filled with 0.
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
   class MITKSEGMENTATION_EXPORT AddContourTool : public ContourTool
   {
@@ -49,15 +47,20 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Return the cursor icon resource for this tool. */
     us::ModuleResource GetCursorIconResource() const override;
+
+    /** \brief Return the toolbar icon resource for this tool. */
     us::ModuleResource GetIconResource() const override;
 
+    /** \brief Return the human-readable name of this tool ("Add"). */
     const char *GetName() const override;
 
   protected:
     AddContourTool(); // purposely hidden
     ~AddContourTool() override;
 
+    /** \brief Toggle painting pixel value and swap cursor icon when CTRL is pressed. */
     void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 

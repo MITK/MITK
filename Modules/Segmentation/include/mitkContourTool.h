@@ -40,8 +40,6 @@ namespace mitk
     (by sub-classes) or during some event (e.g. in OnInvertLogic - when CTRL is pressed).
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
   class MITKSEGMENTATION_EXPORT ContourTool : public FeedbackContourTool
   {
@@ -52,16 +50,28 @@ namespace mitk
     ContourTool(int paintingPixelValue = 1); // purposely hidden
     ~ContourTool() override;
 
+    /** \brief Called when the tool is activated. Delegates to superclass. */
     void Activated() override;
+
+    /** \brief Called when the tool is deactivated. Delegates to superclass. */
     void Deactivated() override;
 
+    /** \brief Initialize the feedback contour with the first point on mouse press. */
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
+
+    /** \brief Add subsequent points to the feedback contour during mouse drag. */
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
+
+    /** \brief Close the contour, project it to the image slice, and fill it on mouse release. */
     virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent);
+
+    /** \brief Toggle painting pixel value between 0 and 1 (called when CTRL is pressed). */
     virtual void OnInvertLogic(StateMachineAction *, InteractionEvent *interactionEvent);
 
+    /** \brief Wire state machine actions to the corresponding member functions. */
     void ConnectActionsAndFunctions() override;
 
+    /** \brief The pixel value used when filling the contour (0 = erase, 1 = draw). */
     int m_PaintingPixelValue;
   };
 

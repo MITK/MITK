@@ -20,6 +20,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Converts a segmentation image to a surface representation and adds it to the DataStorage.
+   *
+   * Runs the surface generation in a background thread using the NonBlockingAlgorithm framework.
+   * Supports both binary images and multi-label segmentation images, where each label
+   * is converted to a separate surface.
+   *
+   * \sa SegmentationSink, NonBlockingAlgorithm
+   */
   class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSink
   {
   public:

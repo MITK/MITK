@@ -21,16 +21,25 @@ namespace mitk
 {
   class Image;
 
-  /** \brief An Operation for applying an edited slice to the a group of a MultiLabelSegmentation.
-    \sa SegSliceOperationApplier
-    This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
+  /** \brief An Operation for applying an edited 2D slice to a group of a MultiLabelSegmentation.
+
+    \sa SegChangeOperationApplier
+
+    This Operation stores a 2D slice together with its plane geometry, time step, and
+    target group index, enabling undo-redo for slice-based segmentation edits.
   */
   class MITKSEGMENTATION_EXPORT SegSliceOperation : public SegChangeOperationBase
   {
   public:
     mitkClassMacro(SegSliceOperation, SegChangeOperationBase);
 
-    /** \brief */
+    /** \brief Construct a slice operation.
+      \param segmentation The target segmentation.
+      \param groupID The group index of the group image to modify.
+      \param slice The 2D slice image to apply.
+      \param timestep The time step at which the slice should be applied.
+      \param planeGeometry The plane geometry defining the slice position and orientation in the volume.
+    */
     SegSliceOperation(MultiLabelSegmentation* segmentation,
                        MultiLabelSegmentation::GroupIndexType groupID,
                        const Image *slice,

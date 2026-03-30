@@ -21,11 +21,13 @@ namespace mitk
 {
   class Image;
 
-  /** \brief An Operation for applying a modification to the properties of a label (E.g. name, color) of a MultiLabelSegmentation.
-    \sa SegOperationApplier
-    This Operation can be used to realize undo-redo functionality for changing of label properties.
-    If you want to add/remove labels from a segmentation (w/ or w/o the pixel data), use the
-    SegGroupModifyOperation.
+  /** \brief An Operation for modifying the properties (e.g. name, color) of labels in a MultiLabelSegmentation.
+
+    \sa SegChangeOperationApplier
+
+    This Operation can be used to realize undo-redo functionality for changing label properties.
+    If you want to add/remove labels from a segmentation (with or without pixel data), use
+    SegGroupModifyOperation instead.
   */
   class MITKSEGMENTATION_EXPORT SegLabelPropModifyOperation : public SegChangeOperationBase
   {
@@ -33,20 +35,27 @@ namespace mitk
     mitkClassMacro(SegLabelPropModifyOperation, SegChangeOperationBase);
 
     using ModifyLabelsVectorType = MultiLabelSegmentation::ConstLabelVectorType;
-    
-    /** \brief */
+
+    /** \brief Construct a label property modify operation with the given label data.
+      \param segmentation The target segmentation.
+      \param modifiedLabel The vector of modified label objects containing new property values.
+    */
     SegLabelPropModifyOperation(MultiLabelSegmentation* segmentation,
       const ModifyLabelsVectorType& modifiedLabel);
 
     ~SegLabelPropModifyOperation() override = default;
 
-    /** \brief Get the modified labels map.*/
+    /** \brief Get the vector of modified labels stored in this operation. */
     const ModifyLabelsVectorType& GetModifiedLabels() const;
 
     // Explicitly delete copy operations because internally std::unique_ptr are used.
     SegLabelPropModifyOperation(const SegLabelPropModifyOperation&) = delete;
     SegLabelPropModifyOperation& operator=(const SegLabelPropModifyOperation&) = delete;
 
+    /** \brief Factory method that creates a label property modify operation from the current segmentation state.
+      \param segmentation The segmentation to capture label properties from.
+      \param relevantLabels The label values whose properties should be captured.
+    */
     static SegLabelPropModifyOperation* CreatFromSegmentation(MultiLabelSegmentation* segmentation,
       const MultiLabelSegmentation::LabelValueVectorType& relevantLabels);
 

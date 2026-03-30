@@ -19,6 +19,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Non-blocking algorithm that calculates volume, center of mass, and bounding box
+   *        of a binary segmentation image.
+   *
+   * Runs the computation in a background thread and makes the results available
+   * upon completion. Used internally for displaying segmentation statistics.
+   *
+   * \sa SegmentationSink, NonBlockingAlgorithm
+   */
   class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationSink
   {
   public:

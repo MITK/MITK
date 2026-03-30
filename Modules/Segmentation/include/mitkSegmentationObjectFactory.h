@@ -18,6 +18,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory that registers segmentation-specific mappers, I/O factories, and default properties.
+   *
+   * Provides mapper creation for segmentation data types (Contour, ContourSet, ContourModel)
+   * and registers legacy I/O factories for the segmentation module.
+   *
+   * \sa CoreObjectFactoryBase
+   */
   class MITKSEGMENTATION_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
   {
   public:

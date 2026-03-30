@@ -47,30 +47,48 @@ namespace mitk
     mitkClassMacro(LiveWireTool2D, EditableContourTool);
     itkFactorylessNewMacro(Self);
 
+    /** \brief Return the cursor icon resource for this tool. */
     us::ModuleResource GetCursorIconResource() const override;
+
+    /** \brief Return the toolbar icon resource for this tool. */
     us::ModuleResource GetIconResource() const override;
+
+    /** \brief Return the human-readable name of this tool ("Live Wire"). */
     const char *GetName() const override;
 
   protected:
     LiveWireTool2D();
     ~LiveWireTool2D() override;
 
+    /** \brief Wire state machine actions to the corresponding member functions. */
     void ConnectActionsAndFunctions() override;
 
+    /** \brief Recompute the LiveWire contour between start and end points. */
     void UpdateLiveWireContour();
+
+    /** \brief Update the working slice when the time point changes. */
     void OnTimePointChanged() override;
 
+    /** \brief Prepare the initial contour anchor, snapping to the highest gradient magnitude.
+      \return The adjusted anchor point.
+    */
     mitk::Point3D PrepareInitContour(const mitk::Point3D& clickedPoint) override;
+
+    /** \brief Finalize the preview contour segment for the given click position. */
     virtual void FinalizePreviewContour(const Point3D& clickedPoint) override;
+
+    /** \brief Initialize the preview contour for a new LiveWire segment starting at the clicked point. */
     virtual void InitializePreviewContour(const Point3D& clickedPoint) override;
+
+    /** \brief Update the preview contour as the mouse moves to a new position. */
     virtual void UpdatePreviewContour(const Point3D& clickedPoint) override;
 
   private:
 
-    /// \brief Don't use dynamic cost map for LiveWire calculation.
+    /** \brief Handle mouse movement without updating the dynamic cost map. */
     void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /// \brief Finish contour interaction.
+    /** \brief Finalize the contour and write it back as a segmentation result. */
     void FinishTool() override;
 
     template <typename TPixel, unsigned int VImageDimension>

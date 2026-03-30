@@ -16,9 +16,21 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <MitkSegmentationExports.h>
 
+/**
+ * \brief Helper functions for segmentation operations.
+ * \sa MultiLabelSegmentation
+ */
 namespace mitk::SegmentationHelper
 {
-  /** \brief Get a template image for a static segmentation of a dynamic (3d+t) reference image.
+  /**
+   * \brief Creates a static 3D template image suitable for segmenting a dynamic (3D+t) reference image.
+   *
+   * If the reference image is 3D+t, this function creates a single 3D image
+   * with matching geometry that can be used as a segmentation template.
+   *
+   * \param[in] referenceImage The reference image (may be 3D or 3D+t).
+   * \return A 3D image with matching spatial geometry, suitable as segmentation template.
+   * \pre referenceImage must point to a valid instance.
    */
   MITKSEGMENTATION_EXPORT Image::Pointer GetStaticSegmentationTemplate(const Image* referenceImage);
 }

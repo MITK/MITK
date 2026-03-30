@@ -21,11 +21,13 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or
-   * ExternalProcessStdErrEvent in order to get notified of any output.
-   * @remark The events will only be invoked if the pipes are NOT(!) shared. By default the pipes are not shared.
-   *
-   */
+    \brief Process executor for Segment Anything Model (SAM) with timeout and stop support.
+
+    You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or
+    ExternalProcessStdErrEvent in order to get notified of any output.
+
+    \remark The events will only be invoked if the pipes are NOT shared. By default the pipes are not shared.
+  */
   class MITKSEGMENTATION_EXPORT SegmentAnythingProcessExecutor : public mitk::ProcessExecutor
   {
   public:
@@ -41,12 +43,21 @@ namespace mitk
     itkSetMacro(Stop, bool);
     itkGetConstMacro(Stop, bool);
 
-    /**
-     * @brief Executes the process. This version assumes that the executable name is the first argument in the argument
-     * list and has already been converted to its OS dependent name via the static convert function of this class.
-     */
+    /** \brief Execute the process with a timeout and stop-token mechanism.
+
+      This version assumes that the executable name is the first argument in the argument
+      list and has already been converted to its OS-dependent name via the static convert
+      function of this class.
+
+      \param executionPath The working directory for the process.
+      \param argumentList The list of command-line arguments (first element is the executable).
+      \return True if the process completed successfully.
+    */
     bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
 
+    /** \brief Set the timeout duration for the process execution.
+      \param timeout The timeout in seconds.
+    */
     void SetTimeout(double &timeout);
 
   protected:

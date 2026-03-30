@@ -30,8 +30,7 @@ namespace us
 namespace mitk
 {
   /**
-   * @brief Struct to hold featured models individual info
-   * 
+   * \brief Struct holding metadata for a single MonaiLabel model.
    */
   struct MonaiModelInfo
   {
@@ -59,8 +58,7 @@ namespace mitk
   };
 
   /**
-   * @brief Struct to store MonaiLabel server metadata including all model infos
-   * 
+   * \brief Struct storing MonaiLabel server metadata including all model information.
    */
   struct MonaiAppMetadata
   {
@@ -75,9 +73,7 @@ namespace mitk
   };
 
   /**
-   * @brief Request class to pack model and other necessary server information 
-   * from GUI.
-   * 
+   * \brief Request class encapsulating model and server information for a MonaiLabel inference request.
    */
   struct MonaiLabelRequest
   {
@@ -111,37 +107,32 @@ namespace mitk
     void UpdatePrepare() override;
 
     /**
-     * @brief Method does the GET Rest call to fetch MonaiLabel
-     * server metadata including all models' info.
+     * \brief Fetches MonaiLabel server metadata via GET REST call.
      */
     void FetchOverallInfo(const std::string &hostName, const int &port);
 
     /**
-     * @brief Variable to set selected model's and other data needed
-     * for the POST call.
+     * \brief Holds the selected model and server data for the POST inference call.
      */
     std::unique_ptr<MonaiLabelRequest> m_RequestParameters; 
 
     /**
-     * @brief Get the Auto Segmentation Models info for the given 
-     * dimension.
+     * \brief Returns the auto-segmentation model information for the given dimension.
      */
     const std::vector<MonaiModelInfo> GetAutoSegmentationModels(const int dim = -1) const;
 
     /**
-     * @brief Get the Interactive Segmentation Models info for the given 
-     * dimension.
+     * \brief Returns the interactive segmentation model information for the given dimension.
      */
     const std::vector<MonaiModelInfo> GetInteractiveSegmentationModels(const int dim = -1) const;
 
     /**
-     * @brief Get the Scribble Segmentation Models info for the given 
-     * dimension. 
+     * \brief Returns the scribble segmentation model information for the given dimension.
      */
     const std::vector<MonaiModelInfo> GetScribbleSegmentationModels(const int dim = -1) const;
 
     /**
-     * @brief Helper function to get full model info object from model name. 
+     * \brief Returns full model info for the given model name.
      */
     MonaiModelInfo GetModelInfoFromName(const std::string) const;
 
@@ -158,13 +149,12 @@ namespace mitk
 
 
     /**
-     * @brief  Clears all picks and updates the preview.
+     * \brief Clears all seed picks and updates the preview.
      */
     void ClearPicks();
 
     /**
-     * @brief Checks if any point exists in the either of the PointSetPositive
-     * or PointSetNegative.
+     * \brief Checks if any seed point exists in either the positive or negative point set.
      */
     bool HasPicks() const;
 
@@ -177,23 +167,24 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
 
     /**
-     * @brief Writes image to disk as the tool desires.
-     * Default implementation does nothing.
+     * \brief Writes the input image to disk in a format required by the tool.
+     *
+     * Must be implemented by derived classes.
      */
     virtual void WriteImage(const Image *, const std::string &) const = 0;
 
-    /*
-     * @brief Add positive seed point action of StateMachine pattern. 
+    /**
+     * \brief Add positive seed point action of StateMachine pattern.
      */
     virtual void OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /*
-     * @brief Add negative seed point action of StateMachine pattern
+    /**
+     * \brief Add negative seed point action of StateMachine pattern.
      */
     virtual void OnAddNegativePoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /*
-     * @brief Delete action of StateMachine pattern
+    /**
+     * \brief Delete action of StateMachine pattern.
      */
     virtual void OnDelete(StateMachineAction *, InteractionEvent *);
 
@@ -201,20 +192,19 @@ namespace mitk
     void OnRelease(StateMachineAction *, InteractionEvent *);
     void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
     
-    /*
-     * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
+    /**
+     * \brief Clears all seed points and updates the preview to reset the segmentation.
      */
     void ClearSeeds();
 
     /**
-     * @brief Get the Points from given pointset as csv string.
-     * 
+     * \brief Converts point coordinates from a given point set to a CSV string.
      */
     virtual std::string ConvertPointsAsListString(const mitk::BaseGeometry *baseGeometry,
                                                   const PointSet::Pointer pointSet) const;
 
     /**
-     * @brief Writes back segmentation results in 3D or 2D shape to preview MultiLabelSegmentation.
+     * \brief Writes back segmentation results in 3D or 2D shape to the preview image.
      */
     virtual void WriteBackResults(MultiLabelSegmentation *, MultiLabelSegmentation *, TimeStepType) const = 0;
 
@@ -227,31 +217,28 @@ namespace mitk
   private:
 
     /**
-     * @brief Holds all parameters of the server to serve the UI
-     *
+     * \brief Holds all server parameters to serve the UI.
      */
     std::unique_ptr<MonaiAppMetadata> m_InfoParameters;
 
     /**
-     * @brief Helper function to create temp directory for writing/reading images
-     * Returns input and output file names expected as a pair.
+     * \brief Creates temporary directories for writing/reading images.
+     * \return Pair of input and output file paths.
      */
     std::pair<std::string, std::string> CreateTempDirs(const std::string &filePattern) const;
 
     /**
-     * @brief Checks if MonaiLabel server is alive.
+     * \brief Checks if the MonaiLabel server is reachable.
      */
     bool IsMonaiServerOn(const std::string &hostName, const int &port) const;
      
     /**
-     * @brief Applies level window filter on the input image. Current Level window bounds 
-     * are captured from the tool manager.
+     * \brief Applies level window filter on the input image using current level window bounds.
      */
     mitk::Image::Pointer ApplyLevelWindowEffect(const Image *inputAtTimeStep) const;
 
     /**
-     * @brief Function to prepare the Rest request and does the POST call.
-     * Writes the POST responses back to disk.
+     * \brief Prepares and executes the POST REST call for inference, writing responses to disk.
      */
     void PostInferRequest(const std::string &hostName, const int &port, const std::string &filePath, const std::string &outFile,
                           const mitk::BaseGeometry *baseGeometry);

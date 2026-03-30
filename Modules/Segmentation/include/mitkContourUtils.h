@@ -36,23 +36,29 @@ namespace mitk
       /**
         \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
 
-        \param slice
-        \param contourIn3D
+        \param slice The 2D image slice whose geometry defines the projection plane.
+        \param contourIn3D The 3D contour to project.
+        \return A ContourModel expressed in 2D slice index coordinates.
       */
       ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
                                                     Contour *contourIn3D);
 
     /**
-      \brief Projects a slice index coordinates of a contour back into world coordinates.
+      \brief Projects slice index coordinates of a contour back into world coordinates.
 
-      \param sliceGeometry
-      \param contourIn2D
+      \param sliceGeometry The geometry of the 2D slice used for back-projection.
+      \param contourIn2D The contour in 2D index coordinates.
+      \return A ContourModel expressed in 3D world coordinates.
     */
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
                                                         Contour *contourIn2D);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
+
+      \param projectedContour The contour (in index coordinates) to fill.
+      \param sliceImage The 2D image slice to fill into.
+      \param paintingPixelValue The pixel value used for filling (default: 1).
     */
     void FillContourInSlice(Contour *projectedContour, Image *sliceImage, int paintingPixelValue = 1);
 

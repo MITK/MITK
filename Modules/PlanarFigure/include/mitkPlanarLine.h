@@ -21,8 +21,12 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-   * \brief Implementation of PlanarFigure representing a line
-   * through two control points
+   * \brief Implementation of PlanarFigure representing a straight line segment.
+   *
+   * A simple line defined by two control points (start and end). Provides
+   * one feature: the line length (FEATURE_ID_LENGTH).
+   *
+   * \sa PlanarFigure, PlanarArrow, PlanarFigureMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarLine : public PlanarFigure
   {
@@ -33,21 +37,20 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Place figure in its minimal configuration (a point at least)
-       * onto the given 2D geometry.
-       *
-       * Must be implemented in sub-classes.
-       */
-      // virtual void Initialize();
-
-      /** \brief Line has 2 control points per definition. */
+      /** \brief Returns 2 -- a line requires exactly two control points. */
       unsigned int GetMinimumNumberOfControlPoints() const override
     {
       return 2;
     }
 
-    /** \brief Line has 2 control points per definition. */
+    /** \brief Returns 2 -- a line requires exactly two control points. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
+
+    /**
+     * \brief Compares this PlanarLine with another PlanarFigure for equality.
+     * \param[in] other The PlanarFigure to compare with.
+     * \return True if both figures are considered equal.
+     */
     bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:

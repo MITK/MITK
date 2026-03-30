@@ -25,33 +25,38 @@ namespace tinyxml2
 namespace mitk
 {
   /**
-  * Reads/Writes a PlanarFigure to a file
-  * @ingroup Process
-  */
+   * \brief Read and write mitk::PlanarFigure objects to/from XML files.
+   * \ingroup Process
+   */
   class PlanarFigureIO : public mitk::AbstractFileIO
   {
   public:
     typedef mitk::PlanarFigure InputType;
 
+    /** \brief Default constructor. Registers reader/writer for the PlanarFigure MIME type. */
     PlanarFigureIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a PlanarFigure. */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
+    /** \brief Write the PlanarFigure to an XML file. */
     void Write() override;
+
+    /** \brief Return the confidence level for writing the given data as a PlanarFigure. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
     /**
-    * @brief Reads a number of mitk::PlanarFigures from the file system
-    * @return a vector of mitk::PlanarFigures
-    * @throws throws an mitk::Exception if an error occurs during parsing the nrrd header
-    */
+     * \brief Read PlanarFigure objects from the file system.
+     * \return A vector of mitk::PlanarFigures.
+     * \throw mitk::Exception if a parsing error occurs.
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     using DoubleList = std::list<double>;

@@ -19,10 +19,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Superclass of all classes having one or more Images as input and
-  //## generating PlanarFigures as output
-  //## @ingroup MitkPlanarFigureModule
+  /**
+   * \brief Superclass of all filters having one or more Images as input and
+   * generating PlanarFigures as output.
+   *
+   * \ingroup MitkPlanarFigureModule
+   */
   class MITKPLANARFIGURE_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSource
   {
   public:

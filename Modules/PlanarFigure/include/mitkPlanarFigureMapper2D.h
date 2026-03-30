@@ -102,7 +102,7 @@ namespace mitk
   *   </ul>
   * </ol>
   *
-  * @ingroup MitkPlanarFigureModule
+  * \ingroup MitkPlanarFigureModule
   */
 
   class MITKPLANARFIGURE_EXPORT PlanarFigureMapper2D : public Mapper

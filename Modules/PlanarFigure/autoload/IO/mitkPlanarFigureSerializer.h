@@ -18,7 +18,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief Serializes mitk::Surface for mitk::SceneIO
+    \brief Serializes mitk::PlanarFigure for mitk::SceneIO.
   */
   class PlanarFigureSerializer : public BaseDataSerializer
   {

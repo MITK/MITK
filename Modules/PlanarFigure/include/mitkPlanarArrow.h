@@ -21,8 +21,16 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-   * \brief Implementation of PlanarFigure representing an arrow
-   * through two control points
+   * \brief Implementation of PlanarFigure representing an arrow with two control points.
+   *
+   * Draws a directed line segment from the first control point to the second,
+   * with an arrowhead rendered at the second control point. The arrowhead size
+   * is determined relative to the display size and can be adjusted via
+   * SetArrowTipScaleFactor().
+   *
+   * Provides one feature: the arrow length (FEATURE_ID_LENGTH).
+   *
+   * \sa PlanarFigure, PlanarLine, PlanarFigureMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarArrow : public PlanarFigure
   {
@@ -33,23 +41,29 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Place figure in its minimal configuration (a point at least)
-       * onto the given 2D geometry.
-       *
-       * Must be implemented in sub-classes.
-       */
-      // virtual void Initialize();
-
-      /** \brief Line has 2 control points per definition. */
+      /** \brief Returns 2 -- an arrow requires exactly two control points. */
       unsigned int GetMinimumNumberOfControlPoints() const override
     {
       return 2;
     }
 
-    /** \brief Line has 2 control points per definition. */
+    /** \brief Returns 2 -- an arrow requires exactly two control points. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
+
+    /**
+     * \brief Sets the scale factor for the arrowhead size.
+     *
+     * Controls the size of the arrow tip relative to the display.
+     *
+     * \param[in] scale The scale factor for the arrowhead.
+     */
     void SetArrowTipScaleFactor(float scale);
 
+    /**
+     * \brief Compares this PlanarArrow with another PlanarFigure for equality.
+     * \param[in] other The PlanarFigure to compare with.
+     * \return True if both figures are considered equal.
+     */
     bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:

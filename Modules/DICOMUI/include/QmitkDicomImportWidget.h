@@ -31,31 +31,43 @@ namespace Ui
 }
 
 /**
- * \brief Wrapper widget for a ctkDICOMTableManager and a few extra buttons for
- *        importing DICOM data from the hard drive.
+ * \class QmitkDicomImportWidget
+ * \brief Widget for browsing and importing DICOM data from the filesystem.
+ *
+ * This widget wraps a ctkDICOMTableManager for displaying DICOM patients, studies,
+ * and series. It provides a directory browser dialog for scanning DICOM directories,
+ * a button to import selected data into the local storage, and a button to view
+ * selected series. DICOM files are indexed into a temporary SQLite database.
+ *
+ * \sa QmitkDicomLocalStorageWidget
+ * \ingroup MitkDICOMUIModule
  */
 class MITKDICOMUI_EXPORT QmitkDicomImportWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructor.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkDicomImportWidget(QWidget* parent = nullptr);
+
+  /** \brief Destructor. Closes the temporary database. */
   ~QmitkDicomImportWidget() override;
 
 signals:
 
   /**
    * \brief Emitted when a request is made to import DICOM data into local storage.
-   *
-   * \param files The list of files associated with the current selection.
+   * \param[out] files The list of file paths for all series in the current selection.
    */
   void Import(const QStringList& files);
 
   /**
-   * \brief Emitted when the View button is clicked.
-   *
-   * \param series A vector of pairs containing the first file of each series
-                   and optionally its modality (DICOM tag (0008,0060)).
+   * \brief Emitted when the View button is clicked to load selected series.
+   * \param[out] series A vector of pairs, each containing the first file path of a series
+   *             and optionally its DICOM Modality string (tag 0008,0060).
    */
   void ViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);
 

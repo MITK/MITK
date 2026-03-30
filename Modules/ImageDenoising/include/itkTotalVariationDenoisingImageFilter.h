@@ -21,10 +21,27 @@ found in the LICENSE file.
 namespace itk
 {
   /** \class TotalVariationDenoisingImageFilter
-   * \brief Applies a total variation denoising filter to an image
+   * \brief Applies iterative total variation (TV) denoising to an image.
+   *
+   * This filter performs image denoising by minimizing the total variation
+   * of the image. It iteratively applies TotalVariationSingleIterationImageFilter,
+   * which performs a weighted averaging step that balances fidelity to the
+   * original image against smoothness. The trade-off is controlled by the
+   * Lambda parameter.
+   *
+   * Higher Lambda values favor fidelity to the original image (less smoothing),
+   * while lower Lambda values favor smoothness (more denoising). The number of
+   * iterations controls how many denoising steps are performed.
+   *
+   * Default values: Lambda = 1.0, NumberIterations = 0.
    *
    * Reference: Tony F. Chan et al., The digital TV filter and nonlinear denoising
    *
+   * \tparam TInputImage The type of the input image.
+   * \tparam TOutputImage The type of the output image.
+   *
+   * \sa TotalVariationSingleIterationImageFilter
+   * \sa LocalVariationImageFilter
    * \sa Image
    * \sa Neighborhood
    * \sa NeighborhoodOperator
@@ -66,13 +83,29 @@ namespace itk
 
     typedef typename InputImageType::SizeType InputSizeType;
 
+    /** Type of the single-iteration sub-filter used internally. */
     typedef TotalVariationSingleIterationImageFilter<TOutputImage, TOutputImage> SingleIterationFilterType;
 
+    /** Cast filter type used to convert input to output pixel type. */
     typedef typename itk::CastImageFilter<TInputImage, TOutputImage> CastType;
 
+    /**
+     * \brief Set/Get the regularization parameter Lambda.
+     *
+     * Lambda controls the trade-off between fidelity to the original image
+     * and smoothness. Higher values preserve more detail; lower values
+     * produce stronger denoising. Default is 1.0.
+     */
     itkSetMacro(Lambda, double);
     itkGetMacro(Lambda, double);
 
+    /**
+     * \brief Set/Get the number of denoising iterations.
+     *
+     * Each iteration applies one pass of the total variation single-iteration
+     * filter. More iterations yield stronger denoising. Default is 0
+     * (no denoising).
+     */
     itkSetMacro(NumberIterations, int);
     itkGetMacro(NumberIterations, int);
 

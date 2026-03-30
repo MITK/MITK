@@ -217,7 +217,7 @@ namespace mitk::nnInteractive
      *
      * \see SetToolManager(), GetToolManager()
      */
-    virtual void OnSetToolManager() {};
+    virtual void OnSetToolManager();
 
     /** \brief Called when an interaction event for a tool is received.
      *
@@ -230,7 +230,7 @@ namespace mitk::nnInteractive
      *
      * \see HandleEvent(), Tool::HandleEvent()
      */
-    virtual void OnHandleEvent(InteractionEvent* event) {};
+    virtual void OnHandleEvent(InteractionEvent* event);
 
     /** \brief Called when the interactor is enabled.
      *

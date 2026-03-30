@@ -174,10 +174,9 @@ public:
 
   /**
    * \brief Always returns 0.0 since color transfer functions have no y component.
-   * \param[in] index Unused.
    * \return 0.0
    */
-  double GetFunctionY(int index) override { return 0.0; }
+  double GetFunctionY(int /*index*/) override { return 0.0; }
 protected:
   vtkColorTransferFunction *m_ColorTransferFunction;
   QString m_Title;

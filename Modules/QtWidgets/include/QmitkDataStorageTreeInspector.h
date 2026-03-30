@@ -25,10 +25,11 @@ namespace Ui
   class QmitkDataStorageTreeInspector;
 }
 
-/*
-* @brief This is an inspector that offers a simple tree view on a data storage.
-* Something like the "data manager plugin", but in simple/light (with less functionality)
-* It uses the QmitkDataStorageSimpleTreeModel.
+/**
+* \brief Inspector that offers a simple tree view on a data storage.
+*
+* Similar to the "data manager plugin" but in a simpler/lighter variant
+* (with less functionality). It uses the QmitkDataStorageSimpleTreeModel.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeInspector : public QmitkAbstractDataStorageInspector
 {

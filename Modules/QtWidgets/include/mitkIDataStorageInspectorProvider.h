@@ -53,15 +53,15 @@ namespace mitk
     /** Returns a description of the inspector type provided.*/
     virtual std::string GetInspectorDescription() const = 0;
     /** Returns the svg data of the icon of the inspector. Empty array indicates that no icon is defined.
-     @remark It is passed as svg file content and not as icon directly to allow later styling*/
+     \remark It is passed as svg file content and not as icon directly to allow later styling*/
     virtual QIcon GetInspectorIcon() const = 0;
 
     /**
-    * @brief Service property name for the inspector ID.
+    * \brief Service property name for the inspector ID.
     *
     * The property value must be of type \c std::string.
     *
-    * @return The property name.
+    * \return The property name.
     */
     static std::string PROP_INSPECTOR_ID();
   };

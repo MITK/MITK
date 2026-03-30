@@ -29,8 +29,8 @@ found in the LICENSE file.
 namespace Ui { class QmitkNodeSelectionDialog; }
 
 /**
-* @class QmitkNodeSelectionDialog
-* @brief A customized QDialog that displays different data storage inspectors and allows to
+* \class QmitkNodeSelectionDialog
+* \brief A customized QDialog that displays different data storage inspectors and allows to
 *        set and get a current selection by selecting data nodes in the data storage inspectors.
 */
 class MITKQTWIDGETS_EXPORT QmitkNodeSelectionDialog : public QDialog
@@ -42,20 +42,20 @@ public:
   ~QmitkNodeSelectionDialog() override;
 
   /**
-  * @brief Set the data storage that will be used.
+  * \brief Set the data storage that will be used.
   *        The function iterates over the dialog's panels and sets the data storage of each panel accordingly.
   *        Each panel is a specific data storage inspector.
   *
-  * @param dataStorage      A pointer to the data storage to set.
+  * \param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
   /**
-  * @brief Set the node predicate that will be used.
+  * \brief Set the node predicate that will be used.
   *        The function iterates over the dialog's panels and sets the node predicate of each panel accordingly.
   *        Each panel is a specific data storage inspector.
   *
-  * @param nodePredicate    A pointer to node predicate.
+  * \param nodePredicate    A pointer to node predicate.
   */
   virtual void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
@@ -65,13 +65,13 @@ public:
   NodeList GetSelectedNodes() const;
 
   /**
-  * @brief Helper function that is used to check the given selection for consistency.
+  * \brief Helper function that is used to check the given selection for consistency.
   *        Returning an empty string assumes that everything is alright and the selection is valid.
   *        If the string is not empty, the content of the string will be used as error message.
   */
   using SelectionCheckFunctionType = std::function<std::string(const NodeList &)>;
   /**
-  * @brief A selection check function can be set. If set the dialog uses this function to check the made/set selection.
+  * \brief A selection check function can be set. If set the dialog uses this function to check the made/set selection.
   *        If the selection is valid, everything is fine.
   *        If the selection is indicated as invalid, the dialog will display the selection check function error message.
   */
@@ -81,38 +81,38 @@ public:
 
   using SelectionMode = QAbstractItemView::SelectionMode;
   /**
-  * @brief Set the Qt selection mode (e.g. Single selection, multi selection).
+  * \brief Set the Qt selection mode (e.g. Single selection, multi selection).
   *        The function iterates over the dialog's panels and sets the Qt selection mode of each panel accordingly.
   *        Each panel is a concrete data storage inspector.
   *
-  * @param mode   The QAbstractItemView::SelectionMode to define the selection mode.
+  * \param mode   The QAbstractItemView::SelectionMode to define the selection mode.
   */
   void SetSelectionMode(SelectionMode mode);
   SelectionMode GetSelectionMode() const;
 
 Q_SIGNALS:
   /**
-  * @brief A signal that will be emitted if the selected node has changed.
+  * \brief A signal that will be emitted if the selected node has changed.
   *
-  * @param nodes		A list of data nodes that are newly selected.
+  * \param nodes		A list of data nodes that are newly selected.
   */
   void CurrentSelectionChanged(NodeList nodes);
 
   public Q_SLOTS:
   /**
-  * @brief Set the selection modus to (not) include invisible nodes in the selection.
+  * \brief Set the selection modus to (not) include invisible nodes in the selection.
   *        The function iterates over the dialog's panels and sets the selection modus of each panel accordingly.
   *        Each panel is a concrete data storage inspector.
   *
-  * @param selectOnlyVisibleNodes   The bool value to define the selection modus.
+  * \param selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
   /**
-  * @brief Set the currently selected nodes given a list of data nodes.
+  * \brief Set the currently selected nodes given a list of data nodes.
   *        The function iterates over the dialog's panels and sets the current selection of each panel accordingly.
   *        Each panel is a concrete data storage inspector.
   *
-  * @param selectedNodes A list of data nodes that should be newly selected.
+  * \param selectedNodes A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 

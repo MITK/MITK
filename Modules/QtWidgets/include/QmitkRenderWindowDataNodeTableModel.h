@@ -28,8 +28,12 @@ found in the LICENSE file.
 
 #include <QIcon>
 
-/*
-* @brief The 'QmitkRenderWindowDataNodeTableModel' is a table model that extends the 'QAbstractItemModel'.
+/**
+* \brief Table model that manages data nodes for a specific render window.
+*
+* The QmitkRenderWindowDataNodeTableModel extends QAbstractItemModel to provide
+* a table view of data nodes assigned to a specific renderer. It supports
+* drag-and-drop reordering of layers and toggling node visibility.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowDataNodeTableModel : public QAbstractItemModel
 {
@@ -39,14 +43,30 @@ public:
 
   QmitkRenderWindowDataNodeTableModel(QObject* parent = nullptr);
 
+  /** \brief Updates the model data from the data storage for the current renderer. */
   void UpdateModelData();
 
+  /**
+   * \brief Sets the data storage to use.
+   * \param[in] dataStorage Pointer to the data storage.
+   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  /**
+   * \brief Sets the current renderer whose layer stack is displayed.
+   * \param[in] baseRenderer Pointer to the base renderer.
+   */
   void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
+  /** \brief Returns the current renderer. */
   mitk::BaseRenderer::Pointer GetCurrentRenderer() const;
 
+  /** \brief Convenience type alias for a list of data node pointers. */
   using NodeList = QList<mitk::DataNode::Pointer>;
+  /**
+   * \brief Sets the current selection of data nodes.
+   * \param[in] selectedNodes The list of nodes to select.
+   */
   void SetCurrentSelection(NodeList selectedNodes);
+  /** \brief Returns the currently selected data nodes. */
   NodeList GetCurrentSelection() const;
 
   // override from 'QAbstractItemModel'

@@ -46,19 +46,19 @@ public:
 
   // override from 'QmitkAbstractDataStorageInspector'
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   QAbstractItemView* GetView() override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   const QAbstractItemView* GetView() const override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   void SetSelectionMode(SelectionMode mode) override;
   /**
-  * @brief See 'QmitkAbstractDataStorageInspector'
+  * \brief See 'QmitkAbstractDataStorageInspector'
   */
   SelectionMode GetSelectionMode() const override;
 

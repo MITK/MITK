@@ -24,8 +24,8 @@ namespace Ui
   class QmitkDataStorageListInspector;
 }
 
-/*
-* @brief This is an inspector that offers a simple list view on a data storage.
+/**
+* \brief Inspector that offers a simple list view on a data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageListInspector : public QmitkAbstractDataStorageInspector
 {

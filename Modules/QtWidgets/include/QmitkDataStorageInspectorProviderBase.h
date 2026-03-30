@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 
 /**
- * @brief Base class for DataStorage inspector provider.
+ * \brief Base class for DataStorage inspector provider.
  *
  * This class is the default implementation for a inspector provider. You can template it with
  * the respective inspector class to directly use it.

@@ -26,43 +26,59 @@ class QLineEdit;
 
 /**
  * \ingroup QmitkModule
- * \brief Provides a widget with two lineedit fields, one to change the
- * window value of the current image and one to change the level value of
- * the current image.
+ * \brief Widget with two text input fields for direct numeric entry of level and window values.
+ *
+ * This widget provides a QLineEdit for the level (center) value and another for
+ * the window (width) value of the current image's level/window. The user can type
+ * values and press Enter to apply them. A context menu is available for additional
+ * level/window operations.
+ *
+ * \sa QmitkSliderLevelWindowWidget
+ * \sa QmitkLevelWindowWidget
+ * \sa mitk::LevelWindowManager
  */
 class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// constructor
+  /**
+   * \brief Constructs the line edit level/window widget.
+   * \param[in] parent Optional parent widget.
+   * \param[in] f      Optional window flags.
+   */
   QmitkLineEditLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
-  /// destructor
   ~QmitkLineEditLevelWindowWidget() override;
 
-  /// inputfield for level value
+  /** \brief Input field for the level (center) value. */
   QLineEdit *m_LevelInput;
 
-  /// inputfield for window value
+  /** \brief Input field for the window (width) value. */
   QLineEdit *m_WindowInput;
 
-  /*!
-  *  data structure which stores the values manipulated
-  *  by a QmitkLineEditLevelWindowWidget
-  */
+  /** \brief Stores the current level/window values manipulated by this widget. */
   mitk::LevelWindow m_LevelWindow;
 
-  /// manager who is responsible to collect and deliver changes on Level/Window
+  /** \brief The LevelWindowManager responsible for collecting and delivering level/window changes. */
   mitk::LevelWindowManager::Pointer m_Manager;
 
-  /// sets the manager who is responsible to collect and deliver changes on Level/Window
+  /**
+   * \brief Sets the LevelWindowManager for this widget.
+   * \param[in] levelWindowManager The manager to use for level/window changes.
+   */
   void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
-  /// sets the DataStorage which holds all image-nodes
+  /**
+   * \brief Sets the DataStorage that holds all image nodes.
+   * \param[in] ds The data storage to set.
+   */
   void SetDataStorage(mitk::DataStorage *ds);
 
-  /// returns the manager who is responsible to collect and deliver changes on Level/Window
+  /**
+   * \brief Returns the LevelWindowManager used by this widget.
+   * \return Pointer to the LevelWindowManager.
+   */
   mitk::LevelWindowManager *GetManager();
 
 private:
@@ -74,13 +90,18 @@ private:
 
 public Q_SLOTS:
 
-  /** @brief Read the levelInput and change level and slider when the button "ENTER" was pressed
-  *          in the windowInput-LineEdit.
-  */
+  /**
+   * \brief Reads the level input field and applies the value.
+   *
+   * Called when Enter is pressed in the level QLineEdit.
+   */
   void SetLevelValue();
-  /** @brief Read the windowInput and change window and slider when the button "ENTER" was pressed
-  *          in the windowInput-LineEdit.
-  */
+
+  /**
+   * \brief Reads the window input field and applies the value.
+   *
+   * Called when Enter is pressed in the window QLineEdit.
+   */
   void SetWindowValue();
 
 protected:

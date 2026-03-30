@@ -22,28 +22,46 @@ found in the LICENSE file.
 
 #include <set>
 
-/// \ingroup QmitkModule
+/**
+ * \ingroup QmitkModule
+ * \brief A QSortFilterProxyModel that hides data nodes matching one or more predicates.
+ *
+ * This proxy model filters rows from a source model (typically a DataStorage-backed
+ * model) by evaluating a set of mitk::NodePredicateBase instances. If any predicate
+ * returns true for a given data node, the corresponding row is hidden.
+ *
+ * \sa QmitkAbstractDataStorageModel
+ * \sa QmitkDataStorageTreeModel
+ */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageFilterProxyModel : public QSortFilterProxyModel
 {
-  //# CTORS,DTOR
 public:
+  /**
+   * \brief Constructs the filter proxy model.
+   * \param[in] parent Optional parent QObject.
+   */
   QmitkDataStorageFilterProxyModel(QObject *parent = nullptr);
   ~QmitkDataStorageFilterProxyModel() override;
 
 public:
-  ///
-  /// If the predicate pred returns true, the node will be hidden in the data manager view
-  ///
+  /**
+   * \brief Adds a filter predicate. Nodes matching this predicate will be hidden.
+   * \param[in] pred The predicate to add.
+   */
   void AddFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
-  ///
-  /// Remove a predicate from the list of filters. Returns true if pred was found and removed.
-  ///
+  /**
+   * \brief Removes a filter predicate from the filter list.
+   * \param[in] pred The predicate to remove.
+   * \return True if the predicate was found and removed, false otherwise.
+   */
   bool RemoveFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
-  ///
-  /// Check if predicate is present in the list of filtering predicates.
-  ///
+  /**
+   * \brief Checks whether a predicate is currently in the filter list.
+   * \param[in] pred The predicate to check for.
+   * \return True if the predicate is present, false otherwise.
+   */
   bool HasFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
   //#

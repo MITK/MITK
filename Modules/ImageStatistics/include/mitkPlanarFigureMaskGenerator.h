@@ -39,17 +39,53 @@ namespace mitk
     itkNewMacro(Self); /** Runtime information support. */
       itkTypeMacro(PlanarFigureMaskGenerator, MaskGenerator);
 
+    /**
+     * \brief Get the number of masks this generator provides.
+     * \return Always returns 1.
+     */
     unsigned int GetNumberOfMasks() const override;
 
+    /**
+     * \brief Set the planar figure used to define the mask region.
+     *
+     * The planar figure can be a closed shape (polygon, circle, ellipse, etc.)
+     * or an open shape (line, bezier curve). Closed shapes produce a filled
+     * 2D binary mask; open shapes produce a mask along the figure's polyline.
+     *
+     * \param[in] planarFigure Pointer to the PlanarFigure.
+     */
     void SetPlanarFigure(mitk::PlanarFigure* planarFigure);
 
+    /**
+     * \brief Get the reference image for this mask.
+     *
+     * Returns a 2D image slice extracted from the input image at the
+     * planar figure's plane position.
+     *
+     * \return Const pointer to the 2D reference image slice.
+     */
     mitk::Image::ConstPointer GetReferenceImage() override;
 
+    /** \brief Get the image axis index perpendicular to the planar figure's plane. */
     itkGetConstMacro(PlanarFigureAxis, unsigned int);
+
+    /** \brief Get the slice index at which the planar figure is located. */
     itkGetConstMacro(PlanarFigureSlice, unsigned int);
 
-    /** Helper function that indicates if a passed planar geometry is tilted regarding a given geometry and its main axis.
-     *@pre If either planarGeometry or geometry is nullptr it will return false.*/
+    /**
+     * \brief Check whether a planar figure's plane is axis-aligned with a geometry.
+     *
+     * Returns true if the planar figure's plane normal is parallel to one of
+     * the principal axes of the given geometry (i.e., the figure is not tilted).
+     *
+     * \param[in] planarGeometry The plane geometry of the planar figure.
+     * \param[in] geometry The reference geometry to check against.
+     *
+     * \return True if the planar figure is not tilted; false if tilted or if
+     *         either argument is nullptr.
+     *
+     * \pre If either planarGeometry or geometry is nullptr, returns false.
+     */
     static bool CheckPlanarFigureIsNotTilted(const PlaneGeometry* planarGeometry, const BaseGeometry *geometry);
 
   protected:

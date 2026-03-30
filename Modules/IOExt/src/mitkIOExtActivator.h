@@ -22,10 +22,19 @@ namespace mitk
   struct IFileReader;
   struct IFileWriter;
 
+  /**
+   * \brief Module activator for the IOExt module.
+   *
+   * Registers various file reader and writer services for formats such as
+   * MITK scene files, VTK unstructured grids, OBJ, and PLY when the module is loaded.
+   */
   class IOExtActivator : public us::ModuleActivator
   {
   public:
+    /** \brief Register extended IO reader and writer services. */
     void Load(us::ModuleContext *context) override;
+
+    /** \brief Unregister all extended IO services. */
     void Unload(us::ModuleContext *context) override;
 
   private:

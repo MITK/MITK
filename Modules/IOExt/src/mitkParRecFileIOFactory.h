@@ -22,9 +22,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Create instances of ParRecFileReader objects using an object factory.
-  //##
+  /**
+   * \brief Create instances of ParRecFileReader objects using an object factory.
+   */
   class ParRecFileIOFactory : public itk::ObjectFactoryBase
   {
   public:

@@ -19,8 +19,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read files in Philips PAR/REC file format
+  /**
+   * \brief Reader for files in Philips PAR/REC file format.
+   *
+   * Reads PAR/REC image data and converts it to an mitk::Image.
+   */
   class ParRecFileReader : public ImageSource, public FileReader
   {
   public:
@@ -49,8 +52,7 @@ namespace mitk
 
     ~ParRecFileReader() override;
 
-    //##Description
-    //## @brief Time when Header was last read
+    /** \brief Time when the header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
 
   protected:

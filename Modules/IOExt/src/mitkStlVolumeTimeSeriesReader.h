@@ -19,8 +19,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read a series of volume files in stl-format
+  /**
+   * \brief Reader for a series of volume files in STL format.
+   *
+   * Reads multiple STL files as time steps of a single surface time series.
+   */
   class StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
   {
   public:
@@ -47,8 +50,7 @@ namespace mitk
 
     ~StlVolumeTimeSeriesReader() override;
 
-    //##Description
-    //## @brief Time when Header was last read
+    /** \brief Time when the header was last read. */
     itk::TimeStamp m_ReadHeaderTime;
   };
 

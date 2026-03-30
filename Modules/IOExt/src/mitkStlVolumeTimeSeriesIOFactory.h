@@ -21,8 +21,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Create instances of StlVolumeTimeSeriesReader objects using an object factory.
+  /**
+   * \brief Create instances of StlVolumeTimeSeriesReader objects using an object factory.
+   */
   class StlVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
   {
   public:

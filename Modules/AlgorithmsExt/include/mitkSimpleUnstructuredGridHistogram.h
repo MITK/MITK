@@ -21,6 +21,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Simple histogram implementation for unstructured grid data.
+   *
+   * Computes a histogram from the scalar values of an UnstructuredGrid.
+   *
+   * \sa SimpleHistogram
+   */
   class MITKALGORITHMSEXT_EXPORT SimpleUnstructuredGridHistogram : public SimpleHistogram
   {
   public:

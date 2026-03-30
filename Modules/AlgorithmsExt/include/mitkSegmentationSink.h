@@ -18,6 +18,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief A NonBlockingAlgorithm that places segmentation results into the DataStorage.
+   *
+   * SegmentationSink serves as a base class for algorithms that produce segmentation
+   * results (binary images, surfaces, etc.) and insert them into the DataStorage
+   * below a specified group node. Subclasses override ThreadedUpdateFunction() to
+   * perform the actual segmentation computation.
+   *
+   * \sa NonBlockingAlgorithm
+   * \sa DataStorage
+   */
   class MITKALGORITHMSEXT_EXPORT SegmentationSink : public NonBlockingAlgorithm
   {
   public:

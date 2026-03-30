@@ -26,7 +26,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * @brief This filter uses the DBSCAN algorithm for clustering an
+  * \brief This filter uses the DBSCAN algorithm for clustering an
   * mitk::UnstructuredGrid. "MinPts" defines the number of neighbours which are
   * required to be a kernel point if a point is in range of a kernel point
   * but hasn't enough neighbours this point is added to the cluster but is a
@@ -66,21 +66,50 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** Sets the distance for the neighbour search */
+      /**
+       * \brief Set the search radius (epsilon) for the DBSCAN neighbour search.
+       * \param[in] _arg The search radius in world coordinate units.
+       */
       itkSetMacro(eps, double);
+
+      /**
+       * \brief Get the search radius (epsilon) for the DBSCAN neighbour search.
+       * \return The current search radius.
+       */
       itkGetMacro(eps, double);
 
-      /** Sets the number of required neighbours */
+      /**
+       * \brief Set the minimum number of neighbours required to form a core point.
+       * \param[in] _arg The minimum number of neighbours (MinPts).
+       */
       itkSetMacro(MinPts, int);
+
+      /**
+       * \brief Get the minimum number of neighbours required to form a core point.
+       * \return The current MinPts value.
+       */
       itkGetMacro(MinPts, int);
 
-      /** If activated the clusteres UnstructuredGrid is meshed */
+      /**
+       * \brief Enable or disable meshing of the clustered UnstructuredGrid.
+       *
+       * When enabled, the output UnstructuredGrid is meshed so that it
+       * can be visualized in 2D render windows.
+       *
+       * \param[in] _arg True to enable meshing, false to disable.
+       */
       itkSetMacro(Meshing, bool);
 
-      /** Returns all clusters as UnstructuredGrids which were found */
+      /**
+       * \brief Returns all clusters found by the DBSCAN algorithm.
+       * \return A vector of UnstructuredGrid smart pointers, one per cluster.
+       */
       virtual std::vector<mitk::UnstructuredGrid::Pointer> GetAllClusters();
 
-    /** Returns the number of the clusters which were found */
+    /**
+     * \brief Returns the number of clusters found by the algorithm.
+     * \return The number of clusters.
+     */
     virtual int GetNumberOfFoundClusters();
 
   protected:

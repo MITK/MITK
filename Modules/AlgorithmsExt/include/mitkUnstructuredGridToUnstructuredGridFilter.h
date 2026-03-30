@@ -23,6 +23,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Base class for filters that take an UnstructuredGrid as input and produce
+   * an UnstructuredGrid as output.
+   *
+   * This filter provides the infrastructure for connecting UnstructuredGrid inputs
+   * and outputs. Subclasses should override GenerateData() to implement the actual
+   * filtering logic.
+   *
+   * \sa UnstructuredGrid
+   * \sa UnstructuredGridSource
+   * \sa UnstructuredGridClusteringFilter
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT UnstructuredGridToUnstructuredGridFilter : public UnstructuredGridSource
   {
   public:
@@ -30,20 +43,40 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** Initializes the output information */
+      /** \brief Initializes the output information based on the input. */
       void GenerateOutputInformation() override;
 
-    /** Returns a const reference to the input image */
+    /**
+     * \brief Returns the input unstructured grid.
+     * \return Const pointer to the input UnstructuredGrid, or nullptr if not set.
+     */
     const mitk::UnstructuredGrid *GetInput(void);
 
+    /**
+     * \brief Returns the input unstructured grid at a given index.
+     * \param[in] idx Zero-based index of the input to retrieve.
+     * \return Const pointer to the input UnstructuredGrid at index \p idx.
+     */
     virtual const mitk::UnstructuredGrid *GetInput(unsigned int idx);
 
-    /** Set the source grid. As input every mitk unstructured grid can be used. */
+    /**
+     * \brief Set the input unstructured grid.
+     * \param[in] grid The unstructured grid to use as input.
+     */
     using itk::ProcessObject::SetInput;
     virtual void SetInput(const UnstructuredGrid *grid);
 
+    /**
+     * \brief Set the input unstructured grid at a specified index.
+     * \param[in] idx Zero-based index of the input to set.
+     * \param[in] grid The unstructured grid to use as input.
+     */
     virtual void SetInput(unsigned int idx, const UnstructuredGrid *grid);
 
+    /**
+     * \brief Creates output objects for all inputs starting at the given index.
+     * \param[in] idx The starting index for creating outputs.
+     */
     virtual void CreateOutputsForAllInputs(unsigned int idx);
 
   protected:

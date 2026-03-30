@@ -20,6 +20,15 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class IndexedValueFunctorPolicy
+   * \brief Policy class adapting an IndexedValueFunctorBase for use with itkMultiOutputNaryFunctorImageFilter.
+   *
+   * Wraps an IndexedValueFunctorBase and provides the operator() interface expected
+   * by the ITK image filter, passing both the pixel values and the current index.
+   *
+   * \sa IndexedValueFunctorBase, SimpleFunctorPolicy
+   */
   class MITKMODELFIT_EXPORT IndexedValueFunctorPolicy
   {
   public:

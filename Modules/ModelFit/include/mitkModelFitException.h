@@ -20,7 +20,7 @@ namespace mitk
     namespace modelFit
     {
         /**
-         *  @brief  Class-specific exception for modelfits.
+         * \brief Class-specific exception for model fits.
          */
         class MITKMODELFIT_EXPORT ModelFitException : public Exception
         {

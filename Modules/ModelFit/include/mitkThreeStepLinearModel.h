@@ -20,6 +20,17 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ThreeStepLinearModel
+   * \brief Piecewise linear model with three segments and two transition points.
+   *
+   * The model defines three linear segments: a baseline region before x0,
+   * an ascending/descending region between x0 and x1, and a final region after x1.
+   * Parameters are the baseline value (y_bl), transition points (x0, x1), and
+   * slopes (b0, b1). Derived parameters include AUC, x_fin, y_fin, y_max, y1, and y2.
+   *
+   * \sa ThreeStepLinearModelFactory, ThreeStepLinearModelParameterizer, ModelBase
+   */
   class MITKMODELFIT_EXPORT ThreeStepLinearModel : public mitk::ModelBase
   {
 

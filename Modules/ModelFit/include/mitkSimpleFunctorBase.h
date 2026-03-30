@@ -24,7 +24,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /**Simple functor base class for the itkMultiOutputNaryFunctorImageFilter. */
+  /**
+   * \class SimpleFunctorBase
+   * \brief Abstract base class for simple functors used with itkMultiOutputNaryFunctorImageFilter.
+   *
+   * Subclasses implement Compute() to transform an input pixel vector into an output
+   * pixel vector, and GetNumberOfOutputs() to declare the output count.
+   * GetGrid() returns the time/signal grid associated with the functor.
+   *
+   * \sa SimpleFunctorPolicy, ModelDataGenerationFunctor
+   */
   class MITKMODELFIT_EXPORT SimpleFunctorBase: public ::itk::Object
   {
   public:
@@ -45,9 +54,9 @@ namespace mitk
 
     virtual OutputPixelVectorType Compute(const InputPixelVectorType & value) const = 0;
 
-    /** @todo #3 Function needs to be implemented in every derived Functor
-     * The function is already declared here to ensure that derived models give feedback on how many output parameters they produce
-     * This is requested by several generators
+    /** \todo #3 Function needs to be implemented in every derived Functor.
+     * The function is already declared here to ensure that derived models give feedback on how many output parameters they produce.
+     * This is requested by several generators.
      */
     virtual unsigned int GetNumberOfOutputs() const = 0;
 

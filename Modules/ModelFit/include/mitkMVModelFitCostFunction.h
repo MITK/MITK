@@ -23,10 +23,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
-/** Base class for all model fit cost function that return a multiple cost value
- * It offers also a default implementation for the numerical computation of the
- * derivatives. Normally you just have to (re)implement CalcMeasure().
-*/
+/**
+ * \class MVModelFitCostFunction
+ * \brief Base class for all model fit cost functions that return a vector of cost values.
+ *
+ * Inherits from itk::MultipleValuedCostFunction and ModelFitCostFunctionInterface.
+ * This class provides a default numerical derivative computation. Subclasses only
+ * need to implement CalcMeasure() to define the specific cost metric.
+ *
+ * \sa SVModelFitCostFunction, SquaredDifferencesFitCostFunction, MVConstrainedCostFunctionDecorator
+ */
 class MITKMODELFIT_EXPORT MVModelFitCostFunction : public itk::MultipleValuedCostFunction, public ModelFitCostFunctionInterface
 {
 public:
@@ -40,12 +46,36 @@ public:
     typedef Superclass::MeasureType MeasureType;
     typedef Superclass::DerivativeType DerivativeType;
 
+    /**
+     * \brief Sets the observed sample signal.
+     * \param[in] sampleSet The sample signal array.
+     */
     void SetSample(const SignalType &sampleSet) override;
 
+    /**
+     * \brief Computes the cost value vector for the given parameters.
+     * \param[in] parameter The model parameters to evaluate.
+     * \return A vector of cost values (one per time point).
+     */
     MeasureType GetValue(const ParametersType& parameter) const override;
+
+    /**
+     * \brief Computes the Jacobian matrix numerically via finite differences.
+     * \param[in] parameters The parameters at which the derivative is evaluated.
+     * \param[out] derivative The computed Jacobian matrix.
+     */
     void GetDerivative (const ParametersType &parameters, DerivativeType &derivative) const override;
 
+    /**
+     * \brief Returns the number of values (residuals) returned by GetValue().
+     * \return The number of cost values (equals the sample signal size).
+     */
     unsigned int GetNumberOfValues (void) const override;
+
+    /**
+     * \brief Returns the number of model parameters.
+     * \return The number of parameters of the associated model.
+     */
     unsigned int GetNumberOfParameters (void) const override;
 
     itkSetConstObjectMacro(Model, ModelBase);

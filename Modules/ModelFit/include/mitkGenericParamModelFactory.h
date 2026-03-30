@@ -23,6 +23,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class GenericParamModelFactory
+   * \brief Factory for creating GenericParamModel instances and their parameterizers.
+   *
+   * \sa GenericParamModel, GenericParamModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT GenericParamModelFactory : public
     ConcreteModelFactoryBase<GenericParamModel>
   {

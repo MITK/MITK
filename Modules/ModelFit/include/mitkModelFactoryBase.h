@@ -25,9 +25,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**Base class for model factories.
-   * Default implementation just passes the model properties through from an instance created with add model.
-   * To use the the base class, derive and at least implement the abstract member functions.
+  /**
+   * \class ModelFactoryBase
+   * \brief Abstract base class for model factories in the model fitting framework.
+   *
+   * A model factory is responsible for creating model instances, parameterizers,
+   * and default constraints. It also exposes the model traits through the
+   * ModelTraitsInterface. Derive from this class and implement the abstract
+   * member functions to create a factory for a specific model type.
+   *
+   * \sa ConcreteModelFactoryBase, ModelBase, ModelParameterizerBase
    */
   class MITKMODELFIT_EXPORT ModelFactoryBase : public itk::Object, public ModelTraitsInterface
   {
@@ -56,20 +63,34 @@ namespace mitk
     typedef ModelTraitsInterface::DerivedParamterScaleMapType DerivedParamterScaleMapType;
     typedef ModelTraitsInterface::DerivedParamterUnitMapType DerivedParamterUnitMapType;
 
+    /**
+     * \brief Creates and returns a new instance of the model.
+     * \return Smart pointer to the newly created model instance.
+     */
     virtual ModelBasePointer CreateModel() const = 0;
 
-    /** Created a model parameterizer set up according to the passed model fit info.
-     @pre fit must point to a valid instance.*/
+    /**
+     * \brief Creates a model parameterizer configured according to the given model fit info.
+     * \param[in] fit Pointer to the model fit info describing the fit configuration.
+     * \return Smart pointer to the configured parameterizer.
+     * \pre fit must point to a valid instance.
+     */
     ModelParameterizerBase::Pointer CreateParameterizer(const modelFit::ModelFitInfo* fit) const;
 
-    /** Create the default constraints that should/can be used for fitting if nothing else
-     * is specified by the user.
-     * @return Pointer to the constraint checker for default constraints. May return a NULL pointer
-     * to indicated that the Model has no constraints by default. */
+    /**
+     * \brief Creates default constraints for the model fitting process.
+     *
+     * These constraints should/can be used for fitting if the user does not specify custom ones.
+     *
+     * \return Pointer to the constraint checker for default constraints. May return a NULL pointer
+     * to indicate that the model has no constraints by default.
+     */
     virtual ConstraintCheckerBase::Pointer CreateDefaultConstraints() const = 0;
 
-    /** This function returns the default parameterization (e.g. initial parametrization for fitting)
-     defined by the model developer for for the given model.*/
+    /**
+     * \brief Returns the default initial parameterization defined by the model developer.
+     * \return The default initial parameter values for fitting.
+     */
     virtual ParametersType GetDefaultInitialParameterization() const = 0;
 
    protected:

@@ -24,6 +24,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class TwoStepLinearModelFactory
+   * \brief Factory for creating TwoStepLinearModel instances and their parameterizers.
+   *
+   * \sa TwoStepLinearModel, TwoStepLinearModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT TwoStepLinearModelFactory : public ConcreteModelFactoryBase<TwoStepLinearModel>
   {
   public:

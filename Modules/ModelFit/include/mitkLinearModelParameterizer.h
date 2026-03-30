@@ -18,7 +18,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-
+  /**
+   * \brief Type alias for the parameterizer of the LinearModel.
+   *
+   * \sa LinearModel, LinearModelFactory, ConcreteModelParameterizerBase
+   */
   typedef ConcreteModelParameterizerBase<mitk::LinearModel> LinearModelParameterizer;
 }
 

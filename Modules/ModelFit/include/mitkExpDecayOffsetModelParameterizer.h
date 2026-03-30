@@ -20,6 +20,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ExpDecayOffsetModelParameterizer
+   * \brief Parameterizer for the ExpDecayOffsetModel providing default initial values.
+   *
+   * \sa ExpDecayOffsetModel, ExpDecayOffsetModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT ExpDecayOffsetModelParameterizer : public
     mitk::ConcreteModelParameterizerBase<mitk::ExpDecayOffsetModel>
   {

@@ -22,8 +22,8 @@ found in the LICENSE file.
 namespace mitk
 {
     /**
-     *  @brief  Serializer for the ScalarListLookupTableProperty so it can be written and read from
-     *          file.
+     * \class ScalarListLookupTablePropertySerializer
+     * \brief Serializer for the ScalarListLookupTableProperty so it can be written and read from file.
      */
     class ScalarListLookupTablePropertySerializer : public BasePropertySerializer
     {

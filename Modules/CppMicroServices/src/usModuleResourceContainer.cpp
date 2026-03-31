@@ -204,15 +204,41 @@ bool ModuleResourceContainer::Matches(const std::string& name, const std::string
   // short-cut
   if (filePattern == "*") return true;
 
+  std::vector<std::string> tokens;
   std::stringstream ss(filePattern);
   std::string tok;
-  std::size_t pos = 0;
   while(std::getline(ss, tok, '*'))
   {
-    std::size_t index = name.find(tok, pos);
-    if (index == std::string::npos) return false;
-    pos = index + tok.size();
+    tokens.push_back(tok);
   }
+
+  if (tokens.empty()) return true;
+
+  bool startsWithWild = !filePattern.empty() && filePattern[0] == '*';
+  bool endsWithWild = !filePattern.empty() && filePattern[filePattern.size()-1] == '*';
+
+  std::size_t pos = 0;
+  for (std::size_t i = 0; i < tokens.size(); ++i)
+  {
+    if (tokens[i].empty()) continue;
+
+    if (i == 0 && !startsWithWild)
+    {
+      // First token must match at the start of name
+      if (name.compare(0, tokens[i].size(), tokens[i]) != 0) return false;
+      pos = tokens[i].size();
+    }
+    else
+    {
+      std::size_t index = name.find(tokens[i], pos);
+      if (index == std::string::npos) return false;
+      pos = index + tokens[i].size();
+    }
+  }
+
+  // Last token must match at the end of name (unless pattern ends with *)
+  if (!endsWithWild && pos != name.size()) return false;
+
   return true;
 }
 

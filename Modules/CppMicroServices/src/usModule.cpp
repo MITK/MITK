@@ -138,14 +138,23 @@ void Module::Start()
     catch (...)
     {
       MITK_ERROR << "Creating the module activator of " << d->info.name << " failed";
+      delete d->moduleContext;
+      d->moduleContext = nullptr;
       throw;
     }
 
-    // This method should be "noexcept" and by not catching exceptions
-    // here we semantically treat it that way since any exception during
-    // static initialization will either terminate the program or cause
-    // the dynamic loader to report an error.
-    d->moduleActivator->Load(d->moduleContext);
+    try
+    {
+      d->moduleActivator->Load(d->moduleContext);
+    }
+    catch (...)
+    {
+      MITK_ERROR << "Calling the module activator Load() method of " << d->info.name << " failed!";
+      d->moduleActivator = nullptr;
+      delete d->moduleContext;
+      d->moduleContext = nullptr;
+      throw;
+    }
   }
 
   if (ModuleSettings::IsAutoLoadingEnabled())
@@ -299,5 +308,9 @@ std::ostream& operator<<(std::ostream& os, const Module& module)
 
 std::ostream& operator<<(std::ostream& os, Module const * module)
 {
+  if (module == nullptr)
+  {
+    return os << "null";
+  }
   return operator<<(os, *module);
 }

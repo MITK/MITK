@@ -56,7 +56,7 @@ Module* ModuleContext::GetModule(long id) const
 
 Module* ModuleContext::GetModule(const std::string& name)
 {
-  return ModuleRegistry::GetModule(name);
+  return d->module->coreCtx->moduleHooks.FilterModule(this, ModuleRegistry::GetModule(name));
 }
 
 std::vector<Module*> ModuleContext::GetModules() const

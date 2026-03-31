@@ -136,7 +136,7 @@ void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
   (void)(Lock(this));
   std::vector<ServiceListenerEntry> entries;
   for (ServiceListenerEntries::iterator it = serviceSet.begin();
-       it != serviceSet.end(); )
+       it != serviceSet.end(); ++it)
   {
     if (it->GetModuleContext() == mc)
     {

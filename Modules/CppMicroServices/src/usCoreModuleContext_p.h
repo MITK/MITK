@@ -22,7 +22,11 @@ found in the LICENSE file.
 namespace us {
 
 /**
+ * \brief Internal context holding shared framework state for all modules.
+ *
  * This class is not part of the public API.
+ *
+ * \sa ServiceRegistry ServiceListeners ServiceHooks ModuleHooks
  */
 class CoreModuleContext
 {
@@ -49,15 +53,17 @@ public:
   ModuleHooks moduleHooks;
 
   /**
-   * Construct a core context
-   *
+   * \brief Construct a core context.
    */
   CoreModuleContext();
 
+  /** \brief Destructor. */
   ~CoreModuleContext();
 
+  /** \brief Initialize all sub-components (listeners, services, hooks). */
   void Init();
 
+  /** \brief Tear down all sub-components. */
   void Uninit();
 
 };

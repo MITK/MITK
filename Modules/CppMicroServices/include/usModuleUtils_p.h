@@ -29,13 +29,22 @@ namespace us {
 struct ModuleInfo;
 
 /**
- * This class is not intended to be used directly. It is exported to support
+ * \brief This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  */
 struct MITKCPPMICROSERVICES_EXPORT ModuleUtils
 {
+  /** \brief Get the file system path of the library containing the given symbol.
+   * \param[in] symbol A pointer to a symbol within the library.
+   * \return The library's file system path.
+   */
   static std::string GetLibraryPath(void* symbol);
 
+  /** \brief Look up a symbol in the given module.
+   * \param[in] module The module information.
+   * \param[in] symbol The name of the symbol to look up.
+   * \return A pointer to the symbol, or \c nullptr if not found.
+   */
   static void* GetSymbol(const ModuleInfo& module, const char* symbol);
 };
 

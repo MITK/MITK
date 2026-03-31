@@ -22,14 +22,24 @@ namespace us {
 
 class ModuleResourceBufferPrivate;
 
+/** \brief Stream buffer for reading module resource data.
+ *
+ * This is a private implementation class used by ModuleResourceStream.
+ */
 class MITKCPPMICROSERVICES_EXPORT ModuleResourceBuffer: public std::streambuf
 {
 
 public:
 
+  /** \brief Construct a ModuleResourceBuffer.
+   * \param[in] data Pointer to the raw resource data.
+   * \param[in] size Size of the resource data in bytes.
+   * \param[in] mode The open mode for the stream buffer.
+   */
   explicit ModuleResourceBuffer(void* data, std::size_t size,
                                 std::ios_base::openmode mode);
 
+  /** \brief Destructor. */
   ~ModuleResourceBuffer() override;
 
 private:

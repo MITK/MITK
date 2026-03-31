@@ -25,15 +25,15 @@ class ModuleContext;
 class ServiceListenerEntry;
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Service Listener Hook Service.
+ * \brief Service Listener Hook Service.
  *
  * <p>
  * Modules registering this service will be called during service listener
  * addition and removal.
  *
- * @remarks Implementations of this interface are required to be thread-safe.
+ * \remarks Implementations of this interface are required to be thread-safe.
  */
 struct MITKCPPMICROSERVICES_EXPORT ServiceListenerHook
 {
@@ -41,47 +41,51 @@ struct MITKCPPMICROSERVICES_EXPORT ServiceListenerHook
   class ListenerInfoData;
 
   /**
-   * Information about a Service Listener. This class describes the module
+   * \brief Information about a Service Listener. This class describes the module
    * which added the Service Listener and the filter with which it was added.
    *
-   * @remark This class is not intended to be implemented by clients.
+   * \remarks This class is not intended to be implemented by clients.
    */
   struct MITKCPPMICROSERVICES_EXPORT ListenerInfo
   {
+    /** \brief Default constructor. Creates an invalid ListenerInfo instance. */
     ListenerInfo();
 
+    /** \brief Copy constructor. */
     ListenerInfo(const ListenerInfo& other);
 
+    /** \brief Destructor. */
     ~ListenerInfo();
 
+    /** \brief Copy assignment operator. */
     ListenerInfo& operator=(const ListenerInfo& other);
 
     /**
-     * Can be used to check if this ListenerInfo instance is valid,
+     * \brief Can be used to check if this ListenerInfo instance is valid,
      * or if it has been constructed using the default constructor.
      *
-     * @return <code>true</code> if this listener object is valid,
+     * \return <code>true</code> if this listener object is valid,
      *         <code>false</code> otherwise.
      */
     bool IsNull() const;
 
     /**
-     * Return the context of the module which added the listener.
+     * \brief Return the context of the module which added the listener.
      *
-     * @return The context of the module which added the listener.
+     * \return The context of the module which added the listener.
      */
     ModuleContext* GetModuleContext() const;
 
     /**
-     * Return the filter string with which the listener was added.
+     * \brief Return the filter string with which the listener was added.
      *
-     * @return The filter string with which the listener was added. This may
+     * \return The filter string with which the listener was added. This may
      *         be empty if the listener was added without a filter.
      */
     std::string GetFilter() const;
 
     /**
-     * Return the state of the listener for this addition and removal life
+     * \brief Return the state of the listener for this addition and removal life
      * cycle. Initially this method will return \c false indicating the
      * listener has been added but has not been removed. After the listener
      * has been removed, this method must always returns \c true.
@@ -96,20 +100,20 @@ struct MITKCPPMICROSERVICES_EXPORT ServiceListenerHook
      * service listener. This method can be used to detect this rare
      * occurrence.
      *
-     * @return \c false if the listener has not been been removed,
+     * \return \c false if the listener has not been been removed,
      *         \c true otherwise.
      */
     bool IsRemoved() const;
 
     /**
-     * Compares this \c ListenerInfo to another \c ListenerInfo.
+     * \brief Compares this \c ListenerInfo to another \c ListenerInfo.
      * Two {@code ListenerInfo}s are equal if they refer to the same
      * listener for a given addition and removal life cycle. If the same
      * listener is added again, it will have a different
      * \c ListenerInfo which is not equal to this \c ListenerInfo.
      *
-     * @param other The object to compare against this \c ListenerInfo.
-     * @return \c true if the other object is a \c ListenerInfo
+     * \param[in] other The object to compare against this \c ListenerInfo.
+     * \return \c true if the other object is a \c ListenerInfo
      *         object and both objects refer to the same listener for a
      *         given addition and removal life cycle.
      */
@@ -126,28 +130,29 @@ struct MITKCPPMICROSERVICES_EXPORT ServiceListenerHook
     ExplicitlySharedDataPointer<ListenerInfoData> d;
   };
 
+  /** \brief Destructor. */
   virtual ~ServiceListenerHook();
 
   /**
-   * Added listeners hook method. This method is called to provide the hook
+   * \brief Added listeners hook method. This method is called to provide the hook
    * implementation with information on newly added service listeners. This
    * method will be called as service listeners are added while this hook is
    * registered. Also, immediately after registration of this hook, this
    * method will be called to provide the current collection of service
    * listeners which had been added prior to the hook being registered.
    *
-   * @param listeners A collection of \c ListenerInfo objects for newly added
+   * \param[in] listeners A collection of \c ListenerInfo objects for newly added
    *        service listeners which are now listening to service events.
    */
   virtual void Added(const std::vector<ListenerInfo>& listeners) = 0;
 
   /**
-   * Removed listeners hook method. This method is called to provide the hook
+   * \brief Removed listeners hook method. This method is called to provide the hook
    * implementation with information on newly removed service listeners. This
    * method will be called as service listeners are removed while this hook is
    * registered.
    *
-   * @param listeners A collection of \c ListenerInfo objects for newly removed
+   * \param[in] listeners A collection of \c ListenerInfo objects for newly removed
    *        service listeners which are no longer listening to service events.
    */
   virtual void Removed(const std::vector<ListenerInfo>& listeners) = 0;

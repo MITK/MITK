@@ -22,7 +22,7 @@ namespace us {
 /**
  * \ingroup MicroServicesUtils
  *
- * A std::map style associative container allowing query and removal
+ * \brief A std::map style associative container allowing query and removal
  * operations only.
  */
 template<class Key, class T>

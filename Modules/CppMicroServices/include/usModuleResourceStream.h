@@ -24,7 +24,7 @@ class ModuleResource;
 /**
  * \ingroup MicroServices
  *
- * An input stream class for ModuleResource objects.
+ * \brief An input stream class for ModuleResource objects.
  *
  * This class provides access to the resource data embedded in a module's
  * shared library via a STL input stream interface.
@@ -37,11 +37,11 @@ class MITKCPPMICROSERVICES_EXPORT ModuleResourceStream : private ModuleResourceB
 public:
 
   /**
-   * Construct a %ModuleResourceStream object.
+   * \brief Construct a %ModuleResourceStream object.
    *
-   * @param resource The ModuleResource object for which an input stream
+   * \param[in] resource The ModuleResource object for which an input stream
    * should be constructed.
-   * @param mode The open mode of the stream. If \c std::ios_base::binary
+   * \param[in] mode The open mode of the stream. If \c std::ios_base::binary
    * is used, the resource data will be treated as binary data, otherwise
    * the data is interpreted as text data and the usual platform specific
    * end-of-line translations take place.

@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace us {
 
 /**
- * This class acts as an atomic integer.
+ * \brief This class acts as an atomic integer.
  *
  * The integer value represented by this class can be incremented
  * and decremented atomically. This is often useful in reference
@@ -36,7 +36,7 @@ public:
   AtomicInt(int value = 0) : AtomicCounter(value) {}
 
   /**
-   * Increase the reference count atomically by 1.
+   * \brief Increase the reference count atomically by 1.
    *
    * \return <code>true</code> if the new value is unequal to zero, <code>false</code>
    *         otherwise.
@@ -45,7 +45,7 @@ public:
   { return AtomicIncrement() != 0; }
 
   /**
-   * Decrease the reference count atomically by 1.
+   * \brief Decrease the reference count atomically by 1.
    *
    * \return <code>true</code> if the new value is unequal to zero, <code>false</code>
    *         otherwise.
@@ -54,8 +54,7 @@ public:
   { return AtomicDecrement() != 0; }
 
   /**
-   * Returns the current value.
-   *
+   * \brief Returns the current value.
    */
   inline operator int() const
   {

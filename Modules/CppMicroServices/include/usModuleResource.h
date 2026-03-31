@@ -30,7 +30,7 @@ class ModuleResourceContainer;
 /**
  * \ingroup MicroServices
  *
- * Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.
+ * \brief Represents a resource (text file, image, etc.) embedded in a CppMicroServices module.
  *
  * A \c %ModuleResource object provides information about a resource (external file) which
  * was embedded into this module's shared library. \c %ModuleResource objects can be obtained
@@ -54,71 +54,72 @@ private:
 public:
 
   /**
-   * Creates in invalid %ModuleResource object.
+   * \brief Creates an invalid %ModuleResource object.
    */
   ModuleResource();
   /**
-   * Copy constructor.
-   * @param resource The object to be copied.
+   * \brief Copy constructor.
+   * \param[in] resource The object to be copied.
    */
   ModuleResource(const ModuleResource& resource);
 
+  /** \brief Destructor. */
   ~ModuleResource();
 
   /**
-   * Assignment operator.
+   * \brief Assignment operator.
    *
-   * @param resource The %ModuleResource object which is assigned to this instance.
-   * @return A reference to this %ModuleResource instance.
+   * \param[in] resource The %ModuleResource object which is assigned to this instance.
+   * \return A reference to this %ModuleResource instance.
    */
   ModuleResource& operator=(const ModuleResource& resource);
 
   /**
-   * A less then operator using the full resource path as returned by
+   * \brief A less then operator using the full resource path as returned by
    * GetResourcePath() to define the ordering.
    *
-   * @param resource The object to which this %ModuleResource object is compared to.
-   * @return \c true if this %ModuleResource object is less then \c resource,
+   * \param[in] resource The object to which this %ModuleResource object is compared to.
+   * \return \c true if this %ModuleResource object is less then \c resource,
    * \c false otherwise.
    */
   bool operator<(const ModuleResource& resource) const;
 
   /**
-   * Equality operator for %ModuleResource objects.
+   * \brief Equality operator for %ModuleResource objects.
    *
-   * @param resource The object for testing equality.
-   * @return \c true if this %ModuleResource object is equal to \c resource, i.e.
+   * \param[in] resource The object for testing equality.
+   * \return \c true if this %ModuleResource object is equal to \c resource, i.e.
    * they are coming from the same module (shared or static) and have an equal
    * resource path, \c false otherwise.
    */
   bool operator==(const ModuleResource& resource) const;
 
   /**
-   * Inequality operator for %ModuleResource objects.
+   * \brief Inequality operator for %ModuleResource objects.
    *
-   * @param resource The object for testing inequality.
-   * @return The result of <code>!(*this == resource)</code>.
+   * \param[in] resource The object for testing inequality.
+   * \return The result of <code>!(*this == resource)</code>.
    */
   bool operator!=(const ModuleResource& resource) const;
 
   /**
-   * Tests this %ModuleResource object for validity.
+   * \brief Tests this %ModuleResource object for validity.
    *
    * Invalid %ModuleResource objects are created by the default constructor or
    * can be returned by the Module class if the resource path is not found.
    *
-   * @return \c true if this %ModuleReource object is valid and can safely be used,
+   * \return \c true if this %ModuleReource object is valid and can safely be used,
    * \c false otherwise.
    */
   bool IsValid() const;
 
   /**
-   * Boolean conversion operator using IsValid().
+   * \brief Boolean conversion operator using IsValid().
    */
   operator bool_type() const;
 
   /**
-   * Returns the name of the resource, excluding the path.
+   * \brief Returns the name of the resource, excluding the path.
    *
    * Example:
    * \code
@@ -126,13 +127,13 @@ public:
    * std::string name = resource.GetName(); // name = "archive.tar.gz"
    * \endcode
    *
-   * @return The resource name.
-   * @see GetPath(), GetResourcePath()
+   * \return The resource name.
+   * \sa GetPath(), GetResourcePath()
    */
   std::string GetName() const;
 
   /**
-   * Returns the resource's path, without the file name.
+   * \brief Returns the resource's path, without the file name.
    *
    * Example:
    * \code
@@ -142,21 +143,21 @@ public:
    *
    * The path with always begin and end with a forward slash.
    *
-   * @return The resource path without the name.
-   * @see GetResourcePath(), GetName() and IsDir()
+   * \return The resource path without the name.
+   * \sa GetResourcePath(), GetName() and IsDir()
    */
   std::string GetPath() const;
 
   /**
-   * Returns the resource path including the file name.
+   * \brief Returns the resource path including the file name.
    *
-   * @return The resource path including the file name.
-   * @see GetPath(), GetName() and IsDir()
+   * \return The resource path including the file name.
+   * \sa GetPath(), GetName() and IsDir()
    */
   std::string GetResourcePath() const;
 
   /**
-   * Returns the base name of the resource without the path.
+   * \brief Returns the base name of the resource without the path.
    *
    * Example:
    * \code
@@ -164,13 +165,13 @@ public:
    * std::string base = resource.GetBaseName(); // base = "archive"
    * \endcode
    *
-   * @return The resource base name.
-   * @see GetName(), GetSuffix(), GetCompleteSuffix() and GetCompleteBaseName()
+   * \return The resource base name.
+   * \sa GetName(), GetSuffix(), GetCompleteSuffix() and GetCompleteBaseName()
    */
   std::string GetBaseName() const;
 
   /**
-   * Returns the complete base name of the resource without the path.
+   * \brief Returns the complete base name of the resource without the path.
    *
    * Example:
    * \code
@@ -178,13 +179,13 @@ public:
    * std::string base = resource.GetCompleteBaseName(); // base = "archive.tar"
    * \endcode
    *
-   * @return The resource's complete base name.
-   * @see GetName(), GetSuffix(), GetCompleteSuffix(), and GetBaseName()
+   * \return The resource's complete base name.
+   * \sa GetName(), GetSuffix(), GetCompleteSuffix(), and GetBaseName()
    */
   std::string GetCompleteBaseName() const;
 
   /**
-   * Returns the suffix of the resource.
+   * \brief Returns the suffix of the resource.
    *
    * The suffix consists of all characters in the resource name after (but not
    * including) the last '.'.
@@ -195,13 +196,13 @@ public:
    * std::string suffix = resource.GetSuffix(); // suffix = "gz"
    * \endcode
    *
-   * @return The resource name suffix.
-   * @see GetName(), GetCompleteSuffix(), GetBaseName() and GetCompleteBaseName()
+   * \return The resource name suffix.
+   * \sa GetName(), GetCompleteSuffix(), GetBaseName() and GetCompleteBaseName()
    */
   std::string GetSuffix() const;
 
   /**
-   * Returns the complete suffix of the resource.
+   * \brief Returns the complete suffix of the resource.
    *
    * The suffix consists of all characters in the resource name after (but not
    * including) the first '.'.
@@ -212,57 +213,57 @@ public:
    * std::string suffix = resource.GetCompleteSuffix(); // suffix = "tar.gz"
    * \endcode
    *
-   * @return The resource name suffix.
-   * @see GetName(), GetSuffix(), GetBaseName(), and GetCompleteBaseName()
+   * \return The resource name suffix.
+   * \sa GetName(), GetSuffix(), GetBaseName(), and GetCompleteBaseName()
    */
   std::string GetCompleteSuffix() const;
 
   /**
-   * Returns \c true if this %ModuleResource object points to a directory and thus
+   * \brief Returns \c true if this %ModuleResource object points to a directory and thus
    * may have child resources.
    *
-   * @return \c true if this object points to a directory, \c false otherwise.
+   * \return \c true if this object points to a directory, \c false otherwise.
    */
   bool IsDir() const;
 
   /**
-   * Returns \c true if this %ModuleResource object points to a file resource.
+   * \brief Returns \c true if this %ModuleResource object points to a file resource.
    *
-   * @return \c true if this object points to an embedded file, \c false otherwise.
+   * \return \c true if this object points to an embedded file, \c false otherwise.
    */
   bool IsFile() const;
 
   /**
-   * Returns a list of resource names which are children of this object.
+   * \brief Returns a list of resource names which are children of this object.
    *
    * The returned names are relative to the path of this %ModuleResource object
    * and may contain file as well as directory entries.
    *
-   * @return A list of child resource names.
+   * \return A list of child resource names.
    */
   std::vector<std::string> GetChildren() const;
 
   /**
-   * Returns a list of resource objects which are children of this object.
+   * \brief Returns a list of resource objects which are children of this object.
    *
    * The return ModuleResource objects may contain files as well as
    * directory resources.
    *
-   * @return A list of child resource objects.
+   * \return A list of child resource objects.
    */
   std::vector<ModuleResource> GetChildResources() const;
 
   /**
-   * Returns the size of the resource data for this %ModuleResource object.
+   * \brief Returns the size of the resource data for this %ModuleResource object.
    *
-   * @return The resource data size.
+   * \return The resource data size.
    */
   int GetSize() const;
 
   /**
-   * Returns the last modified time of this resource in seconds from the epoch.
+   * \brief Returns the last modified time of this resource in seconds from the epoch.
    *
-   * @return Last modified time of this resource.
+   * \return Last modified time of this resource.
    */
   time_t GetLastModified() const;
 
@@ -292,6 +293,11 @@ US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices
+ * \brief Stream output operator for ModuleResource.
+ *
+ * \param[in] os The output stream.
+ * \param[in] resource The module resource to write to the stream.
+ * \return The output stream.
  */
 MITKCPPMICROSERVICES_EXPORT std::ostream& operator<<(std::ostream& os, const us::ModuleResource& resource);
 

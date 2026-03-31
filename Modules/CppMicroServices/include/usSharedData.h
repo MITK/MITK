@@ -32,6 +32,11 @@ namespace us {
 
 /**
  * \ingroup MicroServicesUtils
+ *
+ * \brief Base class for implicitly shared data with reference counting.
+ *
+ * \sa SharedDataPointer
+ * \sa ExplicitlySharedDataPointer
  */
 class SharedData
 {
@@ -48,6 +53,12 @@ private:
 
 /**
  * \ingroup MicroServicesUtils
+ *
+ * \brief A pointer to implicitly shared data with automatic copy-on-write semantics.
+ *
+ * \tparam T The shared data type, must inherit from SharedData.
+ *
+ * \sa SharedData
  */
 template <class T>
 class SharedDataPointer
@@ -123,6 +134,13 @@ private:
 
 /**
  * \ingroup MicroServicesUtils
+ *
+ * \brief A pointer to explicitly shared data requiring manual detach for copy-on-write.
+ *
+ * \tparam T The shared data type, must inherit from SharedData.
+ *
+ * \sa SharedData
+ * \sa SharedDataPointer
  */
 template <class T> class ExplicitlySharedDataPointer
 {

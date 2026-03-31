@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace us {
 
 /**
- * This class is not intended to be used directly. It is exported to support
+ * \brief This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  *
  * Abstract class to track items. If a Tracker is reused (closed then reopened),
@@ -32,9 +32,9 @@ namespace us {
  * tracked items. This is not a public class. It is only for use by the
  * implementation of the Tracker class.
  *
- * @tparam S The tracked item. It is the key.
- * @tparam T The value mapped to the tracked item.
- * @tparam R The reason the tracked item is  being tracked or untracked.
+ * \tparam S The tracked item. It is the key.
+ * \tparam T The value mapped to the tracked item.
+ * \tparam R The reason the tracked item is  being tracked or untracked.
  * @ThreadSafe
  */
 template<class S, class TTT, class R>
@@ -50,27 +50,27 @@ public:
   typedef std::map<S,T> TrackingMap;
 
   /**
-   * ModuleAbstractTracked constructor.
+   * \brief ModuleAbstractTracked constructor.
    */
   ModuleAbstractTracked();
 
   virtual ~ModuleAbstractTracked();
 
   /**
-   * Set initial list of items into tracker before events begin to be
+   * \brief Set initial list of items into tracker before events begin to be
    * received.
    *
    * This method must be called from Tracker's open method while synchronized
    * on this object in the same synchronized block as the add listener call.
    *
-   * @param list The initial list of items to be tracked. <code>null</code>
+   * \param[in] list The initial list of items to be tracked. <code>null</code>
    *        entries in the list are ignored.
    * @GuardedBy this
    */
   void SetInitial(const std::vector<S>& list);
 
   /**
-   * Track the initial list of items. This is called after events can begin to
+   * \brief Track the initial list of items. This is called after events can begin to
    * be received.
    *
    * This method must be called from Tracker's open method while not
@@ -80,64 +80,64 @@ public:
   void TrackInitial();
 
   /**
-   * Called by the owning Tracker object when it is closed.
+   * \brief Called by the owning Tracker object when it is closed.
    */
   void Close();
 
   /**
-   * Begin to track an item.
+   * \brief Begin to track an item.
    *
-   * @param item S to be tracked.
-   * @param related Action related object.
+   * \param[in] item S to be tracked.
+   * \param[in] related Action related object.
    */
   void Track(S item, R related);
 
   /**
-   * Discontinue tracking the item.
+   * \brief Discontinue tracking the item.
    *
-   * @param item S to be untracked.
-   * @param related Action related object.
+   * \param[in] item S to be untracked.
+   * \param[in] related Action related object.
    */
   void Untrack(S item, R related);
 
   /**
-   * Returns the number of tracked items.
+   * \brief Returns the number of tracked items.
    *
-   * @return The number of tracked items.
+   * \return The number of tracked items.
    *
    * @GuardedBy this
    */
   std::size_t Size() const;
 
   /**
-   * Returns if the tracker is empty.
+   * \brief Returns if the tracker is empty.
    *
-   * @return Whether the tracker is empty.
+   * \return Whether the tracker is empty.
    *
    * @GuardedBy this
    */
   bool IsEmpty() const;
 
   /**
-   * Return the customized object for the specified item
+   * \brief Return the customized object for the specified item
    *
-   * @param item The item to lookup in the map
-   * @return The customized object for the specified item.
+   * \param[in] item The item to lookup in the map
+   * \return The customized object for the specified item.
    *
    * @GuardedBy this
    */
   T GetCustomizedObject(S item) const;
 
   /**
-   * Return the list of tracked items.
+   * \brief Return the list of tracked items.
    *
-   * @return The tracked items.
+   * \param[out] items The tracked items.
    * @GuardedBy this
    */
   void GetTracked(std::vector<S>& items) const;
 
   /**
-   * Increment the modification count. If this method is overridden, the
+   * \brief Increment the modification count. If this method is overridden, the
    * overriding method MUST call this method to increment the tracking count.
    *
    * @GuardedBy this
@@ -145,63 +145,63 @@ public:
   virtual void Modified();
 
   /**
-   * Returns the tracking count for this <code>ServiceTracker</code> object.
+   * \brief Returns the tracking count for this <code>ServiceTracker</code> object.
    *
    * The tracking count is initialized to 0 when this object is opened. Every
    * time an item is added, modified or removed from this object the tracking
    * count is incremented.
    *
    * @GuardedBy this
-   * @return The tracking count for this object.
+   * \return The tracking count for this object.
    */
   int GetTrackingCount() const;
 
   /**
-   * Copy the tracked items and associated values into the specified map.
+   * \brief Copy the tracked items and associated values into the specified map.
    *
-   * @param map The map into which to copy the tracked items and associated
+   * \param[out] map The map into which to copy the tracked items and associated
    *        values. This map must not be a user provided map so that user code
    *        is not executed while synchronized on this.
-   * @return The specified map.
+   * \return The specified map.
    * @GuardedBy this
    */
   void CopyEntries(TrackingMap& map) const;
 
   /**
-   * Call the specific customizer adding method. This method must not be
+   * \brief Call the specific customizer adding method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item S to be tracked.
-   * @param related Action related object.
-   * @return Customized object for the tracked item or <code>null</code> if
+   * \param[in] item S to be tracked.
+   * \param[in] related Action related object.
+   * \return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
   virtual T CustomizerAdding(S item, const R& related) = 0;
 
   /**
-   * Call the specific customizer modified method. This method must not be
+   * \brief Call the specific customizer modified method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
+   * \param[in] item Tracked item.
+   * \param[in] related Action related object.
+   * \param[in] object Customized object for the tracked item.
    */
   virtual void CustomizerModified(S item, const R& related,
                                   T object) = 0;
 
   /**
-   * Call the specific customizer removed method. This method must not be
+   * \brief Call the specific customizer removed method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
+   * \param[in] item Tracked item.
+   * \param[in] related Action related object.
+   * \param[in] object Customized object for the tracked item.
    */
   virtual void CustomizerRemoved(S item, const R& related,
                                  T object) = 0;
 
   /**
-   * List of items in the process of being added. This is used to deal with
+   * \brief List of items in the process of being added. This is used to deal with
    * nesting of events. Since events may be synchronously delivered, events
    * can be nested. For example, when processing the adding of a service and
    * the customizer causes the service to be unregistered, notification to the
@@ -217,7 +217,7 @@ public:
   std::list<S> adding;
 
   /**
-   * true if the tracked object is closed.
+   * \brief true if the tracked object is closed.
    *
    * This field is volatile because it is set by one thread and read by
    * another.
@@ -225,7 +225,7 @@ public:
   volatile bool closed;
 
   /**
-   * Initial list of items for the tracker. This is used to correctly process
+   * \brief Initial list of items for the tracker. This is used to correctly process
    * the initial items which could be modified before they are tracked. This
    * is necessary since the initial set of tracked items are not "announced"
    * by events and therefore the event which makes the item untracked could be
@@ -244,12 +244,12 @@ public:
   std::list<S> initial;
 
   /**
-   * Common logic to add an item to the tracker used by track and
+   * \brief Common logic to add an item to the tracker used by track and
    * trackInitial. The specified item must have been placed in the adding list
    * before calling this method.
    *
-   * @param item S to be tracked.
-   * @param related Action related object.
+   * \param[in] item S to be tracked.
+   * \param[in] related Action related object.
    */
   void TrackAdding(S item, R related);
 
@@ -258,14 +258,14 @@ private:
   typedef ModuleAbstractTracked<S,TTT,R> Self;
 
   /**
-   * Map of tracked items to customized objects.
+   * \brief Map of tracked items to customized objects.
    *
    * @GuardedBy this
    */
   TrackingMap tracked;
 
   /**
-   * Modification count. This field is initialized to zero and incremented by
+   * \brief Modification count. This field is initialized to zero and incremented by
    * modified.
    *
    * @GuardedBy this

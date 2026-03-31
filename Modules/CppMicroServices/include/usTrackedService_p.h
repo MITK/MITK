@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace us {
 
 /**
- * This class is not intended to be used directly. It is exported to support
+ * \brief This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  */
 template<class S, class TTT>
@@ -37,11 +37,11 @@ public:
                  ServiceTrackerCustomizer<S,T>* customizer);
 
   /**
-   * Method connected to service events for the
+   * \brief Method connected to service events for the
    * <code>ServiceTracker</code> class. This method must NOT be
    * synchronized to avoid deadlock potential.
    *
-   * @param event <code>ServiceEvent</code> object from the framework.
+   * \param[in] event <code>ServiceEvent</code> object from the framework.
    */
   void ServiceChanged(const ServiceEvent event) override;
 
@@ -53,7 +53,7 @@ private:
   ServiceTrackerCustomizer<S,T>* customizer;
 
   /**
-   * Increment the tracking count and tell the tracker there was a
+   * \brief Increment the tracking count and tell the tracker there was a
    * modification.
    *
    * @GuardedBy this
@@ -61,34 +61,34 @@ private:
   void Modified() override;
 
   /**
-   * Call the specific customizer adding method. This method must not be
+   * \brief Call the specific customizer adding method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item Item to be tracked.
-   * @param related Action related object.
-   * @return Customized object for the tracked item or <code>null</code>
+   * \param[in] item Item to be tracked.
+   * \param[in] related Action related object.
+   * \return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
   T CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related) override;
 
   /**
-   * Call the specific customizer modified method. This method must not be
+   * \brief Call the specific customizer modified method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
+   * \param[in] item Tracked item.
+   * \param[in] related Action related object.
+   * \param[in] object Customized object for the tracked item.
    */
   void CustomizerModified(ServiceReference<S> item,
                           const ServiceEvent& related, T object) override ;
 
   /**
-   * Call the specific customizer removed method. This method must not be
+   * \brief Call the specific customizer removed method. This method must not be
    * called while synchronized on this object.
    *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
+   * \param[in] item Tracked item.
+   * \param[in] related Action related object.
+   * \param[in] object Customized object for the tracked item.
    */
   void CustomizerRemoved(ServiceReference<S> item,
                          const ServiceEvent& related, T object) override ;

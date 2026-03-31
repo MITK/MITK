@@ -19,7 +19,7 @@ found in the LICENSE file.
 namespace us {
 
 /**
- * This class is not intended to be used directly. It is exported to support
+ * \brief This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  */
 struct TrackedServiceListener
@@ -27,11 +27,11 @@ struct TrackedServiceListener
   virtual ~TrackedServiceListener() {}
 
   /**
-   * Slot connected to service events for the
+   * \brief Slot connected to service events for the
    * <code>ServiceTracker</code> class. This method must NOT be
    * synchronized to avoid deadlock potential.
    *
-   * @param event <code>ServiceEvent</code> object from the framework.
+   * \param[in] event <code>ServiceEvent</code> object from the framework.
    */
   virtual void ServiceChanged(const ServiceEvent event) = 0;
 

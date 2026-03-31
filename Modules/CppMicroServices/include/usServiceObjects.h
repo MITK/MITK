@@ -25,6 +25,15 @@ namespace us {
 
 class ServiceObjectsBasePrivate;
 
+/**
+ * \ingroup MicroServices
+ *
+ * \brief Base class for ServiceObjects providing type-erased service object management.
+ *
+ * This class is not intended to be used directly. Use ServiceObjects instead.
+ *
+ * \sa ServiceObjects
+ */
 class MITKCPPMICROSERVICES_EXPORT ServiceObjectsBase
 {
 
@@ -34,34 +43,43 @@ private:
 
 protected:
 
+  /** \brief Constructs a ServiceObjectsBase instance.
+   *
+   * \param[in] context The module context.
+   * \param[in] reference The service reference.
+   */
   ServiceObjectsBase(ModuleContext* context, const ServiceReferenceBase& reference);
 
+  /** \brief Copy constructor. */
   ServiceObjectsBase(const ServiceObjectsBase& other);
 
+  /** \brief Destructor. */
   ~ServiceObjectsBase();
 
+  /** \brief Copy assignment operator. */
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other);
 
-  // Called by ServiceObjects<S> with S != void
+  /** \brief Called by ServiceObjects\<S\> with S != void to get a service object. */
   void* GetService() const;
 
-  // Called by the ServiceObjects<void> specialization
+  /** \brief Called by the ServiceObjects<void> specialization to get a service InterfaceMap. */
   InterfaceMap GetServiceInterfaceMap() const;
 
-  // Called by ServiceObjects<S> with S != void
+  /** \brief Called by ServiceObjects\<S\> with S != void to release a service object. */
   void UngetService(void* service);
 
-  // Called by the ServiceObjects<void> specialization
+  /** \brief Called by the ServiceObjects<void> specialization to release a service InterfaceMap. */
   void UngetService(const InterfaceMap& interfaceMap);
 
+  /** \brief Returns the ServiceReferenceBase for this ServiceObjects object. */
   ServiceReferenceBase GetReference() const;
 
 };
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Allows multiple service objects for a service to be obtained.
+ * \brief Allows multiple service objects for a service to be obtained.
  *
  * For services with \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink scope,
  * multiple service objects for the service can be obtained. For services with
@@ -72,7 +90,7 @@ protected:
  * associated with the ModuleContext used to create this ServiceObjects object is
  * stopped.
  *
- * @tparam S Type of Service.
+ * \tparam S Type of Service.
  */
 template<class S>
 class ServiceObjects : private ServiceObjectsBase
@@ -81,7 +99,7 @@ class ServiceObjects : private ServiceObjectsBase
 public:
 
   /**
-   * Returns a service object for the referenced service.
+   * \brief Returns a service object for the referenced service.
    *
    * This ServiceObjects object can be used to obtain multiple service objects for
    * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
@@ -106,15 +124,15 @@ public:
    *   <li>The service object is returned.</li>
    * </ol>
    *
-   * @return A service object for the referenced service or \c nullptr if the service is not
+   * \return A service object for the referenced service or \c nullptr if the service is not
    *         registered, the service object returned by a ServiceFactory does not contain
    *         all the classes under which it was registered or the ServiceFactory threw an
    *         exception.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects object
+   * \throws std::logic_error If the ModuleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
-   * @see UngetService()
+   * \sa UngetService()
    */
   S* GetService() const
   {
@@ -122,7 +140,7 @@ public:
   }
 
   /**
-   * Releases a service object for the referenced service.
+   * \brief Releases a service object for the referenced service.
    *
    * This ServiceObjects object can be used to obtain multiple service objects for
    * the referenced service if the service has \link ServiceConstants::SCOPE_PROTOTYPE prototype\endlink
@@ -143,14 +161,14 @@ public:
    *       should be destroyed after calling this method.</li>
    * </ol>
    *
-   * @param service A service object previously provided by this ServiceObjects object.
+   * \param[in] service A service object previously provided by this ServiceObjects object.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects
+   * \throws std::logic_error If the ModuleContext used to create this ServiceObjects
    *        object is no longer valid.
-   * @throw std::invalid_argument If the specified service was not provided by this
+   * \throws std::invalid_argument If the specified service was not provided by this
    *        ServiceObjects object.
    *
-   * @see GetService()
+   * \sa GetService()
    */
   void UngetService(S* service)
   {
@@ -158,9 +176,9 @@ public:
   }
 
   /**
-   * Returns the ServiceReference for this ServiceObjects object.
+   * \brief Returns the ServiceReference for this ServiceObjects object.
    *
-   * @return The ServiceReference for this ServiceObjects object.
+   * \return The ServiceReference for this ServiceObjects object.
    */
   ServiceReference<S> GetServiceReference() const
   {
@@ -178,14 +196,14 @@ private:
 };
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Allows multiple service objects for a service to be obtained.
+ * \brief Allows multiple service objects for a service to be obtained.
  *
  * This is a specialization of the ServiceObjects class template for
  * "void", which maps to all service interface types.
  *
- * @see ServiceObjects
+ * \sa ServiceObjects
  */
 template<>
 class MITKCPPMICROSERVICES_EXPORT ServiceObjects<void> : private ServiceObjectsBase
@@ -194,47 +212,47 @@ class MITKCPPMICROSERVICES_EXPORT ServiceObjects<void> : private ServiceObjectsB
 public:
 
   /**
-   * Returns a service object as a InterfaceMap instance for the referenced service.
+   * \brief Returns a service object as a InterfaceMap instance for the referenced service.
    *
-   * This method is the same as ServiceObjects<S>::GetService() except for the
+   * This method is the same as ServiceObjects\<S\>::GetService() except for the
    * return type. Further, this method will always return an empty InterfaeMap
    * object when the referenced service has been unregistered.
    *
-   * @return A InterfaceMap object for the referenced service, which is empty if the
+   * \return A InterfaceMap object for the referenced service, which is empty if the
    *         service is not registered, the InterfaceMap returned by a ServiceFactory
    *         does not contain all the classes under which the service object was
    *         registered or the ServiceFactory threw an exception.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects object
+   * \throws std::logic_error If the ModuleContext used to create this ServiceObjects object
    *        is no longer valid.
    *
-   * @see ServiceObjects<S>::GetService()
-   * @see UngetService()
+   * \sa ServiceObjects\<S\>::GetService()
+   * \sa UngetService()
    */
   InterfaceMap GetService() const;
 
   /**
-   * Releases a service object for the referenced service.
+   * \brief Releases a service object for the referenced service.
    *
-   * This method is the same as ServiceObjects<S>::UngetService() except for the
+   * This method is the same as ServiceObjects\<S\>::UngetService() except for the
    * parameter type.
    *
-   * @param service An InterfaceMap object previously provided by this ServiceObjects object.
+   * \param[in] service An InterfaceMap object previously provided by this ServiceObjects object.
    *
-   * @throw std::logic_error If the ModuleContext used to create this ServiceObjects
+   * \throws std::logic_error If the ModuleContext used to create this ServiceObjects
    *        object is no longer valid.
-   * @throw std::invalid_argument If the specified service was not provided by this
+   * \throws std::invalid_argument If the specified service was not provided by this
    *        ServiceObjects object.
    *
-   * @see ServiceObjects<S>::UngetService()
-   * @see GetService()
+   * \sa ServiceObjects\<S\>::UngetService()
+   * \sa GetService()
    */
   void UngetService(const InterfaceMap& service);
 
   /**
-   * Returns the ServiceReference for this ServiceObjects object.
+   * \brief Returns the ServiceReference for this ServiceObjects object.
    *
-   * @return The ServiceReference for this ServiceObjects object.
+   * \return The ServiceReference for this ServiceObjects object.
    */
   ServiceReferenceU GetServiceReference() const;
 

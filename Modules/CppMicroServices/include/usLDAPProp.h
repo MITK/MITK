@@ -43,7 +43,7 @@ private:
 /**
  * \ingroup MicroServicesUtils
  *
- * A fluent API for creating LDAP filter strings.
+ * \brief A fluent API for creating LDAP filter strings.
  *
  * Examples for creating LDAPFilter objects:
  * \code
@@ -64,19 +64,19 @@ class MITKCPPMICROSERVICES_EXPORT LDAPProp
 public:
 
   /**
-   * Create a LDAPProp instance for the named LDAP property.
+   * \brief Create a LDAPProp instance for the named LDAP property.
    *
-   * @param property The name of the LDAP property.
+   * \param[in] property The name of the LDAP property.
    */
   LDAPProp(const std::string& property);
 
   /**
-   * LDAP equality '='
+   * \brief LDAP equality '='
    *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
+   * \param[in] s A type convertible to std::string.
+   * \return A LDAP expression object.
    *
-   * @{
+   * \{
    */
   LDAPPropExpr operator==(const std::string& s) const;
   LDAPPropExpr operator==(const us::Any& s) const;
@@ -87,19 +87,20 @@ public:
     ss << s;
     return LDAPPropExpr("(" + m_property + "=" + ss.str() + ")");
   }
-  /// @}
+  /// \}
 
+  /** \brief Conversion operator to LDAPPropExpr for property presence checks. */
   operator LDAPPropExpr () const;
 
   /**
-   * States the absence of the LDAP property.
+   * \brief States the absence of the LDAP property.
    *
-   * @return A LDAP expression object.
+   * \return A LDAP expression object.
    */
   LDAPPropExpr operator!() const;
 
   /**
-   * Convenience operator for LDAP inequality.
+   * \brief Convenience operator for LDAP inequality.
    *
    * Writing either
    * \code
@@ -111,10 +112,10 @@ public:
    * \endcode
    * leads to the same string "(!(attr=val))".
    *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
+   * \param[in] s A type convertible to std::string.
+   * \return A LDAP expression object.
    *
-   * @{
+   * \{
    */
   LDAPPropExpr operator!=(const std::string& s) const;
   LDAPPropExpr operator!=(const us::Any& s) const;
@@ -125,15 +126,15 @@ public:
     ss << s;
     return operator!=(ss.str());
   }
-  /// @}
+  /// \}
 
   /**
-   * LDAP greater or equal '>='
+   * \brief LDAP greater or equal '>='
    *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
+   * \param[in] s A type convertible to std::string.
+   * \return A LDAP expression object.
    *
-   * @{
+   * \{
    */
   LDAPPropExpr operator>=(const std::string& s) const;
   LDAPPropExpr operator>=(const us::Any& s) const;
@@ -144,15 +145,15 @@ public:
     ss << s;
     return operator>=(ss.str());
   }
-  /// @}
+  /// \}
 
   /**
-   * LDAP less or equal '<='
+   * \brief LDAP less or equal '<='
    *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
+   * \param[in] s A type convertible to std::string.
+   * \return A LDAP expression object.
    *
-   * @{
+   * \{
    */
   LDAPPropExpr operator<=(const std::string& s) const;
   LDAPPropExpr operator<=(const us::Any& s) const;
@@ -163,15 +164,15 @@ public:
     ss << s;
     return operator<=(ss.str());
   }
-  /// @}
+  /// \}
 
   /**
-   * LDAP approximation '~='
+   * \brief LDAP approximation '~='
    *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
+   * \param[in] s A type convertible to std::string.
+   * \return A LDAP expression object.
    *
-   * @{
+   * \{
    */
   LDAPPropExpr Approx(const std::string& s) const;
   LDAPPropExpr Approx(const us::Any& s) const;
@@ -182,7 +183,7 @@ public:
     ss << s;
     return Approx(ss.str());
   }
-  /// @}
+  /// \}
 
 private:
 
@@ -196,22 +197,22 @@ private:
 /**
  * \ingroup MicroServicesUtils
  *
- * LDAP logical and '&'
+ * \brief LDAP logical and '&'
  *
- * @param left A LDAP expression.
- * @param right A LDAP expression.
- * @return A LDAP expression
+ * \param[in] left A LDAP expression.
+ * \param[in] right A LDAP expression.
+ * \return A LDAP expression
  */
 MITKCPPMICROSERVICES_EXPORT us::LDAPPropExpr operator&&(const us::LDAPPropExpr& left, const us::LDAPPropExpr& right);
 
 /**
  * \ingroup MicroServicesUtils
  *
- * LDAP logical or '|'
+ * \brief LDAP logical or '|'
  *
- * @param left A LDAP expression.
- * @param right A LDAP expression.
- * @return A LDAP expression
+ * \param[in] left A LDAP expression.
+ * \param[in] right A LDAP expression.
+ * \return A LDAP expression
  */
 MITKCPPMICROSERVICES_EXPORT us::LDAPPropExpr operator||(const us::LDAPPropExpr& left, const us::LDAPPropExpr& right);
 

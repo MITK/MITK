@@ -22,21 +22,29 @@ found in the LICENSE file.
 #include <typeinfo>
 
 namespace us {
+
+/**
+ * \ingroup MicroServices
+ * \brief Returns the demangled name for the given type_info.
+ *
+ * \param[in] typeInfo The type information to demangle.
+ * \return The demangled type name as a string.
+ */
 std::string GetDemangledName(const std::type_info& typeInfo);
 }
 
 /**
  * \ingroup MicroServices
  *
- * Returns a unique id for a given type. By default, the
+ * \brief Returns a unique id for a given type. By default, the
  * demangled name of \c T is returned.
  *
  * This template method may be specialized directly or be
  * using the macro #US_DECLARE_SERVICE_INTERFACE to return
  * a custom id for each service interface.
  *
- * @tparam T The service interface type.
- * @return A unique id for the service interface type T.
+ * \tparam T The service interface type.
+ * \return A unique id for the service interface type T.
  */
 template<class T> std::string us_service_interface_iid()
 {
@@ -89,8 +97,8 @@ template<> inline std::string us_service_interface_iid<void>() { return std::str
  * US_DECLARE_SERVICE_INTERFACE(Foo::ISomeInterface, "com.mycompany.service.ISomeInterface/1.0")
  * \endcode
  *
- * @param _service_interface_type The service interface type.
- * @param _service_interface_id A string literal representing a globally unique identifier.
+ * \param[in] _service_interface_type The service interface type.
+ * \param[in] _service_interface_id A string literal representing a globally unique identifier.
  */
 #define US_DECLARE_SERVICE_INTERFACE(_service_interface_type, _service_interface_id)               \
   template<> inline std::string us_service_interface_iid<_service_interface_type>()                \
@@ -102,19 +110,21 @@ namespace us {
 class ServiceFactory;
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * A helper type used in several methods to get proper
+ * \brief A helper type used in several methods to get proper
  * method overload resolutions.
  */
 template<class Interface>
 struct InterfaceType {};
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * A map containing interfaces ids and their corresponding service object
- * pointers. InterfaceMap instances represent a complete service object
+ * \brief A map containing interfaces ids and their corresponding service object
+ * pointers.
+ *
+ * InterfaceMap instances represent a complete service object
  * which implements one or more service interfaces. For each implemented
  * service interface, there is an entry in the map with the key being
  * the service interface id and the value a pointer to the service
@@ -122,9 +132,9 @@ struct InterfaceType {};
  *
  * To create InterfaceMap instances, use the MakeInterfaceMap helper class.
  *
- * @note This is a low-level type and should only rarely be used.
+ * \note This is a low-level type and should only rarely be used.
  *
- * @see MakeInterfaceMap
+ * \sa MakeInterfaceMap
  */
 typedef std::map<std::string, void*> InterfaceMap;
 
@@ -150,9 +160,9 @@ inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
 
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Helper class for constructing InterfaceMap instances based
+ * \brief Helper class for constructing InterfaceMap instances based
  * on service implementations or service factories.
  *
  * Example usage:
@@ -164,7 +174,7 @@ inline bool InsertInterfaceType<void>(InterfaceMap&, void*)
  * The MakeInterfaceMap supports service implementations with
  * up to three service interfaces.
  *
- * @see InterfaceMap
+ * \sa InterfaceMap
  */
 template<class I1, class I2 = void, class I3 = void>
 struct MakeInterfaceMap
@@ -175,9 +185,9 @@ struct MakeInterfaceMap
   I3* m_interface3;
 
   /**
-   * Constructor taking a service implementation pointer.
+   * \brief Constructor taking a service implementation pointer.
    *
-   * @param impl A service implementation pointer, which must
+   * \param[in] impl A service implementation pointer, which must
    *        be castable to a all specified service interfaces.
    */
   template<class Impl>
@@ -189,9 +199,9 @@ struct MakeInterfaceMap
   {}
 
   /**
-   * Constructor taking a service factory.
+   * \brief Constructor taking a service factory.
    *
-   * @param factory A service factory.
+   * \param[in] factory A service factory.
    */
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
@@ -205,6 +215,7 @@ struct MakeInterfaceMap
     }
   }
 
+  /** \brief Conversion operator to InterfaceMap. */
   operator InterfaceMap ()
   {
     InterfaceMap sim;
@@ -306,16 +317,16 @@ struct MakeInterfaceMap<void,void,void>;
 /// \endcond
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Extract a service interface pointer from a given InterfaceMap instance.
+ * \brief Extract a service interface pointer from a given InterfaceMap instance.
  *
- * @param map a InterfaceMap instance.
- * @return The service interface pointer for the service interface id of the
+ * \param[in] map a InterfaceMap instance.
+ * \return The service interface pointer for the service interface id of the
  *         \c I1 interface type or nullptr if \c map does not contain an entry
  *         for the given type.
  *
- * @see MakeInterfaceMap
+ * \sa MakeInterfaceMap
  */
 template<class I1>
 I1* ExtractInterface(const InterfaceMap& map)

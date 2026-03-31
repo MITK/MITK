@@ -136,7 +136,7 @@ std::string any_value_to_json(const std::map<K, V>& m);
 /**
  * \ingroup MicroServicesUtils
  *
- * An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
+ * \brief An Any class represents a general type and is capable of storing any type, supporting type-safe extraction
  * of the internally stored data.
  *
  * Code taken from the Boost 1.46.1 library. Original copyright by Kevlin Henney. Modified for CppMicroServices.
@@ -146,13 +146,13 @@ class Any
 public:
 
   /**
-   * Creates an empty any type.
+   * \brief Creates an empty any type.
    */
   Any(): _content(nullptr)
   { }
 
   /**
-   * Creates an Any which stores the init parameter inside.
+   * \brief Creates an Any which stores the init parameter inside.
    *
    * \param value The content of the Any
    *
@@ -168,7 +168,7 @@ public:
   { }
 
   /**
-   * Copy constructor, works with empty Anys and initialized Any values.
+   * \brief Copy constructor, works with empty Anys and initialized Any values.
    *
    * \param other The Any to copy
    */
@@ -182,7 +182,7 @@ public:
   }
 
   /**
-   * Swaps the content of the two Anys.
+   * \brief Swaps the content of the two Anys.
    *
    * \param rhs The Any to swap this Any with.
    */
@@ -193,7 +193,7 @@ public:
   }
 
   /**
-   * Assignment operator for all types != Any.
+   * \brief Assignment operator for all types != Any.
    *
    * \param rhs The value which should be assigned to this Any.
    *
@@ -211,7 +211,7 @@ public:
   }
 
   /**
-   * Assignment operator for Any.
+   * \brief Assignment operator for Any.
    *
    * \param rhs The Any which should be assigned to this Any.
    */
@@ -222,7 +222,7 @@ public:
   }
 
   /**
-   * returns true if the Any is empty
+   * \brief Returns true if the Any is empty.
    */
   bool Empty() const
   {
@@ -230,7 +230,7 @@ public:
   }
 
   /**
-   * Returns a string representation for the content.
+   * \brief Returns a string representation for the content.
    *
    * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
    * function or specialize the any_value_to_string template function for meaningful output.
@@ -241,7 +241,7 @@ public:
   }
 
   /**
-   * Returns a JSON representation for the content.
+   * \brief Returns a JSON representation for the content.
    *
    * Custom types should specialize the any_value_to_json template function for meaningful output.
    */
@@ -251,7 +251,7 @@ public:
   }
 
   /**
-   * Returns the type information of the stored content.
+   * \brief Returns the type information of the stored content.
    * If the Any is empty typeid(void) is returned.
    * It is suggested to always query an Any for its type info before trying to extract
    * data via an any_cast/ref_any_cast.
@@ -320,6 +320,14 @@ private:
     Placeholder* _content;
 };
 
+/**
+ * \ingroup MicroServicesUtils
+ *
+ * \brief Exception thrown when an any_cast fails due to a type mismatch.
+ *
+ * \sa Any
+ * \sa any_cast
+ */
 class BadAnyCastException : public std::bad_cast
 {
 public:
@@ -345,7 +353,7 @@ private:
 };
 
 /**
- * any_cast operator used to extract the ValueType from an Any*. Will return a pointer
+ * \brief any_cast operator used to extract the ValueType from an Any*. Will return a pointer
  * to the stored value.
  *
  * Example Usage:
@@ -363,7 +371,7 @@ ValueType* any_cast(Any* operand)
 }
 
 /**
- * any_cast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
+ * \brief any_cast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
  * to the stored value.
  *
  * Example Usage:
@@ -379,7 +387,7 @@ const ValueType* any_cast(const Any* operand)
 }
 
 /**
- * any_cast operator used to extract a copy of the ValueType from an const Any&.
+ * \brief any_cast operator used to extract a copy of the ValueType from an const Any&.
  *
  * Example Usage:
  * \code
@@ -399,7 +407,7 @@ ValueType any_cast(const Any& operand)
 }
 
 /**
- * any_cast operator used to extract a copy of the ValueType from an Any&.
+ * \brief any_cast operator used to extract a copy of the ValueType from an Any&.
  *
  * Example Usage:
  * \code
@@ -419,7 +427,7 @@ ValueType any_cast(Any& operand)
 }
 
 /**
- * ref_any_cast operator used to return a const reference to the internal data.
+ * \brief ref_any_cast operator used to return a const reference to the internal data.
  *
  * Example Usage:
  * \code
@@ -435,7 +443,7 @@ const ValueType& ref_any_cast(const Any & operand)
 }
 
 /**
- * ref_any_cast operator used to return a reference to the internal data.
+ * \brief ref_any_cast operator used to return a reference to the internal data.
  *
  * Example Usage:
  * \code

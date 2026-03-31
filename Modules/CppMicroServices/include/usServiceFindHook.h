@@ -25,33 +25,34 @@ class ModuleContext;
 class ServiceReferenceBase;
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * Service Find Hook Service.
+ * \brief Service Find Hook Service.
  *
  * <p>
  * Modules registering this service will be called during service find
  * (get service references) operations.
  *
- * @remarks Implementations of this interface are required to be thread-safe.
+ * \remarks Implementations of this interface are required to be thread-safe.
  */
 struct MITKCPPMICROSERVICES_EXPORT ServiceFindHook
 {
 
+  /** \brief Destructor. */
   virtual ~ServiceFindHook();
 
   /**
-   * Find hook method. This method is called during the service find operation
+   * \brief Find hook method. This method is called during the service find operation
    * (for example, ModuleContext::GetServiceReferences<S>()). This method can
    * filter the result of the find operation.
    *
-   * @param context The module context of the module performing the find
+   * \param[in] context The module context of the module performing the find
    *        operation.
-   * @param name The class name of the services to find or an empty string to
+   * \param[in] name The class name of the services to find or an empty string to
    *        find all services.
-   * @param filter The filter criteria of the services to find or an empty string
+   * \param[in] filter The filter criteria of the services to find or an empty string
    *        for no filter criteria.
-   * @param references A list of Service References to be returned as a result of the
+   * \param[in] references A list of Service References to be returned as a result of the
    *        find operation. The implementation of this method may remove
    *        service references from the list to prevent the references from being
    *        returned to the module performing the find operation.

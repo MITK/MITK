@@ -24,17 +24,20 @@ namespace us {
 struct ModuleActivator;
 
 /**
- * This class is not intended to be used directly. It is exported to support
+ * \brief This class is not intended to be used directly. It is exported to support
  * the CppMicroServices module system.
  */
 struct MITKCPPMICROSERVICES_EXPORT ModuleInfo
 {
+  /** \brief Construct a ModuleInfo with the given name.
+   * \param[in] name The module name.
+   */
   ModuleInfo(const std::string& name);
 
-  std::string name;
-  std::string location;
-  std::string autoLoadDir;
-  long id;
+  std::string name;       ///< \brief The module name.
+  std::string location;   ///< \brief The file system location of the module.
+  std::string autoLoadDir; ///< \brief The auto-load directory for the module.
+  long id;                ///< \brief The unique module identifier.
 };
 
 }

@@ -22,23 +22,24 @@ class Module;
 class ModuleContext;
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * %Module Context Hook Service.
+ * \brief %Module Context Hook Service.
  *
  * <p>
  * Modules registering this service will be called during module find
  * (get modules) operations.
  *
- * @remarks Implementations of this interface are required to be thread-safe.
+ * \remarks Implementations of this interface are required to be thread-safe.
  */
 struct MITKCPPMICROSERVICES_EXPORT ModuleFindHook
 {
 
+  /** \brief Virtual destructor. */
   virtual ~ModuleFindHook();
 
   /**
-   * Find hook method. This method is called for module find operations
+   * \brief Find hook method. This method is called for module find operations
    * using ModuleContext::GetBundle(long)
    * and ModuleContext::GetModules() methods. The find method can
    * filter the result of the find operation.
@@ -47,9 +48,9 @@ struct MITKCPPMICROSERVICES_EXPORT ModuleFindHook
    *       method does not cause the find method to be called, neither does any
    *       call to the static methods of the ModuleRegistry class.
    *
-   * @param context The module context of the module performing the find
+   * \param[in] context The module context of the module performing the find
    *        operation.
-   * @param modules A list of Modules to be returned as a result of the
+   * \param[in] modules A list of Modules to be returned as a result of the
    *        find operation. The implementation of this method may remove
    *        modules from the list to prevent the modules from being
    *        returned to the module performing the find operation.

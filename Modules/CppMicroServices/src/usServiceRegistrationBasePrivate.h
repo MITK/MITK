@@ -27,7 +27,10 @@ class ModulePrivate;
 class ServiceRegistrationBase;
 
 /**
+ * \brief Private implementation data for ServiceRegistrationBase.
+ *
  * \ingroup MicroServices
+ * \sa ServiceRegistrationBase ServiceReferenceBasePrivate
  */
 class ServiceRegistrationBasePrivate
 {
@@ -111,21 +114,34 @@ public:
   // needs to be recursive
   Mutex propsLock;
 
+  /** \brief Construct a service registration private implementation.
+   *  \param[in] module The module registering the service.
+   *  \param[in] service The service object or factory interface map.
+   *  \param[in] props The service properties.
+   */
   ServiceRegistrationBasePrivate(ModulePrivate* module, const InterfaceMap& service,
                                  const ServicePropertiesImpl& props);
 
+  /** \brief Destructor. */
   ~ServiceRegistrationBasePrivate();
 
   /**
-   * Check if a module uses this service
+   * \brief Check if a module uses this service.
    *
-   * @param p Module to check
-   * @return true if module uses this service
+   * \param[in] m The module to check.
+   * \return \c true if the module uses this service.
    */
   bool IsUsedByModule(Module* m) const;
 
+  /** \brief Get the interface map of the registered service.
+   *  \return The InterfaceMap for this registration.
+   */
   const InterfaceMap& GetInterfaces() const;
 
+  /** \brief Get the service pointer for a given interface.
+   *  \param[in] interfaceId The interface identifier to look up.
+   *  \return The service pointer, or nullptr if not found.
+   */
   void* GetService(const std::string& interfaceId) const;
 
 private:

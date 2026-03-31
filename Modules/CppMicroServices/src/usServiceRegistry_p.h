@@ -29,7 +29,9 @@ class ServicePropertiesImpl;
 
 
 /**
- * Here we handle all the CppMicroServices services that are registered.
+ * \brief Registry for all CppMicroServices services in the framework.
+ *
+ * \sa CoreModuleContext ServiceRegistrationBase
  */
 class ServiceRegistry
 {
@@ -38,16 +40,19 @@ public:
 
   typedef Mutex MutexType;
 
+  /** \brief Mutex protecting registry state. */
   mutable MutexType mutex;
 
   /**
-   * Creates a new ServiceProperties object containing <code>in</code>
-   * with the keys converted to lower case.
+   * \brief Create a ServicePropertiesImpl with keys converted to lower case.
    *
-   * @param classes A list of class names which will be added to the
-   *        created ServiceProperties object under the key
-   *        ModuleConstants::OBJECTCLASS.
-   * @param sid A service id which will be used instead of a default one.
+   * \param[in] in The source service properties.
+   * \param[in] classes A list of class names added under the key
+   *            ModuleConstants::OBJECTCLASS.
+   * \param[in] isFactory Whether the service is a ServiceFactory.
+   * \param[in] isPrototypeFactory Whether the service is a PrototypeServiceFactory.
+   * \param[in] sid A service id to use instead of a default one.
+   * \return The created ServicePropertiesImpl object.
    */
   static ServicePropertiesImpl CreateServiceProperties(const ServiceProperties& in,
                                                        const std::vector<std::string>& classes = std::vector<std::string>(),
@@ -57,108 +62,111 @@ public:
   typedef std::unordered_map<std::string, std::vector<ServiceRegistrationBase> > MapClassServices;
 
   /**
-   * All registered services in the current framework.
+   * \brief All registered services in the current framework.
+   *
    * Mapping of registered service to class names under which
    * the service is registered.
    */
   MapServiceClasses services;
 
+  /** \brief Ordered list of all service registrations. */
   std::vector<ServiceRegistrationBase> serviceRegistrations;
 
   /**
-   * Mapping of classname to registered service.
-   * The List of registered services are ordered with the highest
+   * \brief Mapping of class name to registered services.
+   *
+   * The list of registered services is ordered with the highest
    * ranked service first.
    */
   MapClassServices classServices;
 
+  /** \brief The core module context that owns this registry. */
   CoreModuleContext* core;
 
+  /** \brief Construct a ServiceRegistry.
+   *  \param[in] coreCtx The core module context owning this registry.
+   */
   ServiceRegistry(CoreModuleContext* coreCtx);
 
+  /** \brief Destructor. */
   ~ServiceRegistry();
 
+  /** \brief Remove all registered services. */
   void Clear();
 
   /**
-   * Register a service in the framework wide register.
+   * \brief Register a service in the framework-wide register.
    *
-   * @param module The module registering the service.
-   * @param classes The class names under which the service can be located.
-   * @param service The service object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object.
-   * @exception std::invalid_argument If one of the following is true:
-   * <ul>
-   * <li>The service object is 0.</li>
-   * <li>The service parameter is not a ServiceFactory or an
-   * instance of all the named classes in the classes parameter.</li>
-   * </ul>
+   * \param[in] module The module registering the service.
+   * \param[in] service The service object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistrationBase object.
+   * \throws std::invalid_argument If the service object is null or is not
+   *         a ServiceFactory or an instance of all named classes.
    */
   ServiceRegistrationBase RegisterService(ModulePrivate* module,
                                           const InterfaceMap& service,
                                           const ServiceProperties& properties);
 
   /**
-   * Service ranking changed, reorder registered services
-   * according to ranking.
+   * \brief Reorder registered services after a ranking change.
    *
-   * @param serviceRegistration The ServiceRegistrationPrivate object.
-   * @param rank New rank of object.
+   * \param[in] sr The service registration whose ranking changed.
+   * \param[in] classes The class names under which the service is registered.
    */
   void UpdateServiceRegistrationOrder(const ServiceRegistrationBase& sr,
                                       const std::vector<std::string>& classes);
 
   /**
-   * Get all services implementing a certain class.
+   * \brief Get all services implementing a certain class.
+   *
    * Only used internally by the framework.
    *
-   * @param clazz The class name of the requested service.
-   * @return A sorted list of {@link ServiceRegistrationPrivate} objects.
+   * \param[in] clazz The class name of the requested service.
+   * \param[out] serviceRegs A sorted list of matching service registrations.
    */
   void Get(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
-   * Get a service implementing a certain class.
+   * \brief Get a service implementing a certain class.
    *
-   * @param module The module requesting reference
-   * @param clazz The class name of the requested service.
-   * @return A {@link ServiceReference} object.
+   * \param[in] module The module requesting the reference.
+   * \param[in] clazz The class name of the requested service.
+   * \return A ServiceReferenceBase object.
    */
   ServiceReferenceBase Get(ModulePrivate* module, const std::string& clazz) const;
 
   /**
-   * Get all services implementing a certain class and then
-   * filter these with a property filter.
+   * \brief Get all services implementing a class, filtered by properties.
    *
-   * @param clazz The class name of requested service.
-   * @param filter The property filter.
-   * @param module The module requesting reference.
-   * @return A list of {@link ServiceReference} object.
+   * \param[in] clazz The class name of the requested service.
+   * \param[in] filter The LDAP property filter.
+   * \param[in] module The module requesting the references.
+   * \param[out] serviceRefs A list of matching ServiceReferenceBase objects.
    */
   void Get(const std::string& clazz, const std::string& filter,
            ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
 
   /**
-   * Remove a registered service.
+   * \brief Remove a registered service.
    *
-   * @param sr The ServiceRegistration object that is registered.
+   * \param[in] sr The ServiceRegistrationBase object to remove.
    */
   void RemoveServiceRegistration(const ServiceRegistrationBase& sr) ;
 
   /**
-   * Get all services that a module has registered.
+   * \brief Get all services registered by a module.
    *
-   * @param p The module
-   * @return A set of {@link ServiceRegistration} objects
+   * \param[in] m The module whose registrations to retrieve.
+   * \param[out] serviceRegs The matching service registrations.
    */
   void GetRegisteredByModule(ModulePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
   /**
-   * Get all services that a module uses.
+   * \brief Get all services used by a module.
    *
-   * @param p The module
-   * @return A set of {@link ServiceRegistration} objects
+   * \param[in] m The module to check.
+   * \param[out] serviceRegs The service registrations used by the module.
    */
   void GetUsedByModule(Module* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
@@ -166,8 +174,18 @@ private:
 
   friend class ServiceHooks;
 
+  /** \brief Get all services implementing a class without acquiring the lock.
+   *  \param[in] clazz The class name of the requested service.
+   *  \param[out] serviceRegs A sorted list of matching service registrations.
+   */
   void Get_unlocked(const std::string& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
+  /** \brief Get filtered services without acquiring the lock.
+   *  \param[in] clazz The class name of the requested service.
+   *  \param[in] filter The LDAP property filter.
+   *  \param[in] module The module requesting the references.
+   *  \param[out] serviceRefs A list of matching ServiceReferenceBase objects.
+   */
   void Get_unlocked(const std::string& clazz, const std::string& filter,
                     ModulePrivate* module, std::vector<ServiceReferenceBase>& serviceRefs) const;
 

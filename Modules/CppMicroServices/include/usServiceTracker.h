@@ -42,10 +42,10 @@ class ModuleContext;
  *   <li><em>static TrackedType DefaultValue()</em> Returns the default value for newly created tracked objects.</li>
  * </ul>
  *
- * @tparam T The type of the tracked object.
- * @tparam TTT The tracked type traits class deriving from this class.
+ * \tparam T The type of the tracked object.
+ * \tparam TTT The tracked type traits class deriving from this class.
  *
- * @see ServiceTracker
+ * \sa ServiceTracker
  */
 template<class T, class TTT>
 struct TrackedTypeTraitsBase
@@ -80,8 +80,8 @@ struct TrackedTypeTraits;
  * Use this tracked type traits template for custom tracked objects of
  * pointer type with the ServiceTracker class.
  *
- * @tparam S The type of the service being tracked.
- * @tparam T The type of the tracked object.
+ * \tparam S The type of the service being tracked.
+ * \tparam T The type of the tracked object.
  */
 template<class S, class T>
 struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTraits<S,T*> >
@@ -211,12 +211,12 @@ struct TrackedTypeTraits<void,void*>
  * \snippet uServices-servicetracker/main.cpp tracker2
  *
  *
- * @tparam S The type of the service being tracked. The type S* must be an
+ * \tparam S The type of the service being tracked. The type S* must be an
  *         assignable datatype.
- * @tparam TTT Type traits of the tracked object. The type traits class provides
+ * \tparam TTT Type traits of the tracked object. The type traits class provides
  *         information about the customized service object, see TrackedTypeTraitsBase.
  *
- * @remarks This class is thread safe.
+ * \remarks This class is thread safe.
  */
 template<class S, class TTT = TrackedTypeTraits<S,S*> >
 class ServiceTracker : protected ServiceTrackerCustomizer<S,typename TTT::TrackedType>
@@ -228,25 +228,28 @@ public:
   /// The type of the tracked object
   typedef typename TTT::TrackedType T;
 
+  /** \brief The service reference type. */
   typedef ServiceReference<S> ServiceReferenceType;
 
+  /** \brief A map type from ServiceReference to tracked objects. */
   typedef std::map<ServiceReference<S>,T> TrackingMap;
 
+  /** \brief Destructor. */
   ~ServiceTracker() override;
 
   /**
-   * Create a <code>ServiceTracker</code> on the specified
+   * \brief Create a <code>ServiceTracker</code> on the specified
    * <code>ServiceReference</code>.
    *
    * <p>
    * The service referenced by the specified <code>ServiceReference</code>
    * will be tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * \param[in] context The <code>ModuleContext</code> against which the tracking
    *        is done.
-   * @param reference The <code>ServiceReference</code> for the service to be
+   * \param[in] reference The <code>ServiceReference</code> for the service to be
    *        tracked.
-   * @param customizer The customizer object to call when services are added,
+   * \param[in] customizer The customizer object to call when services are added,
    *        modified, or removed in this <code>ServiceTracker</code>. If
    *        customizer is <code>null</code>, then this
    *        <code>ServiceTracker</code> will be used as the
@@ -259,16 +262,16 @@ public:
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
-   * Create a <code>ServiceTracker</code> on the specified class name.
+   * \brief Create a <code>ServiceTracker</code> on the specified class name.
    *
    * <p>
    * Services registered under the specified class name will be tracked by
    * this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * \param[in] context The <code>ModuleContext</code> against which the tracking
    *        is done.
-   * @param clazz The class name of the services to be tracked.
-   * @param customizer The customizer object to call when services are added,
+   * \param[in] clazz The class name of the services to be tracked.
+   * \param[in] customizer The customizer object to call when services are added,
    *        modified, or removed in this <code>ServiceTracker</code>. If
    *        customizer is <code>null</code>, then this
    *        <code>ServiceTracker</code> will be used as the
@@ -280,18 +283,18 @@ public:
                  ServiceTrackerCustomizer<S,T>* customizer = 0);
 
   /**
-   * Create a <code>ServiceTracker</code> on the specified
+   * \brief Create a <code>ServiceTracker</code> on the specified
    * <code>LDAPFilter</code> object.
    *
    * <p>
    * Services which match the specified <code>LDAPFilter</code> object will be
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * \param[in] context The <code>ModuleContext</code> against which the tracking
    *        is done.
-   * @param filter The <code>LDAPFilter</code> to select the services to be
+   * \param[in] filter The <code>LDAPFilter</code> to select the services to be
    *        tracked.
-   * @param customizer The customizer object to call when services are added,
+   * \param[in] customizer The customizer object to call when services are added,
    *        modified, or removed in this <code>ServiceTracker</code>. If
    *        customizer is null, then this <code>ServiceTracker</code> will be
    *        used as the <code>ServiceTrackerCustomizer</code> and this
@@ -302,16 +305,16 @@ public:
                  ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
-   * Create a <code>ServiceTracker</code> on the class template
+   * \brief Create a <code>ServiceTracker</code> on the class template
    * argument S.
    *
    * <p>
    * Services registered under the interface name of the class template
    * argument S will be tracked by this <code>ServiceTracker</code>.
    *
-   * @param context The <code>ModuleContext</code> against which the tracking
+   * \param[in] context The <code>ModuleContext</code> against which the tracking
    *        is done.
-   * @param customizer The customizer object to call when services are added,
+   * \param[in] customizer The customizer object to call when services are added,
    *        modified, or removed in this <code>ServiceTracker</code>. If
    *        customizer is null, then this <code>ServiceTracker</code> will be
    *        used as the <code>ServiceTrackerCustomizer</code> and this
@@ -321,21 +324,21 @@ public:
   ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
-   * Open this <code>ServiceTracker</code> and begin tracking services.
+   * \brief Open this <code>ServiceTracker</code> and begin tracking services.
    *
    * <p>
    * Services which match the search criteria specified when this
    * <code>ServiceTracker</code> was created are now tracked by this
    * <code>ServiceTracker</code>.
    *
-   * @throws std::logic_error If the <code>ModuleContext</code>
+   * \throws std::logic_error If the <code>ModuleContext</code>
    *         with which this <code>ServiceTracker</code> was created is no
    *         longer valid.
    */
   virtual void Open();
 
   /**
-   * Close this <code>ServiceTracker</code>.
+   * \brief Close this <code>ServiceTracker</code>.
    *
    * <p>
    * This method should be called when this <code>ServiceTracker</code> should
@@ -348,7 +351,7 @@ public:
   virtual void Close();
 
   /**
-   * Wait for at least one service to be tracked by this
+   * \brief Wait for at least one service to be tracked by this
    * <code>ServiceTracker</code>. This method will also return when this
    * <code>ServiceTracker</code> is closed.
    *
@@ -362,20 +365,20 @@ public:
    * This implementation calls GetService() to determine if a service
    * is being tracked.
    *
-   * @return Returns the result of GetService().
+   * \return Returns the result of GetService().
    */
   virtual T WaitForService(unsigned long timeoutMillis = 0);
 
   /**
-   * Return a list of <code>ServiceReference</code>s for all services being
+   * \brief Return a list of <code>ServiceReference</code>s for all services being
    * tracked by this <code>ServiceTracker</code>.
    *
-   * @return List of <code>ServiceReference</code>s.
+   * \return List of <code>ServiceReference</code>s.
    */
   virtual std::vector<ServiceReferenceType> GetServiceReferences() const;
 
   /**
-   * Returns a <code>ServiceReference</code> for one of the services being
+   * \brief Returns a <code>ServiceReference</code> for one of the services being
    * tracked by this <code>ServiceTracker</code>.
    *
    * <p>
@@ -390,25 +393,25 @@ public:
    * This implementation calls GetServiceReferences() to get the list
    * of references for the tracked services.
    *
-   * @return A <code>ServiceReference</code> for a tracked service.
-   * @throws ServiceException if no services are being tracked.
+   * \return A <code>ServiceReference</code> for a tracked service.
+   * \throws ServiceException if no services are being tracked.
    */
   virtual ServiceReferenceType GetServiceReference() const;
 
   /**
-   * Returns the service object for the specified
+   * \brief Returns the service object for the specified
    * <code>ServiceReference</code> if the specified referenced service is
    * being tracked by this <code>ServiceTracker</code>.
    *
-   * @param reference The reference to the desired service.
-   * @return A service object or <code>null</code> if the service referenced
+   * \param[in] reference The reference to the desired service.
+   * \return A service object or <code>null</code> if the service referenced
    *         by the specified <code>ServiceReference</code> is not being
    *         tracked.
    */
   virtual T GetService(const ServiceReferenceType& reference) const;
 
   /**
-   * Return a list of service objects for all services being tracked by this
+   * \brief Return a list of service objects for all services being tracked by this
    * <code>ServiceTracker</code>.
    *
    * <p>
@@ -417,46 +420,46 @@ public:
    * GetService(const ServiceReference&) for each reference to get the
    * tracked service object.
    *
-   * @return A list of service objects or an empty list if no services
+   * \return A list of service objects or an empty list if no services
    *         are being tracked.
    */
   virtual std::vector<T> GetServices() const;
 
   /**
-   * Returns a service object for one of the services being tracked by this
+   * \brief Returns a service object for one of the services being tracked by this
    * <code>ServiceTracker</code>.
    *
    * <p>
    * If any services are being tracked, this implementation returns the result
    * of calling <code>%GetService(%GetServiceReference())</code>.
    *
-   * @return A service object or <code>null</code> if no services are being
+   * \return A service object or <code>null</code> if no services are being
    *         tracked.
    */
   virtual T GetService() const;
 
   /**
-   * Remove a service from this <code>ServiceTracker</code>.
+   * \brief Remove a service from this <code>ServiceTracker</code>.
    *
    * The specified service will be removed from this
    * <code>ServiceTracker</code>. If the specified service was being tracked
    * then the <code>ServiceTrackerCustomizer::RemovedService</code> method will
    * be called for that service.
    *
-   * @param reference The reference to the service to be removed.
+   * \param[in] reference The reference to the service to be removed.
    */
   virtual void Remove(const ServiceReferenceType& reference);
 
   /**
-   * Return the number of services being tracked by this
+   * \brief Return the number of services being tracked by this
    * <code>ServiceTracker</code>.
    *
-   * @return The number of services being tracked.
+   * \return The number of services being tracked.
    */
   virtual int Size() const;
 
   /**
-   * Returns the tracking count for this <code>ServiceTracker</code>.
+   * \brief Returns the tracking count for this <code>ServiceTracker</code>.
    *
    * The tracking count is initialized to 0 when this
    * <code>ServiceTracker</code> is opened. Every time a service is added,
@@ -471,19 +474,19 @@ public:
    * been added, modified or removed from this <code>ServiceTracker</code>
    * since the previous tracking count was collected.
    *
-   * @return The tracking count for this <code>ServiceTracker</code> or -1 if
+   * \return The tracking count for this <code>ServiceTracker</code> or -1 if
    *         this <code>ServiceTracker</code> is not open.
    */
   virtual int GetTrackingCount() const;
 
   /**
-   * Return a sorted map of the <code>ServiceReference</code>s and
+   * \brief Return a sorted map of the <code>ServiceReference</code>s and
    * service objects for all services being tracked by this
    * <code>ServiceTracker</code>. The map is sorted in natural order
    * of <code>ServiceReference</code>. That is, the last entry is the service
    * with the highest ranking and the lowest service id.
    *
-   * @param tracked A <code>TrackingMap</code> with the <code>ServiceReference</code>s
+   * \param[out] tracked A <code>TrackingMap</code> with the <code>ServiceReference</code>s
    *         and service objects for all services being tracked by this
    *         <code>ServiceTracker</code>. If no services are being tracked,
    *         then the returned map is empty.
@@ -491,9 +494,9 @@ public:
   virtual void GetTracked(TrackingMap& tracked) const;
 
   /**
-   * Return if this <code>ServiceTracker</code> is empty.
+   * \brief Return if this <code>ServiceTracker</code> is empty.
    *
-   * @return <code>true</code> if this <code>ServiceTracker</code> is not tracking any
+   * \return <code>true</code> if this <code>ServiceTracker</code> is not tracking any
    *         services.
    */
   virtual bool IsEmpty() const;
@@ -501,7 +504,7 @@ public:
 protected:
 
   /**
-   * Default implementation of the
+   * \brief Default implementation of the
    * <code>ServiceTrackerCustomizer::AddingService</code> method.
    *
    * <p>
@@ -520,16 +523,16 @@ protected:
    * \link RemovedService(const ServiceReferenceType&, T service) removedService\endlink
    * to unget the service.
    *
-   * @param reference The reference to the service being added to this
+   * \param[in] reference The reference to the service being added to this
    *        <code>ServiceTracker</code>.
-   * @return The service object to be tracked for the service added to this
+   * \return The service object to be tracked for the service added to this
    *         <code>ServiceTracker</code>.
-   * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
+   * \sa ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
   T AddingService(const ServiceReferenceType& reference) override;
 
   /**
-   * Default implementation of the
+   * \brief Default implementation of the
    * <code>ServiceTrackerCustomizer::ModifiedService</code> method.
    *
    * <p>
@@ -539,14 +542,14 @@ protected:
    * <p>
    * This implementation does nothing.
    *
-   * @param reference The reference to modified service.
-   * @param service The service object for the modified service.
-   * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
+   * \param[in] reference The reference to modified service.
+   * \param[in] service The service object for the modified service.
+   * \sa ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
   void ModifiedService(const ServiceReferenceType& reference, T service) override;
 
   /**
-   * Default implementation of the
+   * \brief Default implementation of the
    * <code>ServiceTrackerCustomizer::RemovedService</code> method.
    *
    * <p>
@@ -562,9 +565,9 @@ protected:
    * implementation of \link AddingService(const ServiceReferenceType&) AddingService\endlink
    * method was used, this method must unget the service.
    *
-   * @param reference The reference to removed service.
-   * @param service The service object for the removed service.
-   * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, T)
+   * \param[in] reference The reference to removed service.
+   * \param[in] service The service object for the removed service.
+   * \sa ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, T)
    */
   void RemovedService(const ServiceReferenceType& reference, T service) override;
 

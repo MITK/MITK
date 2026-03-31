@@ -231,15 +231,14 @@ public:
 
   /**
    * \brief Returns a string representation for the content.
+   * If this Any is empty, returns an empty string.
    *
    * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
    * function or specialize the any_value_to_string template function for meaningful output.
-   *
-   * \pre Empty() returns \c false.
    */
   std::string ToString() const
   {
-    return _content->ToString();
+    return Empty() ? std::string() : _content->ToString();
   }
 
   /**

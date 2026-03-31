@@ -253,6 +253,7 @@ time_t ModuleResource::GetLastModified() const
 
 std::size_t ModuleResource::Hash() const
 {
+  if (!IsValid()) return 0;
   using namespace std;
   return std::hash<std::string>()(d->resourceContainer->GetModuleInfo()->name + this->GetResourcePath());
 }

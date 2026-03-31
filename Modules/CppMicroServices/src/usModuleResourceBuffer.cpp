@@ -83,7 +83,7 @@ ModuleResourceBuffer::ModuleResourceBuffer(void* data, std::size_t _size,
 #endif
 
 #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
-  if (data != nullptr && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
+  if (data != nullptr && size > 0 && !(mode & std::ios_base::binary) && begin[size-1] == '\n')
   {
     --size;
   }
@@ -202,6 +202,7 @@ std::streambuf::pos_type ModuleResourceBuffer::seekoff(std::streambuf::off_type 
     d->current = d->end;
     step = -1;
   }
+  // for std::ios_base::cur, d->current stays where it is
 
   if (!(d->mode & std::ios_base::binary))
   {
@@ -213,6 +214,7 @@ std::streambuf::pos_type ModuleResourceBuffer::seekoff(std::streambuf::off_type 
     {
       d->current -= 1;
     }
+    // for std::ios_base::cur, d->pos stays at its current value
 
     std::streambuf::off_type i = 0;
     // scan through off amount of characters excluding '\r'

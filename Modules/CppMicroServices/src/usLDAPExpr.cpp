@@ -190,27 +190,18 @@ bool LDAPExpr::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
         {
           // if AND op and classes in several operands,
           // then only the intersection is possible.
-          LDAPExpr::ObjectClassSet::iterator it1 = objClasses.begin();
-          LDAPExpr::ObjectClassSet::iterator it2 = r.begin();
-          while ( (it1 != objClasses.end()) && (it2 != r.end()) )
+          for (LDAPExpr::ObjectClassSet::iterator it1 = objClasses.begin();
+               it1 != objClasses.end(); )
           {
-            if (*it1 < *it2)
+            if (r.find(*it1) == r.end())
             {
               objClasses.erase(it1++);
             }
-            else if (*it2 < *it1)
-            {
-              ++it2;
-            }
             else
-            { // *it1 == *it2
+            {
               ++it1;
-              ++it2;
             }
           }
-          // Anything left in set_1 from here on did not appear in set_2,
-          // so we remove it.
-          objClasses.erase(it1, objClasses.end());
         }
       }
     }
@@ -361,7 +352,7 @@ bool LDAPExpr::Compare( const Any& obj, int op, const std::string& s ) const
         return false;
 
       std::string boolVal = any_cast<bool>(obj) ? "true" : "false";
-      return std::equal(s.begin(), s.end(), boolVal.begin(), stricomp);
+      return s.size() == boolVal.size() && std::equal(s.begin(), s.end(), boolVal.begin(), stricomp);
     }
     else if (objType == typeid(short))
     {

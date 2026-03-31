@@ -121,7 +121,7 @@ public:
 Q_SIGNALS:
   /**
    * \brief Emitted when the set of selected nodes has changed.
-   * \param[out] nodes The newly selected data nodes.
+   * \param[in] nodes The newly selected data nodes.
    */
   void CurrentSelectionChanged(NodeList nodes);
 

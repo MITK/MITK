@@ -76,7 +76,7 @@ Q_SIGNALS:
    * The node list includes non-visible nodes from a previous SetCurrentSelection
    * call if selectOnlyVisibleNodes is false.
    *
-   * \param[out] nodes The newly selected data nodes.
+   * \param[in] nodes The newly selected data nodes.
    */
   void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 

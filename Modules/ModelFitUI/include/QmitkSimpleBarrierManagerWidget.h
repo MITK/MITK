@@ -62,7 +62,7 @@ public:
 signals:
   /**
    * \brief Emitted when a constraint is changed.
-   * \param[out] constraint The modified constraint.
+   * \param[in] constraint The modified constraint.
    */
   void ConstraintChanged(mitk::SimpleBarrierConstraintChecker::Constraint constraint);
 

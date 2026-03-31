@@ -75,7 +75,7 @@ signals:
 
   /**
    * \brief Emitted when the View button is clicked to load selected series.
-   * \param[out] series A vector of pairs, each containing the first file path of a series
+   * \param[in] series A vector of pairs, each containing the first file path of a series
    *             and optionally its DICOM Modality string (tag 0008,0060).
    */
   void ViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);

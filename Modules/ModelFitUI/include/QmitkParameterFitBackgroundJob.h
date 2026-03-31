@@ -102,25 +102,25 @@ signals:
     void Finished();
 
     /** \brief Emitted when an error occurs during fitting.
-     *  \param[out] err Description of the error. */
+     *  \param[in] err Description of the error. */
     void Error(QString err);
 
     /**
      * \brief Emitted when the fit results are available.
-     * \param[out] resultMap Vector of data nodes containing the generated result images.
-     * \param[out] pJob Pointer to this job instance for identification.
+     * \param[in] resultMap Vector of data nodes containing the generated result images.
+     * \param[in] pJob Pointer to this job instance for identification.
      */
     void ResultsAreAvailable(mitk::modelFit::ModelFitResultNodeVectorType resultMap, const ParameterFitBackgroundJob* pJob);
 
     /**
      * \brief Emitted to report the progress of the fitting process.
-     * \param[out] progress The current progress value (0.0 to 1.0).
+     * \param[in] progress The current progress value (0.0 to 1.0).
      */
     void JobProgress(double progress);
 
     /**
      * \brief Emitted to report status changes during the fitting process.
-     * \param[out] info A human-readable status message.
+     * \param[in] info A human-readable status message.
      */
     void JobStatusChanged(QString info);
 

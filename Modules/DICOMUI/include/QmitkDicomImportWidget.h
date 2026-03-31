@@ -60,13 +60,13 @@ signals:
 
   /**
    * \brief Emitted when a request is made to import DICOM data into local storage.
-   * \param[out] files The list of file paths for all series in the current selection.
+   * \param[in] files The list of file paths for all series in the current selection.
    */
   void Import(const QStringList& files);
 
   /**
    * \brief Emitted when the View button is clicked to load selected series.
-   * \param[out] series A vector of pairs, each containing the first file path of a series
+   * \param[in] series A vector of pairs, each containing the first file path of a series
    *             and optionally its DICOM Modality string (tag 0008,0060).
    */
   void ViewSeries(const std::vector<std::pair<std::string, std::optional<std::string>>>& series);

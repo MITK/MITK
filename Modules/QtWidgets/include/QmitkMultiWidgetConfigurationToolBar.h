@@ -61,38 +61,38 @@ Q_SIGNALS:
 
   /**
    * \brief Emitted when a grid layout is selected.
-   * \param[out] row    The number of rows.
-   * \param[out] column The number of columns.
+   * \param[in] row    The number of rows.
+   * \param[in] column The number of columns.
    */
   void LayoutSet(int row, int column);
 
   /**
    * \brief Emitted when the user requests to save the current layout.
-   * \param[out] outStream The output stream to write the layout to.
+   * \param[in] outStream The output stream to write the layout to.
    */
   void SaveLayout(std::ostream* outStream);
 
   /**
    * \brief Emitted when the user requests to load a layout from JSON.
-   * \param[out] jsonData The JSON data to load from.
+   * \param[in] jsonData The JSON data to load from.
    */
   void LoadLayout(const nlohmann::json* jsonData);
 
   /**
    * \brief Emitted when a data-based layout is requested.
-   * \param[out] nodes The selected data nodes for the layout.
+   * \param[in] nodes The selected data nodes for the layout.
    */
   void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
 
   /**
    * \brief Emitted when the synchronization state changes.
-   * \param[out] synchronized True if synchronized scrolling is enabled.
+   * \param[in] synchronized True if synchronized scrolling is enabled.
    */
   void Synchronized(bool synchronized);
 
   /**
    * \brief Emitted when the interaction scheme changes.
-   * \param[out] scheme The new interaction scheme.
+   * \param[in] scheme The new interaction scheme.
    */
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 

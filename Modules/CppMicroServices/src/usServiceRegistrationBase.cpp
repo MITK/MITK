@@ -174,6 +174,12 @@ void ServiceRegistrationBase::Unregister()
           unregisteringEvent);
   }
 
+  // Copy service data under lock, then call UngetService outside the lock
+  // to avoid potential deadlock if the factory callback accesses properties.
+  ServiceFactory* serviceFactory = nullptr;
+  ServiceRegistrationBasePrivate::ModuleToServicesMap prototypesCopy;
+  ServiceRegistrationBasePrivate::ModuleToServiceMap moduleSvcCopy;
+
   {
     MutexLock lock(d->eventLock);
     {
@@ -182,44 +188,9 @@ void ServiceRegistrationBase::Unregister()
       InterfaceMap::const_iterator factoryIter = d->service.find("org.cppmicroservices.factory");
       if (d->module && factoryIter != d->service.end())
       {
-        ServiceFactory* serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
-        ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator end = d->prototypeServiceInstances.end();
-
-        // unget all prototype services
-        for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = d->prototypeServiceInstances.begin();
-             i != end; ++i)
-        {
-          for (std::list<InterfaceMap>::const_iterator listIter = i->second.begin();
-               listIter != i->second.end(); ++listIter)
-          {
-            const InterfaceMap& service = *listIter;
-            try
-            {
-              // NYI, don't call inside lock
-              serviceFactory->UngetService(i->first, *this, service);
-            }
-            catch (const std::exception& /*ue*/)
-            {
-              MITK_WARN << "ServiceFactory UngetService implementation threw an exception";
-            }
-          }
-        }
-
-        // unget module scope services
-        ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator moduleEnd = d->moduleServiceInstance.end();
-        for (ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator i = d->moduleServiceInstance.begin();
-             i != moduleEnd; ++i)
-        {
-          try
-          {
-            // NYI, don't call inside lock
-            serviceFactory->UngetService(i->first, *this, i->second);
-          }
-          catch (const std::exception& /*ue*/)
-          {
-            MITK_WARN << "ServiceFactory UngetService implementation threw an exception";
-          }
-        }
+        serviceFactory = reinterpret_cast<ServiceFactory*>(factoryIter->second);
+        prototypesCopy = d->prototypeServiceInstances;
+        moduleSvcCopy = d->moduleServiceInstance;
       }
       d->module = nullptr;
       d->dependents.clear();
@@ -231,6 +202,40 @@ void ServiceRegistrationBase::Unregister()
       d->ref.Ref();
       d->reference = 0;
       d->unregistering = false;
+    }
+  }
+
+  // Call UngetService outside the lock
+  if (serviceFactory != nullptr)
+  {
+    for (ServiceRegistrationBasePrivate::ModuleToServicesMap::const_iterator i = prototypesCopy.begin();
+         i != prototypesCopy.end(); ++i)
+    {
+      for (std::list<InterfaceMap>::const_iterator listIter = i->second.begin();
+           listIter != i->second.end(); ++listIter)
+      {
+        try
+        {
+          serviceFactory->UngetService(i->first, *this, *listIter);
+        }
+        catch (const std::exception& /*ue*/)
+        {
+          MITK_WARN << "ServiceFactory UngetService implementation threw an exception";
+        }
+      }
+    }
+
+    for (ServiceRegistrationBasePrivate::ModuleToServiceMap::const_iterator i = moduleSvcCopy.begin();
+         i != moduleSvcCopy.end(); ++i)
+    {
+      try
+      {
+        serviceFactory->UngetService(i->first, *this, i->second);
+      }
+      catch (const std::exception& /*ue*/)
+      {
+        MITK_WARN << "ServiceFactory UngetService implementation threw an exception";
+      }
     }
   }
 }

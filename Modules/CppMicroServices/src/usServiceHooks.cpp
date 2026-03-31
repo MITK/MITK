@@ -204,6 +204,7 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* lh = listenerHookTracker->GetService(*srIter);
+      if (lh == nullptr) continue;
       try
       {
         lh->Added(set);
@@ -256,6 +257,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* const lh = listenerHookTracker->GetService(*srIter);
+      if (lh == nullptr) continue;
       try
       {
         lh->Removed(lis);

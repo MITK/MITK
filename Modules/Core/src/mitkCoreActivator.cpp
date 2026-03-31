@@ -87,24 +87,6 @@ found in the LICENSE file.
 
 namespace
 {
-  void HandleMicroServicesMessages(us::MsgType type, const char* msg)
-  {
-    switch (type)
-    {
-    case us::DebugMsg:
-      MITK_DEBUG << msg;
-      break;
-    case us::InfoMsg:
-      MITK_INFO << msg;
-      break;
-    case us::WarningMsg:
-      MITK_WARN << msg;
-      break;
-    case us::ErrorMsg:
-      MITK_ERROR << msg;
-      break;
-    }
-  }
 
   void AddMitkAutoLoadPaths(const std::string& programPath)
   {
@@ -245,9 +227,6 @@ protected:
 void MitkCoreActivator::Load(us::ModuleContext *context)
 {
   LimitDefaultNumberOfThreads(16);
-
-  // Handle messages from CppMicroServices
-  us::installMsgHandler(HandleMicroServicesMessages);
 
   this->m_Context = context;
 

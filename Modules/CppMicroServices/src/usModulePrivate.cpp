@@ -64,10 +64,6 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   {
     Any versionAny = moduleManifest.GetValue(Module::PROP_VERSION());
     std::string errMsg;
-    if (versionAny.Type() != typeid(std::string))
-    {
-      errMsg = std::string("The version identifier must be a string");
-    }
     try
     {
       version = ModuleVersion(versionAny.ToString());
@@ -75,10 +71,6 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
     catch (const std::exception& e)
     {
       errMsg = std::string("The version identifier is invalid: ") + e.what();
-    }
-
-    if (!errMsg.empty())
-    {
       throw std::invalid_argument(std::string("The Json value for ") + Module::PROP_VERSION() + " for module " +
                                   info->location + " is not valid: " + errMsg);
     }

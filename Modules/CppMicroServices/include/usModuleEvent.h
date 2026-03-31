@@ -119,17 +119,17 @@ public:
 
   /**
    * \brief Returns the module which had a lifecycle change.
+   * If this is a null event (default-constructed), returns \c nullptr.
    *
-   * \pre IsNull() returns \c false.
-   *
-   * \return The module that had a change occur in its lifecycle.
+   * \return The module that had a change occur in its lifecycle,
+   *         or \c nullptr for null events.
    */
   Module* GetModule() const;
 
   /**
    * \brief Returns the type of lifecycle event.
    *
-   * \pre IsNull() returns \c false.
+   * \throws std::logic_error If this ModuleEvent is null (default-constructed).
    *
    * The type values are:
    * <ul>

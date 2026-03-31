@@ -45,7 +45,7 @@ public:
 
   enum Type {
     /**
-     * \brief No exception type is unspecified.
+     * \brief The exception type is unspecified.
      */
     UNSPECIFIED = 0,
     /**

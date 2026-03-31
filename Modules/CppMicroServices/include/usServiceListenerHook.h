@@ -72,12 +72,16 @@ struct MITKCPPMICROSERVICES_EXPORT ServiceListenerHook
     /**
      * \brief Return the context of the module which added the listener.
      *
+     * \pre IsNull() returns \c false.
+     *
      * \return The context of the module which added the listener.
      */
     ModuleContext* GetModuleContext() const;
 
     /**
      * \brief Return the filter string with which the listener was added.
+     *
+     * \pre IsNull() returns \c false.
      *
      * \return The filter string with which the listener was added. This may
      *         be empty if the listener was added without a filter.

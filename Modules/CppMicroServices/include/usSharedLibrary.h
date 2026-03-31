@@ -161,8 +161,8 @@ public:
   std::string GetLibraryPath() const;
 
   /**
-   * \brief Sets the suffix for shared library names (e.g. lib). Does nothing if the shared
-   * library is already loaded or the SharedLibrary(const std::string&)
+   * \brief Sets the suffix for shared library names (e.g. .dll or .so). Does nothing if the
+   * shared library is already loaded or the SharedLibrary(const std::string&)
    * constructor was used.
    *
    * \param[in] suffix The shared library name suffix.
@@ -177,7 +177,7 @@ public:
   std::string GetSuffix() const;
 
   /**
-   * \brief Sets the file name prefix for shared library names (e.g. .dll or .so).
+   * \brief Sets the file name prefix for shared library names (e.g. lib).
    * Does nothing if the shared library is already loaded or the
    * SharedLibrary(const std::string&) constructor was used.
    *

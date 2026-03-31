@@ -234,6 +234,8 @@ public:
    *
    * Custom types should either provide a <code>std::ostream& operator<<(std::ostream& os, const CustomType& ct)</code>
    * function or specialize the any_value_to_string template function for meaningful output.
+   *
+   * \pre Empty() returns \c false.
    */
   std::string ToString() const
   {

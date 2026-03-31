@@ -120,6 +120,7 @@ public:
    * There must be no whitespace in version.
    *
    * \param[in] version string representation of the version identifier.
+   * \throws std::invalid_argument If \c version is not a valid version string.
    */
   ModuleVersion(const std::string& version);
 
@@ -158,6 +159,7 @@ public:
    * \brief Returns the majorVersion component of this version identifier.
    *
    * \return The majorVersion component.
+   * \throws std::logic_error If this version is undefined.
    */
   unsigned int GetMajor() const;
 
@@ -165,6 +167,7 @@ public:
    * \brief Returns the minorVersion component of this version identifier.
    *
    * \return The minorVersion component.
+   * \throws std::logic_error If this version is undefined.
    */
   unsigned int GetMinor() const;
 
@@ -172,6 +175,7 @@ public:
    * \brief Returns the microVersion component of this version identifier.
    *
    * \return The microVersion component.
+   * \throws std::logic_error If this version is undefined.
    */
   unsigned int GetMicro() const;
 
@@ -179,6 +183,7 @@ public:
    * \brief Returns the qualifier component of this version identifier.
    *
    * \return The qualifier component.
+   * \throws std::logic_error If this version is undefined.
    */
   std::string GetQualifier() const;
 
@@ -231,6 +236,7 @@ public:
    * \return A negative integer, zero, or a positive integer if this object is
    *         less than, equal to, or greater than the specified
    *         <code>ModuleVersion</code> object.
+   * \throws std::logic_error If either version is undefined.
    */
   int Compare(const ModuleVersion& object) const;
 

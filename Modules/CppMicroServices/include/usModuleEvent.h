@@ -120,12 +120,18 @@ public:
   /**
    * \brief Returns the module which had a lifecycle change.
    *
+   * \pre IsNull() returns \c false.
+   *
    * \return The module that had a change occur in its lifecycle.
    */
   Module* GetModule() const;
 
   /**
-   * \brief Returns the type of lifecycle event. The type values are:
+   * \brief Returns the type of lifecycle event.
+   *
+   * \pre IsNull() returns \c false.
+   *
+   * The type values are:
    * <ul>
    * <li>{@link #LOADING}
    * <li>{@link #LOADED}

@@ -72,6 +72,8 @@ public:
    * been unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   *
    * \param[in] key The property key.
    * \return The property value to which the key is mapped; an invalid Any
    *         if there is no property named after the key.
@@ -87,6 +89,8 @@ public:
    * This method will continue to return the keys after the service has been
    * unregistered. This is so references to unregistered services can
    * still be interrogated.
+   *
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
    *
    * \param[out] keys A vector being filled with the property keys.
    */
@@ -112,6 +116,8 @@ public:
    * \brief Returns the modules that are using the service referenced by this
    * <code>ServiceReferenceBase</code> object. Specifically, this method returns
    * the modules whose usage count for that service is greater than zero.
+   *
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
    *
    * \param[out] modules A list of modules whose usage count for the service referenced
    *         by this <code>ServiceReferenceBase</code> object is greater than

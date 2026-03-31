@@ -144,6 +144,8 @@ public:
    * <p>
    * This reference is the source of the event.
    *
+   * \pre IsNull() returns \c false.
+   *
    * \return Reference to the service that had a lifecycle change.
    */
   ServiceReferenceU GetServiceReference() const;
@@ -161,7 +163,11 @@ public:
   }
 
   /**
-   * \brief Returns the type of event. The event type values are:
+   * \brief Returns the type of event.
+   *
+   * \pre IsNull() returns \c false.
+   *
+   * The event type values are:
    * <ul>
    * <li>{@link #REGISTERED} </li>
    * <li>{@link #MODIFIED} </li>

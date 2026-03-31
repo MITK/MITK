@@ -240,7 +240,7 @@ public:
    * method returns an empty Any if the property is not found.
    *
    * \param[in] key The name of the requested property.
-   * \return The value of the requested property, or an empty string
+   * \return The value of the requested property, or an empty Any
    *         if the property is undefined.
    *
    * \sa GetPropertyKeys()

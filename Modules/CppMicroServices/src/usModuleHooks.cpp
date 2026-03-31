@@ -76,6 +76,7 @@ void ModuleHooks::FilterModules(const ModuleContext* mc, std::vector<Module*>& m
         MITK_WARN << "Failed to call Module FindHook  #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
                 << ": unknown exception type";
       }
+      sr.d->UngetService(GetModuleContext()->GetModule(), false);
     }
   }
 }
@@ -137,6 +138,7 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
           MITK_WARN << "Failed to call Module EventHook #" << sr.GetProperty(ServiceConstants::SERVICE_ID()).ToString()
                   << ": unknown exception type";
         }
+        sr.d->UngetService(GetModuleContext()->GetModule(), false);
       }
     }
 

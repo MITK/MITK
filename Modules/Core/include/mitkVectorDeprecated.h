@@ -21,6 +21,11 @@ found in the LICENSE file.
 #include <mitkPoint.h>
 #include <mitkVector.h>
 
+/** \brief Traits class for extracting the value type from various vector/array types.
+ *
+ * Specializations exist for common ITK, VNL, and MITK vector and point types.
+ * \tparam T The vector or array type.
+ */
 template <class T>
 class VectorTraits
 {
@@ -200,6 +205,10 @@ public:
 
 namespace mitk
 {
+  /** \brief Copy a 3D ITK-style vector/point to a VTK-style array.
+   *
+   * \deprecated Use mitk::ToArray() instead.
+   */
   template <class Tin, class Tout>
   inline void itk2vtk(const Tin &in, Tout &out)
   {
@@ -208,6 +217,10 @@ namespace mitk
     out[2] = (typename VectorTraits<Tout>::ValueType)(in[2]);
   }
 
+  /** \brief Copy a 3D VTK-style array to an ITK-style vector/point.
+   *
+   * \deprecated Use mitk::FillArray() instead.
+   */
   template <class Tin, class Tout>
   inline void vtk2itk(const Tin &in, Tout &out)
   {
@@ -216,6 +229,10 @@ namespace mitk
     out[2] = (typename VectorTraits<Tout>::ValueType)(in[2]);
   }
 
+  /** \brief Copy elements from a vnl_vector to a raw array.
+   *
+   * \deprecated Use mitk::ToArray() instead.
+   */
   template <class Tin, class Tout>
   inline void vnl2vtk(const vnl_vector<Tin> &in, Tout *out)
   {
@@ -224,6 +241,10 @@ namespace mitk
       out[i] = (Tout)(in[i]);
   }
 
+  /** \brief Copy elements from a raw array to a vnl_vector.
+   *
+   * \deprecated Use mitk::FillArray() instead.
+   */
   template <class Tin, class Tout>
   inline void vtk2vnl(const Tin *in, vnl_vector<Tout> &out)
   {
@@ -232,6 +253,10 @@ namespace mitk
       out[i] = (Tout)(in[i]);
   }
 
+  /** \brief Copy elements from a vnl_vector_fixed to a raw array.
+   *
+   * \deprecated Use mitk::ToArray() instead.
+   */
   template <class Tin, class Tout, unsigned int n>
   inline void vnl2vtk(const vnl_vector_fixed<Tin, n> &in, Tout *out)
   {
@@ -240,6 +265,10 @@ namespace mitk
       out[i] = (Tout)(in[i]);
   }
 
+  /** \brief Copy elements from a raw array to a vnl_vector_fixed.
+   *
+   * \deprecated Use mitk::FillArray() instead.
+   */
   template <class Tin, class Tout, unsigned int n>
   inline void vtk2vnl(const Tin *in, vnl_vector_fixed<Tout, n> &out)
   {
@@ -248,6 +277,10 @@ namespace mitk
       out[i] = (Tout)(in[i]);
   }
 
+  /** \brief Copy elements from one itk::Matrix to another, possibly with different element types.
+   *
+   * \deprecated Prefer direct assignment if types match.
+   */
   template <typename U, typename V, unsigned int NRows, unsigned int NColumns>
   inline void TransferMatrix(const itk::Matrix<U, NRows, NColumns> &in, itk::Matrix<V, NRows, NColumns> &out)
   {

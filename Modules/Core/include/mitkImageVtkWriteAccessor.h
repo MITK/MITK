@@ -23,26 +23,33 @@ namespace mitk
   class ImageDataItem;
 
   /**
-   * @brief ImageVtkWriteAccessor class provides any image write access which is required by Vtk methods
-   * @ingroup Data
+   * \brief Provides write access to image data in the form required by VTK methods.
+   *
+   * This class locks the image data for writing and provides access to the
+   * underlying vtkImageData representation.
+   *
+   * \ingroup Data
    */
   class MITKCORE_EXPORT ImageVtkWriteAccessor : public ImageAccessorBase
   {
   public:
     typedef itk::SmartPointer<Image> ImagePointer;
 
-    /** \brief Creates an ImageVtkWriteAccessor for a whole Image
-     *  \param iP specifies the associated Image
-     *  \param iDI
-     *  \param imageDataVtk
+    /** \brief Creates an ImageVtkWriteAccessor for a whole Image.
+     *  \param iP The associated Image (smart pointer).
+     *  \param iDI The image data item describing the allocated image part.
+     *  \param imageDataVtk The VTK image data representation to provide access to.
      */
     ImageVtkWriteAccessor(ImagePointer iP, const ImageDataItem *iDI, vtkImageData *imageDataVtk);
 
+    /** \brief Destructor unregisters this accessor from the image. */
     ~ImageVtkWriteAccessor() override;
 
+    /** \brief Returns the VTK image data for write access. */
     vtkImageData *GetVtkImageData() const;
 
   protected:
+    /** \brief Returns a const pointer to the associated Image. */
     const Image *GetImage() const override;
 
   private:

@@ -21,9 +21,12 @@ namespace mitk
 {
   class Image;
 
-  /** \brief An Operation for applying an edited slice to the a group of a MultiLabelSegmentation.
+  /** \brief An Operation for removing groups from a MultiLabelSegmentation.
+
     \sa SegChangeOperationApplier
-    This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
+
+    This Operation can be used to realize undo-redo functionality for group
+    removal in segmentation workflows. It stores the indices of the groups to be removed.
   */
   class MITKSEGMENTATION_EXPORT SegGroupRemoveOperation : public SegChangeOperationBase
   {
@@ -32,12 +35,16 @@ namespace mitk
 
     using GroupIndexSetType = std::set<MultiLabelSegmentation::GroupIndexType>;
 
-    /** \brief */
+    /** \brief Construct a remove operation for the specified groups.
+      \param segmentation The target segmentation.
+      \param removalGroupIDs The set of group indices to remove.
+    */
     SegGroupRemoveOperation(MultiLabelSegmentation* segmentation,
       const GroupIndexSetType& removalGroupIDs);
 
     ~SegGroupRemoveOperation() override = default;
 
+    /** \brief Get the group indices to be removed. */
     GroupIndexSetType GetGroupIDs() const;
 
     // Explicitly delete copy operations because internally std::unique_ptr are used.

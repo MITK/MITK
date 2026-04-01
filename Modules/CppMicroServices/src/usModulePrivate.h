@@ -31,51 +31,59 @@ class ModuleContext;
 struct ModuleActivator;
 
 /**
+ * \brief Internal implementation data for a Module.
+ *
+ * This class is not part of the public API.
+ *
  * \ingroup MicroServices
+ * \sa Module ModuleContext ModuleInfo
  */
 class ModulePrivate {
 
 public:
 
   /**
-   * Construct a new module based on a ModuleInfo object.
+   * \brief Construct a new module based on a ModuleInfo object.
+   *
+   * \param[in] qq The public Module instance (q-pointer).
+   * \param[in] coreCtx The shared core module context.
+   * \param[in] info Module metadata used for initialization.
    */
   ModulePrivate(Module* qq, CoreModuleContext* coreCtx, ModuleInfo* info);
 
+  /** \brief Destructor. */
   virtual ~ModulePrivate();
 
+  /** \brief Remove all registered resources for this module. */
   void RemoveModuleResources();
 
-  CoreModuleContext* const coreCtx;
+  CoreModuleContext* const coreCtx; ///< \brief The shared core module context.
 
-  /**
-   * Module version
-   */
+  /** \brief Module version. */
   ModuleVersion version;
 
-  ModuleInfo info;
+  ModuleInfo info; ///< \brief Module metadata.
 
-  ModuleResourceContainer resourceContainer;
+  ModuleResourceContainer resourceContainer; ///< \brief Container for embedded resources.
 
-  /**
-   * ModuleContext for the module
-   */
+  /** \brief ModuleContext for the module. */
   ModuleContext* moduleContext;
 
-  ModuleActivator* moduleActivator;
+  ModuleActivator* moduleActivator; ///< \brief Optional activator for start/stop callbacks.
 
-  ModuleManifest moduleManifest;
+  ModuleManifest moduleManifest; ///< \brief Parsed manifest properties.
 
-  std::string baseStoragePath;
-  std::string storagePath;
+  std::string baseStoragePath; ///< \brief Base persistent storage path.
+  std::string storagePath; ///< \brief Module-specific persistent storage path.
 
-  Module* const q;
+  Module* const q; ///< \brief Pointer to the public Module (q-pointer pattern).
 
 private:
 
+  /** \brief Load and initialize embedded module resources. */
   void InitializeResources();
 
-  static AtomicInt idCounter;
+  static AtomicInt idCounter; ///< \brief Global module ID counter.
 
   // purposely not implemented
   ModulePrivate(const ModulePrivate&);

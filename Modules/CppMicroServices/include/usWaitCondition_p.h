@@ -64,10 +64,10 @@ public:
 
   bool Wait(unsigned long time = 0);
 
-  /** Notify that the condition is true and release one waiting thread */
+  /** \brief Notify that the condition is true and release one waiting thread. */
   void Notify();
 
-  /** Notify that the condition is true and release all waiting threads */
+  /** \brief Notify that the condition is true and release all waiting threads. */
   void NotifyAll();
 
 private:
@@ -76,7 +76,7 @@ private:
   WaitCondition(const WaitCondition& other);
   const WaitCondition& operator=(const WaitCondition&);
 
-  /** Suspend execution of this thread until the condition is signaled. The
+  /** \brief Suspend execution of this thread until the condition is signaled. The
    *  argument is a SimpleMutex object that must be locked prior to calling
    *  this method.  */
   bool Wait(Mutex& mutex, unsigned long time = 0);

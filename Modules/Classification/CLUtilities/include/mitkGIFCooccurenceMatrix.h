@@ -37,13 +37,36 @@ namespace mitk
 
       GIFCooccurenceMatrix();
 
+      /**
+       * \brief Calculate co-occurrence matrix features for the given image and mask.
+       *
+       * \param[in] image The input intensity image.
+       * \param[in] mask The binary mask defining the region of interest.
+       * \param[in] maskNoNAN The mask with NaN voxels excluded.
+       * \return A list of computed feature name-value pairs.
+       */
       FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
       using Superclass::CalculateFeatures;
 
+      /** \brief Get the distance ranges used for co-occurrence computation. */
       itkGetConstMacro(Ranges, std::vector<double>);
+
+      /**
+       * \brief Set multiple distance ranges for co-occurrence computation.
+       * \param[in] ranges Vector of distances between co-occurring voxels.
+       */
       void SetRanges(std::vector<double> ranges);
+
+      /**
+       * \brief Set a single distance range for co-occurrence computation.
+       * \param[in] range The distance between co-occurring voxels.
+       */
       void SetRange(double range);
 
+      /**
+       * \brief Add command line arguments for configuring this feature class.
+       * \param[in,out] parser The command line parser to add arguments to.
+       */
       void AddArguments(mitkCommandLineParser& parser) const override;
 
   protected:

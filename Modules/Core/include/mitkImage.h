@@ -44,28 +44,34 @@ namespace mitk
   class ImageStatisticsHolder;
 
   /**
-    * @brief Image class for storing images
-    *
-    * Can be asked for header information, the data vector, or vtkImageData objects.
-    * If not the complete data is required, the appropriate SubImageSelector class
-    * should be used for access.
-    * Image organizes sets of slices (s x 2D), volumes (t x 3D) and channels (n
-    * x ND). Channels are for different kind of data, e.g., morphology in
-    * channel 0, velocities in channel 1. All channels must have the same Geometry! In
-    * particular, the dimensions of all channels are the same, only the pixel-type
-    * may differ between channels.
-    *
-    * For importing ITK images use of mitk::ITKImageImport is recommended, see
-    * \ref Adaptor.
-    *
-    * For ITK v3.8 and older: Converting coordinates from the ITK physical
-    * coordinate system (which does not support rotated images) to the MITK world
-    * coordinate system should be performed via the BaseGeometry of the Image, see
-    * BaseGeometry::WorldToItkPhysicalPoint.
-    *
-    * For more information, see \ref MitkImagePage .
-    * @ingroup Data
-    */
+   * \brief Image class for storing multi-dimensional medical image data.
+   *
+   * Image is the primary data class for pixel-based image data in MITK. It can
+   * be queried for header information, raw data vectors, or vtkImageData objects.
+   * If access to only part of the data is required, use the appropriate accessor
+   * classes (ImageReadAccessor, ImageWriteAccessor, ImagePixelReadAccessor,
+   * ImagePixelWriteAccessor) rather than direct data access.
+   *
+   * Image organizes data hierarchically as:
+   * - \b Slices (s x 2D): individual 2D planes
+   * - \b Volumes (t x 3D): stacks of slices for each time step
+   * - \b Channels (n x ND): separate data arrays per channel (e.g., morphology
+   *   in channel 0, velocity in channel 1)
+   *
+   * All channels must share the same geometry (including dimensions). Only the
+   * pixel type may differ between channels.
+   *
+   * For importing ITK images, use of mitk::ITKImageImport is recommended.
+   * See \ref Adaptor for details.
+   *
+   * For more information, see \ref MitkImagePage.
+   *
+   * \sa mitk::SlicedData, mitk::BaseData
+   * \sa mitk::ImageReadAccessor, mitk::ImageWriteAccessor
+   * \sa mitk::ImagePixelReadAccessor, mitk::ImagePixelWriteAccessor
+   * \sa mitk::ImageVtkReadAccessor, mitk::ImageVtkWriteAccessor
+   * \ingroup Data
+   */
   class MITKCORE_EXPORT Image : public SlicedData
   {
     friend class SubImageSelector;
@@ -83,208 +89,308 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-    /** Smart Pointer type to a ImageDataItem. */
+    /** \brief Smart Pointer type to an ImageDataItem. */
     typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
+
+    /** \brief Histogram type used for image statistics (double-precision). */
     typedef itk::Statistics::Histogram<double> HistogramType;
+
+    /** \brief Pointer type to the ImageStatisticsHolder. */
     typedef mitk::ImageStatisticsHolder *StatisticsHolderPointer;
 
-    /** This enum is evaluated when setting new data to an image.
-      */
+    /**
+     * \brief Defines how imported memory is managed when setting data on an Image.
+     *
+     * This enum is evaluated by SetImportSlice, SetImportVolume, and
+     * SetImportChannel to decide ownership of the provided data buffer.
+     */
     enum ImportMemoryManagementType
     {
-      CopyMemory, /**< Data to be set is copied and assigned to a new memory block. Data memory block will be freed on deletion of mitk::Image. */
-      ManageMemory, /**< Data to be set will be referenced, and Data memory block will be freed on deletion of mitk::Image. */
-      ReferenceMemory, /**< Data to be set will be referenced, but Data memory block will not be freed on deletion of mitk::Image. */
-      DontManageMemory = ReferenceMemory
+      CopyMemory, /**< \brief Data is copied to a new memory block owned by the Image. The original buffer is not freed by Image. */
+      ManageMemory, /**< \brief Data is referenced by the Image. The Image takes ownership and will free the buffer on deletion. */
+      ReferenceMemory, /**< \brief Data is referenced by the Image. The Image does \em not free the buffer on deletion; the caller retains ownership. */
+      DontManageMemory = ReferenceMemory /**< \brief Alias for ReferenceMemory. */
     };
 
     /**
-      * @brief Vector container of SmartPointers to ImageDataItems;
-      * Class is only for internal usage to allow convenient access to all slices over iterators;
-      * See documentation of ImageDataItem for details.
-      */
+     * \brief Vector container of SmartPointers to ImageDataItems.
+     *
+     * For internal usage to allow convenient access to all slices via iterators.
+     * \sa ImageDataItem
+     */
     typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
   public:
     /**
-      * @brief Returns the PixelType of channel @a n.
-      */
+     * \brief Returns the PixelType of channel \a n.
+     *
+     * \param[in] n The channel index (default: 0).
+     * \return The PixelType describing the voxel data type and number of components.
+     * \sa PixelType
+     */
     const mitk::PixelType GetPixelType(int n = 0) const;
 
     /**
-      * @brief Get dimension of the image
-      */
+     * \brief Get the number of dimensions of the image.
+     *
+     * \return The image dimensionality (e.g., 2, 3, or 4).
+     */
     unsigned int GetDimension() const;
 
     /**
-      * @brief Get the size of dimension @a i (e.g., i=0 results in the number of pixels in x-direction).
-      *
-      * @sa GetDimensions()
-      */
+     * \brief Get the size of dimension \a i.
+     *
+     * For example, i=0 gives the number of pixels in x-direction, i=1 in
+     * y-direction, i=2 in z-direction (number of slices), and i=3 the
+     * number of time steps.
+     *
+     * \param[in] i The dimension index.
+     * \return The size of the requested dimension, or 1 if \a i is out of range.
+     * \sa GetDimensions
+     */
     unsigned int GetDimension(int i) const;
 
   public:
     /**
-      * @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
-      */
+     * \brief Get a volume at a specific time step \a t of channel \a n as a vtkImageData.
+     *
+     * If the image is not initialized, the method will attempt to trigger an
+     * update from the pipeline source.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return Pointer to the vtkImageData, or nullptr if the data is unavailable.
+     * \sa ImageVtkReadAccessor, ImageVtkWriteAccessor
+     */
     virtual vtkImageData *GetVtkImageData(int t = 0, int n = 0);
+
+    /** \copydoc GetVtkImageData(int, int) */
     virtual const vtkImageData *GetVtkImageData(int t = 0, int n = 0) const;
 
     /**
-      * @brief Check whether slice @a s at time @a t in channel @a n is set
-      */
+     * \brief Check whether slice \a s at time \a t in channel \a n is set.
+     *
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the slice data is available.
+     */
     bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
 
     /**
-      * @brief Check whether volume at time @a t in channel @a n is set
-      */
+     * \brief Check whether the volume at time \a t in channel \a n is set.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the volume data is available.
+     */
     bool IsVolumeSet(int t = 0, int n = 0) const override;
 
     /**
-      * @brief Check whether the channel @a n is set
-      */
+     * \brief Check whether channel \a n is set.
+     *
+     * \param[in] n Channel number (default: 0).
+     * \return True if the channel data is available.
+     */
     bool IsChannelSet(int n = 0) const override;
 
     /**
-      * @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a slice (at least is not smaller than a slice), since there is
-      * no chance to check this.
-      *
-      * The data is copied to an array managed by the image. If the image shall
-      * reference the data, use SetImportSlice with ImportMemoryManagementType
-      * set to ReferenceMemory. For importing ITK images use of mitk::
-      * ITKImageImport is recommended.
-      * @sa SetPicSlice, SetImportSlice, SetImportVolume
-      */
+     * \brief Set \a data as slice \a s at time \a t in channel \a n.
+     *
+     * The data is copied into an array managed by the Image. If the image
+     * should reference external data instead, use SetImportSlice with
+     * ImportMemoryManagementType set to ReferenceMemory.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one slice.
+     *
+     * \param[in] data Pointer to the slice data.
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True on success.
+     * \sa SetImportSlice, SetVolume
+     */
     virtual bool SetSlice(const void *data, int s = 0, int t = 0, int n = 0);
 
     /**
-      * @brief Set @a data as volume at time @a t in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a volume (at least is not smaller than a volume), since there is
-      * no chance to check this.
-      *
-      * The data is copied to an array managed by the image. If the image shall
-      * reference the data, use SetImportVolume with ImportMemoryManagementType
-      * set to ReferenceMemory. For importing ITK images use of mitk::
-      * ITKImageImport is recommended.
-      * @sa SetPicVolume, SetImportVolume
-      */
+     * \brief Set \a data as volume at time \a t in channel \a n.
+     *
+     * The data is copied into an array managed by the Image. If the image
+     * should reference external data instead, use SetImportVolume with
+     * ImportMemoryManagementType set to ReferenceMemory.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one volume.
+     *
+     * \param[in] data Pointer to the volume data.
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True on success.
+     * \sa SetImportVolume, SetSlice
+     */
     virtual bool SetVolume(const void *data, int t = 0, int n = 0);
 
     /**
-      * @brief Set @a data in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a channel (at least is not smaller than a channel), since there is
-      * no chance to check this.
-      *
-      * The data is copied to an array managed by the image. If the image shall
-      * reference the data, use SetImportChannel with ImportMemoryManagementType
-      * set to ReferenceMemory. For importing ITK images use of mitk::
-      * ITKImageImport is recommended.
-      * @sa SetPicChannel, SetImportChannel
-      */
+     * \brief Set \a data as the data for channel \a n.
+     *
+     * The data is copied into an array managed by the Image. If the image
+     * should reference external data instead, use SetImportChannel with
+     * ImportMemoryManagementType set to ReferenceMemory.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one channel.
+     *
+     * \param[in] data Pointer to the channel data.
+     * \param[in] n Channel number (default: 0).
+     * \return True on success.
+     * \sa SetImportChannel
+     */
     virtual bool SetChannel(const void *data, int n = 0);
 
     /**
-      * @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a slice (at least is not smaller than a slice), since there is
-      * no chance to check this.
-      *
-      * The data is managed according to the parameter \a importMemoryManagement.
-      * @sa SetPicSlice
-      */
+     * \brief Set \a data as slice \a s at time \a t in channel \a n with
+     * configurable memory management.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one slice.
+     *
+     * \param[in] data Pointer to the slice data.
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \param[in] importMemoryManagement Specifies how the data buffer is managed
+     *            (default: CopyMemory).
+     * \return True on success.
+     * \sa SetSlice, ImportMemoryManagementType
+     */
     virtual bool SetImportSlice(
       void *data, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
     /**
-      * @brief Set @a data as volume at time @a t in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a volume (at least is not smaller than a volume), since there is
-      * no chance to check this.
-      *
-      * The data is managed according to the parameter \a importMemoryManagement.
-      * @sa SetPicVolume
-      */
+     * \brief Set \a data as volume at time \a t in channel \a n with
+     * configurable memory management.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one volume.
+     *
+     * \param[in] data Pointer to the volume data.
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \param[in] importMemoryManagement Specifies how the data buffer is managed
+     *            (default: CopyMemory).
+     * \return True on success.
+     * \sa SetVolume, ImportMemoryManagementType
+     */
     virtual bool SetImportVolume(void *data,
                                  int t = 0,
                                  int n = 0,
                                  ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
+    /**
+     * \brief Set \a const_data as volume at time \a t in channel \a n (copy-only).
+     *
+     * This overload always copies the data (equivalent to CopyMemory).
+     *
+     * \param[in] const_data Pointer to the const volume data to copy.
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True on success.
+     */
     virtual bool SetImportVolume(const void *const_data, int t = 0, int n = 0);
 
     /**
-      * @brief Allocate a zero-initialized volume at time @a t in channel @a n.
-      *
-      * The image must already be initialized with a pixel type and dimensions
-      * (via any Initialize() overload) but must not yet have volume data set
-      * for the given time step and channel.
-      *
-      * Supports images with 1 to 3 dimensions.
-      *
-      * @throws mitk::Exception if the image is not initialized, has unsupported
-      *         dimensions (0 or >3), or already has volume data at (t, n).
-      */
+     * \brief Allocate a zero-initialized volume at time \a t in channel \a n.
+     *
+     * The image must already be initialized with a pixel type and dimensions
+     * (via any Initialize() overload) but must not yet have volume data set
+     * for the given time step and channel.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \pre Image must be initialized (IsInitialized() == true).
+     * \pre Image dimension must be between 1 and 3.
+     * \pre No volume data may already exist at (t, n).
+     * \throw mitk::Exception if any precondition is violated.
+     */
     virtual void AllocateZeroedVolume(int t = 0, int n = 0);
 
     /**
-      * @brief Set @a data in channel @a n. It is in
-      * the responsibility of the caller to ensure that the data vector @a data
-      * is really a channel (at least is not smaller than a channel), since there is
-      * no chance to check this.
-      *
-      * The data is managed according to the parameter \a importMemoryManagement.
-      * @sa SetPicChannel
-      */
+     * \brief Set \a data as the data for channel \a n with configurable
+     * memory management.
+     *
+     * \pre The caller must ensure \a data points to a buffer at least as large
+     *      as one channel.
+     *
+     * \param[in] data Pointer to the channel data.
+     * \param[in] n Channel number (default: 0).
+     * \param[in] importMemoryManagement Specifies how the data buffer is managed
+     *            (default: CopyMemory).
+     * \return True on success.
+     * \sa SetChannel, ImportMemoryManagementType
+     */
     virtual bool SetImportChannel(void *data,
                                   int n = 0,
                                   ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
     /**
-      * initialize new (or re-initialize) image information
-      * @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-      */
+     * \brief Initialize (or re-initialize) image with pixel type and dimensions.
+     *
+     * Creates a plane, evenly spaced geometry starting at origin (0,0,0).
+     *
+     * \param[in] type The pixel type for the image.
+     * \param[in] dimension The number of dimensions (2, 3, or 4).
+     * \param[in] dimensions Array of sizes for each dimension.
+     * \param[in] channels Number of channels (default: 1).
+     * \warning Assumes a plane, evenly spaced geometry starting at (0,0,0).
+     */
     virtual void Initialize(const mitk::PixelType &type,
                             unsigned int dimension,
                             const unsigned int *dimensions,
                             unsigned int channels = 1);
 
     /**
-      * initialize new (or re-initialize) image information by a BaseGeometry
-      *
-      * \param type
-      * \param geometry
-      * \param channels
-      * @param tDim defines the number of time steps for which the Image should be initialized
-      */
+     * \brief Initialize (or re-initialize) image from a BaseGeometry.
+     *
+     * \param[in] type The pixel type for the image.
+     * \param[in] geometry The spatial geometry to use.
+     * \param[in] channels Number of channels (default: 1).
+     * \param[in] tDim Number of time steps (default: 1).
+     */
     virtual void Initialize(const mitk::PixelType &type,
                             const mitk::BaseGeometry &geometry,
                             unsigned int channels = 1,
                             int tDim = 1);
 
     /**
-    * \brief Initialize new (or re-initialize) image information by a TimeGeometry
-    *
-    * \param type
-    * \param geometry
-    * \param channels
-    * \param tDim override time dimension if the value is bigger than 0 (Default -1)
-    */
+     * \brief Initialize (or re-initialize) image from a TimeGeometry.
+     *
+     * \param[in] type The pixel type for the image.
+     * \param[in] geometry The time geometry providing spatial and temporal information.
+     * \param[in] channels Number of channels (default: 1).
+     * \param[in] tDim Override the time dimension if the value is > 0 (default: -1,
+     *            meaning use the number of time steps from the TimeGeometry).
+     */
     virtual void Initialize(const mitk::PixelType &type,
                             const mitk::TimeGeometry &geometry,
                             unsigned int channels = 1,
                             int tDim = -1);
 
     /**
-      * initialize new (or re-initialize) image information by a PlaneGeometry and number of slices
-      *
-      * Initializes the bounding box according to the width/height of the
-      * PlaneGeometry and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
-      * The spacing is calculated from the PlaneGeometry.
-      * \sa SlicedGeometry3D::InitializeEvenlySpaced
-      */
+     * \brief Initialize (or re-initialize) image from a PlaneGeometry and number
+     * of slices.
+     *
+     * The bounding box is initialized according to the width/height of the
+     * PlaneGeometry and \a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
+     * The spacing is calculated from the PlaneGeometry.
+     *
+     * \param[in] type The pixel type for the image.
+     * \param[in] sDim Number of slices.
+     * \param[in] geometry2d The 2D plane geometry.
+     * \param[in] channels Number of channels (default: 1).
+     * \param[in] tDim Number of time steps (default: 1).
+     * \sa SlicedGeometry3D::InitializeEvenlySpaced
+     */
     virtual void Initialize(const mitk::PixelType &type,
                             int sDim,
                             const mitk::PlaneGeometry &geometry2d,
@@ -292,39 +398,47 @@ namespace mitk
                             int tDim = 1);
 
     /**
-      * initialize new (or re-initialize) image information by another
-      * mitk-image.
-      * Only the header is used, not the data vector!
-      */
+     * \brief Initialize (or re-initialize) image from another mitk::Image.
+     *
+     * Only the header information is copied, not the data vector.
+     *
+     * \param[in] image The source image whose header to copy.
+     */
     virtual void Initialize(const mitk::Image *image);
 
+    /**
+     * \brief Initialize (or re-initialize) image from an ImageDescriptor.
+     *
+     * \param[in] inDesc The image descriptor providing type and dimension information.
+     */
     virtual void Initialize(const mitk::ImageDescriptor::Pointer inDesc);
 
     /**
-      * initialize new (or re-initialize) image information by @a vtkimagedata,
-      * a vtk-image.
-      * Only the header is used, not the data vector! Use
-      * SetVolume(vtkimage->GetScalarPointer()) to set the data vector.
-      *
-      * @param vtkimagedata
-      * @param channels
-      * @param tDim override time dimension in @a vtkimagedata (if >0 and <)
-      * @param sDim override z-space dimension in @a vtkimagedata (if >0 and <)
-      * @param pDim override y-space dimension in @a vtkimagedata (if >0 and <)
-      */
+     * \brief Initialize (or re-initialize) image from a vtkImageData.
+     *
+     * Only the header is used, not the data vector. Use
+     * SetVolume(vtkimage->GetScalarPointer()) to transfer the pixel data.
+     *
+     * \param[in] vtkimagedata The VTK image providing header information.
+     * \param[in] channels Number of channels (default: 1).
+     * \param[in] tDim Override time dimension (default: -1, use VTK value).
+     * \param[in] sDim Override z-space dimension (default: -1, use VTK value).
+     * \param[in] pDim Override y-space dimension (default: -1, use VTK value).
+     */
     virtual void Initialize(vtkImageData *vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1, int pDim = -1);
 
     /**
-      * initialize new (or re-initialize) image information by @a itkimage,
-      * a templated itk-image.
-      * Only the header is used, not the data vector! Use
-      * SetVolume(itkimage->GetBufferPointer()) to set the data vector.
-      *
-      * @param itkimage
-      * @param channels
-      * @param tDim override time dimension in @a itkimage (if >0 and <)
-      * @param sDim override z-space dimension in @a itkimage (if >0 and <)
-      */
+     * \brief Initialize (or re-initialize) image from a templated ITK image.
+     *
+     * Only the header (spacing, origin, direction, dimensions) is used, not the
+     * data vector. Use SetVolume(itkimage->GetBufferPointer()) to transfer data.
+     *
+     * \tparam itkImageType The ITK image type.
+     * \param[in] itkimage The ITK image providing header information.
+     * \param[in] channels Number of channels (default: 1).
+     * \param[in] tDim Override time dimension (default: -1, use ITK value).
+     * \param[in] sDim Override z-space dimension (default: -1, use ITK value).
+     */
     template <typename itkImageType>
     void InitializeByItk(const itkImageType *itkimage, int channels = 1, int tDim = -1, int sDim = -1)
     {
@@ -462,46 +576,94 @@ namespace mitk
     }
 
     /**
-      * @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e.,
-      * is (or can be) inside of the image
-      */
+     * \brief Check whether slice \a s at time \a t in channel \a n is valid.
+     *
+     * A valid slice is one whose indices are within the image bounds.
+     *
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the specified slice is within the image bounds.
+     */
     virtual bool IsValidSlice(int s = 0, int t = 0, int n = 0) const;
 
     /**
-      * @brief Check whether volume at time @a t in channel @a n is valid, i.e.,
-      * is (or can be) inside of the image
-      */
+     * \brief Check whether the volume at time \a t in channel \a n is valid.
+     *
+     * A valid volume has indices within the image bounds.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the specified volume is within the image bounds.
+     */
     virtual bool IsValidVolume(int t = 0, int n = 0) const;
 
     /**
-      * @brief Check whether the channel @a n is valid, i.e.,
-      * is (or can be) inside of the image
-      */
+     * \brief Check whether channel \a n is valid.
+     *
+     * A valid channel has an index within the image bounds.
+     *
+     * \param[in] n Channel number (default: 0).
+     * \return True if the specified channel is within the image bounds.
+     */
     virtual bool IsValidChannel(int n = 0) const;
 
     /**
-      * @brief Returns true if an image is rotated, i.e. its geometry's
-      * transformation matrix has nonzero elements besides the diagonal.
-      * Non-diagonal elements are checked if larger then 1/1000 of the matrix' trace.
-      */
+     * \brief Check whether the image has a rotated geometry.
+     *
+     * Returns true if the geometry's transformation matrix has non-zero
+     * off-diagonal elements larger than 1/1000 of the matrix trace.
+     *
+     * \return True if the image geometry is rotated.
+     */
     bool IsRotated() const;
 
     /**
-      * @brief Get the sizes of all dimensions as an integer-array.
-      *
-      * @sa GetDimension(int i);
-      */
+     * \brief Get the sizes of all dimensions as an integer array.
+     *
+     * \return Pointer to the internal array of dimension sizes.
+     * \sa GetDimension(int)
+     */
     unsigned int *GetDimensions() const;
 
+    /**
+     * \brief Get the image descriptor containing type and dimension information.
+     *
+     * \return Smart pointer to the ImageDescriptor.
+     */
     ImageDescriptor::Pointer GetImageDescriptor() const { return m_ImageDescriptor; }
+
+    /**
+     * \brief Get the channel descriptor for channel \a id.
+     *
+     * \param[in] id The channel index (default: 0).
+     * \return The ChannelDescriptor for the specified channel.
+     */
     ChannelDescriptor GetChannelDescriptor(int id = 0) const { return m_ImageDescriptor->GetChannelDescriptor(id); }
-    /** \brief Sets a geometry to an image.
-      */
+
+    /**
+     * \brief Set the geometry of the image.
+     *
+     * Overrides BaseData::SetGeometry to handle SlicedGeometry3D and
+     * PlaneGeometry conversion.
+     *
+     * \param[in] aGeometry3D The geometry to set.
+     */
     void SetGeometry(BaseGeometry *aGeometry3D) override;
 
     /**
-    * @warning for internal use only
-    */
+     * \brief Get the ImageDataItem for slice \a s at time \a t in channel \a n.
+     *
+     * \warning For internal use only. Use ImageReadAccessor or ImageWriteAccessor
+     * for safe data access.
+     *
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \param[in] data Optional pre-allocated data buffer (default: nullptr).
+     * \param[in] importMemoryManagement Memory management policy (default: CopyMemory).
+     * \return Smart pointer to the ImageDataItem, or nullptr if invalid.
+     */
     virtual ImageDataItemPointer GetSliceData(int s = 0,
                                               int t = 0,
                                               int n = 0,
@@ -509,26 +671,46 @@ namespace mitk
                                               ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     /**
-    * @warning for internal use only
-    */
+     * \brief Get the ImageDataItem for the volume at time \a t in channel \a n.
+     *
+     * \warning For internal use only. Use ImageReadAccessor or ImageWriteAccessor
+     * for safe data access.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \param[in] data Optional pre-allocated data buffer (default: nullptr).
+     * \param[in] importMemoryManagement Memory management policy (default: CopyMemory).
+     * \return Smart pointer to the ImageDataItem, or nullptr if invalid.
+     */
     virtual ImageDataItemPointer GetVolumeData(int t = 0,
                                                int n = 0,
                                                void *data = nullptr,
                                                ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     /**
-    * @warning for internal use only
-    */
+     * \brief Get the ImageDataItem for channel \a n.
+     *
+     * \warning For internal use only. Use ImageReadAccessor or ImageWriteAccessor
+     * for safe data access.
+     *
+     * \param[in] n Channel number (default: 0).
+     * \param[in] data Optional pre-allocated data buffer (default: nullptr).
+     * \param[in] importMemoryManagement Memory management policy (default: CopyMemory).
+     * \return Smart pointer to the ImageDataItem, or nullptr if invalid.
+     */
     virtual ImageDataItemPointer GetChannelData(int n = 0,
                                                 void *data = nullptr,
                                                 ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     /**
-      \brief Returns a pointer to the ImageStatisticsHolder object that holds all statistics information for the image.
-
-      All Get-methods for statistics properties formerly accessible directly from an Image object are now moved to the
-      new \a ImageStatisticsHolder object.
-      */
+     * \brief Get the ImageStatisticsHolder that provides statistics for this image.
+     *
+     * All statistics query methods (min, max, scalar 2nd, etc.) are available
+     * through the returned ImageStatisticsHolder object.
+     *
+     * \return Pointer to the ImageStatisticsHolder.
+     * \sa ImageStatisticsHolder
+     */
     StatisticsHolderPointer GetStatistics() const { return m_ImageStatistics; }
 
   protected:

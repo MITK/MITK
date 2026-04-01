@@ -20,24 +20,36 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Offers IO capability for MatchPoint registration wrappers
-  */
+   * \brief Provides IO capability for MatchPoint registration wrappers.
+   *
+   * Reads and writes mitk::MAPRegistrationWrapper objects to/from
+   * MatchPoint registration files.
+   */
   class MAPRegistrationWrapperIO : public AbstractFileIO
   {
   public:
-
+    /** \brief Default constructor. Registers reader/writer for the MAP registration MIME type. */
     MAPRegistrationWrapperIO();
 
     // -------------- AbstractFileReader -------------
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a registration wrapper. */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
+
+    /** \brief Write the registration wrapper to the configured output location. */
     void Write() override;
+
+    /** \brief Return the confidence level for writing the given data as a registration wrapper. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
+    /**
+     * \brief Perform the actual reading of registration wrapper data.
+     * \return A vector of loaded BaseData objects (MAPRegistrationWrappers).
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:

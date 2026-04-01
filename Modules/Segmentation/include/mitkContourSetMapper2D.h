@@ -23,10 +23,10 @@ namespace mitk
   class ContourSet;
 
   /**
-   * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
+   * \brief OpenGL-based mapper to display a mitk::ContourSet object in a 2D render window.
    *
-   *
-   * @ingroup Mapper
+   * \ingroup Mapper
+   * \sa ContourSet
    */
   class MITKSEGMENTATION_EXPORT ContourSetMapper2D : public Mapper
   {

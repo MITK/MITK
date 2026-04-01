@@ -29,9 +29,10 @@ namespace Ui
 }
 
 /**
-* @brief
+* \brief Widget that allows the user to select and apply a layout for a multi widget.
 *
-*
+* Provides a table to define custom row/column layouts, buttons for data-based
+* layout selection, and functionality to save and load layouts to/from JSON files.
 */
 class MITKQTWIDGETS_EXPORT QmitkMultiWidgetLayoutSelectionWidget : public QWidget
 {

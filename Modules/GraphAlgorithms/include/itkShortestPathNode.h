@@ -16,22 +16,36 @@ found in the LICENSE file.
 
 namespace itk
 {
-  typedef double DistanceType; // Type to declare the costs
-  typedef unsigned int
-    NodeNumType; // Type for Node Numeration: unsignend int for up to 4.2 billion pixel in 32Bit system
+  /** \brief Type used to represent path costs (distances). */
+  typedef double DistanceType;
 
+  /**
+   * \brief Type used for node indexing.
+   *
+   * An unsigned int supports up to approximately 4.2 billion nodes
+   * on 32-bit systems.
+   */
+  typedef unsigned int NodeNumType;
+
+  /**
+   * \brief A node in the shortest path graph used by ShortestPathImageFilter.
+   *
+   * Each ShortestPathNode corresponds to a single pixel in the image and stores
+   * the state needed for the A*graph search algorithm: accumulated cost,
+   * estimated total cost, predecessor link, and closed status.
+   *
+   * \sa ShortestPathImageFilter
+   * \sa ShortestPathCostFunction
+   */
   class MITKGRAPHALGORITHMS_EXPORT ShortestPathNode
   {
   public:
-    DistanceType distance;     // minimal costs from StartPoint to this pixel
-    DistanceType distAndEst;   // Distance+Estimated Distance to target
-    NodeNumType prevNode;      // previous node. Important to find the Shortest Path
-    NodeNumType mainListIndex; // Indexnumber of this node in m_Nodes
-    bool closed;               // determines if this node is closes, so its optimal path to startNode is known
+    DistanceType distance;     ///< Minimal cumulative cost from the start node to this node.
+    DistanceType distAndEst;   ///< Sum of distance and estimated remaining cost to the target (used by A*).
+    NodeNumType prevNode;      ///< Index of the predecessor node on the shortest path.
+    NodeNumType mainListIndex; ///< Index of this node in the main node array (m_Nodes).
+    bool closed;               ///< True if this node's optimal path to the start has been determined.
   };
-
-  // bool operator<(const ShortestPathNode &a) const;
-  // bool operator==(const ShortestPathNode &a) const;
 }
 
 #endif

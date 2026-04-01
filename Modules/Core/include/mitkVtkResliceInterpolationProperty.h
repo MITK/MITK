@@ -25,10 +25,11 @@ namespace mitk
 #endif
 
   /**
-   * Encapsulates the enumeration for reslice interpolation. Valid values are
-   * (VTK constant/Id/string representation):
-   * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC
-   * Default is VTK_RESLICE_NEAREST
+   * \brief Encapsulates the VTK reslice interpolation enumeration as an EnumerationProperty.
+   *
+   * Valid values are (VTK constant / Id / string representation):
+   * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC.
+   * Default is VTK_RESLICE_NEAREST.
    */
   class MITKCORE_EXPORT VtkResliceInterpolationProperty : public EnumerationProperty
   {
@@ -44,53 +45,47 @@ namespace mitk
     mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string &);
 
     /**
-     * Returns the current interpolation value as defined by VTK constants.
+     * \brief Return the current reslice interpolation value as defined by VTK constants.
+     * \return The current interpolation as a VTK constant.
      */
     virtual int GetInterpolation();
 
-    /**
-     * Sets the interpolation type to VTK_RESLICE_NEAREST.
-     */
+    /** \brief Set the interpolation type to VTK_RESLICE_NEAREST. */
     virtual void SetInterpolationToNearest();
 
-    /**
-     * Sets the interpolation type to VTK_RESLICE_LINEAR.
-     */
+    /** \brief Set the interpolation type to VTK_RESLICE_LINEAR. */
     virtual void SetInterpolationToLinear();
 
-    /**
-     * Sets the interpolation type to VTK_RESLICE_CUBIC.
-     */
+    /** \brief Set the interpolation type to VTK_RESLICE_CUBIC. */
     virtual void SetInterpolationToCubic();
 
     using BaseProperty::operator=;
 
   protected:
-    /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
-     */
+    /** \brief Constructor. Sets reslice interpolation to default (VTK_RESLICE_NEAREST). */
     VtkResliceInterpolationProperty();
 
     /**
-     * Constructor. Sets reslice interpolation to the given value.
+     * \brief Constructor. Sets reslice interpolation to the given value.
+     * \param[in] value The integer representation of the interpolation type.
      */
     VtkResliceInterpolationProperty(const IdType &value);
 
     /**
-     * Constructor. Sets reslice interpolation to the given value.
+     * \brief Constructor. Sets reslice interpolation to the given value.
+     * \param[in] value The string representation of the interpolation type.
      */
     VtkResliceInterpolationProperty(const std::string &value);
 
     VtkResliceInterpolationProperty(const VtkResliceInterpolationProperty &other);
 
     /**
-     * this function is overridden as protected, so that the user may not add
-     * additional invalid interpolation types.
+     * \brief Overridden as protected to prevent adding invalid interpolation types.
      */
     bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
-     * Adds the enumeration types as defined by vtk to the list of known
-     * enumeration values.
+     * \brief Add the VTK-defined reslice interpolation types to the enumeration.
      */
     virtual void AddInterpolationTypes();
 

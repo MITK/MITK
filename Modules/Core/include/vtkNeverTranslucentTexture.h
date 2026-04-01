@@ -49,22 +49,28 @@ found in the LICENSE file.
 class MITKCORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 {
 public:
+  /** \brief Create a new instance of vtkNeverTranslucentTexture. */
   static vtkNeverTranslucentTexture *New();
   vtkTypeMacro(vtkNeverTranslucentTexture, vtkOpenGLTexture);
+
+  /** \brief Print the object state to the given output stream. */
   void PrintSelf(ostream &os, vtkIndent indent) override;
 
   /**
-    \brief The FIX (see class description).
-
-    VTK Description: Is this Texture Translucent?
-
-    Returns false (0) if the texture is either fully opaque or has
-    only fully transparent pixels and fully opaque pixels and the
-    Interpolate flag is turn off.
-  */
+   * \brief Always returns 0 (not translucent) to avoid the expensive per-pixel check.
+   *
+   * This is the core fix: VTK normally pushes every pixel through the lookup table
+   * to determine translucency, which is extremely slow during level/window operations.
+   * By always returning 0, this check is bypassed entirely.
+   *
+   * \return Always 0 (not translucent).
+   *
+   * \sa ImageVtkMapper2D
+   */
   int IsTranslucent() override;
 
 protected:
+  /** \brief Constructor. */
   vtkNeverTranslucentTexture();
 
 private:
@@ -73,21 +79,37 @@ private:
 };
 
 /**
-  \brief Factory for vtkNeverTranslucentTexture (see this class!).
-
-  Registered in CoreActivator to replace all instances of vtkTexture
-  with vtkNeverTranslucentTexture.
-
-  Required to make rendering of images during level/window operations
-  acceptably fast.
-*/
+ * \brief Factory that replaces vtkTexture with vtkNeverTranslucentTexture.
+ *
+ * Registered in CoreActivator to replace all instances of vtkTexture
+ * with vtkNeverTranslucentTexture.
+ *
+ * Required to make rendering of images during level/window operations
+ * acceptably fast.
+ *
+ * \sa vtkNeverTranslucentTexture
+ */
 class vtkNeverTranslucentTextureFactory : public vtkObjectFactory
 {
 public:
+  /** \brief Constructor. Registers the override for vtkTexture. */
   vtkNeverTranslucentTextureFactory();
 
+  /** \brief Create a new instance of this factory. */
   static vtkNeverTranslucentTextureFactory *New();
+
+  /**
+   * \brief Get the VTK source version string.
+   *
+   * \return The VTK source version.
+   */
   const char *GetVTKSourceVersion() override;
+
+  /**
+   * \brief Get a description of this factory.
+   *
+   * \return A human-readable description string.
+   */
   const char *GetDescription() override;
 
 protected:

@@ -20,6 +20,17 @@ found in the LICENSE file.
 namespace mitk
 {
 
+    /**
+     * \class ReducedChiSquareFitCostFunction
+     * \brief Single-valued cost function that computes the reduced chi-square statistic.
+     *
+     * The reduced chi-square normalizes the chi-square value by the number of degrees
+     * of freedom (number of data points minus number of fitted parameters), providing
+     * a measure of goodness-of-fit that is comparable across fits with different numbers
+     * of parameters.
+     *
+     * \sa SVModelFitCostFunction, ChiSquareFitCostFunction
+     */
     class MITKMODELFIT_EXPORT ReducedChiSquareFitCostFunction : public mitk::SVModelFitCostFunction
     {
     public:

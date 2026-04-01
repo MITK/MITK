@@ -31,9 +31,9 @@ namespace us {
  * The <code>ServiceRegistration</code> object may be used to update the
  * properties of the service or to unregister the service.
  *
- * @tparam S Class type of the service interface
- * @see ModuleContext#RegisterService()
- * @remarks This class is thread safe.
+ * \tparam S Class type of the service interface
+ * \sa ModuleContext#RegisterService()
+ * \remarks This class is thread safe.
  */
 template<class I1, class I2 = void, class I3 = void>
 class ServiceRegistration : public ServiceRegistrationBase
@@ -42,7 +42,7 @@ class ServiceRegistration : public ServiceRegistrationBase
 public:
 
   /**
-   * Creates an invalid ServiceRegistration object. You can use
+   * \brief Creates an invalid ServiceRegistration object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
@@ -52,16 +52,16 @@ public:
 
   ///@{
   /**
-   * Returns a <code>ServiceReference</code> object for a service being
+   * \brief Returns a <code>ServiceReference</code> object for a service being
    * registered.
    * <p>
    * The <code>ServiceReference</code> object may be shared with other
    * modules.
    *
-   * @throws std::logic_error If this
+   * \throws std::logic_error If this
    *         <code>ServiceRegistration</code> object has already been
    *         unregistered or if it is invalid.
-   * @return <code>ServiceReference</code> object.
+   * \return <code>ServiceReference</code> object.
    */
   ServiceReference<I1> GetReference(InterfaceType<I1>) const
   {
@@ -165,7 +165,7 @@ class ServiceRegistration<void, void, void> : public ServiceRegistrationBase
 public:
 
   /**
-   * Creates an invalid ServiceReference object. You can use
+   * \brief Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */

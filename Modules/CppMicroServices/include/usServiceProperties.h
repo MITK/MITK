@@ -41,7 +41,7 @@ typedef std::unordered_map<std::string, Any> ServiceProperties;
 namespace ServiceConstants {
 
 /**
- * Service property identifying all of the class names under which a service
+ * \brief Service property identifying all of the class names under which a service
  * was registered in the framework. The value of this property must be of
  * type <code>std::vector&lt;std::string&gt;</code>.
  *
@@ -51,7 +51,7 @@ namespace ServiceConstants {
 MITKCPPMICROSERVICES_EXPORT const std::string& OBJECTCLASS(); // = "objectclass"
 
 /**
- * Service property identifying a service's registration number. The value
+ * \brief Service property identifying a service's registration number. The value
  * of this property must be of type <code>long int</code>.
  *
  * <p>
@@ -63,7 +63,7 @@ MITKCPPMICROSERVICES_EXPORT const std::string& OBJECTCLASS(); // = "objectclass"
 MITKCPPMICROSERVICES_EXPORT const std::string& SERVICE_ID(); // = "service.id"
 
 /**
- * Service property identifying a service's ranking number.
+ * \brief Service property identifying a service's ranking number.
  *
  * <p>
  * This property may be supplied in the
@@ -90,7 +90,7 @@ MITKCPPMICROSERVICES_EXPORT const std::string& SERVICE_ID(); // = "service.id"
 MITKCPPMICROSERVICES_EXPORT const std::string& SERVICE_RANKING(); // = "service.ranking"
 
 /**
- * Service property identifying a service's scope.
+ * \brief Service property identifying a service's scope.
  * This property is set by the framework when a service is registered. If the
  * registered object implements PrototypeServiceFactory, then the value of this
  * service property will be SCOPE_PROTOTYPE(). Otherwise, if the registered
@@ -101,27 +101,27 @@ MITKCPPMICROSERVICES_EXPORT const std::string& SERVICE_RANKING(); // = "service.
 MITKCPPMICROSERVICES_EXPORT const std::string& SERVICE_SCOPE(); // = "service.scope"
 
 /**
- * Service scope is singleton. All modules using the service receive the same
+ * \brief Service scope is singleton. All modules using the service receive the same
  * service object.
  *
- * @see SERVICE_SCOPE()
+ * \sa SERVICE_SCOPE()
  */
 MITKCPPMICROSERVICES_EXPORT const std::string& SCOPE_SINGLETON(); // = "singleton"
 
 /**
- * Service scope is module. Each module using the service receives a distinct
+ * \brief Service scope is module. Each module using the service receives a distinct
  * service object.
  *
- * @see SERVICE_SCOPE()
+ * \sa SERVICE_SCOPE()
  */
 MITKCPPMICROSERVICES_EXPORT const std::string& SCOPE_MODULE(); // = "module"
 
 /**
- * Service scope is prototype. Each module using the service receives either
+ * \brief Service scope is prototype. Each module using the service receives either
  * a distinct service object or can request multiple distinct service objects
  * via ServiceObjects.
  *
- * @see SERVICE_SCOPE()
+ * \sa SERVICE_SCOPE()
  */
 MITKCPPMICROSERVICES_EXPORT const std::string& SCOPE_PROTOTYPE(); // = "prototype"
 

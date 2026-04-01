@@ -17,10 +17,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read surface files in vtk-format
-  //## @ingroup MitkLegacyIOModule
-  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  /**
+   * \brief Reader to read surface files in VTK format.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   */
   class MITKLEGACYIO_EXPORT VtkSurfaceReader : public SurfaceSource
   {
   public:
@@ -38,16 +40,28 @@ namespace mitk
     itkSetStringMacro(FilePattern);
     itkGetStringMacro(FilePattern);
 
+    /**
+     * \brief Check if the given file can be read.
+     * \param filename The name of the file to check.
+     * \param filePrefix The file prefix.
+     * \param filePattern The file pattern.
+     * \return True if the file can be read, false otherwise.
+     */
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
+    /** \brief Generate the output data. */
     void GenerateData() override;
 
+    /** \brief Default constructor. */
     VtkSurfaceReader();
 
+    /** \brief Destructor. */
     ~VtkSurfaceReader() override;
 
-    std::string m_FileName, m_FilePrefix, m_FilePattern;
+    std::string m_FileName;     ///< \brief The file name to read.
+    std::string m_FilePrefix;   ///< \brief The file prefix.
+    std::string m_FilePattern;  ///< \brief The file pattern.
   };
 
 } // namespace mitk

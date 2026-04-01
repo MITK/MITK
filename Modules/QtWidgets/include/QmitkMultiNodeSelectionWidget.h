@@ -31,8 +31,8 @@ namespace Ui
 }
 
 /**
-* @class QmitkMultiNodeSelectionWidget
-* @brief Widget that allows to perform and represents a multiple node selection.
+* \class QmitkMultiNodeSelectionWidget
+* \brief Widget that allows to perform and represents a multiple node selection.
 */
 class MITKQTWIDGETS_EXPORT QmitkMultiNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -45,14 +45,14 @@ public:
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
   /**
-  * @brief Helper function that is used to check the given selection for consistency.
+  * \brief Helper function that is used to check the given selection for consistency.
   *        Returning an empty string assumes that everything is alright and the selection
   *        is valid. If the string is not empty, the content of the string will be used
   *        as error message in the overlay to indicate the problem.
   */
   using SelectionCheckFunctionType = std::function<std::string(const NodeList &)>;
   /**
-  * @brief A selection check function can be set. If set the widget uses this function to
+  * \brief A selection check function can be set. If set the widget uses this function to
   *        check the made/set selection. If the selection is valid, everything is fine.
   *        If selection is indicated as invalid, it will not be communicated by the widget
   *        (no signal emission).

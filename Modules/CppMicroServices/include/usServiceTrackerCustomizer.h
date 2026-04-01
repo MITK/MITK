@@ -53,14 +53,20 @@ namespace us {
 template<class S, class T = S*>
 struct ServiceTrackerCustomizer {
 
+  /** \brief The service type being tracked. */
   typedef S ServiceType;
+
+  /** \brief The tracked object type. */
   typedef T TrackedType;
+
+  /** \brief The service reference type for the tracked service. */
   typedef ServiceReference<ServiceType> ServiceReferenceType;
 
+  /** \brief Destructor. */
   virtual ~ServiceTrackerCustomizer() {}
 
   /**
-   * A service is being added to the <code>ServiceTracker</code>.
+   * \brief A service is being added to the <code>ServiceTracker</code>.
    *
    * <p>
    * This method is called before a service which matched the search
@@ -71,35 +77,35 @@ struct ServiceTrackerCustomizer {
    * is available from the <code>GetService</code> and
    * <code>GetServices</code> methods.
    *
-   * @param reference The reference to the service being added to the
+   * \param[in] reference The reference to the service being added to the
    *        <code>ServiceTracker</code>.
-   * @return The service object to be tracked for the specified referenced
+   * \return The service object to be tracked for the specified referenced
    *         service or <code>0</code> if the specified referenced service
    *         should not be tracked.
    */
   virtual TrackedType AddingService(const ServiceReferenceType& reference) = 0;
 
   /**
-   * A service tracked by the <code>ServiceTracker</code> has been modified.
+   * \brief A service tracked by the <code>ServiceTracker</code> has been modified.
    *
    * <p>
    * This method is called when a service being tracked by the
    * <code>ServiceTracker</code> has had it properties modified.
    *
-   * @param reference The reference to the service that has been modified.
-   * @param service The service object for the specified referenced service.
+   * \param[in] reference The reference to the service that has been modified.
+   * \param[in] service The service object for the specified referenced service.
    */
   virtual void ModifiedService(const ServiceReferenceType& reference, TrackedType service) = 0;
 
   /**
-   * A service tracked by the <code>ServiceTracker</code> has been removed.
+   * \brief A service tracked by the <code>ServiceTracker</code> has been removed.
    *
    * <p>
    * This method is called after a service is no longer being tracked by the
    * <code>ServiceTracker</code>.
    *
-   * @param reference The reference to the service that has been removed.
-   * @param service The service object for the specified referenced service.
+   * \param[in] reference The reference to the service that has been removed.
+   * \param[in] service The service object for the specified referenced service.
    */
   virtual void RemovedService(const ServiceReferenceType& reference, TrackedType service) = 0;
 };

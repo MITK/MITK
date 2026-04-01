@@ -41,11 +41,15 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
   {
   public:
-    // sent when the pen size is changed or should be updated in a GUI.
+    /** \brief Emitted when the pen size changes or should be updated in a GUI. */
     Message1<int> SizeChanged;
 
     mitkClassMacro(PaintbrushTool, FeedbackContourTool);
 
+    /**
+     * \brief Sets the radius of the circular paintbrush pen.
+     * \param[in] value The pen radius in pixels.
+     */
     void SetSize(int value);
 
   protected:

@@ -17,11 +17,14 @@ found in the LICENSE file.
 
 namespace itk
 {
-  /** /class ConnectedAdaptiveThreholdImageFilter
-  * \brief ImageFilter used for processing an image with an adaptive
-  *        iterator (such as itkAdaptiveThresholdIterator)
-  *
-  * \ingroup RegionGrowingSegmentation
+  /** \class ConnectedAdaptiveThresholdImageFilter
+    \brief ImageFilter for region growing with an adaptive threshold iterator.
+
+    Uses itkAdaptiveThresholdIterator to perform connected region growing
+    with an adaptively expanding threshold range. Supports leakage detection
+    in both raw and fine modes (e.g. for bronchial tree segmentation).
+
+    \ingroup RegionGrowingSegmentation
   */
   template <class TInputImage, class TOutputImage>
   class ITK_EXPORT ConnectedAdaptiveThresholdImageFilter
@@ -47,40 +50,55 @@ namespace itk
     typedef typename InputImageType::IndexType IndexType;
     typedef typename InputImageType::PixelType PixelType;
 
+    /** \brief Set the growing direction for adaptive thresholding.
+      \param upwards If true, threshold expands upwards; otherwise downwards.
+    */
     void SetGrowingDirectionIsUpwards(bool upwards) { m_GrowingDirectionIsUpwards = upwards; }
-    /* Switch between fine and raw leakage detection. */
+
+    /** \brief Switch between fine and raw leakage detection mode.
+      \param fine If true, fine detection mode is used (for smaller bronchial vessels).
+    */
     void SetFineDetectionMode(bool fine)
     {
       m_FineDetectionMode = fine;
       m_DiscardLastPreview = false;
     }
 
+    /** \brief Get the pixel value at the seed point. */
     int GetSeedpointValue(void) { return m_SeedpointValue; }
+
+    /** \brief Get the detected leakage point value. */
     int GetLeakagePoint(void) { return m_DetectedLeakagePoint; }
 
-    /*
-    * Correct the position of the seed point, only performed if seed point value is outside threshold range
-    * @param sizeOfVolume edge length of the square volume in which the search for a "better" seed is performed
+    /** \brief Correct the seed point position if its value is outside the threshold range.
+
+      Searches within a cubic volume of the given edge length for a voxel that
+      lies within the threshold range.
+
+      \param sizeOfVolume Edge length of the search volume.
+      \param lowerTh Lower threshold bound.
+      \param upperTh Upper threshold bound.
+      \return The corrected seed point index.
     */
     IndexType CorrectSeedPointPosition(unsigned int sizeOfVolume, int lowerTh, int upperTh);
 
-    /* Sets all voxels in a square volume with the size of @param croppingSize
-    * and the center point equal to @param seedPoint to the value zero.
+    /** \brief Set all voxels in a cubic region around the seed point to zero.
+      \param croppingSize Edge length of the cubic cropping region.
     */
     void CropMask(unsigned int croppingSize);
 
-    /* Modifies the iterator mask to keep all previous segmentation results in the same mask.
-    * @returnParam largest value in the segmentation mask
+    /** \brief Modify the iterator mask to accumulate previous segmentation results.
+      \return The largest pixel value in the segmentation mask.
     */
     unsigned int AdjustIteratorMask();
 
-    /* Sets parameters needed for adjusting the iterator mask
-    * @param iteratorMaskForFineSegmentation pointer to the image containing the complete segmentation result of one
-    * leaf (inclusively leakage-segmentation)
-    * @param adjLowerTh lower threshold value of the segmentation without leakage-segmentation
-    * @param adjLowerTh upper threshold value of the segmentation without leakage-segmentation
-    * @param discardLeafSegmentation flag if the last segmentation preview ended with a leakage already in the first
-    * step
+    /** \brief Configure parameters for fine segmentation (bronchial tree leaf analysis).
+      \param iteratorMaskForFineSegmentation Pointer to the image containing the complete
+             segmentation result of one leaf (including leakage segmentation).
+      \param adjLowerTh Lower threshold for the segmentation without leakage.
+      \param adjUpperTh Upper threshold for the segmentation without leakage.
+      \param seedPoint The seed point index for the fine segmentation.
+      \param discardLeafSegmentation True if the last preview ended with leakage in the first step.
     */
     void SetParameterForFineSegmentation(TOutputImage *iteratorMaskForFineSegmentation,
                                          unsigned int adjLowerTh,
@@ -88,6 +106,7 @@ namespace itk
                                          itk::Index<3> seedPoint,
                                          bool discardLeafSegmentation);
 
+    /** \brief Get the result image after filter execution. */
     TOutputImage *GetResultImage();
 
   protected:

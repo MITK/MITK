@@ -20,6 +20,25 @@ found in the LICENSE file.
 
 namespace mitk
 {
+    /**
+     * \brief Computes image statistics, optionally restricted by one or two masks.
+     *
+     * ImageStatisticsCalculator is the central class for computing pixel statistics
+     * on MITK images. It supports single images and time-series images, and can
+     * restrict computation to regions defined by one or two MaskGenerator instances
+     * (combined via pixel-wise AND).
+     *
+     * Computed statistics include: mean, standard deviation, variance, minimum,
+     * maximum, RMS, skewness, kurtosis, MPP (mean of positive pixels), entropy,
+     * uniformity, UPP, median, and a configurable histogram.
+     *
+     * Results are stored in an ImageStatisticsContainer that organizes statistics
+     * by label value and time step.
+     *
+     * \sa ImageStatisticsContainer
+     * \sa MaskGenerator
+     * \sa HistogramStatisticsCalculator
+     */
     class MITKIMAGESTATISTICS_EXPORT ImageStatisticsCalculator: public itk::Object
     {
     public:
@@ -33,45 +52,89 @@ namespace mitk
         itkNewMacro(Self); /** Runtime information support. */
         itkTypeMacro(ImageStatisticsCalculator, itk::Object);
 
+        /** \brief Type for individual statistics values. */
         typedef double statisticsValueType;
+        /** \brief Map type associating statistic names with their values. */
         typedef std::map<std::string, statisticsValueType> statisticsMapType;
+        /** \brief Histogram type used for pixel value distribution. */
         typedef itk::Statistics::Histogram<double> HistogramType;
+        /** \brief Pixel type used for mask images. */
         typedef unsigned short MaskPixelType;
+        /** \brief Type used for label indexing in statistics containers. */
         using LabelIndex = ImageStatisticsContainer::LabelValueType;
 
-        /**Documentation
-        @brief Set the image for which the statistics are to be computed.*/
+        /**
+         * \brief Set the image for which statistics are to be computed.
+         * \param[in] image Pointer to the input MITK image.
+         * \pre image must not be nullptr.
+         */
         void SetInputImage(const mitk::Image* image);
 
-        /**Documentation
-        @brief Set the mask generator that creates the mask which is to be used to calculate statistics. If no more mask is desired simply set @param mask to nullptr*/
+        /**
+         * \brief Set the primary mask generator for restricting statistics computation.
+         *
+         * If no mask is desired, pass nullptr to clear the mask.
+         *
+         * \param[in] mask Pointer to a MaskGenerator, or nullptr.
+         */
         void SetMask(mitk::MaskGenerator* mask);
 
-        /**Documentation
-        @brief Set this if more than one mask should be applied (for instance if a IgnorePixelValueMask were to be used alongside with a segmentation).
-        Both masks are combined using pixel wise AND operation. The secondary mask does not have to be the same size than the primary but they need to have some overlap*/
+        /**
+         * \brief Set a secondary mask generator for additional region restriction.
+         *
+         * When set, the secondary mask is combined with the primary mask via
+         * pixel-wise AND operation. The secondary mask does not need to be the
+         * same size as the primary, but they must have some spatial overlap.
+         *
+         * \param[in] mask Pointer to a secondary MaskGenerator, or nullptr.
+         */
         void SetSecondaryMask(mitk::MaskGenerator* mask);
 
-        /**Documentation
-        @brief Set number of bins to be used for histogram statistics. If Bin size is set after number of bins, bin size will be used instead!*/
+        /**
+         * \brief Set the number of histogram bins for histogram statistics.
+         *
+         * If SetBinSizeForHistogramStatistics() is called after this method,
+         * bin size will take precedence over number of bins.
+         *
+         * \param[in] nBins Number of histogram bins. Default is 100.
+         */
         void SetNBinsForHistogramStatistics(unsigned int nBins);
 
-        /**Documentation
-        @brief Retrieve the number of bins used for histogram statistics. Careful: The return value does not indicate whether NBins or BinSize is used.
-        That solely depends on which parameter has been set last.*/
+        /**
+         * \brief Get the number of histogram bins.
+         *
+         * \return The currently configured number of bins. Note: this does not
+         *         indicate whether NBins or BinSize is actually used; that depends
+         *         on which was set last.
+         */
         unsigned int GetNBinsForHistogramStatistics() const;
 
-        /**Documentation
-        @brief Set bin size to be used for histogram statistics. If nbins is set after bin size, nbins will be used instead!*/
+        /**
+         * \brief Set the bin size for histogram statistics.
+         *
+         * If SetNBinsForHistogramStatistics() is called after this method,
+         * number of bins will take precedence over bin size.
+         *
+         * \param[in] binSize The desired histogram bin width. Default is 10.0.
+         */
         void SetBinSizeForHistogramStatistics(double binSize);
 
-        /**Documentation
-        @brief Retrieve the bin size for histogram statistics. Careful: The return value does not indicate whether NBins or BinSize is used.
-        That solely depends on which parameter has been set last.*/
+        /**
+         * \brief Get the histogram bin size.
+         *
+         * \return The currently configured bin size. Note: this does not indicate
+         *         whether NBins or BinSize is actually used; that depends on which
+         *         was set last.
+         */
         double GetBinSizeForHistogramStatistics() const;
 
-        /**Documentation
-        @brief Returns the statistics. If these requested statistics are not computed yet the computation is done as well.
+        /**
+         * \brief Get the computed statistics container.
+         *
+         * If statistics have not been computed yet or are out of date, this method
+         * triggers recomputation before returning the results.
+         *
+         * \return Pointer to the ImageStatisticsContainer holding all results.
          */
         ImageStatisticsContainer* GetStatistics();
 

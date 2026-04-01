@@ -25,9 +25,7 @@ found in the LICENSE file.
 
   \ingroup org_mitk_gui_qt_interactivesegmentation
 
-  Created through ITK object factory. TODO May be changed to a toolkit specific way later?
-
-  Last contributor: $Author$
+  Created through ITK object factory.
 */
 
 class MITKSEGMENTATIONUI_EXPORT QmitkToolGUI : public QWidget, public itk::Object
@@ -37,16 +35,20 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUI : public QWidget, public itk::Objec
 public:
   mitkClassMacroItkParent(QmitkToolGUI, itk::Object);
 
+  /** \brief Associates the given tool with this GUI, emitting NewToolAssociated. */
   void SetTool(mitk::Tool *tool);
 
-  // just make sure ITK won't take care of anything (especially not destruction)
+  /** \brief Intentional no-op; prevents ITK reference counting from interfering with Qt ownership. */
   void Register() const override;
+  /** \brief Intentional no-op; prevents ITK reference counting from interfering with Qt ownership. */
   void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
+  /** \brief Intentional no-op; prevents ITK reference counting from interfering with Qt ownership. */
   void SetReferenceCount(int) override;
 
   ~QmitkToolGUI() override;
 
 signals:
+  /** \brief Emitted when a new tool is associated with this GUI via SetTool(). */
   void NewToolAssociated(mitk::Tool *);
 
 protected:
@@ -54,6 +56,7 @@ protected:
 
   mitk::Tool::Pointer m_Tool;
 
+  /** \brief Called when the tool's busy state changes. Override to enable/disable UI elements. */
   virtual void BusyStateChanged(bool){};
 };
 

@@ -18,6 +18,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory that creates UnstructuredGridVtkWriter instances for various VTK writer types.
+   */
   class UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
   {
   public:

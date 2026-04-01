@@ -55,11 +55,17 @@ namespace itk
     /** ImageDimension constants */
     itkStaticConstMacro(InputImageDimension, unsigned int, TInputImage::ImageDimension);
 
-    /** Set/Get the image input of this process object.  */
+    /** \brief Set the image input of this process object. */
     using Superclass::SetInput;
     virtual void SetInput(const InputImageType *image);
+
+    /** \brief Set the image input at a specific index. */
     virtual void SetInput(unsigned int, const TInputImage *image);
+
+    /** \brief Get the first image input. */
     const InputImageType *GetInput(void);
+
+    /** \brief Get the image input at a specific index. */
     const InputImageType *GetInput(unsigned int idx);
 
   protected:

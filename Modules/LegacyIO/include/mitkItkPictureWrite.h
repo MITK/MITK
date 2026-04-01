@@ -17,23 +17,36 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 
 /**
- * @brief ITK-Like method to be called for writing an single-component image using the AccessByItk Macros
+ * \brief Write an ITK image with single-component pixel type to a picture file.
  *
- * @param itkImage an image with single-component pixel type
- * @param fileName the filename
+ * This is an ITK-style template function intended to be called via the MITK
+ * AccessByItk macros for writing images to standard picture formats (e.g., PNG, TIFF).
+ * It internally uses ITK image writers.
  *
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * \tparam TPixel The pixel type of the ITK image (must be a single-component scalar type).
+ * \tparam VImageDimension The dimension of the ITK image.
+ * \param[in] itkImage Pointer to the ITK image to write.
+ * \param[in] fileName The output file path including the extension that determines
+ *            the image format.
+ *
+ * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 template <typename TPixel, unsigned int VImageDimension>
 DEPRECATED(void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkImage, const std::string &fileName));
 
 /**
- * @brief ITK-Like method to be called for writing an image
+ * \brief Write an ITK image with single-component or composite pixel type to a picture file.
  *
- * @param itkImage an Image with single-component or composite pixel type
- * @param fileName the filename
+ * Similar to _mitkItkPictureWrite(), but additionally supports composite (multi-component)
+ * pixel types such as RGB or RGBA.
  *
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+ * \tparam TPixel The pixel type of the ITK image (may be scalar or composite).
+ * \tparam VImageDimension The dimension of the ITK image.
+ * \param[in] itkImage Pointer to the ITK image to write.
+ * \param[in] fileName The output file path including the extension that determines
+ *            the image format.
+ *
+ * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 template <typename TPixel, unsigned int VImageDimension>
 DEPRECATED(void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,

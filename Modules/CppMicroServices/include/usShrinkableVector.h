@@ -22,7 +22,7 @@ namespace us {
 /**
  * \ingroup MicroServicesUtils
  *
- * A std::vector style container allowing query and removal
+ * \brief A std::vector style container allowing query and removal
  * operations only.
  */
 template<class E>

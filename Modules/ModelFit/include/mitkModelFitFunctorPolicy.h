@@ -20,6 +20,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ModelFitFunctorPolicy
+   * \brief Policy class that combines a ModelFitFunctorBase and a ModelParameterizerBase for pixel-wise fitting.
+   *
+   * This policy generates a parameterized model for each pixel position, retrieves
+   * the initial parameters, and invokes the model fit functor. It is used as the
+   * functor type for itkMultiOutputNaryFunctorImageFilter in pixel-based fitting.
+   *
+   * \sa ModelFitFunctorBase, ModelParameterizerBase, PixelBasedParameterFitImageGenerator
+   */
   class MITKMODELFIT_EXPORT ModelFitFunctorPolicy
   {
   public:

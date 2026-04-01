@@ -36,15 +36,14 @@ namespace mitk
 
 class QmitkRenderWindow;
 
-/*
-* @brief The 'QmitkRenderWindowUtilityWidget' can be added to a 'QMitkRenderWindowWidget' to extend it
-*        with window-specific utilities.
+/**
+* \brief Utility widget that extends a QmitkRenderWindowWidget with window-specific controls.
 *
-*        It offers to select the viewing direction of the window, as well as a 'QmitkSliceNavigationWidget'
-*        to scroll through the current view direction.
-*        In addition, it contains a 'QmitkSynchronizedNodeSelectionWidget' that controls renderer-specific
-*        properties and shown nodes, as well as a synchronization-group selector to share this state with
-*        other render windows.
+* It offers to select the viewing direction of the window, as well as a QmitkSliceNavigationWidget
+* to scroll through the current view direction.
+* In addition, it contains a QmitkSynchronizedNodeSelectionWidget that controls renderer-specific
+* properties and shown nodes, as well as a synchronization-group selector to share this state with
+* other render windows.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {

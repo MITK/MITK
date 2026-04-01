@@ -45,7 +45,7 @@ namespace mitk
 }
 
 /**
- * @brief QmitkIOUtil Provides static helper methods to open and save files with Qt dialogs.
+ * \brief QmitkIOUtil Provides static helper methods to open and save files with Qt dialogs.
  */
 class MITKQTWIDGETS_EXPORT QmitkIOUtil : public mitk::IOUtil
 {
@@ -79,13 +79,13 @@ public:
   };
 
   /**
-   * @brief GetFilterString
-   * @return
+   * \brief GetFilterString
+   * \return
    */
   static QString GetFileOpenFilterString();
 
   /**
-   * @brief Loads the specified files
+   * \brief Loads the specified files
    *
    * This methods tries to load all specified files and pop-ups dialog boxes if further
    * user input is required (e.g. ambiguous mime-types or reader options).
@@ -93,9 +93,9 @@ public:
    * If the provided DataStorage is not nullptr, some files will be added to it automatically,
    * depending on the IFileReader used.
    *
-   * @param paths
-   * @param parent
-   * @return A list of BaseData instances which have not already been added to the data storage.
+   * \param paths
+   * \param parent
+   * \return A list of BaseData instances which have not already been added to the data storage.
    */
   static QList<mitk::BaseData::Pointer> Load(const QStringList &paths, QWidget *parent = nullptr);
 
@@ -118,7 +118,7 @@ public:
                       bool setPathProperty = false);
 
   /**
-   * @brief Save a list of BaseData objects using a "File Save Dialog".
+   * \brief Save a list of BaseData objects using a "File Save Dialog".
    *
    * For each element in the \c data vector, the following algorithm is
    * used to find a IFileWriter instance for writing the BaseData object.
@@ -169,12 +169,12 @@ public:
    *     reported and the second phase continues with the next base data object.</li>
    * </ol>
    *
-   * @param data
-   * @param defaultBaseNames
-   * @param defaultPath
-   * @param parent
-   * @param setPathProperty
-   * @return
+   * \param data
+   * \param defaultBaseNames
+   * \param defaultPath
+   * \param parent
+   * \param setPathProperty
+   * \return
    */
   static QStringList Save(const std::vector<const mitk::BaseData *> &data,
                           const QStringList &defaultBaseNames,
@@ -185,46 +185,46 @@ public:
   using mitk::IOUtil::Save;
 
   /**
-   * @brief SaveBaseDataWithDialog Convenience method to save any data with a Qt dialog.
-   * @param data BaseData holding the data you wish to save.
-   * @param fileName The file name where to save the data (including path and extension).
-   * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
+   * \brief SaveBaseDataWithDialog Convenience method to save any data with a Qt dialog.
+   * \param data BaseData holding the data you wish to save.
+   * \param fileName The file name where to save the data (including path and extension).
+   * \param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
    * screen.
-   * @deprecatedSince{2014_10} Use Save() instead.
+   * \deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget *parent = nullptr));
 
   /**
-   * @brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.
-   * @param surface The surface to save.
-   * @param fileName The file name where to save the data (including path and extension).
-   * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
+   * \brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.
+   * \param surface The surface to save.
+   * \param fileName The file name where to save the data (including path and extension).
+   * \param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
    * screen.
-   * @deprecatedSince{2014_10} Use Save() instead.
+   * \deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveSurfaceWithDialog(mitk::Surface::Pointer surface,
                                                std::string fileName = "",
                                                QWidget *parent = nullptr));
 
   /**
-   * @brief SaveImageWithDialog Convenience method to save an image with a Qt dialog.
-   * @param image The image to save.
-   * @param fileName The file name where to save the data (including path and extension).
-   * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
+   * \brief SaveImageWithDialog Convenience method to save an image with a Qt dialog.
+   * \param image The image to save.
+   * \param fileName The file name where to save the data (including path and extension).
+   * \param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
    * screen.
-   * @deprecatedSince{2014_10} Use Save() instead.
+   * \deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SaveImageWithDialog(mitk::Image::Pointer image,
                                              std::string fileName = "",
                                              QWidget *parent = nullptr));
 
   /**
-   * @brief SavePointSetWithDialog Convenience method to save a pointset with a Qt dialog.
-   * @param pointset The pointset to save.
-   * @param fileName The file name where to save the data (including path and extension).
-   * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
+   * \brief SavePointSetWithDialog Convenience method to save a pointset with a Qt dialog.
+   * \param pointset The pointset to save.
+   * \param fileName The file name where to save the data (including path and extension).
+   * \param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the
    * screen.
-   * @deprecatedSince{2014_10} Use Save() instead.
+   * \deprecatedSince{2014_10} Use Save() instead.
    */
   DEPRECATED(static void SavePointSetWithDialog(mitk::PointSet::Pointer pointset,
                                                 std::string fileName = "",

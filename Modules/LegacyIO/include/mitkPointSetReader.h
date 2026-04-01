@@ -29,22 +29,23 @@ namespace tinyxml2
 namespace mitk
 {
   /**
-   * @brief reads xml representations of mitk::PointSets from a file
+   * \brief XML-based reader for mitk::PointSet files.
    *
-   * Reader for xml files containing one or multiple xml representations of
-   * mitk::PointSets. If multiple mitk::PointSets are stored in one file,
-   * these are assigned to multiple outputs of the filter. The number of point
-   * sets which have be read can be retrieven by a call to GetNumberOfOutputs()
-   * after the pipeline update().
-   * The reader is able to read the old 3D Pointsets without the "specification" and "timeseries" tags and the new 4D
-   * Pointsets.
-   * @note loading point sets from multiple files according to a given file pattern
-   * is not yet supported!
+   * Reads XML files containing one or more serialized mitk::PointSet objects.
+   * If multiple point sets are stored in a single file, each is assigned to a
+   * separate output of this filter. The number of loaded point sets can be
+   * queried via GetNumberOfOutputs() after calling Update().
    *
-   * @ingroup MitkLegacyIOModule
+   * The reader supports both the legacy 3D point set format (without "specification"
+   * and "timeseries" tags) and the newer 4D point set format with time series support.
    *
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-  */
+   * \note Loading point sets from multiple files according to a file pattern
+   *       is not yet supported.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::PointSetWriter, mitk::PointSetIOFactory, mitk::PointSetSource
+   */
   class MITKLEGACYIO_EXPORT PointSetReader : public PointSetSource, public FileReader
   {
   public:
@@ -54,42 +55,56 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /**
-       * @brief Sets the filename of the file to be read
-       * @param _arg the filename of the point set xml-file
-       */
-      itkSetStringMacro(FileName);
+    /**
+     * \brief Set the filename of the point set XML file to read.
+     * \param[in] _arg The absolute path to the point set XML file.
+     */
+    itkSetStringMacro(FileName);
 
     /**
-     * @brief Returns the filename of the point set xml-file.
-     * @returns the filename of the point set xml-file.
+     * \brief Get the filename of the point set XML file.
+     * \return The file path that was set via SetFileName().
      */
     itkGetStringMacro(FileName);
 
     /**
-     * @warning multiple load not (yet) supported
+     * \brief Set the file prefix for multi-file loading.
+     * \warning Multiple file loading is not yet supported.
      */
     itkSetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple load not (yet) supported
+     * \brief Get the file prefix.
+     * \warning Multiple file loading is not yet supported.
      */
     itkGetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple load not (yet) supported
+     * \brief Set the file pattern for multi-file loading.
+     * \warning Multiple file loading is not yet supported.
      */
     itkSetStringMacro(FilePattern);
 
     /**
-     * @warning multiple load not (yet) supported
+     * \brief Get the file pattern.
+     * \warning Multiple file loading is not yet supported.
      */
     itkGetStringMacro(FilePattern);
 
+    /**
+     * \brief Check whether the given file can be read by this reader.
+     * \param[in] filename The file path to check.
+     * \param[in] filePrefix The file prefix (currently unused).
+     * \param[in] filePattern The file pattern (currently unused).
+     * \return \c true if the file can be read (checks for ".mps" extension);
+     *         \c false otherwise.
+     */
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
     /**
-     * @returns whether the last read attempt was successful or not.
+     * \brief Query whether the last read attempt was successful.
+     * \return \c true if the last call to Update() successfully read point set data;
+     *         \c false otherwise.
      */
     bool GetSuccess() const;
 
@@ -120,14 +135,14 @@ namespace mitk
 
     /**
      * Resizes the output-objects according to the given number.
-     * @param num the new number of output objects.
+     * \param num the new number of output objects.
      */
     virtual void ResizeOutputs(const unsigned int &num);
 
     /**
      * Checks if the given file has appropriate
      * read access.
-     * @returns true if the file exists and may be read
+     * \return true if the file exists and may be read
      *          or false otherwise.
      */
     virtual int CanReadFile(const char *name);

@@ -21,57 +21,64 @@ found in the LICENSE file.
 
 /**
  * \ingroup QmitkModule
- * \brief Provides a contextmenu for Level/Window functionality.
+ * \brief Provides a context menu for level/window manipulation.
  *
- * Either creates
- * a new contextmenu with standard functions or adds Level/Window standard
- * functions to an predefined contextmenu.
+ * This widget creates a context menu offering standard level/window operations
+ * such as preset selection, auto-optimization, scale range changes, and image
+ * selection. It can either generate a standalone context menu or append its
+ * entries to an existing QMenu.
+ *
+ * \sa QmitkSliderLevelWindowWidget
+ * \sa QmitkLineEditLevelWindowWidget
+ * \sa QmitkLevelWindowWidget
+ * \sa mitk::LevelWindowManager
  */
 class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// constructor
+  /**
+   * \brief Constructs the context menu widget.
+   * \param[in] parent The parent widget.
+   * \param[in] f      Optional window flags.
+   */
   QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f = {});
   ~QmitkLevelWindowWidgetContextMenu() override;
 
-  /*!
-  *  data structure which reads and writes presets defined in a XML-file
-  */
+  /** \brief Handles reading and writing of level/window presets from an XML file. */
   mitk::LevelWindowPreset *m_LevelWindowPreset;
 
-  /*!
-  *  data structure which stores the values manipulated
-  *  by a QmitkLevelWindowWidgetContextMenu
-  */
+  /** \brief Stores the current level/window values manipulated by the context menu. */
   mitk::LevelWindow m_LevelWindow;
 
-  /// submenu with all presets for contextmenu
+  /** \brief Submenu listing all available presets. */
   QMenu *m_PresetSubmenu;
 
-  /// submenu with all images for contextmenu
+  /** \brief Submenu listing all available images. */
   QMenu *m_ImageSubmenu;
 
-  /// pointer to the object which manages all Level/Window changes on images and holds the LevelWindowProperty
-  /// of the current image
+  /** \brief The LevelWindowManager that tracks level/window changes and holds the current image's LevelWindowProperty. */
   mitk::LevelWindowManager *m_Manager;
 
-  /// map to hold all image-properties, one can get the image which is selected in the contextmenu
-  /// with the QAction representing the image for the contextmenu
+  /** \brief Maps context menu actions to their associated LevelWindowProperty for image selection. */
   std::map<QAction *, mitk::LevelWindowProperty::Pointer> m_Images;
 
-  /*!
-  * returns the contextmenu with standard functions for Level/Window
-  *
-  * input is a prefilled contextmenu to which standard functions will be added
-  */
+  /**
+   * \brief Appends standard level/window actions to an existing context menu.
+   * \param[in,out] contextMenu The menu to which level/window actions are appended.
+   */
   void GetContextMenu(QMenu *contextMenu);
 
-  /// returns the contextmenu with standard functions for Level/Window
+  /**
+   * \brief Creates and shows a standalone context menu with standard level/window actions.
+   */
   void GetContextMenu();
 
-  /// lets this object know about the LevelWindowManager to get all images and tell about changes
+  /**
+   * \brief Sets the LevelWindowManager used for image queries and change notifications.
+   * \param[in] levelWindowManager The LevelWindowManager to use.
+   */
   void SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
 protected:

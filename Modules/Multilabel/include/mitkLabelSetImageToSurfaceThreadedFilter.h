@@ -19,6 +19,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Threaded filter that generates a surface mesh from a label in a MultiLabelSegmentation.
+   *
+   * This filter runs the surface extraction in a background thread using the
+   * NonBlockingAlgorithm framework. It extracts a single requested label from
+   * the input segmentation and produces a mitk::Surface.
+   *
+   * \sa LabelSetImageToSurfaceFilter, SegmentationSink, MultiLabelSegmentation
+   */
   class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
   {
   public:

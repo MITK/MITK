@@ -25,25 +25,24 @@ class vtkPolyData;
 namespace mitk
 {
   /**
+   * \brief Converts surface data to pixel data by stamping a surface into a volume image.
    *
-   * @brief Converts surface data to pixel data. Requires a surface and an
-   * image, which header information defines the output image.
-   *
+   * Requires a surface and an image, whose header information defines the output image.
    * The resulting image has the same dimension, size, and Geometry3D
    * as the input image. The image is cut using a vtkStencil.
-   * The user can decide if he wants to keep the original values or create a
-   * binary image by setting MakeBinaryOutputOn (default is \a false). If
-   * set to \a true all voxels inside the surface are set to one and all
-   * outside voxel are set to zero.
+   * The user can decide whether to keep the original values or create a
+   * binary image by setting MakeBinaryOutputOn (default is false). If
+   * set to true, all voxels inside the surface are set to one and all
+   * outside voxels are set to zero.
    *
-   * NOTE: Since the reference input image is passed to the vtkStencil in
+   * \note Since the reference input image is passed to the vtkStencil in
    * any case, the image needs to be initialized with pixel values greater than
    * the numerical minimum of the used pixel type (e.g. at least -127 for
-   * unsigned char images, etc.) to produce a correct binary image
+   * unsigned char images) to produce a correct binary image
    * representation of the surface in MakeOutputBinary mode.
    *
-   * @ingroup SurfaceFilters
-   * @ingroup Process
+   * \ingroup SurfaceFilters
+   * \ingroup Process
    */
   class MITKSEGMENTATION_EXPORT SurfaceStampImageFilter : public ImageToImageFilter
   {
@@ -65,14 +64,22 @@ namespace mitk
     itkGetConstMacro(ForegroundValue, float);
     itkSetMacro(ForegroundValue, float);
 
+    /** \brief Generates the input requested region for the filter pipeline. */
     void GenerateInputRequestedRegion() override;
 
+    /** \brief Generates the output information (image properties). */
     void GenerateOutputInformation() override;
 
+    /** \brief Executes the surface stamping filter. */
     void GenerateData() override;
 
+    /**
+     * \brief Sets the surface to be stamped onto the image.
+     * \param[in] surface The surface whose enclosed volume defines the stamping region.
+     */
     void SetSurface(mitk::Surface *surface);
 
+    /** \brief Mesh type used internally for surface processing. */
     typedef itk::QuadEdgeMesh<double, 3> MeshType;
 
   protected:

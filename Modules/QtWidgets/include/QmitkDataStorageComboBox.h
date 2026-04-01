@@ -10,6 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file QmitkDataStorageComboBox.h
+ * \brief Declares QmitkDataStorageComboBox, a QComboBox subclass that displays data nodes from a DataStorage.
+ *
+ * \ingroup QmitkModule
+ */
+
 #ifndef QmitkDataStorageComboBox_h
 #define QmitkDataStorageComboBox_h
 
@@ -180,8 +187,14 @@ protected:
   ///
   virtual void Reset();
 
+  ///
+  /// \brief Remove the node at the given index and unregister its property list observers.
+  ///
   void RemoveNodeAndPropertyLists(int index);
 
+  ///
+  /// \brief Update the combo box display text when a node's property list changes.
+  ///
   virtual void UpdateComboBoxText(const mitk::PropertyList*);
 
 protected:

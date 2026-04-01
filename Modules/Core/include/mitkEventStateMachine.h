@@ -99,14 +99,22 @@ namespace mitk
   /**
    * \class EventStateMachine
    *
-   * \brief Super-class that provides the functionality of a StateMachine to DataInteractors.
+   * \brief Provides state machine functionality for DataInteractors.
    *
-   * A state machine is created by loading a state machine pattern. It consists of states, transitions and action.
-   * The state represent the current status of the interaction, transitions are means to switch between states. Each
-   * transition
-   * is triggered by an event and it is associated with actions that are to be executed when the state change is
-   * performed.
+   * A state machine is created by loading an XML state machine pattern via
+   * LoadStateMachine(). It consists of states, transitions, and actions:
+   * - States represent the current status of the interaction.
+   * - Transitions are the means to switch between states; each is triggered by an event.
+   * - Actions are executed when a state change is performed.
    *
+   * Subclasses override ConnectActionsAndFunctions() to bind action names from the
+   * XML description to C++ member functions using the CONNECT_FUNCTION macro.
+   * Conditions can be bound similarly using the CONNECT_CONDITION macro.
+   *
+   * \sa DataInteractor
+   * \sa InteractionEventHandler
+   * \sa Dispatcher
+   * \ingroup Interaction
    */
   class MITKCORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
@@ -118,36 +126,47 @@ namespace mitk
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
     /**
-      * @brief Loads XML resource
-      *
-      * Loads a XML resource file from the given module.
-      * Default is the Mitk module (core).
-      * The files have to be placed in the Resources/Interaction folder of their respective module.
-      **/
+     * \brief Load a state machine pattern from an XML resource file.
+     *
+     * The file must be located in the Resources/Interaction folder of the
+     * given module. Default is the Mitk module (core). After loading,
+     * ConnectActionsAndFunctions() is called to bind actions.
+     *
+     * \param[in] filename The resource filename (e.g. "PointSetInteraction.xml").
+     * \param[in] module The module containing the resource. Defaults to the Mitk module.
+     * \return true if the state machine was loaded successfully, false otherwise.
+     */
     bool LoadStateMachine(const std::string &filename, const us::Module *module = nullptr);
+
     /**
-     * Receives Event from Dispatcher.
-     * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening
-     * for
-     * such an Event. If this is the case, the transition to the next state it performed and all actions associated with
-     * the transition executed,
-     * and true is returned to the caller.
-     * If the StateMachine can't handle this event false is returned.
-     * Attention:
-     * If a transition is associated with multiple actions - "true" is returned if one action returns true,
-     * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all
-     * actions that occur within
-     * one transitions have the same conditions.
+     * \brief Process an incoming interaction event.
+     *
+     * Receives an event from the Dispatcher, maps it to a variant via the
+     * EventConfig, checks if the current state has a matching transition, and
+     * if so, transitions to the next state and executes all associated actions.
+     *
+     * \param[in] event The interaction event to handle.
+     * \param[in] dataNode The DataNode associated with this interactor.
+     * \return true if the event was handled (a transition was executed), false otherwise.
+     *
+     * \note If a transition has multiple actions, true is returned as soon as one
+     *       action succeeds. All actions within a transition should have consistent conditions.
      */
     bool HandleEvent(InteractionEvent *event, DataNode *dataNode);
 
     /**
-    * @brief Enables or disabled Undo.
-    **/
+     * \brief Enable or disable the undo mechanism for this state machine.
+     * \param[in] enable True to enable undo, false to disable.
+     */
     void EnableUndo(bool enable) { m_UndoEnabled = enable; }
+
     /**
-    * @brief Enables/disables the state machine. In un-enabled state it won't react to any events.
-    **/
+     * \brief Enable or disable the state machine.
+     *
+     * When disabled, the state machine will not react to any events.
+     *
+     * \param[in] enable True to enable interaction, false to disable.
+     */
     void EnableInteraction(bool enable) { m_IsActive = enable; }
   protected:
     EventStateMachine();

@@ -38,6 +38,7 @@ std::vector<std::string> AutoLoadModules(const ModuleInfo& moduleInfo);
 
 namespace us {
 
+/** \brief Returns a human-readable string describing the last system error. */
 MITKCPPMICROSERVICES_EXPORT std::string GetLastErrorStr();
 
 }

@@ -35,7 +35,7 @@ namespace mitk
   class PointSet;
 
   /**
-  * @brief Vtk-based 2D mapper for PointSet
+  * \brief Vtk-based 2D mapper for PointSet
   *
   * Due to the need of different colors for selected
   * and unselected points and the facts, that we also have a contour and
@@ -50,7 +50,7 @@ namespace mitk
   * a contour between points, calculating and displaying distances or angles
   * between points.
   *
-  * @section mitkPointSetVtkMapper2D_point_rep Point Representation
+  * \section mitkPointSetVtkMapper2D_point_rep Point Representation
   *
   * The points are displayed as small glyphs of configurable shape
   * (see property "PointSet.2D.shape"). The size of these glyphs
@@ -64,7 +64,7 @@ namespace mitk
   * object is returned in GetProp() and so hooked up into the rendering
   * pipeline.
   *
-  * @section mitkPointSetVtkMapper2D_propertires Applicable Properties
+  * \section mitkPointSetVtkMapper2D_propertires Applicable Properties
   *
   * Properties that can be set for point sets and influence the PointSetVTKMapper2D are:
   *
@@ -112,7 +112,9 @@ namespace mitk
   * to
   * the point
   *
-  * @ingroup Mapper
+  * \sa PointSetVtkMapper3D
+  * \sa PointSet
+  * \ingroup Mapper
   */
   class MITKCORE_EXPORT PointSetVtkMapper2D : public VtkMapper
   {
@@ -123,12 +125,25 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+      /** \brief Returns the PointSet input data object of this mapper.
+       *
+       * \return The associated PointSet, or nullptr if no data is set.
+       */
       virtual const mitk::PointSet *GetInput() const;
 
-    /** \brief returns the a prop assembly */
+    /** \brief Returns the vtkPropAssembly containing all VTK actors for the given renderer.
+     *
+     * \param renderer the renderer for which to retrieve the VTK prop.
+     * \return The vtkPropAssembly that aggregates all rendering actors.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief set the default properties for this mapper */
+    /** \brief Sets default properties for point set visualization in 2D.
+     *
+     * \param node the data node to configure.
+     * \param renderer the renderer for which properties should be set, or nullptr for global defaults.
+     * \param overwrite if true, existing properties will be overwritten.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -198,29 +213,41 @@ namespace mitk
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   protected:
-    /* constructor */
+    /** \brief Constructor. */
     PointSetVtkMapper2D();
 
-    /* destructor */
+    /** \brief Destructor. */
     ~PointSetVtkMapper2D() override;
 
-    /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
+    /** \brief Applies the color and opacity properties and calls CreateVTKRenderObjects.
+     *
+     * \param renderer the renderer for which data is generated.
+     */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-    /* \brief Called in mitk::Mapper::Update
-    * If TimeGeometry or time step is not valid of point set: reset mapper so that nothing is
-    * displayed e.g. toggle visibility of the propassembly */
+
+    /** \brief Called in mitk::Mapper::Update to reset the mapper.
+     *
+     * If TimeGeometry or time step is not valid for the point set, the mapper is reset
+     * so that nothing is displayed (e.g. toggles visibility of the prop assembly off).
+     *
+     * \param renderer the renderer for which the mapper is reset.
+     */
     void ResetMapper(BaseRenderer *renderer) override;
 
-    /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
-   * This function iterates over the input point set and determines the glyphs which lie in a specific
-   * range around the current slice. Those glyphs are rendered using a specific shape defined in vtk glyph source
-   * to mark each point. The shape can be changed in MITK using the property "PointSet.2D.shape".
-   *
-   * There were issues when rendering vtk glyphs in the 2D-render windows. By default, the glyphs are
-   * rendered within the x-y plane in each 2D-render window, so you would only see them from the
-   * side in the sagittal and coronal 2D-render window. The solution to this is to rotate the glyphs in order
-   * to be orthogonal to the current view vector. To achieve this, the rotation (vtktransform) of the current
-   * PlaneGeometry is applied to the orientation of the glyphs. */
+    /** \brief Fills the VTK objects; only called when the point set has been changed.
+     *
+     * This function iterates over the input point set and determines the glyphs which lie in a specific
+     * range around the current slice. Those glyphs are rendered using a specific shape defined in vtk glyph source
+     * to mark each point. The shape can be changed in MITK using the property "PointSet.2D.shape".
+     *
+     * There were issues when rendering vtk glyphs in the 2D-render windows. By default, the glyphs are
+     * rendered within the x-y plane in each 2D-render window, so you would only see them from the
+     * side in the sagittal and coronal 2D-render window. The solution to this is to rotate the glyphs in order
+     * to be orthogonal to the current view vector. To achieve this, the rotation (vtktransform) of the current
+     * PlaneGeometry is applied to the orientation of the glyphs.
+     *
+     * \param renderer the renderer for which the VTK render objects are created.
+     */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer *renderer);
 
     // member variables holding the current value of the properties used in this mapper

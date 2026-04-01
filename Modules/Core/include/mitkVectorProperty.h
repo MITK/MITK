@@ -23,35 +23,47 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief Helper for VectorProperty to determine a good ITK ClassName.
-
-    This template is specialized for special instantiations that need
-    a serializer of this VectorProperty.
-  */
+   * \brief Helper trait for VectorProperty to determine a good ITK class name prefix.
+   *
+   * This template is specialized for specific instantiations that need
+   * a serializer for the VectorProperty. The default returns "Invalid"
+   * to indicate an unsupported type.
+   *
+   * \tparam D The data type of the vector elements.
+   *
+   * \sa VectorProperty
+   */
   template <typename D>
   struct VectorPropertyDataType
   {
+    /** \brief Return the prefix string for the class name.
+     *  \return "Invalid" for unspecialized types. */
     static const char *prefix() { return "Invalid"; }
   };
 
   /**
-    \brief Providing a std::vector as property.
-
-    Templated over the data type of the std::vector that is held
-    by this class. Nothing special about data handling, setting and
-    getting of std::vectors is implemented by-value.
-
-    When checking the declaration of this class, you'll notice
-    that it does not use the mitkClassMacro but instead writes all
-    of its definition manually.
-    This is in order to specifically override the GetNameOfClass()
-    method without having to inherit again from the template (see
-    comments in code).
-  */
+   * \brief Property for storing a std::vector of values.
+   *
+   * Templated over the data type of the std::vector that is held by this class.
+   * Setting and getting of std::vectors is implemented by-value.
+   *
+   * The class manually expands most of mitkClassMacro to specifically override
+   * GetNameOfClass() and GetStaticNameOfClass() in order to return type-dependent
+   * class names (e.g., "DoubleVectorProperty", "IntVectorProperty"). This is
+   * essential for serialization.
+   *
+   * \tparam DATATYPE The element type of the stored vector.
+   *
+   * \ingroup DataManagement
+   *
+   * \sa BaseProperty
+   * \sa VectorPropertyDataType
+   */
   template <typename DATATYPE>
   class MITKCORE_EXPORT VectorProperty : public BaseProperty
   {
   public:
+    /** \brief The type of the std::vector stored by this property. */
     typedef std::vector<DATATYPE> VectorType;
 
     // Manually expand most of mitkClassMacro:
@@ -63,9 +75,15 @@ namespace mitk
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
     std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }
-    /// This function must return different
-    /// strings in function of the template parameter!
-    /// Serialization depends on this feature.
+
+    /**
+     * \brief Return the static class name including the type-dependent prefix.
+     *
+     * This function returns different strings depending on the template parameter,
+     * which is required for serialization to work correctly.
+     *
+     * \return The class name string (e.g., "DoubleVectorProperty").
+     */
     static const char *GetStaticNameOfClass()
     {
       // concatenate a prefix dependent on the template type and our own classname
@@ -77,23 +95,43 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /// Returns the property value as a std::string.
-      ///
-      /// Since VectorProperty potentially holds many
-      /// elements, it implements this function in a way
-      /// that only the first and the last couple of
-      /// elements really appear in the string.
-      /// Missing central elements are indicated by
-      /// an ellipsis ("...")
-      std::string GetValueAsString() const override;
+    /**
+     * \brief Return the property value as a human-readable string.
+     *
+     * Since VectorProperty potentially holds many elements, only the first
+     * and last few elements appear in the string. Missing central elements
+     * are indicated by an ellipsis ("...").
+     *
+     * \return A string representation showing the first and last elements.
+     */
+    std::string GetValueAsString() const override;
 
-    /// returns a const reference to the contained vector
+    /**
+     * \brief Get a const reference to the contained vector.
+     * \return A const reference to the stored vector.
+     */
     virtual const VectorType &GetValue() const;
 
-    /// sets the content vector
+    /**
+     * \brief Set the content vector.
+     * \param[in] parameter_vector The new vector to store.
+     */
     virtual void SetValue(const VectorType &parameter_vector);
 
+    /**
+     * \brief Serialize the vector to JSON as a JSON array.
+     *
+     * \param[out] j The JSON value to write into.
+     * \return Always \c true.
+     */
     bool ToJSON(nlohmann::json& j) const override;
+
+    /**
+     * \brief Deserialize the vector from a JSON array.
+     *
+     * \param[in] j The JSON array to read from.
+     * \return Always \c true.
+     */
     bool FromJSON(const nlohmann::json& j) override;
 
   protected:

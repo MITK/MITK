@@ -209,29 +209,65 @@ namespace mitk
     */
     void SetTimeStepGeometry(BaseGeometry *geometry, TimeStepType timeStep) override;
 
+    /**
+     * \brief Remove all stored geometries and time bounds, leaving the container empty.
+     */
     void ClearAllGeometries();
 
-    /** Append the passed geometry to the time geometry.
-     * @pre The passed geometry pointer must be valid.
-     * @pre The minimumTimePoint must not be smaller than the maximum time point of the currently last time step.
-     * Therefore time steps must not be overlapping in time.
-     * @pre minimumTimePoint must not be larger then maximumTimePoint.*/
+    /**
+     * \brief Append a new time step with the given geometry and time bounds.
+     *
+     * \param[in] geometry The geometry for the new time step.
+     * \param[in] minimumTimePoint Lower time bound (ms) of the new step.
+     * \param[in] maximumTimePoint Upper time bound (ms) of the new step.
+     *
+     * \pre \a geometry must not be nullptr.
+     * \pre \a minimumTimePoint must be >= the maximum time point of the
+     *      currently last time step (no overlap).
+     * \pre \a minimumTimePoint must be <= \a maximumTimePoint.
+     *
+     * \throw mitk::Exception if any precondition is violated.
+     */
     void AppendNewTimeStep(BaseGeometry *geometry, TimePointType minimumTimePoint, TimePointType maximumTimePoint);
 
-    /** Same than AppendNewTimeStep. But clones geometry before adding it.*/
+    /**
+     * \brief Append a new time step with a clone of the given geometry.
+     *
+     * Clones \a geometry and then delegates to AppendNewTimeStep().
+     *
+     * \param[in] geometry The geometry to clone for the new time step.
+     * \param[in] minimumTimePoint Lower time bound (ms) of the new step.
+     * \param[in] maximumTimePoint Upper time bound (ms) of the new step.
+     *
+     * \sa AppendNewTimeStep
+     */
     void AppendNewTimeStepClone(const BaseGeometry* geometry,
                               TimePointType minimumTimePoint,
                               TimePointType maximumTimePoint );
 
+    /**
+     * \brief Pre-allocate space for a given number of geometries.
+     *
+     * Reserves memory in the internal vectors for geometries and time
+     * bounds without actually creating objects.
+     *
+     * \param[in] numberOfGeometries The number of slots to reserve.
+     */
     void ReserveSpaceForGeometries( TimeStepType numberOfGeometries );
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    /** This is a helper that indicates problematic corner cases that often occur e.g. when loading
-    dynamic DICOM data. There the final time step is collapsed as min time bound and max time bound
-    have the same value. For a more detailed explanation why it happens please see:
-    https://phabricator.mitk.org/T24766#131411 and https://phabricator.mitk.org/T27259#203524
-    */
+    /**
+     * \brief Check whether the final time step has collapsed (zero-duration) bounds.
+     *
+     * This indicates a problematic corner case that frequently occurs
+     * when loading dynamic DICOM data stored as single-frame images,
+     * where no duration can be deduced for the last time step. The
+     * minimum and maximum time bounds of the final step are identical.
+     *
+     * \return true if the final time step has min == max time bound.
+     * \sa https://phabricator.mitk.org/T24766, https://phabricator.mitk.org/T27259
+     */
     bool HasCollapsedFinalTimeStep() const;
 
   protected:

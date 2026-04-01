@@ -48,7 +48,7 @@ namespace mitk
 
     using ProviderMapType = std::map<std::string, mitk::ToolManager::Pointer>;
 
-    // Known ToolManager contexts
+    /** \brief Well-known context identifier for the default segmentation ToolManager. */
     static const char* const SEGMENTATION;
 
     /**

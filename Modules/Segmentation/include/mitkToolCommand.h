@@ -20,11 +20,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief A command to get tool process feedback.
-  *
-  * \sa ProgressBar
-  *
-  */
+   * \brief ITK command for tracking progress of segmentation tool operations.
+   *
+   * This command can be registered as an observer on ITK filters to receive
+   * ProgressEvent and IterationEvent notifications. It updates the MITK
+   * progress bar accordingly.
+   *
+   * \sa SegWithPreviewTool, ProgressBar
+   */
   class MITKSEGMENTATION_EXPORT ToolCommand : public itk::Command
   {
   public:
@@ -34,40 +37,42 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /**
-      * \brief Reacts on events from ITK filters.
-      *
-      */
-      void Execute(itk::Object *caller, const itk::EventObject &event) override;
+    /**
+     * \brief Handles events from ITK filters (e.g. ProgressEvent, IterationEvent).
+     * \param[in] caller The ITK object that triggered the event.
+     * \param[in] event The event object.
+     */
+    void Execute(itk::Object *caller, const itk::EventObject &event) override;
 
     /**
-    * \brief Not implemented...
-    *
-    */
+     * \brief Const version of Execute (not implemented).
+     * \param[in] object The ITK object that triggered the event.
+     * \param[in] event The event object.
+     */
     void Execute(const itk::Object *object, const itk::EventObject &event) override;
 
     /**
-    * \brief Add new steps to the progress bar.
-    *
-    */
+     * \brief Adds new steps to the progress bar total.
+     * \param[in] steps Number of steps to add.
+     */
     void AddStepsToDo(int steps);
 
     /**
-    * \brief Sets the remaining progress to the progress bar when the optimization process is done.
-    *
-    */
+     * \brief Sets the progress to the given number of completed steps.
+     * \param[in] steps Number of completed steps.
+     */
     void SetProgress(int steps);
 
     /**
-    * \brief Returns the current progress value.
-    *
-    */
+     * \brief Returns the current progress value.
+     * \return Current progress as a double.
+     */
     double GetCurrentProgressValue();
 
     /**
-    * \brief Sets the stop processing flag, which is used to call ...
-    *
-    */
+     * \brief Sets the stop processing flag to abort the current operation.
+     * \param[in] value If true, signals the operation to stop.
+     */
     void SetStopProcessing(bool value);
 
   protected:

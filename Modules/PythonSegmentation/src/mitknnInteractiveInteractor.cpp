@@ -174,6 +174,14 @@ void mitk::nnInteractive::Interactor::Reset()
   this->OnReset();
 }
 
+void mitk::nnInteractive::Interactor::OnSetToolManager()
+{
+}
+
+void mitk::nnInteractive::Interactor::OnHandleEvent(InteractionEvent*)
+{
+}
+
 std::string mitk::nnInteractive::Interactor::GetIcon() const
 {
   return ReadSvgResource(

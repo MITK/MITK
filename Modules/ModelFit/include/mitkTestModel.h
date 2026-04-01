@@ -20,7 +20,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /**Simple (linear) test model that is used to check functionality of default implementations in factories and stuff.*/
+  /**
+   * \class TestModel
+   * \brief Simple linear test model used to verify factory and framework functionality.
+   *
+   * This model implements a basic linear function for testing purposes. It is not
+   * intended for production model fitting but serves as a reference implementation
+   * to validate the model fitting infrastructure.
+   *
+   * \sa TestModelFactory, ModelBase
+   */
   class MITKMODELFIT_EXPORT TestModel : public mitk::ModelBase
   {
 

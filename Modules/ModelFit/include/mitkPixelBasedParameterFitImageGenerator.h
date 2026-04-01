@@ -28,7 +28,7 @@ namespace mitk
 
   /** Class for generators for pixel based parameter fits of a given model based on a given 4D mitk image.
    * The class uses a model fit functor (based on ModelFitFunctorBase) given by the use.
-   * @remark This generator fits every pixel on its own. If you want to fit the mean value of the given mask use
+   * \remark This generator fits every pixel on its own. If you want to fit the mean value of the given mask use
    * ROIBasedParameterFitImageGenerator.
    * The generator creates 4 types of images:
    * - parameter images: The images that encode the results of each fitted parameter

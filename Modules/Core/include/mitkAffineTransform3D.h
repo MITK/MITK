@@ -20,13 +20,26 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief 3D affine transform type used throughout MITK.
+   *
+   * Alias for itk::ScalableAffineTransform with MITK's ScalarType and 3 dimensions.
+   */
   using AffineTransform3D = itk::ScalableAffineTransform<ScalarType, 3>;
 
-  /** \brief Write transform (4x4 matrix) as JSON array with 16 elements.
+  /**
+   * \brief Serialize an AffineTransform3D to a JSON array with 16 elements (row-major 4x4 matrix).
+   *
+   * \param[out] j The JSON value to write to.
+   * \param[in] transform The transform to serialize.
    */
   MITKCORE_EXPORT void ToJSON(nlohmann::json& j, AffineTransform3D::ConstPointer transform);
 
-  /** \brief Read transform from JSON array (16 elements, resp. 4x4 matrix).
+  /**
+   * \brief Deserialize an AffineTransform3D from a JSON array with 16 elements (row-major 4x4 matrix).
+   *
+   * \param[in] j The JSON value to read from.
+   * \param[in,out] transform The transform to populate.
    */
   MITKCORE_EXPORT void FromJSON(const nlohmann::json& j, AffineTransform3D::Pointer transform);
 }

@@ -21,6 +21,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Default multi-resolution level set motion registration algorithm.
+   *
+   * Type alias for the MatchPoint ITK level set motion multi-resolution
+   * registration algorithm with a MITK-specific UID policy.
+   *
+   * \tparam TImageType The ITK image type to register.
+   */
   template <typename TImageType>
   using LevelSetMotionMultiResDefaultRegistrationAlgorithm = map::algorithm::boxed::ITKLevelSetMotionMultiResRegistrationAlgorithm<TImageType, map::algorithm::mitkLevelSetMotionMultiResDefaultRegistrationAlgorithmUIDPolicy>;
 }

@@ -10,6 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkScalarListLookupTableProperty.h
+ * \brief Declares the ScalarListLookupTableProperty, a mitk::GenericProperty wrapping
+ *        a ScalarListLookupTable for storage in MITK property lists.
+ *
+ * This property type is primarily used by the model fit framework to persist maps
+ * of named scalar lists (e.g. static model parameters) as node or data properties.
+ *
+ * \sa mitk::ScalarListLookupTable, mitk::GenericProperty
+ * \ingroup ModelFit
+ */
+
 #ifndef mitkScalarListLookupTableProperty_h
 #define mitkScalarListLookupTableProperty_h
 
@@ -19,6 +31,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+    /**
+     * \brief Property type that holds a ScalarListLookupTable value.
+     *
+     * Generated via the mitkDeclareGenericProperty macro, which creates a
+     * BaseProperty subclass with value semantics for ScalarListLookupTable.
+     *
+     * \sa mitk::ScalarListLookupTable
+     */
     mitkDeclareGenericProperty(ScalarListLookupTableProperty, ScalarListLookupTable,
                                MITKMODELFIT_EXPORT);
 }

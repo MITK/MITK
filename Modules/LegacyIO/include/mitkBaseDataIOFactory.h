@@ -22,26 +22,43 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief BaseDataIO creates instances of BaseData objects using an object factory.
+   * \brief Factory class for loading BaseData objects from files.
    *
-   * @ingroup MitkLegacyIOModule
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * Provides a static method to load mitk::BaseData objects from a given file path
+   * using the registered IO factories. Internally delegates to mitk::IOUtil::Load().
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::IOUtil, mitk::FileReaderRegistry
    */
   class DEPRECATED() MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
   {
   public:
-    /** Standard class typedefs. */
+    /** \brief Standard ITK self type. */
     typedef BaseDataIO Self;
+    /** \brief Standard ITK superclass type. */
     typedef itk::Object Superclass;
+    /** \brief Smart pointer type. */
     typedef itk::SmartPointer<Self> Pointer;
+    /** \brief Const smart pointer type. */
     typedef itk::SmartPointer<const Self> ConstPointer;
 
-    /** Class Methods used to interface with the registered factories */
-
-    /** Run-time type information (and related methods). */
+    /** \brief Run-time type information (and related methods). */
     itkTypeMacro(BaseDataIO, Object);
 
-    /** Create the appropriate BaseData depending on the particulars of the file. */
+    /**
+     * \brief Load BaseData objects from a file.
+     *
+     * Creates the appropriate BaseData objects depending on the file type.
+     * Internally delegates to mitk::IOUtil::Load(). The \p filePrefix,
+     * \p filePattern, and \p series parameters are currently ignored.
+     *
+     * \param[in] path The absolute file path to load data from.
+     * \param[in] filePrefix The file prefix (currently unused).
+     * \param[in] filePattern The file pattern (currently unused).
+     * \param[in] series Whether the file is part of a series (currently unused).
+     * \return A vector of loaded BaseData objects.
+     */
     static std::vector<mitk::BaseData::Pointer> LoadBaseDataFromFile(const std::string path,
                                                                      const std::string filePrefix,
                                                                      const std::string filePattern,

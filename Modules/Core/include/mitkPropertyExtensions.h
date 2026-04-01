@@ -18,19 +18,31 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Implementation of the IPropertyExtensions service interface.
+   *
+   * Manages PropertyExtension instances associated with property names,
+   * optionally restricted to specific data node class names.
+   *
+   * \sa IPropertyExtensions
+   */
   class PropertyExtensions : public IPropertyExtensions
   {
   public:
     PropertyExtensions();
     ~PropertyExtensions() override;
 
+    /** \copydoc IPropertyExtensions::AddExtension */
     bool AddExtension(const std::string &propertyName,
                       PropertyExtension::Pointer extension,
                       const std::string &className,
                       bool overwrite) override;
+    /** \copydoc IPropertyExtensions::GetExtension */
     PropertyExtension::Pointer GetExtension(const std::string &propertyName, const std::string &className) override;
+    /** \copydoc IPropertyExtensions::HasExtension */
     bool HasExtension(const std::string &propertyName, const std::string &className) override;
+    /** \copydoc IPropertyExtensions::RemoveAllExtensions */
     void RemoveAllExtensions(const std::string &className) override;
+    /** \copydoc IPropertyExtensions::RemoveExtension */
     void RemoveExtension(const std::string &propertyName, const std::string &className) override;
 
   private:

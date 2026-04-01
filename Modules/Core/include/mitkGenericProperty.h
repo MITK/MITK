@@ -28,20 +28,27 @@ namespace mitk
 #pragma warning(disable : 4522)
 #endif
 
-  /*!
-    @ brief Template class for generating properties for int, float, bool, etc.
-
-    This class template can be instantiated for all classes/internal types that fulfills
-    these requirements:
-      - an operator<< so that the properties value can be put into a std::stringstream
-      - an operator== so that two properties can be checked for equality
-
-    Note: you must use the macros mitkDeclareGenericProperty and mitkDefineGenericProperty to
-    provide specializations for concrete types (e.g. BoolProperty). See mitkProperties.h for
-    examples. If you don't use these macros, GetNameOfClass() will return "GenericProperty",
-    which will mess up serialization for example.
-
-  */
+  /**
+   * \brief Template class for generating properties for simple value types (int, float, bool, etc.).
+   *
+   * This class template can be instantiated for all classes/internal types that fulfill
+   * these requirements:
+   *   - an \c operator<< so that the property value can be put into a std::stringstream
+   *   - an \c operator== so that two properties can be checked for equality
+   *
+   * \note You must use the macros mitkDeclareGenericProperty and mitkDefineGenericProperty to
+   * provide specializations for concrete types (e.g. BoolProperty). See mitkProperties.h for
+   * examples. If you don't use these macros, GetNameOfClass() will return "GenericProperty",
+   * which will break serialization.
+   *
+   * \tparam T The value type stored by this property.
+   *
+   * \ingroup DataManagement
+   *
+   * \sa BaseProperty
+   * \sa mitkDeclareGenericProperty
+   * \sa mitkDefineGenericProperty
+   */
   template <typename T>
   class MITK_EXPORT GenericProperty : public BaseProperty
   {
@@ -50,11 +57,24 @@ namespace mitk
     mitkNewMacro1Param(GenericProperty<T>, T);
     itkCloneMacro(Self);
 
+    /** \brief The type of the value stored by this property. */
     typedef T ValueType;
 
+    /** \brief Set the property value.
+     *  \param[in] _arg The new value. */
     itkSetMacro(Value, T);
+
+    /** \brief Get the property value.
+     *  \return The current value. */
     itkGetConstMacro(Value, T);
 
+    /**
+     * \brief Return the property value as a string.
+     *
+     * Uses \c operator<< to stream the value into a stringstream.
+     *
+     * \return A string representation of the property value.
+     */
     std::string GetValueAsString() const override
     {
       std::stringstream myStr;
@@ -62,11 +82,29 @@ namespace mitk
       return myStr.str();
     }
 
+    /**
+     * \brief Serialize property value to JSON.
+     *
+     * The base GenericProperty template does not support JSON serialization.
+     * Concrete specializations (via mitkDefineGenericProperty) override this
+     * to provide actual serialization.
+     *
+     * \return Always \c false in the base template.
+     */
     bool ToJSON(nlohmann::json&) const override
     {
       return false;
     }
 
+    /**
+     * \brief Deserialize property value from JSON.
+     *
+     * The base GenericProperty template does not support JSON deserialization.
+     * Concrete specializations (via mitkDefineGenericProperty) override this
+     * to provide actual deserialization.
+     *
+     * \return Always \c false in the base template.
+     */
     bool FromJSON(const nlohmann::json&) override
     {
       return false;

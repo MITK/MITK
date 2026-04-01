@@ -33,11 +33,15 @@ namespace mitk
 {
   class BaseRenderer;
 
-  /**
-   * @brief OpenGL-based mapper to display a 2d cut through a poly data
-   * OpenGL-based mapper to display a 2D cut through a poly data. The result is
-   * normally a line. This class can be added to any data object, which is
-   * rendered in 3D via a vtkPolyData.
+  /** \brief OpenGL-based mapper for rendering 2D cross-sections of unstructured grids.
+   *
+   * Displays a 2D cut through an unstructured grid or poly data by slicing
+   * through the n-cells, producing (n-1)-cells (typically lines). This mapper
+   * can be used with any data object that has a 3D VTK mapper producing a
+   * vtkPolyData or vtkPointSet.
+   *
+   * \sa UnstructuredGridVtkMapper3D, GLMapper
+   * \ingroup Mapper
    */
   class MITKMAPPEREXT_EXPORT UnstructuredGridMapper2D : public GLMapper
   {
@@ -48,12 +52,14 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /**
-       * Renders a cut through a pointset by cutting through the n-cells,
-       * producing (n-1)-cells.
-       * @param renderer the render to render in.
-       */
-      void Paint(mitk::BaseRenderer *renderer) override;
+    /** \brief Render a 2D cross-section of the unstructured grid.
+     *
+     * Cuts through the n-cells with the current slice plane, producing
+     * (n-1)-cells which are rendered as lines.
+     *
+     * \param[in] renderer The renderer to paint into.
+     */
+    void Paint(mitk::BaseRenderer *renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 

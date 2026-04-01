@@ -64,29 +64,52 @@ public:
    */
   virtual void SetResendQtEvents(bool resend);
 
-  // Set Layout Index to define the Layout Type
+  /**
+   * \brief Sets the layout index to define the layout type.
+   * \param[in] layoutIndex The layout index to set.
+   */
   void SetLayoutIndex(QmitkRenderWindowMenu::LayoutIndex layoutIndex);
 
-  // Get Layout Index to define the Layout Type
+  /** \brief Returns the current layout index. */
   QmitkRenderWindowMenu::LayoutIndex GetLayoutIndex();
 
-  // MenuWidget need to update the Layout Design List when Layout had changed
+  /**
+   * \brief Updates the layout design list in the menu widget when the layout has changed.
+   * \param[in] layoutDesign The new layout design.
+   */
   void UpdateLayoutDesignList(QmitkRenderWindowMenu::LayoutDesign layoutDesign);
 
-  void UpdateCrosshairVisibility(bool);
+  /**
+   * \brief Updates the crosshair visibility state in the menu widget.
+   * \param[in] visible True to show the crosshair, false to hide it.
+   */
+  void UpdateCrosshairVisibility(bool visible);
 
-  void UpdateCrosshairRotationMode(int);
+  /**
+   * \brief Updates the crosshair rotation mode in the menu widget.
+   * \param[in] mode The new rotation mode.
+   */
+  void UpdateCrosshairRotationMode(int mode);
 
-  // Activate or Deactivate MenuWidget.
+  /**
+   * \brief Activates or deactivates the render window menu widget.
+   * \param[in] state True to activate the menu, false to deactivate.
+   */
   void ActivateMenuWidget(bool state);
 
+  /** \brief Returns whether the menu widget is activated. */
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
 
+  /**
+   * \brief Shows or hides the geometry violation warning overlay.
+   * \param[in] show True to show, false to hide.
+   */
   void ShowOverlayMessage(bool show);
 
-  // Get it from the QVTKWidget parent
+  /** \brief Returns the underlying VTK render window. */
   vtkRenderWindow *GetVtkRenderWindow() override { return this->renderWindow(); }
 
+  /** \brief Returns nullptr since no interactor is used. */
   vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return nullptr; }
 
 protected:

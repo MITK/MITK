@@ -18,26 +18,39 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /*!
-    \brief Generated unique IDs
-
-    Creates unique IDs.
-
-    The current implementation uses the UUID specification (https://www.ietf.org/rfc/rfc4122.txt) and
-    random generator.
-    One may define a prefix for the UID string. But it is not needed to guarantee uniqueness. It is
-    just a human readable addition, e.g. to see for which purpose the UID was generated.
-  */
+  /**
+   * \brief Generates unique identifier strings.
+   *
+   * Produces unique IDs based on the UUID specification (RFC 4122) using a
+   * random generator. The generator is thread-safe.
+   *
+   * An optional prefix can be specified for human-readable context (e.g. to
+   * indicate the purpose of the UID), but it is not required for uniqueness.
+   *
+   * \sa Identifiable
+   * \ingroup Core
+   */
   class MITKCORE_EXPORT UIDGenerator
   {
   public:
+    /**
+     * \brief Construct a UID generator with an optional prefix.
+     * \param[in] prefix A string prepended to every generated UID. May be empty.
+     */
     explicit UIDGenerator(const char * prefix = "");
 
-    /** @return Returns a unique ID as string. You will get another unique ID each time you call GetUID. */
+    /**
+     * \brief Generate and return a new unique ID string.
+     *
+     * Each call produces a different unique ID. The format is the optional
+     * prefix followed by a random UUID.
+     *
+     * \return A unique ID string.
+     */
     std::string GetUID();
 
   private:
-    std::string m_Prefix;
+    std::string m_Prefix; ///< Optional prefix prepended to each generated UID.
   };
 } // namespace mitk
 

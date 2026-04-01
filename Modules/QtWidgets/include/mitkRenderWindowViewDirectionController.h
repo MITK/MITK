@@ -39,33 +39,33 @@ namespace mitk
 
     RenderWindowViewDirectionController();
     /**
-    * @brief Set the data storage on which to work.
+    * \brief Set the data storage on which to work.
     */
     void SetDataStorage(DataStorage::Pointer dataStorage);
     /**
-    * @brief Set the controlled base renderer.
+    * \brief Set the controlled base renderer.
     */
     void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
     // wrapper functions to change the view direction
     /**
-    * @brief Set the ciew direction for the given renderer (nullptr = all renderer)
-    * @param viewDirection  The view direction that should be used for this renderer as a string.
+    * \brief Set the ciew direction for the given renderer (nullptr = all renderer)
+    * \param viewDirection  The view direction that should be used for this renderer as a string.
     *                       Currently "axial", "coronal" and "sagittal" is supported.
-    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    * \param renderer       Pointer to the renderer instance for which the view direction should be changed.
     *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
     void SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer = nullptr);
     /**
-    * @brief Set the ciew direction for the given renderer (nullptr = all renderer)
-    * @param viewDirection  The view direction that should be used for this renderer.
-    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    * \brief Set the ciew direction for the given renderer (nullptr = all renderer)
+    * \param viewDirection  The view direction that should be used for this renderer.
+    * \param renderer       Pointer to the renderer instance for which the view direction should be changed.
     *                       If it is a nullptr (default) nothing happens.
     */
     void SetViewDirectionOfRenderer(AnatomicalPlane viewDirection, BaseRenderer* renderer = nullptr);
     /**
-    * @brief Reinitialize the given renderer with the currently visible nodes.
-    * @param renderer       Pointer to the renderer instance which should be reinitialized.
+    * \brief Reinitialize the given renderer with the currently visible nodes.
+    * \param renderer       Pointer to the renderer instance which should be reinitialized.
     *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
     void InitializeViewByBoundingObjects(const BaseRenderer* renderer);

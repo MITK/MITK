@@ -19,13 +19,18 @@ found in the LICENSE file.
 namespace mitk
 {
   class Image;
+
   /**
-   * @brief Writer for mitk::Image
+   * \brief Writer for mitk::Image objects to various file formats.
    *
-   * Uses the given extension (SetExtension) to decide the format to write
-   * (.mhd is default, .tif, .png, .jpg supported yet).
-   * @ingroup MitkLegacyIOModule
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
+   * Uses the configured file extension (SetExtension()) to decide the output format.
+   * The default extension is ".mhd" (MetaImage). Other supported formats include
+   * ".tif", ".png", and ".jpg". The writer delegates to ITK image writers internally
+   * and supports optional compression.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
+   * \sa mitk::FileWriterWithInformation, mitk::IOUtil
    */
   class MITKLEGACYIO_EXPORT ImageWriter : public mitk::FileWriterWithInformation
   {
@@ -39,102 +44,158 @@ namespace mitk
       mitkWriterMacro;
 
     /**
-     * Sets the filename of the file to write.
-     * @param fileName the name of the file to write.
+     * \brief Set the filename of the file to write.
+     * \param[in] fileName The name of the file to write (C-string variant).
      */
     void SetFileName(const char *fileName) override;
+
+    /**
+     * \brief Set the filename of the file to write.
+     * \param[in] fileName The name of the file to write (std::string variant).
+     */
     virtual void SetFileName(const std::string &fileName);
 
     /**
-     * @returns the name of the file to be written to disk.
+     * \brief Get the filename of the file to be written.
+     * \return The output file name.
      */
     itkGetStringMacro(FileName);
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
-     * @param extension Extension to be added to the filename, including a "."
-     * (e.g., ".mhd").
+     * \param[in] extension Extension to be added to the filename, including a "."
+     *            (e.g., ".mhd").
      */
     virtual void SetExtension(const char *extension);
+
+    /**
+     * \brief Explicitly set the extension to be added to the filename.
+     * \param[in] extension Extension to be added to the filename, including a "."
+     *            (e.g., ".mhd") (std::string variant).
+     */
     virtual void SetExtension(const std::string &extension);
 
     /**
      * \brief Get the extension to be added to the filename.
-     * @returns the extension to be added to the filename (e.g.,
-     * ".mhd").
+     * \return The file extension (e.g., ".mhd").
      */
     itkGetStringMacro(Extension);
 
     /**
-     * \brief Set the extension to be added to the filename to the default
+     * \brief Reset the extension to the default value (".mhd").
      */
     void SetDefaultExtension();
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file prefix for multi-file writing.
+     * \warning Multiple file write is not yet supported.
      */
     itkSetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file prefix.
+     * \warning Multiple file write is not yet supported.
      */
     itkGetStringMacro(FilePrefix);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Set the file pattern for multi-file writing.
+     * \warning Multiple file write is not yet supported.
      */
     itkSetStringMacro(FilePattern);
 
     /**
-     * @warning multiple write not (yet) supported
+     * \brief Get the file pattern.
+     * \warning Multiple file write is not yet supported.
      */
     itkGetStringMacro(FilePattern);
 
     /**
-     * Sets the 0'th input object for the filter.
-     * @param input the first input for the filter.
+     * \brief Set the 0th input object for the writer.
+     * \param[in] input The mitk::Image to write.
      */
     void SetInput(mitk::Image *input);
 
-    //##Documentation
-    //## @brief Return the possible file extensions for the data type associated with the writer
+    /**
+     * \brief Return the list of possible file extensions for image data.
+     * \return A vector of supported file extension strings.
+     */
     std::vector<std::string> GetPossibleFileExtensions() override;
 
+    /**
+     * \brief Return the class name of the supported base data type.
+     * \return The static class name of mitk::Image.
+     */
     std::string GetSupportedBaseData() const override;
 
     /**
-    * @brief Return the extension to be added to the filename.
-    */
+     * \brief Return the currently configured file extension.
+     * \return The file extension string.
+     */
     std::string GetFileExtension() override;
 
     /**
-    * @brief Check if the Writer can write the Content of the
-    */
-    bool CanWriteDataType(DataNode *) override;
+     * \brief Check whether the writer can write data from the given DataNode.
+     * \param[in] node The DataNode to check. The node's data must be a mitk::Image.
+     * \return \c true if the node contains a mitk::Image; \c false otherwise.
+     */
+    bool CanWriteDataType(DataNode * node) override;
 
     /**
-    * @brief Return the MimeType of the saved File.
-    */
+     * \brief Return the MIME type of the file to be written.
+     * \return The MIME type string (e.g., "image/vnd.mitk.image").
+     */
     std::string GetWritenMIMEType() override;
 
     using Superclass::SetInput;
-    /**
-    * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
-    */
-    virtual void SetInput(DataNode *);
 
     /**
-     * @returns the 0'th input object of the filter.
+     * \brief Set a DataNode as input. Extracts the mitk::Image from the node.
+     * \param[in] node The DataNode containing the image to write.
+     */
+    virtual void SetInput(DataNode * node);
+
+    /**
+     * \brief Get the 0th input image.
+     * \return Pointer to the input mitk::Image, or \c nullptr if not set.
      */
     const mitk::Image *GetInput();
 
-    // FileWriterWithInformation methods
+    /**
+     * \brief Return the default filename for file save dialogs.
+     * \return A default filename string (e.g., "GitHubIssue").
+     */
     const char *GetDefaultFilename() override;
+
+    /**
+     * \brief Return the file dialog filter pattern.
+     * \return A filter pattern string for file dialogs (e.g., "MITK Image (*.nrrd)").
+     */
     const char *GetFileDialogPattern() override;
+
+    /**
+     * \brief Return the default file extension.
+     * \return The default extension string (e.g., ".nrrd").
+     */
     const char *GetDefaultExtension() override;
+
+    /**
+     * \brief Check whether this writer can write the given BaseData type.
+     * \param[in] data The data object to check.
+     * \return \c true if the data is a mitk::Image; \c false otherwise.
+     */
     bool CanWriteBaseDataType(BaseData::Pointer data) override;
+
+    /**
+     * \brief Write the given BaseData object to file.
+     * \param[in] data The data to write (must be a mitk::Image).
+     */
     void DoWrite(BaseData::Pointer data) override;
 
+    /**
+     * \brief Enable or disable compression for the output file.
+     * \param[in] useCompression If \c true, the output is compressed.
+     */
     void SetUseCompression(bool useCompression);
 
   protected:

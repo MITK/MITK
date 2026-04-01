@@ -17,8 +17,8 @@ found in the LICENSE file.
 
 #include <QTreeView>
 
-/*
-* @brief This is an inspector that offers a simple list view on a data storage.
+/**
+* \brief Customized QTreeView for displaying multi-label segmentation data.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeView : public QTreeView
 {

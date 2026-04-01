@@ -37,9 +37,9 @@ public:
   virtual ~QmitkAbstractNodeSelectionWidget() override;
 
   /**
-  * @brief Sets the data storage that will be used / monitored by widget.
+  * \brief Sets the data storage that will be used / monitored by widget.
   *
-  * @par dataStorage      A pointer to the data storage to set.
+  * \par dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
@@ -47,7 +47,7 @@ public:
   * Sets the node predicate and updates the widget, according to the node predicate.
   * Implement OnNodePredicateChange() for custom actualization of a derived widget class.
   *
-  * @par nodePredicate    A pointer to node predicate.
+  * \par nodePredicate    A pointer to node predicate.
   */
   void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
@@ -76,15 +76,15 @@ public:
 
 Q_SIGNALS:
   /**
-  * @brief A signal that will be emitted if the selected node has changed.
+  * \brief A signal that will be emitted if the selected node has changed.
   *
-  * @par	nodes		A list of data nodes that are newly selected.
+  * \par	nodes		A list of data nodes that are newly selected.
   */
   void CurrentSelectionChanged(NodeList nodes);
 
 public Q_SLOTS:
   /**
-  * @brief Change the selection modus of the item view's selection model.
+  * \brief Change the selection modus of the item view's selection model.
   *
   *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
   *   An outgoing selection can then at most contain the filtered nodes.
@@ -92,12 +92,12 @@ public Q_SLOTS:
   *   to include the original selection that could not be modified.
   *   The part of the original selection, that is non-visible are the nodes, that do not fulfill the predicate.
   *
-  * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
+  * \par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
   /**
-  * @brief Transform a list of data nodes (a selection) into a model selection and set this as a new selection of the
+  * \brief Transform a list of data nodes (a selection) into a model selection and set this as a new selection of the
   *        selection model of the private member item view.
   *
   *   The function filters the given list of nodes according to the 'm_SelectOnlyVisibleNodes' member variable. If
@@ -106,7 +106,7 @@ public Q_SLOTS:
   *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
   *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
   *
-  * @par	nodes		A list of data nodes that should be newly selected.
+  * \par	nodes		A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 
@@ -150,7 +150,7 @@ protected:
 
   /** Method is called if the predicate has changed, before the selection will be updated according to the new predicate.
   *   The default implementation does nothing.
-  *   @remark If you are only interested to know when the selection has changed, overwrite OnInternalSelectionChange().
+  *   \remark If you are only interested to know when the selection has changed, overwrite OnInternalSelectionChange().
   */
   virtual void OnNodePredicateChanged();
 
@@ -208,7 +208,7 @@ protected:
   /** This function will be called before the CurrentSelectionChanged signal is emitted. The return value indicates
   *   if the signal should be emitted (true = emission; false = no emission). The default implementation always
   *   returns true.
-  *   @param emissionCandidates The nodes that will be emitted if the function returns true.
+  *   \param emissionCandidates The nodes that will be emitted if the function returns true.
   */
   virtual bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const;
 

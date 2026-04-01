@@ -67,3 +67,7 @@ void QmitkOverlay::AddDropShadow(QWidget *widget)
     widget->setGraphicsEffect(effect);
   }
 }
+
+void QmitkOverlay::GenerateData(mitk::PropertyList::Pointer)
+{
+}

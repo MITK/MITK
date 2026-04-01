@@ -30,32 +30,102 @@ namespace mitk
 {
   class BaseData;
 
-  /** Gets the radio nuclide half life stored in the properties of the passed data (DICOM path (0054,0016)[*](0018,1075) in seconds. If no apropriate DICOM element was found the vector is empty.
-   Radiopharmaceutical Information Sequence (0x0054,0x0016) containes more then one item, the half life of all sequence items will be returned. The order of the results is
-   the same like the order of the sequence items.*/
+  /**
+   * \brief Get the radionuclide half-life values from DICOM properties.
+   *
+   * Extracts the radionuclide half-life from the Radiopharmaceutical Information
+   * Sequence stored in the DICOM properties of the passed data. Reads from
+   * DICOM path (0054,0016)[*](0018,1075).
+   *
+   * If the Radiopharmaceutical Information Sequence contains more than one item,
+   * the half-life of all sequence items is returned. The order of results matches
+   * the order of the sequence items.
+   *
+   * \param[in] data The BaseData object containing DICOM properties to query.
+   * \return A vector of half-life values in seconds. Empty if no appropriate
+   *         DICOM element was found or if \p data is \c nullptr.
+   *
+   * \sa GetRadionuclideTotalDose, GetRadionuclideNames
+   */
   std::vector<double> MITKPET_EXPORT GetRadionuclideHalfLife(mitk::BaseData* data);
 
-  /** Gets the name of the used radio nuclides stored in the properties of the passed data (DICOM path (0054,0016)[*](0054,0300)[*](0008,0104). If no apropriate DICOM element was found the string is empty.*/
+  /**
+   * \brief Get the radionuclide names from DICOM properties.
+   *
+   * Extracts the radionuclide code meaning from the Radiopharmaceutical Information
+   * Sequence stored in the DICOM properties of the passed data. Reads from
+   * DICOM path (0054,0016)[*](0054,0300)[*](0008,0104).
+   *
+   * \param[in] data The BaseData object containing DICOM properties to query.
+   * \return A space-separated string of radionuclide names. Empty if no appropriate
+   *         DICOM element was found or if \p data is \c nullptr.
+   *
+   * \sa GetRadionuclideHalfLife
+   */
   std::string MITKPET_EXPORT GetRadionuclideNames(mitk::BaseData* data);
 
-  /** Gets the radio nuclide total dose (injected does) in [Bq] stored in the properties of the passed data (DICOM path (0054,0016)[*](0018,1074) in seconds. If no apropriate DICOM element was found the vector is empty.
-  Radiopharmaceutical Information Sequence (0x0054,0x0016) containes more then one item, the total dose of all sequence items will be returned. The order of the results is
-  the same like the order of the sequence items.*/
+  /**
+   * \brief Get the radionuclide total dose (injected dose) from DICOM properties.
+   *
+   * Extracts the radionuclide total dose in [Bq] from the Radiopharmaceutical
+   * Information Sequence stored in the DICOM properties of the passed data. Reads from
+   * DICOM path (0054,0016)[*](0018,1074).
+   *
+   * If the Radiopharmaceutical Information Sequence contains more than one item,
+   * the total dose of all sequence items is returned. The order of results matches
+   * the order of the sequence items.
+   *
+   * \param[in] data The BaseData object containing DICOM properties to query.
+   * \return A vector of total dose values in [Bq]. Empty if no appropriate
+   *         DICOM element was found or if \p data is \c nullptr.
+   *
+   * \sa GetRadionuclideHalfLife
+   */
   std::vector<double> MITKPET_EXPORT GetRadionuclideTotalDose(mitk::BaseData* data);
 
-  /** Gets the patient's weight in [kg]. If data is invalid or containes no weight property an exception will be thrown.
-   * @pre data must point to a valid instance.
-   * @pre data must contain a DICOM patient weight property.*/
+  /**
+   * \brief Get the patient's weight from DICOM properties.
+   *
+   * Extracts the patient weight from DICOM tag (0010,1030) stored in the
+   * properties of the passed data.
+   *
+   * \param[in] data The BaseData object containing DICOM properties to query.
+   * \return The patient's weight in [kg].
+   * \pre \p data must point to a valid instance.
+   * \pre \p data must contain a DICOM patient weight property.
+   * \throw mitk::Exception if \p data is \c nullptr or contains no weight property.
+   */
   double MITKPET_EXPORT GetPatientsWeight(mitk::BaseData* data);
 
-  /**Map that stores the decay time in [sec] per slice. Key of the map is the slice index (z-index).*/
+  /**
+   * \brief Map storing the decay time in seconds per slice.
+   *
+   * The key of the map is the slice index (z-index).
+   */
   typedef std::map<mitk::SlicedData::IndexValueType, double> DecayTimeSliceMapType;
+
+  /**
+   * \brief Map storing per-time-step decay time slice maps.
+   *
+   * The outer key is the time step, the inner map stores decay times per slice index.
+   */
   typedef std::map<mitk::TimeStepType, DecayTimeSliceMapType> DecayTimeMapType;
 
-  /** Helper function that deduces the decay time in [sec] for each slice with the following strategy:\n
-   1. Get AcquisitionDate and AcquisitionTime.
-   2. Get StartDateTime (if not available StartTime; if just times are available it is assumed that it has the same date)
-   3. DecayTime is AcquesitionTime - StartTime
+  /**
+   * \brief Deduce the radioactive decay time per slice from DICOM acquisition timestamps.
+   *
+   * Computes the decay time in seconds for each slice using the following strategy:
+   *   -# Retrieve AcquisitionDate (0008,0022) and AcquisitionTime (0008,0032).
+   *   -# Retrieve Radiopharmaceutical Start DateTime (0018,1078) or, if unavailable,
+   *      Start Time (0018,1072). If only times are available, the acquisition date is assumed.
+   *   -# DecayTime = AcquisitionTime - StartTime.
+   *
+   * \param[in] data The BaseData object containing the relevant DICOM time properties.
+   * \return A nested map of decay times [s] indexed by time step and slice index.
+   * \throw mitk::Exception if required DICOM time properties are missing or
+   *        time string conversion fails.
+   *
+   * \sa computeSUVbwScaleFactor, SUVbwFunctorPolicy
    */
   DecayTimeMapType MITKPET_EXPORT DeduceDecayTime_AcquisitionMinusStartSliceResolved(mitk::BaseData* data);
 

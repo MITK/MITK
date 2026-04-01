@@ -24,6 +24,12 @@ namespace mitk
 {
 
 
+  /**
+   * \class ThreeStepLinearModelFactory
+   * \brief Factory for creating ThreeStepLinearModel instances and their parameterizers.
+   *
+   * \sa ThreeStepLinearModel, ThreeStepLinearModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
   {
   public:

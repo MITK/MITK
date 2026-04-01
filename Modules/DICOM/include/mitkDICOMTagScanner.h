@@ -35,7 +35,7 @@ namespace mitk
 
     This is an abstract base class for concrete scanner implementations.
 
-    @remark When used in a process where multiple classes will access the scan
+    \remark When used in a process where multiple classes will access the scan
     results, care should be taken that all the tags and files of interest
     are communicated to DICOMTagScanner before requesting the results!
   */

@@ -20,6 +20,17 @@ namespace mitk
 {
 
 
+  /**
+   * \brief Implementation of the extended one-tissue compartment model for PET pharmacokinetics.
+   *
+   * Extends the standard one-tissue compartment model with an additional blood volume
+   * fraction parameter (vb). Models the tissue concentration as a combination of the
+   * blood contribution and a single-compartment residue function.
+   *
+   * Fitted parameters: K1 (influx rate constant), k2 (efflux rate constant), vb (blood volume fraction).
+   *
+   * \sa OneTissueCompartmentModel, TwoTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedOneTissueCompartmentModel : public AIFBasedModelBase
   {
 

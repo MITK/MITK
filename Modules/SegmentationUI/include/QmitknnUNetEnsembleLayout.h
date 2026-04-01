@@ -25,6 +25,15 @@ found in the LICENSE file.
 
 QT_BEGIN_NAMESPACE
 
+/**
+ * \brief UI template class for nnU-Net task parameter selection (model, trainer, planner, folds).
+ *
+ * Programmatically creates a layout with combo boxes for selecting nnU-Net configuration,
+ * trainer, planner, and folds. Used by QmitknnUNetToolGUI for both single-model and
+ * ensemble inference modes.
+ *
+ * \sa QmitknnUNetToolGUI
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetTaskParamsUITemplate
 {
 

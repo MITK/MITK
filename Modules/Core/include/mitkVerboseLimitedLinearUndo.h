@@ -27,11 +27,14 @@ namespace mitk
   class UndoStackItem;
 
   /**
-  * @brief A limited linear undo model providing GUI elements with stack status information.
-  *
-  * Basically does the same, as LimitedLinearUndo class, but it allows you to retrieve a string list, which describes
-  * the undo stack or the redo stack. This can be used for display by GUI elements.
-  */
+   * \brief A limited linear undo model providing GUI elements with stack status information.
+   *
+   * Extends LimitedLinearUndo by allowing retrieval of human-readable description
+   * lists for the undo and redo stacks. These descriptions can be displayed
+   * in GUI elements such as undo/redo menus.
+   *
+   * \ingroup Undo
+   */
   class MITKCORE_EXPORT VerboseLimitedLinearUndo : public LimitedLinearUndo
   {
   public:
@@ -39,13 +42,39 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      typedef std::pair<int, std::string> StackDescriptionItem;
-    typedef std::vector<StackDescriptionItem>
-      StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions
+    /** \brief A pair of ObjectEventId and its human-readable description. */
+    typedef std::pair<int, std::string> StackDescriptionItem;
 
+    /** \brief A list of (ObjectEventId, description) pairs representing a stack. */
+    typedef std::vector<StackDescriptionItem> StackDescription;
+
+    /**
+     * \brief Store an operation event on the undo stack.
+     *
+     * Clears the redo list when a new operation is stored.
+     * Respects the undo limit by removing the oldest entry if necessary.
+     *
+     * \param[in] undoStackItem The undo stack item to store.
+     * \return True if the item was stored successfully, false if the item is nullptr.
+     */
     bool SetOperationEvent(UndoStackItem *undoStackItem) override;
 
+    /**
+     * \brief Return human-readable descriptions of the undo stack.
+     *
+     * Groups operations by ObjectEventId and generates a description for each group.
+     *
+     * \return A StackDescription vector with entries ordered from most recent to oldest.
+     */
     virtual StackDescription GetUndoDescriptions();
+
+    /**
+     * \brief Return human-readable descriptions of the redo stack.
+     *
+     * Groups operations by ObjectEventId and generates a description for each group.
+     *
+     * \return A StackDescription vector with entries ordered from most recent to oldest.
+     */
     virtual StackDescription GetRedoDescriptions();
 
   protected:

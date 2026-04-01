@@ -24,41 +24,65 @@ class vtkPolyDataMapper;
 class vtkGeometryFilter;
 class vtkUnstructuredGrid;
 
+/** \brief VTK mapper that renders vtkUnstructuredGrid by converting to poly data.
+ *
+ * Internally uses a vtkGeometryFilter to extract the surface geometry from an
+ * unstructured grid and renders it via a vtkPolyDataMapper. Optionally supports
+ * clipping to a BoundingObject.
+ *
+ * \sa UnstructuredGridVtkMapper3D
+ */
 class MITKMAPPEREXT_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
 public:
+  /** \brief Create a new instance. */
   static vtkUnstructuredGridMapper *New();
   vtkTypeMacro(vtkUnstructuredGridMapper, vtkMapper);
   void PrintSelf(ostream &os, vtkIndent indent) override;
+
+  /** \brief Render the unstructured grid.
+   *
+   * \param[in] ren The VTK renderer.
+   * \param[in] act The VTK actor.
+   */
   void Render(vtkRenderer *ren, vtkActor *act) override;
 
-  // Description:
-  // Get the internal poly data mapper used to map data set to graphics system.
+  /** \brief Get the internal poly data mapper used to render the extracted surface.
+   * \return The internal vtkPolyDataMapper.
+   */
   vtkGetObjectMacro(PolyDataMapper, vtkPolyDataMapper);
 
-  // Description:
-  // Release any graphics resources that are being consumed by this mapper.
-  // The parameter window could be used to determine which graphic
-  // resources to release.
-  // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
-  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *) override);
+  /** \brief Release graphics resources consumed by this mapper.
+   *
+   * \param[in] window The render window (unused).
+   * \deprecated Use ReleaseGraphicsResources(mitk::BaseRenderer*) instead.
+   */
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *window) override);
 
-  // Description:
-  // Release any graphics resources that are being consumed by this mapper.
-  // The parameter renderer could be used to determine which graphic
-  // resources to release.
-  // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  /** \brief Release graphics resources for the given renderer.
+   *
+   * \param[in] renderer The renderer whose resources should be released.
+   */
   void ReleaseGraphicsResources(mitk::BaseRenderer *renderer);
 
-  // Description:
-  // Get the mtime also considering the lookup table.
+  /** \brief Get the modification time, including the lookup table's mtime.
+   * \return The combined modification time.
+   */
   vtkMTimeType GetMTime() override;
 
-  // Description:
-  // Set the Input of this mapper.
+  /** \brief Set the unstructured grid input.
+   * \param[in] input The unstructured grid to render.
+   */
   void SetInput(vtkUnstructuredGrid *input);
+
+  /** \brief Get the unstructured grid input.
+   * \return The current input grid.
+   */
   vtkUnstructuredGrid *GetInput();
 
+  /** \brief Set a bounding object for clipping the rendered grid.
+   * \param[in] bo The bounding object, or \c nullptr to disable clipping.
+   */
   void SetBoundingObject(mitk::BoundingObject *bo);
 
 protected:

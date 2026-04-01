@@ -29,9 +29,16 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for visualization styles. Valid values are:
- * 0/Grid, 1/Glyph, 2/Points
- * Default is "Grid"
+ * \brief Enumeration property defining the visual representation style for registrations.
+ *
+ * Valid values are:
+ * - 0: Grid (deformation grid)
+ * - 1: Glyph (arrow glyphs showing deformation vectors)
+ * - 2: Points (point cloud)
+ *
+ * Default is "Grid".
+ *
+ * \sa mitk::MITKRegistrationWrapperMapperBase, mitk::RegVisColorStyleProperty, mitk::RegVisDirectionProperty
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegVisStyleProperty : public EnumerationProperty
 {
@@ -41,8 +48,10 @@ public:
 
   itkNewMacro(RegVisStyleProperty);
 
+  /** \brief Constructs a RegVisStyleProperty from a numeric ID. */
   mitkNewMacro1Param(RegVisStyleProperty, const IdType&);
 
+  /** \brief Constructs a RegVisStyleProperty from a string name. */
   mitkNewMacro1Param(RegVisStyleProperty, const std::string&);
 
 

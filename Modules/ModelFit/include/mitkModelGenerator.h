@@ -26,23 +26,40 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ModelGenerator
+   * \brief Utility class for creating model factories and parameterizers from model class IDs.
+   *
+   * This class uses the micro services registry to look up IModelFitProvider instances
+   * and create the corresponding model factories and parameterizers.
+   *
+   * \sa ModelFactoryBase, ModelParameterizerBase, IModelFitProvider
+   */
   class MITKMODELFIT_EXPORT ModelGenerator
   {
   public:
     typedef ModelFactoryBase::ModellClassIDType ModelClassIDType;
 
-    /** Returns the pointer to a factory instance that is responsible for the
-     given model class id.
-     If no fitting factory can be found, a null pointer is returned.
-    */
+    /**
+     * \brief Returns a factory instance for the given model class ID.
+     * \param[in] id The model class identifier.
+     * \return Smart pointer to the factory, or nullptr if no matching factory is found.
+     */
     static ModelFactoryBase::Pointer GetModelFactory(const ModelClassIDType& id);
 
-    /** Takes a fit instances and generates the corresponding ModelParameterizer.
-     If no fitting factory can be found or no class id is specified in the fit, a null pointer is returned.
-    */
+    /**
+     * \brief Generates a model parameterizer from a model fit info instance.
+     * \param[in] fit The model fit info describing the fit configuration.
+     * \return Smart pointer to the parameterizer, or nullptr if no matching factory is found.
+     */
     static ModelParameterizerBase::Pointer GenerateModelParameterizer(const modelFit::ModelFitInfo&
         fit);
 
+    /**
+     * \brief Returns the IModelFitProvider service for the given model class ID.
+     * \param[in] id The model class identifier.
+     * \return Pointer to the provider service, or nullptr if not found.
+     */
     static IModelFitProvider* GetProviderService(const ModelClassIDType& id);
 
   protected:

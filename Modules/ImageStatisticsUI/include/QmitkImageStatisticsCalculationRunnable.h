@@ -25,48 +25,94 @@ found in the LICENSE file.
 #include <MitkImageStatisticsUIExports.h>
 
 /**
-* /brief This class is executed as background thread for image statistics calculation.
-*
-*   This class is derived from QRunnable and is intended to be used by QmitkImageStatisticsView
-*   to run the image statistics calculation in a background thread keeping the GUI usable.
-*/
+ * \brief Background thread runnable for computing image statistics.
+ *
+ * This class derives from QmitkDataGenerationJobBase and performs image statistics
+ * calculation in a background thread, keeping the GUI responsive. It supports optional
+ * mask data (binary images, multi-label segmentations, or planar figures) and can be
+ * configured to ignore zero-valued voxels and to use a specific number of histogram bins.
+ *
+ * The computed results include an mitk::ImageStatisticsContainer with relation rules
+ * connecting it to the source image and mask.
+ *
+ * \sa QmitkDataGenerationJobBase
+ * \sa QmitkImageStatisticsDataGenerator
+ * \sa mitk::ImageStatisticsCalculator
+ */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsCalculationRunnable : public QmitkDataGenerationJobBase
 {
   Q_OBJECT
 public:
 
+  /** \brief ITK histogram type used for statistics computation. */
   typedef itk::Statistics::Histogram<double> HistogramType;
 
-  /*!
-  /brief standard constructor. */
+  /** \brief Default constructor. Initializes with zero-ignore disabled and 100 histogram bins. */
   QmitkImageStatisticsCalculationRunnable();
-  /*!
-  /brief standard destructor. */
+
+  /** \brief Destructor. */
   ~QmitkImageStatisticsCalculationRunnable();
 
-  /*!
-  /brief Initializes the object with necessary data. */
+  /**
+   * \brief Initializes the runnable with the image and optional mask data.
+   *
+   * \param[in] image The input image for which statistics will be calculated.
+   * \param[in] mask Optional mask data. Supported types: mitk::MultiLabelSegmentation,
+   *                 mitk::Image (binary mask), or mitk::PlanarFigure. Pass nullptr for no mask.
+   * \throw mitk::Exception if the mask is not nullptr and not one of the supported types.
+   */
   void Initialize(const mitk::Image* image, const mitk::BaseData* mask);
-  /*!
-  /brief returns the calculated image statistics. */
+
+  /**
+   * \brief Returns the computed statistics container.
+   * \return Pointer to the ImageStatisticsContainer, or nullptr if computation has not run or failed.
+   */
   mitk::ImageStatisticsContainer* GetStatisticsData() const;
 
+  /**
+   * \brief Returns the input image used for statistics calculation.
+   * \return Pointer to the input image.
+   */
   const mitk::Image* GetStatisticsImage() const;
+
+  /**
+   * \brief Returns the mask data used for statistics calculation.
+   * \return Pointer to the mask data, or nullptr if no mask was set.
+   */
   const mitk::BaseData* GetMaskData() const;
 
-  /*!
-  /brief Set flag to ignore zero valued voxels */
+  /**
+   * \brief Sets whether zero-valued voxels should be ignored during computation.
+   * \param[in] _arg True to ignore zero-valued voxels; false to include them.
+   */
   void SetIgnoreZeroValueVoxel(bool _arg);
-  /*!
-  /brief Get status of zero value voxel ignoring. */
+
+  /**
+   * \brief Returns whether zero-valued voxels are ignored during computation.
+   * \return True if zero-valued voxels are ignored; false otherwise.
+   */
   bool GetIgnoreZeroValueVoxel() const;
-  /*!
-  /brief Set bin size for histogram resolution.*/
+
+  /**
+   * \brief Sets the number of bins for histogram computation.
+   * \param[in] nbins The number of histogram bins.
+   */
   void SetHistogramNBins(unsigned int nbins);
-  /*!
-  /brief Get bin size for histogram resolution.*/
+
+  /**
+   * \brief Returns the number of bins used for histogram computation.
+   * \return The number of histogram bins.
+   */
   unsigned int GetHistogramNBins() const;
 
+  /**
+   * \brief Returns the computation results as a labeled map.
+   *
+   * The result map contains a single entry with key "statistics" mapping to the
+   * computed mitk::ImageStatisticsContainer.
+   *
+   * \return The result map.
+   */
   ResultMapType GetResults() const override;
 
 protected:

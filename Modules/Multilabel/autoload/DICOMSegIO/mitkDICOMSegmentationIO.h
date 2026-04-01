@@ -25,8 +25,8 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Read and Writes a MultiLabelSegmentation to a dcm file
-   * @ingroup Process
+   * \brief Read and write MultiLabelSegmentation objects as DICOM Segmentation files.
+   * \ingroup Process
    */
   class DICOMSegmentationIO : public mitk::AbstractFileIO
   {
@@ -35,24 +35,29 @@ namespace mitk
     typedef itk::Image<unsigned short, 3> itkInputImageType;
     typedef itk::Image<short, 3> itkInternalImageType;
 
+    /** \brief Default constructor. Registers reader/writer for the DICOM Segmentation MIME type. */
     DICOMSegmentationIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a DICOM segmentation. */
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
+    /** \brief Write the MultiLabelSegmentation as a DICOM Segmentation file. */
     void Write() override;
+
+    /** \brief Return the confidence level for writing the given data as a DICOM segmentation. */
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
     /**
-     * @brief Reads a number of DICOM segmentation from the file system
-     * @return a vector of mitk::LabelSetImages
-     * @throws throws an mitk::Exception if an error occurs
+     * \brief Read DICOM segmentation objects from the file system.
+     * \return A vector of mitk::LabelSetImages.
+     * \throw mitk::Exception if an error occurs during reading.
      */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

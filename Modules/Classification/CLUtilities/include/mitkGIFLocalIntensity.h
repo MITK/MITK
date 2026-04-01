@@ -52,12 +52,26 @@ namespace mitk
 
     GIFLocalIntensity();
 
+    /** \brief Get the radius (in mm) of the local intensity neighbourhood. */
     itkGetConstMacro(Range, double);
+    /** \brief Set the radius (in mm) of the local intensity neighbourhood (default: 6.2). */
     itkSetMacro(Range, double);
 
+    /**
+     * \brief Calculate local intensity features for the given image and mask.
+     *
+     * \param[in] image The input intensity image.
+     * \param[in] mask The binary mask defining the region of interest.
+     * \param[in] maskNoNAN The mask with NaN voxels excluded.
+     * \return A list of computed feature name-value pairs.
+     */
     FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
     using Superclass::CalculateFeatures;
 
+    /**
+     * \brief Add command line arguments for configuring this feature class.
+     * \param[in,out] parser The command line parser to add arguments to.
+     */
     void AddArguments(mitkCommandLineParser& parser) const override;
 
   protected:

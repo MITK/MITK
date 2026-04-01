@@ -48,19 +48,20 @@ namespace us {
  * not made available to other modules in the module environment. The framework
  * may concurrently call a <code>ServiceFactory</code>.
  *
- * @see ModuleContext#GetService
- * @see PrototypeServiceFactory
- * @remarks This class is thread safe.
+ * \sa ModuleContext#GetService
+ * \sa PrototypeServiceFactory
+ * \remarks This class is thread safe.
  */
 class ServiceFactory
 {
 
 public:
 
+  /** \brief Destructor. */
   virtual ~ServiceFactory() {}
 
   /**
-   * Creates a new service object.
+   * \brief Creates a new service object.
    *
    * <p>
    * The Framework invokes this method the first time the specified
@@ -76,30 +77,30 @@ public:
    * framework does not allow this method to be concurrently called for the
    * same module.
    *
-   * @param module The module using the service.
-   * @param registration The <code>ServiceRegistrationBase</code> object for the
+   * \param[in] module The module using the service.
+   * \param[in] registration The <code>ServiceRegistrationBase</code> object for the
    *        service.
-   * @return A service object that <strong>must</strong> contain entries for all
+   * \return A service object that <strong>must</strong> contain entries for all
    *         the interfaces named when the service was registered.
-   * @see ModuleContext#GetService
-   * @see InterfaceMap
+   * \sa ModuleContext#GetService
+   * \sa InterfaceMap
    */
   virtual InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) = 0;
 
   /**
-   * Releases a service object.
+   * \brief Releases a service object.
    *
    * <p>
    * The framework invokes this method when a service has been released by a
    * module. The service object may then be destroyed.
    *
-   * @param module The Module releasing the service.
-   * @param registration The <code>ServiceRegistration</code> object for the
+   * \param[in] module The Module releasing the service.
+   * \param[in] registration The <code>ServiceRegistration</code> object for the
    *        service.
-   * @param service The service object returned by a previous call to the
+   * \param[in] service The service object returned by a previous call to the
    *        <code>ServiceFactory::GetService</code> method.
-   * @see ModuleContext#UngetService
-   * @see InterfaceMap
+   * \sa ModuleContext#UngetService
+   * \sa InterfaceMap
    */
   virtual void UngetService(Module* module, const ServiceRegistrationBase& registration,
                             const InterfaceMap& service) = 0;

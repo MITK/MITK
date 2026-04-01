@@ -50,15 +50,13 @@ namespace mitk
     void Deactivated() override;
 
     /**
-     * @brief  Clears all picks and updates the preview.
+     * \brief Clears all seed picks and updates the preview.
      */
     virtual void ClearPicks();
 
     /**
-     * @brief Checks if any point exists in the either
-     * of the pointsets
-     * 
-     * @return bool 
+     * \brief Checks if any seed point exists in either the positive or negative point set.
+     * \return true if picks exist, false otherwise.
      */
     virtual bool HasPicks() const;
 
@@ -88,16 +86,13 @@ namespace mitk
     itkBooleanMacro(IsReady);
 
     /**
-     * @brief Initializes python service and
-     * starts async python daemon of SegmentAnything model.
-     * 
+     * \brief Initializes the Python service and starts the async SAM daemon.
      */
     void InitSAMPythonProcess();
 
     /**
-     * @brief Checks if Python daemon is ready to accept inputs.
-     * 
-     * @return bool 
+     * \brief Checks if the Python daemon is ready to accept inputs.
+     * \return true if the daemon is ready, false otherwise.
      */
     bool IsPythonReady() const;
 
@@ -109,20 +104,21 @@ namespace mitk
 
     void ConnectActionsAndFunctions() override;
 
-    /*
-     * @brief Add positive seed point action of StateMachine pattern
+    /**
+     * \brief Add positive seed point action of StateMachine pattern.
      */
     virtual void OnAddPositivePoint(StateMachineAction*, InteractionEvent *interactionEvent);
     
-    /*
-     * @brief Add negative seed point action of StateMachine pattern
+    /**
+     * \brief Add negative seed point action of StateMachine pattern.
      */
     virtual void OnAddNegativePoint(StateMachineAction*, InteractionEvent *interactionEvent);
 
-    /*
-     * @brief Delete action of StateMachine pattern. The function deletes positive or negative points in 
-       the reverse order of creation. This is done by finding & deleting the Point having the highest 
-       PointIdentifier value from either of the PointSets m_PointSetPositive & m_PointSetNegative.
+    /**
+     * \brief Delete action of StateMachine pattern.
+     *
+     * Deletes positive or negative points in reverse order of creation by finding and
+     * deleting the point with the highest PointIdentifier value from either point set.
      */
     virtual void OnDelete(StateMachineAction*, InteractionEvent*);
 
@@ -130,72 +126,60 @@ namespace mitk
     void OnRelease(StateMachineAction*, InteractionEvent*);
     void OnPrimaryButtonPressed(StateMachineAction *, InteractionEvent *);
 
-    /*
-     * @brief Clear all seed points and call UpdatePreview to reset the segmentation Preview
+    /**
+     * \brief Clears all seed points and updates the preview.
      */
     void ClearSeeds();
 
     /**
-     * @brief Overridden method from the tool manager to execute the segmentation
-     * Implementation:
-     * 1. Creates Hash for input image from current plane geometry.
-     * 2. Transfers image pointer to python service along with the hash code.
-     * 3. Creates seed points as CSV string & transfers to python service
-     * 3. Retrieves resulting segmentation Image pointer from python service and sets to previewImage.
+     * \brief Executes the SAM segmentation by communicating with the Python daemon.
      *
-     * @param inputAtTimeStep
-     * @param oldSegAtTimeStep
-     * @param previewImage
-     * @param timeStep
+     * Implementation: (1) creates a hash for the input image from the current plane geometry;
+     * (2) transfers the image to the Python service; (3) creates seed points as CSV and transfers
+     * them; (4) retrieves the resulting segmentation from the Python service and writes it to the preview.
      */
     void DoUpdatePreview(const Image *inputAtTimeStep, const Image *oldSegAtTimeStep, MultiLabelSegmentation *previewImage, TimeStepType timeStep) override;
 
     /**
-     * @brief Get the Points from positive and negative pointsets as std::vector.
-     * 
-     * @return std::vector<std::pair<mitk::Point2D, std::string>> 
+     * \brief Returns all seed points from both positive and negative point sets as a vector.
+     * \return Vector of 2D point/label-string pairs.
      */
     std::vector<std::pair<mitk::Point2D, std::string>> GetPointsAsVector(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
-     * @brief Get the Points from positive and negative pointsets as csv string.
-     * 
-     * @param baseGeometry 
-     * @return std::string 
+     * \brief Returns all seed points from positive and negative point sets as a CSV string.
+     * \return CSV-formatted string of point coordinates.
      */
     virtual std::string GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const;
 
     /**
-     * @brief Get the Hash For Current Plane from current working plane geometry.
-     * 
-     * @return std::string 
+     * \brief Computes a hash for the current working plane geometry.
+     * \return A hash string identifying the current plane.
      */
     std::string GetHashForCurrentPlane(const mitk::LevelWindow &levelWindow) const;
 
     /**
-     * @brief Emits message to connected Listnerers.
-     * 
+     * \brief Emits a status message to connected listeners.
      */
     void EmitSAMStatusMessageEvent(const std::string &status);
 
     /**
-     * @brief Cleans up segmentation preview and clears all seeds.
-     * 
+     * \brief Cleans up segmentation preview and clears all seeds.
      */
     void ConfirmCleanUp() override;
 
     /**
-     * @brief Applies ITK IntensityWindowing Filter to input image;
-     *
+     * \brief Applies ITK intensity windowing filter to the input image.
      */
     template <typename TPixel, unsigned int VImageDimension>
     void ITKWindowing(const itk::Image<TPixel, VImageDimension>*, mitk::Image*, ScalarType, ScalarType);
 
     /**
-     * @brief Convert 3D world coordinates to 2D indices.
-     * 
-     * @param baseGeometry Base Geometry of image
-     * @param point3d 3D world coordinates
+     * \brief Converts 3D world coordinates to 2D index coordinates.
+     *
+     * \param[in] baseGeometry Base geometry of the image.
+     * \param[in] point3d The 3D world coordinates to convert.
+     * \return The corresponding 2D index coordinates.
      */
     static mitk::Point2D Get2DIndicesfrom3DWorld(const mitk::BaseGeometry *baseGeometry, const mitk::Point3D &point3d);
 

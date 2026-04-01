@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * @brief The filter extracts the edge pixels of an image as points and stores
+  * \brief The filter extracts the edge pixels of an image as points and stores
   * them in an UnstructuredGrid. Every pixel which grey value is between the
   * mean +- standard deviation * (2 or 3), will be extracted as point. The
   * DetectionMethod can be set to choose if the doubled or tripled standard
@@ -31,7 +31,7 @@ namespace mitk
   {
   public:
     /**
-     * @brief The method which calculates and extracts the edge pixels/points.
+     * \brief The method which calculates and extracts the edge pixels/points.
      * For the edge detection the laplacian filter is used and for extraction
      * the standard deviation multiplied with 2, 3 or 4 (depending on selected
      * method) is used.

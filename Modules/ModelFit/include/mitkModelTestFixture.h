@@ -10,6 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkModelTestFixture.h
+ * \brief Provides a reusable test fixture base class for validating MITK pharmacokinetic / model fit models
+ *        against JSON-based reference data.
+ *
+ * \ingroup ModelFit
+ */
+
 #ifndef mitkModelTestFixture_h
 #define mitkModelTestFixture_h
 
@@ -30,9 +38,31 @@ using json = nlohmann::json;
 
 namespace mitk
 {
+  /**
+   * \brief Test fixture base class for model fit unit tests.
+   *
+   * Provides static helper methods that load model reference data from JSON files
+   * and compare a model's profile, signal output, and derived parameters against
+   * the reference values. Subclass this fixture, set up your model in \c setUp(),
+   * and use the provided comparison methods in your test cases.
+   *
+   * The expected JSON structure contains:
+   * - A "profile" object with numberOfParameters, parameterNames, parameterScales,
+   *   parameterUnits, static parameter metadata, functionString, classID, etc.
+   * - A "modelValues" array with entries containing timeGrid, modelParameterValues,
+   *   staticParameterValues, signal, and derivedParameterValues.
+   *
+   * \sa mitk::ModelBase, mitk::TestFixture
+   */
   class mitkModelTestFixture : public mitk::TestFixture
   {
   public:
+    /**
+     * \brief Parse a JSON file from the test data directory.
+     *
+     * \param path Relative path to the JSON file within the MITK test data directory.
+     * \return The parsed JSON object. Returns an empty object if the file cannot be opened or parsed.
+     */
     static json ParseJSONFile(const std::string path)
     {
       std::string pathToFile = GetTestDataFilePath(path);
@@ -53,6 +83,15 @@ namespace mitk
       return json_obj;
     }
 
+    /**
+     * \brief Extract model parameter values from a JSON object into a ParametersType array.
+     *
+     * Reads the "modelParameterValues" array from the JSON object and returns it
+     * as a ModelBase::ParametersType.
+     *
+     * \param modelValues_json_obj JSON object containing a "modelParameterValues" array.
+     * \return The parsed parameter values.
+     */
     static ModelBase::ParametersType ParseTestParameters(const json modelValues_json_obj)
     {
       ModelBase::ParametersType testparameters;
@@ -64,6 +103,13 @@ namespace mitk
       return testparameters;
     }
 
+    /**
+     * \brief Parse static parameter names and values from JSON into a StaticParameterMapType.
+     *
+     * \param profile_json_obj      JSON object containing "staticParameterNames".
+     * \param modelValues_json_obj  JSON object containing "staticParameterValues".
+     * \return A map of static parameter names to their value vectors.
+     */
     static ModelBase::StaticParameterMapType ParseStaticParameters(const json profile_json_obj, const json modelValues_json_obj)
     {
       ModelBase::StaticParameterMapType staticParameterMap;
@@ -81,6 +127,13 @@ namespace mitk
       return staticParameterMap;
     }
 
+    /**
+     * \brief Convenience method that parses static parameters from JSON and applies them to a model.
+     *
+     * \param testmodel             The model instance to configure.
+     * \param profile_json_obj      JSON object containing "staticParameterNames".
+     * \param modelValues_json_obj  JSON object containing "staticParameterValues".
+     */
     static void SetStaticParametersForTest(mitk::ModelBase::Pointer testmodel, const json profile_json_obj, const json modelValues_json_obj)
     {
       mitk::ModelBase::StaticParameterMapType staticParameterMap;
@@ -88,6 +141,16 @@ namespace mitk
       testmodel->SetStaticParameters(staticParameterMap);
     }
 
+    /**
+     * \brief Assert that a model's profile (parameter names, scales, units, etc.) matches a JSON reference.
+     *
+     * Checks numberOfParameters, parameterNames, parameterScales, parameterUnits,
+     * derived parameters, static parameters, functionString, classID, modelDisplayName,
+     * modelType, axis names, and axis units.
+     *
+     * \param testmodel        The model instance to validate.
+     * \param profile_json_obj JSON object containing the expected profile values.
+     */
     static void CompareModelAndReferenceProfile(const mitk::ModelBase::Pointer testmodel, const json profile_json_obj)
     {
       CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", testmodel->GetNumberOfParameters() == profile_json_obj["numberOfParameters"].get<unsigned int>());
@@ -121,6 +184,17 @@ namespace mitk
       CPPUNIT_ASSERT_MESSAGE("Checking y axis unit.", testmodel->GetYAxisUnit() == profile_json_obj["yAxisUnit"].get<std::string>());
     }
 
+    /**
+     * \brief Assert that a model's computed signal matches a JSON reference for all parameter sets.
+     *
+     * For each entry in the "modelValues" array, sets the static parameters and time grid,
+     * computes the signal via \c GetSignal(), and compares each sample against the
+     * reference "signal" array with a tolerance of 1e-6.
+     *
+     * \param testmodel             The model instance to validate.
+     * \param modelValues_json_obj  JSON object containing the "modelValues" array.
+     * \param profile_json_obj      JSON object containing static parameter names.
+     */
     static void CompareModelAndReferenceSignal(mitk::ModelBase::Pointer testmodel, const json modelValues_json_obj, const json profile_json_obj)
     {
 
@@ -160,6 +234,16 @@ namespace mitk
       }
     }
 
+    /**
+     * \brief Assert that a model's derived parameters match a JSON reference for all parameter sets.
+     *
+     * For each entry in the "modelValues" array, sets the time grid, computes the
+     * derived parameters via \c GetDerivedParameters(), and compares each value against
+     * the reference "derivedParameterValues" array with a tolerance of 1e-6.
+     *
+     * \param testmodel             The model instance to validate.
+     * \param modelValues_json_obj  JSON object containing the "modelValues" array.
+     */
     static void CompareModelAndReferenceDerivedParameters(const mitk::ModelBase::Pointer testmodel, json modelValues_json_obj)
     {
       for (unsigned int j = 0; j < modelValues_json_obj["modelValues"].size(); j++)

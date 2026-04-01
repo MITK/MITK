@@ -39,10 +39,11 @@ private:
 
 public:
 
+  /** \brief Copy constructor. */
   ServiceReferenceBase(const ServiceReferenceBase& ref);
 
   /**
-   * Converts this ServiceReferenceBase instance into a boolean
+   * \brief Converts this ServiceReferenceBase instance into a boolean
    * expression. If this instance was default constructed or
    * the service it references has been unregistered, the conversion
    * returns <code>false</code>, otherwise it returns <code>true</code>.
@@ -50,15 +51,16 @@ public:
   operator bool_type() const;
 
   /**
-   * Releases any resources held or locked by this
+   * \brief Releases any resources held or locked by this
    * <code>ServiceReferenceBase</code> and renders it invalid.
    */
   ServiceReferenceBase& operator=(int null);
 
+  /** \brief Destructor. */
   ~ServiceReferenceBase();
 
   /**
-   * Returns the property value to which the specified property key is mapped
+   * \brief Returns the property value to which the specified property key is mapped
    * in the properties <code>ServiceProperties</code> object of the service
    * referenced by this <code>ServiceReferenceBase</code> object.
    *
@@ -70,14 +72,16 @@ public:
    * been unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
-   * @param key The property key.
-   * @return The property value to which the key is mapped; an invalid Any
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   *
+   * \param[in] key The property key.
+   * \return The property value to which the key is mapped; an invalid Any
    *         if there is no property named after the key.
    */
   Any GetProperty(const std::string& key) const;
 
   /**
-   * Returns a list of the keys in the <code>ServiceProperties</code>
+   * \brief Returns a list of the keys in the <code>ServiceProperties</code>
    * object of the service referenced by this <code>ServiceReferenceBase</code>
    * object.
    *
@@ -86,12 +90,14 @@ public:
    * unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
-   * @param keys A vector being filled with the property keys.
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   *
+   * \param[out] keys A vector being filled with the property keys.
    */
   void GetPropertyKeys(std::vector<std::string>& keys) const;
 
   /**
-   * Returns the module that registered the service referenced by this
+   * \brief Returns the module that registered the service referenced by this
    * <code>ServiceReferenceBase</code> object.
    *
    * <p>
@@ -99,52 +105,54 @@ public:
    * unregistered. This can be used to determine if the service has been
    * unregistered.
    *
-   * @return The module that registered the service referenced by this
+   * \return The module that registered the service referenced by this
    *         <code>ServiceReferenceBase</code> object; <code>0</code> if that
    *         service has already been unregistered.
-   * @see ModuleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa ModuleContext::RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   Module* GetModule() const;
 
   /**
-   * Returns the modules that are using the service referenced by this
+   * \brief Returns the modules that are using the service referenced by this
    * <code>ServiceReferenceBase</code> object. Specifically, this method returns
    * the modules whose usage count for that service is greater than zero.
    *
-   * @param modules A list of modules whose usage count for the service referenced
+   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   *
+   * \param[out] modules A list of modules whose usage count for the service referenced
    *         by this <code>ServiceReferenceBase</code> object is greater than
    *         zero.
    */
   void GetUsingModules(std::vector<Module*>& modules) const;
 
   /**
-   * Returns the interface identifier this ServiceReferenceBase object
+   * \brief Returns the interface identifier this ServiceReferenceBase object
    * is bound to.
    *
    * A default constructed ServiceReferenceBase object is not bound to
    * any interface identifier and calling this method will return an
    * empty string.
    *
-   * @return The interface identifier for this ServiceReferenceBase object.
+   * \return The interface identifier for this ServiceReferenceBase object.
    */
   std::string GetInterfaceId() const;
 
   /**
-   * Checks whether this ServiceReferenceBase object can be converted to
+   * \brief Checks whether this ServiceReferenceBase object can be converted to
    * another ServiceReferenceBase object, which will be bound to the
    * given interface identifier.
    *
    * ServiceReferenceBase objects can be converted if the underlying service
    * implementation was registered under multiple service interfaces.
    *
-   * @param interfaceid
-   * @return \c true if this ServiceReferenceBase object can be converted,
+   * \param[in] interfaceid The target interface identifier.
+   * \return \c true if this ServiceReferenceBase object can be converted,
    *         \c false otherwise.
    */
   bool IsConvertibleTo(const std::string& interfaceid) const;
 
   /**
-   * Compares this <code>ServiceReferenceBase</code> with the specified
+   * \brief Compares this <code>ServiceReferenceBase</code> with the specified
    * <code>ServiceReferenceBase</code> for order.
    *
    * <p>
@@ -161,16 +169,20 @@ public:
    * {@link ServiceConstants::SERVICE_ID service id} and greater if it has a lower
    * service id.
    *
-   * @param reference The <code>ServiceReferenceBase</code> to be compared.
-   * @return Returns a false or true if this
+   * \param[in] reference The <code>ServiceReferenceBase</code> to be compared.
+   * \return Returns a false or true if this
    *         <code>ServiceReferenceBase</code> is less than or greater
    *         than the specified <code>ServiceReferenceBase</code>.
    */
   bool operator<(const ServiceReferenceBase& reference) const;
 
+  /** \brief Equality comparison operator. */
   bool operator==(const ServiceReferenceBase& reference) const;
+
+  /** \brief Equality comparison with nullptr. */
   bool operator==(std::nullptr_t) const noexcept;
 
+  /** \brief Copy assignment operator. */
   ServiceReferenceBase& operator=(const ServiceReferenceBase& reference);
 
 private:
@@ -214,6 +226,8 @@ US_MSVC_POP_WARNING
 
 /**
  * \ingroup MicroServices
+ *
+ * \brief Stream output operator for ServiceReferenceBase.
  */
 MITKCPPMICROSERVICES_EXPORT std::ostream& operator<<(std::ostream& os, const us::ServiceReferenceBase& serviceRef);
 

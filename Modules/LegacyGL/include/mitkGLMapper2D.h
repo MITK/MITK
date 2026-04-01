@@ -17,8 +17,10 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  // typedef allows integration of mappers into the new mapper architecture
-  // \deprecatedSince{2013_03} Use GLMapper instead
+  /**
+   * \brief Backward-compatible typedef for GLMapper.
+   * \deprecatedSince{2013_03} Use GLMapper instead.
+   */
   DEPRECATED(typedef GLMapper GLMapper2D);
 
 } // namespace mitk

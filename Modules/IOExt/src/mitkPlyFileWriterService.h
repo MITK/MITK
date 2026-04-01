@@ -18,12 +18,12 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Used to write Surfaces to the PLY format.
+   * \brief Writer service for saving surfaces in PLY format.
    *
-   * Currently, this writer uses the binary format as standard. Should the ASCII Format be required,
-   * it is suggested to incorporate Options.
+   * Currently, this writer uses the binary format as default. Should the ASCII
+   * format be required, it is suggested to incorporate Options.
    *
-   * @ingroup IOExt
+   * \ingroup IOExt
    */
   class PlyFileWriterService : public AbstractFileWriter
   {

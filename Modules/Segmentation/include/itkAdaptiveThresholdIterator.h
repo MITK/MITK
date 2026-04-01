@@ -97,25 +97,34 @@ namespace itk
     * should be used when the seed pixel is unknown */
     AdaptiveThresholdIterator(ImageType *imagePtr, FunctionType *fnPtr);
 
-    /** Default Destructor. */
+    /** \brief Default Destructor. */
     ~AdaptiveThresholdIterator() override{};
 
-    /** Initializes the iterator, called from constructor */
+    /** \brief Initialize the iterator, called from constructor. */
     void InitializeIterator();
 
-    // makes the iterator go one step further
+    /** \brief Advance the iterator by one step of the extended flood fill. */
     void DoExtendedFloodStep();
 
-    // set-method for member-variable
+    /** \brief Set the expansion direction for adaptive thresholding.
+      \param upwards If true, threshold expands upwards; otherwise downwards.
+    */
     void SetExpansionDirection(bool upwards);
 
-    // Init-method
+    /** \brief Initialize the region growing state machine. */
     void InitRegionGrowingState();
 
+    /** \brief Set the minimum threshold value.
+      \param min The minimum threshold.
+    */
     void SetMinTH(int min);
 
+    /** \brief Set the maximum threshold value.
+      \param max The maximum threshold.
+    */
     void SetMaxTH(int max);
 
+    /** \brief Get the pixel value at the seed point. */
     int GetSeedPointValue(void);
 
     /** switch between fine and raw leakage detection */
@@ -134,25 +143,30 @@ namespace itk
       return (*m_QueueMap.find(m_RegionGrowingState)).second.front();
     } // [!] is never called?!
 
+    /** \brief Get the pixel value at the current iterator position. */
     const PixelType Get(void) const override
     {
       return const_cast<ImageType *>(this->m_Image.GetPointer())
         ->GetPixel((*m_QueueMap.find(m_RegionGrowingState)).second.front());
     }
-    //[!] is never called?!
 
+    /** \brief Set the pixel value at the current iterator position. */
     void Set(const PixelType &value)
     {
       const_cast<ImageType *>(this->m_Image.GetPointer())
         ->GetPixel((*m_QueueMap.find(m_RegionGrowingState)).second.front()) = value;
     }
 
+    /** \brief Reset the iterator to the beginning. */
     void GoToBegin();
 
-    /** Is the iterator at the end of the region? */
+    /** \brief Check whether the iterator has reached the end of the region. */
     bool IsAtEnd() const override { return this->m_IsAtEnd; };
-    /** Walk forward one index */
+
+    /** \brief Walk forward one index by performing an extended flood step. */
     void operator++() override { this->DoExtendedFloodStep(); }
+
+    /** \brief Get the function used for threshold evaluation. */
     virtual SmartPointer<FunctionType> GetFunction() const { return m_Function; }
     /** operator= is provided to make sure the handle to the image is properly
     * reference counted. */
@@ -172,16 +186,20 @@ namespace itk
       return *this;
     }
 
-    /** Compute whether the index of interest should be included in the flood */
+    /** \brief Compute whether the pixel at the given index should be included in the flood fill. */
     bool IsPixelIncluded(const IndexType &index) const override;
 
-    // Calculate the value the outputImage is initialized to
+    /** \brief Calculate the initialization value for the output image based on threshold range.
+      \param lower The lower threshold.
+      \param upper The upper threshold.
+      \return The initialization value.
+    */
     static int CalculateInitializeValue(int lower, int upper) { return ((upper - lower) + 1) * (-1); };
+
+    /** \brief Get the detected leakage point in the region growing state space. */
     int GetLeakagePoint(void) { return m_DetectedLeakagePoint; }
   protected:
-    /*
-    * @brief Pointer on the output image to which the result shall be written
-    */
+    /** \brief Pointer to the output image to which the result shall be written. */
     SmartPointer<ImageType> m_OutputImage;
 
     SmartPointer<FunctionType> m_Function;
@@ -202,16 +220,19 @@ namespace itk
 
     int m_InitializeValue;
 
+    /** \brief Expand the threshold range upwards by one step. */
     void ExpandThresholdUpwards();
 
+    /** \brief Expand the threshold range downwards by one step. */
     void ExpandThresholdDownwards();
 
+    /** \brief Increment the region growing state counter. */
     void IncrementRegionGrowingState();
 
-    // calculates how many steps the voxel is from the current step
+    /** \brief Estimate the distance (in expansion steps) of a voxel from the current state. */
     int EstimateDistance(IndexType);
 
-    // calculates how many expansion steps will be taken
+    /** \brief Calculate the maximum number of region growing expansion steps. */
     unsigned int CalculateMaxRGS();
 
   private:

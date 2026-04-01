@@ -24,39 +24,82 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \brief Property name for the histogram bin count stored on statistics nodes. */
   static const std::string STATS_HISTOGRAM_BIN_PROPERTY_NAME = "MITK.statistic.histogram_bins";
+  /** \brief Property name indicating whether zero voxels were ignored. */
   static const std::string STATS_IGNORE_ZERO_VOXEL_PROPERTY_NAME = "MITK.statistic.ignore_zero_voxel";
+  /** \brief Property name for the generation status of the statistics. */
   static const std::string STATS_GENERATION_STATUS_PROPERTY_NAME = "MITK.statistic.generation.status";
+  /** \brief Status value indicating statistics computation is in progress. */
   static const std::string STATS_GENERATION_STATUS_VALUE_WORK_IN_PROGRESS = "workInProgress";
+  /** \brief Status value indicating statistics computation is pending. */
   static const std::string STATS_GENERATION_STATUS_VALUE_PENDING = "pending";
+  /** \brief Status value indicating statistics computation failed. */
   static const std::string STATS_GENERATION_STATUS_VALUE_BASE_DATA_FAILED = "failed";
 
   /**
-  \brief Returns the StatisticsContainer that was computed on given input (image/mask/planar figure) and is added as DataNode in a DataStorage
-  */
+   * \brief Manages lookup of ImageStatisticsContainer nodes in a DataStorage.
+   *
+   * This utility class provides static methods to find or retrieve
+   * ImageStatisticsContainer instances that were previously computed for a
+   * given image and optional mask, and stored as DataNode objects in a
+   * DataStorage.
+   *
+   * \sa ImageStatisticsContainer
+   * \sa ImageStatisticsCalculator
+   * \sa StatisticsToImageRelationRule
+   * \sa StatisticsToMaskRelationRule
+   */
   class MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainerManager
   {
   public:
-    /**Documentation
-    @brief Returns the StatisticsContainer for the given image and mask from the storage-
-    @return a valid StatisticsContainer or nullptr if no StatisticsContainer is found.
-    @details if more than one StatisticsContainer is found, only the newest (ModifiedTime) is returned
-    @pre Datastorage must point to a valid instance.
-    @pre image must Point to a valid instance.
-    @param dataStorage
-    @param image
-    @param mask
-    @param onlyIfUpToDate Indicates if results should only be returned if the are up to date, thus not older then image and ROI.
-    @param noWIP If noWIP is true, the function only returns valid final result and not just its placeholder (WIP).
-    If noWIP equals false it might also return a WIP, thus the valid result is currently processed/ordered but might not be ready yet.
-    @param ignoreZeroVoxel indicates the wanted statistics are calculated with or w/o zero voxels.
-    @param histogramNBins Number of bins the statistics should have that are searched for.
-    */
+    /**
+     * \brief Find and return the ImageStatisticsContainer for the given image and mask.
+     *
+     * Searches the data storage for an ImageStatisticsContainer that was computed
+     * on the specified image (and optionally mask). If multiple containers match,
+     * the one with the newest modification time is returned.
+     *
+     * \param[in] dataStorage Pointer to the DataStorage to search.
+     * \param[in] image Pointer to the source image.
+     * \param[in] mask Pointer to the mask (can be nullptr if unmasked statistics are desired).
+     * \param[in] ignoreZeroVoxel Whether the desired statistics exclude zero voxels.
+     * \param[in] histogramNBins Number of histogram bins the desired statistics should have.
+     * \param[in] onlyIfUpToDate If true, only returns statistics that are newer than image and mask.
+     * \param[in] noWIP If true, only returns completed results (not work-in-progress placeholders).
+     *
+     * \return A valid ImageStatisticsContainer, or nullptr if none is found.
+     *
+     * \pre dataStorage must point to a valid instance.
+     * \pre image must point to a valid instance.
+     */
     static mitk::ImageStatisticsContainer::Pointer GetImageStatistics(const mitk::DataStorage* dataStorage, const mitk::BaseData* image, const mitk::BaseData* mask=nullptr, bool ignoreZeroVoxel = false, unsigned int histogramNBins = 100, bool onlyIfUpToDate = true, bool noWIP = true);
+
+    /**
+     * \brief Find and return the DataNode containing the ImageStatisticsContainer.
+     *
+     * Same search logic as GetImageStatistics(), but returns the DataNode wrapper.
+     *
+     * \param[in] dataStorage Pointer to the DataStorage to search.
+     * \param[in] image Pointer to the source image.
+     * \param[in] mask Pointer to the mask (can be nullptr).
+     * \param[in] ignoreZeroVoxel Whether zero voxels were ignored.
+     * \param[in] histogramNBins Number of histogram bins.
+     * \param[in] onlyIfUpToDate Only return up-to-date results.
+     * \param[in] noWIP Only return completed results.
+     *
+     * \return The matching DataNode, or nullptr if none is found.
+     */
     static mitk::DataNode::Pointer GetImageStatisticsNode(const mitk::DataStorage* dataStorage, const mitk::BaseData* image, const mitk::BaseData* mask = nullptr, bool ignoreZeroVoxel = false, unsigned int histogramNBins = 100, bool onlyIfUpToDate = true, bool noWIP = true);
 
-    /** Returns the predicate that can be used to search for statistic containers of
-    the given image (and mask) in the passed data storage.*/
+    /**
+     * \brief Create a predicate to search for statistics containers of the given sources.
+     *
+     * \param[in] image Pointer to the source image.
+     * \param[in] mask Pointer to the mask (can be nullptr).
+     *
+     * \return A node predicate matching statistics containers for the given sources.
+     */
     static mitk::NodePredicateBase::ConstPointer GetStatisticsPredicateForSources(const mitk::BaseData* image, const mitk::BaseData* mask = nullptr);
   };
 }

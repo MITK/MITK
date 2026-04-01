@@ -27,94 +27,107 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Maintains transient UID <-> DataNode mappings.
+   * \brief Maintains transient UID-to-DataNode mappings for the REST API.
    *
-   * UIDs are:
-   * - Generated on first access
-   * - Stored as node property for debugging visibility
-   * - Cleared from cache when node removed from DataStorage
-   * - Never reused during session lifetime
-   * - NOT persisted when scene is saved (transient property)
+   * This class provides a bidirectional mapping between string UIDs and DataNode
+   * pointers. UIDs are:
+   *   - Generated on first access (format: "node_<counter>")
+   *   - Stored as a node property under the key "restapi.uid" for debugging visibility
+   *   - Cleared from the cache when the node is removed from the DataStorage
+   *   - Never reused during a session lifetime
+   *   - NOT persisted when a scene is saved (transient property)
+   *
+   * All public methods are thread-safe.
+   *
+   * \sa DataStorageBridge
    */
   class MITKRESTAPI_EXPORT NodeUidMapper
   {
   public:
-    /// Property key for storing UID on nodes (for debugging)
+    /** \brief Property key for storing the UID on nodes (for debugging visibility). */
     static constexpr const char* UID_PROPERTY_KEY = "restapi.uid";
 
+    /** \brief Default constructor. */
     NodeUidMapper();
+
+    /** \brief Destructor. Disconnects from the DataStorage if connected. */
     ~NodeUidMapper();
 
-    // Non-copyable, non-movable
     NodeUidMapper(const NodeUidMapper&) = delete;
     NodeUidMapper& operator=(const NodeUidMapper&) = delete;
     NodeUidMapper(NodeUidMapper&&) = delete;
     NodeUidMapper& operator=(NodeUidMapper&&) = delete;
 
     /**
-     * @brief Connect to a DataStorage and start tracking nodes.
+     * \brief Connect to a DataStorage and start tracking nodes.
      *
-     * Subscribes to AddNodeEvent and RemoveNodeEvent.
-     * Clears any existing restapi.uid properties (fresh start).
+     * Subscribes to AddNodeEvent and RemoveNodeEvent. Clears all existing
+     * mappings and removes any stale "restapi.uid" properties from all nodes
+     * in the DataStorage (fresh start).
      *
-     * @param dataStorage The DataStorage to track, or nullptr to disconnect.
+     * \param[in] dataStorage The DataStorage to track, or \c nullptr to disconnect.
      */
     void SetDataStorage(DataStorage* dataStorage);
 
     /**
-     * @brief Disconnect from current DataStorage.
+     * \brief Disconnect from the current DataStorage.
+     *
+     * Equivalent to calling SetDataStorage(nullptr).
      */
     void ClearDataStorage();
 
     /**
-     * @brief Get or create a UID for the given node.
+     * \brief Get or create a UID for the given node.
      *
-     * Thread-safe. Creates new UID if none exists.
+     * If the node already has a cached UID, it is returned. Otherwise a new
+     * unique UID is generated, stored in the cache, and set as a property
+     * on the node.
      *
-     * @param node The node to get/create UID for. Must not be nullptr.
-     * @return The UID for this node.
-     * @throws std::invalid_argument if node is nullptr.
+     * \param[in] node The node to get or create a UID for. Must not be \c nullptr.
+     * \return The UID string for this node.
+     * \throw std::invalid_argument if \p node is \c nullptr.
      */
     std::string GetOrCreateUid(DataNode* node);
 
     /**
-     * @brief Find a node by its UID.
+     * \brief Find a node by its UID.
      *
-     * Thread-safe. Returns a null SmartPointer if not found or if the node
-     * has already been destroyed. Returns a strong reference to guarantee
-     * the node stays alive after the internal lock is released.
+     * Returns a strong SmartPointer reference to guarantee the node stays alive
+     * after the internal lock is released.
      *
-     * @param uid The UID to look up.
-     * @return A SmartPointer to the node, or null if not found.
+     * \param[in] uid The UID to look up.
+     * \return A SmartPointer to the node, or a null pointer if not found or if
+     *         the node has already been destroyed.
      */
     DataNode::Pointer FindNodeByUid(const std::string& uid) const;
 
     /**
-     * @brief Get UID for a node if it exists (doesn't create).
+     * \brief Get the UID for a node without creating one.
      *
-     * @param node The node to look up.
-     * @return The UID if it exists, or std::nullopt if not.
+     * \param[in] node The node to look up.
+     * \return The UID if it exists, or \c std::nullopt if the node has no UID
+     *         or \p node is \c nullptr.
      */
     std::optional<std::string> GetUid(const DataNode* node) const;
 
     /**
-     * @brief Check if a UID exists.
+     * \brief Check whether a UID exists in the mapping.
      *
-     * @param uid The UID to check.
-     * @return true if the UID exists in the mapping.
+     * \param[in] uid The UID string to check.
+     * \return \c true if the UID is registered in the mapping.
      */
     bool HasUid(const std::string& uid) const;
 
     /**
-     * @brief Restore a UID mapping for a node.
+     * \brief Restore a previously assigned UID mapping for a node.
      *
      * Used to preserve UIDs across operations that temporarily remove and re-add
      * nodes to the DataStorage (e.g., reparenting). The node's previous UID is
      * re-registered in the cache and stored as a property.
      *
-     * @param node The node to restore the UID for. Must not be nullptr.
-     * @param uid The UID to restore.
-     * @throws std::invalid_argument if node is nullptr.
+     * \param[in] node The node to restore the UID for. Must not be \c nullptr.
+     * \param[in] uid The UID to restore.
+     * \throw std::invalid_argument if \p node is \c nullptr.
      */
     void RestoreUid(const DataNode* node, const std::string& uid);
 

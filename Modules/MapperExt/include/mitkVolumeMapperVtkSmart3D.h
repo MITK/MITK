@@ -32,10 +32,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  //##Documentation
-  //## @brief Vtk-based mapper for VolumeData
-  //##
-  //## @ingroup Mapper
+  /** \brief VTK-based mapper for volume rendering of 3D image data.
+   *
+   * Uses vtkSmartVolumeMapper which automatically selects the best volume
+   * rendering method (GPU ray casting, software ray casting, etc.) based on
+   * hardware capabilities. Transfer functions for color and opacity are
+   * configured from the DataNode's TransferFunction property.
+   *
+   * \sa ImageVtkMapper2D, VtkMapper
+   * \ingroup Mapper
+   */
   class MITKMAPPEREXT_EXPORT VolumeMapperVtkSmart3D : public VtkMapper
   {
   public:
@@ -45,9 +51,26 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+    /** \brief Get the VTK volume prop for 3D rendering.
+     *
+     * \param[in] renderer The renderer context.
+     * \return The VTK volume prop.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Apply visual properties to the actor.
+     *
+     * \param[in] actor    The VTK actor to apply properties to.
+     * \param[in] renderer The renderer context.
+     */
     void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
+
+    /** \brief Set default rendering properties for volume visualization.
+     *
+     * \param[in] node      The data node to configure.
+     * \param[in] renderer  The renderer context, or \c nullptr for all renderers.
+     * \param[in] overwrite If \c true, overwrite existing properties.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:

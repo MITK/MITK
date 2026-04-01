@@ -53,27 +53,27 @@ public:
   enum Type {
 
     /**
-     * This service has been registered.
+     * \brief This service has been registered.
      * <p>
      * This event is delivered <strong>after</strong> the service
      * has been registered with the framework.
      *
-     * @see ModuleContext#RegisterService()
+     * \sa ModuleContext#RegisterService()
      */
     REGISTERED = 0x00000001,
 
     /**
-     * The properties of a registered service have been modified.
+     * \brief The properties of a registered service have been modified.
      * <p>
      * This event is delivered <strong>after</strong> the service
      * properties have been modified.
      *
-     * @see ServiceRegistration#SetProperties
+     * \sa ServiceRegistration#SetProperties
      */
     MODIFIED = 0x00000002,
 
     /**
-     * This service is in the process of being unregistered.
+     * \brief This service is in the process of being unregistered.
      * <p>
      * This event is delivered <strong>before</strong> the service
      * has completed unregistering.
@@ -85,13 +85,13 @@ public:
      * this event, the framework will automatically release the module's use of
      * the service while completing the service unregistration operation.
      *
-     * @see ServiceRegistration#Unregister
-     * @see ModuleContext#UngetService
+     * \sa ServiceRegistration#Unregister
+     * \sa ModuleContext#UngetService
      */
     UNREGISTERING = 0x00000004,
 
     /**
-     * The properties of a registered service have been modified and the new
+     * \brief The properties of a registered service have been modified and the new
      * properties no longer match the listener's filter.
      * <p>
      * This event is delivered <strong>after</strong> the service
@@ -100,51 +100,62 @@ public:
      * matched the service properties prior to the modification but the filter
      * does not match the modified service properties.
      *
-     * @see ServiceRegistration#SetProperties
+     * \sa ServiceRegistration#SetProperties
      */
     MODIFIED_ENDMATCH = 0x00000008
 
   };
 
   /**
-   * Creates an invalid instance.
+   * \brief Creates an invalid instance.
    */
   ServiceEvent();
 
+  /** \brief Destructor. */
   ~ServiceEvent();
 
   /**
-   * Can be used to check if this ServiceEvent instance is valid,
+   * \brief Can be used to check if this ServiceEvent instance is valid,
    * or if it has been constructed using the default constructor.
    *
-   * @return <code>true</code> if this event object is valid,
+   * \return <code>true</code> if this event object is valid,
    *         <code>false</code> otherwise.
    */
   bool IsNull() const;
 
   /**
-   * Creates a new service event object.
+   * \brief Creates a new service event object.
    *
-   * @param type The event type.
-   * @param reference A <code>ServiceReference</code> object to the service
+   * \param[in] type The event type.
+   * \param[in] reference A <code>ServiceReference</code> object to the service
    *        that had a lifecycle change.
    */
   ServiceEvent(Type type, const ServiceReferenceBase& reference);
 
+  /** \brief Copy constructor. */
   ServiceEvent(const ServiceEvent& other);
 
+  /** \brief Copy assignment operator. */
   ServiceEvent& operator=(const ServiceEvent& other);
 
   /**
-   * Returns a reference to the service that had a change occur in its
+   * \brief Returns a reference to the service that had a change occur in its
    * lifecycle.
    * <p>
    * This reference is the source of the event.
    *
-   * @return Reference to the service that had a lifecycle change.
+   * \pre IsNull() returns \c false.
+   *
+   * \return Reference to the service that had a lifecycle change.
    */
   ServiceReferenceU GetServiceReference() const;
 
+  /**
+   * \brief Returns a typed reference to the service that had a change occur in its lifecycle.
+   *
+   * \tparam S The service interface type.
+   * \return Typed reference to the service that had a lifecycle change.
+   */
   template<class S>
   ServiceReference<S> GetServiceReference(InterfaceType<S>) const
   {
@@ -152,7 +163,11 @@ public:
   }
 
   /**
-   * Returns the type of event. The event type values are:
+   * \brief Returns the type of event.
+   *
+   * \pre IsNull() returns \c false.
+   *
+   * The event type values are:
    * <ul>
    * <li>{@link #REGISTERED} </li>
    * <li>{@link #MODIFIED} </li>
@@ -160,7 +175,7 @@ public:
    * <li>{@link #UNREGISTERING} </li>
    * </ul>
    *
-   * @return Type of service lifecycle change.
+   * \return Type of service lifecycle change.
    */
   Type GetType() const;
 
@@ -168,11 +183,15 @@ public:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \{
  */
+
+/** \brief Stream output operator for ServiceEvent::Type. */
 MITKCPPMICROSERVICES_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type);
+
+/** \brief Stream output operator for ServiceEvent. */
 MITKCPPMICROSERVICES_EXPORT std::ostream& operator<<(std::ostream& os, const ServiceEvent& event);
-/** @}*/
+/** \} */
 
 }
 

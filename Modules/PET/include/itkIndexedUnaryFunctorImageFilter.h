@@ -21,62 +21,85 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
-/** \class IndexedUnaryFunctorImageFilter
- * \brief Perform a generic pixel-wise index specific operation on an input image and produces an output image.
+/**
+ * \class IndexedUnaryFunctorImageFilter
+ * \brief Perform a generic pixel-wise, index-aware operation on an input image to produce an output image.
  *
- * This is filter is simelar to itk::UnaryFunctorImageFilter, but it can used for operations where the index position
- * in the input image is relevant for the output result.\n
- * Class is templated over the type of the input image
- * and the type of the output image. It is also templated by the
- * operation to be applied.  A Functor style is used to represent the
- * function.\n
+ * This filter is similar to itk::UnaryFunctorImageFilter, but it passes both the pixel value
+ * and its image index to the functor. This is useful for operations where the spatial position
+ * of a pixel within the image is relevant for computing the output (e.g., spatially varying
+ * decay correction in PET SUV calculations).
+ *
+ * \tparam TInputImage  Type of the input image.
+ * \tparam TOutputImage Type of the output image.
+ * \tparam TFunction    Functor type. Must define \c operator()(const InputPixelType&, const IndexType&)
+ *                      and \c operator!=().
+ *
+ * The functor is called for each pixel as:
+ * \code
+ * output[index] = functor(input[index], index);
+ * \endcode
  *
  * \ingroup IntensityImageFilters MultiThreaded
  * \ingroup ITKImageIntensity
+ * \sa itk::UnaryFunctorImageFilter, SUVbwFunctorPolicy
  */
 
   template< typename TInputImage, typename TOutputImage, typename TFunction >
   class IndexedUnaryFunctorImageFilter :public InPlaceImageFilter< TInputImage, TOutputImage >
   {
   public:
-    /** Standard class typedefs. */
+    /** \brief Standard class typedefs. */
     typedef IndexedUnaryFunctorImageFilter                         Self;
     typedef InPlaceImageFilter< TInputImage, TOutputImage > Superclass;
     typedef SmartPointer< Self >                            Pointer;
     typedef SmartPointer< const Self >                      ConstPointer;
 
-    /** Method for creation through the object factory. */
+    /** \brief Method for creation through the object factory. */
     itkNewMacro(Self);
 
-    /** Run-time type information (and related methods). */
+    /** \brief Run-time type information (and related methods). */
     itkTypeMacro(IndexedUnaryFunctorImageFilter, InPlaceImageFilter);
 
-    /** Some typedefs. */
+    /** \brief Type of the functor used for the pixel-wise operation. */
     typedef TFunction FunctorType;
 
-    typedef TInputImage                              InputImageType;
-    typedef typename    InputImageType::ConstPointer InputImagePointer;
-    typedef typename    InputImageType::RegionType   InputImageRegionType;
-    typedef typename    InputImageType::PixelType    InputImagePixelType;
+    typedef TInputImage                              InputImageType;     ///< \brief Input image type.
+    typedef typename    InputImageType::ConstPointer InputImagePointer;  ///< \brief Input image const pointer type.
+    typedef typename    InputImageType::RegionType   InputImageRegionType; ///< \brief Input image region type.
+    typedef typename    InputImageType::PixelType    InputImagePixelType;  ///< \brief Input pixel type.
 
-    typedef TOutputImage                             OutputImageType;
-    typedef typename     OutputImageType::Pointer    OutputImagePointer;
-    typedef typename     OutputImageType::RegionType OutputImageRegionType;
-    typedef typename     OutputImageType::PixelType  OutputImagePixelType;
+    typedef TOutputImage                             OutputImageType;     ///< \brief Output image type.
+    typedef typename     OutputImageType::Pointer    OutputImagePointer;  ///< \brief Output image pointer type.
+    typedef typename     OutputImageType::RegionType OutputImageRegionType; ///< \brief Output image region type.
+    typedef typename     OutputImageType::PixelType  OutputImagePixelType;  ///< \brief Output pixel type.
 
-    /** Get the functor object.  The functor is returned by reference.
-    * (Functors do not have to derive from itk::LightObject, so they do
-    * not necessarily have a reference count. So we cannot return a
-    * SmartPointer.) */
+    /**
+     * \brief Get a mutable reference to the functor object.
+     *
+     * The functor is returned by reference because functors do not have to derive
+     * from itk::LightObject and thus may not have a reference count.
+     *
+     * \return Mutable reference to the functor.
+     */
     FunctorType &       GetFunctor() { return m_Functor; }
+
+    /**
+     * \brief Get a const reference to the functor object.
+     *
+     * \return Const reference to the functor.
+     */
     const FunctorType & GetFunctor() const { return m_Functor; }
 
-    /** Set the functor object.  This replaces the current Functor with a
-    * copy of the specified Functor. This allows the user to specify a
-    * functor that has ivars set differently than the default functor.
-    * This method requires an operator!=() be defined on the functor
-    * (or the compiler's default implementation of operator!=() being
-    * appropriate). */
+    /**
+     * \brief Set the functor object.
+     *
+     * Replaces the current functor with a copy of the specified functor. This allows
+     * configuring functor parameters (e.g., injected activity, body weight) before
+     * running the filter. Requires \c operator!=() to be defined on the functor type.
+     *
+     * \param[in] functor The functor to copy into this filter.
+     */
     void SetFunctor(const FunctorType & functor)
     {
       if (m_Functor != functor)

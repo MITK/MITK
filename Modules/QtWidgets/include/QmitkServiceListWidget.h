@@ -93,7 +93,7 @@ public:
   us::ServiceReferenceU GetSelectedServiceReference();
 
   /**
-   * @return Returns all service references that are displayed in this widget.
+   * \return Returns all service references that are displayed in this widget.
    */
   std::vector<us::ServiceReferenceU> GetAllServiceReferences();
 
@@ -122,7 +122,7 @@ public:
   *  Make sure you pass the appropriate type, or else this call will fail.
   *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer. Example:
   *  \verbatim mitk::USDevice::Pointer device = GetSelectedService<mitk::USDevice>(); \endverbatim
-  *  @return Returns the current selected device. Returns nullptr if no device is selected.
+  *  \return Returns the current selected device. Returns nullptr if no device is selected.
   */
   template <class T>
   T *GetSelectedService()

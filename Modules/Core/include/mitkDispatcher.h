@@ -30,16 +30,26 @@ namespace mitk
   struct InteractionEventObserver;
 
   /**
-  * \class Dispatcher
-  * \brief Manages event distribution
-  *
-  * Receives Events (Mouse-,Key-, ... Events) and dispatches them to the registered DataInteractor Objects.
-  * The order in which DataInteractors are offered to handle an event is determined by layer of their associated
-  * DataNode.
-  * Higher layers are preferred.
-  *
-  * \ingroup Interaction
-  */
+   * \class Dispatcher
+   * \brief Central event distribution hub for interaction events.
+   *
+   * The Dispatcher receives InteractionEvents (mouse, key, etc.) and dispatches
+   * them to registered DataInteractor objects. The order in which DataInteractors
+   * are offered an event is determined by the "layer" property of their associated
+   * DataNode -- higher layers are preferred.
+   *
+   * After all DataInteractors have been offered the event, registered
+   * InteractionEventObserver instances are notified.
+   *
+   * The Dispatcher supports several processing modes (REGULAR, GRABINPUT,
+   * PREFERINPUT, CONNECTEDMOUSEACTION) that control how events are routed
+   * during ongoing interactions such as mouse drags.
+   *
+   * \sa DataInteractor
+   * \sa InteractionEventObserver
+   * \sa BaseRenderer
+   * \ingroup Interaction
+   */
 
   class MITKCORE_EXPORT Dispatcher : public itk::LightObject
   {
@@ -47,45 +57,59 @@ namespace mitk
     mitkClassMacroItkParent(Dispatcher, itk::LightObject);
     mitkNewMacro1Param(Self, const std::string &);
 
+    /** \brief List type for storing weak pointers to DataInteractors. */
     typedef std::list<mitk::WeakPointer<DataInteractor>> ListInteractorType;
+    /** \brief List type for storing queued InteractionEvents. */
     typedef std::list<itk::SmartPointer<InteractionEvent>> ListEventsType;
 
     /**
-     * To post new Events which are to be handled by the Dispatcher.
+     * \brief Process an interaction event by dispatching it to registered DataInteractors.
      *
-     * @return Returns true if the event has been handled by an DataInteractor, and false else.
+     * The event is offered to DataInteractors in order of descending layer.
+     * Internal events are handled separately. After dispatching, all registered
+     * InteractionEventObservers are notified. Queued events are processed
+     * after the current event is fully handled.
+     *
+     * \param[in] event The interaction event to process.
+     * \return true if the event was handled by a DataInteractor, false otherwise.
      */
     bool ProcessEvent(InteractionEvent *event);
 
     /**
-     * Adds an Event to the Dispatchers EventQueue, these events will be processed after a a regular posted event has
-     * been
-     * fully handled.
-     * This allows DataInteractors to post their own events without interrupting regular Dispatching workflow.
-     * It is important to note that the queued events will be processed AFTER the state change of a current transition
-     * (which queued the events)
-     * is performed.
+     * \brief Queue an event for deferred processing.
      *
-     * \note 1) If an event is added from an other source than an DataInteractor / Observer its execution will be
-     * delayed
-     * until the next regular event
-     * comes in.
-     * \note 2) Make sure you're not causing infinite loops!
+     * Queued events are processed after the currently dispatched event has been
+     * fully handled (including state transitions). This allows DataInteractors
+     * to post follow-up events without interrupting the current dispatch.
+     *
+     * \param[in] event The event to enqueue.
+     * \note Events queued from outside a DataInteractor/Observer will be delayed
+     *       until the next regular event arrives.
+     * \note Be careful not to cause infinite loops.
      */
     void QueueEvent(InteractionEvent *event);
 
     /**
-     * Adds the DataInteractor that is associated with the DataNode to the Dispatcher Queue.
-     * If there already exists an DataInteractor that has a reference to the same DataNode, it is removed.
-     * Note that within this method also all other DataInteractors are checked and removed if they are no longer active,
-     * and were not removed properly.
+     * \brief Register the DataInteractor associated with the given DataNode.
+     *
+     * If a DataInteractor for the same DataNode already exists, it is removed first.
+     * Orphaned interactors (without valid DataNodes) are also cleaned up.
+     *
+     * \param[in] dataNode The DataNode whose DataInteractor should be registered.
      */
     void AddDataInteractor(const DataNode *dataNode);
+
     /**
-     * Remove all DataInteractors related to this Node, to prevent double entries and dead references.
+     * \brief Remove all DataInteractors associated with the given DataNode.
+     * \param[in] dataNode The DataNode whose interactors should be removed.
      */
     void RemoveDataInteractor(const DataNode *dataNode);
-    size_t GetNumberOfInteractors(); // DEBUG TESTING
+
+    /**
+     * \brief Get the number of currently registered DataInteractors.
+     * \return The number of interactors.
+     */
+    size_t GetNumberOfInteractors();
 
   protected:
     Dispatcher(const std::string &rendererName);

@@ -54,45 +54,45 @@ namespace mitk
     virtual ~IModelFitProvider();
 
     /**
-     * \brief returns a factory instance for the model represented by the provider.
+     * \brief Returns a factory instance for the model represented by the provider.
+     * \return Smart pointer to the model factory.
      */
     virtual itk::SmartPointer<ModelFactoryBase> GenerateFactory() const = 0;
 
     /**
-     * @param fitInfo Pointer to a fit info instance for the respective model.
+     * \brief Returns the variable grid (e.g. time grid) that was used by the fit.
      *
-     * This methods returns the values of the model variable that was used by the fit.
      * Normally it is a time grid directly extracted from the input image time geometry.
      * But depending on the model and fit it could be generated out of other properties.
-     * This method is a.o. used when the fit should be plotted correctly.
+     * This method is used e.g. when the fit should be plotted correctly.
+     *
+     * \param fitInfo Pointer to a fit info instance for the respective model.
+     * \return The variable grid used by the fit.
      */
     virtual ModelBase::TimeGridType GetVariableGrid(const modelFit::ModelFitInfo* fitInfo) const = 0;
 
     /**
-    * @brief Service property name for a description.
-    *
-    * The property value must be of type \c std::string.
-    *
-    * @return The property name.
-    */
+     * \brief Service property name for a description.
+     *
+     * The property value must be of type std::string.
+     * \return The property name.
+     */
     static std::string PROP_DESCRIPTION();
 
     /**
-    * @brief Service property name for the model ID handled by the provider.
-    *
-    * The property value must be of type \c std::string.
-    *
-    * @return The property name.
-    */
+     * \brief Service property name for the model ID handled by the provider.
+     *
+     * The property value must be of type std::string.
+     * \return The property name.
+     */
     static std::string PROP_MODEL_CLASS_ID();
 
     /**
-    * @brief Service property name for the model type of the model handled by the provider.
-    *
-    * The property value must be of type \c std::string.
-    *
-    * @return The property name.
-    */
+     * \brief Service property name for the model type of the model handled by the provider.
+     *
+     * The property value must be of type std::string.
+     * \return The property name.
+     */
     static std::string PROP_MODEL_TYPE();
   };
 

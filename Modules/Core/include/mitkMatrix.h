@@ -21,26 +21,32 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief MITK matrix type extending itk::Matrix with additional constructors and utility methods.
+   *
+   * \tparam T Element type (e.g. double, float).
+   * \tparam NRows Number of rows (default: 3).
+   * \tparam NColumns Number of columns (default: 3).
+   */
   template <class T, unsigned int NRows = 3, unsigned int NColumns = 3>
   class Matrix : public itk::Matrix<T, NRows, NColumns>
   {
   public:
-    /** Standard class typedefs. */
+    /** \brief Standard class typedefs. */
     typedef Matrix Self;
 
     typedef typename itk::Matrix<T, NRows, NColumns>::InternalMatrixType InternalMatrixType;
 
-    /** Default constructor. */
+    /** \brief Default constructor. */
     explicit Matrix() : itk::Matrix<T, NRows, NColumns>() {}
-    /** Copy constructor. */
+    /** \brief Copy constructor. */
     explicit Matrix(const Matrix &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
-    /** Copy constructor for itk compatibility */
+    /** \brief Copy constructor for itk compatibility. */
     Matrix(const itk::Matrix<T, NRows, NColumns> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix)
     {
     }
-    /**For every operator=, there should be an equivalent copy constructor. */
+    /** \brief Constructor from vnl_matrix. */
     inline Matrix(const vnl_matrix<T> &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
-    /**For every operator=, there should be an equivalent copy constructor. */
+    /** \brief Constructor from internal matrix type. */
     inline explicit Matrix(InternalMatrixType &matrix) : itk::Matrix<T, NRows, NColumns>(matrix) {}
     /**
      * Necessary because otherwise operator= is default operator= from Matrix.
@@ -48,10 +54,11 @@ namespace mitk
     using itk::Matrix<T, NRows, NColumns>::operator=;
 
     /**
-     * Copies the elements from array array to this.
+     * \brief Copy elements from a 2D array into this matrix.
+     *
      * Note that this method will assign doubles to floats without complaining!
      *
-     * @param array the array whose values shall be copied. Must overload [] operator.
+     * \param[in] array The array whose values shall be copied. Must overload [][] operator.
      */
     template <typename ArrayType>
     void FillMatrix(const ArrayType &array)
@@ -66,7 +73,9 @@ namespace mitk
     };
 
     /**
-     * Warning: matrix must have same dimension as Matrix
+     * \brief Copy the elements of this matrix into a 2D array.
+     *
+     * \warning The target matrix must have the same dimensions as this Matrix.
      */
     template <typename MatrixType>
     void ToArray(MatrixType matrix) const
@@ -85,13 +94,14 @@ namespace mitk
   typedef Matrix<ScalarType, 3, 3> Matrix3D;
   typedef Matrix<ScalarType, 4, 4> Matrix4D;
 
-  /*!
-  \brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS)
-  of all elements is calculated.
-  \param matrix1 first vnl matrix
-  \param matrix2 second vnl matrix
-  \param epsilon user defined accuracy bounds
-  */
+  /**
+   * \brief Check for matrix equality using root mean squared error (RMS) of all elements.
+   *
+   * \param[in] matrix1 First vnl matrix.
+   * \param[in] matrix2 Second vnl matrix.
+   * \param[in] epsilon User-defined accuracy bounds.
+   * \return True if the RMS of element differences is below epsilon.
+   */
   template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
   inline bool MatrixEqualRMS(const vnl_matrix_fixed<TCoordRep, NRows, NCols> &matrix1,
                              const vnl_matrix_fixed<TCoordRep, NRows, NCols> &matrix2,
@@ -115,13 +125,16 @@ namespace mitk
     }
   }
 
-  /*!
-  \brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS)
-  of all elements is calculated.
-  \param matrix1 first itk matrix
-  \param matrix2 second itk matrix
-  \param epsilon user defined accuracy bounds
-  */
+  /**
+   * \brief Check for matrix equality using root mean squared error (RMS) of all elements.
+   *
+   * Overload for itk::Matrix types.
+   *
+   * \param[in] matrix1 First itk matrix.
+   * \param[in] matrix2 Second itk matrix.
+   * \param[in] epsilon User-defined accuracy bounds.
+   * \return True if the RMS of element differences is below epsilon.
+   */
   template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
   inline bool MatrixEqualRMS(const itk::Matrix<TCoordRep, NRows, NCols> &matrix1,
                              const itk::Matrix<TCoordRep, NRows, NCols> &matrix2,
@@ -130,12 +143,14 @@ namespace mitk
     return mitk::MatrixEqualRMS(matrix1.GetVnlMatrix(), matrix2.GetVnlMatrix(), epsilon);
   }
 
-  /*!
-  \brief Check for element-wise matrix equality with a user defined accuracy.
-  \param matrix1 first vnl matrix
-  \param matrix2 second vnl matrix
-  \param epsilon user defined accuracy bounds
-  */
+  /**
+   * \brief Check for element-wise matrix equality with a user-defined accuracy.
+   *
+   * \param[in] matrix1 First vnl matrix.
+   * \param[in] matrix2 Second vnl matrix.
+   * \param[in] epsilon User-defined accuracy bounds.
+   * \return True if all element-wise differences are below epsilon.
+   */
   template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
   inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep, NRows, NCols> &matrix1,
                                      const vnl_matrix_fixed<TCoordRep, NRows, NCols> &matrix2,
@@ -162,12 +177,16 @@ namespace mitk
     }
   }
 
-  /*!
-  \brief Check for element-wise matrix equality with a user defined accuracy.
-  \param matrix1 first itk matrix
-  \param matrix2 second itk matrix
-  \param epsilon user defined accuracy bounds
-  */
+  /**
+   * \brief Check for element-wise matrix equality with a user-defined accuracy.
+   *
+   * Overload for itk::Matrix types.
+   *
+   * \param[in] matrix1 First itk matrix.
+   * \param[in] matrix2 Second itk matrix.
+   * \param[in] epsilon User-defined accuracy bounds.
+   * \return True if all element-wise differences are below epsilon.
+   */
   template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
   inline bool MatrixEqualElementWise(const itk::Matrix<TCoordRep, NRows, NCols> &matrix1,
                                      const itk::Matrix<TCoordRep, NRows, NCols> &matrix2,

@@ -25,39 +25,61 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @ingroup IO
-   * @ingroup MicroServices_Interfaces
+   * \ingroup IO
+   * \ingroup MicroServices_Interfaces
    *
-   * @brief The IMimeTypeProvider service interface allows to query all registered
-   *        mime types.
+   * \brief Service interface for querying all registered mime-types.
    *
-   * Mime types are added to the system by registering a service object of type
-   * CustomMimeType and the registered mime types can be queried bei either using direct
-   * look-ups in the service registry or calling the methods of this service interface.
+   * Mime-types are added to the system by registering service objects of type
+   * CustomMimeType. The registered mime-types can be queried either through
+   * direct look-ups in the service registry or by calling the methods of
+   * this service interface.
    *
-   * This service interface also allows to infer the mime type of a file on the file
-   * system. The heuristics for inferring the actual mime type is implementation specific.
+   * This service interface also allows inferring the mime-type of a file on
+   * the file system. The heuristics for inferring the actual mime-type is
+   * implementation specific.
    *
-   * @note This is a <em>core service</em>
+   * \note This is a <em>core service</em> and can be obtained via
+   *       CoreServices::GetMimeTypeProvider().
    *
-   * @sa CustomMimeType
-   * @sa CoreServices::GetMimeTypeProvider()
+   * \sa CustomMimeType
+   * \sa MimeType
+   * \sa CoreServices::GetMimeTypeProvider()
    */
   struct MITKCORE_EXPORT IMimeTypeProvider
   {
     virtual ~IMimeTypeProvider();
 
+    /**
+     * \brief Get all registered mime-types.
+     * \return A vector of all registered MimeType objects.
+     */
     virtual std::vector<MimeType> GetMimeTypes() const = 0;
 
+    /**
+     * \brief Get all mime-types that apply to the given file path.
+     * \param[in] filePath The absolute file path to match against.
+     * \return A vector of matching MimeType objects, sorted by rank (highest first).
+     */
     virtual std::vector<MimeType> GetMimeTypesForFile(const std::string &filePath) const = 0;
 
+    /**
+     * \brief Get all mime-types in a specific category.
+     * \param[in] category The category string (e.g. "Images", "Surfaces").
+     * \return A vector of MimeType objects belonging to the given category.
+     */
     virtual std::vector<MimeType> GetMimeTypesForCategory(const std::string &category) const = 0;
 
+    /**
+     * \brief Get the mime-type registered under the given name.
+     * \param[in] name The unique mime-type name (e.g. "application/vnd.mitk.image.nrrd").
+     * \return The matching MimeType, or an invalid MimeType if not found.
+     */
     virtual MimeType GetMimeTypeForName(const std::string &name) const = 0;
 
     /**
-     * @brief Get a sorted and unique list of mime-type categories.
-     * @return A sorted, unique list of mime-type categories.
+     * \brief Get a sorted and unique list of all registered mime-type categories.
+     * \return A sorted, unique vector of category strings.
      */
     virtual std::vector<std::string> GetCategories() const = 0;
   };

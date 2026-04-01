@@ -74,13 +74,17 @@ namespace mitk
                                             int &affectedSlice);
 
     /**
-     * @brief Updates the surface interpolations by extracting the contour form the given slice for all labels
-     * that have a surface contour information stored for the given plane at the given timestep.
-     * @param workingImage the segmentation image
-     * @param timeStep the time step for which the surface interpolation information should be updated.
-     * @param plane the plane in which the slice lies
-     * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
-     * erosion it is most likely an intersecting contour an will not be added to the SurfaceInterpolationController
+     * \brief Updates the surface interpolations by extracting contours from the given slice.
+     *
+     * Updates contour information for all labels that have surface contour data stored
+     * for the given plane at the given time step.
+     *
+     * \param[in] workingImage The segmentation image.
+     * \param[in] timeStep The time step for which the surface interpolation should be updated.
+     * \param[in] plane The plane in which the slice lies.
+     * \param[in] detectIntersection If true, the slice is eroded before contour extraction.
+     *            If the slice is empty after the erosion, it is most likely an intersecting
+     *            contour and will not be added to the SurfaceInterpolationController.
      */
     static void UpdateAllSurfaceInterpolations(const MultiLabelSegmentation* workingImage,
                                            TimeStepType timeStep,
@@ -114,35 +118,55 @@ namespace mitk
       const Image* image,
       TimeStepType timeStep,
       unsigned int component = 0);
+    /**
+     * \brief Extract the slice of an image cut by the given plane at a specified time point.
+     *
+     * \param[in] planeGeometry Geometry defining the slice that should be cut out.
+     * \param[in] image Image that should be sliced.
+     * \param[in] timePoint Time point of the image that should be sliced.
+     * \param[in] component The component to extract of a given multi-component image.
+     * \return The extracted 2D slice, or nullptr on failure.
+     */
     static Image::Pointer GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry,
       const Image* image,
       TimePointType timePoint,
       unsigned int component = 0);
 
-    /** \brief Writes the provided segmentation result slice into the data of the passed workingNode.
-     * The function is a public convenience wrapper around the static protected overload of this function
-     * and does the following: 1) passed slice is written to workingNode (and generate and undo/redo step);
-     * 2) update the surface interpolation and 3) mark the node as modified.
-     * @param workingNode Pointer to the node that contains the working image.
-     * @param planeGeometry Indicates where the slice should be added in the data of the working node.
-     * @param segmentationResult Point to the slice image that should be added.
-     * @param timeStep time step of the working node data that should be modified
-     * @param toolName Name of the tool that should be used as description in the undo operation.
-     * @pre workingNode must point to a valid instance and contain an image instance as data.
-     * @pre planeGeometry must point to a valid instance.
-     * @pre segmentationResult must point to a valid instance.*/
+    /**
+     * \brief Writes the provided segmentation result slice into the data of the passed workingNode.
+     *
+     * Public convenience wrapper that: (1) writes the slice to the working node and generates
+     * an undo/redo step; (2) updates the surface interpolation; and (3) marks the node as modified.
+     *
+     * \param[in] workingNode Pointer to the node that contains the working image.
+     * \param[in] planeGeometry Indicates where the slice should be added in the data of the working node.
+     * \param[in] segmentationResult Pointer to the slice image that should be written.
+     * \param[in] timeStep Time step of the working node data that should be modified.
+     * \param[in] toolName Name of the tool used as description in the undo operation.
+     * \pre workingNode must point to a valid instance and contain an image instance as data.
+     * \pre planeGeometry must point to a valid instance.
+     * \pre segmentationResult must point to a valid instance.
+     */
     static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep, const std::string& toolName);
 
-    /** Writes a provided slice into the passed working image. The content of working image that is covered
-    * by the slice will be completely overwritten.
-    * @param workingImage Pointer to the image that is the target of the write operation.
-    * @param planeGeometry Geometry that indicates the plane that should be overwritten by the slice.
-    * @param slice Image containing the slice that should be written into working image.
-    * @param timeStep Time step of the working image that should be overwritten.
-    * @pre workingImage, planeGeometry and slice must point to valid instances.*/
+    /**
+     * \brief Writes a provided slice into the passed working image.
+     *
+     * The content of working image that is covered by the slice will be completely overwritten.
+     *
+     * \param[in,out] workingImage Pointer to the image that is the target of the write operation.
+     * \param[in] planeGeometry Geometry that indicates the plane that should be overwritten by the slice.
+     * \param[in] slice Image containing the slice that should be written into working image.
+     * \param[in] timeStep Time step of the working image that should be overwritten.
+     * \pre workingImage, planeGeometry and slice must point to valid instances.
+     */
     static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep);
 
-    void SetShowMarkerNodes(bool);
+    /**
+     * \brief Sets whether contour marker nodes should be visible in the DataStorage.
+     * \param[in] show If true, marker nodes are shown; otherwise hidden.
+     */
+    void SetShowMarkerNodes(bool show);
 
     /**
      * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to
@@ -158,12 +182,18 @@ namespace mitk
     itkBooleanMacro(IsTimePointChangeAware);
 
     /**
-     * @brief returns the segmentation node that should be modified by the tool.
+     * \brief Returns the segmentation node that should be modified by the tool.
+     * \return Pointer to the working data node, or nullptr if none is set.
      */
     DataNode* GetWorkingDataNode() const;
+
+    /** \brief Returns the working data (multi-label segmentation image). */
     MultiLabelSegmentation* GetWorkingData() const;
 
+    /** \brief Returns the reference data node. */
     DataNode* GetReferenceDataNode() const;
+
+    /** \brief Returns the reference image data. */
     Image* GetReferenceData() const;
 
   protected:
@@ -188,14 +218,15 @@ namespace mitk
     };
 
     /**
-     * @brief Updates the surface interpolation by extracting the contour form the given slice.
-     * @param sliceInfos vector of slice information instances from which the contours should be extracted
-     * @param workingImage the segmentation image
-     * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
-     * @param activeLabelValue The label value of the active label.
-     * @param silent Indicates if the modification event of the SurfaceInterpolationController should be triggered.
-     * erosion it is most
-     *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
+     * \brief Updates the surface interpolation by extracting contours from given slices.
+     *
+     * \param[in] sliceInfos Vector of slice information instances from which contours are extracted.
+     * \param[in] workingImage The segmentation image.
+     * \param[in] detectIntersection If true, the slice is eroded before contour extraction.
+     *            If the slice is empty after erosion, it is likely an intersecting contour
+     *            and will not be added to the SurfaceInterpolationController.
+     * \param[in] activeLabelValue The label value of the active label.
+     * \param[in] silent If true, suppresses the modification event of the SurfaceInterpolationController.
      */
     static void UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
       const Image* workingImage,
@@ -282,9 +313,22 @@ namespace mitk
 
     itkGetMacro(LastTimePointTriggered, TimePointType);
 
+    /** \brief Pushes the current tool cursor onto the cursor stack. */
     void PushCursor();
+
+    /**
+     * \brief Pushes a custom cursor onto the cursor stack.
+     * \param[in] cursorResource The cursor icon to push.
+     */
     void PushCursor(us::ModuleResource cursorResource);
+
+    /**
+     * \brief Pops the most recently pushed cursor from the stack.
+     * \param[in] popFirstCursor If true, also pops the first/initial cursor.
+     */
     void PopCursor(bool popFirstCursor = false);
+
+    /** \brief Pops all cursors from the stack, restoring the default cursor. */
     void PopAllCursors();
 
   private:

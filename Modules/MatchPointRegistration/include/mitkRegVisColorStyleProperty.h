@@ -29,9 +29,15 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for direction for the registration visualization. Valid values are:
- * 0/UniColor, 1/VectorMagnitude
- * Default is "UniColor"
+ * \brief Enumeration property defining the color style for registration visualization.
+ *
+ * Valid values are:
+ * - 0: UniColor (single uniform color)
+ * - 1: VectorMagnitude (color mapped by deformation vector magnitude)
+ *
+ * Default is "UniColor".
+ *
+ * \sa mitk::MITKRegistrationWrapperMapperBase, mitk::RegVisStyleProperty
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegVisColorStyleProperty : public EnumerationProperty
 {
@@ -41,8 +47,10 @@ public:
 
   itkNewMacro(RegVisColorStyleProperty);
 
+  /** \brief Constructs a RegVisColorStyleProperty from a numeric ID. */
   mitkNewMacro1Param(RegVisColorStyleProperty, const IdType&);
 
+  /** \brief Constructs a RegVisColorStyleProperty from a string name. */
   mitkNewMacro1Param(RegVisColorStyleProperty, const std::string&);
 
 

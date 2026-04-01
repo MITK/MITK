@@ -84,40 +84,68 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Convert 2D index coordinates (units) to 2D world coordinates (mm).
+     *
+     * Uses the in-plane extent ratio (ExtentInMM / Extent) per axis.
+     *
+     * \param[in] pt_units 2D point in index/unit coordinates.
+     * \param[out] pt_mm 2D point in world coordinates (mm).
+     */
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
 
+    /**
+     * \brief Convert 2D world coordinates (mm) to 2D index coordinates (units).
+     *
+     * Inverse of IndexToWorld(Point2D, Point2D).
+     *
+     * \param[in] pt_mm 2D point in world coordinates (mm).
+     * \param[out] pt_units 2D point in index/unit coordinates.
+     */
     virtual void WorldToIndex(const Point2D &pt_mm, Point2D &pt_units) const;
 
-    //##Documentation
-    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-    //## \a vec_units to world coordinates (in mm)
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const
-    // mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
-    //## For further information about coordinates types, please see the Geometry documentation
+    /**
+     * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
+     *
+     * \deprecated The first parameter \a atPt2d_untis is unused.
+     *             Use IndexToWorld(const Vector2D&, Vector2D&) instead.
+     *
+     * \param[in] atPt2d_untis Unused point parameter.
+     * \param[in] vec_units Vector in index coordinates.
+     * \param[out] vec_mm Vector in world coordinates (mm).
+     */
     virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis,
                               const mitk::Vector2D &vec_units,
                               mitk::Vector2D &vec_mm) const;
 
-    //##Documentation
-    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-    //## \a vec_units to world coordinates (in mm)
-    //## For further information about coordinates types, please see the Geometry documentation
+    /**
+     * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
+     *
+     * \param[in] vec_units Vector in index coordinates.
+     * \param[out] vec_mm Vector in world coordinates (mm).
+     */
     virtual void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em vector
-    //## \a vec_mm to (continuous!) index coordinates.
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const
-    // mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
-    //## For further information about coordinates types, please see the Geometry documentation
+    /**
+     * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.
+     *
+     * \deprecated The first parameter \a atPt2d_mm is unused.
+     *             Use WorldToIndex(const Vector2D&, Vector2D&) instead.
+     *
+     * \param[in] atPt2d_mm Unused point parameter.
+     * \param[in] vec_mm Vector in world coordinates (mm).
+     * \param[out] vec_units Vector in continuous index coordinates.
+     */
     virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm,
                               const mitk::Vector2D &vec_mm,
                               mitk::Vector2D &vec_units) const;
 
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em vector
-    //## \a vec_mm to (continuous!) index coordinates.
-    //## For further information about coordinates types, please see the Geometry documentation
+    /**
+     * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.
+     *
+     * \param[in] vec_mm Vector in world coordinates (mm).
+     * \param[out] vec_units Vector in continuous index coordinates.
+     */
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
     /**
@@ -290,30 +318,54 @@ namespace mitk
     static bool CheckRotationMatrix(AffineTransform3D *transform, double epsilon=1e-6);
 
     /**
-    * \brief Normal of the plane
-    *
-    */
+     * \brief Get the normal vector of the plane.
+     *
+     * The normal is the third column of the IndexToWorldTransform matrix,
+     * representing the direction perpendicular to the plane surface.
+     *
+     * \return Normal vector in world coordinates.
+     */
     Vector3D GetNormal() const;
 
     /**
-    * \brief Normal of the plane as VnlVector
-    *
-    */
+     * \brief Get the normal vector of the plane as a VnlVector.
+     *
+     * \return Normal as a VnlVector.
+     * \sa GetNormal
+     */
     VnlVector GetNormalVnl() const;
 
+    /**
+     * \brief Compute the signed distance of a point from the plane.
+     *
+     * The sign indicates which side of the plane the point lies on.
+     * If the point is within the bounding box but on the plane, the result
+     * is 0. If the point is outside the bounding box, the distance to
+     * the nearest in-bounds point on the plane is returned.
+     *
+     * \param[in] pt3d_mm Point in world coordinates (mm).
+     * \return Signed distance in mm.
+     */
     virtual ScalarType SignedDistance(const Point3D &pt3d_mm) const;
 
     /**
-    * \brief Calculates, whether a point is below or above the plane. There are two different
-    *calculation methods, with or without consideration of the bounding box.
-    */
+     * \brief Determine whether a point is above (in the normal direction of) the plane.
+     *
+     * \param[in] pt3d_mm Point in world coordinates (mm).
+     * \param[in] considerBoundingBox If true, points outside the bounding box
+     *            are always considered "not above".
+     * \return true if the point is above the plane.
+     */
     virtual bool IsAbove(const Point3D &pt3d_mm, bool considerBoundingBox = false) const;
 
     /**
-    * \brief Distance of the point from the plane
-    * (bounding-box \em not considered)
-    *
-    */
+     * \brief Unsigned distance of a point from the infinite plane.
+     *
+     * The bounding box is \em not considered.
+     *
+     * \param[in] pt3d_mm Point in world coordinates (mm).
+     * \return Distance in mm (always >= 0).
+     */
     ScalarType DistanceFromPlane(const Point3D &pt3d_mm) const;
 
     /**
@@ -440,7 +492,15 @@ namespace mitk
     */
     Point3D ProjectPointOntoPlane(const Point3D &pt) const;
 
-    /** Implements operation to re-orient the plane */
+    /**
+     * \brief Execute an operation to re-orient or reposition the plane.
+     *
+     * Handles operations such as OpORIENT (re-orientation via
+     * PlaneOperation) in addition to the standard operations
+     * inherited from BaseGeometry.
+     *
+     * \param[in] operation The operation to execute.
+     */
     void ExecuteOperation(Operation *operation) override;
 
     /**
@@ -531,24 +591,39 @@ namespace mitk
     virtual bool Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
     /**
-    * \brief Distance of the point from the geometry
-    * (bounding-box \em not considered)
-    *
-    */
+     * \brief Unsigned distance of a point from the geometry.
+     *
+     * Returns the absolute value of SignedDistance(). The bounding box
+     * is \em not considered for the underlying plane distance calculation.
+     *
+     * \param[in] pt3d_mm Point in world coordinates (mm).
+     * \return Unsigned distance in mm.
+     * \sa SignedDistance
+     */
     inline ScalarType Distance(const Point3D &pt3d_mm) const { return fabs(SignedDistance(pt3d_mm)); }
     /**
-    * \brief Set the geometrical frame of reference in which this PlaneGeometry
-    * is placed.
-    *
-    * This would usually be the BaseGeometry of the underlying dataset, but
-    * setting it is optional.
-    */
+     * \brief Set the geometrical frame of reference in which this PlaneGeometry is placed.
+     *
+     * This is typically the BaseGeometry of the underlying dataset (e.g.,
+     * an Image). It is used for bounding-box intersection calculations of
+     * inclined / rotated planes. Setting it is optional.
+     *
+     * \param[in] geometry The reference geometry (may be nullptr to clear).
+     */
     void SetReferenceGeometry(const mitk::BaseGeometry *geometry);
 
     /**
-    * \brief Get the geometrical frame of reference for this PlaneGeometry.
-    */
+     * \brief Get the geometrical frame of reference for this PlaneGeometry.
+     *
+     * \return Const pointer to the reference geometry, or nullptr if not set.
+     */
     const BaseGeometry *GetReferenceGeometry() const;
+
+    /**
+     * \brief Check whether a reference geometry has been set.
+     *
+     * \return true if a non-null reference geometry is available.
+     */
     bool HasReferenceGeometry() const;
 
   protected:

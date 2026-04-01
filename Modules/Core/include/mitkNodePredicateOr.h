@@ -17,13 +17,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Composite predicate that forms a logical OR relation from its child predicates
-  //##
-  //##
-  //##
-  //##
-  //## @ingroup DataStorage
+  /**
+   * \brief Composite predicate that forms a logical OR (disjunction) from its child predicates.
+   *
+   * A node passes the check if at least one child predicate returns true.
+   * Evaluation short-circuits on the first true result.
+   *
+   * \code
+   * auto pred = NodePredicateOr::New(
+   *   NodePredicateDataType::New("Image"),
+   *   NodePredicateDataType::New("Surface"));
+   * auto imagesOrSurfaces = dataStorage->GetSubset(pred);
+   * \endcode
+   *
+   * \ingroup DataStorage
+   * \sa NodePredicateAnd, NodePredicateNot, NodePredicateCompositeBase
+   */
   class MITKCORE_EXPORT NodePredicateOr : public NodePredicateCompositeBase
   {
   public:
@@ -32,12 +41,18 @@ namespace mitk
     mitkNewMacro2Param(NodePredicateOr, const NodePredicateBase *, const NodePredicateBase *);
     mitkNewMacro3Param(NodePredicateOr, const NodePredicateBase *, const NodePredicateBase *, const NodePredicateBase *);
 
-    //##Documentation
-    //## @brief Standard Destructor
+    /**
+     * \brief Destructor.
+     */
     ~NodePredicateOr() override;
 
-    //##Documentation
-    //## @brief Checks, if the node fulfills any of the subpredicates conditions
+    /**
+     * \brief Check whether the node satisfies any child predicate (logical OR).
+     *
+     * \param[in] node  The DataNode to evaluate. Must not be nullptr.
+     * \return \a true if at least one child predicate returns true for the node.
+     * \throw std::invalid_argument if no child predicates have been added or \a node is nullptr.
+     */
     bool CheckNode(const DataNode *node) const override;
 
   protected:

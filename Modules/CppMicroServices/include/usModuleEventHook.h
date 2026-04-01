@@ -22,23 +22,24 @@ class ModuleContext;
 class ModuleEvent;
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * %Module Event Hook Service.
+ * \brief %Module Event Hook Service.
  *
  * <p>
  * Modules registering this service will be called during module lifecycle
  * (loading, loaded, unloading, and unloaded) operations.
  *
- * @remarks Implementations of this interface are required to be thread-safe.
+ * \remarks Implementations of this interface are required to be thread-safe.
  */
 struct MITKCPPMICROSERVICES_EXPORT ModuleEventHook
 {
 
+  /** \brief Virtual destructor. */
   virtual ~ModuleEventHook();
 
   /**
-   * Module event hook method. This method is called prior to module event
+   * \brief Module event hook method. This method is called prior to module event
    * delivery when a module is loading, loaded, unloading, or unloaded.
    * This method can filter the modules which receive the event.
    * <p>
@@ -46,8 +47,8 @@ struct MITKCPPMICROSERVICES_EXPORT ModuleEventHook
    * each module event generated, this includes module events which are
    * generated when there are no module listeners registered.
    *
-   * @param event The module event to be delivered.
-   * @param contexts A list of Module Contexts for modules which have
+   * \param[in] event The module event to be delivered.
+   * \param[in] contexts A list of Module Contexts for modules which have
    *        listeners to which the specified event will be delivered. The
    *        implementation of this method may remove module contexts from the
    *        list to prevent the event from being delivered to the

@@ -89,10 +89,10 @@ namespace mitk
                             BarrierWidthType width = 0.0);
 
     /*returns the constraint with the given index.
-     @pre The index must exist.*/
+     \pre The index must exist.*/
     Constraint& GetConstraint(unsigned int index);
     /*returns the constraint with the given index.
-     @pre The index must exist.*/
+     \pre The index must exist.*/
     const Constraint& GetConstraint(unsigned int index) const;
 
     /*removes a constraint. Indicated by the index. If the index does not exist,

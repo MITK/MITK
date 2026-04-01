@@ -21,6 +21,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \brief Parameterizer for the ExtendedOneTissueCompartmentModel.
+   * \sa ExtendedOneTissueCompartmentModel, ExtendedOneTissueCompartmentModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT ExtendedOneTissueCompartmentModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::ExtendedOneTissueCompartmentModel>
   {

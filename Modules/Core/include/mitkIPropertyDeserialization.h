@@ -36,6 +36,11 @@ namespace mitk
   public:
     virtual ~IPropertyDeserialization();
 
+    /** \brief Create a new instance of a registered property type by class name.
+     *
+     * \param className The class name of the property type to instantiate.
+     * \return A new instance of the requested property type, or nullptr if not registered.
+     */
     virtual BaseProperty::Pointer CreateInstance(const std::string& className) = 0;
 
     /**
@@ -52,6 +57,12 @@ namespace mitk
     }
 
   protected:
+    /** \brief Internal method to register a property instance for deserialization.
+     *
+     * Called by the public RegisterProperty() template method.
+     *
+     * \param property A prototype instance of the property type to register.
+     */
     virtual void InternalRegisterProperty(const BaseProperty* property) = 0;
   };
 }

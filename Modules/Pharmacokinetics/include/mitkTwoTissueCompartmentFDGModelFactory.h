@@ -20,6 +20,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the TwoTissueCompartmentFDGModel (irreversible FDG model).
+   * \sa TwoTissueCompartmentFDGModel, TwoTissueCompartmentFDGModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentFDGModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<TwoTissueCompartmentFDGModelParameterizer>
   {

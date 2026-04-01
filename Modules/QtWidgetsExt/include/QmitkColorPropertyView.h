@@ -17,13 +17,28 @@ found in the LICENSE file.
 #include <mitkColorProperty.h>
 #include <mitkPropertyObserver.h>
 
-/// @ingroup Widgets
+/**
+ * \brief Read-only QLabel that displays a mitk::ColorProperty as a colored swatch.
+ * \ingroup Widgets
+ *
+ * Observes a mitk::ColorProperty and updates its background color whenever
+ * the property changes. The widget auto-fills its background to show the color.
+ *
+ * \sa QmitkColorPropertyEditor, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 
 public:
-  QmitkColorPropertyView(const mitk::ColorProperty *, QWidget *parent);
+  /**
+   * \brief Construct a color view for the given property.
+   * \param[in] property The mitk::ColorProperty to observe and display.
+   * \param[in] parent The parent widget.
+   */
+  QmitkColorPropertyView(const mitk::ColorProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkColorPropertyView() override;
 
 protected:

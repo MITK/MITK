@@ -26,16 +26,38 @@ namespace mitk
   /**
    * \brief Implementation of the IPreferences interface.
    *
+   * Stores preferences as string key-value pairs in a tree structure. Each node
+   * has a name, an absolute path, a parent, and zero or more children. Values
+   * are stored as strings and converted on access (int, bool, float, double, byte
+   * array). Supports overrides that shadow regular property values without
+   * modifying the persisted data.
+   *
    * Only used through the IPreferences interface.
    *
    * \sa IPreferences
+   * \sa IPreferencesStorage
+   * \sa PreferencesService
    */
   class Preferences : public IPreferences
   {
   public:
+    /** \brief Property map type: string keys to string values. */
     using Properties = std::unordered_map<std::string, std::string>;
 
+    /**
+     * \brief Construct a preferences node.
+     *
+     * If parent is non-null, this node is automatically added as a child of the parent.
+     * The absolute path is computed from the parent's path and the given name.
+     *
+     * \param[in] properties Initial key-value properties for this node.
+     * \param[in] name The name of this preferences node.
+     * \param[in] parent The parent node, or nullptr for a root node.
+     * \param[in] storage The backing storage. Must not be nullptr.
+     * \throw mitk::Exception if storage is nullptr.
+     */
     Preferences(const Properties& properties, const std::string& name, Preferences* parent, IPreferencesStorage* storage);
+
     ~Preferences() override;
 
     Preferences(const Preferences&) = delete;

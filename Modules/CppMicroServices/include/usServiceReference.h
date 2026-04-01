@@ -44,21 +44,22 @@ namespace us {
  * <code>ServiceReference</code> objects associated with different
  * <code>ServiceRegistration</code> objects are not equal.
  *
- * @tparam S The class type of the service interface
- * @see ModuleContext::GetServiceReference
- * @see ModuleContext::GetServiceReferences
- * @see ModuleContext::GetService
- * @remarks This class is thread safe.
+ * \tparam S The class type of the service interface
+ * \sa ModuleContext::GetServiceReference
+ * \sa ModuleContext::GetServiceReferences
+ * \sa ModuleContext::GetService
+ * \remarks This class is thread safe.
  */
 template<class S>
 class ServiceReference : public ServiceReferenceBase {
 
 public:
 
+  /** \brief The service interface type. */
   typedef S ServiceType;
 
   /**
-   * Creates an invalid ServiceReference object. You can use
+   * \brief Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
@@ -66,6 +67,14 @@ public:
   {
   }
 
+  /**
+   * \brief Constructs a ServiceReference from a ServiceReferenceBase.
+   *
+   * If the base reference is not convertible to this service interface type,
+   * the resulting ServiceReference will be invalid.
+   *
+   * \param[in] base The base service reference to convert.
+   */
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
   {
@@ -101,7 +110,7 @@ class ServiceReference<void> : public ServiceReferenceBase
 public:
 
   /**
-   * Creates an invalid ServiceReference object. You can use
+   * \brief Creates an invalid ServiceReference object. You can use
    * this object in boolean expressions and it will evaluate to
    * <code>false</code>.
    */
@@ -109,6 +118,11 @@ public:
   {
   }
 
+  /**
+   * \brief Constructs a ServiceReference from a ServiceReferenceBase.
+   *
+   * \param[in] base The base service reference to convert.
+   */
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
   {
@@ -116,6 +130,7 @@ public:
 
   using ServiceReferenceBase::operator=;
 
+  /** \brief The service interface type (void for untyped references). */
   typedef void ServiceType;
 };
 /// \endcond

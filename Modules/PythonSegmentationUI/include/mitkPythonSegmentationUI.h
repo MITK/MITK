@@ -15,8 +15,19 @@ found in the LICENSE file.
 
 #include <MitkPythonSegmentationUIExports.h>
 
+/** \brief Namespace for the PythonSegmentationUI module.
+ *
+ * \sa QmitknnInteractiveToolGUI, QmitknnInteractiveInstallDialog
+ */
 namespace mitk::PythonSegmentationUI
 {
+  /** \brief Forces the linker to include this module.
+   *
+   * Since this module only contains runtime dependencies (e.g., tool GUI
+   * registrations via static initialization), it would be discarded by the
+   * linker without an explicit symbol reference. Call this function from a
+   * dependent module to ensure the PythonSegmentationUI module is linked.
+   */
   MITKPYTHONSEGMENTATIONUI_EXPORT void EnforceLinkage();
 }
 

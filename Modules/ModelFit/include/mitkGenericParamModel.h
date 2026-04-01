@@ -20,20 +20,25 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /** Model that can parse a user specified function string and uses it as model function
-  that is represented by the model instance.
-  The parser used to interpret the string can handle simple mathematical formulas (e.g. "3.5 + a * x * sin(x) - 1 / 2").
-  The parser is able to recognize:
-  - sums, differences, products and divisions (a + b, 4 - 3, 2 * x, 9 / 3)
-  - algebraic signs ( +5, -5)
-  - exponentiation ( 2 ^ 4 )
-  - parentheses (3 * (4 + 2))
-  - following unary functions: abs, exp, sin, cos, tan, sind (sine in degrees), cosd (cosine in degrees), tand (tangent in degrees)
-  - variables (x, a, b, ... j)
-
-  Remark: The variable "x" is reserved. It is the signal position / timepoint.
-  Remark: The current version supports up to 10 model parameter.
-  Don't use it for a model parameter that should be deduced by fitting (these are a..j).*/
+  /**
+   * \class GenericParamModel
+   * \brief Model that uses a user-specified formula string as its model function.
+   *
+   * The parser used to interpret the string can handle simple mathematical formulas
+   * (e.g. "3.5 + a * x * sin(x) - 1 / 2"). It recognizes:
+   * - sums, differences, products and divisions (a + b, 4 - 3, 2 * x, 9 / 3)
+   * - algebraic signs (+5, -5)
+   * - exponentiation (2 ^ 4)
+   * - parentheses (3 * (4 + 2))
+   * - unary functions: abs, exp, sin, cos, tan, sind, cosd, tand
+   * - variables (x, a, b, ... j)
+   *
+   * \note The variable "x" is reserved for the signal position / time point.
+   * \note The current version supports up to 10 model parameters (a through j).
+   *       Do not use "x" as a model parameter; it is the independent variable.
+   *
+   * \sa GenericParamModelFactory, GenericParamModelParameterizer, FormulaParser
+   */
   class MITKMODELFIT_EXPORT GenericParamModel : public mitk::ModelBase
   {
 
@@ -62,7 +67,7 @@ namespace mitk
     FunctionStringType GetFunctionString() const override;
     itkSetStringMacro(FunctionString);
 
-    /**@pre The Number of parameters must be between 1 and 10.*/
+    /** \pre The number of parameters must be between 1 and 10. */
     itkSetClampMacro(NumberOfParameters, ParametersSizeType, 1, 10);
 
     std::string GetXName() const override;

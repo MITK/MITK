@@ -43,24 +43,76 @@ namespace mitk
     // itkFactorylessNewMacro(Self)
     // itkCloneMacro(Self)
 
+    /** \brief Virtual destructor. */
     virtual ~RenderWindowBase();
 
+    /** \brief Initializes the renderer associated with this render window. */
     void InitRenderer();
 
+    /** \brief Returns the SliceNavigationController for navigating through slices.
+     *
+     * \return The SliceNavigationController associated with this render window.
+     */
     virtual mitk::SliceNavigationController *GetSliceNavigationController();
+
+    /** \brief Returns the CameraRotationController for 3D camera rotation.
+     *
+     * \return The CameraRotationController associated with this render window.
+     */
     virtual mitk::CameraRotationController *GetCameraRotationController();
+
+    /** \brief Returns the appropriate controller for the current mapper mode.
+     *
+     * Returns the SliceNavigationController for 2D rendering or
+     * the CameraRotationController for 3D rendering.
+     *
+     * \return The active BaseController for this render window.
+     */
     virtual mitk::BaseController *GetController();
+
+    /** \brief Returns the VtkPropRenderer associated with this render window.
+     *
+     * \return The VtkPropRenderer instance.
+     */
     virtual mitk::VtkPropRenderer *GetRenderer();
+
+    /** \brief Returns the underlying vtkRenderWindow. Must be implemented by subclasses.
+     *
+     * \return The VTK render window instance.
+     */
     virtual vtkRenderWindow *GetVtkRenderWindow() = 0;
+
+    /** \brief Returns the underlying vtkRenderWindowInteractor. Must be implemented by subclasses.
+     *
+     * \return The VTK render window interactor instance.
+     */
     virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() = 0;
 
+    /** \brief Dispatches an interaction event to the renderer's event dispatcher.
+     *
+     * \param interactionEvent the interaction event to handle.
+     * \return True if the event was processed successfully.
+     */
     virtual bool HandleEvent(InteractionEvent *interactionEvent);
 
   protected:
+    /** \brief Constructor. */
     RenderWindowBase();
 
-    // helper functions: within constructors and destructors classes are not polymorph.
+    /** \brief Initializes the renderer and adds it to the RenderingManager.
+     *
+     * This helper must be called from subclass constructors because virtual functions
+     * are not polymorphic during construction.
+     *
+     * \param name a descriptive name for the renderer.
+     */
     void Initialize(const char *name = "unnamed renderer");
+
+    /** \brief Tears down the renderer and removes it from the RenderingManager.
+     *
+     * This helper must be called from subclass destructors because virtual functions
+     * are not polymorphic during destruction.
+     */
     void Destroy();
 
     mitk::VtkPropRenderer::Pointer m_Renderer;

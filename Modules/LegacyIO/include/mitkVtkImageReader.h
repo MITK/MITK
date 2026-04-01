@@ -19,10 +19,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read image files in vtk file format
-  //## @ingroup MitkLegacyIOModule
-  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  /**
+   * \brief Reader to read image files in VTK file format.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   */
   class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageReader : public ImageSource, public FileReader
   {
   public:
@@ -40,25 +42,34 @@ namespace mitk
     itkSetStringMacro(FilePattern);
     itkGetStringMacro(FilePattern);
 
+    /**
+     * \brief Check if the given file can be read.
+     * \param filename The name of the file to check.
+     * \param filePrefix The file prefix.
+     * \param filePattern The file pattern.
+     * \return True if the file can be read, false otherwise.
+     */
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
+    /** \brief Default constructor. */
     VtkImageReader();
 
+    /** \brief Destructor. */
     ~VtkImageReader() override;
 
+    /** \brief Generate the output data. */
     void GenerateData() override;
 
-    //##Description
-    //## @brief Time when Header was last read
+    /** \brief Time when header was last read. */
     // itk::TimeStamp m_ReadHeaderTime;
 
   protected:
-    std::string m_FileName;
+    std::string m_FileName;     ///< \brief The file name to read.
 
-    std::string m_FilePrefix;
+    std::string m_FilePrefix;   ///< \brief The file prefix.
 
-    std::string m_FilePattern;
+    std::string m_FilePattern;  ///< \brief The file pattern.
   };
 
 } // namespace mitk

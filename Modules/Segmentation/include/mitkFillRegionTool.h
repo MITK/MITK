@@ -24,9 +24,9 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Fill the inside of a contour with the foreground pixel value.
+    \brief Fill a connected region with the active label's pixel value.
 
-    \sa SetRegionTool
+    \sa FillRegionBaseTool
 
     \ingroup Interactions
 
@@ -44,12 +44,17 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Return the cursor icon resource for this tool. */
     us::ModuleResource GetCursorIconResource() const override;
+
+    /** \brief Return the toolbar icon resource for this tool. */
     us::ModuleResource GetIconResource() const override;
 
+    /** \brief Return the human-readable name of this tool ("Fill"). */
     const char *GetName() const override;
 
   protected:
+    /** \brief Configure fill parameters to use the active label value with merge style. */
     void PrepareFilling(const Image* workingSlice, Point3D seedPoint) override;
 
     FillRegionTool() = default; // purposely hidden

@@ -122,15 +122,41 @@ namespace mitk
 
     GIFNeighbouringGreyLevelDependenceFeature();
 
+    /**
+     * \brief Calculate neighbouring grey level dependence features for the given image and mask.
+     *
+     * \param[in] image The input intensity image.
+     * \param[in] mask The binary mask defining the region of interest.
+     * \param[in] maskNoNAN The mask with NaN voxels excluded.
+     * \return A list of computed feature name-value pairs.
+     */
     FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
     using Superclass::CalculateFeatures;
 
+    /** \brief Get the distance ranges for neighbourhood computation. */
     itkGetConstMacro(Ranges, std::vector<double>);
+
+    /**
+     * \brief Set multiple distance ranges for neighbourhood computation.
+     * \param[in] ranges Vector of neighbourhood distances.
+     */
     void SetRanges(std::vector<double> ranges);
+
+    /**
+     * \brief Set a single distance range for neighbourhood computation.
+     * \param[in] range The neighbourhood distance (default: 1).
+     */
     void SetRange(double range);
+
+    /** \brief Get the alpha coarseness parameter for dependence counting. */
     itkGetConstMacro(Alpha, int);
+    /** \brief Set the alpha coarseness parameter for dependence counting. */
     itkSetMacro(Alpha, int);
 
+    /**
+     * \brief Add command line arguments for configuring this feature class.
+     * \param[in,out] parser The command line parser to add arguments to.
+     */
     void AddArguments(mitkCommandLineParser& parser) const override;
 
   protected:

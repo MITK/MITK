@@ -28,6 +28,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Compute comprehensive image statistics including moments, histogram, entropy, and median.
+   *
+   * This filter is a MITK-specific replacement for ITK's itkStatisticsImageFilter.
+   * It computes: min, max, mean, sigma, variance, sum, sum of squares/cubes/quadruples,
+   * skewness, kurtosis, MPP (mean of positive pixels), entropy, uniformity, UPP
+   * (uniformity of positive pixels), median, and an optional histogram.
+   *
+   * The filter is streaming-capable via itk::ImageSink and supports multi-threaded
+   * processing.
+   *
+   * \tparam TInputImage The type of the input image.
+   *
+   * \sa LabelStatisticsImageFilter
+   * \sa ImageStatisticsCalculator
+   */
   template <typename TInputImage>
   class StatisticsImageFilter : public itk::ImageSink<TInputImage>
   {
@@ -76,6 +92,12 @@ namespace mitk
     itkGetDecoratedOutputMacro(UPP, RealType);
     itkGetDecoratedOutputMacro(Median, RealType);
 
+    /**
+     * \brief Set the histogram parameters.
+     * \param[in] size Number of bins for the histogram.
+     * \param[in] lowerBound Lower bound of the histogram range.
+     * \param[in] upperBound Upper bound of the histogram range.
+     */
     void SetHistogramParameters(unsigned int size, RealType lowerBound, RealType upperBound);
 
     using DataObjectIdentifierType = itk::ProcessObject::DataObjectIdentifierType;

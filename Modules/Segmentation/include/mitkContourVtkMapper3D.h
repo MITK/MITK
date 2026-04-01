@@ -30,8 +30,9 @@ namespace mitk
   class Contour;
 
   /**
-   @brief Vtk-based mapper for mitk::Contour
-   @ingroup Mapper
+   * \brief VTK-based mapper for rendering a mitk::Contour in 3D.
+   * \ingroup Mapper
+   * \sa Contour
    */
   class MITKSEGMENTATION_EXPORT ContourVtkMapper3D : public VtkMapper
   {

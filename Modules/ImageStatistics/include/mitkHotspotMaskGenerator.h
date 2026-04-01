@@ -26,15 +26,26 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
-     * @warning Until T30375 is not clarified the class should be deemed deprecated/erroneous and should not
-     * be used
-     * @brief The HotspotMaskGenerator class is used when a hotspot has to be found in an image. A hotspot is
-     * the region of the image where the mean intensity is maximal (=brightest spot). It is usually used in PET scans.
-     * The identification of the hotspot is done as follows: First a cubic (or circular, if image is 2d)
-     * mask of predefined size is generated. This mask is then convolved with the input image (in fourier domain).
-     * The maximum value of the convolved image then corresponds to the hotspot.
-     * If a maskGenerator is set, only the pixels of the convolved image where the corresponding mask is == @a label
-     * are searched for the maximum value.
+     * \brief Generates a spherical mask centered on the hotspot (brightest region) of an image.
+     *
+     * \warning Until T30375 is clarified, this class should be considered
+     * deprecated/erroneous and should not be used.
+     *
+     * A hotspot is the spherical region of the image where the mean intensity
+     * is maximal (the brightest spot). This is commonly used in PET scans.
+     *
+     * The identification of the hotspot works as follows:
+     * -# A cubic (or circular in 2D) convolution kernel of the specified radius
+     *    is generated.
+     * -# The kernel is convolved with the input image in the Fourier domain.
+     * -# The maximum value of the convolved image corresponds to the hotspot center.
+     * -# A binary spherical mask is generated around that center.
+     *
+     * If an additional MaskGenerator is set, only pixels where the mask equals
+     * the specified label value are considered as candidate hotspot centers.
+     *
+     * \sa MaskGenerator
+     * \sa ImageStatisticsCalculator
      */
     class MITKIMAGESTATISTICS_EXPORT HotspotMaskGenerator: public MaskGenerator
     {
@@ -49,27 +60,40 @@ namespace mitk
         itkNewMacro(Self); /** Runtime information support. */
         itkTypeMacro(HotspotMaskGenerator, MaskGenerator);
 
+        /**
+         * \brief Returns the number of masks this generator provides.
+         * \return Always returns 1.
+         */
         unsigned int GetNumberOfMasks() const override;
 
         /**
-        @brief Set a mask (can be nullptr if no mask is desired)
+         * \brief Set an optional mask generator to restrict the hotspot search area.
+         * \param[in] _arg Pointer to a MaskGenerator, or nullptr to disable masking.
          */
         itkSetObjectMacro(Mask, MaskGenerator);
 
         /**
-        @brief Set the radius of the hotspot (in MM)
+         * \brief Set/Get the radius of the hotspot sphere in millimeters.
          */
         itkGetConstMacro(HotspotRadiusInMM, double);
         itkSetMacro(HotspotRadiusInMM, double);
 
         /**
-        @brief Define whether the hotspot must be completely inside the image. Default is true
+         * \brief Set/Get whether the hotspot sphere must be completely inside the image.
+         *
+         * When true, candidate hotspot centers are rejected if the sphere at that
+         * center extends beyond the image boundary. Default is true.
          */
         itkGetConstMacro(HotspotMustBeCompletelyInsideImage, bool);
         itkSetMacro(HotspotMustBeCompletelyInsideImage, bool);
 
         /**
-        @brief If a maskGenerator is set, this determines which mask value is used
+         * \brief Set the mask label value used to restrict the hotspot search.
+         *
+         * Only pixels in the convolved image where the corresponding mask
+         * pixel equals this label value are considered as candidate hotspot
+         * centers.
+         * \param[in] _arg The label value to match.
          */
         itkSetMacro(Label, unsigned short);
 

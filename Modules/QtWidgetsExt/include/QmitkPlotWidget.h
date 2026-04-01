@@ -26,30 +26,26 @@ found in the LICENSE file.
 #include <vector>
 
 /**
-* Provides a convenient interface for plotting curves using qwt.
-* Designed for qwt version 5.2.1.
-* Can be used with a QmitkPlotDialog, which provides a "Close" button.
-* @see QmitkPlotDialog
-*
-* To plot data do the following:
-* 1. Create two QmitkPlotWidget::DataVector Objects and fill them
-*    with corresponding x/y values. DataVectors are simple stl-vectors
-*    of type std::vector<double>. Please note that the xValues
-*    vector and the yValues vector MUST have the same size.
-* 2. Instantiate the widget for example like that:
-*      QmitkPlotWidget* widget = new QmitkPlotWidget( this, "widget" );
-*      widget->SetAxisTitle( QwtPlot::xBottom, "My x asis [mm]" );
-*      widget->SetAxisTitle( QwtPlot::yLeft, "My y axis [mm]" );
-*      int curveId = widget->InsertCurve( "My sophisticated data" );
-*      widget->SetCurveData( curveId, xValues, yValues );
-*      widget->SetCurvePen( curveId, QPen( red ) );
-*      widget->SetCurveTitle( curveId, "My curve description" );
-*      widget->Replot();
-* 3. You can modify the behavior of the plot by directly referencing
-*    the QwtPlot instance using the method GetPlot().
-* @see QwtPlot
-* @deprecatedSince{2018_04} Use QmitkChartWidget instead
-*/
+ * \brief Convenience widget providing a high-level interface for plotting curves using Qwt.
+ *
+ * Wraps a QwtPlot and provides methods for inserting curves, setting data,
+ * configuring appearance (pen, brush, symbols), and managing error bars.
+ * Can be used standalone or inside a QmitkPlotDialog.
+ *
+ * Usage example:
+ * \code
+ *   QmitkPlotWidget* widget = new QmitkPlotWidget(this, "widget");
+ *   widget->SetAxisTitle(QwtPlot::xBottom, "X [mm]");
+ *   widget->SetAxisTitle(QwtPlot::yLeft, "Y [mm]");
+ *   int curveId = widget->InsertCurve("My data");
+ *   widget->SetCurveData(curveId, xValues, yValues);
+ *   widget->SetCurvePen(curveId, QPen(Qt::red));
+ *   widget->Replot();
+ * \endcode
+ *
+ * \deprecated Since 2018.04. Use QmitkChartWidget instead.
+ * \sa QmitkPlotDialog, QwtPlot
+ */
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget
   : public QWidget
@@ -58,92 +54,82 @@ private:
   Q_OBJECT
 
 public:
-  /**
-  * represents the data type used for scalar values stored
-  * in data arrays. This type is provided by qwt and may not
-  * be changed.
-  */
+  /** \brief Scalar type used for data values (double, defined by Qwt). */
   typedef double ScalarType;
 
-  /**
-  * This type may be used to store a set of scalar values
-  * representing either x or y coordinates of the data
-  * points that should be rendered.
-  */
+  /** \brief Vector of scalar values representing x or y coordinates. */
   typedef std::vector<ScalarType> DataVector;
 
-  /**
-  * convenience type used to store pairs representing x/y coordinates
-  * that should be rendered as a curve by the plot widget
-  */
+  /** \brief Vector of (x, y) pairs representing curve data points. */
   typedef std::vector<std::pair<double, double>> XYDataVector;
 
   /**
-  * Standard qt constructor
-  */
+   * \brief Construct the plot widget.
+   * \param[in] parent The parent widget.
+   * \param[in] title The plot title.
+   * \param[in] name The object name (unused, kept for compatibility).
+   * \param[in] f Window flags.
+   */
   QmitkPlotWidget(QWidget *parent = nullptr,
                   const char *title = nullptr,
                   const char *name = nullptr,
                   Qt::WindowFlags f = {});
 
-  /**
-  * Virtual destructor
-  */
+  /** \brief Destructor. Clears all curves and deletes the plot. */
   ~QmitkPlotWidget() override;
 
   /**
-  * Returns the instance of the plot-widget. This may be used
-  * to modify any detail of the appearance of the plot.
-  */
+   * \brief Get the underlying QwtPlot instance for low-level customization.
+   * \return Pointer to the QwtPlot.
+   */
   QwtPlot *GetPlot();
 
   /**
-    * Set the title using (formatted) QwtText object
-    */
+   * \brief Set the plot title using a formatted QwtText.
+   * \param[in] qwt_title The formatted title.
+   */
   void SetPlotTitle(const QwtText &qwt_title);
 
   /**
-    * Set plain text title, using default formatting
-    */
+   * \brief Set the plot title using plain text.
+   * \param[in] title The title string.
+   */
   void SetPlotTitle(const char *title);
 
   /**
-  * Inserts a new curve into the plot-window.
-  * @param title the name of the curve
-  * @param color
-  * @returns the id of the curve. Use this id to
-  * refer to the curve, if you want to modify or add data.
-  */
+   * \brief Insert a new curve into the plot.
+   * \param[in] title The curve name (shown in legend).
+   * \param[in] color The curve title text color (default black).
+   * \return The curve ID used to reference this curve in subsequent calls.
+   */
   unsigned int InsertCurve(const char *title, QColor color = QColor(Qt::black));
 
   /**
-  * Sets the title of the given axis. For the set of available axes
-  * @see QwtPlot::Axis.
-  * @param axis the axis for which the description should be set.
-  * @param title the name of the axis.
-  */
+   * \brief Set the title of an axis.
+   * \param[in] axis The axis identifier (e.g. QwtPlot::xBottom, QwtPlot::yLeft).
+   * \param[in] title The axis title.
+   */
   void SetAxisTitle(int axis, const char *title);
 
   /**
-  * Sets the data for a previously added curve. Data is provided as two vectors of double.
-  * The first vector represents the x coordinates, the second vector represents the y coordinates.
-  * @param curveId the id of the curve for which data should be added.
-  * @param xValues the x coordinates of the points that define the curve
-  * @param yValues the y coordinates of the points that define the curve
-  * @returns whether data was added successfully or not
-  */
+   * \brief Set curve data from separate x and y vectors.
+   * \param[in] curveId The curve ID.
+   * \param[in] xValues The x coordinates.
+   * \param[in] yValues The y coordinates.
+   * \pre xValues and yValues must have the same size.
+   * \return True if data was set successfully.
+   */
   bool SetCurveData(unsigned int curveId, const DataVector &xValues, const DataVector &yValues);
 
   /**
-  * @brief Sets the data with errors for a previously added curve.
-  *
-  * @param curveId the id of the curve for which data should be added.
-  * @param xValues the x coordinates of the points that define the curve
-  * @param yValues the y coordinates of the points that define the curve
-  * @param yLowerError the magnitude (>0) of the error in the lesser direction of y
-  * @param yUpperError the magnitude (>0) of the error in the larger direction of y
-  * @returns whether data was added successfully or not
-  */
+   * \brief Set curve data with y-axis error bars.
+   * \param[in] curveId The curve ID.
+   * \param[in] xValues The x coordinates.
+   * \param[in] yValues The y coordinates.
+   * \param[in] yLowerError The magnitude of the error in the negative y direction.
+   * \param[in] yUpperError The magnitude of the error in the positive y direction.
+   * \return True if data was set successfully.
+   */
   bool SetCurveData(unsigned int curveId,
                     const DataVector &xValues,
                     const DataVector &yValues,
@@ -151,17 +137,16 @@ public:
                     const DataVector &yUpperError);
 
   /**
-  * @brief Sets the data with errors for a previously added curve.
-  *
-  * @param curveId the id of the curve for which data should be added.
-  * @param xValues the x coordinates of the points that define the curve
-  * @param yValues the y coordinates of the points that define the curve
-  * @param xLowerError the magnitude (>0) of the error in the lesser direction of x
-  * @param xUpperError the magnitude (>0) of the error in the larger direction of x
-  * @param yLowerError the magnitude (>0) of the error in the lesser direction of y
-  * @param yUpperError the magnitude (>0) of the error in the larger direction of y
-  * @returns whether data was added successfully or not
-  */
+   * \brief Set curve data with both x and y error bars.
+   * \param[in] curveId The curve ID.
+   * \param[in] xValues The x coordinates.
+   * \param[in] yValues The y coordinates.
+   * \param[in] xLowerError The magnitude of the error in the negative x direction.
+   * \param[in] xUpperError The magnitude of the error in the positive x direction.
+   * \param[in] yLowerError The magnitude of the error in the negative y direction.
+   * \param[in] yUpperError The magnitude of the error in the positive y direction.
+   * \return True if data was set successfully.
+   */
   bool SetCurveData(unsigned int curveId,
                     const DataVector &xValues,
                     const DataVector &yValues,
@@ -171,96 +156,97 @@ public:
                     const DataVector &yUpperError);
 
   /**
-  * Sets the data for a previously added curve. Data is provided as a vectors of pairs.
-  * The pairs represent x/y coordinates of the points that define the curve.
-  * @param curveId the id of the curve for which data should be added.
-  * @param data the coordinates of the points that define the curve
-  * @returns whether data was added successfully or not
-  */
+   * \brief Set curve data from a vector of (x, y) pairs.
+   * \param[in] curveId The curve ID.
+   * \param[in] data The vector of coordinate pairs.
+   * \return True if data was set successfully.
+   */
   bool SetCurveData(unsigned int curveId, const XYDataVector &data);
 
   /**
-  * Defines how a curve should be drawn. For drawing a curve, a QPen is used.
-  * @param curveId the id of the curve for which appearance should be changed
-  * @param pen a QPen (@see QPen) defining the line style
-  */
+   * \brief Set the pen (line style) for a curve.
+   * \param[in] curveId The curve ID.
+   * \param[in] pen The QPen defining line color, width, and style.
+   */
   void SetCurvePen(unsigned int curveId, const QPen &pen);
 
   /**
-  * Assign a brush, which defines the fill pattern of shapes drawn by a QPainter.
-  * In case of brush.style() != QBrush::NoBrush and * style() != QwtPlotCurve::Sticks
-  * the area between the curve and the baseline will be filled.
-  * In case !brush.color().isValid() the area will be filled by pen.color().
-  * The fill algorithm simply connects the first and the last curve point to the
-  * baseline. So the curve data has to be sorted (ascending or descending).
-  * @param curveId the id of the curve for which appearance should be changed
-  * @param brush a QBrush (@see QBrush) defining the line style
-  */
+   * \brief Set the brush (fill pattern) for a curve.
+   *
+   * When set, the area between the curve and the baseline is filled.
+   * Curve data should be sorted for correct filling.
+   *
+   * \param[in] curveId The curve ID.
+   * \param[in] brush The QBrush defining the fill pattern.
+   */
   void SetCurveBrush(unsigned int curveId, const QBrush &brush);
 
   /**
-  * Sets the style how the line is drawn for the curve; like, plain line,
-  * or with the data points marked with a symbol;
-  * @param curveId
-  * @param style A QwtPlotCurve::CurveStyle
-  */
+   * \brief Set the curve drawing style (lines, sticks, dots, etc.).
+   * \param[in] curveId The curve ID.
+   * \param[in] style The QwtPlotCurve::CurveStyle.
+   */
   void SetCurveStyle(unsigned int curveId, const QwtPlotCurve::CurveStyle style);
 
   /**
-  * Sets the style data points are drawn for the curve; like, a line,
-  * or dots;
-  * @param curveId
-  * @param symbol A QwtSymbol
-  */
+   * \brief Set the symbol used for drawing data points.
+   * \param[in] curveId The curve ID.
+   * \param[in] symbol The QwtSymbol (ownership transferred to the curve).
+   */
   void SetCurveSymbol(unsigned int curveId, QwtSymbol *symbol);
 
+  /**
+   * \brief Enable antialiasing for a curve.
+   * \param[in] curveId The curve ID.
+   */
   void SetCurveAntialiasingOn(unsigned int curveId);
+
+  /**
+   * \brief Disable antialiasing for a curve.
+   * \param[in] curveId The curve ID.
+   */
   void SetCurveAntialiasingOff(unsigned int curveId);
 
   /**
-  * Sets the title of the given curve. The title will be shown in the legend of
-  * the QwtPlot.
-  * @param curveId the id of the curve for which the title should be set
-  * @param title the description of the curve that will be shown in the legend.
-  */
+   * \brief Set the title of a curve (shown in the plot title, not legend).
+   * \param[in] curveId The curve ID.
+   * \param[in] title The curve title.
+   */
   void SetCurveTitle(unsigned int curveId, const char *title);
 
   /**
-  * Defines how a curves errors should be drawn. For drawing a QPen is used.
-  * @param curveId the id of the curve for which error appearance should be changed
-  * @param pen a QPen (@see QPen) defining the line style
-  */
+   * \brief Set the pen for drawing error bars.
+   * \param[in] curveId The curve ID.
+   * \param[in] pen The QPen for error bars.
+   */
   void SetErrorPen(unsigned int curveId, const QPen &pen);
 
   /**
-  * Defines the style of errors, symbols or as a curve.
-  * @param curveId the id of the curve for which error appearance should be changed
-  * @param drawSmybols true - draw symbols, false - draw curve
-  */
+   * \brief Set error bar drawing style.
+   * \param[in] curveId The curve ID.
+   * \param[in] drawSmybols True to draw error bars as symbols, false as a filled tube.
+   */
   void SetErrorStyleSymbols(unsigned int curveId, bool drawSmybols);
 
   /**
-  * Sets the legend of the plot
-  *
-  */
+   * \brief Set the plot legend.
+   * \param[in] legend The QwtLegend widget.
+   * \param[in] pos The legend position (default: right).
+   * \param[in] ratio The legend size ratio (-1 for automatic).
+   */
   void SetLegend(QwtLegend *legend, QwtPlot::LegendPosition pos = QwtPlot::RightLegend, double ratio = -1);
 
   /**
-  * Set a curve's legend attribute
-  * @param curveId the id of the curve
-  * @param attribute the legend attribute to be set
-  */
+   * \brief Set a legend attribute for a curve.
+   * \param[in] curveId The curve ID.
+   * \param[in] attribute The legend attribute to set.
+   */
   void SetLegendAttribute(unsigned int curveId, const QwtPlotCurve::LegendAttribute &attribute);
 
-  /**
-  * Triggers a replot of the curve. Replot should be called once after
-  * setting new data.
-  */
+  /** \brief Trigger a replot. Call after setting new data or changing appearance. */
   void Replot();
 
-  /**
-  * Resets the plot into an empty state
-  */
+  /** \brief Clear all curves and reset the plot to an empty state. */
   void Clear();
 
 protected:

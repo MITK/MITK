@@ -16,8 +16,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read unstructured grid files in vtk-format
+  /**
+   * \brief Reader for unstructured grid files in VTK format.
+   */
   class VtkUnstructuredGridReader : public AbstractFileReader
   {
   public:

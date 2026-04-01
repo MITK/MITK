@@ -18,10 +18,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Parameterizer for the DescriptivePharmacokineticBrixModel that use an image
-   for initializing the model. This parameterizer is amongst others used for pixel based fiting
-   strategies.
-   @sa DescriptivePharmacokineticBrixModelParameterizer*/
+  /**
+   * \brief Parameterizer for the DescriptivePharmacokineticBrixModel using a baseline image.
+   *
+   * Uses a 3D base image to provide the per-voxel pre-contrast signal S0 as a local
+   * static parameter. This parameterizer is primarily used for pixel-based fitting strategies.
+   *
+   * \sa DescriptivePharmacokineticBrixModel, DescriptivePharmacokineticBrixModelValueBasedParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT DescriptivePharmacokineticBrixModelParameterizer : public
     ConcreteModelParameterizerBase<mitk::DescriptivePharmacokineticBrixModel>
   {
@@ -55,12 +59,12 @@ namespace mitk
     itkGetConstObjectMacro(BaseImage, BaseImageType);
 
     /* Returns the global static parameters for the model.
-     * @remark this default implementation assumes no global static parameters exist.
+     * \remark this default implementation assumes no global static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetGlobalStaticParameters() const override;
 
     /* Returns the local static parameters for the model at the given index.
-     * @remark this default implementation assumes no local static parameters exist.
+     * \remark this default implementation assumes no local static parameters exist.
      * Thus an empty map is returned.*/
     StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const override;
 

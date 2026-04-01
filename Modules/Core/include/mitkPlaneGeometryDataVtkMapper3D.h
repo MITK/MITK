@@ -100,20 +100,24 @@ namespace mitk
       * only)
       */
       vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    /** \brief Update the VTK transform for the given renderer. */
     void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     /**
-    *  \brief Get the PlaneGeometryData to map
-    */
+     * \brief Get the PlaneGeometryData that is being mapped.
+     * \return The PlaneGeometryData input of this mapper.
+     */
     virtual const PlaneGeometryData *GetInput();
 
     /**
-    * \brief All images found when traversing the (sub-) tree starting at
-    * \a iterator which are resliced by an ImageVtkMapper2D will be mapped.
-    * This method is used to set the data storage to traverse. This offers
-    * the possibility to use this mapper for other data storages (not only
-    * the default data storage).
-    */
+     * \brief Set the data storage used for traversing image nodes for texturing.
+     *
+     * All images found when traversing the data tree that are resliced by an
+     * ImageVtkMapper2D will be mapped as textures. This allows using a data
+     * storage other than the default.
+     *
+     * \param storage The data storage to traverse for image nodes.
+     */
     virtual void SetDataStorageForTexture(mitk::DataStorage *storage);
 
   protected:
@@ -123,10 +127,13 @@ namespace mitk
 
     ~PlaneGeometryDataVtkMapper3D() override;
 
+    /** \brief Generate the VTK representation for the given renderer. */
     void GenerateDataForRenderer(BaseRenderer *renderer) override;
 
+    /** \brief Process a single data node, creating texture actors for the plane surface. */
     void ProcessNode(DataNode *node, BaseRenderer *renderer, Surface *surface, LayerSortedActorList &layerSortedActors);
 
+    /** \brief Callback invoked when an ImageVtkMapper2D is destroyed. */
     void ImageMapperDeletedCallback(itk::Object *caller, const itk::EventObject &event);
 
     /** \brief general PropAssembly to hold the entire scene */
@@ -186,15 +193,20 @@ namespace mitk
     /** \brief The DataStorage defines which part of the data tree is traversed for rendering. */
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
+    /**
+     * \brief Helper class that associates a vtkActor with an observer on a mapper object.
+     *
+     * Stores the actor, the observed sender, and the observer ID. The observer
+     * connection is cleaned up on destruction.
+     */
     class MITKCORE_EXPORT ActorInfo
     {
     public:
-      vtkActor *m_Actor;
-      // we do not need a smart-pointer, because we delete our
-      // connection, when the referenced mapper is destroyed
-      itk::Object *m_Sender;
-      unsigned long m_ObserverID;
+      vtkActor *m_Actor;       /**< \brief The VTK actor for the image texture. */
+      itk::Object *m_Sender;   /**< \brief The observed mapper object (raw pointer, cleaned up via observer). */
+      unsigned long m_ObserverID; /**< \brief The observer ID for the delete callback. */
 
+      /** \brief Initialize with an actor, a sender object, and a delete command. */
       void Initialize(vtkActor *actor, itk::Object *sender, itk::Command *command);
 
       ActorInfo();

@@ -25,7 +25,7 @@ namespace us {
 /**
  * \ingroup MicroServices
  *
- * Query and set certain properties of the CppMicroServices library.
+ * \brief Query and set certain properties of the CppMicroServices library.
  *
  * The following environment variables influence the runtime behavior
  * of the CppMicroServices library:
@@ -40,10 +40,11 @@ class MITKCPPMICROSERVICES_EXPORT ModuleSettings
 {
 public:
 
+  /** \brief A list of file-system paths. */
   typedef std::vector<std::string> PathList;
 
   /**
-   * Returns a special string which can be used as an argument for a
+   * \brief Returns a special string which can be used as an argument for a
    * AddAutoLoadPath() call.
    *
    * When a module is loaded and this string has been added as a path
@@ -79,7 +80,7 @@ public:
   static bool IsAutoLoadingEnabled();
 
   /**
-   * Enable or disable auto-loading support.
+   * \brief Enable or disable auto-loading support.
    *
    * \param enable If \c true, enable auto-loading support, disable it otherwise.
    *
@@ -96,39 +97,39 @@ public:
   static PathList GetAutoLoadPaths();
 
   /**
-   * Set a list of paths in the file-system from which modules should be
+   * \brief Set a list of paths in the file-system from which modules should be
    * auto-loaded.
-   * @param paths A list of absolute file-system paths.
+   * \param[in] paths A list of absolute file-system paths.
    */
   static void SetAutoLoadPaths(const PathList& paths);
 
   /**
-   * Add a path in the file-system to the list of paths from which modules
+   * \brief Add a path in the file-system to the list of paths from which modules
    * will be auto-loaded.
    *
-   * @param path The additional absolute auto-load path in the file-system.
+   * \param[in] path The additional absolute auto-load path in the file-system.
    */
   static void AddAutoLoadPath(const std::string& path);
 
   /**
-   * Set a local storage path for persistend module data.
+   * \brief Set a local storage path for persistend module data.
    *
    * This path is used as a base directory for providing modules
    * with a storage path for writing persistent data. The callee
    * must ensure that the provided path exists and is writable.
    *
-   * @see ModuleContext::GetDataFile(const std::string&)
+   * \sa ModuleContext::GetDataFile(const std::string&)
    *
-   * @param path An absolute path for writing persistent data.
+   * \param[in] path An absolute path for writing persistent data.
    */
   static void SetStoragePath(const std::string& path);
 
   /**
-   * Get the absolute path for persistent data. The returned path
+   * \brief Get the absolute path for persistent data. The returned path
    * might be empty. If the path is non-empty, it is safe to assume
    * that the path exists and is writable.
    *
-   * @return The absolute path to the persistent storage path.
+   * \return The absolute path to the persistent storage path.
    */
   static std::string GetStoragePath();
 

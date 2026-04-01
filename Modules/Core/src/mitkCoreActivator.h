@@ -38,23 +38,60 @@ found in the LICENSE file.
 
 #include <memory>
 
-/*
- * This is the module activator for the "Mitk" module. It registers core services
- * like ...
+/**
+ * \brief Module activator for the MitkCore module.
+ *
+ * Registers all core services when the module is loaded, including property services
+ * (aliases, descriptions, extensions, filters, persistence, relations, deserialization),
+ * I/O services (MIME types, ITK/VTK image readers/writers, point set and surface I/O,
+ * legacy writer adapters), node selection, plane position management, and preferences.
+ *
+ * On unload, all registered services and file I/O instances are cleaned up.
+ *
+ * \sa mitk::CoreServices
+ * \sa us::ModuleActivator
  */
 class MitkCoreActivator : public us::ModuleActivator
 {
 public:
+  /**
+   * \brief Load and register all core services.
+   *
+   * Called by CppMicroServices when the MitkCore module is loaded. Registers
+   * default MIME types, ITK/VTK readers and writers, point set I/O, geometry
+   * data I/O, raw image reader, legacy writers, property services, preferences,
+   * and MIME type provider.
+   *
+   * \param[in] context The module context for service registration.
+   */
   void Load(us::ModuleContext *context) override;
+
+  /**
+   * \brief Unload and clean up all registered services.
+   *
+   * Called by CppMicroServices when the MitkCore module is unloaded. Deletes
+   * all file reader, writer, and I/O instances and stops the MIME type provider.
+   */
   void Unload(us::ModuleContext *) override;
 
 private:
+  /**
+   * \brief Handle module lifecycle events.
+   *
+   * \param[in] moduleEvent The module event to handle.
+   */
   void HandleModuleEvent(const us::ModuleEvent moduleEvent);
 
+  /** \brief Register default MIME types for common file formats. */
   void RegisterDefaultMimeTypes();
+
+  /** \brief Register ITK-based image reader/writer services. */
   void RegisterItkReaderWriter();
+
+  /** \brief Register VTK-based image and surface reader/writer services. */
   void RegisterVtkReaderWriter();
 
+  /** \brief Register legacy mitk::FileWriter instances as micro services. */
   void RegisterLegacyWriter();
 
   // mitk::RenderingManager::Pointer m_RenderingManager;

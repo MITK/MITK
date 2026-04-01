@@ -17,16 +17,27 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <QDialog>
 /**
-  \brief Displays read-only QTextEdit.
-
-  For output of any kind of information that might be copied into other applications.
-*/
+ * \brief Dialog that displays a read-only text area for copying content to the clipboard.
+ *
+ * Shows a QTextEdit in read-only mode, suitable for displaying any kind of information
+ * (e.g., statistics, measurements) that the user may want to copy into other applications.
+ *
+ * \sa QmitkImageStatisticsWidget
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the dialog with the given text content.
+   * \param[in] text The text to display in the read-only text area.
+   * \param[in] parent Optional parent widget.
+   * \param[in] name Optional object name for the dialog.
+   */
   QmitkCopyToClipBoardDialog(const QString &text, QWidget *parent = nullptr, const char *name = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkCopyToClipBoardDialog() override;
 
 signals:

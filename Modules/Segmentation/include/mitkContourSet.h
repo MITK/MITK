@@ -22,9 +22,11 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * This class holds stores vertices for drawing a contour
-  *
-  */
+   * \brief Holds a collection of mitk::Contour objects indexed by ID.
+   *
+   * \deprecated Use ContourModelSet instead.
+   * \sa ContourModelSet, Contour
+   */
   class MITKSEGMENTATION_EXPORT ContourSet : public BaseData
   {
   public:
@@ -38,54 +40,47 @@ namespace mitk
     typedef ContourVectorType::iterator ContourIterator;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
 
-    /**
-    * clean up the contour data
-    */
+    /** \brief Clears all contour data. */
     void Initialize() override;
 
     /**
-    * add a contour
-    */
+     * \brief Adds a contour at the given index.
+     * \param[in] index The index key for the contour.
+     * \param[in] contour The contour to add.
+     */
     void AddContour(unsigned int index, mitk::Contour::Pointer contour);
 
     /**
-    * add a contour
-    */
+     * \brief Removes the contour at the given index.
+     * \param[in] index The index key of the contour to remove.
+     */
     void RemoveContour(unsigned long index);
 
     /**
-    * returns the number of points stored in the contour
-    */
+     * \brief Returns the number of contours stored in the set.
+     * \return The contour count.
+     */
     unsigned int GetNumberOfContours();
 
     /**
-    * returns the container of the contour points
-    */
+     * \brief Returns the map of all contours.
+     * \return The contour vector map.
+     */
     ContourVectorType GetContours();
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Updates the output information (bounding box, etc.). */
     void UpdateOutputInformation() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Sets the requested region to the largest possible region. */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Checks whether the requested region is outside the buffered region. */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Verifies that the requested region is valid. */
     bool VerifyRequestedRegion() override;
 
-    /**
-    * intherited from parent
-    */
+    /** \brief Sets the requested region from an itk::DataObject. */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
   protected:

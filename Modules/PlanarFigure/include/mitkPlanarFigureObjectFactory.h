@@ -18,6 +18,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory for PlanarFigure types.
+   *
+   * Registers mappers and default properties for all PlanarFigure sub-classes.
+   *
+   * \ingroup MitkPlanarFigureModule
+   */
   class MITKPLANARFIGURE_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBase
   {
   public:

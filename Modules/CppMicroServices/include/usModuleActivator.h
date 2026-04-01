@@ -27,7 +27,7 @@ class ModuleContext;
 /**
  * \ingroup MicroServices
  *
- * Customizes the starting and stopping of a CppMicroServices module.
+ * \brief Customizes the starting and stopping of a CppMicroServices module.
  * <p>
  * <code>%ModuleActivator</code> is an interface that can be implemented by
  * CppMicroServices modules. The CppMicroServices library can create instances of a
@@ -54,18 +54,19 @@ class ModuleContext;
 struct ModuleActivator
 {
 
+  /** \brief Virtual destructor. */
   virtual ~ModuleActivator() {}
 
   /**
-   * Called when this module is loaded. This method
+   * \brief Called when this module is loaded. This method
    * can be used to register services or to allocate any resources that this
    * module may need globally (during the whole module lifetime).
    *
    * <p>
    * This method must complete and return to its caller in a timely manner.
    *
-   * @param context The execution context of the module being loaded.
-   * @throws std::exception If this method throws an exception, this
+   * \param[in] context The execution context of the module being loaded.
+   * \throws std::exception If this method throws an exception, this
    *         module is marked as stopped and the framework will remove this
    *         module's listeners, unregister all services registered by this
    *         module, and release all services used by this module.
@@ -73,7 +74,7 @@ struct ModuleActivator
   virtual void Load(ModuleContext* context) = 0;
 
   /**
-   * Called when this module is unloaded. In general, this
+   * \brief Called when this module is unloaded. In general, this
    * method should undo the work that the <code>ModuleActivator::Load</code>
    * method started. There should be no active threads that were started by
    * this module when this method returns.
@@ -81,8 +82,8 @@ struct ModuleActivator
    * <p>
    * This method must complete and return to its caller in a timely manner.
    *
-   * @param context The execution context of the module being unloaded.
-   * @throws std::exception If this method throws an exception, the
+   * \param[in] context The execution context of the module being unloaded.
+   * \throws std::exception If this method throws an exception, the
    *         module is still marked as unloaded, and the framework will remove
    *         the module's listeners, unregister all services registered by the
    *         module, and release all services used by the module.

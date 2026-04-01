@@ -20,13 +20,31 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Parses a provisioning file to determine which plugins to install and start.
+   *
+   * The provisioning file uses a simple text format with keywords READ, INSTALL, START,
+   * and STOP followed by plugin URLs. The special placeholder \@EXECUTABLE_DIR is
+   * substituted with the application's directory path.
+   */
   class ProvisioningInfo
   {
   public:
+    /**
+     * \brief Construct a ProvisioningInfo by parsing the given provisioning file.
+     *
+     * \param file Path to the provisioning file.
+     * \throw mitk::Exception if the file cannot be opened.
+     */
     ProvisioningInfo(const QString &file);
 
+    /** \brief Return the list of directories containing discovered plugins. */
     QStringList getPluginDirs() const;
+
+    /** \brief Return the list of plugin URLs that should be installed. */
     QList<QUrl> getPluginsToInstall() const;
+
+    /** \brief Return the list of plugin URLs that should be started after installation. */
     QList<QUrl> getPluginsToStart() const;
 
   private:

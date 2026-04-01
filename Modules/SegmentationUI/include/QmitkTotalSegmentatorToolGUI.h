@@ -26,9 +26,10 @@ namespace Ui
   class QmitkTotalSegmentatorToolGUIControls;
 }
 
-/*
+/**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::TotalSegmentatorTool.
+  \sa mitk::TotalSegmentatorTool
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkTotalSegmentatorToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -42,7 +43,7 @@ public:
 protected slots:
 
   /**
-   * @brief Qt Slot
+   * \brief Qt Slot
    */
   void OnPreviewBtnClicked();
 
@@ -54,37 +55,37 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   /**
-   * @brief Enable (or Disable) GUI elements.
+   * \brief Enable (or Disable) GUI elements.
    */
   void EnableAll(bool);
   
   /**
-   * @brief Adds and removes licensed task in combo box.
+   * \brief Adds and removes licensed task in combo box.
    */
   void ToggleLicensedTasks(bool activate);
 
   /**
-   * @brief Creates a QMessage object and shows on screen.
+   * \brief Creates a QMessage object and shows on screen.
    */
   void ShowErrorMessage(const std::string&, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Writes any message in white on the tool pane.
+   * \brief Writes any message in white on the tool pane.
    */
   void WriteStatusMessage(const QString&);
 
   /**
-   * @brief Writes any message in red on the tool pane.
+   * \brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString&);
 
   /**
-   * @brief Checks for changes in preferences
+   * \brief Checks for changes in preferences
    */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent&);
 
   /**
-   * @brief Update status label as per status received from mitk::Message event
+   * \brief Update status label as per status received from mitk::Message event
    */
   void DownloadStatusWorker(const bool isDownloading);
 

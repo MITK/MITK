@@ -19,16 +19,18 @@ found in the LICENSE file.
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::BinaryThresholdTool.
+  \brief GUI for mitk::BinaryThresholdTool providing a single-threshold slider.
 
-  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
+  This GUI shows a slider to change the tool's threshold and an OK button to accept
+  a preview for actual thresholding. It operates in single-threshold mode (lower bound only).
 
-  There is only a slider for INT values in QT. So, if the working image has a float/double pixeltype, we need to convert
-  the original float intensity into a respective int value for the slider. The slider range is then between 0 and 99.
+  For images with float/double pixel types, the original float intensity is converted
+  to an integer slider value in the range 0 to 99. For integer pixel types, no conversion
+  is needed.
 
-  If the pixeltype is INT, then we do not need any conversion.
-
-  Last contributor: $Author$
+  \sa mitk::BinaryThresholdTool
+  \sa QmitkBinaryThresholdToolGUIBase
+  \sa QmitkBinaryThresholdULToolGUI
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkBinaryThresholdToolGUIBase
 {

@@ -17,7 +17,17 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkPropertyObserver.h>
 
-/// @ingroup Widgets
+/**
+ * \brief Read-only QLabel that displays a numeric MITK property value.
+ * \ingroup Widgets
+ *
+ * Observes an mitk::IntProperty, mitk::FloatProperty, or mitk::DoubleProperty
+ * and displays its current value as text. Supports configurable decimal places,
+ * a text suffix, and percentage display mode. If the property is removed,
+ * "n/a" is shown.
+ *
+ * \sa QmitkNumberPropertyEditor, QmitkNumberPropertySlider, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
@@ -26,20 +36,65 @@ class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyView : public QLabel, public mi
   Q_PROPERTY(bool showPercent READ showPercent WRITE setShowPercent)
 
 public:
-  QmitkNumberPropertyView(const mitk::IntProperty *, QWidget *parent);
-  QmitkNumberPropertyView(const mitk::FloatProperty *, QWidget *parent);
-  QmitkNumberPropertyView(const mitk::DoubleProperty *, QWidget *parent);
+  /**
+   * \brief Construct a view for an integer property.
+   * \param[in] property The int property to observe.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyView(const mitk::IntProperty *property, QWidget *parent);
 
+  /**
+   * \brief Construct a view for a float property.
+   * \param[in] property The float property to observe.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyView(const mitk::FloatProperty *property, QWidget *parent);
+
+  /**
+   * \brief Construct a view for a double property.
+   * \param[in] property The double property to observe.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyView(const mitk::DoubleProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkNumberPropertyView() override;
 
+  /**
+   * \brief Get the number of decimal places displayed.
+   * \return The decimal places count.
+   */
   short decimalPlaces() const;
-  void setDecimalPlaces(short);
 
+  /**
+   * \brief Set the number of decimal places to display.
+   * \param[in] places The number of decimal places.
+   */
+  void setDecimalPlaces(short places);
+
+  /**
+   * \brief Get the current text suffix.
+   * \return The suffix string.
+   */
   QString suffix() const;
-  void setSuffix(const QString &);
 
+  /**
+   * \brief Set a text suffix appended to the displayed value.
+   * \param[in] suffix The suffix string (e.g. " mm").
+   */
+  void setSuffix(const QString &suffix);
+
+  /**
+   * \brief Check whether values are displayed as percentages.
+   * \return True if percentage mode is active.
+   */
   bool showPercent() const;
-  void setShowPercent(bool);
+
+  /**
+   * \brief Enable or disable percentage display (value multiplied by 100, "%" suffix).
+   * \param[in] show True to enable percentage mode.
+   */
+  void setShowPercent(bool show);
 
 protected:
   void initialize();

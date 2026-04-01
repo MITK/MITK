@@ -50,36 +50,57 @@ namespace mitk
   class MITKCORE_EXPORT IOUtil
   {
   public:
-    /**Struct that contains information regarding the current loading process. (e.g. Path that should be loaded,
-    all found readers for the load path,...). It is set be IOUtil and used to pass information via the option callback
-    in load operations.
-    */
+    /** \brief Contains information about the current loading process.
+     *
+     * Holds the path to be loaded, all found readers for the load path, and the resulting
+     * output data. It is set by IOUtil and used to pass information via the option callback
+     * in load operations.
+     */
     struct MITKCORE_EXPORT LoadInfo
     {
+      /** \brief Constructor.
+       * \param path The file path to load.
+       */
       LoadInfo(const std::string &path);
 
+      /// The file path to load.
       std::string m_Path;
+      /// The loaded BaseData objects (output).
       std::vector<BaseData::Pointer> m_Output;
-
+      /// The reader selector containing all suitable readers for the file.
       FileReaderSelector m_ReaderSelector;
+      /// Flag indicating if the load operation should be canceled.
       bool m_Cancel;
-
+      /// Optional properties to pass to the file reader.
       const PropertyList* m_Properties;
     };
 
-    /**Struct that is the base class for option callbacks used in load operations. The callback is used by IOUtil, if
-    more than one suitable reader was found or the a reader contains options that can be set. The callback allows to
-    change option settings and select the reader that should be used (via loadInfo).
-    */
+    /** \brief Base class for option callbacks used in load operations.
+     *
+     * The callback is used by IOUtil if more than one suitable reader was found or
+     * a reader contains options that can be set. The callback allows changing option
+     * settings and selecting the reader that should be used (via loadInfo).
+     */
     struct MITKCORE_EXPORT ReaderOptionsFunctorBase
     {
+      /** \brief Callback operator invoked during load to configure reader options.
+       * \param loadInfo Reference to the LoadInfo struct for the current load operation.
+       * \return True if loading should proceed, false to cancel.
+       */
       virtual bool operator()(LoadInfo &loadInfo) const = 0;
     };
 
+    /** \brief Contains information about a save operation for a BaseData object. */
     struct MITKCORE_EXPORT SaveInfo
     {
+      /** \brief Constructor.
+       * \param baseData The BaseData object to save.
+       * \param mimeType The MIME type for writing.
+       * \param path The file path to write to.
+       */
       SaveInfo(const BaseData *baseData, const MimeType &mimeType, const std::string &path);
 
+      /** \brief Comparison operator for ordering SaveInfo objects. */
       bool operator<(const SaveInfo &other) const;
 
       /// The BaseData object to save.
@@ -95,19 +116,25 @@ namespace mitk
       bool m_Cancel;
     };
 
-    /**Struct that is the base class for option callbacks used in save operations. The callback is used by IOUtil, if
-    more than one suitable writer was found or the a writer contains options that can be set. The callback allows to
-    change option settings and select the writer that should be used (via saveInfo).
-    */
+    /** \brief Base class for option callbacks used in save operations.
+     *
+     * The callback is used by IOUtil if more than one suitable writer was found or
+     * a writer contains options that can be set. The callback allows changing option
+     * settings and selecting the writer that should be used (via saveInfo).
+     */
     struct MITKCORE_EXPORT WriterOptionsFunctorBase
     {
+      /** \brief Callback operator invoked during save to configure writer options.
+       * \param saveInfo Reference to the SaveInfo struct for the current save operation.
+       * \return True if saving should proceed, false to cancel.
+       */
       virtual bool operator()(SaveInfo &saveInfo) const = 0;
     };
 
     /**
      * Get the file system path where the running executable is located.
      *
-     * @return The location of the currently running executable, without the filename.
+     * \return The location of the currently running executable, without the filename.
      */
     static std::string GetProgramPath();
 
@@ -129,14 +156,14 @@ namespace mitk
     /**
      * Get the default temporary path without a trailing path separator.
      *
-     * @return The default path for temporary data.
+     * \return The default path for temporary data.
      */
     static std::string GetTempPath();
 
     /**
     * Returns the Directory Separator for the current OS.
     *
-    * @return the Directory Separator for the current OS, i.e. "\\" for Windows and "/" otherwise.
+    * \return the Directory Separator for the current OS, i.e. "\\" for Windows and "/" otherwise.
     */
     static char GetDirectorySeparator();
 
@@ -152,13 +179,13 @@ namespace mitk
      *
      * The file is created with read and write permissions for owner only.
      *
-     * @param tmpStream The output stream for writing to the temporary file.
-     * @param templateName An optional template for the filename.
-     * @param path An optional path where the temporary file should be created. Defaults
+     * \param tmpStream The output stream for writing to the temporary file.
+     * \param templateName An optional template for the filename.
+     * \param path An optional path where the temporary file should be created. Defaults
      *        to the default temp path as returned by GetTempPath().
-     * @return The filename of the created temporary file.
+     * \return The filename of the created temporary file.
      *
-     * @throw mitk::Exception if the temporary file could not be created.
+     * \throw mitk::Exception if the temporary file could not be created.
      */
     static std::string CreateTemporaryFile(std::ofstream &tmpStream,
                                            const std::string &templateName = "XXXXXX",
@@ -177,14 +204,14 @@ namespace mitk
      *
      * The file is created with read and write permissions for owner only.
      *
-     * @param tmpStream The output stream for writing to the temporary file.
-     * @param mode The open mode for the temporary file stream.
-     * @param templateName An optional template for the filename.
-     * @param path An optional path where the temporary file should be created. Defaults
+     * \param tmpStream The output stream for writing to the temporary file.
+     * \param mode The open mode for the temporary file stream.
+     * \param templateName An optional template for the filename.
+     * \param path An optional path where the temporary file should be created. Defaults
      *        to the default temp path as returned by GetTempPath().
-     * @return The filename of the created temporary file.
+     * \return The filename of the created temporary file.
      *
-     * @throw mitk::Exception if the temporary file could not be created.
+     * \throw mitk::Exception if the temporary file could not be created.
      */
     static std::string CreateTemporaryFile(std::ofstream &tmpStream,
                                            std::ios_base::openmode mode,
@@ -205,11 +232,11 @@ namespace mitk
     * file path for reading or writing.
     * ---
     *
-    * @return The filename of the created temporary file.
-    * @param templateName An optional template for the filename.
-    * @param path An optional path where the temporary file should be created. Defaults
+    * \return The filename of the created temporary file.
+    * \param templateName An optional template for the filename.
+    * \param path An optional path where the temporary file should be created. Defaults
     *        to the default temp path as returned by GetTempPath().
-    * @throw mitk::Exception if the temporary file could not be created.
+    * \throw mitk::Exception if the temporary file could not be created.
     */
     static std::string CreateTemporaryFile(const std::string &templateName = "XXXXXX",
                                            const std::string &path = std::string());
@@ -223,72 +250,80 @@ namespace mitk
      *
      * The directory is created with read, write and executable permissions for owner only.
      *
-     * @param templateName An optional template for the directory name.
-     * @param path An optional path where the temporary directory should be created. Defaults
+     * \param templateName An optional template for the directory name.
+     * \param path An optional path where the temporary directory should be created. Defaults
      *        to the default temp path as returned by GetTempPath().
-     * @return The filename of the created temporary file.
+     * \return The filename of the created temporary file.
      *
-     * @throw mitk::Exception if the temporary directory could not be created.
+     * \throw mitk::Exception if the temporary directory could not be created.
      */
     static std::string CreateTemporaryDirectory(const std::string &templateName = "XXXXXX",
                                                 std::string path = std::string());
 
     /**
-     * @brief Load a file into the given DataStorage.
+     * \brief Load a file into the given DataStorage.
      *
      * This method calls Load(const std::vector<std::string>&, DataStorage&) with a
      * one-element vector.
      *
-     * @param path The absolute file name including the file extension.
-     * @param storage A DataStorage object to which the loaded data will be added.
-     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * \param path The absolute file name including the file extension.
+     * \param storage A DataStorage object to which the loaded data will be added.
+     * \param optionsCallback Pointer to a callback instance. The callback is used by
      * the load operation if more the suitable reader was found or the reader has options
      * that can be set.
-     * @return The set of added DataNode objects.
-     * @throws mitk::Exception if \c path could not be loaded.
+     * \return The set of added DataNode objects.
+     * \throws mitk::Exception if \c path could not be loaded.
      *
-     * @sa Load(const std::vector<std::string>&, DataStorage&)
+     * \sa Load(const std::vector<std::string>&, DataStorage&)
      */
     static DataStorage::SetOfObjects::Pointer Load(const std::string &path, DataStorage &storage,
                                                    const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
-    * @brief Load a file into the given DataStorage given user defined IFileReader::Options.
+    * \brief Load a file into the given DataStorage given user defined IFileReader::Options.
     *
     * This method calls Load(const std::vector<std::string>&, DataStorage&) with a
     * one-element vector.
     *
-    * @param path The absolute file name including the file extension.
-    * @param options IFileReader option instance that should be used if selected reader
+    * \param path The absolute file name including the file extension.
+    * \param options IFileReader option instance that should be used if selected reader
     * has options.
-    * @param storage A DataStorage object to which the loaded data will be added.
-    * @return The set of added DataNode objects.
-    * @throws mitk::Exception if \c path could not be loaded.
+    * \param storage A DataStorage object to which the loaded data will be added.
+    * \return The set of added DataNode objects.
+    * \throws mitk::Exception if \c path could not be loaded.
     *
-    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    * \sa Load(const std::vector<std::string>&, DataStorage&)
     */
     static DataStorage::SetOfObjects::Pointer Load(const std::string &path,
                                                    const IFileReader::Options &options,
                                                    DataStorage &storage);
 
     /**
-    * @brief Load a file and return the loaded data.
+    * \brief Load a file and return the loaded data.
     *
     * This method calls Load(const std::vector<std::string>&) with a
     * one-element vector.
     *
-    * @param path The absolute file name including the file extension.
-    * @param optionsCallback Pointer to a callback instance. The callback is used by
+    * \param path The absolute file name including the file extension.
+    * \param optionsCallback Pointer to a callback instance. The callback is used by
     * the load operation if more the suitable reader was found or the reader has options
     * that can be set.
-    * @return The set of added DataNode objects.
-    * @throws mitk::Exception if \c path could not be loaded.
+    * \return The set of added DataNode objects.
+    * \throws mitk::Exception if \c path could not be loaded.
     *
-    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    * \sa Load(const std::vector<std::string>&, DataStorage&)
     */
     static std::vector<BaseData::Pointer> Load(const std::string &path,
                                                const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
+    /** \brief Load a file, cast the first result to type T and return it.
+     *
+     * Convenience template that calls Load(path, optionsCallback) and casts the
+     * first element of the result to the specified type.
+     *
+     * \tparam T The target BaseData subclass type.
+     * \return Smart pointer to the loaded object, or nullptr if the cast fails.
+     */
     template <typename T>
     static typename T::Pointer Load(const std::string& path, const ReaderOptionsFunctorBase *optionsCallback = nullptr)
     {
@@ -296,21 +331,26 @@ namespace mitk
     }
 
     /**
-    * @brief Load a file and return the loaded data.
+    * \brief Load a file and return the loaded data.
     *
     * This method calls Load(const std::vector<std::string>&) with a
     * one-element vector.
     *
-    * @param path The absolute file name including the file extension.
-    * @param options IFileReader option instance that should be used if selected reader
+    * \param path The absolute file name including the file extension.
+    * \param options IFileReader option instance that should be used if selected reader
     * has options.
-    * @return The set of added DataNode objects.
-    * @throws mitk::Exception if \c path could not be loaded.
+    * \return The set of loaded BaseData objects.
+    * \throws mitk::Exception if \c path could not be loaded.
     *
-    * @sa Load(const std::vector<std::string>&, DataStorage&)
+    * \sa Load(const std::vector<std::string>&, DataStorage&)
     */
     static std::vector<BaseData::Pointer> Load(const std::string &path, const IFileReader::Options &options);
 
+    /** \brief Load a file with options, cast the first result to type T and return it.
+     *
+     * \tparam T The target BaseData subclass type.
+     * \return Smart pointer to the loaded object, or nullptr if the cast fails.
+     */
     template <typename T>
     static typename T::Pointer Load(const std::string& path, const IFileReader::Options &options)
     {
@@ -318,81 +358,99 @@ namespace mitk
     }
 
     /**
-     * @brief Loads a list of file paths into the given DataStorage.
+     * \brief Loads a list of file paths into the given DataStorage.
      *
      * If an entry in \c paths cannot be loaded, this method will continue to load
      * the remaining entries into \c storage and throw an exception afterwards.
      *
-     * @param paths A list of absolute file names including the file extension.
-     * @param storage A DataStorage object to which the loaded data will be added.
-     * @param optionsCallback Pointer to a callback instance. The callback is used by
+     * \param paths A list of absolute file names including the file extension.
+     * \param storage A DataStorage object to which the loaded data will be added.
+     * \param optionsCallback Pointer to a callback instance. The callback is used by
      * the load operation if more the suitable reader was found or the reader has options
      * that can be set.
-     * @return The set of added DataNode objects.
-     * @throws mitk::Exception if an entry in \c paths could not be loaded.
+     * \return The set of added DataNode objects.
+     * \throws mitk::Exception if an entry in \c paths could not be loaded.
      */
     static DataStorage::SetOfObjects::Pointer Load(const std::vector<std::string> &paths, DataStorage &storage,
                                                    const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
+    /** \brief Load a list of file paths and return the loaded data.
+     *
+     * \param paths A list of absolute file names including the file extension.
+     * \param optionsCallback Pointer to a callback instance for reader selection and options.
+     * \return A vector of loaded BaseData objects.
+     * \throws mitk::Exception if an entry in \c paths could not be loaded.
+     */
     static std::vector<BaseData::Pointer> Load(const std::vector<std::string> &paths,
                                                const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
-     * @brief Loads the contents of a us::ModuleResource and returns the corresponding mitk::BaseData
-     * @param usResource a ModuleResource, representing a BaseData object
-     * @param mode Optional parameter to set the openmode of the stream
-     * @return The set of loaded BaseData objects. \c Should contain either one or zero elements, since a resource
+     * \brief Loads the contents of a us::ModuleResource and returns the corresponding mitk::BaseData
+     * \param usResource a ModuleResource, representing a BaseData object
+     * \param mode Optional parameter to set the openmode of the stream
+     * \return The set of loaded BaseData objects. \c Should contain either one or zero elements, since a resource
      * stream
      * represents one object.
-     * @throws mitk::Exception if no reader was found for the stream.
+     * \throws mitk::Exception if no reader was found for the stream.
      */
     static std::vector<BaseData::Pointer> Load(const us::ModuleResource &usResource,
                                                std::ios_base::openmode mode = std::ios_base::in);
 
+    /** \brief Load a module resource, cast the first result to type T and return it.
+     *
+     * \tparam T The target BaseData subclass type.
+     * \return Smart pointer to the loaded object, or nullptr if the cast fails.
+     */
     template <typename T>
     static typename T::Pointer Load(const us::ModuleResource &usResource, std::ios_base::openmode mode = std::ios_base::in)
     {
       return dynamic_cast<T*>(Load(usResource, mode).at(0).GetPointer());
     }
 
+    /** \brief Load a file with additional properties for the reader.
+     *
+     * \param path The absolute file name including the file extension.
+     * \param properties Properties to pass to the file reader.
+     * \return The loaded BaseData object.
+     */
     static BaseData::Pointer Load(const std::string& path, const PropertyList* properties);
 
     /**
-     * @brief Save a mitk::BaseData instance.
-     * @param data The data to save.
-     * @param path The path to the image including file name and and optional file extension.
+     * \brief Save a mitk::BaseData instance.
+     * \param data The data to save.
+     * \param path The path to the image including file name and and optional file extension.
      *        If no extension is set, the default extension and mime-type for the
      *        BaseData type of \c data is used.
-     * @param setPathProperty
-     * @throws mitk::Exception if no writer for \c data is available or the writer
+     * \param setPathProperty
+     * \throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
     static void Save(const mitk::BaseData *data, const std::string &path, bool setPathProperty = false);
 
     /**
-     * @brief Save a mitk::BaseData instance.
-     * @param data The data to save.
-     * @param path The path to the image including file name and an optional file extension.
+     * \brief Save a mitk::BaseData instance.
+     * \param data The data to save.
+     * \param path The path to the image including file name and an optional file extension.
      *        If no extension is set, the default extension and mime-type for the
      *        BaseData type of \c data is used.
-     * @param options The IFileWriter options to use for the selected writer.
-     * @param setPathProperty
-     * @throws mitk::Exception if no writer for \c data is available or the writer
+     * \param options The IFileWriter options to use for the selected writer.
+     * \param setPathProperty
+     * \throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
     static void Save(const mitk::BaseData *data, const std::string &path, const IFileWriter::Options &options, bool setPathProperty = false);
 
     /**
-     * @brief Save a mitk::BaseData instance.
-     * @param data The data to save.
-     * @param mimeType The mime-type to use for writing \c data.
-     * @param path The path to the image including file name and an optional file extension.
-     * @param addExtension If \c true, an extension according to the given \c mimeType
+     * \brief Save a mitk::BaseData instance.
+     * \param data The data to save.
+     * \param mimeType The mime-type to use for writing \c data.
+     * \param path The path to the image including file name and an optional file extension.
+     * \param addExtension If \c true, an extension according to the given \c mimeType
      *        is added to \c path if it does not contain one. If \c path already contains
      *        a file name extension, it is not checked for compatibility with \c mimeType.
-     * @param setPathProperty
+     * \param setPathProperty
      *
-     * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
+     * \throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
      *         available or the writer is not able to write the image.
      */
     static void Save(const mitk::BaseData *data,
@@ -402,17 +460,17 @@ namespace mitk
                      bool setPathProperty = false);
 
     /**
-     * @brief Save a mitk::BaseData instance.
-     * @param data The data to save.
-     * @param mimeType The mime-type to use for writing \c data.
-     * @param path The path to the image including file name and an optional file extension.
-     * @param options Configuration data for the used IFileWriter instance.
-     * @param addExtension If \c true, an extension according to the given \c mimeType
+     * \brief Save a mitk::BaseData instance.
+     * \param data The data to save.
+     * \param mimeType The mime-type to use for writing \c data.
+     * \param path The path to the image including file name and an optional file extension.
+     * \param options Configuration data for the used IFileWriter instance.
+     * \param addExtension If \c true, an extension according to the given \c mimeType
      *        is added to \c path if it does not contain one. If \c path already contains
      *        a file name extension, it is not checked for compatibility with \c mimeType.
-     * @param setPathProperty
+     * \param setPathProperty
      *
-     * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
+     * \throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
      *         available or the writer is not able to write the image.
      */
     static void Save(const mitk::BaseData *data,
@@ -423,24 +481,42 @@ namespace mitk
                      bool setPathProperty = false);
 
     /**
-     * @brief Use SaveInfo objects to save BaseData instances.
+     * \brief Use SaveInfo objects to save BaseData instances.
      *
      * This is a low-level method for directly working with SaveInfo objects. Usually,
      * the Save() methods taking a BaseData object as an argument are more appropriate.
      *
-     * @param saveInfos A list of SaveInfo objects for saving contained BaseData objects.
-     * @param setPathProperty
+     * \param saveInfos A list of SaveInfo objects for saving contained BaseData objects.
+     * \param setPathProperty
      *
-     * @see Save(const mitk::BaseData*, const std::string&)
+     * \see Save(const mitk::BaseData*, const std::string&)
      */
     static void Save(std::vector<SaveInfo> &saveInfos, bool setPathProperty = false);
 
   protected:
+    /** \brief Internal load implementation that processes LoadInfo objects.
+     *
+     * \param loadInfos Vector of LoadInfo objects describing files to load.
+     * \param nodeResult Optional pointer to receive created DataNode objects.
+     * \param ds Optional DataStorage to add loaded data to.
+     * \param optionsCallback Optional callback for reader selection and options.
+     * \return Error message string (empty on success).
+     */
     static std::string Load(std::vector<LoadInfo> &loadInfos,
                             DataStorage::SetOfObjects *nodeResult,
                             DataStorage *ds,
                             const ReaderOptionsFunctorBase *optionsCallback);
 
+    /** \brief Internal save implementation with writer options callback.
+     *
+     * \param data The data to save.
+     * \param mimeType The MIME type to use for writing.
+     * \param path The file path to save to.
+     * \param optionsCallback Optional callback for writer selection and options.
+     * \param addExtension Whether to add a file extension based on MIME type.
+     * \param setPathProperty Whether to store the file path as a property on the data.
+     * \return Error message string (empty on success).
+     */
     static std::string Save(const BaseData *data,
                             const std::string &mimeType,
                             const std::string &path,
@@ -448,6 +524,13 @@ namespace mitk
                             bool addExtension,
                             bool setPathProperty);
 
+    /** \brief Internal save implementation that processes SaveInfo objects.
+     *
+     * \param saveInfos Vector of SaveInfo objects describing data to save.
+     * \param optionsCallback Optional callback for writer selection and options.
+     * \param setPathProperty Whether to store the file path as a property on the data.
+     * \return Error message string (empty on success).
+     */
     static std::string Save(std::vector<SaveInfo> &saveInfos,
                             WriterOptionsFunctorBase *optionsCallback,
                             bool setPathProperty);

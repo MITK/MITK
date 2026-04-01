@@ -27,15 +27,23 @@ class ANNkd_tree;
 namespace mitk
 {
   /**
-   * Convenience wrapper around ANN to provide fast nearest neighbour searches.
-   * Usage: set your points via SetPoints( vtkPointSet* Points ) or SetPoints(mitk::PointSet*).
-   * Then, you may query the closest point to an arbitrary coordinate by FindClosestPoint().
-   * There is no further call to update etc. needed.
-   * Currently only calls for 1 nearest neighbour are supported. Feel free to add functions
-   * for K nearest neighbours.
-   * NOTE: At least 1 point must be contained in the point set.
+   * \brief Convenience wrapper around ANN (Approximate Nearest Neighbours) for fast
+   * nearest-neighbour point searches.
+   *
+   * Usage:
+   * 1. Set the point set via SetPoints(vtkPointSet*), SetPoints(mitk::PointSet*),
+   *    or SetPoints(ITKPointSet*).
+   * 2. Query the closest point to an arbitrary coordinate via FindClosestPoint().
+   *
+   * No additional Update() call is needed -- the internal kd-tree is built
+   * automatically when the points are set.
+   *
+   * Currently only single nearest-neighbour queries are supported.
+   *
+   * \pre At least 1 point must be contained in the point set.
+   *
+   * \sa mitk::PointSet
    */
-
   class MITKALGORITHMSEXT_EXPORT PointLocator : public itk::Object
   {
   public:
@@ -56,21 +64,21 @@ namespace mitk
     /**
      * Sets the point which will be used for nearest-neighbour searches. Note
      * there must be at least one point in the point set.
-     * @param points the point set containing points for nearest neighbours searches.
+     * \param points the point set containing points for nearest neighbours searches.
      */
     void SetPoints(vtkPointSet *points);
 
     /**
      * Sets the point which will be used for nearest-neighbour searches. Note
      * there must be at least one point in the point set.
-     * @param points the point set containing points for nearest neighbours searches.
+     * \param points the point set containing points for nearest neighbours searches.
      */
     void SetPoints(mitk::PointSet *points);
 
     /**
     * Sets the point which will be used for nearest-neighbour searches. Note
     * there must be at least one point in the point set.
-    * @param pointSet the point set containing points for nearest neighbours searches.
+    * \param pointSet the point set containing points for nearest neighbours searches.
     */
     void SetPoints(ITKPointSet *pointSet);
 
@@ -79,8 +87,8 @@ namespace mitk
      * The Id of the point is returned. Please note, that there is no case, in which
      * no point is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param point the query point, for whom the nearest neighbour will be determined
-     * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
+     * \param point the query point, for whom the nearest neighbour will be determined
+     * \return the id of the nearest neighbour of the given point. The id corresponds to the id
      * which is given in the original point set.
      */
     IdType FindClosestPoint(const double point[3]);
@@ -90,10 +98,10 @@ namespace mitk
      * The Id of the point is returned. Please note, that there is no case, in which
      * no point is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param x the x coordinated of the query point, for whom the nearest neighbour will be determined
-     * @param y the x coordinated of the query point, for whom the nearest neighbour will be determined
-     * @param z the x coordinated of the query point, for whom the nearest neighbour will be determined
-     * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
+     * \param x the x coordinated of the query point, for whom the nearest neighbour will be determined
+     * \param y the x coordinated of the query point, for whom the nearest neighbour will be determined
+     * \param z the x coordinated of the query point, for whom the nearest neighbour will be determined
+     * \return the id of the nearest neighbour of the given point. The id corresponds to the id
      * which is given in the original point set.
      */
     IdType FindClosestPoint(double x, double y, double z);
@@ -103,8 +111,8 @@ namespace mitk
      * The Id of the point is returned. Please note, that there is no case, in which
      * no point is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param point the query point, for whom the nearest neighbour will be determined
-     * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
+     * \param point the query point, for whom the nearest neighbour will be determined
+     * \return the id of the nearest neighbour of the given point. The id corresponds to the id
      * which is given in the original point set.
      */
     IdType FindClosestPoint(mitk::PointSet::PointType point);
@@ -115,8 +123,8 @@ namespace mitk
      * Please note, that there is no case, in which
      * no point is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param point the query point, for whom the minimal distance will be determined
-     * @returns the distance in world coordinates between the nearest point in point set and the given point
+     * \param point the query point, for whom the minimal distance will be determined
+     * \return the distance in world coordinates between the nearest point in point set and the given point
      */
     DistanceType GetMinimalDistance(mitk::PointSet::PointType point);
 
@@ -126,10 +134,10 @@ namespace mitk
     * Please note, that there is no case, in which
     * no point is found, since as a precondition at least one point has to be contained
     * in the point set.
-    * @param point the query point, for whom the minimal distance will be determined
-    * @param id
-    * @param dist
-    * @returns the index of and distance (in world coordinates) between the nearest point in point set and the given
+    * \param point the query point, for whom the minimal distance will be determined
+    * \param id
+    * \param dist
+    * \return the index of and distance (in world coordinates) between the nearest point in point set and the given
     * point
     */
     bool FindClosestPointAndDistance(mitk::PointSet::PointType point, IdType *id, DistanceType *dist);
@@ -178,8 +186,8 @@ namespace mitk
      * The Id of the point is returned. Please note, that there is no case, in which
      * no point is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param point the query point, for whom the nearest neighbour will be determined
-     * @returns the id of the nearest neighbour of the given point. The id corresponds to the id
+     * \param point the query point, for whom the nearest neighbour will be determined
+     * \return the id of the nearest neighbour of the given point. The id corresponds to the id
      * which is given in the original point set.
      */
     IdType FindClosestANNPoint(const MyANNpoint &point);
@@ -189,9 +197,9 @@ namespace mitk
      * The distance is returned. Please note, that there is no case, in which
      * no distance is found, since as a precondition at least one point has to be contained
      * in the point set.
-     * @param point the query point, for whom the minimal distance to a point in the previously defined point set will
+     * \param point the query point, for whom the minimal distance to a point in the previously defined point set will
      * be determined
-     * @returns the squared distance in world coordinates between the given point and the nearest neighbour.
+     * \return the squared distance in world coordinates between the given point and the nearest neighbour.
      */
     DistanceType GetMinimalDistance(const MyANNpoint &point);
 

@@ -25,9 +25,8 @@ found in the LICENSE file.
 
 class QmitkMultiLabelSegTreeItem;
 
-/*!
-\class QmitkMultiLabelTreeModel
-The class is used to represent the information of an MITK MultiLabel segmentation instance (labels, spatial groups...).
+/**
+\brief Tree model representing the information of an MITK MultiLabel segmentation instance (labels, spatial groups).
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemModel
 {
@@ -37,10 +36,13 @@ public:
   using LabelValueType = mitk::MultiLabelSegmentation::LabelValueType;
   using GroupIndexType = mitk::MultiLabelSegmentation::GroupIndexType;
 
+  /** \brief Constructs the tree model. */
   QmitkMultiLabelTreeModel(QObject *parent = nullptr);
   ~QmitkMultiLabelTreeModel() override;
 
+  /** \brief Sets the segmentation whose labels and groups are represented by this model. */
   void SetSegmentation(mitk::MultiLabelSegmentation* segmentation);
+  /** \brief Returns the segmentation represented by this model. */
   const mitk::MultiLabelSegmentation* GetSegmentation() const;
 
   Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -74,7 +76,7 @@ public:
    * class like the passed index.
    *
    * If index points to a group or invalid, nothing will be returned.
-   * @pre currentIndex must be valid and point to a label (class or instance).
+   * \pre currentIndex must be valid and point to a label (class or instance).
    */
   std::vector <LabelValueType> GetLabelInstancesOfSameLabelClass(const QModelIndex& currentIndex) const;
 

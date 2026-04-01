@@ -17,7 +17,18 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkPropertyObserver.h>
 
-/// @ingroup Widgets
+/**
+ * \brief A QSpinBox that edits numeric MITK properties (int, float, double).
+ * \ingroup Widgets
+ *
+ * Provides a spinbox editor that bidirectionally synchronizes with an
+ * mitk::IntProperty, mitk::FloatProperty, or mitk::DoubleProperty. Supports
+ * configurable decimal places, percentage display mode, and min/max ranges.
+ * Internally converts between the property's floating-point value and the
+ * spinbox's integer-based value using scale factors.
+ *
+ * \sa QmitkNumberPropertySlider, QmitkNumberPropertyView, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
 {
   Q_OBJECT
@@ -27,24 +38,89 @@ class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, publi
   Q_PROPERTY(int maxValue READ maxValue WRITE setMaxValue)
 
 public:
-  QmitkNumberPropertyEditor(mitk::IntProperty *, QWidget *parent);
-  QmitkNumberPropertyEditor(mitk::FloatProperty *, QWidget *parent);
-  QmitkNumberPropertyEditor(mitk::DoubleProperty *, QWidget *parent);
+  /**
+   * \brief Construct an editor for an integer property.
+   * \param[in] property The int property to edit.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyEditor(mitk::IntProperty *property, QWidget *parent);
 
+  /**
+   * \brief Construct an editor for a float property.
+   * \param[in] property The float property to edit.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyEditor(mitk::FloatProperty *property, QWidget *parent);
+
+  /**
+   * \brief Construct an editor for a double property.
+   * \param[in] property The double property to edit.
+   * \param[in] parent The parent widget.
+   */
+  QmitkNumberPropertyEditor(mitk::DoubleProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkNumberPropertyEditor() override;
 
+  /**
+   * \brief Get the number of decimal places shown.
+   * \return The decimal places count.
+   */
   short getDecimalPlaces() const;
-  void setDecimalPlaces(short);
 
+  /**
+   * \brief Set the number of decimal places (only effective for float/double properties).
+   * \param[in] places The number of decimal places.
+   */
+  void setDecimalPlaces(short places);
+
+  /**
+   * \brief Check whether values are displayed as percentages.
+   * \return True if percentage mode is active.
+   */
   bool getShowPercent() const;
-  void setShowPercent(bool);
 
+  /**
+   * \brief Enable or disable percentage display (e.g. 0.5 displayed as 50%).
+   * \param[in] showPercent True to enable percentage mode.
+   */
+  void setShowPercent(bool showPercent);
+
+  /**
+   * \brief Get the minimum allowed value.
+   * \return The minimum value.
+   */
   int minValue() const;
-  void setMinValue(int);
+
+  /**
+   * \brief Set the minimum allowed value.
+   * \param[in] value The minimum value.
+   */
+  void setMinValue(int value);
+
+  /**
+   * \brief Get the maximum allowed value.
+   * \return The maximum value.
+   */
   int maxValue() const;
-  void setMaxValue(int);
+
+  /**
+   * \brief Set the maximum allowed value.
+   * \param[in] value The maximum value.
+   */
+  void setMaxValue(int value);
+
+  /**
+   * \brief Get the current value as a double.
+   * \return The property value.
+   */
   double doubleValue() const;
-  void setDoubleValue(double);
+
+  /**
+   * \brief Set the current value from a double.
+   * \param[in] value The value to set.
+   */
+  void setDoubleValue(double value);
 
 protected:
   void initialize();

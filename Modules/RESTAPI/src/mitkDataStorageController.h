@@ -28,7 +28,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Handles all /api/v1/datastorage endpoints.
+   * \brief Handles all /api/v1/datastorage endpoints.
    *
    * Handler method naming convention: HandleMETHOD_path_segments()
    * The method name directly reflects the route for clarity.
@@ -57,75 +57,75 @@ namespace mitk
   {
   public:
     /**
-     * @brief Construct a DataStorageController.
+     * \brief Construct a DataStorageController.
      *
-     * @param bridge Reference to the DataStorageBridge for data operations.
+     * \param bridge Reference to the DataStorageBridge for data operations.
      */
     explicit DataStorageController(DataStorageBridge& bridge);
 
     /**
-     * @brief Set the temporary directory for data serialization.
+     * \brief Set the temporary directory for data serialization.
      *
      * This directory is used for storing serialized data files when
      * responding to GET /nodes/{uid}/data requests.
      *
-     * @param tempDir Path to the temporary directory.
+     * \param tempDir Path to the temporary directory.
      */
     void SetTempDirectory(const std::string& tempDir);
 
     /**
-     * @brief Configure file access restrictions.
+     * \brief Configure file access restrictions.
      *
-     * @pre \a mode must be a valid FileAccessMode value.
-     * @pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
+     * \pre \a mode must be a valid FileAccessMode value.
+     * \pre When \a mode is AllowedDirectories, \a allowedDirs must not be empty.
      *
-     * @param mode The file access mode (Unrestricted or AllowedDirectories).
-     * @param allowedDirs List of allowed directory paths (only used in AllowedDirectories mode).
-     * @param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).
+     * \param mode The file access mode (Unrestricted or AllowedDirectories).
+     * \param allowedDirs List of allowed directory paths (only used in AllowedDirectories mode).
+     * \param tempDirectory Path to the temporary directory (always allowed in AllowedDirectories mode).
      */
     void SetFileAccessConfig(FileAccessMode mode, const std::vector<std::string>& allowedDirs, const std::string& tempDirectory);
 
     /**
-     * @brief Set the maximum number of concurrently active file-reference temp
+     * \brief Set the maximum number of concurrently active file-reference temp
      *        directories per client IP.  When a client exceeds the limit its
      *        oldest directory is evicted (deleted) to make room.  Default: 5.
      *
-     * @pre max >= 1.
+     * \pre max >= 1.
      */
     void SetMaxActiveTempDirsPerIp(size_t max);
 
     // Node operations
 
     /**
-     * @brief Handle GET /datastorage/nodes request.
+     * \brief Handle GET /datastorage/nodes request.
      *
      * Lists all nodes, optionally filtered.
      */
     void HandleGET_nodes(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle POST /datastorage/nodes request.
+     * \brief Handle POST /datastorage/nodes request.
      *
      * Creates a new node.
      */
     void HandlePOST_nodes(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid request.
+     * \brief Handle GET /datastorage/nodes/:uid request.
      *
      * Gets a single node by UID.
      */
     void HandleGET_nodes_uid(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PATCH /datastorage/nodes/:uid request.
+     * \brief Handle PATCH /datastorage/nodes/:uid request.
      *
      * Updates a node (e.g., reparenting).
      */
     void HandlePATCH_nodes_uid(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle DELETE /datastorage/nodes/:uid request.
+     * \brief Handle DELETE /datastorage/nodes/:uid request.
      *
      * Deletes a node.
      */
@@ -134,14 +134,14 @@ namespace mitk
     // Children operations
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid/children request.
+     * \brief Handle GET /datastorage/nodes/:uid/children request.
      *
      * Lists child nodes of a given node.
      */
     void HandleGET_nodes_uid_children(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle POST /datastorage/nodes/:uid/children request.
+     * \brief Handle POST /datastorage/nodes/:uid/children request.
      *
      * Creates a new child node.
      */
@@ -150,7 +150,7 @@ namespace mitk
     // Data operations
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid/data request.
+     * \brief Handle GET /datastorage/nodes/:uid/data request.
      *
      * Downloads the binary data of a node.
      * Supports direct mode (binary response) and file-reference mode (JSON with path).
@@ -158,7 +158,7 @@ namespace mitk
     void HandleGET_nodes_uid_data(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PUT /datastorage/nodes/:uid/data request.
+     * \brief Handle PUT /datastorage/nodes/:uid/data request.
      *
      * Uploads/replaces the binary data of a node.
      * Can also set data on nodes that currently have null data.
@@ -168,42 +168,42 @@ namespace mitk
     // Property operations
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid/properties request.
+     * \brief Handle GET /datastorage/nodes/:uid/properties request.
      *
      * Gets all properties of a node.
      */
     void HandleGET_nodes_uid_properties(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle GET /datastorage/nodes/:uid/properties/:property_key request.
+     * \brief Handle GET /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Gets a single property value.
      */
     void HandleGET_nodes_uid_properties_key(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PUT /datastorage/nodes/:uid/properties/:property_key request.
+     * \brief Handle PUT /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Sets a single property value.
      */
     void HandlePUT_nodes_uid_properties_key(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle DELETE /datastorage/nodes/:uid/properties/:property_key request.
+     * \brief Handle DELETE /datastorage/nodes/:uid/properties/:property_key request.
      *
      * Deletes a property.
      */
     void HandleDELETE_nodes_uid_properties_key(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PUT /datastorage/nodes/:uid/properties request.
+     * \brief Handle PUT /datastorage/nodes/:uid/properties request.
      *
      * Replaces all properties (full replacement).
      */
     void HandlePUT_nodes_uid_properties(const httplib::Request& req, httplib::Response& res);
 
     /**
-     * @brief Handle PATCH /datastorage/nodes/:uid/properties request.
+     * \brief Handle PATCH /datastorage/nodes/:uid/properties request.
      *
      * Updates multiple properties (merge semantics).
      */
@@ -214,57 +214,61 @@ namespace mitk
     void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error);
 
     /**
-     * @brief Send a binary response with appropriate headers.
+     * \brief Send a binary response with appropriate headers.
      *
-     * @param res The response object.
-     * @param data The binary data.
-     * @param filename The filename for Content-Disposition header (includes extension for format).
+     * \param res The response object.
+     * \param data The binary data.
+     * \param filename The filename for Content-Disposition header (includes extension for format).
      */
     void SendBinaryResponse(httplib::Response& res, const std::string& data,
                             const std::string& filename);
 
     /**
-     * @brief Parse query parameters for node list requests.
+     * \brief Parse query parameters for node list requests.
      */
     NodeQueryParams ParseNodeQueryParams(const httplib::Request& req) const;
 
     /**
-     * @brief Parse query parameters for property requests.
+     * \brief Parse query parameters for property requests.
      *
-     * @param req The HTTP request.
-     * @param defaultScope Default scope if not specified in request (default: All for GET, Node for PUT/PATCH).
-     * @return Parsed property query parameters.
+     * \param req The HTTP request.
+     * \param defaultScope Default scope if not specified in request (default: All for GET, Node for PUT/PATCH).
+     * 
+eturn Parsed property query parameters.
      */
     PropertyQueryParams ParsePropertyQueryParams(const httplib::Request& req, PropertyScope defaultScope = PropertyScope::All) const;
 
     /**
-     * @brief Determine transfer mode from request headers.
+     * \brief Determine transfer mode from request headers.
      *
      * Checks X-MITK-Transfer-Mode header and Accept header.
      *
-     * @param req The request.
-     * @return "direct" or "file-reference".
+     * \param req The request.
+     * 
+eturn "direct" or "file-reference".
      */
     std::string DetermineTransferMode(const httplib::Request& req) const;
 
     /**
-     * @brief Extract filename from Content-Disposition header.
+     * \brief Extract filename from Content-Disposition header.
      *
-     * @param req The request.
-     * @return The filename, or empty string if not found.
+     * \param req The request.
+     * 
+eturn The filename, or empty string if not found.
      */
     std::string ExtractFilenameFromContentDisposition(const httplib::Request& req) const;
 
     /**
-     * @brief Build data_metadata JSON for a BaseData object.
+     * \brief Build data_metadata JSON for a BaseData object.
      *
-     * @param data The data object.
-     * @return JSON with type-specific metadata.
+     * \param data The data object.
+     * 
+eturn JSON with type-specific metadata.
      */
     nlohmann::json BuildDataMetadata(const mitk::BaseData* data) const;
 
     /**
-     * @brief Result of resolving a data file path from a request.
+     * \brief Result of resolving a data file path from a request.
      */
     struct ResolveDataPathResult
     {
@@ -276,19 +280,20 @@ namespace mitk
     };
 
     /**
-     * @brief Resolve data file path from request body.
+     * \brief Resolve data file path from request body.
      *
      * Handles both direct transfer (binary body -> temp file) and
      * file-reference mode (JSON body with file_path).
      *
-     * @param req The HTTP request.
-     * @param contentType The Content-Type header value.
-     * @return Result with file path or error information.
+     * \param req The HTTP request.
+     * \param contentType The Content-Type header value.
+     * 
+eturn Result with file path or error information.
      */
     ResolveDataPathResult ResolveDataPath(const httplib::Request& req, const std::string& contentType);
 
     /**
-     * @brief Result of loading data from a file.
+     * \brief Result of loading data from a file.
      */
     struct LoadDataResult
     {
@@ -299,11 +304,12 @@ namespace mitk
     };
 
     /**
-     * @brief Load data from a file path.
+     * \brief Load data from a file path.
      *
-     * @param filePath The file path to load from.
-     * @param requestPath The original request path (for error messages).
-     * @return Result with loaded data or error information.
+     * \param filePath The file path to load from.
+     * \param requestPath The original request path (for error messages).
+     * 
+eturn Result with loaded data or error information.
      */
     LoadDataResult LoadDataFromFile(const std::string& filePath, const std::string& requestPath);
 
@@ -312,21 +318,22 @@ namespace mitk
 
 
     /**
-     * @brief Acquire a new per-request temp directory, enforcing the per-IP quota.
+     * \brief Acquire a new per-request temp directory, enforcing the per-IP quota.
      *
      * Creates the directory, registers it for the given client IP, and evicts
      * the oldest directory for that IP if the quota would be exceeded.
      *
-     * @param clientIp The remote IP address of the requesting client.
-     * @return Path to the newly created temp directory.
+     * \param clientIp The remote IP address of the requesting client.
+     * 
+eturn Path to the newly created temp directory.
      */
     fs::path AcquireRequestTempDir(const std::string& clientIp);
 
     /**
-     * @brief Release a per-request temp directory, deleting it and deregistering it.
+     * \brief Release a per-request temp directory, deleting it and deregistering it.
      *
-     * @param clientIp The remote IP address of the requesting client.
-     * @param dir      The directory path returned by AcquireRequestTempDir().
+     * \param clientIp The remote IP address of the requesting client.
+     * \param dir      The directory path returned by AcquireRequestTempDir().
      */
     void ReleaseRequestTempDir(const std::string& clientIp, const fs::path& dir);
 

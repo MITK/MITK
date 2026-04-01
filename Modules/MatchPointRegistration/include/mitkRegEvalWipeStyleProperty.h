@@ -29,9 +29,16 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration for visualization styles. Valid values are:
- * 0/Cross 1/horizontal wipe 2/vertical wipe
- * Default is "Cross"
+ * \brief Enumeration property defining the wipe style for the Wipe registration evaluation mode.
+ *
+ * Valid values are:
+ * - 0: Cross (wipe in both directions from the crosshair)
+ * - 1: Horizontal wipe
+ * - 2: Vertical wipe
+ *
+ * Default is "Cross".
+ *
+ * \sa mitk::RegEvalStyleProperty, mitk::RegEvaluationMapper2D
  */
 class MITKMATCHPOINTREGISTRATION_EXPORT RegEvalWipeStyleProperty : public EnumerationProperty
 {
@@ -41,8 +48,10 @@ public:
 
   itkNewMacro(RegEvalWipeStyleProperty);
 
+  /** \brief Constructs a RegEvalWipeStyleProperty from a numeric ID. */
   mitkNewMacro1Param(RegEvalWipeStyleProperty, const IdType&);
 
+  /** \brief Constructs a RegEvalWipeStyleProperty from a string name. */
   mitkNewMacro1Param(RegEvalWipeStyleProperty, const std::string&);
 
 

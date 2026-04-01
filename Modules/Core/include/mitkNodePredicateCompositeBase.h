@@ -18,39 +18,54 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Base class for all predicates that can have child predicates (e.g. AND/OR)
-  //##
-  //## This class provides methods to add and remove child predicates. It is used for
-  //## predicates that are compositions of other predicates like AND and OR.
-  //##
-  //## @ingroup DataStorage
+  /**
+   * \brief Abstract base class for composite predicates that contain child predicates (e.g., AND, OR, NOT).
+   *
+   * This class provides methods to add, remove, and retrieve child predicates.
+   * It serves as the foundation for predicates that combine multiple conditions,
+   * such as NodePredicateAnd, NodePredicateOr, and NodePredicateNot.
+   *
+   * \ingroup DataStorage
+   * \sa NodePredicateAnd, NodePredicateOr, NodePredicateNot, NodePredicateBase
+   */
   class MITKCORE_EXPORT NodePredicateCompositeBase : public NodePredicateBase
   {
   public:
     mitkClassMacro(NodePredicateCompositeBase, NodePredicateBase);
 
+    /** \brief List type for storing child predicate smart pointers. */
     typedef std::list<NodePredicateBase::ConstPointer> ChildPredicates;
 
-    //##Documentation
-    //## @brief Pure virtual (but implemented) Destructor makes NodePredicateCompositeBase an abstract class
+    /**
+     * \brief Pure virtual destructor (with implementation) making this class abstract.
+     */
     ~NodePredicateCompositeBase() override = 0;
 
-    //##Documentation
-    //## @brief Adds a child predicate
+    /**
+     * \brief Add a child predicate to this composite.
+     *
+     * \param[in] p  The child predicate to add. Must not be nullptr.
+     * \sa RemovePredicate, GetPredicates
+     */
     virtual void AddPredicate(const NodePredicateBase *p);
 
-    //##Documentation
-    //## @brief Removes a child predicate
+    /**
+     * \brief Remove a child predicate from this composite.
+     *
+     * \param[in] p  The child predicate to remove.
+     * \sa AddPredicate
+     */
     virtual void RemovePredicate(const NodePredicateBase *p);
 
-    //##Documentation
-    //## @brief Return all child predicates (immutable).
+    /**
+     * \brief Return all child predicates (immutable copy).
+     *
+     * \return A copy of the list of child predicates.
+     */
     virtual ChildPredicates GetPredicates() const;
 
   protected:
-    //##Documentation
-    //## @brief list of child predicates
+    /** \brief List of child predicates managed by this composite. */
     ChildPredicates m_ChildPredicates;
   };
 

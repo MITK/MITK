@@ -24,14 +24,22 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief Cuts a region of interest (ROI) out of an image
-
-  In the first step, this filter reduces the image region of the given ROI to a minimum. Using this region, a subvolume
-  ist cut out of the given input image.
-  The ROI is then used to mask the subvolume. Pixel inside the ROI will have their original value, pixel outside will be
-  replaced by m_OutsideValue
-
-  */
+   * \brief Cuts and masks a region of interest (ROI) out of an image.
+   *
+   * This filter performs a three-step operation:
+   * 1. The ROI mask image is auto-cropped to its minimal bounding region.
+   * 2. The corresponding subvolume is extracted from the input image.
+   * 3. The subvolume is masked with the ROI so that pixels outside the ROI
+   *    are replaced by an outside value (-32765).
+   *
+   * The ROI can be provided as a mitk::Image (binary mask) or as a
+   * mitk::BoundingObject, which is internally converted to a binary mask.
+   *
+   * \sa AutoCropImageFilter
+   * \sa MaskImageFilter
+   * \sa BoundingObjectToSegmentationFilter
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT MaskAndCutRoiImageFilter : public ImageToImageFilter
   {
     typedef itk::Image<short, 3> ItkImageType;
@@ -44,12 +52,21 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Set the region of interest.
+     *
+     * The ROI can be either a mitk::Image (used directly as a binary mask) or a
+     * mitk::BoundingObject (internally converted to a binary mask using
+     * BoundingObjectToSegmentationFilter).
+     *
+     * \param[in] roi The region of interest as a BaseData (Image or BoundingObject).
+     */
     void SetRegionOfInterest(mitk::BaseData *roi);
-    // void SetRegionOfInterest(Image::Pointer image);
-    // void SetRegionOfInterest(BoundingObject::Pointer boundingObject);
-    // void SetRegionOfInterestByNode(mitk::DataNode::Pointer node);
 
-    // temporary fix for bug #
+    /**
+     * \brief Get the output image.
+     * \return Smart pointer to the masked and cut output image.
+     */
     mitk::Image::Pointer GetOutput();
 
   protected:

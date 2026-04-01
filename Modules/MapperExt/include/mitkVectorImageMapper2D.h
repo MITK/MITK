@@ -32,6 +32,15 @@ namespace mitk
   class BaseRenderer;
   class PlaneGeometry;
 
+  /** \brief OpenGL-based mapper for rendering 2D vector field visualizations.
+   *
+   * Renders vector image data as glyph arrows on 2D slice views. Each voxel's
+   * vector direction is visualized as an arrow glyph. An explicit image can be
+   * set via SetImage() to override the data node's associated image.
+   *
+   * \sa GLMapper
+   * \ingroup Mapper
+   */
   class MITKMAPPEREXT_EXPORT VectorImageMapper2D : public GLMapper
   {
   public:
@@ -41,28 +50,48 @@ namespace mitk
 
     itkCloneMacro(Self) typedef double vtkScalarType;
 
-    /**
-     * @returns the image held by the associated with the mapper or the image
-     *          which has been explicitly set by SetImage(...)
+    /** \brief Get the input image to render.
+     *
+     * Returns the explicitly set image if available, otherwise the image
+     * from the associated data node.
+     *
+     * \return The input image, or \c nullptr if none is available.
      */
     const mitk::Image *GetInput(void);
 
+    /** \brief Render the vector field as glyphs on the current 2D slice.
+     *
+     * \param[in] renderer The renderer to paint into.
+     */
     void Paint(mitk::BaseRenderer *renderer) override;
 
-    /**
-     * Explicitly set an vector image. This image will be used for
-     * rendering instead of the image returned by GetData()
+    /** \brief Explicitly set a vector image for rendering.
+     *
+     * When set, this image is used instead of the image from GetData().
+     *
+     * \param[in] _arg The vector image to render.
      */
     itkSetConstObjectMacro(Image, mitk::Image);
 
-    /**
-     * Get the explicitly set image
-     * @returns nullptr if no Image has been set instead of GetData();
+    /** \brief Get the explicitly set image.
+     *
+     * \return The explicitly set image, or \c nullptr if none was set.
      */
     itkGetConstObjectMacro(Image, mitk::Image);
 
+    /** \brief Render the cells of a contour poly data as vector glyphs.
+     *
+     * \param[in] contour       The poly data contour to render.
+     * \param[in] worldGeometry The current world geometry (unused).
+     * \param[in] vtktransform  The VTK linear transform for coordinate conversion.
+     * \param[in] renderer      The renderer to paint into.
+     * \param[in] lut           The lookup table for scalar-to-color mapping.
+     * \param[in] color         The default glyph color.
+     * \param[in] lwidth        The line width for rendering.
+     * \param[in] spacing       The voxel spacing array.
+     */
     virtual void PaintCells(vtkPolyData *contour,
-                            const PlaneGeometry * /*worldGeometry*/,
+                            const PlaneGeometry *worldGeometry,
                             vtkLinearTransform *vtktransform,
                             BaseRenderer *renderer,
                             vtkScalarsToColors *lut,

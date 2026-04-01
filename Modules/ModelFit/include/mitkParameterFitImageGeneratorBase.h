@@ -50,9 +50,9 @@ namespace mitk
     /** Commences the model fit over the dynamic image data. Stores the fitted parameter in
     * parameter images. After this method call is finished the parameter images can be retrieved via
     * GetParameterImages.
-    * @pre Model must be set
-    * @pre DynamicImage must be set
-    * @post Parameter image map contains an image for every parameter of the model referenced by the parameter name.*/
+    * \pre Model must be set
+    * \pre DynamicImage must be set
+    * \post Parameter image map contains an image for every parameter of the model referenced by the parameter name.*/
     void Generate();
 
     /** Returns the fitted/generated parameter images. Triggers Generate() if result is outdated.*/

@@ -23,6 +23,16 @@ namespace us
 
 namespace mitk
 {
+  /**
+   * \brief Interactive GrowCut segmentation tool.
+   *
+   * Implements the GrowCut algorithm as an interactive segmentation tool with preview.
+   * The user provides seed labels (foreground and background) and the algorithm grows
+   * the segmentation based on intensity similarity with an optional distance penalty.
+   *
+   * \ingroup ToolManagerEtAl
+   * \sa GrowCutSegmentationFilter, SegWithPreviewTool
+   */
   class MITKSEGMENTATION_EXPORT GrowCutTool : public SegWithPreviewTool
   {
   public:
@@ -30,18 +40,31 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Sets the distance penalty factor for GrowCut. */
     itkSetMacro(DistancePenalty, double);
+
+    /** \brief Returns the distance penalty factor. */
     itkGetConstMacro(DistancePenalty, double);
 
+    /** \brief Type of the seed image used by GrowCut. */
     typedef itk::Image<DefaultSegmentationDataType, 3> SeedImageType;
+
+    /** \brief Index type for the seed image. */
     typedef typename SeedImageType::IndexType IndexType;
 
+    /** \brief Returns the display name of this tool ("GrowCut"). */
     const char *GetName() const override;
+
+    /** \brief Returns the icon resource for this tool's button. */
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
     void Deactivated() override;
 
+    /**
+     * \brief Checks whether the current seed image is valid for running GrowCut.
+     * \return true if the seed image contains valid seed labels, false otherwise.
+     */
     bool SeedImageIsValid();
 
   protected:

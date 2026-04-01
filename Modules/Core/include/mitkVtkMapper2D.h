@@ -17,8 +17,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  // typedef allows integration of mappers into the new mapper architecture
-  // \deprecatedSince{2013_03} Use VtkMapper instead.
+  /** \brief Deprecated typedef for VtkMapper.
+   * \deprecatedSince{2013_03} Use VtkMapper instead.
+   */
   DEPRECATED(typedef VtkMapper VtkMapper2D);
 
 } // namespace mitk

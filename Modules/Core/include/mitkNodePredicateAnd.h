@@ -17,13 +17,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Composite predicate that forms a logical AND relation from its child predicates
-  //##
-  //##
-  //##
-  //##
-  //## @ingroup DataStorage
+  /**
+   * \brief Composite predicate that forms a logical AND (conjunction) from its child predicates.
+   *
+   * A node passes the check if and only if all child predicates return true.
+   * Child predicates are evaluated in order; evaluation short-circuits on the first false result.
+   *
+   * \code
+   * auto pred = NodePredicateAnd::New(
+   *   NodePredicateDataType::New("Image"),
+   *   NodePredicateProperty::New("visible", BoolProperty::New(true)));
+   * auto visibleImages = dataStorage->GetSubset(pred);
+   * \endcode
+   *
+   * \ingroup DataStorage
+   * \sa NodePredicateOr, NodePredicateNot, NodePredicateCompositeBase
+   */
   class MITKCORE_EXPORT NodePredicateAnd : public NodePredicateCompositeBase
   {
   public:
@@ -36,12 +45,18 @@ namespace mitk
                        const NodePredicateBase *,
                        const NodePredicateBase *);
 
-    //##Documentation
-    //## @brief Standard Destructor
+    /**
+     * \brief Destructor.
+     */
     ~NodePredicateAnd() override;
 
-    //##Documentation
-    //## @brief Checks, if the node fulfills all of the subpredicates conditions
+    /**
+     * \brief Check whether the node satisfies all child predicates (logical AND).
+     *
+     * \param[in] node  The DataNode to evaluate. Must not be nullptr.
+     * \return \a true if all child predicates return true for the node.
+     * \throw std::invalid_argument if no child predicates have been added or \a node is nullptr.
+     */
     bool CheckNode(const DataNode *node) const override;
 
   protected:

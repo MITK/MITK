@@ -25,7 +25,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief VTK-based writer for mitk::UnstructuredGrid
+   * \brief VTK-based writer for mitk::UnstructuredGrid.
    *
    * The mitk::UnstructuredGrid is written using the VTK-writer-type provided as the
    * template argument. If the mitk::UnstructuredGrid contains multiple points of
@@ -36,7 +36,9 @@ namespace mitk
    * (S=start, E=end, T=time).
    * Writing of multiple files according to a given filename pattern is not
    * yet supported.
-  */
+   *
+   * \tparam VTKWRITER The VTK writer type to use (e.g. vtkUnstructuredGridWriter).
+   */
   template <class VTKWRITER>
   class UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
   {
@@ -49,58 +51,39 @@ namespace mitk
 
       mitkWriterMacro;
 
-    /**
-     * Sets the filename of the file to write.
-     * @param _arg the name of the file to write.
-     */
+    /** \brief Set the filename of the file to write. */
     itkSetStringMacro(FileName);
 
-    /**
-     * @returns the name of the file to be written to disk.
-     */
+    /** \brief Return the name of the file to be written to disk. */
     itkGetStringMacro(FileName);
 
-    /**
-     * @warning multiple write not (yet) supported
-     */
+    /** \brief Set the file prefix. \warning Multiple write not (yet) supported. */
     itkSetStringMacro(FilePrefix);
 
-    /**
-     * @warning multiple write not (yet) supported
-     */
+    /** \brief Return the file prefix. \warning Multiple write not (yet) supported. */
     itkGetStringMacro(FilePrefix);
 
-    /**
-     * @warning multiple write not (yet) supported
-     */
+    /** \brief Set the file pattern. \warning Multiple write not (yet) supported. */
     itkSetStringMacro(FilePattern);
 
-    /**
-     * @warning multiple write not (yet) supported
-     */
+    /** \brief Return the file pattern. \warning Multiple write not (yet) supported. */
     itkGetStringMacro(FilePattern);
 
     using FileWriter::SetInput;
 
     /**
-     * Sets the 0'th input object for the filter.
-     * @param input the first input for the filter.
+     * \brief Set the input data object to write.
+     * \param input The BaseData (expected to be an UnstructuredGrid).
      */
     void SetInput(BaseData *input);
 
-    /**
-     * @returns the 0'th input object of the filter.
-     */
+    /** \brief Return the input UnstructuredGrid. */
     const UnstructuredGrid *GetInput();
 
-    /**
-     * Returns false if an error happened during writing
-     */
+    /** \brief Return false if an error occurred during writing. */
     itkGetMacro(Success, bool);
 
-    /**
-    * @brief Return the possible file extensions for the data type associated with the writer
-    */
+    /** \brief Return the possible file extensions for this writer's data type. */
     std::vector<std::string> GetPossibleFileExtensions() override;
 
     std::string GetSupportedBaseData() const override { return UnstructuredGrid::GetStaticNameOfClass(); }

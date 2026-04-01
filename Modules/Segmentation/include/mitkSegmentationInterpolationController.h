@@ -42,25 +42,19 @@ namespace mitk
     \attention mitk::SegmentationInterpolationController assumes that the image contains pixel values of 0 and 1.
 
     After you set the segmentation image using SetSegmentationVolume(), the whole image is scanned for pixels other than
-    0.
-    SegmentationInterpolationController registers as an observer to the segmentation image, and repeats the scan
-    whenvever the
-    image is modified.
+    0. SegmentationInterpolationController registers as an observer to the segmentation image, and repeats the scan
+    whenever the image is modified.
 
     You can prevent this (time consuming) scan if you do the changes slice-wise and send difference images to
     SegmentationInterpolationController.
     For this purpose SetChangedSlice() should be used. mitk::OverwriteImageFilter already does this every time it
-    changes a
-    slice of an image. There is a static method InterpolatorForImage(), which can be used to find out if there already
-    is an interpolator
-    instance for a specified image. OverwriteImageFilter uses this to get to know its interpolator.
+    changes a slice of an image. There is a static method InterpolatorForImage(), which can be used to find out if there
+    already is an interpolator instance for a specified image. OverwriteImageFilter uses this to get to know its
+    interpolator.
 
     SegmentationInterpolationController needs to maintain some information about the image slices (in every dimension).
     This information is stored internally in m_SegmentationCountInSlice, which is basically three std::vectors (one for
-    each dimension).
-    Each item describes one image dimension, each vector item holds the count of pixels in "its" slice.
-
-    $Author$
+    each dimension). Each item describes one image dimension, each vector item holds the count of pixels in "its" slice.
   */
   class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::Object
   {
@@ -115,6 +109,10 @@ namespace mitk
                          unsigned int sliceDimension,
                          unsigned int sliceIndex,
                          unsigned int timeStep);
+    /** \brief Update after changing an entire volume at a given time step.
+      \param sliceDiff The difference image for the changed volume.
+      \param timeStep Which time step is changed.
+    */
     void SetChangedVolume(const Image *sliceDiff, unsigned int timeStep);
 
     /**
@@ -136,6 +134,9 @@ namespace mitk
                                unsigned int timeStep,
                                mitk::ShapeBasedInterpolationAlgorithm::Pointer algorithm = nullptr);
 
+    /** \brief Callback invoked when the observed segmentation image is modified.
+      Triggers a full rescan of the segmentation volume unless modifications are blocked.
+    */
     void OnImageModified(const itk::EventObject &);
 
     /**

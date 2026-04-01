@@ -26,7 +26,7 @@ class vtkPolyDataMapper2D;
 namespace mitk
 {
   /**
-    * @brief Vtk-based 2D mapper for rendering a crosshair with the plane geometry.
+    * \brief VTK-based 2D mapper for rendering a crosshair with the plane geometry.
     *
     * This mapper uses the mitkPlaneGeometryData from the three helper objects in
     * the StdMultiWidget to render a crosshair in all 2D render windows. The crosshair
@@ -40,7 +40,9 @@ namespace mitk
     * \b Crosshair.Orientation Decoration: Adds a PlaneOrientationProperty, which
     * indicates the direction of the plane normal. See mitkPlaneOrientationProperty.
     *
-    * @ingroup Mapper
+    * \ingroup Mapper
+    * \sa PlaneGeometryData
+    * \sa PlaneOrientationProperty
     */
   class MITKCORE_EXPORT PlaneGeometryDataMapper2D : public VtkMapper
   {
@@ -51,15 +53,28 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+      /** \brief Get the PlaneGeometryData input of this mapper. */
       virtual const mitk::PlaneGeometryData *GetInput() const;
 
-    /** \brief returns the a prop assembly */
+    /**
+     * \brief Get the VTK prop assembly for the given renderer.
+     * \param renderer The renderer for which to return the VTK prop.
+     * \return The assembled vtkProp containing the crosshair visualization.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** Applies properties specific to this mapper */
+    /**
+     * \brief Apply all visual properties specific to this mapper.
+     * \param renderer The renderer whose properties to apply.
+     */
     virtual void ApplyAllProperties(BaseRenderer *renderer);
 
-    /** \brief set the default properties for this mapper */
+    /**
+     * \brief Set the default properties for this mapper on the given node.
+     * \param node The data node on which to set default properties.
+     * \param renderer The renderer context. If nullptr, properties apply to all renderers.
+     * \param overwrite If true, existing properties are overwritten.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -92,17 +107,25 @@ namespace mitk
     /* destructor */
     ~PlaneGeometryDataMapper2D() override;
 
-    /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
+    /** \brief Apply color and opacity properties, then create VTK render objects. */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
+    /** \brief Create the VTK crosshair representation for the given renderer. */
     void CreateVtkCrosshair(BaseRenderer *renderer);
 
+    /** \brief Test if a point lies within the given PlaneGeometry bounds. */
     static bool TestPointInPlaneGeometry(const PlaneGeometry *planeGeometry, const Point3D &point);
+
+    /** \brief Test if a point lies within the given reference geometry bounds. */
     static bool TestPointInReferenceGeometry(const BaseGeometry *referenceGeometry, const Point3D &point);
 
+    /** \brief Clip a crosshair line segment to the bounds of the given PlaneGeometry. */
     static bool CutCrossLineWithPlaneGeometry(const PlaneGeometry *planeGeometry, Line3D &crossLine);
+
+    /** \brief Clip a crosshair line segment to the bounds of the given reference geometry. */
     static bool CutCrossLineWithReferenceGeometry(const BaseGeometry *referenceGeometry, Line3D &crossLine);
 
+    /** \brief Add a line segment between two 3D points to VTK data structures. */
     void DrawLine(Point3D p0, Point3D p1, vtkCellArray *lines, vtkPoints *points);
 
     // member variables holding the current value of the properties used in this mapper

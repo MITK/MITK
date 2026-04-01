@@ -41,8 +41,8 @@ class ServicePropertiesImpl;
  * \note This class is provided as public API for low-level service management only.
  *       In almost all cases you should use the template ServiceRegistration instead.
  *
- * @see ModuleContext#RegisterService()
- * @remarks This class is thread safe.
+ * \sa ModuleContext#RegisterService()
+ * \remarks This class is thread safe.
  */
 class MITKCPPMICROSERVICES_EXPORT ServiceRegistrationBase
 {
@@ -53,10 +53,11 @@ private:
 
 public:
 
+  /** \brief Copy constructor. */
   ServiceRegistrationBase(const ServiceRegistrationBase& reg);
 
   /**
-   * A boolean conversion operator converting this ServiceRegistrationBase object
+   * \brief A boolean conversion operator converting this ServiceRegistrationBase object
    * to \c true if it is valid and to \c false otherwise. A SeriveRegistration
    * object is invalid if it was default-constructed or was invalidated by
    * assigning 0 to it.
@@ -69,31 +70,32 @@ public:
   operator bool_type() const;
 
   /**
-   * Releases any resources held or locked by this
+   * \brief Releases any resources held or locked by this
    * <code>ServiceRegistrationBase</code> and renders it invalid.
    *
    * \return This ServiceRegistrationBase object.
    */
   ServiceRegistrationBase& operator=(int null);
 
+  /** \brief Destructor. */
   ~ServiceRegistrationBase();
 
   /**
-   * Returns a <code>ServiceReference</code> object for a service being
+   * \brief Returns a <code>ServiceReference</code> object for a service being
    * registered.
    * <p>
    * The <code>ServiceReference</code> object may be shared with other
    * modules.
    *
-   * @throws std::logic_error If this
+   * \throws std::logic_error If this
    *         <code>ServiceRegistrationBase</code> object has already been
    *         unregistered or if it is invalid.
-   * @return <code>ServiceReference</code> object.
+   * \return <code>ServiceReference</code> object.
    */
   ServiceReferenceBase GetReference(const std::string& interfaceId = std::string()) const;
 
   /**
-   * Updates the properties associated with a service.
+   * \brief Updates the properties associated with a service.
    *
    * <p>
    * The ServiceConstants#OBJECTCLASS and ServiceConstants#SERVICE_ID keys
@@ -107,20 +109,20 @@ public:
    * <li>A service event of type ServiceEvent#MODIFIED is fired.
    * </ol>
    *
-   * @param properties The properties for this service. See {@link ServiceProperties}
+   * \param[in] properties The properties for this service. See {@link ServiceProperties}
    *        for a list of standard service property keys. Changes should not
    *        be made to this object after calling this method. To update the
    *        service's properties this method should be called again.
    *
-   * @throws std::logic_error If this <code>ServiceRegistrationBase</code>
+   * \throws std::logic_error If this <code>ServiceRegistrationBase</code>
    *         object has already been unregistered or if it is invalid.
-   * @throws std::invalid_argument If <code>properties</code> contains
+   * \throws std::invalid_argument If <code>properties</code> contains
    *         case variants of the same key name.
    */
   void SetProperties(const ServiceProperties& properties);
 
   /**
-   * Unregisters a service. Remove a <code>ServiceRegistrationBase</code> object
+   * \brief Unregisters a service. Remove a <code>ServiceRegistrationBase</code> object
    * from the framework service registry. All <code>ServiceRegistrationBase</code>
    * objects associated with this <code>ServiceRegistrationBase</code> object
    * can no longer be used to interact with the service once unregistration is
@@ -144,32 +146,37 @@ public:
    * the service object for the module.
    * </ol>
    *
-   * @throws std::logic_error If this
+   * \throws std::logic_error If this
    *         <code>ServiceRegistrationBase</code> object has already been
    *         unregistered or if it is invalid.
-   * @see ModuleContext#UngetService
-   * @see ServiceFactory#UngetService
+   * \sa ModuleContext#UngetService
+   * \sa ServiceFactory#UngetService
    */
   void Unregister();
 
+  /** \brief Returns whether the service is still registered. */
   bool IsAvailable() const;
 
   /**
-   * Compare two ServiceRegistrationBase objects.
+   * \brief Compare two ServiceRegistrationBase objects.
    *
    * If both ServiceRegistrationBase objects are valid, the comparison is done
    * using the underlying ServiceReference object. Otherwise, this ServiceRegistrationBase
    * object is less than the other object if and only if this object is invalid and
    * the other object is valid.
    *
-   * @param o The ServiceRegistrationBase object to compare with.
-   * @return \c true if this ServiceRegistrationBase object is less than the other object.
+   * \param[in] o The ServiceRegistrationBase object to compare with.
+   * \return \c true if this ServiceRegistrationBase object is less than the other object.
    */
   bool operator<(const ServiceRegistrationBase& o) const;
 
+  /** \brief Equality comparison operator. */
   bool operator==(const ServiceRegistrationBase& registration) const;
+
+  /** \brief Equality comparison with nullptr. */
   bool operator==(std::nullptr_t) const noexcept;
 
+  /** \brief Copy assignment operator. */
   ServiceRegistrationBase& operator=(const ServiceRegistrationBase& registration);
 
 

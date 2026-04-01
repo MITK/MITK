@@ -26,14 +26,16 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief
-   * @ingroup MitkContourModelModule
-  */
+   * \brief Reader for mitk::ContourModelSet objects stored in XML format.
+   * \ingroup MitkContourModelModule
+   */
   class ContourModelSetReader : public mitk::AbstractFileReader
   {
   public:
+    /** \brief Copy constructor. */
     ContourModelSetReader(const ContourModelSetReader &other);
 
+    /** \brief Default constructor. Registers reader for the ContourModelSet MIME type. */
     ContourModelSetReader();
 
     ~ContourModelSetReader() override;
@@ -41,6 +43,10 @@ namespace mitk
     using AbstractFileReader::Read;
 
   protected:
+    /**
+     * \brief Perform the actual reading of ContourModelSet data from the file.
+     * \return A vector of loaded BaseData objects (ContourModelSets).
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:

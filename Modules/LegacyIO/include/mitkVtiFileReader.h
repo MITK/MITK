@@ -19,27 +19,47 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Reader to read image files in vtk file format
-  //## @ingroup MitkLegacyIOModule
-  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  /**
+   * \brief Reader for VTK XML ImageData (.vti) files.
+   *
+   * Reads image data from VTK XML ImageData format files using
+   * vtkXMLImageDataReader and converts the result to a mitk::Image.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::VtiFileIOFactory, mitk::ImageSource, mitk::FileReader
+   */
   class DEPRECATED() MITKLEGACYIO_EXPORT VtiFileReader : public ImageSource, public FileReader
   {
   public:
     mitkClassMacro(VtiFileReader, FileReader);
 
-    /** Method for creation through the object factory. */
+    /** \brief Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Set the file name of the VTI file to read. */
     itkSetStringMacro(FileName);
+    /** \brief Get the file name of the VTI file to read. */
     itkGetStringMacro(FileName);
 
+    /** \brief Set the file prefix. */
     itkSetStringMacro(FilePrefix);
+    /** \brief Get the file prefix. */
     itkGetStringMacro(FilePrefix);
 
+    /** \brief Set the file pattern. */
     itkSetStringMacro(FilePattern);
+    /** \brief Get the file pattern. */
     itkGetStringMacro(FilePattern);
 
+    /**
+     * \brief Check whether the given file can be read as a VTI file.
+     * \param[in] filename The file path to check (must have ".vti" extension).
+     * \param[in] filePrefix The file prefix (currently unused).
+     * \param[in] filePattern The file pattern (currently unused).
+     * \return \c true if the file has a VTI extension; \c false otherwise.
+     */
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
@@ -49,8 +69,7 @@ namespace mitk
 
     void GenerateData() override;
 
-    //##Description
-    //## @brief Time when Header was last read
+    /** \brief Time when header was last read. */
     // itk::TimeStamp m_ReadHeaderTime;
 
   protected:

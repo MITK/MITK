@@ -21,10 +21,14 @@ found in the LICENSE file.
 #include <itkVectorImage.h>
 
 /** \file mitkPixelTypeTraits.h
+  * \brief Compile-time type traits for resolving pixel component types, composite pixel types,
+  *        and ITK image types from MITK pixel type information.
   *
   * The pixel type traits are in general used for compile time resolution of the component type and
   * the number of components for compound types like the ones in ItkImageType.
-  * The default values are used to define the corresponding variable also for scalar types
+  * The default values are used to define the corresponding variable also for scalar types.
+  *
+  * \ingroup Core
   */
 
 namespace itk
@@ -34,6 +38,17 @@ namespace itk
   class VariableLengthVector;
 }
 
+/**
+ * \brief Register a custom pixel component type with the MITK type system.
+ *
+ * Creates a specialization of MapPixelComponentType for \a type mapping it to the
+ * integer constant \a ctype, and a specialization of PixelComponentTypeToString
+ * returning \a name.
+ *
+ * \param type  The C++ type to register (e.g. \c MyScalarType).
+ * \param ctype An integer constant identifying this component type.
+ * \param name  A human-readable string name for the type.
+ */
 #define MITK_PIXEL_COMPONENT_TYPE(type, ctype, name)                                                                   \
   template <>                                                                                                          \
   struct mitk::MapPixelComponentType<type>                                                                             \
@@ -47,7 +62,10 @@ namespace itk
 
 namespace mitk
 {
+  /** \brief Starting integer value for user-defined pixel types (beyond the built-in ITK pixel types). */
   static const int PixelUserType = static_cast<int>(itk::IOPixelEnum::MATRIX) + 1;
+
+  /** \brief Starting integer value for user-defined pixel component types (beyond the built-in ITK component types). */
   static const int PixelComponentUserType = static_cast<int>(itk::IOComponentEnum::DOUBLE) + 1;
 
   /**
@@ -102,6 +120,15 @@ namespace mitk
   /** \brief Partial specialization (double) for the isPrimitiveType object */
   DEFINE_TYPE_PRIMITIVE(double);
 
+  /**
+   * \brief Compile-time trait that maps a pixel type and dimension to the corresponding ITK image type.
+   *
+   * For scalar and fixed-length compound pixel types, maps to \c itk::Image.
+   * For \c itk::VariableLengthVector pixel types, maps to \c itk::VectorImage.
+   *
+   * \tparam TPixelType  The pixel type.
+   * \tparam VDimension  The image dimension (0 means the type itself is an image type).
+   */
   template <typename TPixelType, unsigned int VDimension = 0>
   struct ImageTypeTrait
   {
@@ -109,6 +136,7 @@ namespace mitk
     static const bool IsVectorImage = false;
   };
 
+  /** \brief Specialization of ImageTypeTrait for itk::VariableLengthVector pixel types (vector images). */
   template <typename TPixelType, unsigned int VDimension>
   struct ImageTypeTrait<itk::VariableLengthVector<TPixelType>, VDimension>
   {
@@ -116,6 +144,7 @@ namespace mitk
     static const bool IsVectorImage = true;
   };
 
+  /** \brief Specialization of ImageTypeTrait when VDimension is 0 (type is already an image type). */
   template <typename T>
   struct ImageTypeTrait<T, 0>
   {
@@ -123,6 +152,7 @@ namespace mitk
     static const bool IsVectorImage = false;
   };
 
+  /** \brief Specialization of ImageTypeTrait for itk::VectorImage when VDimension is 0. */
   template <typename TPixelType, unsigned int VDimension>
   struct ImageTypeTrait<itk::VectorImage<TPixelType, VDimension>, 0>
   {
@@ -171,7 +201,10 @@ namespace mitk
     static const size_t Size = T::ValueType::Length;
   };
 
+  /** \brief Type alias for the ITK pixel type enumeration. */
   typedef itk::IOPixelEnum itkIOPixelType;
+
+  /** \brief Type alias for the ITK component type enumeration. */
   typedef itk::IOComponentEnum itkIOComponentType;
 
   /** \brief Object for compile-time translation of a composite pixel type into an itk::ImageIOBase::IOPixelType

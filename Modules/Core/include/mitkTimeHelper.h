@@ -17,8 +17,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //## @brief convert the start- and end-index-time of output-region in
-  //## start- and end-index-time of input-region via millisecond-time
+  /**
+   * \brief Convert the start- and end-index-time of output-region in
+   * start- and end-index-time of input-region via millisecond-time.
+   *
+   * \param outputTimeGeometry The time geometry of the output data.
+   * \param outputRegion The output region whose time indices are to be converted.
+   * \param inputTimeGeometry The time geometry of the input data.
+   * \param inputRegion The input region that will receive the converted time indices.
+   */
   template <class TOutputRegion, class TInputRegion>
   void GenerateTimeInInputRegion(const mitk::TimeGeometry *outputTimeGeometry,
                                  const TOutputRegion &outputRegion,
@@ -46,9 +53,13 @@ namespace mitk
       inputRegion.SetSize(3, 1);
   }
 
-  //##Documentation
-  //## @brief convert the start- and end-index-time of output in
-  //## start- and end-index-time of input1 and input2 via millisecond-time
+  /**
+   * \brief Convert the start- and end-index-time of output in
+   * start- and end-index-time of input1 and input2 via millisecond-time.
+   *
+   * \param output The output data whose time region is used as reference.
+   * \param input The input data whose requested region will be updated.
+   */
   template <class TOutputData, class TInputData>
   void GenerateTimeInInputRegion(const TOutputData *output, TInputData *input)
   {

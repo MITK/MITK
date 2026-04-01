@@ -21,8 +21,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Create instances of VtkVolumeTimeSeriesReader objects using an object factory.
+  /**
+   * \brief Create instances of VtkVolumeTimeSeriesReader objects using an object factory.
+   */
   class VtkVolumeTimeSeriesIOFactory : public itk::ObjectFactoryBase
   {
   public:

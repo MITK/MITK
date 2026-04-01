@@ -26,6 +26,22 @@ namespace Ui
   class QmitknnInteractiveToolGUI;
 }
 
+/** \brief GUI widget for the nnInteractiveTool segmentation tool.
+ *
+ * This class provides the user interface for the nnInteractive segmentation
+ * tool. It extends QmitkSegWithPreviewToolGUIBase and manages:
+ *
+ * - Session initialization and settings (initialize button, settings)
+ * - Prompt type selection (positive / negative)
+ * - Interactor mode buttons (point, box, scribble, lasso)
+ * - Auto-zoom and auto-refine options
+ * - Mask-based session initialization
+ * - Keyboard shortcuts for common actions (R: reset, C: confirm,
+ *   T: toggle prompt type, P/B/S/L: toggle interactors)
+ *
+ * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
+ *     QmitknnInteractiveInstallDialog
+ */
 class MITKPYTHONSEGMENTATIONUI_EXPORT QmitknnInteractiveToolGUI : public QmitkSegWithPreviewToolGUIBase
 {
   Q_OBJECT
@@ -35,31 +51,130 @@ public:
   itkFactorylessNewMacro(Self);
 
 protected:
+  /** \brief Alias for mitk::nnInteractive::InteractionType. */
   using InteractionType = mitk::nnInteractive::InteractionType;
+
+  /** \brief Alias for mitk::nnInteractive::PromptType. */
   using PromptType = mitk::nnInteractive::PromptType;
 
+  /** \brief Constructs the GUI with confirm segmentation button disabled by default.
+   */
   QmitknnInteractiveToolGUI();
+
+  /** \brief Destructor. Restores any override cursors and disconnects events.
+   */
   ~QmitknnInteractiveToolGUI() override;
 
+  /** \brief Initializes the UI widgets and connects signals.
+   *
+   * Sets up the form from the .ui file, initializes icons, prompt type
+   * buttons, interactor buttons, checkboxes, keyboard shortcuts, and
+   * connects all signal/slot connections.
+   *
+   * \param[in] mainLayout The parent layout to add the GUI widgets to.
+   */
   void InitializeUI(QBoxLayout* mainLayout) override;
+
+  /** \brief Initializes the prompt type button group and shortcut.
+   */
   void InitializePromptType();
+
+  /** \brief Initializes the interactor toggle buttons with icons and shortcuts.
+   */
   void InitializeInteractorButtons();
+
+  /** \brief Enables or disables the initialize and settings buttons.
+   *
+   * \param[in] enabled Whether the buttons should be enabled.
+   */
   void EnableInitializeButtons(bool enabled);
 
+  /** \brief Handles the initialize button toggle event.
+   *
+   * Creates the virtual environment, Python context, and installs
+   * nnInteractive if needed, then starts the inference session.
+   *
+   * \param[in] checked Whether the button is checked (unused).
+   */
   void OnInitializeButtonToggled(bool checked);
+
+  /** \brief Opens the nnInteractive preferences dialog.
+   */
   void OnSettingsButtonClicked();
+
+  /** \brief Resets all interactions and switches to positive prompt type.
+   */
   void OnResetInteractionsButtonClicked();
+
+  /** \brief Handles auto-refine checkbox toggle.
+   *
+   * \param[in] checked Whether auto-refine should be enabled.
+   */
   void OnAutoRefineCheckBoxToggled(bool checked);
+
+  /** \brief Handles auto-zoom checkbox toggle.
+   *
+   * \param[in] checked Whether auto-zoom should be enabled.
+   */
   void OnAutoZoomCheckBoxToggled(bool checked);
+
+  /** \brief Handles prompt type changes between positive and negative.
+   *
+   * Re-enables the currently active interactor with the new prompt type
+   * and updates the cursor accordingly.
+   */
   void OnPromptTypeChanged();
+
+  /** \brief Handles toggling of an interactor button.
+   *
+   * When checked, enables the corresponding interactor and sets an
+   * appropriate cursor. When unchecked, disables the interactor and
+   * restores the default cursor.
+   *
+   * \param[in] interactionType The interaction type being toggled.
+   * \param[in] checked Whether the interactor should be enabled.
+   */
   void OnInteractorToggled(mitk::nnInteractive::InteractionType interactionType, bool checked);
+
+  /** \brief Handles the mask initialization button click.
+   *
+   * Prompts the user to confirm initialization with the active label of
+   * the working segmentation, then resets interactions and initializes
+   * the session with the label mask.
+   */
   void OnMaskButtonClicked();
+
+  /** \brief Handles cleanup confirmation from the tool.
+   *
+   * \param[in] isConfirmed Whether the cleanup was confirmed.
+   */
   void OnConfirmCleanUp(bool isConfirmed);
 
+  /** \brief Returns the connected nnInteractiveTool.
+   *
+   * \return Pointer to the connected nnInteractiveTool.
+   */
   mitk::nnInteractiveTool* GetTool();
+
+  /** \brief Unchecks all interactor buttons except the specified one.
+   *
+   * \param[in] interactorButton The button to keep checked, or \c nullptr
+   *                             to uncheck all.
+   */
   void UncheckOtherInteractorButtons(QPushButton* interactorButton);
 
+  /** \brief Creates the Python virtual environment if it does not already exist.
+   *
+   * \return \c true if the virtual environment exists or was successfully
+   *         created, \c false otherwise.
+   */
   bool CreateVirtualEnv();
+
+  /** \brief Checks if nnInteractive is installed and shows the install dialog if not.
+   *
+   * \return \c true if nnInteractive is installed (or was successfully
+   *         installed), \c false otherwise.
+   */
   bool Install();
 
 private:

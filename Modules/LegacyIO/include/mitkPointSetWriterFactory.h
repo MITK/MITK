@@ -21,22 +21,41 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \brief ITK object factory for creating mitk::PointSetWriter instances.
+   *
+   * Registers mitk::PointSetWriter with the ITK object factory mechanism,
+   * allowing automatic creation of PointSetWriter objects when requested
+   * through itk::ObjectFactoryBase.
+   *
+   * \ingroup MitkLegacyIOModule
+   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   * \sa mitk::PointSetWriter
    */
   class DEPRECATED() MITKLEGACYIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
   {
   public:
     mitkClassMacroItkParent(mitk::PointSetWriterFactory, itk::ObjectFactoryBase);
 
-      /** Class methods used to interface with the registered factories. */
-      const char *GetITKSourceVersion(void) const override;
+    /**
+     * \brief Return the ITK source version string.
+     * \return A string identifying the ITK source version.
+     */
+    const char *GetITKSourceVersion(void) const override;
+
+    /**
+     * \brief Return a description of this factory.
+     * \return A human-readable description string.
+     */
     const char *GetDescription(void) const override;
 
-    /** Method for class instantiation. */
+    /** \brief Method for class instantiation. */
     itkFactorylessNewMacro(Self);
 
     /**
-     * Register one factory of this type
+     * \brief Register one instance of this factory with the ITK object factory system.
+     *
+     * Ensures the factory is only registered once. Subsequent calls have no effect.
+     *
      * \deprecatedSince{2013_09}
      */
     DEPRECATED(static void RegisterOneFactory(void))

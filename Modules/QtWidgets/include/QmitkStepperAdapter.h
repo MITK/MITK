@@ -18,17 +18,19 @@ found in the LICENSE file.
 #include <QObject>
 
 
-//##Documentation
-//## @brief Helper class to connect Qt-based navigators to instances of Stepper
-//##
-//## The constructor has to be provided with the navigation widget
-//## that wants to use the Stepper. The navigation widget has to define the
-//## slots \a Refetch() and \a SetStepper(mitk::Stepper *). \a SetStepper will be
-//## called only once to pass the Stepper to the navigation widget. When the values of
-//## the Stepper changes, \a Refetch() will be called. The navigation widget can then
-//## ask the \a Stepper for its new values.
-//## \warning The navigation widget has to be aware that it might have caused the changes
-//## of the \a Stepper itself. So take care that no infinite recursion is created!
+/**
+ * \brief Helper class to connect Qt-based navigators to instances of Stepper.
+ *
+ * The constructor has to be provided with the navigation widget
+ * that wants to use the Stepper. The navigation widget has to define the
+ * slots Refetch() and SetStepper(mitk::Stepper *). SetStepper will be
+ * called only once to pass the Stepper to the navigation widget. When the values of
+ * the Stepper change, Refetch() will be called. The navigation widget can then
+ * ask the Stepper for its new values.
+ *
+ * \warning The navigation widget has to be aware that it might have caused the changes
+ * of the Stepper itself. So take care that no infinite recursion is created!
+ */
 class MITKQTWIDGETS_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT

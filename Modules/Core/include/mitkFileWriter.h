@@ -19,112 +19,188 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Interface class of writers that write data to files
-  //## @ingroup DeprecatedIO
-  //## @deprecatedSince{2014_10} Use mitk::IFileWriter instead.
+  /**
+   * \brief Interface class of writers that write data to files.
+   *
+   * \ingroup DeprecatedIO
+   * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
+   *
+   * \sa IFileWriter
+   */
   class MITKCORE_EXPORT FileWriter : public itk::ProcessObject
   {
   public:
     mitkClassMacroItkParent(FileWriter, itk::ProcessObject);
-    //##Documentation
-    //## @brief Get the specified the file to write
-    //##
-    //## Either the FileName or FilePrefix plus FilePattern are used to write.
+
+    /**
+     * \brief Get the specified file to write.
+     *
+     * Either the FileName or FilePrefix plus FilePattern are used to write.
+     *
+     * \return The file name as a C string.
+     */
     virtual const char *GetFileName() const = 0;
 
-    //##Documentation
-    //## @brief Specify the file to write.
-    //##
-    //## Either the FileName or FilePrefix plus FilePattern are used to write.
+    /**
+     * \brief Specify the file to write.
+     *
+     * Either the FileName or FilePrefix plus FilePattern are used to write.
+     *
+     * \param aFileName The file name to write to.
+     */
     virtual void SetFileName(const char *aFileName) = 0;
 
-    //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to write.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /**
+     * \brief Get the specified file prefix for the file(s) to write.
+     *
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \return The file prefix as a C string.
+     */
     virtual const char *GetFilePrefix() const = 0;
 
-    //##Documentation
-    //## @brief Specify file prefix for the file(s) to write.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /**
+     * \brief Specify file prefix for the file(s) to write.
+     *
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \param aFilePrefix The file prefix to use.
+     */
     virtual void SetFilePrefix(const char *aFilePrefix) = 0;
 
-    //##Documentation
-    //## @brief Get the specified file pattern for the file(s) to write. The
-    //## sprintf format used to build filename from FilePrefix and number.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /**
+     * \brief Get the specified file pattern for the file(s) to write.
+     *
+     * The sprintf format used to build filename from FilePrefix and number.
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \return The file pattern as a C string.
+     */
     virtual const char *GetFilePattern() const = 0;
 
-    //##Documentation
-    //## @brief Specified file pattern for the file(s) to write. The sprintf
-    //## format used to build filename from FilePrefix and number.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
+    /**
+     * \brief Specify file pattern for the file(s) to write.
+     *
+     * The sprintf format used to build filename from FilePrefix and number.
+     * You should specify either a FileName or FilePrefix. Use FilePrefix if
+     * the data is stored in multiple files.
+     *
+     * \param aFilePattern The file pattern to use.
+     */
     virtual void SetFilePattern(const char *aFilePattern) = 0;
 
-    //##Documentation
-    //## @brief Return the extension to be added to the filename.
+    /**
+     * \brief Return the extension to be added to the filename.
+     *
+     * \return The default file extension as a string.
+     */
     virtual std::string GetFileExtension();
 
-    //##Documentation
-    //## @brief Checks if given extension is valid for file writer
+    /**
+     * \brief Check if the given extension is valid for this file writer.
+     *
+     * \param extension The file extension to check.
+     * \return \c true if the extension is valid, \c false otherwise.
+     */
     bool IsExtensionValid(std::string extension);
 
-    //##Documentation
-    //## @brief Return the possible file extensions for the data type associated with the writer
+    /**
+     * \brief Return the possible file extensions for the data type associated with the writer.
+     *
+     * \return A vector of valid file extension strings.
+     */
     virtual std::vector<std::string> GetPossibleFileExtensions() = 0;
 
-    //##Documentation
-    //## @brief possible file extensions for the data type associated with the writer as string
+    /**
+     * \brief Get the possible file extensions as a single formatted string.
+     *
+     * \return A space-separated string of possible file extensions prefixed with '*'.
+     */
     virtual std::string GetPossibleFileExtensionsAsString();
 
-    //##Documentation
-    //## @brief Check if the Writer can write this type of data of the
-    //## DataTreenode.
+    /**
+     * \brief Check if the writer can write the data type of the DataNode.
+     *
+     * \return \c true if the writer supports the data type, \c false otherwise.
+     */
     virtual bool CanWriteDataType(DataNode *);
 
-    //##Documentation
-    //## @brief Return the MimeType of the saved File.
+    /**
+     * \brief Return the MIME type of the saved file.
+     *
+     * \return The MIME type string, or an empty string if not available.
+     */
     virtual std::string GetWritenMIMEType();
 
+    /**
+     * \brief Get the class name of the supported BaseData type.
+     *
+     * \return The class name of the data type this writer supports.
+     */
     virtual std::string GetSupportedBaseData() const = 0;
 
     using ProcessObject::SetInput;
+
+    /**
+     * \brief Set the input BaseData to be written.
+     *
+     * \param data The BaseData object to write.
+     */
     void SetInput(BaseData *data);
 
+    /**
+     * \brief Perform the write operation.
+     */
     virtual void Write() = 0;
 
     /**
-    @brief Specifies, whether the file writer also can
-    write a file to a memory buffer */
+     * \brief Check whether the file writer can write to a memory buffer.
+     *
+     * \return \c true if memory writing is supported, \c false otherwise.
+     */
     virtual bool CanWriteToMemory();
 
     /**
-    @brief Set/Get functions to advise the file writer to
-    use tis internal memory array as file writing destination*/
+     * \brief Enable or disable writing to an internal memory buffer.
+     *
+     * \param write If \c true, the writer uses its internal memory array as the destination.
+     */
     virtual void SetWriteToMemory(bool write);
+
+    /**
+     * \brief Get whether the writer is set to write to memory.
+     *
+     * \return \c true if writing to memory is enabled, \c false otherwise.
+     */
     virtual bool GetWriteToMemory();
 
     /**
-    @brief To be used along with a call of SetWriteToMemory(true). This returns
-    the memory buffer where the file was written.*/
+     * \brief Get the memory buffer where the file was written.
+     *
+     * To be used along with a call of SetWriteToMemory(true).
+     *
+     * \return Pointer to the internal memory buffer.
+     */
     virtual const char *GetMemoryPointer();
 
     /**
-    @brief To be used along with a call of SetWriteToMemory(true). This returns
-    the size of the  memory buffer where the file was written.*/
+     * \brief Get the size of the memory buffer where the file was written.
+     *
+     * To be used along with a call of SetWriteToMemory(true).
+     *
+     * \return Size of the memory buffer in bytes.
+     */
     virtual unsigned int GetMemorySize();
 
     /**
-    @brief CAUTION: It's up to the user to call this function to release the
-    memory buffer after use in case the file writer has written to its memory array.*/
+     * \brief Release the internal memory buffer.
+     *
+     * \note It is the caller's responsibility to call this function to release the
+     * memory buffer after use in case the file writer has written to its memory array.
+     */
     virtual void ReleaseMemory();
 
   protected:

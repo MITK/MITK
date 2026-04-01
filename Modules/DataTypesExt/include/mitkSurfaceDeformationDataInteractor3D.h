@@ -20,12 +20,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    * \brief SurfaceDeformation interaction with objects in 3D windows.
-    *
-    * \ingroup Interaction
-    */
-
-  // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
+   * \brief Interactive deformation of surface meshes in 3D render windows.
+   *
+   * Allows the user to locally deform a Surface by clicking and dragging.
+   * The deformation uses a Gaussian falloff around the pick point, and
+   * the affected radius can be scaled interactively.
+   *
+   * \sa DataInteractor, AffineBaseDataInteractor3D
+   * \ingroup Interaction
+   */
   class MITKDATATYPESEXT_EXPORT SurfaceDeformationDataInteractor3D : public DataInteractor
   {
   public:

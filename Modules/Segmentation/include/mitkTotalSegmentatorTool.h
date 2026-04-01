@@ -61,7 +61,7 @@ namespace mitk
     itkBooleanMacro(Fast);
 
    /**
-    * @brief Event triggered after model download started.
+    * \brief Event triggered after model download has started.
     */
     mitk::Message1<const bool> TotalSegDownloadMessageEvent;
 
@@ -70,18 +70,11 @@ namespace mitk
     ~TotalSegmentatorTool();
 
     /**
-     * @brief Overridden method from the tool manager to execute the segmentation
-     * Implementation:
-     * 1. Creates temp directory, if not done already.
-     * 2. Parses Label names from map_to_binary.py for using later on.
-     * 3. Calls "run_totalsegmentator" method.
-     * 4. Expects an output image to be saved in the temporary directory by the python process. Loads it as
-     *    MultiLabelSegmentation and sets to previewImage.
+     * \brief Executes the TotalSegmentator segmentation.
      *
-     * @param inputAtTimeStep
-     * @param oldSegAtTimeStep
-     * @param previewImage
-     * @param timeStep
+     * Implementation: (1) creates temp directory if needed; (2) parses label names;
+     * (3) calls run_totalsegmentator; (4) loads the output image from the temporary
+     * directory and sets it as the preview.
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
     void UpdatePrepare() override;
@@ -89,44 +82,35 @@ namespace mitk
   private:
 
     /**
-     * @brief Runs Totalsegmentator python process with desired arguments
-     * 
+     * \brief Runs the TotalSegmentator Python process with the configured arguments.
      */
     void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, int, const std::string&);
 
     /**
-     * @brief Applies the m_LabelMapTotal lookup table on the output segmentation MultiLabelSegmentation.
-     * 
+     * \brief Applies the label map lookup table to the output segmentation.
      */
     void MapLabelsToSegmentation(const mitk::MultiLabelSegmentation*, mitk::MultiLabelSegmentation*, std::map<mitk::Label::PixelType, std::string>&);
 
     /**
-     * @brief Parses map_to_binary.py file to extract label ids and names
-     * and stores as a map for reference in m_LabelMapTotal
-     * 
+     * \brief Parses the map_to_binary.py file to extract label IDs and names.
      */
     void ParseLabelMapTotalDefault();
 
     /**
-     * @brief Get the Label Map Path from the virtual environment location
-     * 
-     * @return std::string 
+     * \brief Returns the label map file path from the virtual environment.
+     * \return The path to the label map file.
      */
     std::string GetLabelMapPath();
 
     /**
-     * @brief Agglomerate many individual mask image files into one multi-label MultiLabelSegmentation in the
-     * given filePath order.
-     * 
-     * @param filePaths 
-     * @param dimension 
-     * @param geometry 
-     * @return MultiLabelSegmentation::Pointer 
+     * \brief Agglomerates individual mask image files into a single multi-label segmentation.
+     *
+     * \return The combined multi-label segmentation.
      */
     MultiLabelSegmentation::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
 
     /**
-     * @brief Callback to process stdout and stderr outs from the python sub-process.
+     * \brief Callback to process stdout and stderr output from the Python sub-process.
      */
     void PythonProcessEvent(itk::Object*, const itk::EventObject &e);
 

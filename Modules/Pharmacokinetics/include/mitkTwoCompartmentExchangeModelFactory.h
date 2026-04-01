@@ -17,6 +17,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Factory for the TwoCompartmentExchangeModel.
+   * \sa TwoCompartmentExchangeModel, TwoCompartmentExchangeModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoCompartmentExchangeModelFactory : public
     mitk::TwoCompartmentExchangeModelFactoryBase<TwoCompartmentExchangeModelParameterizer>
   {

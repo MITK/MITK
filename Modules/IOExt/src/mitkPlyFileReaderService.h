@@ -21,12 +21,12 @@ namespace mitk
   class BaseData;
 
   /**
-  * @brief Used to read surfaces from the PLY format.
-  *
-  * This reader can read binary and ASCII versions of the format transparently.
-  *
-  * @ingroup IOExt
-  */
+   * \brief Reader service for loading surfaces from PLY format files.
+   *
+   * This reader can read binary and ASCII versions of the format transparently.
+   *
+   * \ingroup IOExt
+   */
   class PlyFileReaderService : public AbstractFileReader
   {
   public:

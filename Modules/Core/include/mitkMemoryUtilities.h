@@ -18,19 +18,26 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Utility functions for querying system and process memory information. */
   namespace MemoryUtilities
   {
     /**
-     * Returns the memory usage of the current process in bytes.
-     * On Linux, this refers to the virtual memory allocated by
-     * the process (the VIRT column in top).
+     * \brief Return the memory usage of the current process in bytes.
+     *
+     * On Linux, this refers to the resident memory minus shared pages
+     * (as reported by the GNOME System Monitor).
      * On Windows, this refers to the size in bytes of the working
      * set pages (the "Speicherauslastung" column in the task manager).
+     * On macOS, this refers to the resident size minus reusable memory.
+     *
+     * \return The process memory usage in bytes, or 0 if the value could not be determined.
      */
     MITKCORE_EXPORT size_t GetProcessMemoryUsage();
 
     /**
-     * Returns the total size of physical memory in bytes
+     * \brief Return the total size of physical RAM in bytes.
+     *
+     * \return The total physical memory in bytes, or 0 if the value could not be determined.
      */
     MITKCORE_EXPORT size_t GetTotalSizeOfPhysicalRam();
   }

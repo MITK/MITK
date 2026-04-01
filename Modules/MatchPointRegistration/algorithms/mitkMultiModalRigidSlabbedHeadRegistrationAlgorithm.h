@@ -21,6 +21,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Rigid slabbed-head registration algorithm for multi-modal images.
+   *
+   * Type alias for the MatchPoint rigid 3D slabbed-head registration algorithm
+   * using Mattes mutual information with a MITK-specific UID policy.
+   *
+   * \tparam TImageType The ITK image type to register.
+   */
   template <class TImageType>
   using MultiModalRigidSlabbedHeadRegistrationAlgorithm = typename map::algorithm::boxed::MultiModalRigidSlabbedHeadRegistrationAlgorithm<TImageType, ::map::algorithm::mitkMultiModalRigidSlabbedHeadRegistrationAlgorithmUIDPolicy>;
 }

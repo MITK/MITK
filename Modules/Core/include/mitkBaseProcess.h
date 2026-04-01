@@ -17,6 +17,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Deprecated typedef for backward compatibility.
+   * \deprecated Use mitk::BaseDataSource instead.
+   * \sa BaseDataSource
+   */
   DEPRECATED(typedef BaseDataSource BaseProcess);
 
 } // namespace mitk

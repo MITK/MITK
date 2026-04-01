@@ -25,9 +25,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Segment Anything Model Python process handler class.
-   * 
-  */
+   * \brief Manages the Python daemon process for the Segment Anything Model (SAM).
+   *
+   * Handles starting, stopping, and communicating with a Python daemon that runs
+   * the SAM inference. Transfers images and point prompts via temporary files and
+   * retrieves segmentation results.
+   *
+   * \sa SegmentAnythingTool, MedSAMTool
+   */
   class MITKSEGMENTATION_EXPORT SegmentAnythingPythonService : public itk::Object
   {
   public: 
@@ -41,21 +46,19 @@ namespace mitk
     mitkClassMacroItkParent(SegmentAnythingPythonService, itk::Object);
 
     /**
-     * @brief Construct a new Segment Anything Python Service object. Specify working directory,
-     * ViT model type, checkpoint path, gpu id and backend
-     * 
-     * @param workingDir of python process
-     * @param modelType of ViT
-     * @param checkPointPath of specified model type
-     * @param gpuId 
-     * @param backend SAM or MedSAM
+     * \brief Constructs a new SegmentAnythingPythonService.
+     *
+     * \param[in] workingDir Working directory for the Python process.
+     * \param[in] modelType The ViT model type identifier.
+     * \param[in] checkPointPath Path to the model checkpoint file.
+     * \param[in] gpuId GPU device ID to use for inference.
+     * \param[in] backend Backend identifier: "SAM" or "MedSAM".
      */
     SegmentAnythingPythonService(std::string workingDir, std::string modelType,
                                  std::string checkPointPath, unsigned int gpuId, std::string backend);
     
     /**
-     * @brief Destroy the Segment Anything Python Service object. Stop the async python process
-     * and deletes temporary directories
+     * \brief Destroys the service, stopping the async Python process and deleting temporary directories.
      */
     ~SegmentAnythingPythonService();
     
@@ -63,52 +66,45 @@ namespace mitk
     itkGetConstMacro(MitkTempDir, std::string);
     mitkNewMacro5Param(SegmentAnythingPythonService, std::string, std::string, std::string, unsigned int, std::string);
     /**
-     * @brief Static function to print out everything from itk::EventObject.
-     * Used as callback in mitk::ProcessExecutor object.
+     * \brief Static callback to print output from itk::EventObject events.
      *
+     * Used as callback in mitk::ProcessExecutor.
      */
     static void onPythonProcessEvent(itk::Object*, const itk::EventObject&, void*);
 
     /**
-     * @brief Checks CurrentStatus enum variable and returns 
-     * true if daemon is READY (to read files) state, false is OFF state or
-     * throws exception if daemon is found KILL or Cuda error state.
-     * 
-     * @return bool 
+     * \brief Checks the daemon status.
+     *
+     * \return true if the daemon is in READY state, false if OFF.
+     * \throw mitk::Exception if the daemon is in KILLED or CUDAError state.
      */
     static bool CheckStatus() /*throw(mitk::Exception)*/;
 
     /**
-     * @brief Creates temp directories and calls start_python_daemon
-     * function async.
-     * 
+     * \brief Creates temporary directories and starts the Python daemon asynchronously.
      */
     void StartAsyncProcess();
 
     /**
-     * @brief Writes KILL to the control file to stop the daemon process.
-     * 
+     * \brief Writes KILL signal to the control file to stop the daemon process.
      */
     void StopAsyncProcess();
 
     /**
-     * @brief Writes image as nifity file with unique id (UId) as file name. 
-     * 
+     * \brief Writes an image as a NIfTI file with a unique ID as the file name.
      */
     void TransferImageToProcess(const Image *inputAtTimeStep, std::string &UId);
 
     /**
-     * @brief Writes csv stringstream of points to a csv file for 
-     * python daemon to read.
-     * 
+     * \brief Writes CSV point data to a trigger file for the Python daemon to read.
      */
     void TransferPointsToProcess(const std::string &triggerCSV) const;
 
     /**
-     * @brief Waits for output nifity file from the daemon to appear and 
-     * reads it as a mitk::Image
-     * 
-     * @return MultiLabelSegmentation::Pointer 
+     * \brief Waits for the output NIfTI file from the daemon and reads it as a segmentation.
+     *
+     * \param[in] timeOut Timeout in milliseconds (-1 for indefinite waiting).
+     * \return The segmentation image produced by the daemon.
      */
     MultiLabelSegmentation::Pointer RetrieveImageFromProcess(long timeOut= -1) const;
 
@@ -116,26 +112,22 @@ namespace mitk
 
   private:
     /**
-     * @brief Runs SAM python daemon using mitk::ProcessExecutor
-     * 
+     * \brief Runs the SAM Python daemon using mitk::ProcessExecutor.
      */
     void start_python_daemon() const;
 
     /**
-     * @brief Writes stringstream content into control file.
-     * 
+     * \brief Writes the given status string to the control file.
      */
     void WriteControlFile(const std::string &statusString) const;
 
     /**
-     * @brief Create a Temp Dirs
-     * 
+     * \brief Creates temporary directories for I/O with the Python daemon.
      */
     void CreateTempDirs(const std::string &dirPattern);
 
     /**
-     * @brief ITK-based file writer for dumping inputs into python daemon
-     *
+     * \brief ITK-based file writer for writing input images to disk for the Python daemon.
      */
     template <typename TPixel, unsigned int VImageDimension>
     void ITKWriter(const itk::Image<TPixel, VImageDimension> *image, std::string& outputFilename) const;

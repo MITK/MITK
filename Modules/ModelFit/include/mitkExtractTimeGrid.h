@@ -25,14 +25,20 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /*Extracts the time grid of an image (its time geometry) for usage with models.
+  /**
+   * \brief Extracts the time grid of an image (its time geometry) for usage with models.
+   *
    * Time grid is empty (size == 0) if image pointer is invalid.
-   * @remark the model time grid has a resolution in sec and not ms like the time geometry.*/
+   * \remark The model time grid has a resolution in seconds, not milliseconds like the time geometry.
+   */
   MITKMODELFIT_EXPORT ModelBase::TimeGridType ExtractTimeGrid(const Image* image);
 
-  /*Extracts the time grid of a time geometry for usage with models.
+  /**
+   * \brief Extracts the time grid of a time geometry for usage with models.
+   *
    * Time grid is empty (size == 0) if geometry pointer is invalid.
-   * @remark the model time grid has a resolution in sec and not ms like the time geometry.*/
+   * \remark The model time grid has a resolution in seconds, not milliseconds like the time geometry.
+   */
   MITKMODELFIT_EXPORT ModelBase::TimeGridType ExtractTimeGrid(const TimeGeometry* geometry);
 
 }

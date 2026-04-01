@@ -19,10 +19,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**
-  * @brief Superclass of all classes generating ContourModels.
-  * @ingroup MitkContourModelModule
-  */
+  /** \brief Base class for all pipeline sources that produce mitk::ContourModelSet outputs.
+   *
+   * Provides the output type declaration and default MakeOutput implementation
+   * for creating ContourModelSet instances in the ITK pipeline framework.
+   *
+   * \sa ContourModelSet, ContourModelSource
+   * \ingroup MitkContourModelModule
+   */
   class MITKCONTOURMODEL_EXPORT ContourModelSetSource : public BaseDataSource
   {
   public:
@@ -30,26 +34,24 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief The output data type produced by this source. */
       typedef ContourModelSet OutputType;
 
+    /** \brief Smart pointer type for the output. */
     typedef OutputType::Pointer OutputTypePointer;
 
     mitkBaseDataSourceGetOutputDeclarations
 
-      /**
-       * Allocates a new output object and returns it. Currently the
-       * index idx is not evaluated.
-       * @param idx the index of the output for which an object should be created
-       * @returns the new object
+      /** \brief Allocate a new output object at the given index.
+       * \param[in] idx The output index (currently not evaluated).
+       * \return A new ContourModelSet instance wrapped in a DataObject pointer.
        */
       itk::DataObject::Pointer
       MakeOutput(DataObjectPointerArraySizeType idx) override;
 
-    /**
-     * This is a default implementation to make sure we have something.
-     * Once all the subclasses of ProcessObject provide an appropriate
-     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
-     * virtual.
+    /** \brief Allocate a new output object by name.
+     * \param[in] name Identifier for the output.
+     * \return A new ContourModelSet instance wrapped in a DataObject pointer.
      */
     itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 

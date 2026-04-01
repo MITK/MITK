@@ -22,18 +22,19 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief
-
-  \sa Interactor
-  \sa ContourModelInteractor
-
-  \ingroup Interaction
-
-
-  \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments
-  will not work!
-
-  */
+   * \brief LiveWire-based contour model interactor for editing contour segments.
+   *
+   * Extends ContourModelInteractor with LiveWire-based computation of contour
+   * segments between control points. When a vertex is moved, the connecting
+   * segments are recomputed using the shortest path algorithm.
+   *
+   * \sa ContourModelInteractor, ImageLiveWireContourModelFilter
+   *
+   * \ingroup Interaction
+   *
+   * \warning Make sure the working image is properly set, otherwise the algorithm
+   *          for computing LiveWire contour segments will not work.
+   */
   class MITKSEGMENTATION_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
@@ -41,6 +42,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Sets the working image used for LiveWire cost computation.
+     * \param[in] _arg Pointer to the image slice for the LiveWire filter.
+     */
     virtual void SetWorkingImage(mitk::Image *_arg);
 
     void ConnectActionsAndFunctions() override;

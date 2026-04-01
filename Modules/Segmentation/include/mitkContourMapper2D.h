@@ -23,10 +23,10 @@ namespace mitk
   class Contour;
 
   /**
-   * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
+   * \brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window.
    *
-   *
-   * @ingroup Mapper
+   * \ingroup Mapper
+   * \sa Contour
    */
   class MITKSEGMENTATION_EXPORT ContourMapper2D : public Mapper
   {

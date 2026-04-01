@@ -33,7 +33,7 @@ namespace mitk
   * ApplyColorAndOpacity() can be used in the subclasses to apply color and opacity properties
   * read from the PropertyList.
   *
-  * @deprecatedSince{2015_05} GLMappers are no longer supported in the rendering pipeline.
+  * \deprecatedSince{2015_05} GLMappers are no longer supported in the rendering pipeline.
   * Please use mitkVtkMapper instead or consider writing your own vtk classes, such as vtkActor
   * or vtkMapper
   * \ingroup Mapper
@@ -43,7 +43,13 @@ namespace mitk
   public:
     mitkClassMacro(GLMapper, Mapper);
 
-    /** \brief Do the painting into the \a renderer */
+    /** \brief Perform OpenGL rendering into the given renderer.
+     *
+     * Subclasses must implement this method with OpenGL drawing commands.
+     * The GL context is pre-configured with display-pixel coordinates.
+     *
+     * \param[in] renderer The renderer to paint into.
+     */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
     /** \brief Apply color and opacity properties read from the PropertyList

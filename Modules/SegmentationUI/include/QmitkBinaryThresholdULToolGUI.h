@@ -19,11 +19,15 @@ found in the LICENSE file.
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::BinaryThresholdTool.
+  \brief GUI for mitk::BinaryThresholdTool with upper and lower threshold range.
 
-  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
+  This GUI shows a range slider to change both upper and lower threshold values and
+  an OK button to accept a preview for actual thresholding. It operates in upper/lower
+  threshold mode (dual bounds).
 
-  Last contributor: $Author$
+  \sa mitk::BinaryThresholdTool
+  \sa QmitkBinaryThresholdToolGUIBase
+  \sa QmitkBinaryThresholdToolGUI
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkBinaryThresholdToolGUIBase
 {

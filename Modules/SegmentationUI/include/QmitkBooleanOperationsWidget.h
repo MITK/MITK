@@ -33,12 +33,28 @@ namespace mitk
   class DataStorage;
 }
 
+/**
+ * \brief Widget providing boolean operations (difference, intersection, union) on multi-label segmentation labels.
+ *
+ * Allows the user to select a segmentation and two labels, then apply boolean set operations
+ * (difference, intersection, or union) to produce a result label mask. The result is saved back
+ * into the segmentation.
+ *
+ * \sa QmitkMultiLabelInspector
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the boolean operations widget.
+   * \param[in] dataStorage Pointer to the data storage for node selection.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkBooleanOperationsWidget() override;
 
 private slots:

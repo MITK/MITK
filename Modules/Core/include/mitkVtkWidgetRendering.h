@@ -31,9 +31,11 @@ namespace mitk
    * After enabling the vtkWidget and calling Enable() of this class, the widget
    * should be rendered.
    *
-   * Note: this class only provides a basic mechanism for adding widget; all widget
+   * \note This class only provides a basic mechanism for adding a widget; all widget
    * configuration such as placement, size, and en-/disabling of interaction
    * mechanisms need to be done in the vtkWidget object.
+   *
+   * \ingroup Rendering
    */
   class MITKCORE_EXPORT VtkWidgetRendering : public BaseData
   {
@@ -45,82 +47,99 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-       * Sets the renderwindow, in which the widget
-       * will be shown. Make sure, you have called this function
-       * before calling Enable()
+       * \brief Set the render window in which the widget will be shown.
+       *
+       * \pre Must be called before calling Enable().
+       *
+       * \param[in] renderWindow  The vtkRenderWindow into which the widget is placed.
        */
       virtual void SetRenderWindow(vtkRenderWindow *renderWindow);
 
     /**
-     * Enables drawing of the widget.
+     * \brief Enable drawing of the widget.
+     *
      * If you want to disable it, call the Disable() function.
+     *
+     * \pre SetRenderWindow() and SetVtkWidget() must have been called.
      */
     virtual void Enable();
 
     /**
-     * Disables drawing of the widget.
+     * \brief Disable drawing of the widget.
+     *
      * If you want to enable it, call the Enable() function.
      */
     virtual void Disable();
 
     /**
-     * Checks, if the widget is currently
-     * enabled (visible)
+     * \brief Check whether the widget is currently enabled (visible).
+     *
+     * \return True if the widget is enabled, false otherwise.
      */
     virtual bool IsEnabled();
 
     /**
-     * Empty implementation, since the VtkWidgetRendering doesn't
-     * support the requested region concept
+     * \brief Empty implementation; VtkWidgetRendering does not support the
+     *        requested region concept.
      */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
-     * Empty implementation, since the VtkWidgetRendering doesn't
-     * support the requested region concept
+     * \brief Empty implementation; VtkWidgetRendering does not support the
+     *        requested region concept.
+     *
+     * \return Always false.
      */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
-     * Empty implementation, since the VtkWidgetRendering doesn't
-     * support the requested region concept
+     * \brief Empty implementation; VtkWidgetRendering does not support the
+     *        requested region concept.
+     *
+     * \return Always true.
      */
     bool VerifyRequestedRegion() override;
 
     /**
-     * Empty implementation, since the VtkWidgetRendering doesn't
-     * support the requested region concept
+     * \brief Empty implementation; VtkWidgetRendering does not support the
+     *        requested region concept.
      */
     void SetRequestedRegion(const itk::DataObject *) override;
 
     /**
-     * Returns the vtkRenderWindow, which is used
-     * for displaying the widget
+     * \brief Get the vtkRenderWindow used for displaying the widget.
+     *
+     * \return The associated vtkRenderWindow, or nullptr if not yet set.
      */
     virtual vtkRenderWindow *GetRenderWindow();
 
     /**
-     * Returns the renderer responsible for
-     * rendering the widget into the
-     * vtkRenderWindow
+     * \brief Get the renderer responsible for rendering the widget into the
+     *        vtkRenderWindow.
+     *
+     * \return The internal vtkRenderer instance.
      */
     virtual vtkRenderer *GetVtkRenderer();
 
-    /** Set the vtkWidget to be rendered */
+    /**
+     * \brief Set the vtkWidget to be rendered.
+     *
+     * \param[in] widget  The vtkInteractorObserver (widget) to render.
+     */
     void SetVtkWidget(vtkInteractorObserver *widget);
 
-    /** Get the vtkWidget to be rendered */
+    /**
+     * \brief Get the vtkWidget that is being rendered.
+     *
+     * \return The currently set vtkInteractorObserver (widget), or nullptr.
+     */
     vtkInteractorObserver *GetVtkWidget() const;
 
   protected:
-    /**
-     * Constructor
-     */
+    /** \brief Constructor. Creates an internal vtkRenderer. */
     VtkWidgetRendering();
 
-    /**
-     * Destructor
-     */
+    /** \brief Destructor. Disables the widget if still enabled. */
     ~VtkWidgetRendering() override;
 
     vtkRenderWindow *m_RenderWindow;

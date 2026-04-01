@@ -85,22 +85,31 @@ namespace mitk
 
     virtual double GetProgress() const;
 
-    /** Commences the generation of the registered 4D image. Stores the result internally.
-    * After this method call is finished the result can be retrieved via
-    * GetRegisteredImage.
-    * @pre 4D image must be set
-    * @pre 4D image must has more then one frame
-    * @pre Reg algorithm must be set
-    * @pre Ignore list values must be within the time geometry of the image
-    * @post Result image was generated.*/
+    /**
+     * \brief Commence the generation of the registered 4D image.
+     *
+     * Stores the result internally. After this call, the result can be
+     * retrieved via GetRegisteredImage().
+     *
+     * \pre 4D image must be set.
+     * \pre 4D image must have more than one frame.
+     * \pre Registration algorithm must be set.
+     * \pre Ignore list values must be within the time geometry of the image.
+     * \post Result image was generated.
+     */
     void Generate();
 
-    /** Returns the generated images. Triggers Generate() if result is outdated.
-       * @pre 4D image must be set
-       * @pre 4D image must has more then one frame
-       * @pre Reg algorithm must be set
-       * @pre Ignore list values must be within the time geometry of the image
-    */
+    /**
+     * \brief Return the generated registered image.
+     *
+     * Triggers Generate() if the result is outdated.
+     *
+     * \pre 4D image must be set.
+     * \pre 4D image must have more than one frame.
+     * \pre Registration algorithm must be set.
+     * \pre Ignore list values must be within the time geometry of the image.
+     * \return The registered 4D image.
+     */
     Image::Pointer GetRegisteredImage();
 
   protected:

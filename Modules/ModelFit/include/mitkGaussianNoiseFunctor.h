@@ -18,6 +18,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \class GaussianNoiseFunctor
+   * \brief Pixel functor that adds Gaussian noise to a pixel value.
+   *
+   * This functor generates a random number from a normal distribution with
+   * the specified mean and standard deviation, and adds it to the input pixel value.
+   *
+   * \tparam TInputPixel The input pixel type.
+   * \tparam TOutputPixel The output pixel type.
+   */
   template <class TInputPixel, class TOutputPixel>
   class GaussianNoiseFunctor
   {
@@ -26,10 +36,12 @@ namespace mitk
     GaussianNoiseFunctor(): m_Mu(0), m_Sigma(0) {};
     ~GaussianNoiseFunctor() {};
 
+    /** \brief Sets the mean of the Gaussian noise distribution. */
     void SetMean(double mu)
     {
       this->m_Mu = mu;
     }
+    /** \brief Sets the standard deviation of the Gaussian noise distribution. */
     void SetSigma(double sigma)
     {
       this->m_Sigma = sigma;
@@ -58,10 +70,9 @@ namespace mitk
     double m_Mu, m_Sigma;
 
 
-    /** @todo #2 Better function?
-     * This function is meant to generate a random number from a normal distribution with the passed mean and standard deviation.
-     * I found this code online, under c++11 there is supposed to be a std - library for that: std::normal_distribution
-     **/
+    /** \brief Generates a random number from a normal distribution.
+     * \todo Consider replacing with std::normal_distribution from the C++11 standard library.
+     */
     inline double noise(double mu,  double sigma) const
     {
       double u1, u2, W, mult;

@@ -45,51 +45,54 @@ public:
 
   enum Type {
     /**
-     * No exception type is unspecified.
+     * \brief The exception type is unspecified.
      */
     UNSPECIFIED = 0,
     /**
-     * The service has been unregistered.
+     * \brief The service has been unregistered.
      */
     UNREGISTERED = 1,
     /**
-     * The service factory produced an invalid service object.
+     * \brief The service factory produced an invalid service object.
      */
     FACTORY_ERROR = 2,
     /**
-     * The service factory threw an exception.
+     * \brief The service factory threw an exception.
      */
     FACTORY_EXCEPTION = 3,
     /**
-     * An error occurred invoking a remote service.
+     * \brief An error occurred invoking a remote service.
      */
     REMOTE = 5,
     /**
-     * The service factory resulted in a recursive call to itself for the
+     * \brief The service factory resulted in a recursive call to itself for the
      * requesting module.
      */
     FACTORY_RECURSION = 6
   };
 
   /**
-   * Creates a <code>ServiceException</code> with the specified message,
+   * \brief Creates a <code>ServiceException</code> with the specified message,
    * type and exception cause.
    *
-   * @param msg The associated message.
-   * @param type The type for this exception.
+   * \param[in] msg The associated message.
+   * \param[in] type The type for this exception.
    */
   ServiceException(const std::string& msg, const Type& type = UNSPECIFIED);
 
+  /** \brief Copy constructor. */
   ServiceException(const ServiceException& o);
+
+  /** \brief Copy assignment operator. */
   ServiceException& operator=(const ServiceException& o);
 
   ~ServiceException() throw() override { }
 
   /**
-   * Returns the type for this exception or <code>UNSPECIFIED</code> if the
+   * \brief Returns the type for this exception or <code>UNSPECIFIED</code> if the
    * type was unspecified or unknown.
    *
-   * @return The type of this exception.
+   * \return The type of this exception.
    */
   Type GetType() const;
 
@@ -110,9 +113,11 @@ private:
 
 /**
  * \ingroup MicroServices
- * @{
+ * \{
  */
+
+/** \brief Stream output operator for ServiceException. */
 MITKCPPMICROSERVICES_EXPORT std::ostream& operator<<(std::ostream& os, const us::ServiceException& exc);
-/** @}*/
+/** \} */
 
 #endif // USSERVICEEXCEPTION_H

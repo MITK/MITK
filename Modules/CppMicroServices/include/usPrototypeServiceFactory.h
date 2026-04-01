@@ -18,9 +18,9 @@ found in the LICENSE file.
 namespace us {
 
 /**
- * @ingroup MicroServices
+ * \ingroup MicroServices
  *
- * A factory for \link ServiceConstants::SCOPE_PROTOTYPE prototype scope\endlink services.
+ * \brief A factory for \link ServiceConstants::SCOPE_PROTOTYPE prototype scope\endlink services.
  * The factory can provide multiple, unique service objects.
  *
  * When registering a service, a PrototypeServiceFactory object can be used
@@ -44,14 +44,14 @@ namespace us {
  * PrototypeServiceFactory objects are only used by the framework and are not made
  * available to other modules. The framework may concurrently call a PrototypeServiceFactory.
  *
- * @see ModuleContext::GetServiceObjects()
- * @see ServiceObjects
+ * \sa ModuleContext::GetServiceObjects()
+ * \sa ServiceObjects
  */
 struct PrototypeServiceFactory : public ServiceFactory
 {
 
   /**
-   * Returns a service object for a caller.
+   * \brief Returns a service object for a caller.
    *
    * The framework invokes this method for each caller requesting a service object using
    * ServiceObjects::GetService(). The factory can then return a specific service object for the caller.
@@ -60,28 +60,28 @@ struct PrototypeServiceFactory : public ServiceFactory
    * was registered, a warning is issued and nullptr is returned to the caller. If this
    * method throws an exception, a warning is issued and nullptr is returned to the caller.
    *
-   * @param module The module requesting the service.
-   * @param registration The ServiceRegistrationBase object for the requested service.
-   * @return A service object that must contain entries for all the interfaces named when
+   * \param[in] module The module requesting the service.
+   * \param[in] registration The ServiceRegistrationBase object for the requested service.
+   * \return A service object that must contain entries for all the interfaces named when
    *         the service was registered.
    *
-   * @see ServiceObjects#GetService()
-   * @see InterfaceMap
+   * \sa ServiceObjects#GetService()
+   * \sa InterfaceMap
    */
   InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) override = 0;
 
   /**
-   * Releases a service object created for a caller.
+   * \brief Releases a service object created for a caller.
    *
    * The framework invokes this method when a service has been released by a modules such as
    * by calling ServiceObjects::UngetService(). The service object may then be destroyed.
    * If this method throws an exception, a warning is issued.
    *
-   * @param module The module releasing the service.
-   * @param registration The ServiceRegistrationBase object for the service being released.
-   * @param service The service object returned by a previous call to the GetService method.
+   * \param[in] module The module releasing the service.
+   * \param[in] registration The ServiceRegistrationBase object for the service being released.
+   * \param[in] service The service object returned by a previous call to the GetService method.
    *
-   * @see ServiceObjects::UngetService()
+   * \sa ServiceObjects::UngetService()
    */
   void UngetService(Module* module, const ServiceRegistrationBase& registration,
                             const InterfaceMap& service) override = 0;

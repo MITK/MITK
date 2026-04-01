@@ -216,11 +216,14 @@ protected:
   void ApplyLookuptable(mitk::BaseRenderer* renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 
   /**
-   * @brief ApplyLevelWindow Apply the level window for the given renderer.
-   * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
-   * @param renderer Level window for which renderer?
-   * @param dataNode
-   * @param levelFilter
+   * \brief Apply the level window for the given renderer.
+   *
+   * \warning To use the level window, the property 'LevelWindow' must be set and an
+   * 'Image Rendering.Mode' which uses the level window must be set.
+   *
+   * \param[in] renderer The renderer for which to apply the level window.
+   * \param[in] dataNode The data node providing the level window property.
+   * \param[in] levelFilter The VTK level window filter to configure.
    */
   void ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 

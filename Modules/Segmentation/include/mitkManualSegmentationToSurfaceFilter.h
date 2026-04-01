@@ -24,17 +24,17 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Supplies a 3D surface from pre-processed segmentation.
+   * \brief Supplies a 3D surface from pre-processed segmentation.
    *
    * The resulting surface depends on a filter pipeline based on vtkMedian (1) and a Gaussian filter with
    * vtkImageGaussianSmooth (2).
-   * All voxel can be changed to an isotropic representation of the
-   * image (ATTENTION: the number of voxels in the image will change). The
-   * resulting isotropic image has 1mm isotropic voxel by default. But
+   * All voxels can be changed to an isotropic representation of the
+   * image (note: the number of voxels in the image will change). The
+   * resulting isotropic image has 1mm isotropic voxels by default, but
    * can be varied freely.
    *
-   * @ingroup ImageFilters
-   * @ingroup Process
+   * \ingroup ImageFilters
+   * \ingroup Process
    */
 
   class MITKSEGMENTATION_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter

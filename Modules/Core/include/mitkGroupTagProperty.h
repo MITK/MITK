@@ -22,14 +22,18 @@ namespace mitk
 #pragma warning(disable : 4522)
 #endif
 
-  /*! @brief Property class that has no value.
-
-    @ingroup DataManagement
-
-      The GroupTag property is used to tag a datatree node to show, that it is member of a
-      group of datatree nodes. This can be used to build groups of datatreenodes without the
-      need to contain them in a specific hiearchic order in the datatree
-  */
+  /**
+   * \brief Property class that carries no value, used as a tag for group membership.
+   *
+   * The GroupTag property is used to tag a data tree node to indicate that it is
+   * a member of a group of data tree nodes. This enables building groups of nodes
+   * without requiring a specific hierarchical order in the data tree. Its mere
+   * presence on a node signals group membership.
+   *
+   * \ingroup DataManagement
+   *
+   * \sa BaseProperty
+   */
   class MITKCORE_EXPORT GroupTagProperty : public BaseProperty
   {
   public:
@@ -37,7 +41,24 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Serialize the group tag to JSON.
+     *
+     * Since GroupTagProperty has no value, this writes a null JSON value.
+     *
+     * \param[out] j The JSON value to write into.
+     * \return Always \c true.
+     */
     bool ToJSON(nlohmann::json& j) const override;
+
+    /**
+     * \brief Deserialize the group tag from JSON.
+     *
+     * Since GroupTagProperty has no value, this is essentially a no-op.
+     *
+     * \param[in] j The JSON value to read from.
+     * \return Always \c true.
+     */
     bool FromJSON(const nlohmann::json& j) override;
 
     using BaseProperty::operator=;

@@ -50,14 +50,12 @@ namespace mitk
     std::string GetPointsAsCSVString(const mitk::BaseGeometry *baseGeometry) const override;
 
     /**
-     * @brief Adds bounding box in the render window when clicked.
-     * 
+     * \brief Adds a bounding box in the render window when clicked.
      */
     void OnRenderWindowClicked(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
-     * @brief Deletes bounding box from the render window.
-     * 
+     * \brief Deletes the bounding box from the render window.
      */
     void OnDelete(StateMachineAction *, InteractionEvent *);
 
@@ -71,14 +69,12 @@ namespace mitk
 
   private:
     /**
-     * @brief Initializes the Bounding Shape Interactor object
-     * 
+     * \brief Initializes the BoundingShapeInteractor object.
      */
     void CreateBoundingShapeInteractor(bool rotationEnabled);
 
     /**
-     * @brief initializes a new bounding shape using the selected image geometry.
-     * 
+     * \brief Initializes a new bounding shape using the selected image geometry.
      */
     mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry *geometry) const;
     DataNode::Pointer m_BoundingBoxNode;

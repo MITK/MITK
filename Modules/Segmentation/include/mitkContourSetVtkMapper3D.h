@@ -28,9 +28,10 @@ class vtkTubeFilter;
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Vtk-based mapper for mitk::Contour
-  //## @ingroup Mapper
+  /**
+   * \brief Vtk-based mapper for mitk::ContourSet.
+   * \ingroup Mapper
+   */
   class MITKSEGMENTATION_EXPORT ContourSetVtkMapper3D : public VtkMapper
   {
   public:

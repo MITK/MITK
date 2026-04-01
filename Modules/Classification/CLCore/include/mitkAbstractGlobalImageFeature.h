@@ -34,30 +34,48 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /**Used as ID for features calculated by feature classes*/
+  /**
+   * \brief Unique identifier for a computed image feature.
+   *
+   * FeatureID combines the feature name, its owning feature class, a settings identifier,
+   * optional parameters, a legacy name (for backward compatibility), and a version string.
+   * It is used as a key in feature result lists.
+   *
+   * \sa AbstractGlobalImageFeature
+   */
   struct MITKCLCORE_EXPORT FeatureID
   {
-    /**Name of the feature*/
-    std::string name;
-    /**Name of the feature class*/
-    std::string featureClass;
-    /**ID for the setting that is represented by parameters and is specified by the feature class while calculating the features. It must be as unique as the parameters themself.*/
-    std::string settingID;
-    /**Alternative name that contains the legacy naming of the feature that encodes the parametersetting directly in the string.*/
-    std::string legacyName;
-    /**Version of the feature definition*/
-    std::string version = "1";
+    std::string name;         ///< Name of the individual feature.
+    std::string featureClass; ///< Name of the feature class that computed this feature.
+    std::string settingID;    ///< Identifier encoding the parameter configuration; must be unique per parameter set.
+    std::string legacyName;   ///< Legacy feature name that encodes parameter settings directly in the string.
+    std::string version = "1"; ///< Version of the feature definition.
 
     using ParametersType = std::map<std::string, us::Any>;
-    ParametersType parameters;
+    ParametersType parameters; ///< Map of parameter name-value pairs used for computation.
 
+    /**
+     * \brief Less-than comparison for use in ordered containers.
+     * \param[in] rh The right-hand FeatureID to compare against.
+     * \return True if this FeatureID sorts before rh.
+     */
     bool operator < (const FeatureID& rh) const;
+
+    /**
+     * \brief Equality comparison.
+     * \param[in] rh The right-hand FeatureID to compare against.
+     * \return True if both FeatureIDs are equal.
+     */
     bool operator ==(const FeatureID& rh) const;
   };
 
-  /**Helper that takes a pass templateID clones it and populates it with the also passed information before returning it.
-   * @param templateID reference ID that should be cloned.
-   * @param name Name of the feature.*/
+  /**
+   * \brief Create a FeatureID by cloning a template and setting its name.
+   *
+   * \param[in] templateID Reference FeatureID to clone.
+   * \param[in] name Name to assign to the new FeatureID.
+   * \return A new FeatureID with the given name and all other fields from templateID.
+   */
   MITKCLCORE_EXPORT FeatureID CreateFeatureID(FeatureID templateID, std::string name);
 
   /**
@@ -183,12 +201,25 @@ public:
   */
   void CalculateAndAppendFeatures(const Image* image, const Image* mask, const Image* maskNoNaN, FeatureListType &featureList, bool checkParameterActivation = true);
 
+  /** \brief Set the prefix prepended to command line option names. */
   itkSetMacro(Prefix, std::string);
+  /** \brief Set the short name used in option keys and feature names. */
   itkSetMacro(ShortName, std::string);
+  /** \brief Set the long (human-readable) name of this feature class. */
   itkSetMacro(LongName, std::string);
+  /** \brief Set the feature class name used in FeatureID. */
   itkSetMacro(FeatureClassName, std::string);
+  /** \brief Set the direction index for directional feature computation. */
   itkSetMacro(Direction, int);
 
+  /**
+   * \brief Set the parameter map and reconfigure the instance accordingly.
+   *
+   * Calls ConfigureQuantifierSettingsByParameters() and ConfigureSettingsByParameters()
+   * to update histogram and feature-specific settings from the provided parameters.
+   *
+   * \param[in] param Map of parameter name-value pairs.
+   */
   void SetParameters(ParametersType param)
   {
     m_Parameters = param;
@@ -197,46 +228,82 @@ public:
     this->Modified();
   };
 
+  /** \brief Get the command line option prefix. */
   itkGetConstMacro(Prefix, std::string);
+  /** \brief Get the short name of this feature class. */
   itkGetConstMacro(ShortName, std::string);
+  /** \brief Get the long name of this feature class. */
   itkGetConstMacro(LongName, std::string);
+  /** \brief Get the feature class name. */
   itkGetConstMacro(FeatureClassName, std::string);
+  /** \brief Get the current parameter map. */
   itkGetConstMacro(Parameters, ParametersType);
 
+  /** \brief Get the IntensityQuantifier used for histogram-based feature computation. */
   itkGetMacro(Quantifier, IntensityQuantifier::Pointer);
 
+  /** \brief Get the direction index. */
   itkGetConstMacro(Direction, int);
 
+  /** \brief Set the minimum intensity for histogram initialization. */
   itkSetMacro(MinimumIntensity, double);
+  /** \brief Set whether to use the explicit minimum intensity. */
   itkSetMacro(UseMinimumIntensity, bool);
+  /** \brief Set the maximum intensity for histogram initialization. */
   itkSetMacro(MaximumIntensity, double);
+  /** \brief Set whether to use the explicit maximum intensity. */
   itkSetMacro(UseMaximumIntensity, bool);
+  /** \brief Get the minimum intensity for histogram initialization. */
   itkGetConstMacro(MinimumIntensity, double);
+  /** \brief Get whether the explicit minimum intensity is used. */
   itkGetConstMacro(UseMinimumIntensity, bool);
+  /** \brief Get the maximum intensity for histogram initialization. */
   itkGetConstMacro(MaximumIntensity, double);
+  /** \brief Get whether the explicit maximum intensity is used. */
   itkGetConstMacro(UseMaximumIntensity, bool);
 
-
+  /** \brief Set the histogram bin size. */
   itkSetMacro(Binsize, double);
+  /** \brief Set whether to use the explicit bin size for histogram initialization. */
   itkSetMacro(UseBinsize, bool);
+  /** \brief Get the histogram bin size. */
   itkGetConstMacro(Binsize, double);
+  /** \brief Get whether the explicit bin size is used. */
   itkGetConstMacro(UseBinsize, bool);
 
+  /** \brief Set the morphological mask image used by some feature classes. */
   itkSetMacro(MorphMask, mitk::Image::Pointer);
+  /** \brief Get the morphological mask image. */
   itkGetConstMacro(MorphMask, mitk::Image::Pointer);
 
+  /** \brief Set the number of histogram bins. */
   itkSetMacro(Bins, int);
+  /** \brief Set whether to use the explicit bin count for histogram initialization. */
   itkSetMacro(UseBins, bool);
+  /** \brief Get whether the explicit bin count is used. */
   itkGetConstMacro(UseBins, bool);
+  /** \brief Get the number of histogram bins. */
   itkGetConstMacro(Bins, int);
 
+  /** \brief Set whether to ignore the mask when computing histogram ranges. */
   itkSetMacro(IgnoreMask, bool);
+  /** \brief Get whether the mask is ignored for histogram range computation. */
   itkGetConstMacro(IgnoreMask, bool);
 
+  /** \brief Set whether to encode parameter values in the feature name prefix. */
   itkSetMacro(EncodeParametersInFeaturePrefix, bool);
+  /** \brief Get whether parameter values are encoded in the feature name prefix. */
   itkGetConstMacro(EncodeParametersInFeaturePrefix, bool);
+  /** \brief Toggle encoding of parameter values in the feature name prefix. */
   itkBooleanMacro(EncodeParametersInFeaturePrefix);
 
+  /**
+   * \brief Build the full option prefix string for command line parameters.
+   *
+   * If a prefix is set, returns "prefix::shortName"; otherwise returns the short name alone.
+   *
+   * \return The option prefix string.
+   */
   std::string GetOptionPrefix() const
   {
     if (!m_Prefix.empty())

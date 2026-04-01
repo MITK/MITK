@@ -34,30 +34,38 @@ namespace mitk
   class MultiLabelSegmentation;
 }
 
-/*!
-  \brief QmitkExtractFromMultiLabelSegmentationWidget
-
-  Widget that offers the GUI and logic to extract different images (class maps, instance maps
-  and instance masks) from a multi label segmentation.
-*/
+/**
+ * \brief Widget for extracting images from multi-label segmentations.
+ *
+ * Provides a GUI and logic to extract different image representations (class maps, instance maps,
+ * and instance masks) from a multi-label segmentation. The extracted images are stored as child
+ * nodes in the data storage.
+ *
+ * \sa mitk::MultiLabelSegmentation
+ * \sa QmitkConvertToMultiLabelSegmentationWidget
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkExtractFromMultiLabelSegmentationWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
+  /**
+   * \brief Constructs the widget with GUI elements and signal/slot connections.
+   * \param[in] dataStorage Pointer to the data storage for node selection and result storage.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkExtractFromMultiLabelSegmentationWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Default destructor. */
+  /** \brief Destructor. */
   ~QmitkExtractFromMultiLabelSegmentationWidget() override;
 
 private slots:
 
-  /** @brief This slot is called if the selection in the workbench is changed. */
+  /** \brief Called when the segmentation selection in the workbench changes. */
   void OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
-  /** @brief This slot is called if user activates the button to convert a surface into a binary image. */
+  /** \brief Called when the user clicks the extract button. */
   void OnExtractPressed();
 
 private:

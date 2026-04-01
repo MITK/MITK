@@ -22,13 +22,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
+   * \brief Converts a contour set to a point set.
    *
-   * @brief Converts a contour set to a point set.
+   * The resulting point set consists of sample points of all the contours,
+   * sampled at a configurable frequency.
    *
-   * The resulting pointset consists of sample points of all the contours
-   *
-   * @ingroup SurfaceFilters
-   * @ingroup Process
+   * \ingroup SurfaceFilters
+   * \ingroup Process
+   * \sa ContourSet, PointSet
    */
   class MITKSEGMENTATION_EXPORT ContourSetToPointSetFilter : public PointSetSource
   {

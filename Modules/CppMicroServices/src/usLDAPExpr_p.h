@@ -31,7 +31,12 @@ class LDAPExprData;
 class ServicePropertiesImpl;
 
 /**
- * This class is not part of the public API.
+ * \brief Internal representation of an LDAP search filter expression.
+ *
+ * This class is not part of the public API. It parses and evaluates
+ * RFC 1960-based LDAP filter strings used to match service properties.
+ *
+ * \sa ServicePropertiesImpl
  */
 class LDAPExpr {
 
@@ -54,31 +59,42 @@ public:
 
 
   /**
-   * Creates an invalid LDAPExpr object. Use with care.
+   * \brief Creates an invalid LDAPExpr object. Use with care.
    *
-   * @see IsNull()
+   * \sa IsNull()
    */
   LDAPExpr();
 
+  /**
+   * \brief Construct an LDAPExpr by parsing the given filter string.
+   *
+   * \param[in] filter LDAP filter string to parse.
+   * \throws InvalidSyntaxException if the filter is malformed.
+   */
   LDAPExpr(const std::string& filter);
 
+  /** \brief Copy constructor. */
   LDAPExpr(const LDAPExpr& other);
 
+  /** \brief Copy assignment operator. */
   LDAPExpr& operator=(const LDAPExpr& other);
 
+  /** \brief Destructor. */
   ~LDAPExpr();
 
   /**
-   * Get object class set matched by this LDAP expression. This will not work
-   * with wildcards and NOT expressions. If a set can not be determined return <code>false</code>.
+   * \brief Get object class set matched by this LDAP expression.
    *
-   * \param objClasses The set of matched classes will be added to objClasses.
-   * \return If the set cannot be determined, <code>false</code> is returned, <code>true</code> otherwise.
+   * This will not work with wildcards and NOT expressions. If a set
+   * can not be determined return \c false.
+   *
+   * \param[out] objClasses The set of matched classes will be added to objClasses.
+   * \return If the set cannot be determined, \c false is returned, \c true otherwise.
    */
   bool GetMatchedObjectClasses(ObjectClassSet& objClasses) const;
 
   /**
-   * Checks if this LDAP expression is "simple". The definition of
+   * \brief Checks if this LDAP expression is "simple". The definition of
    * a simple filter is:
    * <ul>
    *  <li><code>(<it>name</it>=<it>value</it>)</code> is simple if
@@ -93,11 +109,11 @@ public:
    * of attribute values. The keyword-value-pairs are the ones that
    * satisfy this expression, for the given keywords.
    *
-   * @param keywords The keywords to look for.
-   * @param cache An array (indexed by the keyword indexes) of lists to
+   * \param[in] keywords The keywords to look for.
+   * \param[out] cache An array (indexed by the keyword indexes) of lists to
    * fill in with values saturating this expression.
-   * @return <code>true</code> if this expression is simple,
-   * <code>false</code> otherwise.
+   * \return \c true if this expression is simple,
+   * \c false otherwise.
    */
   bool IsSimple(
     const StringList& keywords,
@@ -105,103 +121,154 @@ public:
     bool matchCase) const;
 
   /**
-   * Returns <code>true</code> if this instance is invalid, i.e. it was
+   * \brief Returns \c true if this instance is invalid, i.e. it was
    * constructed using LDAPExpr().
    *
-   * @return <code>true</code> if the expression is invalid,
-   *         <code>false</code> otherwise.
+   * \return \c true if the expression is invalid,
+   *         \c false otherwise.
    */
   bool IsNull() const;
 
-  //!
+  /**
+   * \brief Parse and evaluate a filter string against service properties.
+   *
+   * \param[in] filter LDAP filter string.
+   * \param[in] pd Service properties to match against.
+   * \return \c true if the properties match the filter.
+   */
   static bool Query(const std::string& filter, const ServicePropertiesImpl& pd);
 
-  //! Evaluate this LDAP filter.
+  /**
+   * \brief Evaluate this LDAP filter against the given service properties.
+   *
+   * \param[in] p Service properties to match against.
+   * \param[in] matchCase Whether the comparison is case-sensitive.
+   * \return \c true if the properties satisfy the expression.
+   */
   bool Evaluate(const ServicePropertiesImpl& p, bool matchCase) const;
 
-  //!
+  /**
+   * \brief Return the string representation of this LDAP expression.
+   *
+   * \return The filter string.
+   */
   const std::string ToString() const;
 
 
 private:
 
-  //! Contains the current parser position and parsing utility methods.
+  /** \brief Contains the current parser position and parsing utility methods. */
   class ParseState
   {
 
   private:
 
-    std::size_t m_pos;
-    std::string m_str;
+    std::size_t m_pos; ///< \brief Current parse position.
+    std::string m_str; ///< \brief The string being parsed.
 
   public:
 
+    /**
+     * \brief Construct a ParseState from the given string.
+     *
+     * \param[in] str The LDAP filter string to parse.
+     */
     ParseState(const std::string& str);
 
-    //! Move m_pos to remove the prefix \a pre
+    /**
+     * \brief Move m_pos to remove the prefix \a pre.
+     *
+     * \param[in] pre Prefix to match and skip.
+     * \return \c true if the prefix was found and skipped.
+     */
     bool prefix(const std::string& pre);
 
-    /** Peek a char at m_pos
-    \note If index out of bounds, throw exception
-    */
+    /**
+     * \brief Peek a char at m_pos.
+     *
+     * \note If index is out of bounds, throws an exception.
+     * \return The character at the current position.
+     */
     LDAPExpr::Byte peek();
 
-    //! Increment m_pos by n
+    /**
+     * \brief Increment m_pos by \a n.
+     *
+     * \param[in] n Number of characters to skip.
+     */
     void skip(int n);
 
-    //! return string from m_pos until the end
+    /**
+     * \brief Return the substring from m_pos until the end.
+     *
+     * \return The remaining unparsed string.
+     */
     std::string rest() const;
 
-    //! Move m_pos until there's no spaces
+    /** \brief Advance m_pos past any whitespace characters. */
     void skipWhite();
 
-    //! Get string until special chars. Move m_pos
+    /**
+     * \brief Get the attribute name up to the next special character and advance m_pos.
+     *
+     * \return The attribute name.
+     */
     std::string getAttributeName();
 
-    //! Get string and convert * to WILDCARD
+    /**
+     * \brief Get the attribute value, converting '*' to WILDCARD, and advance m_pos.
+     *
+     * \return The attribute value string.
+     */
     std::string getAttributeValue();
 
-    //! Throw InvalidSyntaxException exception
+    /**
+     * \brief Throw an InvalidSyntaxException with the given message.
+     *
+     * \param[in] m Error message.
+     */
     void error(const std::string& m) const;
 
   };
 
-  //!
+  /** \brief Construct a complex (AND/OR/NOT) expression from sub-expressions. */
   LDAPExpr(int op, const std::vector<LDAPExpr>& args);
 
-  //!
+  /** \brief Construct a simple (EQ/LE/GE/APPROX) expression. */
   LDAPExpr(int op, const std::string& attrName, const std::string& attrValue);
 
-  //!
+  /** \brief Parse a full LDAP expression from the given parse state. */
   static LDAPExpr ParseExpr(ParseState& ps);
 
-  //!
+  /** \brief Parse a simple LDAP expression from the given parse state. */
   static LDAPExpr ParseSimple(ParseState& ps);
 
+  /** \brief Trim leading and trailing whitespace from \a str. */
   static std::string Trim(std::string str);
 
+  /** \brief Convert \a str to lowercase. */
   static std::string ToLower(const std::string& str);
 
-  //!
+  /** \brief Compare a property value against a string using the given operator. */
   bool Compare(const Any& obj, int op, const std::string& s) const;
 
-  //!
+  /** \brief Compare an integral-type property value using the given operator. */
   template<typename T>
   bool CompareIntegralType(const Any& obj, const int op, const std::string& s) const;
 
-  //!
+  /** \brief Compare two strings using the given LDAP operator. */
   static bool CompareString(const std::string& s1, int op, const std::string& s2);
 
-  //!
+  /** \brief Prepare a wildcard pattern string for matching. */
   static std::string FixupString(const std::string &s);
 
-  //!
+  /** \brief Check if the string \a s matches the wildcard pattern \a pat. */
   static bool PatSubstr(const std::string& s, const std::string& pat);
 
-  //!
+  /** \brief Recursive helper for wildcard pattern matching. */
   static bool PatSubstr(const std::string& s, int si, const std::string& pat, int pi);
 
-  //! Shared pointer
+  /** \brief Shared pointer to the expression data. */
   SharedDataPointer<LDAPExprData> d;
 
 };

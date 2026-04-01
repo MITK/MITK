@@ -21,6 +21,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \brief Parameterizer for the TwoTissueCompartmentFDGModel (irreversible FDG model).
+   * \sa TwoTissueCompartmentFDGModel, TwoTissueCompartmentFDGModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentFDGModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::TwoTissueCompartmentFDGModel>
   {

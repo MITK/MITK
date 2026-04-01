@@ -62,7 +62,26 @@ namespace mitk
                                                bool forceManifold = false,
                                                bool boundaryFixing = false);
 
-  /** \brief Encapsulates mitk::Remesh function as filter.
+  /**
+   * \brief ITK/VTK-style filter that encapsulates the mitk::Remesh() function.
+   *
+   * This filter wraps the free-standing Remesh() function into an ITK pipeline filter
+   * derived from SurfaceToSurfaceFilter. Set the desired remeshing parameters via the
+   * provided setter macros, assign an input surface, and call Update() to produce
+   * a remeshed output surface.
+   *
+   * Default parameter values:
+   * - TimeStep: 0
+   * - NumVertices: 0 (keep original vertex count)
+   * - Gradation: 1.0
+   * - Subsampling: 10
+   * - EdgeSplitting: 0.0 (disabled)
+   * - OptimizationLevel: 1
+   * - ForceManifold: false
+   * - BoundaryFixing: false
+   *
+   * \sa Remesh()
+   * \sa SurfaceToSurfaceFilter
    */
   class MITKREMESHING_EXPORT RemeshFilter : public mitk::SurfaceToSurfaceFilter
   {
@@ -70,13 +89,22 @@ namespace mitk
     mitkClassMacro(RemeshFilter, SurfaceToSurfaceFilter);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Set the time step of the input surface to remesh. */
     itkSetMacro(TimeStep, unsigned int);
+    /** \brief Set the desired number of vertices (0 to keep original count). */
     itkSetMacro(NumVertices, int);
+    /** \brief Set the gradation parameter controlling curvature influence on polygon size. */
     itkSetMacro(Gradation, double);
+    /** \brief Set the subsampling factor for input surface refinement before remeshing. */
     itkSetMacro(Subsampling, int);
+    /** \brief Set the edge splitting threshold (0.0 to disable). */
     itkSetMacro(EdgeSplitting, double);
+    /** \brief Set the optimization level for minimizing surface distance (0 to disable). */
     itkSetMacro(OptimizationLevel, int);
+    /** \brief Set whether to force the output surface to be manifold. */
     itkSetMacro(ForceManifold, bool);
+    /** \brief Set whether to fix boundaries by adding extra polygons. */
     itkSetMacro(BoundaryFixing, bool);
 
   protected:

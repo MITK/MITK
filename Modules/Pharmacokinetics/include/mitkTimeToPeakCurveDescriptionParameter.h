@@ -16,8 +16,14 @@ found in the LICENSE file.
 
 namespace mitk {
 
-/** Computes the position of the first maximum of the curve. As a secondary
-  * aspect it also returns the value of the curve.*/
+/**
+ * \brief Curve description parameter that computes the time to peak and the peak value.
+ *
+ * Returns two values: the time point at which the first maximum of the curve occurs
+ * and the maximum curve value itself.
+ *
+ * \sa MaximumCurveDescriptionParameter, CurveDescriptionParameterBase
+ */
 class MITKPHARMACOKINETICS_EXPORT TimeToPeakCurveDescriptionParameter : public mitk::CurveDescriptionParameterBase
 {
 public:
@@ -28,6 +34,9 @@ public:
 
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Returns the names of the computed parameters ("TimeToPeak", "PeakValue").
+     *  \return Vector of parameter name strings. */
     DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
 

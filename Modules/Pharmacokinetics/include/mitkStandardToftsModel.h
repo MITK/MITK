@@ -18,12 +18,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** @class StandardToftsModel
-   * @brief Implementation of the Model function of the Tofts pharmacokinetic model, using an Aterial Input Function
-   * The Model calculates the Concentration-Time-Curve as a convolution of the plasma curve Cp (the AIF) and a tissue specific
-   * residue function (in this case an exponential: R(t) = ktrans * exp(-ktrans/ve * (t)) ).
-   *       C(t) = vp * Cp(t) + conv(Cp(t),R(t))
-   * The parameters ktrans, ve and ve are subject to the fitting routine*/
+  /** \class StandardToftsModel
+   * \brief Implementation of the Standard Tofts pharmacokinetic model using an Arterial Input Function.
+   *
+   * Calculates the concentration-time curve as a convolution of the plasma curve Cp (the AIF)
+   * and an exponential residue function R(t) = ktrans * exp(-ktrans/ve * t):
+   * \code
+   *   C(t) = conv(Cp(t), R(t))
+   * \endcode
+   * Fitted parameters: Ktrans (volume transfer constant), ve (extravascular extracellular
+   * volume fraction).
+   *
+   * \sa ExtendedToftsModel, AIFBasedModelBase
+   */
 
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModel : public AIFBasedModelBase
   {

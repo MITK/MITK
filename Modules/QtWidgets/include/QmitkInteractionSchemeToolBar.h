@@ -22,9 +22,10 @@ found in the LICENSE file.
 #include <QToolBar>
 
 /**
-* @brief
+* \brief Toolbar widget that allows switching between different interaction schemes.
 *
-*
+* Provides buttons to switch the interaction scheme (e.g., MITK default or PACS mode)
+* using the mitk::InteractionSchemeSwitcher.
 */
 class MITKQTWIDGETS_EXPORT QmitkInteractionSchemeToolBar : public QToolBar
 {

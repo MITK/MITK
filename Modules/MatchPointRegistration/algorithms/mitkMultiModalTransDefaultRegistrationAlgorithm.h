@@ -21,10 +21,26 @@ found in the LICENSE file.
 
 namespace mitk
 {
-        /** \class MultiModalTranslationDefaultRegistrationAlgorithm
-        * Algorithm is used as default solution for multimodal 3-degrees of freedom (translation) problem statements in DIPP.
-        * Uses 3 Resolution levels. By default initializes via image centers
-        */
+        /**
+         * \brief Default multimodal translation-only registration algorithm for MITK.
+         *
+         * Provides a pre-configured ITK-based translation registration using Mattes
+         * Mutual Information as the similarity metric with a multi-resolution strategy
+         * (3 levels). The algorithm is designed for multimodal registration problem statements
+         * with only 3 degrees of freedom (translation along X, Y, Z).
+         *
+         * Configuration details:
+         * - Uses 3 resolution levels with adaptive spatial sampling.
+         * - Initializes via image centers (not center of gravity).
+         * - Optimizer: Regular Step Gradient Descent (max step 3.0, min step 0.5, 200 iterations,
+         *   relaxation factor 0.8). All 3 translation scales are set to 1.0.
+         * - Metric: Mattes Mutual Information with 30 histogram bins. Level 0 uses all pixels;
+         *   subsequent levels sample 15% of moving image pixels.
+         *
+         * \tparam TImageType The ITK image type for both fixed and moving images.
+         *
+         * \sa MultiModalAffineDefaultRegistrationAlgorithm, MultiModalRigidDefaultRegistrationAlgorithm
+         */
         template<class TImageType>
         class MultiModalTranslationDefaultRegistrationAlgorithm :
           public map::algorithm::boxed::ITKTransMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalTransDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
@@ -51,6 +67,14 @@ namespace mitk
           {
           };
 
+          /**
+           * \brief Configure the algorithm with default parameters.
+           *
+           * Sets 3 resolution levels, enables pre-initialization via image centers,
+           * and configures optimizer scales (all 1.0 for translation), step sizes,
+           * iteration count, relaxation factor, and Mattes MI metric parameters
+           * (30 histogram bins, all pixels, explicit PDF derivatives).
+           */
           void configureAlgorithm() override
           {
             Superclass::configureAlgorithm();
@@ -79,6 +103,12 @@ namespace mitk
             this->getConcreteMetricControl()->getConcreteMetric()->UseExplicitPDFDerivativesOn();
           }
 
+          /**
+           * \brief Adjust spatial sampling between resolution levels.
+           *
+           * At levels above 0, spatial sampling is reduced to 15% of the moving
+           * image pixels for improved performance.
+           */
           void
           doInterLevelSetup() override
           {

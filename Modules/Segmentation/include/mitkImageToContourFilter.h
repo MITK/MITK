@@ -72,8 +72,7 @@ namespace mitk
     void SetProgressStepSize(unsigned int stepSize);
 
     /**
-     * @brief Set the contour value to be extracted if there are multiple contours
-     *
+     * \brief Sets the contour value to be extracted if there are multiple contours.
      */
     itkSetMacro (ContourValue, ScalarType);
 

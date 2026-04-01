@@ -19,35 +19,42 @@ found in the LICENSE file.
 
 #include <itkMacro.h>
 
-// ------- INFORMATION ----------
-/// SET FUNCTIONS
-// void SetInput( ItkImage ) // Compulsory
-// void SetStartIndex (const IndexType & StartIndex); // Compulsory
-// void SetEndIndex(const IndexType & EndIndex); // Compulsory
-// void SetFullNeighborsMode(bool) // Optional (default=false), if false N4, if true N26
-// void SetActivateTimeOut(bool) // Optional (default=false), for debug issues: after 30s algorithms terminates. You can
-// have a look at the VectorOrderImage to see how far it came
-// void SetMakeOutputImage(bool) // Optional (default=true), Generate an outputimage of the path. You can also get the
-// path directory with GetVectorPath()
-// void SetCalcAllDistances(bool) // Optional (default=false), Calculate Distances over the whole image. CAREFUL,
-// algorithm time extends a lot. Necessary for GetDistanceImage
-// void SetStoreVectorOrder(bool) // Optional (default=false), Stores in which order the pixels were checked. Necessary
-// for GetVectorOrderImage
-// void AddEndIndex(const IndexType & EndIndex) //Optional. By calling this function you can add several endpoints! The
-// algorithm will look for several shortest Paths. From Start to all Endpoints.
-//
-/// GET FUNCTIONS
-// std::vector< itk::Index<3> > GetVectorPath(); // returns the shortest path as vector
-// std::vector< std::vector< itk::Index<3> > GetMultipleVectorPathe(); // returns a vector of shortest Paths (which are
-// vectors of points)
-// GetDistanceImage // Returns the distance image
-// GetVectorOrderIMage // Returns the Vector Order image
-//
-// EXAMPLE USE
-// please see qmitkmitralvalvesegmentation4dtee bundle
-
 namespace itk
 {
+  /**
+   * \brief ITK image filter that computes the shortest path between pixels using A*.
+   *
+   * This filter finds the optimal (minimum cost) path between a start pixel and
+   * one or more end pixels in an image, using the A* graph search algorithm with
+   * a pluggable cost function. The cost function (ShortestPathCostFunction)
+   * determines the transition cost between neighboring pixels.
+   *
+   * **Required inputs:**
+   * - Input image via SetInput()
+   * - Start pixel via SetStartIndex()
+   * - End pixel via SetEndIndex() (or multiple via AddEndIndex())
+   *
+   * **Optional settings:**
+   * - SetFullNeighborsMode(): N4/N6 (false, default) or N8/N26 (true) neighborhood
+   * - SetMakeOutputImage(): Generate a binary output image of the path (default: true)
+   * - SetCalcAllDistances(): Compute distances to all pixels (default: false, slow)
+   * - SetStoreVectorOrder(): Record pixel visit order for debugging (default: false)
+   * - SetActivateTimeOut(): Abort after 30 seconds (default: false)
+   * - SetCostFunction(): Plug in a custom cost function
+   *
+   * **Output retrieval:**
+   * - GetVectorPath(): The shortest path as a vector of pixel indices
+   * - GetMultipleVectorPaths(): Multiple paths when multiple endpoints are used
+   * - GetDistanceImage(): Distance image (requires SetCalcAllDistances(true))
+   * - GetVectorOrderImage(): Visit order image (requires SetStoreVectorOrder(true))
+   *
+   * \tparam TInputImageType The input image type (2D or 3D).
+   * \tparam TOutputImageType The output image type (typically same dimensionality).
+   *
+   * \sa ShortestPathCostFunction
+   * \sa ShortestPathCostFunctionLiveWire
+   * \sa ShortestPathNode
+   */
   template <class TInputImageType, class TOutputImageType>
   class ShortestPathImageFilter : public ImageToImageFilter<TInputImageType, TOutputImageType>
   {
@@ -58,11 +65,11 @@ namespace itk
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-    // Typdefs for metric
+    // Typedefs for metric
     typedef ShortestPathCostFunction<TInputImageType> CostFunctionType;
     typedef typename CostFunctionType::Pointer CostFunctionTypePointer;
 
-    // More typdefs for convenience
+    // More typedefs for convenience
     typedef TInputImageType InputImageType;
     typedef typename TInputImageType::Pointer InputImagePointer;
     typedef typename TInputImageType::PixelType InputImagePixelType;
@@ -84,78 +91,191 @@ namespace itk
     // Run-time type information
     itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter);
 
-    // Display
+    /**
+     * \brief Print object information to an output stream.
+     * \param[in,out] os The output stream.
+     * \param[in] indent The indentation level.
+     */
     void PrintSelf(std::ostream &os, Indent indent) const override;
 
-    // Compare function for A_STAR
+    /**
+     * \brief Comparator for the A* priority queue.
+     *
+     * Orders ShortestPathNode pointers by their combined distance and
+     * estimated remaining cost (distAndEst) in descending order, so
+     * that the node with the lowest cost is at the top of the queue.
+     */
     struct CompareNodeStar
     {
       bool operator()(ShortestPathNode *a, ShortestPathNode *b) { return (a->distAndEst > b->distAndEst); }
     };
 
-    // \brief Set Starpoint for ShortestPath Calculation
+    /**
+     * \brief Set the start pixel index for the shortest path computation.
+     *
+     * \param[in] StartIndex The image index where the path begins.
+     */
     void SetStartIndex(const IndexType &StartIndex);
 
-    // \brief Adds Endpoint for multiple ShortestPath Calculation
+    /**
+     * \brief Add an additional endpoint for multi-target shortest path search.
+     *
+     * When multiple endpoints are added, the algorithm finds the shortest
+     * path from the start to each endpoint. Results can be retrieved via
+     * GetMultipleVectorPaths().
+     *
+     * \param[in] index The image index of the additional endpoint.
+     *
+     * \sa GetMultipleVectorPaths
+     */
     void AddEndIndex(const IndexType &index);
 
-    // \brief Set Endpoint for ShortestPath Calculation
+    /**
+     * \brief Set the (single) endpoint for the shortest path computation.
+     *
+     * \param[in] EndIndex The image index where the path ends.
+     */
     void SetEndIndex(const IndexType &EndIndex);
 
-    // \brief Set FullNeighborsMode. false = no diagonal neighbors, in 2D this means N4 Neigborhood. true = would be N8
-    // in 2D
+    /**
+     * \brief Set the neighborhood connectivity mode.
+     *
+     * When false (default), uses N4 (2D) or N6 (3D) neighborhood
+     * (no diagonal neighbors). When true, uses N8 (2D) or N26 (3D).
+     */
     itkSetMacro(FullNeighborsMode, bool);
+    /** \brief Get the current neighborhood connectivity mode. */
     itkGetMacro(FullNeighborsMode, bool);
 
-    // \brief Set Graph_fullNeighbors. false = no diagonal neighbors, in 2D this means N4 Neigborhood. true = would be
-    // N8 in 2D
+    /**
+     * \brief Set graph-level full neighbors mode.
+     *
+     * Internal setting controlling whether the graph uses diagonal
+     * neighbors. Typically set to match FullNeighborsMode.
+     */
     itkSetMacro(Graph_fullNeighbors, bool);
 
-    // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest
-    // Path directly as vector with the function GetVectorPath
+    /**
+     * \brief Set whether to produce a binary output image of the path.
+     *
+     * Default is true. When true, the output image shows FOREGROUND (255)
+     * on path pixels and BACKGROUND (0) elsewhere. The path can also be
+     * retrieved as a vector via GetVectorPath().
+     */
     itkSetMacro(MakeOutputImage, bool);
+    /** \brief Get whether output image generation is enabled. */
     itkGetMacro(MakeOutputImage, bool);
 
-    // \brief (default=false), Store an Vector of Order, so you can call getVectorOrderImage after update
+    /**
+     * \brief Set whether to record the pixel visit order.
+     *
+     * Default is false. When true, the visit order is stored and can be
+     * retrieved via GetVectorOrderImage(). Useful for debugging.
+     */
     itkSetMacro(StoreVectorOrder, bool);
+    /** \brief Get whether visit order recording is enabled. */
     itkGetMacro(StoreVectorOrder, bool);
 
-    // \brief (default=false), // Calculate all Distances to all pixels, so you can call getDistanceImage after update
-    // (warning algo will take a long time)
+    /**
+     * \brief Set whether to compute distances to all pixels.
+     *
+     * Default is false. When true, the algorithm does not stop at the
+     * endpoint but continues until all reachable pixels are visited.
+     * Results can be retrieved via GetDistanceImage().
+     *
+     * \warning This significantly increases computation time.
+     */
     itkSetMacro(CalcAllDistances, bool);
+    /** \brief Get whether all-distances mode is enabled. */
     itkGetMacro(CalcAllDistances, bool);
 
-    // \brief (default=false), for debug issues: after 30s algorithms terminates. You can have a look at the
-    // VectorOrderImage to see how far it came
+    /**
+     * \brief Set whether to enable a 30-second timeout.
+     *
+     * Default is false. When true, the algorithm terminates after 30
+     * seconds. Useful for debugging; inspect GetVectorOrderImage() to
+     * see how far the search progressed.
+     */
     itkSetMacro(ActivateTimeOut, bool);
+    /** \brief Get whether the timeout is enabled. */
     itkGetMacro(ActivateTimeOut, bool);
 
-    // \brief returns shortest Path as vector
+    /**
+     * \brief Get the computed shortest path as a vector of pixel indices.
+     *
+     * \return A vector of IndexType representing the path from start to end.
+     * \pre The filter must have been updated (Update() called).
+     */
     std::vector<IndexType> GetVectorPath();
 
-    // \brief returns Multiple shortest Paths. You can call this function, when u performed a multiple shortest path
-    // search (one start, several ends)
+    /**
+     * \brief Get multiple shortest paths for multi-endpoint searches.
+     *
+     * Returns one path per endpoint added via AddEndIndex().
+     *
+     * \return A vector of vectors, each containing a path as pixel indices.
+     * \pre Multiple endpoints must have been added and the filter updated.
+     *
+     * \sa AddEndIndex
+     */
     std::vector<std::vector<IndexType>> GetMultipleVectorPaths();
 
-    // \brief returns the vector order image. It shows in which order the pixels were checked. good for debugging. Be
-    // sure to have m_StoreVectorOrder=true
+    /**
+     * \brief Get an image showing the pixel visit order.
+     *
+     * Each pixel value represents the order in which it was visited
+     * during the search. Useful for debugging and visualization.
+     *
+     * \return The visit order image.
+     * \pre SetStoreVectorOrder(true) must have been called before Update().
+     */
     OutputImagePointer GetVectorOrderImage();
 
-    // \brief returns the distance image. It shows the distances from the startpoint to all other pixels. Be sure to
-    // have m_CalcAllDistances=true
+    /**
+     * \brief Get the distance image showing shortest distances from the start.
+     *
+     * Each pixel value represents the minimum cumulative cost from the
+     * start pixel to that pixel.
+     *
+     * \return The distance image.
+     * \pre SetCalcAllDistances(true) must have been called before Update().
+     */
     OutputImagePointer GetDistanceImage();
 
-    // \brief Fill m_VectorPath
+    /**
+     * \brief Trace back from end to start and fill m_VectorPath.
+     *
+     * Follows the prevNode links from the end node back to the start
+     * node to construct the shortest path vector.
+     */
     void MakeShortestPathVector();
 
-    // \brief cleans up the filter
+    /**
+     * \brief Clean up allocated resources.
+     *
+     * Deletes the node array and resets internal state. Called
+     * automatically at the end of GenerateData().
+     */
     void CleanUp();
 
-    itkSetObjectMacro(CostFunction,
-                      CostFunctionType); // itkSetObjectMacro = set function that uses pointer as parameter
+    /** \brief Set the cost function used for computing transition costs. */
+    itkSetObjectMacro(CostFunction, CostFunctionType);
+    /** \brief Get the cost function used for computing transition costs. */
     itkGetObjectMacro(CostFunction, CostFunctionType);
 
+    /**
+     * \brief Enable or disable the custom cost function.
+     *
+     * When disabled, a default unit cost is used for all transitions.
+     *
+     * \param[in] doUseCostFunction true to use the set cost function, false for unit cost.
+     */
     void SetUseCostFunction(bool doUseCostFunction) { m_useCostFunction = doUseCostFunction; };
+
+    /**
+     * \brief Query whether the custom cost function is enabled.
+     * \return true if the custom cost function is in use.
+     */
     bool GetUseCostFunction() { return m_useCostFunction; };
 
   protected:

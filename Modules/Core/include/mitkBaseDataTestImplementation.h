@@ -17,12 +17,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Implementation of BaseData (for testing)
-  //##
-  //## As BaseData is an abstract class, we need an implementation for testing its methods
-  //## @ingroup Data
-
+  /**
+   * \brief Implementation of BaseData (for testing).
+   *
+   * As BaseData is an abstract class, we need an implementation for testing its methods.
+   *
+   * \ingroup Data
+   */
   class BaseDataTestImplementation : public BaseData
   {
   public:
@@ -32,7 +33,10 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
+    /** \brief Initialize the time geometry with the given number of time steps.
+     * \param timeSteps Number of time steps to initialize.
+     */
+    void InitializeTimeGeometry(unsigned int timeSteps /* = 1 */) override
     {
       Superclass::InitializeTimeGeometry(timeSteps);
     }
@@ -40,14 +44,21 @@ namespace mitk
   protected:
     mitkCloneMacro(Self);
 
+    /** \brief Copy constructor. */
     BaseDataTestImplementation(const BaseDataTestImplementation& other) : BaseData(other) {};
 
+    /** \brief Verify the requested region. \return Always returns false. */
     bool VerifyRequestedRegion() override { return false; };
+    /** \brief Check if the requested region is outside of the buffered region. \return Always returns false. */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; };
+    /** \brief Set the requested region to the largest possible region. */
     void SetRequestedRegionToLargestPossibleRegion() override{};
+    /** \brief Set the requested region from the given data object (no-op for testing). */
     void SetRequestedRegion(const itk::DataObject * /*data*/) override{};
 
+    /** \brief Default constructor. */
     BaseDataTestImplementation(){};
+    /** \brief Destructor. */
     ~BaseDataTestImplementation() override{};
   };
 

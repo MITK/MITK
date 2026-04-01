@@ -19,6 +19,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \class ConcreteModelFactoryBase
+   * \brief Template base class for model factories that operate on a specific model type.
+   *
+   * This class provides default implementations for all ModelTraitsInterface methods
+   * by delegating to a reference model instance. It also implements CreateModel()
+   * to instantiate the concrete model type TModel.
+   *
+   * \tparam TModel The concrete model type this factory creates.
+   *
+   * \sa ModelFactoryBase, ModelBase
+   */
   template <class TModel>
   class ConcreteModelFactoryBase : public ModelFactoryBase
   {

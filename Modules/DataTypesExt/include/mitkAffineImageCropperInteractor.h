@@ -21,11 +21,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    * \brief Affine interaction with objects in 3D windows.
-    *
-    * \ingroup Interaction
-    */
-  // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
+   * \brief Affine interaction with objects in 3D windows for image cropping.
+   *
+   * Provides translation, rotation, deformation, and radius scaling for
+   * bounding objects used in image cropping workflows. Inherits from
+   * DataInteractor and uses a configurable state machine pattern.
+   *
+   * \sa AffineBaseDataInteractor3D, DataInteractor
+   * \ingroup Interaction
+   */
   class MITKDATATYPESEXT_EXPORT AffineImageCropperInteractor : public DataInteractor
   {
   public:

@@ -18,11 +18,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Converts composite pixel values to a displayable string
-  *
-  * \throws mitk::Exception If the image is nullptr.
-  * \throws mitk::AccessByItkException for pixel types which are not part of MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ
-  */
+  /** \brief Convert composite pixel values (RGB, RGBA) to a displayable string.
+   *
+   * \param[in] image The image containing composite pixel data.
+   * \param[in] index The 3D index of the pixel to convert.
+   * \return A string representation of the pixel value, or "Out of bounds" if the index is outside the image.
+   * \throws mitk::Exception If the image is nullptr.
+   * \throws mitk::AccessByItkException For pixel types which are not part of MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ.
+   */
   std::string MITKCORE_EXPORT ConvertCompositePixelValueToString(Image::Pointer image, itk::Index<3> index);
 }
 

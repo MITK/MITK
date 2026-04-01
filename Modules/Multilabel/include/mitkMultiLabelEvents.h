@@ -57,28 +57,60 @@ namespace mitk
   itk::EventObject * classname::MakeObject() const { return new classname; } \
   static_assert(true, "Compile time eliminated. Used to require a semi-colon at end of macro.")
 
-  /** Base event class for all events that are about a label in a MultiLabel class.
-  *
-  * It has a member that indicates the label id the event is referring to.
-  * Use the ANY_LABEL value if you want to define an rvent (e.g. for adding an observer)
-  * that reacts to every label and not just to a special one.
-  */
+  /**
+   * \brief Base event class for all label-related events in a MultiLabelSegmentation.
+   *
+   * This event carries a label value identifying which label the event refers to.
+   * Use the special ANY_LABEL value when adding an observer that should react to
+   * events for any label, not just a specific one.
+   *
+   * \sa LabelAddedEvent, LabelModifiedEvent, LabelRemovedEvent, MultiLabelSegmentation
+   */
   class MITKMULTILABEL_EXPORT AnyLabelEvent : public itk::ModifiedEvent
   {
   public:
     using Self = AnyLabelEvent;
     using Superclass = itk::ModifiedEvent;
+
+    /** \brief Sentinel value indicating the event applies to any/all labels. */
     const static mitk::Label::PixelType ANY_LABEL = std::numeric_limits<mitk::Label::PixelType>::max();
 
     AnyLabelEvent() = default;
+
+    /**
+     * \brief Constructor with a specific label value.
+     * \param[in] labelValue The label value this event refers to.
+     */
     AnyLabelEvent(Label::PixelType labelValue);
+
+    /** \brief Copy constructor. */
     AnyLabelEvent(const Self & s);
+
     ~AnyLabelEvent() override;
+
+    /** \brief Returns the name of this event class. */
     const char * GetEventName() const override;
+
+    /**
+     * \brief Checks if a given event matches this event type and label value.
+     * \param[in] e The event to check against.
+     * \return true if the event matches.
+     */
     bool CheckEvent(const itk::EventObject * e) const override;
+
+    /** \brief Creates a copy of this event. */
     itk::EventObject * MakeObject() const override;
 
+    /**
+     * \brief Sets the label value this event refers to.
+     * \param[in] labelValue The label value.
+     */
     void SetLabelValue(Label::PixelType labelValue);
+
+    /**
+     * \brief Returns the label value this event refers to.
+     * \return The label value, or ANY_LABEL if applicable to all labels.
+     */
     Label::PixelType GetLabelValue() const;
   private:
     void operator=(const Self &);
@@ -109,14 +141,16 @@ namespace mitk
   */
   mitkMultiLabelEventMacroDeclaration(LabelRemovedEvent, AnyLabelEvent, Label::PixelType);
 
-  /** Event class that is used to indicated if a set of labels is changed in a MultiLabel class.
-  *
-  * In difference to the other label events LabelsChangedEvent is send only *one time* after
-  * the modification of the MultiLableImage instance is finished. So e.g. even if 4 labels are
-  * changed by a merge operation, this event will only be sent once (compared to LabelRemoved
-  * or LabelModified).
-  * It has a member that indicates the label ids the event is referring to.
-  */
+  /**
+   * \brief Event emitted once after a batch of label changes in a MultiLabelSegmentation.
+   *
+   * Unlike LabelAddedEvent, LabelModifiedEvent, and LabelRemovedEvent (which are emitted
+   * per label), LabelsChangedEvent is sent only once after all modifications in an
+   * operation are complete. For example, even if 4 labels are changed by a merge
+   * operation, this event is sent only once with all affected label values.
+   *
+   * \sa AnyLabelEvent, LabelAddedEvent, LabelModifiedEvent, LabelRemovedEvent
+   */
   class MITKMULTILABEL_EXPORT LabelsChangedEvent : public itk::ModifiedEvent
   {
   public:
@@ -124,43 +158,103 @@ namespace mitk
     using Superclass = itk::ModifiedEvent;
 
     LabelsChangedEvent() = default;
+
+    /**
+     * \brief Constructor with a vector of affected label values.
+     * \param[in] labelValues The label values affected by the change.
+     */
     LabelsChangedEvent(std::vector<Label::PixelType> labelValues);
+
+    /** \brief Copy constructor. */
     LabelsChangedEvent(const Self& s);
+
     ~LabelsChangedEvent() override;
+
+    /** \brief Returns the name of this event class. */
     const char* GetEventName() const override;
+
+    /**
+     * \brief Checks if a given event matches this event type.
+     * \param[in] e The event to check against.
+     * \return true if the event matches.
+     */
     bool CheckEvent(const itk::EventObject* e) const override;
+
+    /** \brief Creates a copy of this event. */
     itk::EventObject* MakeObject() const override;
 
+    /**
+     * \brief Sets the label values this event refers to.
+     * \param[in] labelValues Vector of affected label values.
+     */
     void SetLabelValues(std::vector<Label::PixelType> labelValues);
+
+    /**
+     * \brief Returns the label values this event refers to.
+     * \return Vector of affected label values.
+     */
     std::vector<Label::PixelType> GetLabelValues() const;
   private:
     void operator=(const Self&);
     std::vector<Label::PixelType> m_LabelValues;
   };
 
-  /** Base event class for all events that are about a group in a MultiLabel class.
-  *
-  * It has a member that indicates the group id the event is referring to.
-  * Use the ANY_GROUP value if you want to define an event (e.g. for adding an observer)
-  * that reacts to every group and not just to a special one.
-  */
+  /**
+   * \brief Base event class for all group-related events in a MultiLabelSegmentation.
+   *
+   * This event carries a group index identifying which spatial group the event refers to.
+   * Use the special ANY_GROUP value when adding an observer that should react to
+   * events for any group, not just a specific one.
+   *
+   * \sa GroupAddedEvent, GroupModifiedEvent, GroupRemovedEvent, MultiLabelSegmentation
+   */
   class MITKMULTILABEL_EXPORT AnyGroupEvent : public itk::ModifiedEvent
   {
   public:
+    /** \brief Type for group indices. */
     using GroupIndexType = std::size_t;
     using Self = AnyGroupEvent;
     using Superclass = itk::ModifiedEvent;
+
+    /** \brief Sentinel value indicating the event applies to any/all groups. */
     const static GroupIndexType ANY_GROUP = std::numeric_limits<GroupIndexType>::max();
 
     AnyGroupEvent() = default;
+
+    /**
+     * \brief Constructor with a specific group index.
+     * \param[in] groupID The group index this event refers to.
+     */
     AnyGroupEvent(GroupIndexType groupID);
+
+    /** \brief Copy constructor. */
     AnyGroupEvent(const Self& s);
+
     ~AnyGroupEvent() override;
+
+    /** \brief Returns the name of this event class. */
     const char* GetEventName() const override;
+
+    /**
+     * \brief Checks if a given event matches this event type and group index.
+     * \param[in] e The event to check against.
+     * \return true if the event matches.
+     */
     bool CheckEvent(const itk::EventObject* e) const override;
+
+    /** \brief Creates a copy of this event. */
     itk::EventObject* MakeObject() const override;
 
+    /**
+     * \brief Sets the group index this event refers to.
+     * \param[in] groupID The group index.
+     */
     void SetGroupID(GroupIndexType groupID);
+
+    /**
+     * \brief Returns the group index this event refers to.
+     * \return The group index, or ANY_GROUP if applicable to all groups.
+     */
     GroupIndexType GetGroupID() const;
   private:
     void operator=(const Self&);

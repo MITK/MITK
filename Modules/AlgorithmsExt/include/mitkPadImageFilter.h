@@ -39,16 +39,40 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      /** \brief Sets the intensity of the pixel to pad */
+      /**
+       * \brief Set the intensity value used for padded pixels (default: -32766).
+       * \param[in] _arg The pad constant value.
+       */
       itkSetMacro(PadConstant, int);
 
-    /** \brief sets the binary filter ON or OFF */
+    /**
+     * \brief Enable or disable the binary threshold filter applied after padding.
+     *
+     * When enabled, the padded image is binarized using LowerThreshold and
+     * UpperThreshold, producing an unsigned char output.
+     *
+     * \param[in] _arg True to enable the binary filter, false to disable.
+     */
     itkSetMacro(BinaryFilter, bool);
 
-    /** \brief Sets the lower threshold of the included binary filter */
+    /**
+     * \brief Set the lower threshold of the binary filter.
+     *
+     * Pixels with values at or above this threshold (and at or below UpperThreshold)
+     * are set to 1; others are set to 0.
+     *
+     * \param[in] _arg The lower threshold value (default: -32766).
+     */
     itkSetMacro(LowerThreshold, int);
 
-    /** \brief Sets the upper threshold of the included binary filter */
+    /**
+     * \brief Set the upper threshold of the binary filter.
+     *
+     * Pixels with values at or below this threshold (and at or above LowerThreshold)
+     * are set to 1; others are set to 0.
+     *
+     * \param[in] _arg The upper threshold value (default: -32765).
+     */
     itkSetMacro(UpperThreshold, int);
 
   protected:

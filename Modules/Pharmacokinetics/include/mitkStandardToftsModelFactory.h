@@ -20,6 +20,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the StandardToftsModel.
+   * \sa StandardToftsModel, StandardToftsModelParameterizer, ConcreteAIFBasedModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT StandardToftsModelFactory : public
     mitk::ConcreteAIFBasedModelFactory<StandardToftsModelParameterizer>
   {

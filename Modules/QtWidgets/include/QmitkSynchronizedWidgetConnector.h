@@ -24,8 +24,8 @@ found in the LICENSE file.
 // qt
 #include <QList>
 
-/*
-* @brief This class connects different 'QmitkSynchronizedNodeSelectionWidget', such that
+/**
+* \brief This class connects different 'QmitkSynchronizedNodeSelectionWidget', such that
 *        they can synchronize their current node selection and their current selection mode.
 *
 *        In order to synchronize a new node selection widget with other already connected
@@ -47,8 +47,8 @@ public:
 
   QmitkSynchronizedWidgetConnector();
 
-  /*
-  * @brief This function connects the different signals and slots of this instance and the given
+  /**
+  * \brief This function connects the different signals and slots of this instance and the given
   *        given node selection widget, such that changes to the current list of nodes
   *        and the selection mode can be forwarded or received.
   *        The connections are as follows:
@@ -61,58 +61,58 @@ public:
   *           - QmitkSynchronizedWidgetConnector::SelectionModeChanged
   *             -> QmitkSynchronizedNodeSelectionWidget::SetSelectAll
   *
-  * @param nodeSelectionWidget    The synchronized node selection widget to be connected / synchronized.
+  * \param nodeSelectionWidget    The synchronized node selection widget to be connected / synchronized.
   */
   void ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
-  /*
-  * @brief This function disconnects the different signals and slot of this instance and the given
+  /**
+  * \brief This function disconnects the different signals and slot of this instance and the given
   *        given node selection widget, such that changes to the current list of nodes
   *        and the selection mode cannot be forwarded or received anymore.
   *
-  * @param nodeSelectionWidget    The synchronized node selection widget to be disconnected / desynchronized.
+  * \param nodeSelectionWidget    The synchronized node selection widget to be disconnected / desynchronized.
   */
   void DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget);
-  /*
-  * @brief This function sets the current selection and the selection mode of the given node selection widget
+  /**
+  * \brief This function sets the current selection and the selection mode of the given node selection widget
   *        to the values of this instance. The required values are stored in this class internally.
   *        It can be used to newly initialize the given node selection widget.
   *
-  * @param nodeSelectionWidget    The synchronized node selection widget for which the
+  * \param nodeSelectionWidget    The synchronized node selection widget for which the
   *                               current selection and the selection mode should be set.
   */
   void SynchronizeWidget(QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const;
-  /*
-  * @brief Get the current internal node selection.
+  /**
+  * \brief Get the current internal node selection.
   *
-  * @return NodeList  The current internal node selection stored as a member variable.
+  * \return NodeList  The current internal node selection stored as a member variable.
   */
   NodeList GetNodeSelection() const;
-  /*
-  * @brief Get the current internal selection mode.
+  /**
+  * \brief Get the current internal selection mode.
   *
-  * @return The current internal selection mode stored as a member variable.
+  * \return The current internal selection mode stored as a member variable.
   */
   bool GetSelectionMode() const;
 
 Q_SIGNALS:
-  /*
-  * @brief A signal that will be emitted by the 'ChangeSelection'-slot.
+  /**
+  * \brief A signal that will be emitted by the 'ChangeSelection'-slot.
   *        This happens if a new selection / list of nodes is set from outside of this class,
   *        e.g. from a QmitkSynchronizedNodeSelectionWidget.
   *        This signal is connected to the 'SetCurrentSelection'-slot of each
   *        QmitkSynchronizedNodeSelectionWidget to propagate the new selection.
   *
-  * @param  nodes   A list of data nodes that are newly selected.
+  * \param  nodes   A list of data nodes that are newly selected.
   */
   void NodeSelectionChanged(NodeList nodes);
-  /*
-  * @brief A signal that will be emitted by the 'ChangeSelectionMode'-slot.
+  /**
+  * \brief A signal that will be emitted by the 'ChangeSelectionMode'-slot.
   *        This happens if the selection mode is change from outside of this class,
   *        e.g. from a QmitkSynchronizedNodeSelectionWidget.
   *        This signal is connected to the 'SetSelectAll'-slot of each
   *        QmitkSynchronizedNodeSelectionWidget to propagate the selection mode.
   *
-  * @param  selectAll   True, if the selection mode is changed to "select all" nodes.
+  * \param  selectAll   True, if the selection mode is changed to "select all" nodes.
   *                     False otherwise.
   */
   void SelectionModeChanged(bool selectAll);
@@ -121,40 +121,40 @@ Q_SIGNALS:
   void NodesLayerMoved(QSet<mitk::DataNode*> movedNodes, const int targetLayer);
 
 public Q_SLOTS:
-  /*
-  * @brief Set a new internal selection and send this new selection to connected
+  /**
+  * \brief Set a new internal selection and send this new selection to connected
   *        QmitkSynchronizedNodeSelectionWidgets using the 'NodeSelectionChanged'-signal.
   *
   *        This slot itself is connected to the 'CurrentSelectionChanged'-signal of each
   *        QmitkSynchronizedNodeSelectionWidget to receive a new selection.
   *
-  * @param  nodes   A list of data nodes that are newly selected.
+  * \param  nodes   A list of data nodes that are newly selected.
   */
   void ChangeSelection(NodeList nodes);
 
-  /*
-  * @brief Set a new selection mode and send this new selection mode to connected
+  /**
+  * \brief Set a new selection mode and send this new selection mode to connected
   *        QmitkSynchronizedNodeSelectionWidgets using the 'SelectionModeChanged'-signal.
   *
   *        This slot itself is connected to the 'SelectionModeChanged'-signal of each
   *        QmitkSynchronizedNodeSelectionWidget to receive a new selection mode.
   *
-  * @param  selectAll   True, if the selection mode is changed to "select all" nodes.
+  * \param  selectAll   True, if the selection mode is changed to "select all" nodes.
   *                     False otherwise.
   */
   void ChangeSelectionMode(bool selectAll);
 
-  /*
-  * @brief When the visibility of a node is changed in a connected widget,
+  /**
+  * \brief When the visibility of a node is changed in a connected widget,
   *        update the internal set of invisible selected nodes.
   *        This information is needed to fully synchronize newly connected widgets.
-  * @param  node   A pointer to the data node for which visibility was toggled.
-  * @param  visibility   The new visibility of the respective data node.
+  * \param  node   A pointer to the data node for which visibility was toggled.
+  * \param  visibility   The new visibility of the respective data node.
   */
   void OnNodeVisibilityChanged(mitk::DataNode::Pointer node, bool visibility);
 
-  /*
-  * @brief Decrease the internal counter of connections to keep track of how many
+  /**
+  * \brief Decrease the internal counter of connections to keep track of how many
   *        QmitkSynchronizedNodeSelectionWidgets are synchronized.
   *
   *        This slot itself is connected to the 'DeregisterSynchronization'-signal of each

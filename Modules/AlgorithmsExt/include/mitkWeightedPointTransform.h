@@ -33,7 +33,7 @@ namespace mitk
   /**
    * \ingroup AnisotropicRegistration
    *
-   * @brief This class implements an extension of the
+   * \brief This class implements an extension of the
    * weighted point based registration algorithm
    * from A. Danilchenko, R. Balachandran and J. M. Fitzpatrick.
    *
@@ -69,59 +69,59 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** @brief Method which registers both point sets. */
+      /** \brief Method which registers both point sets. */
       void ComputeTransformation();
 
-    /** @brief Sets the threshold of the registration. Default value is 0.0001.*/
+    /** \brief Sets the threshold of the registration. Default value is 0.0001.*/
     itkSetMacro(Threshold, double);
 
-      /** @brief Sets the maximum number of iterations of the registration.
+      /** \brief Sets the maximum number of iterations of the registration.
         * Default value is 1000.
         */
       itkSetMacro(MaxIterations, double);
 
-      /** @return Returns the number of iterations of the last run
+      /** \return Returns the number of iterations of the last run
         * of the registration algorithm. Returns -1 if there was no
         * run of the registration yet.
         */
       itkGetMacro(Iterations, int);
 
-    /** @return Returns the FRE of the last run of the registration algorithm.
+    /** \return Returns the FRE of the last run of the registration algorithm.
       * Returns -1 if there was no run of the registration yet.
       */
     itkGetMacro(FRE, double);
 
-    /** @brief Sets the FRE normalization factor. Default value is 1.0. */
+    /** \brief Sets the FRE normalization factor. Default value is 1.0. */
     itkSetMacro(FRENormalizationFactor, double);
 
-    /** @return Returns the current FRE normalization factor.*/
+    /** \return Returns the current FRE normalization factor.*/
     itkGetMacro(FRENormalizationFactor, double);
 
     /** Sets the moving point set used for the registration.
-      * @param p The input point set.
+      * \param p The input point set.
       */
     void SetMovingPointSet(vtkSmartPointer<vtkPoints> p);
 
     /**
      * Set the list of 3x3 covariance matrices belonging to the moving point set.
-     * @param matrices List of covariance matrices.
+     * \param matrices List of covariance matrices.
      */
     void SetCovarianceMatricesMoving(const CovarianceMatrixList &matrices);
 
     /** Sets the fixed point set used for the registration.
-      * @param p The input point set.
+      * \param p The input point set.
       */
     void SetFixedPointSet(vtkSmartPointer<vtkPoints> p);
 
     /**
      * Set the list of 3x3 covariance matrices belonging to the fixed point set.
-     * @param matrices List of covariance matrices.
+     * \param matrices List of covariance matrices.
      */
     void SetCovarianceMatricesFixed(const CovarianceMatrixList &matrices);
 
     /**
       * The translation vector computed by the algorithm.
-      * @return 3x1 translation vector.
+      * \return 3x1 translation vector.
       */
     const Translation &GetTransformT() const { return m_Translation; }
     /**
@@ -206,31 +206,31 @@ namespace mitk
       * The computed value is used as a termination constraint of the algorithm and
       * compared against the threshold.
       *
-      * @param X The moving point set in the previous iteration step.
-      * @param X_new The moving point set in the actual step.
+      * \param X The moving point set in the previous iteration step.
+      * \param X_new The moving point set in the actual step.
       *
-      * @return The computed change between the two point sets.
+      * \return The computed change between the two point sets.
       */
     double CalculateConfigChange(vtkPoints *X, vtkPoints *X_new);
 
     /**
-     * @brief This method performs a variant of the weighted point register algorithm presented by
+     * \brief This method performs a variant of the weighted point register algorithm presented by
      *        A. Danilchenko, R. Balachandran and J. M. Fitzpatrick in January 2010. (Modified in January 2011)
      *        converted to C++ by Alfred Franz in March/April 2010
      *
-     * @param X                (input) the moving point set
-     * @param Y                (input) the fixed (static) point set
-     * @param Sigma_X          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair
+     * \param X                (input) the moving point set
+     * \param Y                (input) the fixed (static) point set
+     * \param Sigma_X          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair
      * of points in X
-     * @param Sigma_Y          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair
+     * \param Sigma_Y          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair
      * of points in Y
-     * @param Threshold        (input) the relative size of the change to the moving set above which the iteration
+     * \param Threshold        (input) the relative size of the change to the moving set above which the iteration
      * continues
-     * @param MaxIterations    (input) the maximum number of iterations allowed
-     * @param TransformationR  (output) this variable will hold the computed rotation matrix
-     * @param TransformationT  (output) this variable will hold the computed translation vector
-     * @param FRE              (output) this variable will hold the computed rotation FRE of the transformation
-     * @param n                (output) this variable will hold the number of iterations used by the algorithm
+     * \param MaxIterations    (input) the maximum number of iterations allowed
+     * \param TransformationR  (output) this variable will hold the computed rotation matrix
+     * \param TransformationT  (output) this variable will hold the computed translation vector
+     * \param FRE              (output) this variable will hold the computed rotation FRE of the transformation
+     * \param n                (output) this variable will hold the number of iterations used by the algorithm
      */
     void WeightedPointRegister(vtkPoints *X,
                                vtkPoints *Y,

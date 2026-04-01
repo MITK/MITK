@@ -25,8 +25,8 @@ namespace Ui
   class QmitkDataStorageSelectionHistoryInspector;
 }
 
-/*
-* @brief This is an inspector that offers a simple list view on the last selected nodes (in chronologic order) in a data storage.
+/**
+* \brief Inspector that offers a simple list view on the last selected nodes (in chronologic order) in a data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageSelectionHistoryInspector : public QmitkAbstractDataStorageInspector
 {

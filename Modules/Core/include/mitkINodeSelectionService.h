@@ -31,6 +31,7 @@ namespace mitk
   class MITKCORE_EXPORT INodeSelectionService
   {
   public:
+    /** \brief Virtual destructor. */
     virtual ~INodeSelectionService();
 
     /**

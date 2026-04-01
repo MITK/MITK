@@ -39,19 +39,19 @@ namespace mitk
 {
   class Mapper;
 
-  /*!
-  \brief VtkPropRenderer
-
-  VtkPropRenderer organizes the MITK rendering process. The MITK rendering process is completely integrated into the VTK
-  rendering pipeline.
-  The vtkMitkRenderProp is a custom vtkProp derived class, which implements the rendering interface between MITK and
-  VTK.
-  It redirects render() calls to the VtkPropRenderer, which is responsible for rendering of the datatreenodes.
-  VtkPropRenderer replaces the old OpenGLRenderer.
-
-  \sa rendering
-  \ingroup rendering
-  */
+  /**
+   * \brief Organizes the MITK rendering process within the VTK rendering pipeline.
+   *
+   * The MITK rendering process is completely integrated into the VTK rendering pipeline.
+   * vtkMitkRenderProp is a custom vtkProp derived class that implements the rendering
+   * interface between MITK and VTK. It redirects render() calls to VtkPropRenderer,
+   * which is responsible for rendering the data tree nodes.
+   *
+   * VtkPropRenderer replaces the old OpenGLRenderer.
+   *
+   * \sa rendering
+   * \ingroup rendering
+   */
   class MITKCORE_EXPORT VtkPropRenderer : public BaseRenderer
   {
     // Workaround for Displaylistbug
@@ -67,7 +67,7 @@ namespace mitk
 
     typedef std::map<int, Mapper *> MappersMapType;
 
-    // Render - called by vtkMitkRenderProp, returns the number of props rendered
+    /** \brief Enumeration of render pass types. */
     enum RenderType
     {
       Opaque,
@@ -76,26 +76,64 @@ namespace mitk
       Volumetric
     };
 
-    /** \brief Store/propagate vtkInformation during rendering */
+    /**
+     * \brief Store and propagate vtkInformation during rendering.
+     * \param[in] info The VTK information object to propagate to mappers.
+     */
     void SetPropertyKeys(vtkInformation *info);
 
+    /**
+     * \brief Render the scene for the given render type.
+     *
+     * Called by vtkMitkRenderProp during VTK rendering.
+     *
+     * \param[in] type The render pass type (Opaque, Translucent, Overlay, or Volumetric).
+     * \return The number of props rendered.
+     */
     int Render(RenderType type);
 
-    /** \brief This methods contains all method neceassary before a VTK Render() call */
+    /** \brief Perform all preparations necessary before a VTK Render() call. */
     virtual void PrepareRender();
 
-    // Active current renderwindow
+    /** \brief Make the current render window the active OpenGL context. */
     virtual void MakeCurrent();
 
-    void SetDataStorage(
-      mitk::DataStorage *storage) override; ///< set the datastorage that will be used for rendering
+    /**
+     * \brief Set the data storage that will be used for rendering.
+     * \param[in] storage The data storage to use.
+     */
+    void SetDataStorage(mitk::DataStorage *storage) override;
 
+    /**
+     * \brief Initialize the renderer with the given VTK render window.
+     * \param[in] renderwindow The VTK render window to initialize with.
+     */
     void InitRenderer(vtkRenderWindow *renderwindow) override;
+
+    /**
+     * \brief Update a specific data node in the rendering pipeline.
+     * \param[in] datatreenode The data node to update.
+     */
     virtual void Update(mitk::DataNode *datatreenode);
+
+    /**
+     * \brief Set the mapper slot ID to select 2D or 3D mappers.
+     * \param[in] mapperId The mapper slot identifier.
+     */
     void SetMapperID(const MapperSlotId mapperId) override;
 
-    // Size
+    /**
+     * \brief Initialize the renderer size.
+     * \param[in] w Width in pixels.
+     * \param[in] h Height in pixels.
+     */
     void InitSize(int w, int h) override;
+
+    /**
+     * \brief Resize the renderer.
+     * \param[in] w New width in pixels.
+     * \param[in] h New height in pixels.
+     */
     void Resize(int w, int h) override;
 
     // Picking
@@ -118,19 +156,33 @@ namespace mitk
     itkSetEnumMacro(PickingMode, PickingMode);
     itkGetEnumMacro(PickingMode, PickingMode);
 
+    /**
+     * \brief Pick a world point from a display position using the current picking mode.
+     *
+     * \param[in] displayPoint The 2D display position to pick from.
+     * \param[out] worldPoint The resulting 3D world coordinate.
+     */
     void PickWorldPoint(const Point2D &displayPoint, Point3D &worldPoint) const override;
+
+    /**
+     * \brief Pick the data node at the given display position.
+     *
+     * \param[in] displayPosition The 2D display position to pick from.
+     * \param[out] worldPosition The 3D world position of the picked object.
+     * \return The picked DataNode, or nullptr if nothing was picked.
+     */
     mitk::DataNode *PickObject(const Point2D &displayPosition, Point3D &worldPosition) const override;
 
     /**
-    * @brief WriteSimpleText Write a text in a renderwindow.
-    *
-    * Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the
-  GetTextLabelProperty(int text_id) function
-  in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
-    *
-    * @deprecatedSince{2015_05} Please use mitkTextOverlay2D instead.
-    * See mitkTextOverlay2DRenderingTest for an example.
-    */
+     * \brief Write 2D text as an overlay in the render window.
+     *
+     * Returns a unique text ID for each call, which can be used via
+     * GetTextLabelProperty() to obtain a vtkTextProperty for configuring
+     * font, font size, etc.
+     *
+     * \deprecated Since 2015_05. Use mitkTextOverlay2D instead.
+     * \sa mitkTextOverlay2DRenderingTest
+     */
     DEPRECATED(int WriteSimpleText(std::string text,
                                    double posX,
                                    double posY,
@@ -140,11 +192,13 @@ namespace mitk
                                    float opacity = 1.0));
 
     /**
-     * @brief CGetTextLabelProperty an be used in order to get a vtkTextProperty for
-     * a specific text_id. This property enables the setup of font, font size, etc.
-     * @param text_id the id of the text property.
-     * @deprecatedSince{2015_05} Please use mitkTextOverlay2D instead.
-     * See mitkTextOverlay2DRenderingTest for an example.
+     * \brief Return the vtkTextProperty for a given text ID.
+     *
+     * The returned property enables configuration of font, font size, etc.
+     *
+     * \param[in] text_id The ID of the text property (returned by WriteSimpleText).
+     * \deprecated Since 2015_05. Use mitkTextOverlay2D instead.
+     * \sa mitkTextOverlay2DRenderingTest
      */
     DEPRECATED(vtkTextProperty *GetTextLabelProperty(int text_id));
 
@@ -170,20 +224,49 @@ namespace mitk
      */
     vtkAssemblyPath *GetNextPath();
 
+    /**
+     * \brief Return the number of assembly paths in the current traversal.
+     * \return The number of paths.
+     */
     int GetNumberOfPaths();
 
+    /**
+     * \brief Return the world point picker.
+     * \return Pointer to the internal vtkWorldPointPicker.
+     */
     const vtkWorldPointPicker *GetWorldPointPicker() const;
+
+    /**
+     * \brief Return the point picker.
+     * \return Pointer to the internal vtkPointPicker.
+     */
     const vtkPointPicker *GetPointPicker() const;
+
+    /**
+     * \brief Return the cell picker.
+     * \return Pointer to the internal vtkCellPicker.
+     */
     const vtkCellPicker *GetCellPicker() const;
 
     /**
-    * \brief Release vtk-based graphics resources. Called by
-    * vtkMitkRenderProp::ReleaseGraphicsResources.
-    */
+     * \brief Release VTK-based graphics resources.
+     *
+     * Called by vtkMitkRenderProp::ReleaseGraphicsResources.
+     *
+     * \param[in] renWin The VTK window whose resources should be released.
+     */
     virtual void ReleaseGraphicsResources(vtkWindow *renWin);
 
+    /**
+     * \brief Return the current map of mappers sorted by layer.
+     * \return The mappers map keyed by layer index.
+     */
     MappersMapType GetMappersMap() const;
 
+    /**
+     * \brief Return whether immediate mode rendering is used.
+     * \return True if immediate mode rendering is enabled.
+     */
     static bool useImmediateModeRendering();
 
   protected:

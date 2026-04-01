@@ -77,57 +77,58 @@ template<class S> class ServiceObjects;
  * The framework is the only entity that can create <code>ModuleContext</code>
  * objects.
  *
- * @remarks This class is thread safe.
+ * \remarks This class is thread safe.
  */
 class MITKCPPMICROSERVICES_EXPORT ModuleContext
 {
 
 public:
 
+  /** \brief Destructor. */
   ~ModuleContext();
 
   /**
-   * Returns the <code>Module</code> object associated with this
+   * \brief Returns the <code>Module</code> object associated with this
    * <code>ModuleContext</code>. This module is called the context module.
    *
-   * @return The <code>Module</code> object associated with this
+   * \return The <code>Module</code> object associated with this
    *         <code>ModuleContext</code>.
-   * @throws std::logic_error If this ModuleContext is no
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
    */
   Module* GetModule() const;
 
   /**
-   * Returns the module with the specified identifier.
+   * \brief Returns the module with the specified identifier.
    *
-   * @param id The identifier of the module to retrieve.
-   * @return A <code>Module</code> object or <code>0</code> if the
+   * \param[in] id The identifier of the module to retrieve.
+   * \return A <code>Module</code> object or <code>0</code> if the
    *         identifier does not match any previously loaded module.
    */
   Module* GetModule(long id) const;
 
   /**
-   * Get the module that with the specified module name.
+   * \brief Get the module that with the specified module name.
    *
-   * @param name The name of the module to get.
-   * @return The requested \c Module or \c nullptr.
+   * \param[in] name The name of the module to get.
+   * \return The requested \c Module or \c nullptr.
    */
   Module* GetModule(const std::string& name);
 
   /**
-   * Returns a list of all known modules.
+   * \brief Returns a list of all known modules.
    * <p>
    * This method returns a list of all modules loaded in the module
    * environment at the time of the call to this method. This list will
    * also contain modules which might already have been unloaded.
    *
-   * @return A std::vector of <code>Module</code> objects which
+   * \return A std::vector of <code>Module</code> objects which
    *         will hold one object per known module.
    */
   std::vector<Module*> GetModules() const;
 
   /**
-   * Registers the specified service object with the specified properties
+   * \brief Registers the specified service object with the specified properties
    * under the specified class names into the framework. A
    * <code>ServiceRegistration</code> object is returned. The
    * <code>ServiceRegistration</code> object is for the private use of the
@@ -162,12 +163,12 @@ public:
    * returned.
    * </ol>
    *
-   * @note This is a low-level method and should normally not be used directly.
+   * \note This is a low-level method and should normally not be used directly.
    *       Use one of the templated RegisterService methods instead.
    *
-   * @param service The service object, which is a map of interface identifiers
+   * \param[in] service The service object, which is a map of interface identifiers
    *        to raw service pointers.
-   * @param properties The properties for this service. The keys in the
+   * \param[in] properties The properties for this service. The keys in the
    *        properties object must all be <code>std::string</code> objects. See
    *        us::ServiceConstants for a list of standard service property keys.
    *        Changes should not be made to this object after calling this
@@ -175,26 +176,26 @@ public:
    *        us::ServiceRegistration::SetProperties method must be called.
    *        The set of properties may be omitted if the service has
    *        no properties.
-   * @return A <code>ServiceRegistration</code> object for use by the module
+   * \return A <code>ServiceRegistration</code> object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
    *
-   * @throws std::invalid_argument If one of the following is true:
+   * \throws std::invalid_argument If one of the following is true:
    *         <ul>
    *         <li><code>service</code> is <code>0</code>.
    *         <li><code>properties</code> contains case variants of the same key name.
    *         </ul>
-   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws std::logic_error If this ModuleContext is no longer valid.
    *
-   * @see ServiceRegistration
-   * @see ServiceFactory
-   * @see PrototypeServiceFactory
+   * \sa ServiceRegistration
+   * \sa ServiceFactory
+   * \sa PrototypeServiceFactory
    */
   ServiceRegistrationU RegisterService(const InterfaceMap& service,
                                        const ServiceProperties& properties = ServiceProperties());
 
   /**
-   * Registers the specified service object with the specified properties
+   * \brief Registers the specified service object with the specified properties
    * using the specified template argument with the framework.
    *
    * <p>
@@ -207,17 +208,17 @@ public:
    * \snippet uServices-registration/main.cpp 1-1
    * \snippet uServices-registration/main.cpp 1-2
    *
-   * @tparam S The type under which the service can be located.
-   * @param service The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam S The type under which the service can be located.
+   * \param[in] service The service object or a ServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class S>
   ServiceRegistration<S> RegisterService(S* service, const ServiceProperties& properties = ServiceProperties())
@@ -227,7 +228,7 @@ public:
   }
 
   /**
-   * Registers the specified service object with the specified properties
+   * \brief Registers the specified service object with the specified properties
    * using the specified template argument with the framework.
    *
    * <p>
@@ -240,18 +241,18 @@ public:
    * \snippet uServices-registration/main.cpp 2-1
    * \snippet uServices-registration/main.cpp 2-2
    *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @param impl The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam I1 The first interface type under which the service can be located.
+   * \tparam I2 The second interface type under which the service can be located.
+   * \param[in] impl The service object or a ServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class I2, class Impl>
   ServiceRegistration<I1,I2> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
@@ -261,26 +262,26 @@ public:
   }
 
   /**
-   * Registers the specified service object with the specified properties
+   * \brief Registers the specified service object with the specified properties
    * using the specified template argument with the framework.
    *
    * <p>
    * This method is identical to the RegisterService<I1,I2,Impl>(Impl*, const ServiceProperties&)
    * method except that it supports three service interface types.
    *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @tparam I3 The third interface type under which the service can be located.
-   * @param impl The service object or a ServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam I1 The first interface type under which the service can be located.
+   * \tparam I2 The second interface type under which the service can be located.
+   * \tparam I3 The third interface type under which the service can be located.
+   * \param[in] impl The service object or a ServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class I2, class I3, class Impl>
   ServiceRegistration<I1,I2,I3> RegisterService(Impl* impl, const ServiceProperties& properties = ServiceProperties())
@@ -290,7 +291,7 @@ public:
   }
 
   /**
-   * Registers the specified service factory as a service with the specified properties
+   * \brief Registers the specified service factory as a service with the specified properties
    * using the specified template argument as service interface type with the framework.
    *
    * <p>
@@ -303,17 +304,17 @@ public:
    * \snippet uServices-registration/main.cpp 1-1
    * \snippet uServices-registration/main.cpp f1
    *
-   * @tparam S The type under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam S The type under which the service can be located.
+   * \param[in] factory The ServiceFactory or PrototypeServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service factory object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class S>
   ServiceRegistration<S> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
@@ -323,7 +324,7 @@ public:
   }
 
   /**
-   * Registers the specified service factory as a service with the specified properties
+   * \brief Registers the specified service factory as a service with the specified properties
    * using the specified template argument as service interface type with the framework.
    *
    * <p>
@@ -334,18 +335,18 @@ public:
    * \snippet uServices-registration/main.cpp 2-1
    * \snippet uServices-registration/main.cpp f2
    *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam I1 The first interface type under which the service can be located.
+   * \tparam I2 The second interface type under which the service can be located.
+   * \param[in] factory The ServiceFactory or PrototypeServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service factory object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class I2>
   ServiceRegistration<I1,I2> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
@@ -355,26 +356,26 @@ public:
   }
 
   /**
-   * Registers the specified service factory as a service with the specified properties
+   * \brief Registers the specified service factory as a service with the specified properties
    * using the specified template argument as service interface type with the framework.
    *
    * <p>
    * This method is identical to the RegisterService<S>(ServiceFactory*, const ServiceProperties&)
    * method except that it supports three service interface types.
    *
-   * @tparam I1 The first interface type under which the service can be located.
-   * @tparam I2 The second interface type under which the service can be located.
-   * @tparam I3 The third interface type under which the service can be located.
-   * @param factory The ServiceFactory or PrototypeServiceFactory object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object for use by the module
+   * \tparam I1 The first interface type under which the service can be located.
+   * \tparam I2 The second interface type under which the service can be located.
+   * \tparam I3 The third interface type under which the service can be located.
+   * \param[in] factory The ServiceFactory or PrototypeServiceFactory object.
+   * \param[in] properties The properties for this service.
+   * \return A ServiceRegistration object for use by the module
    *         registering the service to update the service's properties or to
    *         unregister the service.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid or the
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid or the
    *         \c service factory object is nullptr.
    *
-   * @see RegisterService(const InterfaceMap&, const ServiceProperties&)
+   * \sa RegisterService(const InterfaceMap&, const ServiceProperties&)
    */
   template<class I1, class I2, class I3>
   ServiceRegistration<I1,I2,I3> RegisterService(ServiceFactory* factory, const ServiceProperties& properties = ServiceProperties())
@@ -384,7 +385,7 @@ public:
   }
 
   /**
-   * Returns a list of <code>ServiceReference</code> objects. The returned
+   * \brief Returns a list of <code>ServiceReference</code> objects. The returned
    * list contains services that
    * were registered under the specified class and match the specified filter
    * expression.
@@ -417,21 +418,21 @@ public:
    * filter expression must match the service.
    * </ul>
    *
-   * @param clazz The class name with which the service was registered or
+   * \param[in] clazz The class name with which the service was registered or
    *        an empty string for all services.
-   * @param filter The filter expression or empty for all
+   * \param[in] filter The filter expression or empty for all
    *        services.
-   * @return A list of <code>ServiceReference</code> objects or
+   * \return A list of <code>ServiceReference</code> objects or
    *         an empty list if no services are registered which satisfy the
    *         search.
-   * @throws std::invalid_argument If the specified <code>filter</code>
+   * \throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws std::logic_error If this ModuleContext is no longer valid.
    */
   std::vector<ServiceReferenceU> GetServiceReferences(const std::string& clazz, const std::string& filter = std::string());
 
   /**
-   * Returns a list of <code>ServiceReference</code> objects. The returned
+   * \brief Returns a list of <code>ServiceReference</code> objects. The returned
    * list contains services that
    * were registered under the interface id of the template argument <code>S</code>
    * and match the specified filter expression.
@@ -440,18 +441,18 @@ public:
    * This method is identical to GetServiceReferences(const std::string&, const std::string&) except that
    * the class name for the service object is automatically deduced from the template argument.
    *
-   * @tparam S The type under which the requested service objects must have been registered.
-   * @param filter The filter expression or empty for all
+   * \tparam S The type under which the requested service objects must have been registered.
+   * \param[in] filter The filter expression or empty for all
    *        services.
-   * @return A list of <code>ServiceReference</code> objects or
+   * \return A list of <code>ServiceReference</code> objects or
    *         an empty list if no services are registered which satisfy the
    *         search.
-   * @throws std::invalid_argument If the specified <code>filter</code>
+   * \throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If the service type \c S is invalid.
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If the service type \c S is invalid.
    *
-   * @see GetServiceReferences(const std::string&, const std::string&)
+   * \sa GetServiceReferences(const std::string&, const std::string&)
    */
   template<class S>
   std::vector<ServiceReference<S> > GetServiceReferences(const std::string& filter = std::string())
@@ -469,7 +470,7 @@ public:
   }
 
   /**
-   * Returns a <code>ServiceReference</code> object for a service that
+   * \brief Returns a <code>ServiceReference</code> object for a service that
    * implements and was registered under the specified class.
    *
    * <p>
@@ -491,31 +492,31 @@ public:
    * specified in its us::ServiceConstants::SERVICE_ID() property); that is, the
    * service that was registered first is returned.
    *
-   * @param clazz The class name with which the service was registered.
-   * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
+   * \param[in] clazz The class name with which the service was registered.
+   * \return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the named class.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException If no service was registered under the given class name.
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException If no service was registered under the given class name.
    *
-   * @see #GetServiceReferences(const std::string&, const std::string&)
+   * \sa #GetServiceReferences(const std::string&, const std::string&)
    */
   ServiceReferenceU GetServiceReference(const std::string& clazz);
 
   /**
-   * Returns a <code>ServiceReference</code> object for a service that
+   * \brief Returns a <code>ServiceReference</code> object for a service that
    * implements and was registered under the specified template class argument.
    *
    * <p>
    * This method is identical to GetServiceReference(const std::string&) except that
    * the class name for the service object is automatically deduced from the template argument.
    *
-   * @tparam S The type under which the requested service must have been registered.
-   * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
+   * \tparam S The type under which the requested service must have been registered.
+   * \return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the type <code>S</code>.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws ServiceException It no service was registered under the given class name.
-   * @see #GetServiceReference(const std::string&)
-   * @see #GetServiceReferences(const std::string&)
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws ServiceException It no service was registered under the given class name.
+   * \sa #GetServiceReference(const std::string&)
+   * \sa #GetServiceReferences(const std::string&)
    */
   template<class S>
   ServiceReference<S> GetServiceReference()
@@ -526,7 +527,7 @@ public:
   }
 
   /**
-   * Returns the service object referenced by the specified
+   * \brief Returns the service object referenced by the specified
    * <code>ServiceReferenceBase</code> object.
    * <p>
    * A module's use of a service is tracked by the module's use count of that
@@ -563,41 +564,50 @@ public:
    * <li>The service object for the service is returned.
    * </ol>
    *
-   * @param reference A reference to the service.
-   * @return A service object for the service associated with
+   * \param[in] reference A reference to the service.
+   * \return A service object for the service associated with
    *         <code>reference</code> or <code>0</code> if the service is not
    *         registered or the <code>ServiceFactory</code> threw
    *         an exception.
-   * @throws std::logic_error If this ModuleContext is no
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @throws std::invalid_argument If the specified
+   * \throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
-   * @see #UngetService(const ServiceReferenceBase&)
-   * @see ServiceFactory
+   * \sa #UngetService(const ServiceReferenceBase&)
+   * \sa ServiceFactory
    */
   void* GetService(const ServiceReferenceBase& reference);
 
+  /** \brief Returns the service interface map for the service referenced by the
+   *         specified <code>ServiceReferenceU</code> object.
+   *
+   * \param[in] reference A reference to the service.
+   * \return An InterfaceMap for the service associated with
+   *         <code>reference</code>.
+   *
+   * \sa GetService(const ServiceReferenceBase&)
+   */
   InterfaceMap GetService(const ServiceReferenceU& reference);
 
   /**
-   * Returns the service object referenced by the specified
+   * \brief Returns the service object referenced by the specified
    * <code>ServiceReference</code> object.
    * <p>
    * This is a convenience method which is identical to void* GetService(const ServiceReferenceBase&)
    * except that it casts the service object to the supplied template argument type
    *
-   * @tparam S The type the service object will be cast to.
-   * @return A service object for the service associated with
+   * \tparam S The type the service object will be cast to.
+   * \return A service object for the service associated with
    *         <code>reference</code> or <code>0</code> if the service is not
    *         registered, the <code>ServiceFactory</code> threw
    *         an exception or the service could not be casted to the desired type.
-   * @throws std::logic_error If this ModuleContext is no
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @throws std::invalid_argument If the specified
+   * \throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
-   * @see #GetService(const ServiceReferenceBase&)
-   * @see #UngetService(const ServiceReferenceBase&)
-   * @see ServiceFactory
+   * \sa #GetService(const ServiceReferenceBase&)
+   * \sa #UngetService(const ServiceReferenceBase&)
+   * \sa ServiceFactory
    */
   template<class S>
   S* GetService(const ServiceReference<S>& reference)
@@ -607,7 +617,7 @@ public:
   }
 
   /**
-   * Returns the ServiceObjects object for the service referenced by the specified
+   * \brief Returns the ServiceObjects object for the service referenced by the specified
    * ServiceReference object. The ServiceObjects object can be used to obtain
    * multiple service objects for services with prototype scope. For services with
    * singleton or module scope, the ServiceObjects::GetService() method behaves
@@ -616,15 +626,15 @@ public:
    * same as the UngetService(const ServiceReferenceBase&) method. That is, only one,
    * use-counted service object is available from the ServiceObjects object.
    *
-   * @tparam S Type of Service.
-   * @param reference A reference to the service.
-   * @return A ServiceObjects object for the service associated with the specified
+   * \tparam S Type of Service.
+   * \param[in] reference A reference to the service.
+   * \return A ServiceObjects object for the service associated with the specified
    * reference or an invalid instance if the service is not registered.
-   * @throws std::logic_error If this ModuleContext is no longer valid.
-   * @throws std::invalid_argument If the specified ServiceReference is invalid
+   * \throws std::logic_error If this ModuleContext is no longer valid.
+   * \throws std::invalid_argument If the specified ServiceReference is invalid
    * (default constructed or the service has been unregistered)
    *
-   * @see PrototypeServiceFactory
+   * \sa PrototypeServiceFactory
    */
   template<class S>
   ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
@@ -633,7 +643,7 @@ public:
   }
 
   /**
-   * Releases the service object referenced by the specified
+   * \brief Releases the service object referenced by the specified
    * <code>ServiceReference</code> object. If the context module's use count
    * for the service is zero, this method returns <code>false</code>.
    * Otherwise, the context modules's use count for the service is decremented
@@ -658,26 +668,59 @@ public:
    * <li><code>true</code> is returned.
    * </ol>
    *
-   * @param reference A reference to the service to be released.
-   * @return <code>false</code> if the context module's use count for the
+   * \param[in] reference A reference to the service to be released.
+   * \return <code>false</code> if the context module's use count for the
    *         service is zero or if the service has been unregistered;
    *         <code>true</code> otherwise.
-   * @throws std::logic_error If this ModuleContext is no
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @see #GetService
-   * @see ServiceFactory
+   * \sa #GetService
+   * \sa ServiceFactory
    */
   bool UngetService(const ServiceReferenceBase& reference);
 
+  /** \brief Adds the specified service listener with the specified filter to the
+   *         context module's list of listeners.
+   *
+   * \param[in] delegate The service listener functor to add.
+   * \param[in] filter The LDAP filter expression to match.
+   *
+   * \sa RemoveServiceListener()
+   * \sa ServiceEvent
+   */
   void AddServiceListener(const ServiceListener& delegate,
                           const std::string& filter = std::string());
+
+  /** \brief Removes the specified service listener from the context module's
+   *         list of listeners.
+   *
+   * \param[in] delegate The service listener functor to remove.
+   *
+   * \sa AddServiceListener()
+   */
   void RemoveServiceListener(const ServiceListener& delegate);
 
+  /** \brief Adds the specified module listener to the context module's list
+   *         of listeners.
+   *
+   * \param[in] delegate The module listener functor to add.
+   *
+   * \sa RemoveModuleListener()
+   * \sa ModuleEvent
+   */
   void AddModuleListener(const ModuleListener& delegate);
+
+  /** \brief Removes the specified module listener from the context module's
+   *         list of listeners.
+   *
+   * \param[in] delegate The module listener functor to remove.
+   *
+   * \sa AddModuleListener()
+   */
   void RemoveModuleListener(const ModuleListener& delegate);
 
   /**
-   * Adds the specified <code>callback</code> with the
+   * \brief Adds the specified <code>callback</code> with the
    * specified <code>filter</code> to the context modules's list of listeners.
    * See LDAPFilter for a description of the filter syntax. Listeners
    * are notified when a service has a lifecycle state change.
@@ -715,16 +758,16 @@ public:
    * callback will not be called with a <code>ServiceEvent</code> of type
    * <code>REGISTERED</code>.
    *
-   * @tparam R The type of the receiver (containing the member function to be called)
-   * @param receiver The object to connect to.
-   * @param callback The member function pointer to call.
-   * @param filter The filter criteria.
-   * @throws std::invalid_argument If <code>filter</code> contains an
+   * \tparam R The type of the receiver (containing the member function to be called)
+   * \param[in] receiver The object to connect to.
+   * \param[in] callback The member function pointer to call.
+   * \param[in] filter The filter criteria.
+   * \throws std::invalid_argument If <code>filter</code> contains an
    *         invalid filter string that cannot be parsed.
-   * @throws std::logic_error If this ModuleContext is no
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @see ServiceEvent
-   * @see RemoveServiceListener()
+   * \sa ServiceEvent
+   * \sa RemoveServiceListener()
    */
   template<class R>
   void AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent),
@@ -735,19 +778,19 @@ public:
   }
 
   /**
-   * Removes the specified <code>callback</code> from the context module's
+   * \brief Removes the specified <code>callback</code> from the context module's
    * list of listeners.
    *
    * <p>
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam R The type of the receiver (containing the member function to be removed)
-   * @param receiver The object from which to disconnect.
-   * @param callback The member function pointer to remove.
-   * @throws std::logic_error If this ModuleContext is no
+   * \tparam R The type of the receiver (containing the member function to be removed)
+   * \param[in] receiver The object from which to disconnect.
+   * \param[in] callback The member function pointer to remove.
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @see AddServiceListener()
+   * \sa AddServiceListener()
    */
   template<class R>
   void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent))
@@ -757,7 +800,7 @@ public:
   }
 
   /**
-   * Adds the specified <code>callback</code> to the context modules's list
+   * \brief Adds the specified <code>callback</code> to the context modules's list
    * of listeners. Listeners are notified when a module has a lifecycle
    * state change.
    *
@@ -766,12 +809,12 @@ public:
    * of <code>receiver</code> and <code>callback</code> such that
    * <code>(r == receiver && c == callback)</code>, then this method does nothing.
    *
-   * @tparam R The type of the receiver (containing the member function to be called)
-   * @param receiver The object to connect to.
-   * @param callback The member function pointer to call.
-   * @throws std::logic_error If this ModuleContext is no
+   * \tparam R The type of the receiver (containing the member function to be called)
+   * \param[in] receiver The object to connect to.
+   * \param[in] callback The member function pointer to call.
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @see ModuleEvent
+   * \sa ModuleEvent
    */
   template<class R>
   void AddModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
@@ -781,19 +824,19 @@ public:
   }
 
   /**
-   * Removes the specified <code>callback</code> from the context module's
+   * \brief Removes the specified <code>callback</code> from the context module's
    * list of listeners.
    *
    * <p>
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam R The type of the receiver (containing the member function to be removed)
-   * @param receiver The object from which to disconnect.
-   * @param callback The member function pointer to remove.
-   * @throws std::logic_error If this ModuleContext is no
+   * \tparam R The type of the receiver (containing the member function to be removed)
+   * \param[in] receiver The object from which to disconnect.
+   * \param[in] callback The member function pointer to remove.
+   * \throws std::logic_error If this ModuleContext is no
    *         longer valid.
-   * @see AddModuleListener()
+   * \sa AddModuleListener()
    */
   template<class R>
   void RemoveModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
@@ -803,15 +846,15 @@ public:
   }
 
   /**
-   * Get the absolute path for a file or directory in the persistent
+   * \brief Get the absolute path for a file or directory in the persistent
    * storage area provided for the module. The returned path
    * might be empty if no storage path has been set previously.
    * If the path is non-empty, it is safe to assume that the path is writable.
    *
-   * @see ModuleSettings::SetStoragePath(const std::string&)
+   * \sa ModuleSettings::SetStoragePath(const std::string&)
    *
-   * @param filename A relative name to the file or directory to be accessed.
-   * @return The absolute path to the persistent storage area for the given file name.
+   * \param[in] filename A relative name to the file or directory to be accessed.
+   * \return The absolute path to the persistent storage area for the given file name.
    */
   std::string GetDataFile(const std::string& filename) const;
 

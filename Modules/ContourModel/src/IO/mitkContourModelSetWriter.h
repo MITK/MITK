@@ -20,24 +20,30 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * @brief XML-based writer for mitk::ContourModelSet
-  *
-  * Uses the regular ContourModel writer to write each contour of the ContourModelSet to a single file.
-  *
-  * @ingroup MitkContourModelModule
-  */
+   * \brief XML-based writer for mitk::ContourModelSet.
+   *
+   * Uses the regular ContourModel writer to write each contour of the
+   * ContourModelSet to a single file.
+   *
+   * \ingroup MitkContourModelModule
+   */
   class ContourModelSetWriter : public mitk::AbstractFileWriter
   {
   public:
+    /** \brief Default constructor. Registers writer for the ContourModelSet MIME type. */
     ContourModelSetWriter();
     ~ContourModelSetWriter() override;
 
     using AbstractFileWriter::Write;
+
+    /** \brief Write the ContourModelSet to the configured output location. */
     void Write() override;
 
   protected:
+    /** \brief Copy constructor. */
     ContourModelSetWriter(const ContourModelSetWriter &other);
 
+    /** \brief Clone this writer instance. */
     mitk::ContourModelSetWriter *Clone() const override;
   };
 }

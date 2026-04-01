@@ -40,7 +40,7 @@ namespace mitk
    *
    * Implementations of this interface must be registered as a service
    * to make themselves available via the service registry. If the
-   * implementation is state-full, the service should be registered using
+   * implementation is stateful, the service should be registered using
    * a PrototypeServiceFactory.
    *
    * The file reader implementation is associated with a mime-type, specified
@@ -49,13 +49,14 @@ namespace mitk
    * or some other party.
    *
    * It is recommended to derive new implementations from AbstractFileReader or
-   * from AbstractFileIO (if both reader and writer is implemented),
+   * from AbstractFileIO (if both reader and writer are implemented),
    * which provide correct service registration semantics.
    *
    * \sa AbstractFileReader
    * \sa AbstractFileIO
    * \sa CustomMimeType
    * \sa FileReaderRegistry
+   * \sa FileReaderSelector
    * \sa IFileWriter
    */
   struct MITKCORE_EXPORT IFileReader : public IFileIO
@@ -63,15 +64,18 @@ namespace mitk
     ~IFileReader() override;
 
     /**
-     * \brief Set the input location.
-     * \param location The file name to read from.
+     * \brief Set the input file path.
+     * \param[in] location The absolute file-system path to read from.
+     *
+     * This clears any previously set input stream. The given location
+     * is used as the file-system path for reading.
      */
     virtual void SetInput(const std::string &location) = 0;
 
     /**
-     * @brief Set an input stream to read from.
-     * @param location A custom label for the input stream.
-     * @param is The input stream.
+     * \brief Set an input stream to read from.
+     * \param[in] location A custom label for the input stream, or a file-system path.
+     * \param[in] is The input stream, or \c nullptr to clear the stream.
      *
      * If \c is is \c nullptr, this clears the current input stream and \c location
      * is interpreted as a file-system path. Otherwise, \c location is a custom
@@ -80,19 +84,19 @@ namespace mitk
     virtual void SetInput(const std::string &location, std::istream *is) = 0;
 
     /**
-     * @brief Get the current input location.
-     * @return The input location.
+     * \brief Get the current input location.
+     * \return The file-system path or custom label set via SetInput().
      */
     virtual std::string GetInputLocation() const = 0;
 
     /**
-     * @brief Get the input stream.
-     * @return The currently set input stream.
+     * \brief Get the input stream.
+     * \return The currently set input stream, or \c nullptr if no stream was set.
      */
     virtual std::istream *GetInputStream() const = 0;
 
     /**
-     * \brief Reads the specified file or input stream and returns its contents.
+     * \brief Read the specified file or input stream and return its contents.
      *
      * \return A list of created BaseData objects.
      *
@@ -100,38 +104,42 @@ namespace mitk
      * the returned stream object to read the data from. If no input stream
      * was set, the data must be read from the path returned by GetInputLocation().
      *
-     * \throws mitk::Exception
+     * \throws mitk::Exception if the data could not be read.
      */
     virtual std::vector<itk::SmartPointer<BaseData>> Read() = 0;
 
     /**
-     * \brief Reads the specified file or input stream, loading its
-     * contents into the provided DataStorage.
+     * \brief Read the specified file or input stream, loading its
+     *        contents into the provided DataStorage.
      *
-     * \param ds The DataStorage to which the data is added.
-     * \return The set of added DataNodes to \c ds.
+     * \param[in,out] ds The DataStorage to which the data is added.
+     * \return The set of DataNode objects added to \c ds.
      *
      * This method may be overridden by implementations to create or
-     * reconstructed a hierarchy of mitk::DataNode instances in the
+     * reconstruct a hierarchy of mitk::DataNode instances in the
      * provided mitk::DataStorage.
      *
-     * \throws mitk::Exception
+     * \throws mitk::Exception if the data could not be read.
      */
     virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) = 0;
 
     /**
-     * @return A list of files that were loaded during the last call of Read.
+     * \brief Get the list of files that were loaded during the last Read() call.
+     * \return A list of file paths that were consumed during the most recent read
+     *         operation. Must be populated by the reader implementation.
      */
     virtual std::vector< std::string > GetReadFiles() = 0;
 
     /**
      * \brief Optionally provide base data properties as a source of meta data.
+     * \param[in] properties A PropertyList containing meta data from a previous
+     *            read operation, or \c nullptr to clear.
      *
      * The purpose of this method is not to preset the base data property list
      * of the read data but to provide access to meta data of previous read
      * operations that may be beneficial for the new read operation.
      *
-     * A typical usecase may occur when reading files from an MITK scene file
+     * A typical use case occurs when reading files from an MITK scene file
      * in which case base data properties are already provided in addition to
      * the actual data file. If such a data file references other files
      * relative to its original location on the filesystem, the original
@@ -144,7 +152,10 @@ namespace mitk
 
   protected:
 
-    /** \sa SetProperties().
+    /**
+     * \brief Get the properties set via SetProperties().
+     * \return The current PropertyList, or \c nullptr if none was set.
+     * \sa SetProperties()
      */
     virtual const PropertyList* GetProperties() const = 0;
   };

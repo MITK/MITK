@@ -24,16 +24,22 @@ namespace mitk
 #endif
 
   /**
-   * @brief The LookupTableProperty class Property to associate mitk::LookupTable
-   * to an mitk::DataNode.
-   * @ingroup DataManagement
+   * \brief Property to associate a mitk::LookupTable with a DataNode.
    *
-   * @note If you want to use this property to colorize an mitk::Image, make sure
+   * Stores a smart pointer to a LookupTable, which defines a color mapping
+   * for rendering images with discrete or continuous color scales.
+   *
+   * \ingroup DataManagement
+   *
+   * \note If you want to use this property to colorize an mitk::Image, make sure
    * to set the mitk::RenderingModeProperty to a mode which supports lookup tables
-   * (e.g. LOOKUPTABLE_COLOR). Make sure to check the documentation of the
-   * mitk::RenderingModeProperty. For a code example how to use the mitk::LookupTable
-   * and this property check the mitkImageVtkMapper2DLookupTableTest.cpp in
+   * (e.g. LOOKUPTABLE_COLOR). See the documentation of mitk::RenderingModeProperty.
+   * For a code example see mitkImageVtkMapper2DLookupTableTest.cpp in
    * Core/Code/Testing.
+   *
+   * \sa BaseProperty
+   * \sa LookupTable
+   * \sa RenderingModeProperty
    */
   class MITKCORE_EXPORT LookupTableProperty : public BaseProperty
   {
@@ -49,6 +55,7 @@ namespace mitk
     mitkCloneMacro(LookupTableProperty);
 
   public:
+    /** \brief The type of the value stored by this property. */
     typedef LookupTable::Pointer ValueType;
 
     mitkClassMacro(LookupTableProperty, BaseProperty);
@@ -58,15 +65,60 @@ namespace mitk
     itkCloneMacro(Self)
       mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
+    /**
+     * \brief Get the lookup table (ITK macro-generated accessor).
+     * \return A pointer to the stored LookupTable.
+     */
     itkGetObjectMacro(LookupTable, LookupTable);
+
+    /**
+     * \brief Get the lookup table as a smart pointer.
+     * \return The stored LookupTable smart pointer.
+     */
     ValueType GetValue() const;
 
+    /**
+     * \brief Set the lookup table.
+     *
+     * Marks the property as modified if the new table differs from the current one.
+     *
+     * \param[in] aLookupTable The new LookupTable to set.
+     */
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
+
+    /**
+     * \brief Set the lookup table (alias for SetLookupTable()).
+     *
+     * Takes the new LookupTable smart pointer to set.
+     */
     void SetValue(const ValueType &);
 
+    /**
+     * \brief Return a summary string of the lookup table.
+     *
+     * Includes the number of colors, the table range, and the first few RGBA entries.
+     *
+     * \return A string representation of the lookup table.
+     */
     std::string GetValueAsString() const override;
 
+    /**
+     * \brief Serialize the lookup table to JSON.
+     *
+     * Serializes all VTK lookup table parameters including scale, ramp, ranges,
+     * and the full RGBA color table.
+     *
+     * \param[out] j The JSON object to write the value into.
+     * \return Always \c true.
+     */
     bool ToJSON(nlohmann::json& j) const override;
+
+    /**
+     * \brief Deserialize the lookup table from JSON.
+     *
+     * \param[in] j The JSON object containing lookup table data.
+     * \return Always \c true.
+     */
     bool FromJSON(const nlohmann::json& j) override;
 
     using BaseProperty::operator=;

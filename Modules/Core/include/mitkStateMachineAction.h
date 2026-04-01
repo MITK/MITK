@@ -21,12 +21,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Represents an action, that is executed after a certain event (in statemachine-mechanism)
-  //## TODO: implement: Is used to connect the Action-Id in an XML Statemachine description with a functor in the
-  // StateMachine
-  //## implementation
-  //## @ingroup Interaction
+  /**
+   * \brief Represents an action that is executed after a certain event in the state machine mechanism.
+   *
+   * Used to connect the Action-Id in an XML state machine description with a functor in the
+   * StateMachine implementation.
+   *
+   * \ingroup Interaction
+   */
   class MITKCORE_EXPORT StateMachineAction : public itk::LightObject
   {
   public:
@@ -34,8 +36,9 @@ namespace mitk
     mitkNewMacro1Param(Self, const std::string&);
 
     /**
-      * @brief Returns the String-Id of this action.
-      **/
+     * \brief Return the string identifier of this action.
+     * \return The action name.
+     */
     std::string GetActionName() const;
 
   protected:
@@ -44,8 +47,8 @@ namespace mitk
 
   private:
     /**
-     * @brief The Id-Name of this action.
-     **/
+     * \brief The string identifier of this action.
+     */
     std::string m_ActionName;
   };
 

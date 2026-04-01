@@ -21,7 +21,18 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
- * @brief Class that allows to generate masks (for statistic computation) out of multi label segmentations
+ * \brief Generates masks for statistics computation from multi-label segmentations.
+ *
+ * This mask generator takes a MultiLabelSegmentation and produces one binary
+ * mask per label. Each mask isolates a single label from the segmentation,
+ * allowing per-label statistics to be computed via ImageStatisticsCalculator.
+ *
+ * The number of masks returned by GetNumberOfMasks() equals the number of
+ * labels in the segmentation.
+ *
+ * \sa MaskGenerator
+ * \sa ImageStatisticsCalculator
+ * \sa MultiLabelSegmentation
  */
 class MITKIMAGESTATISTICS_EXPORT MultiLabelMaskGenerator: public MaskGenerator
 {
@@ -30,8 +41,16 @@ public:
   mitkClassMacro(MultiLabelMaskGenerator, MaskGenerator);
   itkNewMacro(Self);
 
+  /**
+   * \brief Get the number of masks (one per label in the segmentation).
+   * \return Number of labels in the multi-label segmentation.
+   */
   unsigned int GetNumberOfMasks() const override;
 
+  /**
+   * \brief Set the multi-label segmentation from which to generate masks.
+   * \param[in] _arg Const pointer to the MultiLabelSegmentation.
+   */
   itkSetConstObjectMacro(MultiLabelSegmentation, MultiLabelSegmentation);
 
 protected:

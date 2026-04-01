@@ -29,6 +29,17 @@ namespace Ui
   class QmitkMonaiLabelToolGUIControls;
 }
 
+/**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief Base GUI class for MONAI Label segmentation tools.
+
+  Provides common controls for fetching available models from a MONAI Label server,
+  selecting models, and running inference previews.
+
+  \sa mitk::MonaiLabelTool
+  \sa QmitkMonaiLabel2DToolGUI
+  \sa QmitkMonaiLabel3DToolGUI
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitkMonaiLabelToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
   Q_OBJECT
@@ -55,37 +66,37 @@ protected:
   virtual void DisplayWidgets(bool enabled);
 
   /**
-   * @brief Writes any message in white on the tool pane.
+   * \brief Writes any message in white on the tool pane.
    */
   void WriteStatusMessage(const QString &);
 
   /**
-   * @brief Writes any message in red on the tool pane.
+   * \brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString &);
 
   /**
-   * @brief Creates a QMessage object and shows on screen.
+   * \brief Creates a QMessage object and shows on screen.
    */
   void ShowErrorMessage(const std::string &message);
 
   /**
-   * @brief Function to listen to tool class status emitters.
+   * \brief Function to listen to tool class status emitters.
    */
   void StatusMessageListener(const bool status);
 
   /**
-   * @brief Function to listen to Preference changes
+   * \brief Function to listen to Preference changes
    */
   void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent &event);
 
   /**
-   * @brief Helper function to write MONAI model info in to model combo box
+   * \brief Helper function to write MONAI model info in to model combo box
    */
   void PopulateModelBox(QString appName, std::vector<mitk::MonaiModelInfo> models, bool allowAllModels);
 
   /**
-   * @brief Helper function to populate required server metadata into UI
+   * \brief Helper function to populate required server metadata into UI
    */
   void PopulateUI(bool allowAllModels);
 

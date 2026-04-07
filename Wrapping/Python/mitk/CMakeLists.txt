@@ -30,33 +30,7 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" [==[
-from .mitk import *
-from .mitk import Image as NativeImage  # public alias for isinstance checks
-from pathlib import Path as _Path
-
-
-def Image(source=None, /, **kwargs):
-    """Create an MITK image from various sources.
-
-    - Image()                 -- empty image (must be initialized later)
-    - Image(numpy_array, ...) -- delegate to NativeImage.from_numpy(...)
-    - Image(path)             -- delegate to NativeImage.load(path)
-    """
-    if source is None:
-        return NativeImage.new()
-    if isinstance(source, (str, _Path)):
-        return NativeImage.load(str(source))
-    try:
-        import numpy as _np
-        if isinstance(source, _np.ndarray):
-            return NativeImage.from_numpy(source, **kwargs)
-    except ImportError:
-        pass
-    raise TypeError(
-        f"mitk.Image() does not support source of type {type(source).__name__}"
-    )
-]==])
+file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
 
 if(MSVC)
   set_target_properties(mitk_python_bindings PROPERTIES

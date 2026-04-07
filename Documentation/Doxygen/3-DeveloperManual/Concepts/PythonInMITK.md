@@ -93,7 +93,7 @@ Currently, the following types and functions are exposed:
 
 | Category | Types / Functions |
 |---|---|
-| **Image** | `Image` (Python factory function) and `NativeImage` (C++ class) with `new()`, `initialize()`, `from_numpy()`, `load()`, `save()`, `as_numpy()`, `__array__`, geometry properties (`spacing`, `origin`, `direction`, `direction_cosines`, `ndim`, `shape`, `dtype`, `array`, `time_steps`, `time_geometry`), per-time-step accessors (`get_spacing()`, `set_spacing()`, `get_origin()`, `set_origin()`, `get_direction()`, `set_direction()`, `get_geometry()`) |
+| **Image** | `Image` with constructor overloads (empty / numpy / file path), `initialize()`, classmethods `from_numpy()` and `load()`, `save()`, `as_numpy()`, `__array__`, geometry properties (`spacing`, `origin`, `direction`, `direction_cosines`, `ndim`, `shape`, `dtype`, `array`, `time_steps`, `time_geometry`), per-time-step accessors (`get_spacing()`, `set_spacing()`, `get_origin()`, `set_origin()`, `get_direction()`, `set_direction()`, `get_geometry()`) |
 | **IO** | `IOUtil.load()`, `IOUtil.save()` |
 | **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry` (with `count_time_steps()`, `get_min_time_point()`, `get_max_time_point()`, `get_time_bounds()`, `time_step_to_time_point()`, `time_point_to_time_step()`, `is_valid_time_step()`, `is_valid_time_point()`, `get_geometry_for_time_step()`, `get_geometry_for_time_point()`), `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
 | **Pixel types** | `PixelType`, `make_pixel_type()` |
@@ -101,17 +101,26 @@ Currently, the following types and functions are exposed:
 | **Exceptions** | `Exception` |
 | **CppMicroServices** | `get_loaded_modules()` |
 
-`mitk.Image` is a Python factory function that dispatches by source type (numpy array, file path, or empty). The underlying pybind11 class is also exposed as `mitk.NativeImage` for `isinstance()` checks and direct access to its class methods (`new()`, `from_numpy()`, `load()`).
+`mitk.Image` is the bound C++ class. Its constructor is overloaded by argument type so the same name handles empty construction, loading from a file, and wrapping a numpy array. `isinstance(img, mitk.Image)`, type hints, IDE autocomplete, and subclassing all work normally. Named factories `mitk.Image.from_numpy()` and `mitk.Image.load()` remain available for callers who prefer to be explicit.
 
 Basic usage:
 
 ```python
 import mitk
 import numpy as np
+from pathlib import Path
+
+# Empty image (call initialize() before use)
+empty = mitk.Image()
+empty.initialize("float32", [64, 64, 64])
 
 # Construct from numpy
 arr = np.zeros((64, 64, 64), dtype=np.float32)
 img = mitk.Image(arr, spacing=(1.0, 1.0, 2.5))
+
+# Construct from a file path (str or pathlib.Path)
+loaded = mitk.Image("output.nrrd")
+loaded = mitk.Image(Path("output.nrrd"))
 
 # In-place modification (default direct, unlocked path)
 img.as_numpy(writeable=True)[32, 32, 32] = 1.0
@@ -124,7 +133,6 @@ print(img.shape, img.spacing, img.origin, img.direction)
 
 # Persistence
 img.save("output.nrrd")
-loaded = mitk.Image("output.nrrd")
 ```
 
 By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to fall back to the legacy `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:

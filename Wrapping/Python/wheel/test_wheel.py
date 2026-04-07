@@ -30,7 +30,7 @@ def test_create_image():
     import mitk
     import numpy as np
 
-    img = mitk.NativeImage.new()
+    img = mitk.Image()
     img.initialize("float32", [64, 64, 64])
 
     assert img.get_dimension() == 3
@@ -48,7 +48,7 @@ def test_numpy_roundtrip_direct():
     import mitk
     import numpy as np
 
-    img = mitk.NativeImage.new()
+    img = mitk.Image()
     img.initialize("uint8", [10, 10])
 
     arr = img.as_numpy(writeable=True)
@@ -65,7 +65,7 @@ def test_numpy_roundtrip_accessor():
     import mitk
     import numpy as np
 
-    img = mitk.NativeImage.new()
+    img = mitk.Image()
     img.initialize("uint8", [10, 10])
 
     arr = img.as_numpy(use_accessor=True, writeable=True)
@@ -83,7 +83,7 @@ def test_image_geometry():
     import mitk
     import numpy as np
 
-    img = mitk.NativeImage.new()
+    img = mitk.Image()
     img.initialize("float32", [10, 20, 30])
 
     # numpy convention: shape is reversed wrt MITK dim order
@@ -117,24 +117,24 @@ def test_image_geometry():
 
 
 def test_image_from_numpy():
-    """WP-2: factory from a numpy array, with geometry overrides."""
+    """WP-2: from_numpy classmethod and constructor overload, with geometry overrides."""
     import mitk
     import numpy as np
 
     arr = np.arange(2 * 3 * 4, dtype=np.float32).reshape(4, 3, 2)
-    img = mitk.NativeImage.from_numpy(
-        arr,
-        spacing=(0.5, 1.0, 2.0),
-        origin=(1.0, 2.0, 3.0),
-    )
 
+    # Both forms must work:
+    img = mitk.Image.from_numpy(arr, spacing=(0.5, 1.0, 2.0), origin=(1.0, 2.0, 3.0))
     assert img.shape == arr.shape
     assert img.spacing == (0.5, 1.0, 2.0)
     assert img.origin == (1.0, 2.0, 3.0)
-
-    # round-trip via direct path
     np.testing.assert_array_equal(img.as_numpy(), arr)
-    print("  Image.from_numpy (WP-2) OK")
+
+    # The constructor overload reaches the same code path
+    img2 = mitk.Image(arr, spacing=(0.5, 1.0, 2.0))
+    assert img2.shape == arr.shape
+    assert img2.spacing == (0.5, 1.0, 2.0)
+    print("  Image.from_numpy + ctor overload (WP-2) OK")
 
 
 def test_image_array_protocol():
@@ -142,7 +142,7 @@ def test_image_array_protocol():
     import mitk
     import numpy as np
 
-    img = mitk.NativeImage.from_numpy(np.zeros((4, 5, 6), dtype=np.uint8))
+    img = mitk.Image(np.zeros((4, 5, 6), dtype=np.uint8))
     arr = np.asarray(img)
     assert arr.shape == (4, 5, 6)
     assert arr.dtype == np.uint8
@@ -158,17 +158,27 @@ def test_image_load_save_roundtrip(tmp_dir=None):
     import numpy as np
     import os
     import tempfile
+    from pathlib import Path
 
     arr = np.arange(60, dtype=np.float32).reshape(3, 4, 5)
-    img = mitk.NativeImage.from_numpy(arr, spacing=(0.5, 0.7, 1.1))
+    img = mitk.Image(arr, spacing=(0.5, 0.7, 1.1))
 
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "out.nrrd")
         img.save(path)
 
-        loaded = mitk.NativeImage.load(path)
+        # Classmethod load
+        loaded = mitk.Image.load(path)
         np.testing.assert_array_equal(np.asarray(loaded), arr)
         assert loaded.spacing == (0.5, 0.7, 1.1)
+
+        # Constructor overload via str path
+        loaded2 = mitk.Image(path)
+        assert loaded2.spacing == (0.5, 0.7, 1.1)
+
+        # Constructor overload via pathlib.Path
+        loaded3 = mitk.Image(Path(path))
+        assert loaded3.spacing == (0.5, 0.7, 1.1)
 
         # IOUtil.load should also produce the same result
         results = mitk.IOUtil.load(path)
@@ -178,37 +188,37 @@ def test_image_load_save_roundtrip(tmp_dir=None):
 
 
 def test_image_constructor():
-    """WP-3: Pythonic factory mitk.Image() dispatching by source type."""
+    """WP-3: mitk.Image is the bound C++ class with native py::init overloads."""
     import mitk
     import numpy as np
     import os
     import tempfile
+    from pathlib import Path
 
-    # Empty
+    # Empty: mitk.Image is the class, not a factory function
     empty = mitk.Image()
-    assert isinstance(empty, mitk.NativeImage)
+    assert isinstance(empty, mitk.Image)
+    assert type(empty) is mitk.Image
 
-    # From numpy
+    # From numpy + geometry kwargs
     arr = np.zeros((2, 3, 4), dtype=np.uint8)
     img2 = mitk.Image(arr, spacing=(1.0, 2.0, 3.0))
+    assert isinstance(img2, mitk.Image)
     assert img2.shape == (2, 3, 4)
     assert img2.spacing == (1.0, 2.0, 3.0)
 
-    # From path
+    # From path: both str and pathlib.Path resolve to the same overload
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "x.nrrd")
         img2.save(path)
         img3 = mitk.Image(path)
+        img4 = mitk.Image(Path(path))
         np.testing.assert_array_equal(np.asarray(img3), arr)
+        np.testing.assert_array_equal(np.asarray(img4), arr)
 
-    # Unsupported source raises TypeError
-    try:
-        mitk.Image(42)
-    except TypeError:
-        pass
-    else:
-        raise AssertionError("mitk.Image(int) should raise TypeError")
-    print("  Image() factory constructor (WP-3) OK")
+    # The NativeImage alias from the previous attempt is gone
+    assert not hasattr(mitk, "NativeImage")
+    print("  Image constructor overloads (WP-3) OK")
 
 
 def test_point_vector_types():

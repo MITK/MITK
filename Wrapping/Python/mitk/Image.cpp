@@ -23,8 +23,10 @@ found in the LICENSE file.
 
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl/filesystem.h>
 
 #include <array>
+#include <filesystem>
 #include <optional>
 #include <string>
 
@@ -386,7 +388,31 @@ void SaveImage(const Image* img, const std::string& path)
 void InitImage(py::module_& m)
 {
   py::class_<Image, Image::Pointer>(m, "Image")
-    .def_static("new", &Image::New)
+    // -------------------------------------------------------------- WP-3
+    // Constructor overloads (pybind11 dispatches by argument type at call
+    // time). mitk.Image is the bound C++ class -- isinstance, type hints,
+    // and IDE autocomplete all work normally.
+    .def(py::init([]() { return Image::New(); }),
+      "Construct an empty image. Call initialize(...) before use.")
+    .def(py::init([](const std::filesystem::path& path) {
+        return LoadImage(path.string());
+      }),
+      py::arg("path"),
+      "Load an image from a file path. Accepts both str and pathlib.Path.")
+    .def(py::init([](py::array array,
+                     std::optional<std::array<double, 3>> spacing,
+                     std::optional<std::array<double, 3>> origin,
+                     std::optional<py::array_t<double>> direction,
+                     bool copy) {
+        return ImageFromNumpy(array, spacing, origin, direction, copy);
+      }),
+      py::arg("array"),
+      py::arg("spacing") = py::none(),
+      py::arg("origin") = py::none(),
+      py::arg("direction") = py::none(),
+      py::arg("copy") = true,
+      "Construct an image from a numpy array, optionally with "
+      "spacing/origin/direction overrides.")
     .def("initialize",
       [](Image& img, const py::object& dtype, const std::vector<unsigned int>& dims, unsigned int channels) {
         img.Initialize(MakePixelType(dtype), static_cast<unsigned int>(dims.size()), dims.data(), channels);

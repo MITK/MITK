@@ -36,7 +36,7 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\nPropertyNotOwnedError = mitk.PropertyNotOwnedError\n")
+file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
 
 # Copy the property_view.py file
 configure_file(
@@ -166,3 +166,43 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
     FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
   )
 endif()
+
+# ---------------------------------------------------------------------------
+# Virtual environment setup
+# ---------------------------------------------------------------------------
+# Resolve all runtime paths at configure time, then bake them into a
+# self-contained cmake script that cmake -P can execute at build time without
+# access to the cache or any find_package results.
+# ---------------------------------------------------------------------------
+
+mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH "release" RELEASE)
+
+# Format DLL paths as Python list entries for sitecustomize.py.
+set(_mitk_dll_paths_python_list "")
+foreach(_path IN LISTS MITK_RUNTIME_PATH)
+  string(APPEND _mitk_dll_paths_python_list "    r'${_path}',\n")
+endforeach()
+
+# The site-packages subdirectory layout differs between Windows and POSIX venvs.
+if(WIN32)
+  set(_venv_sitecustomize_subdir "Lib/site-packages")
+else()
+  set(_venv_sitecustomize_subdir "lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages")
+endif()
+
+# Bake all configure-time values into a self-contained build-time script.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/setup_venv.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/setup_venv_resolved.cmake"
+  @ONLY
+)
+
+add_custom_target(mitk_python_venv
+  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/setup_venv_resolved.cmake"
+  COMMENT "Setting up virtual environment for MITK Python bindings"
+  DEPENDS mitk_python_bindings
+)
+
+set_target_properties(mitk_python_venv PROPERTIES
+  FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
+)

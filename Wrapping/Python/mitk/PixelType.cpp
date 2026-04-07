@@ -22,6 +22,11 @@ namespace mitk
   {
     auto dt = py::dtype::from_args(dtype);
 
+    // numpy bool maps to MITK's conventional unsigned char representation.
+    // Check this before the generic char/uchar branches because numpy bool
+    // is a distinct dtype with its own kind ('b').
+    if (dt.kind() == 'b') return MakePixelType<unsigned char, unsigned char>(components);
+
     if (dt.is(py::dtype::of<unsigned char>())) return MakePixelType<unsigned char, unsigned char>(components);
     if (dt.is(py::dtype::of<char>())) return MakePixelType<char, char>(components);
     if (dt.is(py::dtype::of<unsigned short>())) return MakePixelType<unsigned short, unsigned short>(components);

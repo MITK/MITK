@@ -99,7 +99,28 @@ void InitSlicedGeometry3D(py::module_& m)
 void InitTimeGeometry(py::module_& m)
 {
   py::class_<TimeGeometry, TimeGeometry::Pointer>(m, "TimeGeometry")
-    .def("count_time_steps", &TimeGeometry::CountTimeSteps);
+    .def("count_time_steps", &TimeGeometry::CountTimeSteps)
+    .def("get_min_time_point", py::overload_cast<>(&TimeGeometry::GetMinimumTimePoint, py::const_))
+    .def("get_max_time_point", py::overload_cast<>(&TimeGeometry::GetMaximumTimePoint, py::const_))
+    .def("get_min_time_point", py::overload_cast<TimeStepType>(&TimeGeometry::GetMinimumTimePoint, py::const_), py::arg("time_step"))
+    .def("get_max_time_point", py::overload_cast<TimeStepType>(&TimeGeometry::GetMaximumTimePoint, py::const_), py::arg("time_step"))
+    .def("get_time_bounds",
+      [](const TimeGeometry& tg) {
+        const auto b = tg.GetTimeBounds();
+        return std::make_tuple(b[0], b[1]);
+      })
+    .def("get_time_bounds",
+      [](const TimeGeometry& tg, TimeStepType t) {
+        const auto b = tg.GetTimeBounds(t);
+        return std::make_tuple(b[0], b[1]);
+      },
+      py::arg("time_step"))
+    .def("time_step_to_time_point", &TimeGeometry::TimeStepToTimePoint, py::arg("time_step"))
+    .def("time_point_to_time_step", &TimeGeometry::TimePointToTimeStep, py::arg("time_point"))
+    .def("is_valid_time_step", &TimeGeometry::IsValidTimeStep, py::arg("time_step"))
+    .def("is_valid_time_point", &TimeGeometry::IsValidTimePoint, py::arg("time_point"))
+    .def("get_geometry_for_time_step", &TimeGeometry::GetGeometryForTimeStep, py::arg("time_step"))
+    .def("get_geometry_for_time_point", &TimeGeometry::GetGeometryForTimePoint, py::arg("time_point"));
 }
 
 void InitArbitraryTimeGeometry(py::module_& m)

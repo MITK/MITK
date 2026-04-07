@@ -61,12 +61,14 @@ void bind_property_owner(PyClass &cls)
       auto existing = obj.GetConstProperty(key);
       if (existing && !obj.PropertyIsOwned(key))
       {
-        // Raise the Python exception using the Python API
-        py::module::import("mitk").attr("PropertyNotOwnedError")("Property '" + key +
-                                                                 "' is provided read-only by this object "
-                                                                 "and cannot be changed via set_property(). "
-                                                                 "It may be owned by an internal component "
-                                                                 "(e.g., a Label in a MultiLabelSegmentation).");
+        const std::string message = "Property '" + key +
+                                    "' is provided read-only by this object "
+                                    "and cannot be changed via set_property(). "
+                                    "It may be owned by an internal component "
+                                    "(e.g., a Label in a MultiLabelSegmentation).";
+        py::object exc_type = py::module_::import("mitk").attr("PropertyNotOwnedError");
+        PyErr_SetObject(exc_type.ptr(), exc_type(message).ptr());
+        throw py::error_already_set();
       }
       obj.SetProperty(key, resolvePropertyValue(obj, key, value));
     },
@@ -80,10 +82,12 @@ void bind_property_owner(PyClass &cls)
       auto existing = obj.GetConstProperty(key);
       if (existing && !obj.PropertyIsOwned(key))
       {
-        // Raise the Python exception using the Python API
-        py::module::import("mitk").attr("PropertyNotOwnedError")("Property '" + key +
-                                                                 "' is provided read-only by this object "
-                                                                 "and cannot be removed via remove_property().");
+        const std::string message = "Property '" + key +
+                                    "' is provided read-only by this object "
+                                    "and cannot be removed via remove_property().";
+        py::object exc_type = py::module_::import("mitk").attr("PropertyNotOwnedError");
+        PyErr_SetObject(exc_type.ptr(), exc_type(message).ptr());
+        throw py::error_already_set();
       }
       obj.RemoveProperty(key);
     },

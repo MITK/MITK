@@ -34,12 +34,16 @@ using mitk::python::propertyToDict;
  *
  * @param m The pybind11 module to which the property bindings should be added
  */
-void init_Property(py::module &m)
+void init_Property(py::module_ &m)
 {
   // Create PropertyNotOwnedError exception using Python C API
   // This approach works with pybind11 v3.0.1
-  PyObject *exc = PyErr_NewException(const_cast<char *>("mitk.PropertyNotOwnedError"), PyExc_AttributeError, nullptr);
-  PyErr_Clear(); // Clear the error state after creating the exception
+  PyObject *exc = PyErr_NewException("mitk.PropertyNotOwnedError", PyExc_AttributeError, nullptr);
+  if (exc == nullptr)
+  {
+    PyErr_Clear();
+    return;
+  }
 
   // Set the docstring
   PyObject *doc = PyUnicode_FromString("Raised when set_property() or remove_property() is called on a property\n"

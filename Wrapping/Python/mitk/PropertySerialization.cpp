@@ -22,8 +22,8 @@ namespace py = pybind11;
 // that might be needed beyond what's already in those files.
 
 // The main serialization functions are:
-// - convertPropertyToDict() in Property.cpp
-// - convertDictToProperty() in Property.cpp
+// - propertyToDict() in PropertyConversionUtils.h
+// - dictToProperty() in PropertyConversionUtils.h
 // - convertPropertyListToDict() in PropertyList.cpp
 // - convertDictToPropertyList() in PropertyList.cpp
 // - propertyListToJsonString() in PropertyList.cpp
@@ -41,7 +41,7 @@ namespace py = pybind11;
  *
  * @param m The pybind11 module to which serialization bindings should be added
  */
-void init_PropertySerialization(py::module &m)
+void init_PropertySerialization(py::module_ &m)
 {
   // This function can be used to register any additional serialization-related
   // functionality with the Python module

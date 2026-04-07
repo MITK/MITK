@@ -22,6 +22,9 @@ void InitGeometries(py::module_&);
 void InitPixelType(py::module_&);
 void InitImage(py::module_&);
 void InitIOUtil(py::module_&);
+void init_Property(py::module&);
+void init_PropertyList(py::module&);
+void init_PropertySerialization(py::module&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -38,4 +41,7 @@ PYBIND11_MODULE(mitk, m)
   InitPixelType(m);
   InitImage(m);
   InitIOUtil(m);
+  init_Property(m);
+  init_PropertyList(m);
+  init_PropertySerialization(m);
 }

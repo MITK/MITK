@@ -14,6 +14,12 @@ pybind11_add_module(mitk_python_bindings
   PixelType.cpp
   PixelType.h
   Points.cpp
+  Property.cpp
+  PropertyList.cpp
+  PropertySerialization.cpp
+  PropertyAutoWrap.h
+  PropertyConversionUtils.h
+  PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp
 )
@@ -30,7 +36,21 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
+file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\nPropertyNotOwnedError = mitk.PropertyNotOwnedError\n")
+
+# Copy the property_view.py file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
+  "${mitk_PACKAGE_DIR}/property_view.py"
+  COPYONLY
+)
+
+# Copy the test file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_properties.py"
+  "${mitk_PACKAGE_DIR}/tests/test_properties.py"
+  COPYONLY
+)
 
 if(MSVC)
   set_target_properties(mitk_python_bindings PROPERTIES

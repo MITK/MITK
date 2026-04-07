@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "PixelType.h"
 #include "SmartPointer.h"
+#include "PropertyOwnerBindings.h"
 
 #include <mitkAffineTransform3D.h>
 #include <mitkBaseGeometry.h>
@@ -387,9 +388,10 @@ void SaveImage(const Image* img, const std::string& path)
 
 void InitImage(py::module_& m)
 {
-  py::class_<Image, Image::Pointer>(m, "Image")
+  auto image_class = py::class_<Image, Image::Pointer>(m, "Image");
     // -------------------------------------------------------------- WP-3
     // Constructor overloads (pybind11 dispatches by argument type at call
+  image_class
     // time). mitk.Image is the bound C++ class -- isinstance, type hints,
     // and IDE autocomplete all work normally.
     .def(py::init([]() { return Image::New(); }),
@@ -544,4 +546,19 @@ void InitImage(py::module_& m)
     .def("save",
       [](const Image* img, const std::string& path) { SaveImage(img, path); },
       py::arg("path"));
+
+
+  // Bind property owner methods
+  bind_property_owner<decltype(image_class), Image>(image_class);
+
+  // Attach properties view
+  image_class.attr("properties") = py::cpp_function(
+    [](Image& self) {
+      // Import PropertyView and create an instance
+      py::module_ propertyViewModule = py::module_::import("mitk.property_view");
+      py::object PropertyView = propertyViewModule.attr("PropertyView");
+      return PropertyView(self);
+    },
+    py::return_value_policy::reference
+  );
 }

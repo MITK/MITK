@@ -95,7 +95,7 @@ void setPropertyHelper(mitk::PropertyList &pl, const std::string &key, py::objec
  *
  * @param m The pybind11 module to which the PropertyList bindings should be added
  */
-void init_PropertyList(py::module &m)
+void init_PropertyList(py::module_ &m)
 {
   auto propertyList_class = py::class_<mitk::PropertyList, mitk::PropertyList::Pointer>(m, "PropertyList");
 
@@ -137,10 +137,10 @@ void init_PropertyList(py::module &m)
     .def_static("from_json", &propertyListFromJsonString);
 
   // Attach properties view
-  propertyList_class.attr("properties") = py::cpp_function(
+  propertyList_class.def_property_readonly(
+    "properties",
     [](mitk::PropertyList &self)
     {
-      // Import PropertyView and create an instance
       py::module_ propertyViewModule = py::module_::import("mitk.property_view");
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);

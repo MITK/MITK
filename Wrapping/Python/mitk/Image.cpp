@@ -552,13 +552,13 @@ void InitImage(py::module_& m)
   bind_property_owner<decltype(image_class), Image>(image_class);
 
   // Attach properties view
-  image_class.attr("properties") = py::cpp_function(
-    [](Image& self) {
-      // Import PropertyView and create an instance
+  image_class.def_property_readonly(
+    "properties",
+    [](Image &self)
+    {
       py::module_ propertyViewModule = py::module_::import("mitk.property_view");
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);
     },
-    py::return_value_policy::reference
-  );
+    py::return_value_policy::reference);
 }

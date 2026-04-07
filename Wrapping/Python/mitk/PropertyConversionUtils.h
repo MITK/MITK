@@ -131,7 +131,7 @@ namespace mitk
       }
       if (py::isinstance<py::float_>(value))
       {
-        return mitk::FloatProperty::New(value.cast<double>());
+        return mitk::FloatProperty::New(value.cast<float>());
       }
       if (py::isinstance<py::str>(value))
       {

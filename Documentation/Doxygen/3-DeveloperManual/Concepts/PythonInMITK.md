@@ -153,7 +153,7 @@ This allows different MITK components — such as segmentation tools — to use 
 
 These virtual environments are stored in the `mitk_venvs` folder within a dedicated user-writable location:
 
-- `%LocalAppData%` on Windows
+- `%%LocalAppData%` on Windows
 - `$XDG_DATA_HOME` or `$HOME/.local/share` on Linux
 - `$HOME/Library/Application Support` on macOS
 

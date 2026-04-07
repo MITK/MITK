@@ -496,9 +496,12 @@ void InitImage(py::module_& m)
       py::arg("use_accessor") = false,
       py::arg("writeable") = true,
       py::arg("time_step") = 0,
-      "Return a numpy view of the image. By default uses direct, "
-      "unlocked access (the numpy view pins the Image alive via a smart "
-      "pointer capsule). Pass use_accessor=True to get the legacy "
+      "Return a numpy view of the image. Writeable by default (numpy "
+      "convention); pass writeable=False for an explicit read-only view. "
+      "For an implicit read-only view, use img.array or "
+      "np.asarray(img). By default uses direct, unlocked access (the "
+      "numpy view pins the Image alive via a smart pointer capsule). "
+      "Pass use_accessor=True to get the legacy "
       "ImageReadAccessor/ImageWriteAccessor-backed view, which acquires "
       "MITK's read/write lock and releases it when the numpy array is "
       "garbage-collected.")

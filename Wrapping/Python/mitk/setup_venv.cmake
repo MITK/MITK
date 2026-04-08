@@ -42,4 +42,18 @@ for _d in _mitk_dll_dirs:
         os.environ['PATH'] = _d + os.pathsep + os.environ.get('PATH', '')
 ]=])
 
+if(WIN32)
+  set(_venv_python "${_venv_dir}/Scripts/python.exe")
+else()
+  set(_venv_python "${_venv_dir}/bin/python")
+endif()
+
+execute_process(
+  COMMAND "${_venv_python}" -m pip install --quiet pytest
+  RESULT_VARIABLE _pip_result
+)
+if(NOT _pip_result EQUAL 0)
+  message(WARNING "Failed to install pytest in virtual environment at ${_venv_dir}")
+endif()
+
 message(STATUS "Virtual environment set up at ${_venv_dir}")

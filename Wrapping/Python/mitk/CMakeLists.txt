@@ -45,12 +45,6 @@ configure_file(
   COPYONLY
 )
 
-# Copy the test file
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_properties.py"
-  "${mitk_PACKAGE_DIR}/tests/test_properties.py"
-  COPYONLY
-)
 
 if(MSVC)
   set_target_properties(mitk_python_bindings PROPERTIES
@@ -195,3 +189,31 @@ add_custom_target(mitk_python_venv
 set_target_properties(mitk_python_venv PROPERTIES
   FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
 )
+
+# ---------------------------------------------------------------------------
+# CTest integration for pytest property binding tests
+# ---------------------------------------------------------------------------
+if(BUILD_TESTING)
+  # Use the venv Python so that sitecustomize.py is in effect: it adds the
+  # build-tree bindings to sys.path and calls os.add_dll_directory() for all
+  # MITK DLL dirs. The latter is required on Windows (Python >= 3.8), where
+  # PATH is no longer searched for extension-module DLL dependencies.
+  # Build the venv first: cmake --build . --target mitk_python_venv
+  if(WIN32)
+    set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/Scripts/python.exe")
+  else()
+    set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/bin/python")
+  endif()
+
+  add_test(NAME mitkPythonBindingsTest
+    COMMAND "${_venv_python}" -m pytest
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_properties.py"
+            --tb=short -q
+  )
+  set_tests_properties(mitkPythonBindingsTest PROPERTIES
+    REQUIRED_FILES   "${_venv_python}"
+    LABELS           "Python"
+    SKIP_RETURN_CODE 5
+    TIMEOUT          120
+  )
+endif()

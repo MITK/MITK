@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "PropertyAutoWrap.h"
 #include "PropertyConversionUtils.h"
 #include "SmartPointer.h"
+#include "TemporoSpatialStringSerialization.h"
 #include <mitkPropertyList.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -39,8 +40,16 @@ py::dict convertPropertyListToDict(const mitk::PropertyList &pl)
     auto prop = pl.GetProperty(key);
     if (prop)
     {
-      // Use the centralized conversion utility
-      result[py::str(key)] = propertyToDict(*prop);
+      // Try TS serialization first, fall back to centralized utility
+      py::dict propDict;
+      if (mitk::python::tryTemporoSpatialStringToDict(*prop, propDict))
+      {
+        result[py::str(key)] = propDict;
+      }
+      else
+      {
+        result[py::str(key)] = propertyToDict(*prop);
+      }
     }
   }
 
@@ -57,8 +66,12 @@ mitk::PropertyList::Pointer convertDictToPropertyList(const py::dict &d)
     std::string key = item.first.cast<std::string>();
     py::dict propDict = item.second.cast<py::dict>();
 
-    // Use the centralized conversion utility
-    auto prop = dictToProperty(propDict);
+    // Try TS deserialization first, fall back to centralized utility
+    auto prop = mitk::python::tryDictToTemporoSpatialString(propDict);
+    if (!prop)
+    {
+      prop = dictToProperty(propDict);
+    }
     pl->SetProperty(key, prop);
   }
 

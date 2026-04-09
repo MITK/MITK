@@ -22,10 +22,14 @@ pybind11_add_module(mitk_python_bindings
   PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp
+  TemporoSpatialStringProperty.cpp
+  PropertyKeyPath.cpp
+  DICOMTagPath.cpp
+  TemporoSpatialStringSerialization.h
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore Python3::Module
+  PRIVATE MitkCore MitkDICOM Python3::Module
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES
@@ -214,7 +218,7 @@ if(BUILD_TESTING)
 
   add_test(NAME mitkPythonBindingsTest
     COMMAND "${_venv_python}" -m pytest
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/test_properties.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/"
             --tb=short -q
   )
   set_tests_properties(mitkPythonBindingsTest PROPERTIES

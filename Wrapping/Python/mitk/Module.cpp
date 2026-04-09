@@ -25,6 +25,9 @@ void InitIOUtil(py::module_&);
 void init_Property(py::module_&);
 void init_PropertyList(py::module_&);
 void init_PropertySerialization(py::module_&);
+void init_TemporoSpatialStringProperty(py::module_&);
+void init_PropertyKeyPath(py::module_&);
+void init_DICOMTagPath(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -44,4 +47,7 @@ PYBIND11_MODULE(mitk, m)
   init_Property(m);
   init_PropertyList(m);
   init_PropertySerialization(m);
+  init_TemporoSpatialStringProperty(m);
+  init_PropertyKeyPath(m);
+  init_DICOMTagPath(m);
 }

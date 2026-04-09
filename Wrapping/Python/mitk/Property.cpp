@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "PropertyConversionUtils.h"
 #include "SmartPointer.h"
+#include "TemporoSpatialStringSerialization.h"
 #include <Python.h>
 #include <mitkBaseProperty.h>
 #include <mitkColorProperty.h>
@@ -63,7 +64,12 @@ void init_Property(py::module_ &m)
          { return "<mitk." + std::string(p.GetNameOfClass()) + ": " + p.GetValueAsString() + ">"; })
     .def("__eq__", [](const mitk::BaseProperty &a, const mitk::BaseProperty &b) { return a == b; })
     .def_property_readonly("value", nullptr) // Overridden by subclasses
-    .def("to_dict", &propertyToDict)
+    .def("to_dict",
+         [](const mitk::BaseProperty& p) {
+           py::dict result;
+           if (mitk::python::tryTemporoSpatialStringToDict(p, result)) return result;
+           return propertyToDict(p);
+         })
     .def("clone", [](const mitk::BaseProperty &p) { return p.Clone(); });
 
   // StringProperty binding - use lambda for protected constructor
@@ -112,7 +118,10 @@ void init_Property(py::module_ &m)
 
   // Module-level factory function
   m.def("property_from_dict",
-        &dictToProperty,
+        [](const py::dict& d) -> mitk::BaseProperty::Pointer {
+          if (auto ts = mitk::python::tryDictToTemporoSpatialString(d)) return ts;
+          return dictToProperty(d);
+        },
         py::arg("d"),
         "Reconstruct a BaseProperty from a dict produced by to_dict().");
 }

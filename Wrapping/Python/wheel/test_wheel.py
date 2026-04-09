@@ -187,6 +187,62 @@ def test_image_load_save_roundtrip(tmp_dir=None):
     print("  IOUtil load/save round-trip (WP-4) OK")
 
 
+def test_ioutil_reader_preferences():
+    """Exercise the reader_preferences / reader_blacklist kwargs of IOUtil.load.
+
+    The C++ counterpart (mitkPreferenceListReaderOptionsFunctorTest) registers
+    fake readers via CppMicroServices to verify selection logic. That machinery
+    isn't reachable from Python, so this test exercises only the binding
+    plumbing: parameter acceptance, defaults, sequence types, and that data
+    still round-trips under each combination."""
+    import mitk
+    import numpy as np
+    import os
+    import tempfile
+
+    arr = np.arange(60, dtype=np.float32).reshape(3, 4, 5)
+    img = mitk.Image(arr, spacing=(0.5, 0.7, 1.1))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "prefs.nrrd")
+        img.save(path)
+
+        def _assert_loads(**kwargs):
+            results = mitk.IOUtil.load(path, **kwargs)
+            assert len(results) >= 1, f"no results for kwargs={kwargs}"
+            np.testing.assert_array_equal(np.asarray(results[0]), arr)
+
+        # Explicit None must match the default (no-arg) behavior.
+        _assert_loads(reader_preferences=None, reader_blacklist=None)
+
+        # Empty lists must be accepted and behave as no-op filters.
+        _assert_loads(reader_preferences=[], reader_blacklist=[])
+
+        # Preferring the known NRRD reader works. The C++ IOUtil test
+        # (TestIOMetaInformation) asserts that "ITK NrrdImageIO" is the
+        # selected reader for NRRD files.
+        _assert_loads(reader_preferences=["ITK NrrdImageIO"])
+
+        # Preferring a nonexistent reader is benign — falls back to the
+        # default selection. Mirrors UsePreferenceListWithInexistantReaders.
+        _assert_loads(reader_preferences=["NonExistentReader"])
+
+        # Blacklisting an irrelevant reader is a no-op.
+        _assert_loads(reader_blacklist=["NonExistentReader"])
+
+        # Both arguments together. Mirrors UseBlackAndPreferenceList.
+        _assert_loads(
+            reader_preferences=["ITK NrrdImageIO"],
+            reader_blacklist=["NonExistentReader"])
+
+        # Tuples must also work — the bindings should accept any string sequence.
+        _assert_loads(
+            reader_preferences=("ITK NrrdImageIO",),
+            reader_blacklist=("NonExistentReader",))
+
+    print("  IOUtil reader_preferences/reader_blacklist OK")
+
+
 def test_image_constructor():
     """WP-3: mitk.Image is the bound C++ class with native py::init overloads."""
     import mitk
@@ -279,6 +335,7 @@ def run_tests():
         test_image_from_numpy,
         test_image_array_protocol,
         test_image_load_save_roundtrip,
+        test_ioutil_reader_preferences,
         test_image_constructor,
         test_point_vector_types,
         test_pixel_type,

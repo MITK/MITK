@@ -135,7 +135,7 @@ print(img.shape, img.spacing, img.origin, img.direction)
 img.save("output.nrrd")
 ```
 
-By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to fall back to the legacy `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:
+By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to safeguard image access through a `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:
 
 ```python
 arr = img.as_numpy(use_accessor=True, writeable=True)

@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -30,8 +31,23 @@ void InitIOUtil(py::module_& m)
 {
   py::class_<IOUtil>(m, "IOUtil")
     .def_static("load",
-      [](const std::string& path) {
-        auto results = IOUtil::Load(path);
+      [](const std::string& path,
+         std::optional<std::vector<std::string>> reader_preferences,
+         std::optional<std::vector<std::string>> reader_blacklist) {
+        std::vector<BaseData::Pointer> results;
+
+        if (reader_preferences.has_value() || reader_blacklist.has_value())
+        {
+          PreferenceListReaderOptionsFunctor functor(
+            reader_preferences.value_or(std::vector<std::string>{}),
+            reader_blacklist.value_or(std::vector<std::string>{}));
+          results = IOUtil::Load(path, &functor);
+        }
+        else
+        {
+          results = IOUtil::Load(path);
+        }
+
         std::vector<Image::Pointer> images;
         images.reserve(results.size());
 
@@ -44,8 +60,14 @@ void InitIOUtil(py::module_& m)
         return images;
       },
       py::arg("path"),
-      "Load a file. Currently returns only mitk.Image instances; other "
-      "BaseData subclasses will be added as their bindings land.")
+      py::arg("reader_preferences") = py::none(),
+      py::arg("reader_blacklist") = py::none(),
+      "Load a file. Optional `reader_preferences` / `reader_blacklist` are "
+      "sequences of reader description strings; when either is given, a "
+      "PreferenceListReaderOptionsFunctor is built and passed to the C++ "
+      "loader so the caller can steer reader selection. Currently returns "
+      "only mitk.Image instances; other BaseData subclasses will be added "
+      "as their bindings land.")
     .def_static("save",
       [](const Image* img, const std::string& path) {
         if (img == nullptr)

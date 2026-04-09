@@ -86,9 +86,6 @@ void QmitkPropertyItemModel::CreateRootItem()
            << "Value";
 
   m_RootItem.reset(new QmitkPropertyItem(rootData));
-
-  this->beginResetModel();
-  this->endResetModel();
 }
 
 QVariant QmitkPropertyItemModel::data(const QModelIndex &index, int role) const
@@ -268,7 +265,9 @@ void QmitkPropertyItemModel::OnPropertyListModified()
 
 void QmitkPropertyItemModel::OnPropertyListDeleted()
 {
+  this->beginResetModel();
   this->CreateRootItem();
+  this->endResetModel();
 }
 
 void QmitkPropertyItemModel::OnPropertyModified(const itk::Object *property, const itk::EventObject &)

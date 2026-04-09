@@ -703,6 +703,29 @@ namespace mitk
                                                 ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     /**
+     * \brief Get a raw pointer to the volume data at \a t in channel \a n without locking.
+     *
+     * Returns the underlying voxel buffer for direct, unlocked access. No
+     * ImageReadAccessor or ImageWriteAccessor is created and the
+     * accessor lock list is left untouched. The caller is responsible
+     * for ensuring no concurrent SetVolume(), SetSlice(), or
+     * Initialize() call runs while the returned pointer is in use.
+     *
+     * Use the accessor classes (ImageReadAccessor, ImageWriteAccessor)
+     * when lock-based concurrency control is required instead.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return Pointer to the start of the volume buffer, or \c nullptr
+     *         if no volume data is available at (t, n).
+     * \sa GetVolumeData, ImageReadAccessor, ImageWriteAccessor
+     */
+    void *GetData(int t = 0, int n = 0);
+
+    /** \copydoc GetData(int, int) */
+    const void *GetData(int t = 0, int n = 0) const;
+
+    /**
      * \brief Get the ImageStatisticsHolder that provides statistics for this image.
      *
      * All statistics query methods (min, max, scalar 2nd, etc.) are available

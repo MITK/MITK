@@ -9,6 +9,7 @@ pybind11_add_module(mitk_python_bindings
   Exception.cpp
   Geometries.cpp
   Image.cpp
+  IOUtil.cpp
   Module.cpp
   PixelType.cpp
   PixelType.h

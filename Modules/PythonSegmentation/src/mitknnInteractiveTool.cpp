@@ -400,7 +400,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
         return;
     }
 
-    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
+    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
   }
   else if (m_Impl->InitialSeg.IsNotNull())
   {
@@ -643,7 +643,6 @@ void mitk::nnInteractiveTool::StartSession()
   const auto timeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
   
   auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
-  const auto spacing = imageAtTimeStep->GetGeometry()->GetSpacing();
 
   const auto maskPixelType = MultiLabelSegmentation::GetPixelType();
   m_Impl->TargetBuffer->Initialize(maskPixelType, *(imageAtTimeStep->GetTimeGeometry()));
@@ -653,17 +652,13 @@ void mitk::nnInteractiveTool::StartSession()
   pythonContext->BindImage(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
   {
-    std::ostringstream pyCommands; pyCommands
-      << "image = mitk_image.as_numpy()\n"
-      << "spacing = [\n"
-      << std::to_string(spacing[2]) << ", "
-      << std::to_string(spacing[1]) << ", "
-      << std::to_string(spacing[0]) << "]\n"
-      << "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
-      << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
-      << "session.set_image(image[None], {'spacing': spacing})\n"
-      << "session.set_target_buffer(torch_target_buffer)\n";
-    pythonContext->Execute(pyCommands.str());
+    pythonContext->Execute(
+      "image = mitk_image.as_numpy()\n"
+      "spacing = list(reversed(mitk_image.spacing))\n"
+      "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
+      "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+      "session.set_image(image[None], {'spacing': spacing})\n"
+      "session.set_target_buffer(torch_target_buffer)\n");
   }
 }
 
@@ -675,10 +670,7 @@ void mitk::nnInteractiveTool::EndSession()
   std::ostringstream pyCommands; pyCommands
     << "session._reset_session()\n"
     << "del session.network\n"
-    << "del session\n"
-    << "del torch_target_buffer\n"
-    << "del target_buffer\n"
-    << "del image\n";
+    << "del session\n";
 
   if (m_Impl->GetBackend() == Backend::CUDA)
     pyCommands << "torch.cuda.empty_cache()\n";

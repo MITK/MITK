@@ -77,10 +77,25 @@ public:
     auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     pythonContext.BindImage(image, "test_image");
 
-    // Test read-only accessor
+    // Default: as_numpy() returns a writeable view (numpy convention).
+    // The direct-access path used by default holds no MITK accessor lock,
+    // so there is no cost to defaulting to writeable. For a read-only
+    // view, callers should use the .array property or np.asarray(img),
+    // or pass writeable=False explicitly (see below).
     pythonContext.Execute(
       "import gc\n"
-      "arr_ro = test_image.as_numpy()\n"
+      "arr_default = test_image.as_numpy()\n"
+      "default_writeable = arr_default.flags.writeable\n"
+      "del arr_default\n"
+    );
+
+    auto defaultWriteable = pythonContext.GetVariableAsBool("default_writeable");
+    CPPUNIT_ASSERT_MESSAGE("default_writeable should exist", defaultWriteable.has_value());
+    CPPUNIT_ASSERT_MESSAGE("as_numpy() default should be writeable", defaultWriteable.value());
+
+    // Explicit read-only: as_numpy(writeable=False) returns a non-writeable view.
+    pythonContext.Execute(
+      "arr_ro = test_image.as_numpy(writeable=False)\n"
       "ro_shape = arr_ro.shape\n"
       "ro_writeable = arr_ro.flags.writeable\n"
       "del arr_ro\n"
@@ -88,9 +103,9 @@ public:
 
     auto roWriteable = pythonContext.GetVariableAsBool("ro_writeable");
     CPPUNIT_ASSERT_MESSAGE("ro_writeable should exist", roWriteable.has_value());
-    CPPUNIT_ASSERT_MESSAGE("Read-only array should not be writeable", !roWriteable.value());
+    CPPUNIT_ASSERT_MESSAGE("as_numpy(writeable=False) must not be writeable", !roWriteable.value());
 
-    // Test writeable accessor
+    // Explicit writeable: round-trip a write through as_numpy(writeable=True).
     pythonContext.Execute(
       "arr_rw = test_image.as_numpy(writeable=True)\n"
       "rw_writeable = arr_rw.flags.writeable\n"
@@ -102,7 +117,7 @@ public:
 
     auto rwWriteable = pythonContext.GetVariableAsBool("rw_writeable");
     CPPUNIT_ASSERT_MESSAGE("rw_writeable should exist", rwWriteable.has_value());
-    CPPUNIT_ASSERT_MESSAGE("Writeable array should be writeable", rwWriteable.value());
+    CPPUNIT_ASSERT_MESSAGE("as_numpy(writeable=True) must be writeable", rwWriteable.value());
 
     auto modifiedValue = pythonContext.GetVariableAsInt("modified_value");
     CPPUNIT_ASSERT_MESSAGE("modified_value should exist", modifiedValue.has_value());

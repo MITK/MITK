@@ -93,29 +93,54 @@ Currently, the following types and functions are exposed:
 
 | Category | Types / Functions |
 |---|---|
-| **Image** | `Image` with `initialize()`, `as_numpy()`, `get_dimension()` |
-| **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry`, `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
+| **Image** | `Image` with constructor overloads (empty / numpy / file path), `initialize()`, classmethods `from_numpy()` and `load()`, `save()`, `as_numpy()`, `__array__`, geometry properties (`spacing`, `origin`, `direction`, `direction_cosines`, `ndim`, `shape`, `dtype`, `array`, `time_steps`, `time_geometry`), per-time-step accessors (`get_spacing()`, `set_spacing()`, `get_origin()`, `set_origin()`, `get_direction()`, `set_direction()`, `get_geometry()`) |
+| **IO** | `IOUtil.load()`, `IOUtil.save()` |
+| **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry` (with `count_time_steps()`, `get_min_time_point()`, `get_max_time_point()`, `get_time_bounds()`, `time_step_to_time_point()`, `time_point_to_time_step()`, `is_valid_time_step()`, `is_valid_time_point()`, `get_geometry_for_time_step()`, `get_geometry_for_time_point()`), `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
 | **Pixel types** | `PixelType`, `make_pixel_type()` |
 | **Points / Vectors** | `Point2D`, `Point3D`, `Vector2D`, `Vector3D` |
 | **Exceptions** | `Exception` |
 | **CppMicroServices** | `get_loaded_modules()` |
 
-All classes are instantiated through factory methods (e.g. `mitk.Image.new()`) and managed via MITK's reference-counted smart pointers.
+`mitk.Image` is the bound C++ class. Its constructor is overloaded by argument type so the same name handles empty construction, loading from a file, and wrapping a numpy array. `isinstance(img, mitk.Image)`, type hints, IDE autocomplete, and subclassing all work normally. Named factories `mitk.Image.from_numpy()` and `mitk.Image.load()` remain available for callers who prefer to be explicit.
 
 Basic usage:
 
 ```python
 import mitk
 import numpy as np
+from pathlib import Path
 
-img = mitk.Image.new()
-img.initialize("float32", [64, 64, 64])
+# Empty image (call initialize() before use)
+empty = mitk.Image()
+empty.initialize("float32", [64, 64, 64])
 
-arr = img.as_numpy(writeable=True)
-arr[32, 32, 32] = 1.0
-del arr  # release write accessor before reading
+# Construct from numpy
+arr = np.zeros((64, 64, 64), dtype=np.float32)
+img = mitk.Image(arr, spacing=(1.0, 1.0, 2.5))
 
-print(img.as_numpy()[32, 32, 32])  # 1.0
+# Construct from a file path (str or pathlib.Path)
+loaded = mitk.Image("output.nrrd")
+loaded = mitk.Image(Path("output.nrrd"))
+
+# In-place modification (default direct, unlocked path)
+img.as_numpy(writeable=True)[32, 32, 32] = 1.0
+
+# Read access via the array protocol
+print(np.asarray(img)[32, 32, 32])  # 1.0
+
+# Geometry access
+print(img.shape, img.spacing, img.origin, img.direction)
+
+# Persistence
+img.save("output.nrrd")
+```
+
+By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to safeguard image access through a `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:
+
+```python
+arr = img.as_numpy(use_accessor=True, writeable=True)
+arr[5, 5, 5] = 7
+del arr  # release the write accessor before re-acquiring
 ```
 
 The bindings are available both within MITK applications (via the embedded Python in `MITK-build/python`) and as a standalone installable wheel (see below).
@@ -128,7 +153,7 @@ This allows different MITK components — such as segmentation tools — to use 
 
 These virtual environments are stored in the `mitk_venvs` folder within a dedicated user-writable location:
 
-- `%LocalAppData%` on Windows
+- `%%LocalAppData%` on Windows
 - `$XDG_DATA_HOME` or `$HOME/.local/share` on Linux
 - `$HOME/Library/Application Support` on macOS
 

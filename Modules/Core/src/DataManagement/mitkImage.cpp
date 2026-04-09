@@ -368,6 +368,18 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
   }
 }
 
+void *mitk::Image::GetData(int t, int n)
+{
+  auto item = this->GetVolumeData(t, n);
+  return item.IsNotNull() ? item->GetData() : nullptr;
+}
+
+const void *mitk::Image::GetData(int t, int n) const
+{
+  auto item = this->GetVolumeData(t, n);
+  return item.IsNotNull() ? item->GetData() : nullptr;
+}
+
 mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n,
                                                               void *data,
                                                               ImportMemoryManagementType importMemoryManagement) const

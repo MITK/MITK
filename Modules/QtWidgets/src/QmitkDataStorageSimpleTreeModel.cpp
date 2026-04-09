@@ -108,6 +108,7 @@ void QmitkDataStorageSimpleTreeModel::NodeRemoved(const mitk::DataNode *node)
   std::vector<TreeItem *> children = treeItem->GetChildren();
   m_TreeItems.remove(treeItem);
   delete treeItem; //delete in tree
+  this->endRemoveRows();
 
   if (!children.empty())
   {
@@ -279,6 +280,9 @@ Qt::ItemFlags QmitkDataStorageSimpleTreeModel::flags(const QModelIndex &index) c
       return Qt::NoItemFlags;
 
     const auto dataNode = treeItem->GetDataNode();
+    if (dataNode == nullptr)
+      return Qt::NoItemFlags;
+
     if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(dataNode))
     {
       return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;

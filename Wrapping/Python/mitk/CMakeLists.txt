@@ -191,7 +191,15 @@ configure_file(
   @ONLY
 )
 
-add_custom_target(mitk_python_venv
+# Include in ALL when testing is enabled so the venv is always present
+# before ctest runs. In non-testing builds it remains an opt-in target.
+if(BUILD_TESTING)
+  set(_venv_all_flag ALL)
+else()
+  set(_venv_all_flag "")
+endif()
+
+add_custom_target(mitk_python_venv ${_venv_all_flag}
   COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/setup_venv_resolved.cmake"
   COMMENT "Setting up virtual environment for MITK Python bindings"
   DEPENDS mitk_python_bindings
@@ -209,7 +217,6 @@ if(BUILD_TESTING)
   # build-tree bindings to sys.path and calls os.add_dll_directory() for all
   # MITK DLL dirs. The latter is required on Windows (Python >= 3.8), where
   # PATH is no longer searched for extension-module DLL dependencies.
-  # Build the venv first: cmake --build . --target mitk_python_venv
   if(WIN32)
     set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/Scripts/python.exe")
   else()

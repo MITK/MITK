@@ -27,10 +27,10 @@ namespace mitk
    * \brief Provides a Python interpreter context for executing Python code and
    *        interacting with MITK data like images.
    *
-   * This class wraps a Python interpreter and maintains separate global and
-   * local dictionaries for executing Python code. It allows binding MITK data
-   * like images to Python variables and retrieving Python variables from the
-   * context in a type-safe manner.
+   * This class wraps a Python interpreter and maintains a dictionary for
+   * executing Python code. It allows binding MITK data like images to Python
+   * variables and retrieving Python variables from the context in a
+   * type-safe manner.
    *
    * A typical usage pattern is:
    * \code
@@ -64,7 +64,7 @@ namespace mitk
     explicit PythonContext(const std::string& venvName = {});
 
     /**
-     * \brief Destructor. Clears internal Python dictionaries.
+     * \brief Destructor. Clears the internal Python dictionary.
      */
     ~PythonContext();
 
@@ -87,8 +87,8 @@ namespace mitk
      *
      * \param[in] varName Name of the Python variable to check.
      *
-     * \return \c true if the variable exists in either the local or global
-     *         dictionary, \c false otherwise.
+     * \return \c true if the variable exists in the context's dictionary,
+     *         \c false otherwise.
      */
     bool HasVariable(const std::string &varName);
 
@@ -133,7 +133,7 @@ namespace mitk
     std::optional<std::string> GetVariableAsString(const std::string& varName);
 
     /**
-     * \brief Binds an MITK image to a Python variable in the global dictionary.
+     * \brief Binds an MITK image to a Python variable in the context's dictionary.
      *
      * The image is passed by reference to Python (no copy). If the image
      * pointer is \c nullptr, the variable is set to Python's \c None.
@@ -147,10 +147,10 @@ namespace mitk
     void BindImage(mitk::Image* image, const std::string& varName);
 
     /**
-     * \brief Executes arbitrary Python code with the context's dictionaries.
+     * \brief Executes arbitrary Python code within this context.
      *
-     * The code is executed using the context's global and local dictionaries,
-     * so variables set in previous calls are available in subsequent ones.
+     * The code is executed using the context's dictionary, so variables set
+     * in previous calls are available in subsequent ones.
      *
      * \param[in] expression The Python code to execute. May contain multiple
      *                       statements separated by newlines.

@@ -177,6 +177,11 @@ std::optional<int> mitk::PythonContext::GetVariableAsInt(const std::string& varN
   return m_Impl->GetVariableAs<int>(varName);
 }
 
+std::optional<double> mitk::PythonContext::GetVariableAsDouble(const std::string& varName)
+{
+  return m_Impl->GetVariableAs<double>(varName);
+}
+
 std::optional<std::string> mitk::PythonContext::GetVariableAsString(const std::string& varName)
 {
   return m_Impl->GetVariableAs<std::string>(varName);

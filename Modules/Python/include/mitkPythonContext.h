@@ -113,6 +113,16 @@ namespace mitk
     std::optional<int> GetVariableAsInt(const std::string& varName);
 
     /**
+     * \brief Retrieves a Python variable as a double.
+     *
+     * \param[in] varName Name of the Python variable.
+     *
+     * \return The variable value if it exists and can be cast to \c double,
+     *         \c std::nullopt otherwise.
+     */
+    std::optional<double> GetVariableAsDouble(const std::string& varName);
+
+    /**
      * \brief Retrieves a Python variable as a string.
      *
      * \param[in] varName Name of the Python variable.

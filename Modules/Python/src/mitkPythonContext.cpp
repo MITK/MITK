@@ -94,7 +94,6 @@ void mitk::PythonContext::Activate()
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
     << "def add_site_packages(base_path):\n"
-    << "    import os, site, sys\n"
     << "    if os.name == 'nt':\n"
     << "        site_packages = os.path.join(base_path, 'Lib', 'site-packages')\n"
     << "    else:\n"

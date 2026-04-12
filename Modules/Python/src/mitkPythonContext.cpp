@@ -45,11 +45,8 @@ struct mitk::PythonContext::Impl
   {
     py::gil_scoped_acquire gil;
 
-    if (this->LocalDictionary.contains(varName))
-      return this->LocalDictionary[py::str(varName)];
-
-    if (this->GlobalDictionary.contains(varName))
-      return this->GlobalDictionary[py::str(varName)];
+    if (this->Dictionary.contains(varName))
+      return this->Dictionary[py::str(varName)];
 
     return py::none();
   }
@@ -72,8 +69,7 @@ struct mitk::PythonContext::Impl
     }
   }
 
-  py::dict GlobalDictionary;
-  py::dict LocalDictionary;
+  py::dict Dictionary;
 };
 
 mitk::PythonContext::PythonContext(const std::string& venvName)
@@ -98,7 +94,6 @@ void mitk::PythonContext::Activate()
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
     << "def add_site_packages(base_path):\n"
-    << "    import os, site, sys\n"
     << "    if os.name == 'nt':\n"
     << "        site_packages = os.path.join(base_path, 'Lib', 'site-packages')\n"
     << "    else:\n"
@@ -121,8 +116,7 @@ void mitk::PythonContext::Activate()
 
 mitk::PythonContext::~PythonContext()
 {
-  m_Impl->LocalDictionary.clear();
-  m_Impl->GlobalDictionary.clear();
+  m_Impl->Dictionary.clear();
 }
 
 void mitk::PythonContext::Execute(const std::string &expression)
@@ -131,7 +125,7 @@ void mitk::PythonContext::Execute(const std::string &expression)
 
   try
   {
-    py::exec(expression, m_Impl->GlobalDictionary, m_Impl->LocalDictionary);
+    py::exec(expression, m_Impl->Dictionary);
   }
   catch (py::error_already_set& e)
   {
@@ -145,13 +139,13 @@ void mitk::PythonContext::BindImage(Image* image, const std::string& varName)
 
   if (image == nullptr)
   {
-    m_Impl->GlobalDictionary[py::str(varName)] = py::none();
+    m_Impl->Dictionary[py::str(varName)] = py::none();
     return;
   }
 
   try
   {
-    m_Impl->GlobalDictionary[py::str(varName)] = py::cast(image, py::return_value_policy::reference);
+    m_Impl->Dictionary[py::str(varName)] = py::cast(image, py::return_value_policy::reference);
   }
   catch (const py::error_already_set& e)
   {
@@ -163,8 +157,7 @@ bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   py::gil_scoped_acquire gil;
 
-  return m_Impl->LocalDictionary.contains(varName) ||
-         m_Impl->GlobalDictionary.contains(varName);
+  return m_Impl->Dictionary.contains(varName);
 }
 
 std::optional<bool> mitk::PythonContext::GetVariableAsBool(const std::string& varName)
@@ -175,6 +168,11 @@ std::optional<bool> mitk::PythonContext::GetVariableAsBool(const std::string& va
 std::optional<int> mitk::PythonContext::GetVariableAsInt(const std::string& varName)
 {
   return m_Impl->GetVariableAs<int>(varName);
+}
+
+std::optional<double> mitk::PythonContext::GetVariableAsDouble(const std::string& varName)
+{
+  return m_Impl->GetVariableAs<double>(varName);
 }
 
 std::optional<std::string> mitk::PythonContext::GetVariableAsString(const std::string& varName)

@@ -30,6 +30,12 @@ if _is_wheel:
     # Linux: auditwheel sets RPATH to $ORIGIN/../mitk.libs
     # macOS: delocate rewrites @loader_path references
 
+# SYNC: The imports below (from "from .mitk import *" onwards) must match
+# the file(WRITE) block in Wrapping/Python/mitk/CMakeLists.txt.
 from .mitk import *
+from . import _multilabel as _ml
+_ml._patch(MultiLabelSegmentation)
+transfer_labels = _ml.transfer_labels
+transfer_labels_at_time_step = _ml.transfer_labels_at_time_step
 
 __version__ = "@MITK_VERSION_STRING@"

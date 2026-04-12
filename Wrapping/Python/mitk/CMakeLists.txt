@@ -9,9 +9,12 @@ pybind11_add_module(mitk_python_bindings
   CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp
+  GeometryHelpers.cpp
+  GeometryHelpers.h
   Image.cpp
   IOUtil.cpp
   Module.cpp
+  MultiLabelSegmentation.cpp
   PixelType.cpp
   PixelType.h
   Points.cpp
@@ -29,7 +32,7 @@ pybind11_add_module(mitk_python_bindings
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore MitkDICOM Python3::Module
+  PRIVATE MitkCore MitkDICOM MitkMultilabel Python3::Module
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES
@@ -40,12 +43,27 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
+# SYNC: The imports below must match the corresponding section in
+# Wrapping/Python/wheel/__init__.py.in (after "from .mitk import *").
+file(WRITE "${mitk_PACKAGE_DIR}/__init__.py"
+  "from .mitk import *\n"
+  "from . import _multilabel as _ml\n"
+  "_ml._patch(MultiLabelSegmentation)\n"
+  "transfer_labels = _ml.transfer_labels\n"
+  "transfer_labels_at_time_step = _ml.transfer_labels_at_time_step\n"
+)
 
 # Copy the property_view.py file
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
   "${mitk_PACKAGE_DIR}/property_view.py"
+  COPYONLY
+)
+
+# Copy the _multilabel.py file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/_multilabel.py"
+  "${mitk_PACKAGE_DIR}/_multilabel.py"
   COPYONLY
 )
 
@@ -119,11 +137,13 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
     EXCLUDE_FROM_ALL
   )
 
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
-    DESTINATION mitk
-    COMPONENT wheel
-    EXCLUDE_FROM_ALL
-  )
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
+  "${CMAKE_CURRENT_SOURCE_DIR}/_multilabel.py"
+  DESTINATION mitk
+  COMPONENT wheel
+  EXCLUDE_FROM_ALL
+)
 
   # Install auto-load modules into their expected subdirectories.
   # CppMicroServices looks for <module_name>/ subdirectory relative to

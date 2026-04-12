@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "GeometryHelpers.h"
 #include "PixelType.h"
 #include "SmartPointer.h"
 #include "PropertyOwnerBindings.h"
@@ -187,118 +188,6 @@ py::array AsNumpyAccessor(Image& img, bool writeable)
 }
 
 // ---------------------------------------------------------------------------
-// Geometry helpers (WP-1)
-// ---------------------------------------------------------------------------
-
-mitk::BaseGeometry::Pointer GetGeometryAtTimeStep(Image& img, mitk::TimeStepType timeStep)
-{
-  auto geom = img.GetTimeGeometry()->GetGeometryForTimeStep(timeStep);
-
-  if (geom.IsNull())
-    mitkThrow() << "Invalid time step: " << timeStep;
-
-  return geom;
-}
-
-mitk::BaseGeometry::ConstPointer GetGeometryAtTimeStepConst(const Image& img, mitk::TimeStepType timeStep)
-{
-  auto geom = img.GetTimeGeometry()->GetGeometryForTimeStep(timeStep);
-
-  if (geom.IsNull())
-    mitkThrow() << "Invalid time step: " << timeStep;
-
-  return mitk::BaseGeometry::ConstPointer(geom.GetPointer());
-}
-
-std::tuple<double, double, double> GetSpacingAt(const Image& img, mitk::TimeStepType t)
-{
-  auto geom = GetGeometryAtTimeStepConst(img, t);
-  const auto s = geom->GetSpacing();
-  return {s[0], s[1], s[2]};
-}
-
-void SetSpacingAt(Image& img, const std::array<double, 3>& spacing, mitk::TimeStepType t)
-{
-  auto geom = GetGeometryAtTimeStep(img, t);
-  mitk::Vector3D v;
-  v[0] = spacing[0];
-  v[1] = spacing[1];
-  v[2] = spacing[2];
-  geom->SetSpacing(v);
-}
-
-std::tuple<double, double, double> GetOriginAt(const Image& img, mitk::TimeStepType t)
-{
-  auto geom = GetGeometryAtTimeStepConst(img, t);
-  const auto o = geom->GetOrigin();
-  return {o[0], o[1], o[2]};
-}
-
-void SetOriginAt(Image& img, const std::array<double, 3>& origin, mitk::TimeStepType t)
-{
-  auto geom = GetGeometryAtTimeStep(img, t);
-  mitk::Point3D p;
-  p[0] = origin[0];
-  p[1] = origin[1];
-  p[2] = origin[2];
-  geom->SetOrigin(p);
-}
-
-py::array_t<double> ExtractDirection(const BaseGeometry& geom)
-{
-  const auto& matrix = geom.GetIndexToWorldTransform()->GetMatrix();
-  const auto spacing = geom.GetSpacing();
-
-  py::array_t<double> direction({static_cast<py::ssize_t>(3), static_cast<py::ssize_t>(3)});
-  auto buf = direction.mutable_unchecked<2>();
-
-  for (int row = 0; row < 3; ++row)
-    for (int col = 0; col < 3; ++col)
-      buf(row, col) = matrix[row][col] / spacing[col];
-
-  return direction;
-}
-
-py::array_t<double> GetDirectionAt(const Image& img, mitk::TimeStepType t)
-{
-  return ExtractDirection(*GetGeometryAtTimeStepConst(img, t));
-}
-
-void SetDirectionAt(Image& img, py::array_t<double, py::array::c_style | py::array::forcecast> direction, mitk::TimeStepType t)
-{
-  if (direction.ndim() != 2 || direction.shape(0) != 3 || direction.shape(1) != 3)
-    throw py::value_error("direction must be a 3x3 matrix");
-
-  auto geom = GetGeometryAtTimeStep(img, t);
-  auto buf = direction.unchecked<2>();
-  const auto spacing = geom->GetSpacing();
-
-  // Reconstruct the IndexToWorld matrix: each column = direction column * spacing
-  auto* transform = geom->GetIndexToWorldTransform();
-  auto matrix = transform->GetMatrix();
-
-  for (int row = 0; row < 3; ++row)
-    for (int col = 0; col < 3; ++col)
-      matrix[row][col] = buf(row, col) * spacing[col];
-
-  transform->SetMatrix(matrix);
-  geom->Modified();
-}
-
-std::array<double, 9> GetDirectionCosinesAt(const Image& img, mitk::TimeStepType t)
-{
-  auto direction = GetDirectionAt(img, t);
-  auto buf = direction.unchecked<2>();
-  std::array<double, 9> flat{};
-
-  for (int row = 0; row < 3; ++row)
-    for (int col = 0; col < 3; ++col)
-      flat[row * 3 + col] = buf(row, col);
-
-  return flat;
-}
-
-// ---------------------------------------------------------------------------
 // from_numpy (WP-2)
 // ---------------------------------------------------------------------------
 
@@ -349,13 +238,13 @@ Image::Pointer ImageFromNumpy(py::array array,
   }
 
   if (spacing.has_value())
-    SetSpacingAt(*img, *spacing, 0);
+    SetSpacing(img->GetTimeGeometry(), *spacing, 0);
 
   if (origin.has_value())
-    SetOriginAt(*img, *origin, 0);
+    SetOrigin(img->GetTimeGeometry(), *origin, 0);
 
   if (direction.has_value())
-    SetDirectionAt(*img, *direction, 0);
+    SetDirection(img->GetTimeGeometry(), *direction, 0);
 
   return img;
 }
@@ -432,45 +321,6 @@ void InitImage(py::module_& m)
     .def("get_dimension", py::overload_cast<>(&Image::GetDimension, py::const_))
     .def("get_dimension", py::overload_cast<int>(&Image::GetDimension, py::const_), py::arg("i"))
 
-    // Per-time-step accessors.
-    .def("get_spacing",
-      [](const Image& img, mitk::TimeStepType t) { return GetSpacingAt(img, t); },
-      py::arg("time_step") = 0)
-    .def("set_spacing",
-      [](Image& img, const std::array<double, 3>& s, mitk::TimeStepType t) { SetSpacingAt(img, s, t); },
-      py::arg("spacing"), py::arg("time_step") = 0)
-    .def("get_origin",
-      [](const Image& img, mitk::TimeStepType t) { return GetOriginAt(img, t); },
-      py::arg("time_step") = 0)
-    .def("set_origin",
-      [](Image& img, const std::array<double, 3>& o, mitk::TimeStepType t) { SetOriginAt(img, o, t); },
-      py::arg("origin"), py::arg("time_step") = 0)
-    .def("get_direction",
-      [](const Image& img, mitk::TimeStepType t) { return GetDirectionAt(img, t); },
-      py::arg("time_step") = 0)
-    .def("set_direction",
-      [](Image& img, py::array_t<double, py::array::c_style | py::array::forcecast> d, mitk::TimeStepType t) {
-        SetDirectionAt(img, d, t);
-      },
-      py::arg("direction"), py::arg("time_step") = 0)
-    .def("get_direction_cosines",
-      [](const Image& img, mitk::TimeStepType t) { return GetDirectionCosinesAt(img, t); },
-      py::arg("time_step") = 0)
-    .def("get_geometry",
-      [](Image& img, mitk::TimeStepType t) { return GetGeometryAtTimeStep(img, t); },
-      py::arg("time_step") = 0)
-
-    // Convenience properties (always operate on time step 0).
-    .def_property("spacing",
-      [](const Image& img) { return GetSpacingAt(img, 0); },
-      [](Image& img, const std::array<double, 3>& s) { SetSpacingAt(img, s, 0); })
-    .def_property("origin",
-      [](const Image& img) { return GetOriginAt(img, 0); },
-      [](Image& img, const std::array<double, 3>& o) { SetOriginAt(img, o, 0); })
-    .def_property("direction",
-      [](const Image& img) { return GetDirectionAt(img, 0); },
-      [](Image& img, py::array_t<double, py::array::c_style | py::array::forcecast> d) { SetDirectionAt(img, d, 0); })
-    .def_property_readonly("direction_cosines", [](const Image& img) { return GetDirectionCosinesAt(img, 0); })
     .def_property_readonly("ndim", [](const Image& img) { return img.GetDimension(); })
     .def_property_readonly("shape",
       [](const Image& img) {
@@ -482,10 +332,6 @@ void InitImage(py::module_& m)
       })
     .def_property_readonly("dtype", [](const Image& img) { return PixelTypeToDType(img.GetPixelType()); })
     .def_property_readonly("array", [](Image& img) { return AsNumpyDirect(img, false, 0); })
-    .def_property_readonly("time_steps",
-      [](const Image& img) { return img.GetTimeGeometry()->CountTimeSteps(); })
-    .def_property_readonly("time_geometry",
-      [](Image& img) { return mitk::TimeGeometry::Pointer(img.GetTimeGeometry()); })
 
     // Numpy views: direct (unlocked) by default, accessor-backed on request.
     .def("as_numpy",
@@ -547,12 +393,17 @@ void InitImage(py::module_& m)
       py::arg("path"));
 
   // IPropertyOwner methods.
-  bind_property_owner(image_class);
+  bind_property_owner<decltype(image_class), Image>(image_class);
 
-  // Live properties view (delegates to PropertyView in mitk.property_view).
+  // Live properties view (delegates to PropertyView in mitk.property_view).  // Geometry helpers
+  // Image-specific: ndim and shape are bound manually because Image
+  // has a numpy-compatible shape property and overloaded GetDimension().
+  BindGeometryAccessors<decltype(image_class), Image, false>(image_class);
+
   image_class.def_property_readonly(
     "properties",
-    [](Image& self) {
+    [](Image& self)
+    {
       py::module_ propertyViewModule = py::module_::import("mitk.property_view");
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);

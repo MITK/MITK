@@ -28,10 +28,12 @@ namespace py = pybind11;
  * Supported auto-wrap conversions:
  * - bool   -> BoolProperty
  * - int    -> IntProperty
- * - float  -> FloatProperty
+ * - float  -> DoubleProperty (Python float is double-precision)
  * - str    -> StringProperty
- * - tuple(float, float, float) -> ColorProperty
  * - BaseProperty subclasses -> used directly
+ *
+ * For property types without a scalar equivalent (Color, Vector3D, Point*, ...),
+ * callers must pass an explicit mitk.<Name>Property instance.
  *
  * \throws py::type_error if the Python type cannot be auto-wrapped.
  */
@@ -47,24 +49,12 @@ inline mitk::BaseProperty::Pointer pythonValueToProperty(py::object value)
   if (py::isinstance<py::int_>(value))
     return mitk::IntProperty::New(value.cast<int>());
 
+  // Python float is double-precision; use DoubleProperty to preserve it.
   if (py::isinstance<py::float_>(value))
-    return mitk::FloatProperty::New(value.cast<float>());
+    return mitk::DoubleProperty::New(value.cast<double>());
 
   if (py::isinstance<py::str>(value))
     return mitk::StringProperty::New(value.cast<std::string>());
-
-  if (py::isinstance<py::tuple>(value))
-  {
-    auto tupleValue = value.cast<py::tuple>();
-    if (tupleValue.size() == 3)
-    {
-      mitk::Color color;
-      color[0] = tupleValue[0].cast<float>();
-      color[1] = tupleValue[1].cast<float>();
-      color[2] = tupleValue[2].cast<float>();
-      return mitk::ColorProperty::New(color);
-    }
-  }
 
   throw py::type_error("Cannot auto-convert " + std::string(py::str(value.get_type())) +
                        " to a property. Pass a mitk.BaseProperty subclass explicitly "
@@ -99,16 +89,6 @@ inline mitk::BaseProperty::Pointer pythonValueToPropertyWithType(py::object valu
 
   if (targetType == "DoubleProperty")
     return mitk::DoubleProperty::New(value.cast<double>());
-
-  if (targetType == "ColorProperty")
-  {
-    auto valueTuple = value.cast<py::tuple>();
-    mitk::Color color;
-    color[0] = valueTuple[0].cast<float>();
-    color[1] = valueTuple[1].cast<float>();
-    color[2] = valueTuple[2].cast<float>();
-    return mitk::ColorProperty::New(color);
-  }
 
   throw py::type_error("Cannot coerce " + std::string(py::str(value.get_type())) + " to " + targetType +
                        ". Pass the new property value as a mitk." + targetType + " instance explicitly.");

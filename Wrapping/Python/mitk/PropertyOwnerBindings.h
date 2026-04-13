@@ -43,8 +43,7 @@ void bind_property_owner(PyClass &cls)
     {
       return obj.GetConstProperty(key); // None if not found
     },
-    py::arg("key"),
-    py::return_value_policy::reference_internal);
+    py::arg("key"));
 
   cls.def(
     "property_is_owned",

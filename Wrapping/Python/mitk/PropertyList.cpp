@@ -45,8 +45,7 @@ void init_PropertyList(py::module_ &m)
       {
         return pl.GetProperty(key); // returns nullptr -> None if not found
       },
-      py::arg("key"),
-      py::return_value_policy::reference_internal)
+      py::arg("key"))
     .def(
       "property_is_owned",
       [](const mitk::PropertyList &pl, const std::string &key)

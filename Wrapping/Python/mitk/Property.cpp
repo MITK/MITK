@@ -100,12 +100,7 @@ void init_Property(py::module_ &m)
                   color[2] = b;
                   return mitk::ColorProperty::New(color);
                 })
-    .def_property_readonly("value",
-                           [](const mitk::ColorProperty &p)
-                           {
-                             auto color = p.GetColor();
-                             return py::make_tuple(color[0], color[1], color[2]);
-                           });
+    .def_property_readonly("value", &mitk::ColorProperty::GetColor);
 
   // Module-level factory function: reconstruct a BaseProperty from its
   // self-contained JSON representation (produced by to_json()).

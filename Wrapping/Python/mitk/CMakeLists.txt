@@ -5,6 +5,7 @@
 string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
 
 pybind11_add_module(mitk_python_bindings
+  Color.cpp
   CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp

@@ -1,8 +1,23 @@
+# Tests for property bindings.
+#
+# TODO: when MultiLabelSegmentation bindings land (WP-10), add coverage for
+# properties that are provided read-only by an internal component -- reads
+# succeed, writes raise mitk.PropertyNotOwnedError, property_is_owned is False.
+
 import json
 
-import pytest
-
 import mitk
+
+
+def _close(a, b, tol=1e-6):
+    """Float (or float-sequence) comparison within tolerance.
+
+    Used where float32 round-trip through mitk.Color loses precision
+    relative to the double-precision Python input.
+    """
+    if isinstance(a, (list, tuple)):
+        return len(a) == len(b) and all(abs(x - y) <= tol for x, y in zip(a, b))
+    return abs(a - b) <= tol
 
 
 class TestPropertyNotOwnedError:
@@ -10,30 +25,43 @@ class TestPropertyNotOwnedError:
         assert issubclass(mitk.PropertyNotOwnedError, AttributeError)
 
     def test_catchable_as_attribute_error(self):
-        with pytest.raises(AttributeError):
+        try:
             raise mitk.PropertyNotOwnedError("test")
+        except AttributeError:
+            return
+        assert False, "PropertyNotOwnedError should be catchable as AttributeError"
 
 
 class TestPropertyOwnerOnImage:
-    @pytest.fixture
-    def img(self):
-        return mitk.Image()
-
-    def test_property_is_owned_existing(self, img):
+    def test_property_is_owned_existing(self):
+        img = mitk.Image()
         img.set_property("name", "test")
         assert img.property_is_owned("name") is True
 
-    def test_property_is_owned_missing(self, img):
+    def test_property_is_owned_missing(self):
+        img = mitk.Image()
         assert img.property_is_owned("nonexistent") is False
 
-    def test_set_property_creates_new(self, img):
+    def test_set_property_creates_new(self):
+        img = mitk.Image()
         img.set_property("new_prop", "value")
         assert img.get_property("new_prop") is not None
 
-    def test_set_property_updates_owned(self, img):
+    def test_set_property_updates_owned(self):
+        img = mitk.Image()
         img.set_property("name", "original")
         img.set_property("name", "updated")
         assert img.get_property("name").value == "updated"
+
+    def test_get_property_missing_returns_none(self):
+        img = mitk.Image()
+        assert img.get_property("missing") is None
+
+    def test_remove_property_existing(self):
+        img = mitk.Image()
+        img.set_property("k", "v")
+        img.remove_property("k")
+        assert img.get_property("k") is None
 
 
 class TestPropertyList:
@@ -54,9 +82,59 @@ class TestPropertyList:
         assert pl.property_is_owned("prop1") is True
         assert pl.property_is_owned("prop2") is True
 
+    def test_get_property_existing(self):
+        pl = mitk.PropertyList()
+        pl.set_property("key", "value")
+        prop = pl.get_property("key")
+        assert prop is not None
+        assert prop.value == "value"
+
+    def test_get_property_missing_returns_none(self):
+        pl = mitk.PropertyList()
+        assert pl.get_property("missing") is None
+
+    def test_set_property_updates_existing(self):
+        pl = mitk.PropertyList()
+        pl.set_property("k", "first")
+        pl.set_property("k", "second")
+        assert pl.get_property("k").value == "second"
+
+    def test_remove_property_existing(self):
+        pl = mitk.PropertyList()
+        pl.set_property("k", "v")
+        pl.remove_property("k")
+        assert pl.get_property("k") is None
+
+    def test_remove_missing_is_noop(self):
+        # Underlying IPropertyOwner contract: "If the property does not exist,
+        # nothing will be done." Must not raise.
+        pl = mitk.PropertyList()
+        pl.remove_property("missing")
+
+    def test_property_keys_reflects_mutations(self):
+        pl = mitk.PropertyList()
+        pl.set_property("alpha", "a")
+        pl.set_property("beta", "b")
+        assert set(pl.property_keys) == {"alpha", "beta"}
+        pl.remove_property("alpha")
+        assert set(pl.property_keys) == {"beta"}
+
+    def test_auto_wrap_python_types(self):
+        # PropertyList.set_property must auto-wrap the same way Image does.
+        pl = mitk.PropertyList()
+        pl.set_property("s", "hello")
+        pl.set_property("i", 42)
+        pl.set_property("b", True)
+        pl.set_property("d", 3.14)
+
+        assert isinstance(pl.get_property("s"), mitk.StringProperty)
+        assert isinstance(pl.get_property("i"), mitk.IntProperty)
+        assert isinstance(pl.get_property("b"), mitk.BoolProperty)
+        assert isinstance(pl.get_property("d"), mitk.DoubleProperty)
+
 
 class TestPropertyView:
-    def test_view_read_operations(self):
+    def test_view_read_on_image(self):
         img = mitk.Image()
         img.set_property("name", "test")
         img.set_property("count", 42)
@@ -69,7 +147,7 @@ class TestPropertyView:
         # GetPropertyKeys order is unspecified; compare as a set.
         assert set(view.keys()) == {"name", "count"}
 
-    def test_view_write_operations(self):
+    def test_view_write_on_image(self):
         img = mitk.Image()
         view = img.properties
 
@@ -79,6 +157,26 @@ class TestPropertyView:
         view["temp"] = "temp_value"
         del view["temp"]
         assert img.get_property("temp") is None
+
+    def test_view_read_on_property_list(self):
+        pl = mitk.PropertyList()
+        pl.set_property("name", "test")
+
+        view = pl.properties
+
+        assert "name" in view
+        assert view["name"].value == "test"
+        assert len(view) == 1
+
+    def test_view_write_on_property_list(self):
+        pl = mitk.PropertyList()
+        view = pl.properties
+
+        view["k"] = "v"
+        assert pl.get_property("k").value == "v"
+
+        del view["k"]
+        assert pl.get_property("k") is None
 
 
 class TestAutoWrap:
@@ -90,7 +188,7 @@ class TestAutoWrap:
         img.set_property("timestamp", 1.2345678901234567)
         prop = img.get_property("timestamp")
         assert isinstance(prop, mitk.DoubleProperty)
-        assert prop.value == pytest.approx(1.2345678901234567, rel=0, abs=0)
+        assert prop.value == 1.2345678901234567  # exact: double round-trip
 
     def test_python_int_maps_to_int_property(self):
         img = mitk.Image()
@@ -108,38 +206,46 @@ class TestAutoWrap:
     def test_plain_tuple_does_not_auto_wrap_to_color(self):
         # 3-tuple is ambiguous (Color vs Point3D vs Vector3D); callers must be explicit.
         img = mitk.Image()
-        with pytest.raises(TypeError):
+        try:
             img.set_property("color", (1.0, 0.5, 0.0))
+        except TypeError:
+            return
+        assert False, "expected TypeError for tuple auto-wrap"
 
 
 class TestColor:
     def test_construct_and_component_access(self):
+        # 0.25, 0.5, 1.0 are bit-exact in float32 -- direct equality is fine.
         c = mitk.Color(0.25, 0.5, 1.0)
-        assert c.r == pytest.approx(0.25)
-        assert c.g == pytest.approx(0.5)
-        assert c.b == pytest.approx(1.0)
+        assert c.r == 0.25
+        assert c.g == 0.5
+        assert c.b == 1.0
 
     def test_index_access_matches_components(self):
+        # 0.1, 0.2, 0.3 are NOT bit-exact in float32 -- use tolerance.
         c = mitk.Color(0.1, 0.2, 0.3)
-        assert c[0] == pytest.approx(0.1)
-        assert c[1] == pytest.approx(0.2)
-        assert c[2] == pytest.approx(0.3)
+        assert _close(c[0], 0.1)
+        assert _close(c[1], 0.2)
+        assert _close(c[2], 0.3)
         assert len(c) == 3
 
     def test_index_out_of_range_raises(self):
         c = mitk.Color()
-        with pytest.raises(IndexError):
+        try:
             _ = c[3]
+        except IndexError:
+            return
+        assert False, "expected IndexError"
 
     def test_color_property_value_returns_color(self):
         cp = mitk.ColorProperty(mitk.Color(0.7, 0.8, 0.9))
         value = cp.value
         assert isinstance(value, mitk.Color)
-        assert value.r == pytest.approx(0.7)
+        assert _close(value.r, 0.7)
 
     def test_color_property_from_rgb(self):
         cp = mitk.ColorProperty.from_rgb(1.0, 0.5, 0.0)
-        assert cp.value.r == pytest.approx(1.0)
+        assert cp.value.r == 1.0
 
 
 class TestSerialization:
@@ -149,8 +255,7 @@ class TestSerialization:
         # StringProperty is a "simple" type in the self-contained format; it
         # must serialize as a bare JSON primitive, not {"type": ..., "value": ...}.
         prop = mitk.StringProperty("hello")
-        payload = json.loads(prop.to_json())
-        assert payload == "hello"
+        assert json.loads(prop.to_json()) == "hello"
 
     def test_int_property_is_bare_primitive(self):
         prop = mitk.IntProperty(42)
@@ -161,12 +266,12 @@ class TestSerialization:
         assert json.loads(prop.to_json()) is True
 
     def test_color_property_is_wrapped(self):
-        # Complex types carry their class name; ColorProperty's value is a
+        # Complex types carry their class name; ColorProperty's value is an
         # [r, g, b] array (matching what mitk_workbench_remote expects).
         prop = mitk.ColorProperty(mitk.Color(1.0, 0.5, 0.0))
         payload = json.loads(prop.to_json())
         assert payload["type"] == "ColorProperty"
-        assert payload["value"] == pytest.approx([1.0, 0.5, 0.0])
+        assert _close(payload["value"], [1.0, 0.5, 0.0])
 
     def test_property_round_trip(self):
         original = mitk.StringProperty("round-trip")
@@ -186,8 +291,8 @@ class TestSerialization:
         assert restored.get_property("name").value == "segmentation"
         assert restored.get_property("count").value == 3
         assert restored.get_property("enabled").value is True
-        assert restored.get_property("ratio").value == pytest.approx(0.25)
-        assert restored.get_property("color").value.r == pytest.approx(1.0)
+        assert restored.get_property("ratio").value == 0.25
+        assert restored.get_property("color").value.r == 1.0
 
     def test_unbound_property_type_round_trips_via_property_list(self):
         # Vector3DProperty has no dedicated Python binding, but the wire
@@ -210,29 +315,4 @@ class TestSerialization:
         # handle since Vector3DProperty has no dedicated binding.
         round_tripped = json.loads(restored.to_json())
         assert round_tripped["vec"]["type"] == "Vector3DProperty"
-        assert round_tripped["vec"]["value"] == pytest.approx([1.5, 2.5, 3.5])
-
-
-class TestNonOwnedProperties:
-    """Stubs for properties provided read-only by internal components.
-
-    Implemented once MultiLabelSegmentation bindings land (WP-10).
-    """
-
-    def test_get_non_owned_property(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
-
-    def test_set_non_owned_property_raises(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
-
-    def test_remove_non_owned_property_raises(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
-
-    def test_view_setitem_non_owned_raises(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
-
-    def test_view_delitem_non_owned_raises(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
-
-    def test_property_is_owned_non_owned(self):
-        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+        assert _close(round_tripped["vec"]["value"], [1.5, 2.5, 3.5])

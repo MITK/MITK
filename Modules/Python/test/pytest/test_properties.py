@@ -237,6 +237,15 @@ class TestColor:
         assert _close(c[2], 0.3)
         assert len(c) == 3
 
+    def test_index_assignment(self):
+        c = mitk.Color(0.0, 0.0, 0.0)
+        c[0] = 1.0
+        c[1] = 0.5
+        c[2] = 0.25
+        assert c.r == 1.0
+        assert c.g == 0.5
+        assert c.b == 0.25
+
     def test_index_out_of_range_raises(self):
         c = mitk.Color()
         try:
@@ -254,6 +263,12 @@ class TestColor:
     def test_color_property_from_rgb(self):
         cp = mitk.ColorProperty.from_rgb(1.0, 0.5, 0.0)
         assert cp.value.r == 1.0
+
+    def test_float_property_construct_and_value(self):
+        # FloatProperty stores float32; inputs are silently truncated to float
+        # precision, so use a value that is bit-exact in both.
+        fp = mitk.FloatProperty(0.5)
+        assert fp.value == 0.5
 
 
 class TestSerialization:

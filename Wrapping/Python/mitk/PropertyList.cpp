@@ -55,11 +55,7 @@ void InitPropertyList(py::module_ &m)
     .def("set_property", &setPropertyHelper, py::arg("key"), py::arg("value"))
     .def(
       "remove_property",
-      [](mitk::PropertyList &pl, const std::string &key)
-      {
-        // Use default context and fallback parameters
-        pl.RemoveProperty(key, "", false);
-      },
+      [](mitk::PropertyList &pl, const std::string &key) { pl.RemoveProperty(key); },
       py::arg("key"))
     .def_property_readonly("property_keys",
                            [](const mitk::PropertyList &pl)

@@ -10,21 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "PropertyConversionUtils.h"
 #include "SmartPointer.h"
 #include <Python.h>
 #include <mitkBaseProperty.h>
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
+#include <nlohmann/json.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
-
-// Use the centralized conversion utilities
-using mitk::python::dictToProperty;
-using mitk::python::propertyToDict;
 
 /**
  * @brief Initializes Python bindings for MITK property types
@@ -63,7 +59,8 @@ void init_Property(py::module_ &m)
          { return "<mitk." + std::string(p.GetNameOfClass()) + ": " + p.GetValueAsString() + ">"; })
     .def("__eq__", [](const mitk::BaseProperty &a, const mitk::BaseProperty &b) { return a == b; })
     .def_property_readonly("value", nullptr) // Overridden by subclasses
-    .def("to_dict", &propertyToDict)
+    .def("to_json",
+         [](const mitk::BaseProperty &p) { return mitk::ConvertPropertyToSelfContainedJson(&p).dump(); })
     .def("clone", [](const mitk::BaseProperty &p) { return p.Clone(); });
 
   // StringProperty binding - use lambda for protected constructor
@@ -110,9 +107,11 @@ void init_Property(py::module_ &m)
                              return py::make_tuple(color[0], color[1], color[2]);
                            });
 
-  // Module-level factory function
-  m.def("property_from_dict",
-        &dictToProperty,
-        py::arg("d"),
-        "Reconstruct a BaseProperty from a dict produced by to_dict().");
+  // Module-level factory function: reconstruct a BaseProperty from its
+  // self-contained JSON representation (produced by to_json()).
+  m.def(
+    "property_from_json",
+    [](const std::string &json) { return mitk::ConvertPropertyFromSelfContainedJson(nlohmann::json::parse(json)); },
+    py::arg("json"),
+    "Reconstruct a BaseProperty from the self-contained JSON produced by to_json().");
 }

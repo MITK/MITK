@@ -24,7 +24,6 @@ void InitImage(py::module_&);
 void InitIOUtil(py::module_&);
 void init_Property(py::module_&);
 void init_PropertyList(py::module_&);
-void init_PropertySerialization(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -43,5 +42,4 @@ PYBIND11_MODULE(mitk, m)
   InitIOUtil(m);
   init_Property(m);
   init_PropertyList(m);
-  init_PropertySerialization(m);
 }

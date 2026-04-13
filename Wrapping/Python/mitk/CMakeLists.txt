@@ -16,9 +16,7 @@ pybind11_add_module(mitk_python_bindings
   Points.cpp
   Property.cpp
   PropertyList.cpp
-  PropertySerialization.cpp
   PropertyAutoWrap.h
-  PropertyConversionUtils.h
   PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp

@@ -30,7 +30,7 @@ namespace py = pybind11;
  * plus the PropertyNotOwnedError exception and the property_from_json()
  * module-level factory.
  */
-void init_Property(py::module_ &m)
+void InitProperty(py::module_ &m)
 {
   auto propertyNotOwnedError =
     py::register_exception<PropertyNotOwnedError>(m, "PropertyNotOwnedError", PyExc_AttributeError);

@@ -32,7 +32,7 @@ static void setPropertyHelper(mitk::PropertyList &pl, const std::string &key, py
  * Registers the PropertyList class with methods for property management
  * and JSON serialization via MITK's self-contained JSON format.
  */
-void init_PropertyList(py::module_ &m)
+void InitPropertyList(py::module_ &m)
 {
   auto propertyList_class = py::class_<mitk::PropertyList, mitk::PropertyList::Pointer>(m, "PropertyList");
 

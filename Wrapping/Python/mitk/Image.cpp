@@ -389,11 +389,11 @@ void SaveImage(const Image* img, const std::string& path)
 void InitImage(py::module_& m)
 {
   auto image_class = py::class_<Image, Image::Pointer>(m, "Image");
-    // -------------------------------------------------------------- WP-3
-    // Constructor overloads (pybind11 dispatches by argument type at call
+
   image_class
-    // time). mitk.Image is the bound C++ class -- isinstance, type hints,
-    // and IDE autocomplete all work normally.
+    // Constructor overloads. pybind11 dispatches by argument type at call time;
+    // mitk.Image is the bound C++ class, so isinstance, type hints, and IDE
+    // autocomplete all work normally.
     .def(py::init([]() { return Image::New(); }),
       "Construct an empty image. Call initialize(...) before use.")
     .def(py::init([](const std::filesystem::path& path) {
@@ -432,8 +432,7 @@ void InitImage(py::module_& m)
     .def("get_dimension", py::overload_cast<>(&Image::GetDimension, py::const_))
     .def("get_dimension", py::overload_cast<int>(&Image::GetDimension, py::const_), py::arg("i"))
 
-    // -------------------------------------------------------------- WP-1
-    // Per-time-step accessors
+    // Per-time-step accessors.
     .def("get_spacing",
       [](const Image& img, mitk::TimeStepType t) { return GetSpacingAt(img, t); },
       py::arg("time_step") = 0)
@@ -461,7 +460,7 @@ void InitImage(py::module_& m)
       [](Image& img, mitk::TimeStepType t) { return GetGeometryAtTimeStep(img, t); },
       py::arg("time_step") = 0)
 
-    // Convenience properties (always operate on time step 0)
+    // Convenience properties (always operate on time step 0).
     .def_property("spacing",
       [](const Image& img) { return GetSpacingAt(img, 0); },
       [](Image& img, const std::array<double, 3>& s) { SetSpacingAt(img, s, 0); })
@@ -488,7 +487,7 @@ void InitImage(py::module_& m)
     .def_property_readonly("time_geometry",
       [](Image& img) { return mitk::TimeGeometry::Pointer(img.GetTimeGeometry()); })
 
-    // -------------------------------------------------------------- direct + accessor as_numpy
+    // Numpy views: direct (unlocked) by default, accessor-backed on request.
     .def("as_numpy",
       [](Image& img, bool use_accessor, bool writeable, mitk::TimeStepType time_step) {
         if (use_accessor)
@@ -508,7 +507,7 @@ void InitImage(py::module_& m)
       "MITK's read/write lock and releases it when the numpy array is "
       "garbage-collected.")
 
-    // -------------------------------------------------------------- WP-5
+    // numpy array protocol.
     .def("__array__",
       [](Image& img, py::object dtype, py::object copy) {
         auto arr = AsNumpyDirect(img, false, 0);
@@ -524,7 +523,7 @@ void InitImage(py::module_& m)
       py::arg("dtype") = py::none(),
       py::arg("copy") = py::none())
 
-    // -------------------------------------------------------------- WP-2
+    // Factory class methods.
     .def_static("from_numpy",
       [](py::array array,
          std::optional<std::array<double, 3>> spacing,
@@ -539,7 +538,7 @@ void InitImage(py::module_& m)
       py::arg("direction") = py::none(),
       py::arg("copy") = true)
 
-    // -------------------------------------------------------------- WP-4 shortcuts
+    // Load / save shortcuts.
     .def_static("load",
       [](const std::string& path) { return LoadImage(path); },
       py::arg("path"))
@@ -547,15 +546,13 @@ void InitImage(py::module_& m)
       [](const Image* img, const std::string& path) { SaveImage(img, path); },
       py::arg("path"));
 
-
-  // Bind property owner methods
+  // IPropertyOwner methods.
   bind_property_owner(image_class);
 
-  // Attach properties view
+  // Live properties view (delegates to PropertyView in mitk.property_view).
   image_class.def_property_readonly(
     "properties",
-    [](Image &self)
-    {
+    [](Image& self) {
       py::module_ propertyViewModule = py::module_::import("mitk.property_view");
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);

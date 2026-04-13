@@ -65,7 +65,7 @@ namespace
   }
 }
 
-int mitkPythonBindingsTest(int argc, char* argv[])
+int mitkPythonBindingsTest(int, char*[])
 {
   MITK_TEST_BEGIN("mitkPythonBindingsTest")
 

@@ -10,33 +10,32 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/**
- * @file PropertyOwnerBindings.h
- * @brief Reusable template for binding IPropertyOwner methods to Python
- */
-
-#pragma once
+#ifndef PropertyOwnerBindings_h
+#define PropertyOwnerBindings_h
 
 #include "PropertyAutoWrap.h"
+#include "PropertyNotOwnedError.h"
 #include <mitkIPropertyOwner.h>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
 /**
- * @brief Binds IPropertyOwner methods to a Python class
+ * \brief Binds IPropertyOwner methods to a Python class.
  *
- * This template function adds property-related methods to a Python class that wraps
- * an MITK class implementing IPropertyOwner. It provides methods for getting properties
- * and checking property ownership.
+ * Adds get_property / set_property / remove_property / property_is_owned /
+ * property_keys to the given pybind11 class. The underlying C++ type is
+ * inferred from \c PyClass::type, so call sites stay terse:
  *
- * @tparam PyClass The pybind11 class type
- * @tparam CppClass The C++ class type that implements IPropertyOwner
- * @param cls The pybind11 class to extend with property owner methods
+ * \code
+ * bind_property_owner(image_class);
+ * \endcode
  */
-template <typename PyClass, typename CppClass>
+template <typename PyClass>
 void bind_property_owner(PyClass &cls)
 {
+  using CppClass = typename PyClass::type;
+
   cls.def(
     "get_property",
     [](const CppClass &obj, const std::string &key) -> mitk::BaseProperty::ConstPointer
@@ -60,14 +59,11 @@ void bind_property_owner(PyClass &cls)
       auto existing = obj.GetConstProperty(key);
       if (existing && !obj.PropertyIsOwned(key))
       {
-        const std::string message = "Property '" + key +
+        throw PropertyNotOwnedError("Property '" + key +
                                     "' is provided read-only by this object "
                                     "and cannot be changed via set_property(). "
                                     "It may be owned by an internal component "
-                                    "(e.g., a Label in a MultiLabelSegmentation).";
-        py::object exc_type = py::module_::import("mitk").attr("PropertyNotOwnedError");
-        PyErr_SetObject(exc_type.ptr(), exc_type(message).ptr());
-        throw py::error_already_set();
+                                    "(e.g., a Label in a MultiLabelSegmentation).");
       }
       obj.SetProperty(key, resolvePropertyValue(obj, key, value));
     },
@@ -81,12 +77,9 @@ void bind_property_owner(PyClass &cls)
       auto existing = obj.GetConstProperty(key);
       if (existing && !obj.PropertyIsOwned(key))
       {
-        const std::string message = "Property '" + key +
+        throw PropertyNotOwnedError("Property '" + key +
                                     "' is provided read-only by this object "
-                                    "and cannot be removed via remove_property().";
-        py::object exc_type = py::module_::import("mitk").attr("PropertyNotOwnedError");
-        PyErr_SetObject(exc_type.ptr(), exc_type(message).ptr());
-        throw py::error_already_set();
+                                    "and cannot be removed via remove_property().");
       }
       obj.RemoveProperty(key);
     },
@@ -99,3 +92,5 @@ void bind_property_owner(PyClass &cls)
                               return std::vector<std::string>(keys.begin(), keys.end());
                             });
 }
+
+#endif

@@ -549,7 +549,7 @@ void InitImage(py::module_& m)
 
 
   // Bind property owner methods
-  bind_property_owner<decltype(image_class), Image>(image_class);
+  bind_property_owner(image_class);
 
   // Attach properties view
   image_class.def_property_readonly(

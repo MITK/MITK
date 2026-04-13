@@ -18,6 +18,7 @@ pybind11_add_module(mitk_python_bindings
   Property.cpp
   PropertyList.cpp
   PropertyAutoWrap.h
+  PropertyNotOwnedError.h
   PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp

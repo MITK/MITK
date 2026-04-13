@@ -46,6 +46,15 @@ else()
   )
 endif()
 
+# The MitkPython test driver hosts mitkPythonBindingsTest, which imports the
+# 'mitk' Python package at runtime. Ensure the bindings are built before the
+# test driver. Declared here (not in the test CMakeLists) because the Modules
+# subtree is configured before Wrapping, so mitk_python_bindings does not yet
+# exist at test-registration time.
+if(TARGET MitkPythonTestDriver)
+  add_dependencies(MitkPythonTestDriver mitk_python_bindings)
+endif()
+
 # ---------------------------------------------------------------------------
 # Wheel packaging support (PythonWheel configuration only)
 # ---------------------------------------------------------------------------

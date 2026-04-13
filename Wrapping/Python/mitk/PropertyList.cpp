@@ -27,12 +27,10 @@ static void setPropertyHelper(mitk::PropertyList &pl, const std::string &key, py
 }
 
 /**
- * @brief Initializes Python bindings for MITK PropertyList
+ * \brief Initializes Python bindings for MITK PropertyList.
  *
- * This function registers the PropertyList class with the Python module,
- * including methods for property management and JSON serialization.
- *
- * @param m The pybind11 module to which the PropertyList bindings should be added
+ * Registers the PropertyList class with methods for property management
+ * and JSON serialization via MITK's self-contained JSON format.
  */
 void init_PropertyList(py::module_ &m)
 {

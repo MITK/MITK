@@ -271,6 +271,58 @@ class TestColor:
         assert fp.value == 0.5
 
 
+class TestColorProperty:
+    """Tests for tuple-based color property ergonomics."""
+
+    @pytest.fixture
+    def img(self):
+        return mitk.Image()
+
+    def test_set_color_tuple_typed_path(self, img):
+        """set_property accepts a (r,g,b) tuple when an existing ColorProperty is present."""
+        img.set_property("color", mitk.ColorProperty(mitk.Color(1.0, 0.0, 0.0)))
+        img.set_property("color", (0.0, 1.0, 0.0))
+        assert img.get_property("color") == (0.0, 1.0, 0.0)
+
+    def test_set_color_tuple_untyped_path(self, img):
+        """set_property creates a ColorProperty from a 3-element tuple with no prior property."""
+        img.set_property("new_color", (0.5, 0.5, 0.5))
+        assert img.get_property("new_color") == (0.5, 0.5, 0.5)
+        assert isinstance(img.get_property("new_color", raw=True), mitk.ColorProperty)
+
+    def test_set_color_mitk_color_still_works(self, img):
+        """set_property still accepts a mitk.Color object (backwards compatible)."""
+        img.set_property("color", mitk.Color(1.0, 0.5, 0.0))
+        assert img.get_property("color") == pytest.approx((1.0, 0.5, 0.0))
+
+    def test_get_color_returns_tuple(self, img):
+        """get_property returns an (r,g,b) tuple for a ColorProperty by default."""
+        img.set_property("color", mitk.ColorProperty(mitk.Color(0.2, 0.4, 0.6)))
+        result = img.get_property("color")
+        assert isinstance(result, tuple)
+        assert len(result) == 3
+        assert result == pytest.approx((0.2, 0.4, 0.6))
+
+    def test_get_color_raw_returns_property_object(self, img):
+        """get_property(raw=True) returns the mitk.ColorProperty object."""
+        img.set_property("color", mitk.ColorProperty(mitk.Color(1.0, 0.0, 0.0)))
+        prop = img.get_property("color", raw=True)
+        assert isinstance(prop, mitk.ColorProperty)
+
+    def test_color_roundtrip(self, img):
+        """Setting and getting a color tuple is a lossless round-trip."""
+        original = (0.1, 0.2, 0.9)
+        img.set_property("color", original)
+        assert img.get_property("color") == pytest.approx(original)
+
+    def test_mitk_color_iter(self):
+        """mitk.Color supports iteration: tuple(color) and unpacking work."""
+        c = mitk.Color(0.3, 0.6, 0.9)
+        assert tuple(c) == pytest.approx((0.3, 0.6, 0.9))
+        r, g, b = c
+        assert (r, g, b) == pytest.approx((0.3, 0.6, 0.9))
+
+
 class TestSerialization:
     """Round-trip through MITK's self-contained JSON format."""
 

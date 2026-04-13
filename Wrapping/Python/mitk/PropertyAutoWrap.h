@@ -26,11 +26,13 @@ namespace py = pybind11;
  * \brief Converts a Python object to a BaseProperty, auto-wrapping common scalar types.
  *
  * Supported auto-wrap conversions:
- * - bool       -> BoolProperty
- * - int        -> IntProperty
- * - float      -> DoubleProperty (Python float is double-precision)
- * - str        -> StringProperty
- * - mitk.Color -> ColorProperty
+ * - bool              -> BoolProperty
+ * - int               -> IntProperty
+ * - float             -> DoubleProperty (Python float is double-precision)
+ * - str               -> StringProperty
+ * - mitk.Color        -> ColorProperty
+ * - tuple(r, g, b)    -> ColorProperty  (3-element tuple shorthand; lists are not accepted
+ *                        in this untyped path to avoid accidental mismatches)
  * - BaseProperty subclasses -> used directly
  *
  * For property types without a scalar equivalent (Vector3D, Point*, ...),
@@ -59,6 +61,23 @@ inline mitk::BaseProperty::Pointer pythonValueToProperty(py::object value)
 
   if (py::isinstance<mitk::Color>(value))
     return mitk::ColorProperty::New(value.cast<mitk::Color>());
+
+  // A 3-element tuple is treated as an (r, g, b) colour shorthand.
+  // No other MITK property type uses a bare 3-tuple, so the mapping is unambiguous.
+  // Lists of 3 are deliberately NOT auto-wrapped here -- a list is more likely
+  // to be an accidental value than an intentional colour literal.
+  if (py::isinstance<py::tuple>(value))
+  {
+    auto t = value.cast<py::tuple>();
+    if (t.size() == 3)
+    {
+      mitk::Color c;
+      c[0] = t[0].cast<float>();
+      c[1] = t[1].cast<float>();
+      c[2] = t[2].cast<float>();
+      return mitk::ColorProperty::New(c);
+    }
+  }
 
   throw py::type_error("Cannot auto-convert " + std::string(py::str(value.get_type())) +
                        " to a property. Pass a mitk.BaseProperty subclass explicitly "
@@ -95,7 +114,22 @@ inline mitk::BaseProperty::Pointer pythonValueToPropertyWithType(py::object valu
     return mitk::DoubleProperty::New(value.cast<double>());
 
   if (targetType == "ColorProperty")
-    return mitk::ColorProperty::New(value.cast<mitk::Color>());
+  {
+    // Accept mitk.Color directly, or a plain (r, g, b) sequence as a shorthand.
+    // The target type is already known here, so any 3-element sequence is unambiguous.
+    if (py::isinstance<mitk::Color>(value))
+      return mitk::ColorProperty::New(value.cast<mitk::Color>());
+    if (py::isinstance<py::sequence>(value))
+    {
+      auto seq = value.cast<py::sequence>();
+      mitk::Color c;
+      c[0] = seq[0].cast<float>();
+      c[1] = seq[1].cast<float>();
+      c[2] = seq[2].cast<float>();
+      return mitk::ColorProperty::New(c);
+    }
+    throw py::type_error("ColorProperty requires a mitk.Color or a 3-element (r,g,b) sequence.");
+  }
 
   throw py::type_error("Cannot coerce " + std::string(py::str(value.get_type())) + " to " + targetType +
                        ". Pass the new property value as a mitk." + targetType + " instance explicitly.");

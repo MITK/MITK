@@ -496,7 +496,7 @@ void InitMultiLabelSegmentation(py::module_& m)
       });
 
   // Bind property owner methods on Label (it derives from PropertyList which is IPropertyOwner)
-  bind_property_owner<decltype(label_class), Label>(label_class);
+  bind_property_owner(label_class);
 
   // =======================================================================
   // mitk.LabelVector
@@ -932,7 +932,7 @@ void InitMultiLabelSegmentation(py::module_& m)
   BindGeometryAccessors<decltype(seg_class), MultiLabelSegmentation>(seg_class);
 
   // Bind property owner methods
-  bind_property_owner<decltype(seg_class), MultiLabelSegmentation>(seg_class);
+  bind_property_owner(seg_class);
 
   // =======================================================================
   // Module-level helpers

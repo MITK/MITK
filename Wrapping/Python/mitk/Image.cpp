@@ -393,7 +393,7 @@ void InitImage(py::module_& m)
       py::arg("path"));
 
   // IPropertyOwner methods.
-  bind_property_owner<decltype(image_class), Image>(image_class);
+  bind_property_owner(image_class);
 
   // Live properties view (delegates to PropertyView in mitk.property_view).  // Geometry helpers
   // Image-specific: ndim and shape are bound manually because Image

@@ -5,6 +5,7 @@
 string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
 
 pybind11_add_module(mitk_python_bindings
+  Color.cpp
   CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp
@@ -16,9 +17,8 @@ pybind11_add_module(mitk_python_bindings
   Points.cpp
   Property.cpp
   PropertyList.cpp
-  PropertySerialization.cpp
   PropertyAutoWrap.h
-  PropertyConversionUtils.h
+  PropertyNotOwnedError.h
   PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp
@@ -64,74 +64,85 @@ else()
   )
 endif()
 
+# The MitkPython test driver hosts mitkPythonBindingsTest, which imports the
+# 'mitk' Python package at runtime. Ensure the bindings are built before the
+# test driver. Declared here (not in the test CMakeLists) because the Modules
+# subtree is configured before Wrapping, so mitk_python_bindings does not yet
+# exist at test-registration time.
+if(TARGET MitkPythonTestDriver)
+  add_dependencies(MitkPythonTestDriver mitk_python_bindings)
+endif()
+
 # ---------------------------------------------------------------------------
-# Wheel packaging support
+# Wheel packaging support (PythonWheel configuration only)
 # ---------------------------------------------------------------------------
 # The 'wheel' install component stages the Python bindings and auto-load
-# modules for packaging into a redistributable wheel. It is EXCLUDE_FROM_ALL
-# so it does not interfere with the default install.
+# modules for packaging into a redistributable wheel.
+#
+# Guarded by MITK_BUILD_CONFIGURATION to prevent the 'wheel' component from
+# leaking into regular builds. CPack's DragNDrop generator on macOS switches
+# into component-aware mode when it detects any named component, creating an
+# ALL_IN_ONE folder that breaks the app bundle layout.
 #
 # Usage:
 #   cmake --install <build-dir> --component wheel --prefix <staging-dir>
 #   python Wrapping/Python/wheel/build_wheel.py --build-dir <build-dir>
 # ---------------------------------------------------------------------------
 
-if(APPLE)
-  set_target_properties(mitk_python_bindings PROPERTIES
-    INSTALL_RPATH "@loader_path"
-  )
-elseif(NOT WIN32)
-  set_target_properties(mitk_python_bindings PROPERTIES
-    INSTALL_RPATH "$ORIGIN"
-  )
-endif()
-
-install(TARGETS mitk_python_bindings
-  COMPONENT wheel
-  EXCLUDE_FROM_ALL
-  RUNTIME DESTINATION mitk
-  LIBRARY DESTINATION mitk
-)
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/__init__.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
-  @ONLY
-)
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
-  DESTINATION mitk
-  COMPONENT wheel
-  EXCLUDE_FROM_ALL
-)
-
-# Install auto-load modules into their expected subdirectories.
-# CppMicroServices looks for <module_name>/ subdirectory relative to
-# US_AUTOLOAD_PATHS (set to the package directory in __init__.py).
-
-get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
-
-set(_wheel_autoload_targets "")
-
-foreach(_target IN LISTS _mitk_module_targets)
-  get_target_property(_autoload_dir ${_target} MITK_AUTOLOAD_DIRECTORY)
-
-  if(_autoload_dir AND NOT "${_target}" STREQUAL "MitkPreloadPython")
-    install(TARGETS ${_target}
-      COMPONENT wheel
-      EXCLUDE_FROM_ALL
-      RUNTIME DESTINATION mitk/${_autoload_dir}
-      LIBRARY DESTINATION mitk/${_autoload_dir}
-    )
-    list(APPEND _wheel_autoload_targets ${_target})
-  endif()
-endforeach()
-
-# ---------------------------------------------------------------------------
-# Wheel build target (PythonWheel configuration only)
-# ---------------------------------------------------------------------------
-
 if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
+  if(APPLE)
+    set_target_properties(mitk_python_bindings PROPERTIES
+      INSTALL_RPATH "@loader_path"
+    )
+  elseif(NOT WIN32)
+    set_target_properties(mitk_python_bindings PROPERTIES
+      INSTALL_RPATH "$ORIGIN"
+    )
+  endif()
+
+  install(TARGETS mitk_python_bindings
+    COMPONENT wheel
+    EXCLUDE_FROM_ALL
+    RUNTIME DESTINATION mitk
+    LIBRARY DESTINATION mitk
+  )
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/__init__.py.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
+    @ONLY
+  )
+
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
+    DESTINATION mitk
+    COMPONENT wheel
+    EXCLUDE_FROM_ALL
+  )
+
+  # Install auto-load modules into their expected subdirectories.
+  # CppMicroServices looks for <module_name>/ subdirectory relative to
+  # US_AUTOLOAD_PATHS (set to the package directory in __init__.py).
+
+  get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+
+  set(_wheel_autoload_targets "")
+
+  foreach(_target IN LISTS _mitk_module_targets)
+    get_target_property(_autoload_dir ${_target} MITK_AUTOLOAD_DIRECTORY)
+
+    if(_autoload_dir AND NOT "${_target}" STREQUAL "MitkPreloadPython")
+      install(TARGETS ${_target}
+        COMPONENT wheel
+        EXCLUDE_FROM_ALL
+        RUNTIME DESTINATION mitk/${_autoload_dir}
+        LIBRARY DESTINATION mitk/${_autoload_dir}
+      )
+      list(APPEND _wheel_autoload_targets ${_target})
+    endif()
+  endforeach()
+
+  # Wheel build target
+
   set(_wheel_script "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/build_wheel.py")
 
   if(WIN32)

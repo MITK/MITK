@@ -11,17 +11,20 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCommon.h>
-#include <mitkTestingMacros.h>
-#include <mitkTestFixture.h>
+#include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkPythonContext.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
-class mitkPythonTestSuite : public mitk::TestFixture
+#include <fstream>
+
+class mitkPythonContextTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkPythonTestSuite);
+  CPPUNIT_TEST_SUITE(mitkPythonContextTestSuite);
   MITK_TEST(TestExecuteAndGetVariable);
+  MITK_TEST(TestExecuteFile);
   MITK_TEST(TestBindImageToPython);
-  MITK_TEST(TestImageAsNumpyAccessors);
   MITK_TEST(TestPythonContextExclusivity);
   CPPUNIT_TEST_SUITE_END();
 
@@ -41,6 +44,49 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Variable 'result' should exist", result.has_value());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Result should be 10", 10, result.value());
+  }
+
+  void TestExecuteFile()
+  {
+    mitk::PythonContext pythonContext;
+    pythonContext.Activate();
+
+    const fs::path scriptPath = fs::temp_directory_path() / "mitk_python_context_execute_file_test.py";
+    {
+      std::ofstream stream(scriptPath.string(), std::ios::binary);
+      stream << "from pathlib import Path\n"
+             << "file_name = Path(__file__).name\n"
+             << "file_exists = Path(__file__).is_file()\n"
+             << "file_value = 21 * 2\n";
+    }
+
+    try
+    {
+      pythonContext.ExecuteFile(scriptPath);
+    }
+    catch (...)
+    {
+      std::error_code error;
+      fs::remove(scriptPath, error);
+      throw;
+    }
+
+    std::error_code error;
+    fs::remove(scriptPath, error);
+
+    auto fileName = pythonContext.GetVariableAsString("file_name");
+    CPPUNIT_ASSERT_MESSAGE("file_name should exist", fileName.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Executed file should see its own path",
+                                 std::string("mitk_python_context_execute_file_test.py"),
+                                 fileName.value());
+
+    auto fileExists = pythonContext.GetVariableAsBool("file_exists");
+    CPPUNIT_ASSERT_MESSAGE("file_exists should exist", fileExists.has_value());
+    CPPUNIT_ASSERT_MESSAGE("__file__ should point to an existing file during execution", fileExists.value());
+
+    auto fileValue = pythonContext.GetVariableAsInt("file_value");
+    CPPUNIT_ASSERT_MESSAGE("file_value should exist", fileValue.has_value());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("ExecuteFile should run the file contents", 42, fileValue.value());
   }
 
   void TestBindImageToPython()
@@ -69,61 +115,6 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image should have 3 dimensions", 3, dims.value());
   }
 
-  void TestImageAsNumpyAccessors()
-  {
-    mitk::PythonContext pythonContext;
-    pythonContext.Activate();
-
-    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
-    pythonContext.BindImage(image, "test_image");
-
-    // Default: as_numpy() returns a writeable view (numpy convention).
-    // The direct-access path used by default holds no MITK accessor lock,
-    // so there is no cost to defaulting to writeable. For a read-only
-    // view, callers should use the .array property or np.asarray(img),
-    // or pass writeable=False explicitly (see below).
-    pythonContext.Execute(
-      "import gc\n"
-      "arr_default = test_image.as_numpy()\n"
-      "default_writeable = arr_default.flags.writeable\n"
-      "del arr_default\n"
-    );
-
-    auto defaultWriteable = pythonContext.GetVariableAsBool("default_writeable");
-    CPPUNIT_ASSERT_MESSAGE("default_writeable should exist", defaultWriteable.has_value());
-    CPPUNIT_ASSERT_MESSAGE("as_numpy() default should be writeable", defaultWriteable.value());
-
-    // Explicit read-only: as_numpy(writeable=False) returns a non-writeable view.
-    pythonContext.Execute(
-      "arr_ro = test_image.as_numpy(writeable=False)\n"
-      "ro_shape = arr_ro.shape\n"
-      "ro_writeable = arr_ro.flags.writeable\n"
-      "del arr_ro\n"
-    );
-
-    auto roWriteable = pythonContext.GetVariableAsBool("ro_writeable");
-    CPPUNIT_ASSERT_MESSAGE("ro_writeable should exist", roWriteable.has_value());
-    CPPUNIT_ASSERT_MESSAGE("as_numpy(writeable=False) must not be writeable", !roWriteable.value());
-
-    // Explicit writeable: round-trip a write through as_numpy(writeable=True).
-    pythonContext.Execute(
-      "arr_rw = test_image.as_numpy(writeable=True)\n"
-      "rw_writeable = arr_rw.flags.writeable\n"
-      "original_value = int(arr_rw[0, 0, 0])\n"
-      "arr_rw[0, 0, 0] = 42\n"
-      "modified_value = int(arr_rw[0, 0, 0])\n"
-      "del arr_rw\n"
-    );
-
-    auto rwWriteable = pythonContext.GetVariableAsBool("rw_writeable");
-    CPPUNIT_ASSERT_MESSAGE("rw_writeable should exist", rwWriteable.has_value());
-    CPPUNIT_ASSERT_MESSAGE("as_numpy(writeable=True) must be writeable", rwWriteable.value());
-
-    auto modifiedValue = pythonContext.GetVariableAsInt("modified_value");
-    CPPUNIT_ASSERT_MESSAGE("modified_value should exist", modifiedValue.has_value());
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Modified value should be 42", 42, modifiedValue.value());
-  }
-
   void TestPythonContextExclusivity()
   {
     mitk::PythonContext pythonContext_1;
@@ -149,6 +140,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("test_var_context_1 should not be found in context 2",
                            !pythonContext_2.HasVariable("test_var_context_1"));
   }
+
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkPython)
+MITK_TEST_SUITE_REGISTRATION(mitkPythonContext)

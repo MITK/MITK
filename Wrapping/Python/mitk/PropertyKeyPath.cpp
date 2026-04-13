@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace py = pybind11;
 
-void init_PropertyKeyPath(py::module_& m)
+void InitPropertyKeyPath(py::module_& m)
 {
   // PropertyKeyPath binding
   py::class_<mitk::PropertyKeyPath>(m, "PropertyKeyPath")

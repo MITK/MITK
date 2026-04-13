@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 namespace py = pybind11;
 
-void init_DICOMTagPath(py::module_& m)
+void InitDICOMTagPath(py::module_& m)
 {
   // DICOMTag binding (needed for DICOMTagPath construction)
   py::class_<mitk::DICOMTag>(m, "DICOMTag")

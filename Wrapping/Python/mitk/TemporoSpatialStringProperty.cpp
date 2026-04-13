@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 namespace py = pybind11;
 
-void init_TemporoSpatialStringProperty(py::module_& m)
+void InitTemporoSpatialStringProperty(py::module_& m)
 {
   // TemporoSpatialStringProperty binding
   py::class_<mitk::TemporoSpatialStringProperty, mitk::BaseProperty, mitk::TemporoSpatialStringProperty::Pointer>(m, "TemporoSpatialStringProperty")

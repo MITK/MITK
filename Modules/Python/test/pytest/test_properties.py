@@ -275,7 +275,7 @@ class TestSerialization:
 
     def test_property_round_trip(self):
         original = mitk.StringProperty("round-trip")
-        restored = mitk.property_from_json(original.to_json())
+        restored = mitk.BaseProperty.from_json(original.to_json())
         assert restored.value == "round-trip"
 
     def test_property_list_round_trip_mixed_types(self):

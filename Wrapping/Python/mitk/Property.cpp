@@ -27,8 +27,7 @@ namespace py = pybind11;
  *
  * Registers BaseProperty and its concrete subclasses (StringProperty,
  * BoolProperty, IntProperty, FloatProperty, DoubleProperty, ColorProperty),
- * plus the PropertyNotOwnedError exception and the property_from_json()
- * module-level factory.
+ * plus the PropertyNotOwnedError exception.
  */
 void InitProperty(py::module_ &m)
 {
@@ -47,6 +46,12 @@ void InitProperty(py::module_ &m)
     .def("__eq__", [](const mitk::BaseProperty &a, const mitk::BaseProperty &b) { return a == b; })
     .def("to_json",
          [](const mitk::BaseProperty &p) { return mitk::ConvertPropertyToSelfContainedJson(&p).dump(); })
+    .def_static(
+      "from_json",
+      [](const std::string &json) { return mitk::ConvertPropertyFromSelfContainedJson(nlohmann::json::parse(json)); },
+      py::arg("json"),
+      "Reconstruct a BaseProperty subclass instance from the self-contained JSON\n"
+      "representation produced by to_json().")
     .def("clone", [](const mitk::BaseProperty &p) { return p.Clone(); });
 
   py::class_<mitk::StringProperty, mitk::BaseProperty, mitk::StringProperty::Pointer>(m, "StringProperty")
@@ -81,10 +86,4 @@ void InitProperty(py::module_ &m)
                   return mitk::ColorProperty::New(color);
                 })
     .def_property_readonly("value", &mitk::ColorProperty::GetColor);
-
-  m.def(
-    "property_from_json",
-    [](const std::string &json) { return mitk::ConvertPropertyFromSelfContainedJson(nlohmann::json::parse(json)); },
-    py::arg("json"),
-    "Reconstruct a BaseProperty from the self-contained JSON produced by to_json().");
 }

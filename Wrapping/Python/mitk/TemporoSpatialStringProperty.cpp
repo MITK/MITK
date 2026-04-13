@@ -151,7 +151,13 @@ void InitTemporoSpatialStringProperty(py::module_& m)
          py::arg("z_slice") = py::none(),
          "Check if a value exists at specific time step and/or slice.")
     
-    // Inherited to_dict works via the serialization helper
-    // No need to override - the base class to_dict dispatches correctly
+    .def("to_dict",
+         [](const mitk::TemporoSpatialStringProperty &p)
+         {
+           py::dict result;
+           mitk::python::tryTemporoSpatialStringToDict(p, result);
+           return result;
+         },
+         "Serialize this property to a Python dict.")
     ;
 }

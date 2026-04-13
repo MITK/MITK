@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "PropertyConversionUtils.h"
 #include "PropertyNotOwnedError.h"
 #include "SmartPointer.h"
 #include "TemporoSpatialStringSerialization.h"
@@ -89,4 +90,16 @@ void InitProperty(py::module_ &m)
                   return mitk::ColorProperty::New(color);
                 })
     .def_property_readonly("value", &mitk::ColorProperty::GetColor);
+
+  m.def(
+    "property_from_dict",
+    [](const py::dict &d) -> mitk::BaseProperty::Pointer
+    {
+      if (d.contains("type") &&
+          d["type"].cast<std::string>() == "TemporoSpatialStringProperty")
+        return mitk::python::tryDictToTemporoSpatialString(d);
+      return mitk::python::dictToProperty(d);
+    },
+    py::arg("d"),
+    "Reconstruct a BaseProperty subclass from a dict produced by a property's to_dict().");
 }

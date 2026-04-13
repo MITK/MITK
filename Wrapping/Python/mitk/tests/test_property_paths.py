@@ -388,10 +388,13 @@ class TestIntegration:
         pl_back = mitk.PropertyList.from_dict(pl_dict)
         
         # Verify all properties
-        assert pl_back.get_property("string_prop").value == "string value"
-        assert pl_back.get_property("int_prop").value == 42
-        assert pl_back.get_property("bool_prop").value is True
-        
+        assert pl_back.get_property("string_prop") == "string value"
+        assert pl_back.get_property("int_prop") == 42
+        assert pl_back.get_property("bool_prop") is True
+        assert pl_back.get_property("string_prop", raw=True).value == "string value"
+        assert pl_back.get_property("int_prop", raw=True).value == 42
+        assert pl_back.get_property("bool_prop", raw=True).value is True     
+
         ts_back = pl_back.get_property("ts_prop")
         assert isinstance(ts_back, mitk.TemporoSpatialStringProperty)
         assert ts_back.get_value(time_step=0, z_slice=0) == "ts value 0,0"

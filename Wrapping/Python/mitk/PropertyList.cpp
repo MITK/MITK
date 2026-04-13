@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "PropertyAutoWrap.h"
 #include "PropertyConversionUtils.h"
 #include "SmartPointer.h"
+#include "TemporoSpatialStringSerialization.h"
 #include <mitkPropertyList.h>
 #include <nlohmann/json.hpp>
 #include <pybind11/pybind11.h>
@@ -82,7 +83,45 @@ void InitPropertyList(py::module_ &m)
       "from_json",
       [](const std::string &json)
       { return mitk::ConvertPropertyListFromSelfContainedJson(nlohmann::json::parse(json)); },
-      py::arg("json"));
+      py::arg("json"))
+    .def(
+      "to_dict",
+      [](const mitk::PropertyList &pl)
+      {
+        py::dict result;
+        for (const auto &key : pl.GetPropertyKeys())
+        {
+          const auto *prop = pl.GetProperty(key);
+          py::dict propDict;
+          if (!mitk::python::tryTemporoSpatialStringToDict(*prop, propDict))
+            propDict = mitk::python::propertyToDict(*prop);
+          result[py::str(key)] = propDict;
+        }
+        return result;
+      },
+      "Serialize all properties to a Python dict keyed by property name.")
+    .def_static(
+      "from_dict",
+      [](const py::dict &d)
+      {
+        auto pl = mitk::PropertyList::New();
+        for (const auto &item : d)
+        {
+          const std::string key = item.first.cast<std::string>();
+          const py::dict propDict = item.second.cast<py::dict>();
+          mitk::BaseProperty::Pointer prop;
+          if (propDict.contains("type") &&
+              propDict["type"].cast<std::string>() == "TemporoSpatialStringProperty")
+            prop = mitk::python::tryDictToTemporoSpatialString(propDict);
+          else
+            prop = mitk::python::dictToProperty(propDict);
+          if (prop)
+            pl->SetProperty(key, prop);
+        }
+        return pl;
+      },
+      py::arg("d"),
+      "Reconstruct a PropertyList from a dict produced by to_dict().");
 
   // Attach properties view
   propertyList_class.def_property_readonly(

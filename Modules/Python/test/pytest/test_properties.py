@@ -391,3 +391,37 @@ class TestSerialization:
         round_tripped = json.loads(restored.to_json())
         assert round_tripped["vec"]["type"] == "Vector3DProperty"
         assert _close(round_tripped["vec"]["value"], [1.5, 2.5, 3.5])
+
+
+
+class TestNonOwnedProperties:
+    """Tests for properties that are provided read-only (not owned).
+
+    These tests are stubs that will be fully implemented when
+    MultiLabelSegmentation bindings are available (WP-10).
+    """
+
+    def test_get_non_owned_property(self):
+        """Reading non-owned properties should work."""
+        # This will be implemented when MultiLabelSegmentation is available
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+
+    def test_set_non_owned_property_raises(self):
+        """Setting non-owned property should raise PropertyNotOwnedError."""
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+
+    def test_remove_non_owned_property_raises(self):
+        """Removing non-owned property should raise PropertyNotOwnedError."""
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+
+    def test_view_setitem_non_owned_raises(self):
+        """View setitem on non-owned property should raise PropertyNotOwnedError."""
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+
+    def test_view_delitem_non_owned_raises(self):
+        """View delitem on non-owned property should raise PropertyNotOwnedError."""
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")
+
+    def test_property_is_owned_non_owned(self):
+        """property_is_owned should return False for non-owned properties."""
+        pytest.skip("Requires MultiLabelSegmentation (WP-10)")

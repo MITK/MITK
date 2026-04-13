@@ -16,6 +16,10 @@ found in the LICENSE file.
 
 #include <pybind11/embed.h>
 
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+
 namespace py = pybind11;
 
 namespace
@@ -131,6 +135,46 @@ void mitk::PythonContext::Execute(const std::string &expression)
   {
     mitkThrow() << "An error occurred while executing Python code: " << e.what();
   }
+}
+
+void mitk::PythonContext::ExecuteFile(const fs::path& filePath)
+{
+  const auto normalizedPath = fs::absolute(filePath).lexically_normal();
+
+  std::ifstream stream(normalizedPath, std::ios::binary);
+
+  if (!stream.is_open())
+    mitkThrow() << "Could not open Python file: " << normalizedPath.string();
+
+  std::ostringstream buffer;
+  buffer << stream.rdbuf();
+
+  py::gil_scoped_acquire gil;
+
+  // __file__ and __name__ are script-scoped: set them for the duration of
+  // execution so scripts can use Path(__file__) and `if __name__ == "__main__"`,
+  // then remove them so subsequent Execute() calls don't see stale values.
+  // User-defined globals intentionally persist in the shared dictionary.
+  m_Impl->Dictionary[py::str("__file__")] = py::str(normalizedPath.generic_string());
+  m_Impl->Dictionary[py::str("__name__")] = py::str("__main__");
+
+  std::string errorMessage;
+
+  try
+  {
+    py::exec(buffer.str(), m_Impl->Dictionary);
+  }
+  catch (py::error_already_set& e)
+  {
+    errorMessage = e.what();
+  }
+
+  PyDict_DelItemString(m_Impl->Dictionary.ptr(), "__file__");
+  PyDict_DelItemString(m_Impl->Dictionary.ptr(), "__name__");
+
+  if (!errorMessage.empty())
+    mitkThrow() << "An error occurred while executing Python file \""
+                << normalizedPath.string() << "\": " << errorMessage;
 }
 
 void mitk::PythonContext::BindImage(Image* image, const std::string& varName)

@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPythonContext_h
 #define mitkPythonContext_h
 
+#include <mitkFileSystem.h>
 #include <MitkPythonExports.h>
 
 #include <memory>
@@ -158,6 +159,19 @@ namespace mitk
      * \throw mitk::Exception if execution fails (e.g., due to a Python error).
      */
     void Execute(const std::string &expression);
+
+    /**
+     * \brief Executes a Python file within this context.
+     *
+     * The file contents are executed using the same dictionary as Execute(),
+     * so variables and imports remain available across calls. The special
+     * \c __file__ variable is set to the executed file path.
+     *
+     * \param[in] filePath Absolute or relative path to the Python file.
+     *
+     * \throw mitk::Exception if the file cannot be read or execution fails.
+     */
+    void ExecuteFile(const fs::path& filePath);
 
   private:
     struct Impl;

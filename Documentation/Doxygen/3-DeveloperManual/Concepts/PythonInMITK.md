@@ -84,6 +84,15 @@ In most cases, you won't need to interact with the `MitkPreloadPython` module di
 To run the Python interpreter as a separate process, use `MitkPythonHelper`.
 To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
 
+### Testing
+
+The `MitkPython` module ships two complementary test binaries, both compiled into `MitkPythonTestDriver`:
+
+1. **`mitkPythonContextTest`**: a CppUnit suite exercising the `mitk::PythonContext` class directly from C++ — interpreter initialization, variable exchange, `Execute()`, `ExecuteFile()`, image binding, and context isolation.
+2. **`mitkPythonBindingsTest`**: a thin C++ host that spins up a dedicated `mitk_pytest` virtual environment, installs `pytest` on first run, then hands control to a pytest suite under `Modules/Python/test/pytest/`. The suite covers the `mitk` Python module's binding surface (image construction, NumPy interop, I/O, geometry, pixel types, points/vectors, auto-loaded modules) as seen from idiomatic Python.
+
+Splitting the two lets each side use its native testing idiom: CppUnit for C++ API coverage, pytest for Python-side behavior. The `mitk_pytest` venv is reused across test runs, so the pytest install cost is paid only once per machine.
+
 ## Python Wrapping: The mitk Python module
 
 The Python wrapping of MITK is handled by pybind11.
@@ -161,6 +170,8 @@ To avoid interference between multiple MITK versions built or installed on the s
 
 Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Settings** plugin in MITK.
 
+The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
+
 ## Python Wheel
 
 The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk-*.whl`).
@@ -207,7 +218,8 @@ python Wrapping/Python/wheel/test_wheel.py --build-dir ../MITK-superbuild/MITK-b
 ```
 
 This automatically creates a temporary virtual environment, installs the wheel, runs the tests, and cleans up.
-The tests verify import, image creation, NumPy roundtrip, geometry types, and CppMicroServices auto-loading.
+The test scope is deliberately narrow: it covers wheel-specific concerns (import, `__version__`, CppMicroServices auto-load bundling) plus a single functional sanity check.
+Comprehensive binding coverage lives in the `mitkPythonBindingsTest` pytest suite described above — running those against the wheel would be redundant.
 
 ### Standalone usage
 

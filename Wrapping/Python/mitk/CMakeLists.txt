@@ -5,6 +5,7 @@
 string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
 
 pybind11_add_module(mitk_python_bindings
+  Color.cpp
   CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp
@@ -14,6 +15,11 @@ pybind11_add_module(mitk_python_bindings
   PixelType.cpp
   PixelType.h
   Points.cpp
+  Property.cpp
+  PropertyList.cpp
+  PropertyAutoWrap.h
+  PropertyNotOwnedError.h
+  PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp
 )
@@ -31,6 +37,14 @@ set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
 file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
+
+# Copy the property_view.py file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
+  "${mitk_PACKAGE_DIR}/property_view.py"
+  COPYONLY
+)
+
 
 if(MSVC)
   set_target_properties(mitk_python_bindings PROPERTIES

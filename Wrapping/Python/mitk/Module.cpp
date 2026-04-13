@@ -19,9 +19,12 @@ void InitException(py::module_&);
 void InitPoints(py::module_&);
 void InitVectors(py::module_&);
 void InitGeometries(py::module_&);
+void InitColor(py::module_&);
 void InitPixelType(py::module_&);
 void InitImage(py::module_&);
 void InitIOUtil(py::module_&);
+void InitProperty(py::module_&);
+void InitPropertyList(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -35,7 +38,10 @@ PYBIND11_MODULE(mitk, m)
   InitPoints(m);
   InitVectors(m);
   InitGeometries(m);
+  InitColor(m);
   InitPixelType(m);
   InitImage(m);
   InitIOUtil(m);
+  InitProperty(m);
+  InitPropertyList(m);
 }

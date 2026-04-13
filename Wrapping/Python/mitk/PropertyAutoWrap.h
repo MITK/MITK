@@ -26,13 +26,14 @@ namespace py = pybind11;
  * \brief Converts a Python object to a BaseProperty, auto-wrapping common scalar types.
  *
  * Supported auto-wrap conversions:
- * - bool   -> BoolProperty
- * - int    -> IntProperty
- * - float  -> DoubleProperty (Python float is double-precision)
- * - str    -> StringProperty
+ * - bool       -> BoolProperty
+ * - int        -> IntProperty
+ * - float      -> DoubleProperty (Python float is double-precision)
+ * - str        -> StringProperty
+ * - mitk.Color -> ColorProperty
  * - BaseProperty subclasses -> used directly
  *
- * For property types without a scalar equivalent (Color, Vector3D, Point*, ...),
+ * For property types without a scalar equivalent (Vector3D, Point*, ...),
  * callers must pass an explicit mitk.<Name>Property instance.
  *
  * \throws py::type_error if the Python type cannot be auto-wrapped.
@@ -55,6 +56,9 @@ inline mitk::BaseProperty::Pointer pythonValueToProperty(py::object value)
 
   if (py::isinstance<py::str>(value))
     return mitk::StringProperty::New(value.cast<std::string>());
+
+  if (py::isinstance<mitk::Color>(value))
+    return mitk::ColorProperty::New(value.cast<mitk::Color>());
 
   throw py::type_error("Cannot auto-convert " + std::string(py::str(value.get_type())) +
                        " to a property. Pass a mitk.BaseProperty subclass explicitly "
@@ -89,6 +93,9 @@ inline mitk::BaseProperty::Pointer pythonValueToPropertyWithType(py::object valu
 
   if (targetType == "DoubleProperty")
     return mitk::DoubleProperty::New(value.cast<double>());
+
+  if (targetType == "ColorProperty")
+    return mitk::ColorProperty::New(value.cast<mitk::Color>());
 
   throw py::type_error("Cannot coerce " + std::string(py::str(value.get_type())) + " to " + targetType +
                        ". Pass the new property value as a mitk." + targetType + " instance explicitly.");

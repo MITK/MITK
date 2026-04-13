@@ -212,6 +212,14 @@ class TestAutoWrap:
             return
         assert False, "expected TypeError for tuple auto-wrap"
 
+    def test_color_auto_wraps_to_color_property(self):
+        # mitk.Color is a bound type, so set_property accepts it directly.
+        img = mitk.Image()
+        img.set_property("color", mitk.Color(1.0, 0.5, 0.0))
+        prop = img.get_property("color")
+        assert isinstance(prop, mitk.ColorProperty)
+        assert prop.value.r == 1.0
+
 
 class TestColor:
     def test_construct_and_component_access(self):

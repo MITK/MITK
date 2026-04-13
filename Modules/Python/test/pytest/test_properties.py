@@ -89,20 +89,21 @@ class TestAutoWrap:
         img = mitk.Image()
         img.set_property("timestamp", 1.2345678901234567)
         prop = img.get_property("timestamp")
-        assert prop.GetNameOfClass() == "DoubleProperty"
+        assert isinstance(prop, mitk.DoubleProperty)
         assert prop.value == pytest.approx(1.2345678901234567, rel=0, abs=0)
 
     def test_python_int_maps_to_int_property(self):
         img = mitk.Image()
         img.set_property("n", 7)
-        assert img.get_property("n").GetNameOfClass() == "IntProperty"
+        assert isinstance(img.get_property("n"), mitk.IntProperty)
 
     def test_python_bool_maps_to_bool_property(self):
         # bool is subclass of int in Python; the binding must handle that first.
         img = mitk.Image()
         img.set_property("flag", True)
-        assert img.get_property("flag").GetNameOfClass() == "BoolProperty"
-        assert img.get_property("flag").value is True
+        prop = img.get_property("flag")
+        assert isinstance(prop, mitk.BoolProperty)
+        assert prop.value is True
 
     def test_plain_tuple_does_not_auto_wrap_to_color(self):
         # 3-tuple is ambiguous (Color vs Point3D vs Vector3D); callers must be explicit.
@@ -201,11 +202,12 @@ class TestSerialization:
             }
         )
         restored = mitk.PropertyList.from_json(payload)
-        prop = restored.get_property("vec")
-        assert prop is not None
-        assert prop.GetNameOfClass() == "Vector3DProperty"
+        assert restored.get_property("vec") is not None
 
-        # Serializing back must preserve the same shape and values.
+        # Serializing back must preserve the type tag and values. This is the
+        # actual proof that IPropertyDeserialization round-tripped the unbound
+        # type correctly -- the returned Python object is just a BaseProperty
+        # handle since Vector3DProperty has no dedicated binding.
         round_tripped = json.loads(restored.to_json())
         assert round_tripped["vec"]["type"] == "Vector3DProperty"
         assert round_tripped["vec"]["value"] == pytest.approx([1.5, 2.5, 3.5])

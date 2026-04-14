@@ -21,7 +21,8 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
-#include <QmitknnInteractiveInstallDialog.h>
+#include <QmitkPipInstallDialog.h>
+#include <mitkPipPackageInfo.h>
 #include <QmitkRun.h>
 #include <QmitkStyleManager.h>
 
@@ -35,6 +36,21 @@ MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, 
 
 namespace
 {
+  // With PyTorch v2.9.0, nnInteractive has a 4x performance regression.
+  // Starting with PyTorch v2.9.1, support for the GeForce 10-series GPUs is dropped.
+  constexpr auto TORCH = "torch>=2.8.0,<2.9.0";
+
+  constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
+  constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
+
+#if defined(_WIN32)
+  // Starting with CUDA v12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
+#endif
+
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 
   void SetIcon(QAbstractButton* button, const char* icon)
@@ -293,8 +309,24 @@ bool QmitknnInteractiveToolGUI::Install()
   if (this->GetTool()->IsInstalled())
     return true;
 
-  QmitknnInteractiveInstallDialog installDialog;
-  return installDialog.exec() == QDialog::Accepted;
+  mitk::PipInstallSpec spec;
+  spec.name = "nnInteractive";
+
+  // PyTorch needs --index-url for CUDA builds on Windows, so it goes in its own group.
+  mitk::PipInstallGroup pytorchGroup;
+  pytorchGroup.requirements = { TORCH, TORCH_VISION };
+
+#if defined(_WIN32)
+  pytorchGroup.indexUrl = CUDA_INDEX_URL;
+#endif
+
+  spec.groups.append(pytorchGroup);
+
+  // nnInteractive installs from default PyPI.
+  spec.groups.append({ { NNINTERACTIVE }, {}, {} });
+
+  QmitkPipInstallDialog dialog(spec);
+  return dialog.exec() == QDialog::Accepted;
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)

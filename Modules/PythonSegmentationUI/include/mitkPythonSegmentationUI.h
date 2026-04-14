@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 /** \brief Namespace for the PythonSegmentationUI module.
  *
- * \sa QmitknnInteractiveToolGUI, QmitknnInteractiveInstallDialog
+ * \sa QmitknnInteractiveToolGUI, QmitkPipInstallDialog
  */
 namespace mitk::PythonSegmentationUI
 {

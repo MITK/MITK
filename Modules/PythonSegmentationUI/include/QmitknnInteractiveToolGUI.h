@@ -40,7 +40,7 @@ namespace Ui
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
  * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
- *     QmitknnInteractiveInstallDialog
+ *     QmitkPipInstallDialog
  */
 class MITKPYTHONSEGMENTATIONUI_EXPORT QmitknnInteractiveToolGUI : public QmitkSegWithPreviewToolGUIBase
 {

@@ -107,7 +107,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id)
 
 const std::string mitk::ImageDescriptor::GetChannelName(unsigned int id) const
 {
-  if (id > this->m_ChannelNames.size())
+  if (id >= this->m_ChannelNames.size())
     return "Out-of-range-access";
   else
     return this->m_ChannelNames.at(id);

@@ -81,16 +81,15 @@ mitk::ChannelDescriptor mitk::ImageDescriptor::GetChannelDescriptor(unsigned int
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) const
 {
-  unsigned int idFound = 0;
   const std::string search_str(name);
 
-  for (auto iter = this->m_ChannelNames.begin(); iter < this->m_ChannelNames.end(); iter++)
+  for (auto iter = this->m_ChannelNames.begin(); iter != this->m_ChannelNames.end(); ++iter)
   {
-    if (search_str.compare(*iter))
-      idFound = iter - this->m_ChannelNames.begin();
+    if (search_str == *iter)
+      return (m_ChannelDesc[iter - this->m_ChannelNames.begin()]).GetPixelType();
   }
 
-  return (m_ChannelDesc[idFound]).GetPixelType();
+  throw std::invalid_argument("No channel found with the given name.");
 }
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id) const

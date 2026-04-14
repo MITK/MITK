@@ -262,7 +262,7 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
 
 mitk::PlanarFigure::PolyLineType& mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
-  if (index > m_PolyLines.size() || !m_PolyLineUpToDate)
+  if (index >= m_PolyLines.size() || !m_PolyLineUpToDate)
   {
     this->GeneratePolyLine();
     m_PolyLineUpToDate = true;

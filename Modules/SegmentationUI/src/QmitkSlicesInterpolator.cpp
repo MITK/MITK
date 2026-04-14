@@ -800,7 +800,13 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
   const auto timeStep = segmentationImage->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
-  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage->GetGroupImage(segmentationImage->GetGroupIndexOfLabel(m_CurrentActiveLabelValue)), timeStep)->Clone();
+  auto affectedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage->GetGroupImage(segmentationImage->GetGroupIndexOfLabel(m_CurrentActiveLabelValue)), timeStep);
+  if (affectedSlice.IsNull())
+  {
+    MITK_ERROR << "Unable to extract slice for interpolation.";
+    return;
+  }
+  auto interpolatedSlice = affectedSlice->Clone();
   auto activeValue = segmentationImage->GetActiveLabel()->GetValue();
   mitk::TransferLabelContentAtTimeStep(
     interpolatedPreview,

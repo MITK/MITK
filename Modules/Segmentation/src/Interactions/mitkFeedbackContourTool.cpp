@@ -236,15 +236,15 @@ mitk::Image::Pointer mitk::FeedbackContourTool::GenerateSliceWithContourUpdate(c
 
   const auto groupIndex = workingSeg->GetGroupIndexOfLabel(labelValue);
   const auto groupImage = workingSeg->GetGroupImage(groupIndex);
-  auto resultSlice = this->GetAffectedImageSliceAs2DImageByTimePoint(sliceGeometry, groupImage, timePoint)->Clone();
-
-  const auto activeLabelValue = addMode ? labelValue : MultiLabelSegmentation::UNLABELED_VALUE;
-
-  if (resultSlice.IsNull())
+  auto slice = this->GetAffectedImageSliceAs2DImageByTimePoint(sliceGeometry, groupImage, timePoint);
+  if (slice.IsNull())
   {
     MITK_ERROR << "Unable to extract slice." << std::endl;
     return nullptr;
   }
+  auto resultSlice = slice->Clone();
+
+  const auto activeLabelValue = addMode ? labelValue : MultiLabelSegmentation::UNLABELED_VALUE;
 
   ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
     resultSlice, contour);

@@ -66,6 +66,7 @@ protected:
 
 private slots:
   void OnInstallClicked();
+  void OnAdvancedSettingsClicked();
 
   void OnVirtualEnvCreationStarted();
   void OnVirtualEnvCreationFinished(bool success);

@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkPipInstaller.h>
 #include <mitkPythonHelper.h>
 
+#include <QmitkPipInstallAdvancedDialog.h>
+
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QPushButton>
@@ -49,6 +51,8 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   // Wire the Install (Yes) button to our slot instead of the default accept.
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
+
+  connect(m_Ui->advancedSettingsButton, &QPushButton::clicked, this, &QmitkPipInstallDialog::OnAdvancedSettingsClicked);
 
   // Dot animation timer for the package label.
   m_DotTimer = new QTimer(this);
@@ -84,6 +88,14 @@ void QmitkPipInstallDialog::reject()
     return;
 
   QDialog::reject();
+}
+
+void QmitkPipInstallDialog::OnAdvancedSettingsClicked()
+{
+  QmitkPipInstallAdvancedDialog dialog(m_Spec, this);
+
+  if (dialog.exec() == QDialog::Accepted)
+    m_Spec = dialog.GetInstallSpec();
 }
 
 void QmitkPipInstallDialog::OnInstallClicked()
@@ -231,6 +243,7 @@ bool QmitkPipInstallDialog::ConfirmCancel()
 void QmitkPipInstallDialog::SetUiInstalling()
 {
   m_IsInstalling = true;
+  m_Ui->advancedSettingsButton->hide();
 
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Yes))
     button->setEnabled(false);

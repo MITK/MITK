@@ -22,7 +22,11 @@ namespace
   {
     bool operator()(mitk::WeakPointer<mitk::DataInteractor> d1, mitk::WeakPointer<mitk::DataInteractor> d2)
     {
-      return (d1.Lock()->GetLayer() > d2.Lock()->GetLayer());
+      auto locked1 = d1.Lock();
+      auto locked2 = d2.Lock();
+      if (locked1.IsNull() || locked2.IsNull())
+        return false;
+      return (locked1->GetLayer() > locked2->GetLayer());
     }
   };
 }

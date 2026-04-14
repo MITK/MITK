@@ -6,6 +6,7 @@
 
 import json
 
+import pytest
 import mitk
 
 

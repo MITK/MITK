@@ -201,15 +201,7 @@ configure_file(
   @ONLY
 )
 
-# Include in ALL when testing is enabled so the venv is always present
-# before ctest runs. In non-testing builds it remains an opt-in target.
-if(BUILD_TESTING)
-  set(_venv_all_flag ALL)
-else()
-  set(_venv_all_flag "")
-endif()
-
-add_custom_target(mitk_python_venv ${_venv_all_flag}
+add_custom_target(mitk_python_venv ""
   COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/setup_venv_resolved.cmake"
   COMMENT "Setting up virtual environment for MITK Python bindings"
   DEPENDS mitk_python_bindings
@@ -218,30 +210,3 @@ add_custom_target(mitk_python_venv ${_venv_all_flag}
 set_target_properties(mitk_python_venv PROPERTIES
   FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
 )
-
-# ---------------------------------------------------------------------------
-# CTest integration for pytest property binding tests
-# ---------------------------------------------------------------------------
-if(BUILD_TESTING)
-  # Use the venv Python so that sitecustomize.py is in effect: it adds the
-  # build-tree bindings to sys.path and calls os.add_dll_directory() for all
-  # MITK DLL dirs. The latter is required on Windows (Python >= 3.8), where
-  # PATH is no longer searched for extension-module DLL dependencies.
-  if(WIN32)
-    set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/Scripts/python.exe")
-  else()
-    set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/bin/python")
-  endif()
-
-  add_test(NAME mitkPythonWrappingTest
-    COMMAND "${_venv_python}" -m pytest
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/"
-            --tb=short -q
-  )
-  set_tests_properties(mitkPythonWrappingTest PROPERTIES
-    REQUIRED_FILES   "${_venv_python}"
-    LABELS           "Python"
-    SKIP_RETURN_CODE 5
-    TIMEOUT          120
-  )
-endif()

@@ -59,13 +59,6 @@ namespace mitk
     PointSetReaderService(const PointSetReaderService &other);
 
     /**
-     * \brief Read a Geometry3D from an XML element.
-     * \param[in] parentElement The XML element containing geometry data.
-     * \return The deserialized BaseGeometry.
-     */
-    mitk::BaseGeometry::Pointer ReadGeometry(tinyxml2::XMLElement *parentElement);
-
-    /**
      * \brief Read point data from an XML time series element.
      * \param[in] newPointSet The PointSet to populate.
      * \param[in] currentTimeSeries The XML element for the current time series.

@@ -694,8 +694,8 @@ namespace
 
     if (finding2 != mapping2.end())
     {
-      MITK_DEBUG << "Deserialized label used a simplified index-less name. Converted name into valid name. Original name: \"" << externalName << "\"; new name: \"" << finding->second << "\"";
-      return finding->second;
+      MITK_DEBUG << "Deserialized label used a simplified index-less name. Converted name into valid name. Original name: \"" << externalName << "\"; new name: \"" << finding2->second << "\"";
+      return finding2->second;
     }
 
     return externalName;

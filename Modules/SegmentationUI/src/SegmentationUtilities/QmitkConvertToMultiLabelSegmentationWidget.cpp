@@ -512,10 +512,14 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
-    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
-    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ m_Controls->outputSegSelector->GetSelectedNode()->GetName()+"\"");
+    auto outputNode = m_Controls->outputSegSelector->GetSelectedNode();
+    if (outputNode.IsNotNull())
+    {
+      mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
+      undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ outputNode->GetName()+"\"");
 
-    m_Controls->outputSegSelector->GetSelectedNode()->Modified();
+      outputNode->Modified();
+    }
   }
   else
   {

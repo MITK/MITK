@@ -742,7 +742,7 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure &other) const
 
     while (itThis != itEnd)
     {
-      if ((itThis->Quantity - itOther->Quantity) > .001)
+      if (fabs(itThis->Quantity - itOther->Quantity) > .001)
       {
         MITK_ERROR << "Quantity is Different" << itThis->Quantity << "/" << itOther->Quantity;
         return false;

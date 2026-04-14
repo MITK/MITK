@@ -330,7 +330,13 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
-    outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Controls->outputSegSelector->GetSelectedNode()->GetData());
+    auto outputNode = m_Controls->outputSegSelector->GetSelectedNode();
+    if (outputNode.IsNull())
+    {
+      QApplication::restoreOverrideCursor();
+      return;
+    }
+    outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(outputNode->GetData());
 
     if (outputSeg->GetNumberOfGroups() > 0)
     {

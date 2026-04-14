@@ -94,7 +94,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) co
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id) const
 {
-  if (id > this->m_NumberOfChannels)
+  if (id >= this->m_NumberOfChannels)
   {
     throw std::invalid_argument("The given id exceeds the number of active channel.");
   }

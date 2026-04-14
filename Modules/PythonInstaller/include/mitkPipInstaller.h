@@ -179,6 +179,7 @@ namespace mitk
     State m_State = State::Idle;
     bool m_AutoInstall = false;
     bool m_AnyFailed = false;
+    bool m_CreatedVirtualEnv = false;
 
     int m_CurrentGroup = 0;
     int m_CurrentPackage = 0;

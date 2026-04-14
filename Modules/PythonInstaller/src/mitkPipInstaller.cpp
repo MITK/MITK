@@ -54,6 +54,7 @@ void mitk::PipInstaller::StartResolve()
   m_CurrentPackage = 0;
   m_GroupStartIndex = 0;
   m_AnyFailed = false;
+  m_CreatedVirtualEnv = false;
 
   StartCreateVirtualEnv();
 }
@@ -82,21 +83,31 @@ void mitk::PipInstaller::StartResolveAndInstall()
   m_CurrentPackage = 0;
   m_GroupStartIndex = 0;
   m_AnyFailed = false;
+  m_CreatedVirtualEnv = false;
 
   StartCreateVirtualEnv();
 }
 
 void mitk::PipInstaller::Cancel()
 {
-  if (m_Process->state() != QProcess::NotRunning)
-    m_Process->kill();
-
   auto previousState = m_State;
   m_State = State::Failed;
 
+  if (m_Process->state() != QProcess::NotRunning)
+  {
+    m_Process->kill();
+    m_Process->waitForFinished(5000);
+  }
+
+  if (m_CreatedVirtualEnv && !m_Spec.venvName.empty())
+  {
+    PythonHelper::RemoveVirtualEnv(m_Spec.venvName);
+    m_CreatedVirtualEnv = false;
+  }
+
   if (previousState == State::Resolving)
     emit ResolveFinished(false, {});
-  else if (previousState == State::Installing)
+  else if (previousState != State::Idle && previousState != State::Done && previousState != State::Failed)
     emit InstallFinished(false);
 }
 
@@ -307,6 +318,7 @@ void mitk::PipInstaller::StartCreateVirtualEnv()
   }
 
   m_State = State::CreatingVirtualEnv;
+  m_CreatedVirtualEnv = true;
   emit VirtualEnvCreationStarted();
 
   auto venvPath = PythonHelper::GetVirtualEnvPath(m_Spec.venvName);

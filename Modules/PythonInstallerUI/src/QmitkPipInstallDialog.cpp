@@ -50,6 +50,11 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
 
+  // Dot animation timer for the package label.
+  m_DotTimer = new QTimer(this);
+  m_DotTimer->setInterval(333);
+  connect(m_DotTimer, &QTimer::timeout, this, &QmitkPipInstallDialog::OnDotTimer);
+
   // Installer connections.
   connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationStarted, this, &QmitkPipInstallDialog::OnVirtualEnvCreationStarted);
   connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationFinished, this, &QmitkPipInstallDialog::OnVirtualEnvCreationFinished);
@@ -69,28 +74,13 @@ QmitkPipInstallDialog::~QmitkPipInstallDialog()
 
 void QmitkPipInstallDialog::closeEvent(QCloseEvent* event)
 {
-  if (m_IsInstalling)
-  {
-    auto answer = QMessageBox::question(
-      this,
-      "Cancel installation",
-      "<p>The installation is still in progress. "
-      "Closing now may leave packages in an incomplete state.</p>"
-      "<p>Close anyway?</p>");
-
-    if (answer == QMessageBox::No)
-    {
-      event->ignore();
-      return;
-    }
-
-    m_Installer->Cancel();
-  }
+  if (m_IsInstalling && !ConfirmCancel())
+    event->ignore();
 }
 
 void QmitkPipInstallDialog::reject()
 {
-  if (m_IsInstalling)
+  if (m_IsInstalling && !ConfirmCancel())
     return;
 
   QDialog::reject();
@@ -137,6 +127,7 @@ void QmitkPipInstallDialog::OnPipUpgradeFinished(bool /*success*/)
 
 void QmitkPipInstallDialog::OnResolveStarted()
 {
+  m_DotTimer->stop();
   ++m_CurrentStep;
   SetStatus("Resolve dependencies");
   m_Ui->progressBar->setRange(0, 0);
@@ -147,6 +138,7 @@ void QmitkPipInstallDialog::OnResolveFinished(bool success, const std::vector<mi
 {
   if (!success)
   {
+    m_DotTimer->stop();
     SetUiFinished(false);
     m_Ui->statusLabel->setText("Installation failed. Could not resolve dependencies.");
     m_Ui->packageLabel->hide();
@@ -168,17 +160,21 @@ void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& nam
     SetStatus("Install packages");
   }
 
-  // Show name and version.
-  m_Ui->packageLabel->show();
-
+  // Show name and version with animated dots.
   if (index < static_cast<int>(resolvedPackages.size()) && !resolvedPackages[index].version.empty())
-    m_Ui->packageLabel->setText(QString("Installing %1 %2...").arg(name, QString::fromStdString(resolvedPackages[index].version)));
+    m_PackageLabelBaseText = QString("Installing %1 %2").arg(name, QString::fromStdString(resolvedPackages[index].version));
   else
-    m_Ui->packageLabel->setText(QString("Installing %1...").arg(name));
+    m_PackageLabelBaseText = QString("Installing %1").arg(name);
+
+  m_DotCount = 0;
+  m_Ui->packageLabel->setText(m_PackageLabelBaseText + ".");
+  m_Ui->packageLabel->show();
+  m_DotTimer->start();
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)
 {
+  m_DotTimer->stop();
   SetUiFinished(success);
 
   if (success)
@@ -202,17 +198,43 @@ void QmitkPipInstallDialog::OnProgressChanged(int current, int total)
 
 void QmitkPipInstallDialog::OnErrorOccurred(const QString& message)
 {
+  m_DotTimer->stop();
   SetUiFinished(false);
   m_Ui->statusLabel->setText("Installation failed: " + message);
   m_Ui->packageLabel->hide();
 }
 
+void QmitkPipInstallDialog::OnDotTimer()
+{
+  m_DotCount = (m_DotCount + 1) % 3;
+  m_Ui->packageLabel->setText(m_PackageLabelBaseText + QString(m_DotCount + 1, '.'));
+}
+
 // --- Private helpers ---
+
+bool QmitkPipInstallDialog::ConfirmCancel()
+{
+  auto answer = QMessageBox::question(
+    this,
+    "Cancel installation",
+    "<p>The installation is still in progress. "
+    "Closing now will cancel the installation and remove all already installed packages.</p>"
+    "<p>Cancel anyway?</p>");
+
+  if (answer == QMessageBox::No)
+    return false;
+
+  m_Installer->Cancel();
+  return true;
+}
 
 void QmitkPipInstallDialog::SetUiInstalling()
 {
   m_IsInstalling = true;
-  m_Ui->buttonBox->setEnabled(false);
+
+  if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Yes))
+    button->setEnabled(false);
+
   m_Ui->statusLabel->show();
   m_Ui->packageLabel->setText("");
 }

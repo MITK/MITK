@@ -57,6 +57,10 @@ namespace mitk
                                   "",
                                   "qt",
                                   "",
+                                  "python",
+                                  "py",
+                                  "installer",
+                                  "inst",
 
                                   "object",
                                   "obj",

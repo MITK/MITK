@@ -34,6 +34,8 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT fs::path CreateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);
+  MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const fs::path& path);
 }
 
 #endif

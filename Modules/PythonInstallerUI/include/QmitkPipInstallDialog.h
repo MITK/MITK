@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkPipPackageInfo.h>
 
 #include <QDialog>
+#include <QTimer>
 #include <memory>
 
 class QCloseEvent;
@@ -76,8 +77,10 @@ private slots:
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
+  void OnDotTimer();
 
 private:
+  bool ConfirmCancel();
   void SetUiInstalling();
   void SetUiFinished(bool success);
 
@@ -86,6 +89,9 @@ private:
   std::unique_ptr<Ui::QmitkPipInstallDialog> m_Ui;
   mitk::PipInstaller* m_Installer;
   mitk::PipInstallSpec m_Spec;
+  QTimer* m_DotTimer;
+  QString m_PackageLabelBaseText;
+  int m_DotCount = 0;
   bool m_IsInstalling = false;
   int m_CurrentStep = 0;
   int m_TotalSteps = 0;

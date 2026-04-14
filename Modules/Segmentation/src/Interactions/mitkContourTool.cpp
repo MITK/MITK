@@ -100,7 +100,10 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   auto workingSeg = this->GetWorkingData();
   if (!workingSeg)
     return;
-  const auto activeLabelValue = workingSeg->GetActiveLabel()->GetValue();
+  auto activeLabel = workingSeg->GetActiveLabel();
+  if (nullptr == activeLabel)
+    return;
+  const auto activeLabelValue = activeLabel->GetValue();
 
   this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, activeLabelValue, m_PaintingPixelValue!=0);
 }

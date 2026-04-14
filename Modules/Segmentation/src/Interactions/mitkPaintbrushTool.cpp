@@ -476,7 +476,10 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
     return;
 
   auto workingSeg = this->GetWorkingData();
-  Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
+  auto activeLabel = workingSeg->GetActiveLabel();
+  if (nullptr == activeLabel)
+    return;
+  Label::PixelType activePixelValue = activeLabel->GetValue();
   if (!m_FillMode)
   {
     activePixelValue = MultiLabelSegmentation::UNLABELED_VALUE;

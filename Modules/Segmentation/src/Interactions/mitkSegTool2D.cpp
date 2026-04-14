@@ -603,7 +603,12 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
     mitkThrow() << "Working node does not contain labelSetImage.";
   }
 
-  const auto activeLabelValue = segmentation->GetActiveLabel()->GetValue();
+  auto activeLabel = segmentation->GetActiveLabel();
+  if (nullptr == activeLabel)
+  {
+    mitkThrow() << "Cannot write slice to working node. No active label set.";
+  }
+  const auto activeLabelValue = activeLabel->GetValue();
   const auto groupIndex = segmentation->GetGroupIndexOfLabel(activeLabelValue);
   auto groupImage = segmentation->GetGroupImage(groupIndex);
   if (nullptr == groupImage)

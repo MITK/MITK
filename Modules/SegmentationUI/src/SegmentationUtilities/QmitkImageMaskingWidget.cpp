@@ -152,11 +152,28 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   //create result image, get mask node and reference image
   mitk::Image::Pointer resultImage(nullptr);
   mitk::MultiLabelSegmentation::Pointer segmentation = m_Controls->labelInspector->GetMultiLabelSegmentation();
-  mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(m_Controls->imageNodeSelector->GetSelectedNode()->GetData());
+
+  auto imageNode = m_Controls->imageNodeSelector->GetSelectedNode();
+  if (imageNode.IsNull())
+  {
+    QMessageBox::information(this, "Image Masking", "Please select an image node.", QMessageBox::Ok);
+    this->EnableButtons(true);
+    mitk::ProgressBar::GetInstance()->Progress(4);
+    return;
+  }
+  mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(imageNode->GetData());
 
   mitk::ProgressBar::GetInstance()->Progress();
 
-  auto labelImage = mitk::CreateLabelMask(segmentation, m_Controls->labelInspector->GetSelectedLabels().front(), true);
+  auto selectedLabels = m_Controls->labelInspector->GetSelectedLabels();
+  if (selectedLabels.empty())
+  {
+    QMessageBox::information(this, "Image Masking", "Please select a label.", QMessageBox::Ok);
+    this->EnableButtons(true);
+    mitk::ProgressBar::GetInstance()->Progress(4);
+    return;
+  }
+  auto labelImage = mitk::CreateLabelMask(segmentation, selectedLabels.front(), true);
   resultImage = this->MaskImage(referenceImage, labelImage);
 
   mitk::ProgressBar::GetInstance()->Progress();

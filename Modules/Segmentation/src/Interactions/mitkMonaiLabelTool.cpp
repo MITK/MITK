@@ -354,7 +354,13 @@ namespace
 mitk::Image::Pointer mitk::MonaiLabelTool::ApplyLevelWindowEffect(const Image *inputAtTimeStep) const
 {
   mitk::LevelWindow levelWindow;
-  this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
+  auto* toolManager = this->GetToolManager();
+  if (nullptr == toolManager)
+    return nullptr;
+  auto* referenceData = toolManager->GetReferenceData(0);
+  if (nullptr == referenceData)
+    return nullptr;
+  referenceData->GetLevelWindow(levelWindow);
   auto filteredImage = mitk::Image::New();
   filteredImage->Initialize(inputAtTimeStep);
   AccessByItk_n(inputAtTimeStep,

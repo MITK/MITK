@@ -85,7 +85,7 @@ namespace mitk
      *
      * Populated after resolveFinished() is emitted.
      */
-    QList<PipPackageInfo> ResolvedPackages() const;
+    std::vector<PipPackageInfo> ResolvedPackages() const;
 
   signals:
     /** \brief Emitted when the pip upgrade step starts. */
@@ -105,7 +105,7 @@ namespace mitk
      * \param[in] success Whether resolution succeeded.
      * \param[in] packages The accumulated list of resolved packages.
      */
-    void resolveFinished(bool success, const QList<mitk::PipPackageInfo>& packages);
+    void resolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
 
     /** \brief Emitted when a package's installation status changes.
      *
@@ -162,7 +162,7 @@ namespace mitk
     QString PythonExecutable() const;
 
     PipInstallSpec m_Spec;
-    QList<PipPackageInfo> m_ResolvedPackages;
+    std::vector<PipPackageInfo> m_ResolvedPackages;
 
     QProcess* m_Process = nullptr;
     State m_State = State::Idle;

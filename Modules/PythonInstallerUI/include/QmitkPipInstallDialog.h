@@ -34,16 +34,16 @@ namespace mitk
 
 /** \brief Reusable dialog for installing Python packages via pip.
  *
- * Shows a package list with per-package status indicators (pending, installing,
- * installed, failed), an overall progress bar, and a collapsible raw output
- * area for advanced users.
+ * Presents a simple, non-technical installation dialog with a progress bar
+ * and per-package status label. Designed for end users who do not need to
+ * see raw pip output or manage package versions.
  *
  * Usage:
  * \code
  * mitk::PipInstallSpec spec;
  * spec.name = "nnInteractive";
- * spec.groups.append({ {"torch>=2.8.0,<2.9.0"}, cudaIndexUrl, {} });
- * spec.groups.append({ {"nninteractive>=1.1.2,<2.0.0"}, {}, {} });
+ * spec.groups.push_back({ {"torch>=2.8.0,<2.9.0"}, cudaIndexUrl, {} });
+ * spec.groups.push_back({ {"nninteractive>=1.1.2,<2.0.0"}, {}, {} });
  *
  * QmitkPipInstallDialog dialog(spec);
  * if (dialog.exec() == QDialog::Accepted) { ... }
@@ -69,27 +69,24 @@ private slots:
   void OnPipUpgradeStarted();
   void OnPipUpgradeFinished(bool success);
   void OnResolveStarted();
-  void OnResolveFinished(bool success, const QList<mitk::PipPackageInfo>& packages);
+  void OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
   void OnInstallFinished(bool success);
-  void OnOutputReceived(const QString& text, bool isError);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
 
-  void OnShowAdvancedSettingsClicked(bool checked);
-  void OnShowDetailsClicked(bool checked);
-
 private:
-  void SetPackageStatus(int index, mitk::PackageStatus status);
   void SetUiInstalling();
   void SetUiFinished(bool success);
-  void AutoScrollOutput();
-  void BuildAdvancedSettings();
+
+  void SetStatus(const QString& text);
 
   std::unique_ptr<Ui::QmitkPipInstallDialog> m_Ui;
   mitk::PipInstaller* m_Installer;
   mitk::PipInstallSpec m_Spec;
   bool m_IsInstalling = false;
+  int m_CurrentStep = 0;
+  int m_TotalSteps = 0;
 };
 
 #endif

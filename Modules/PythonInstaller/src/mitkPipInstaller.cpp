@@ -19,6 +19,11 @@ found in the LICENSE file.
 
 #include <QFile>
 
+namespace
+{
+  QString toQ(const std::string& s) { return QString::fromStdString(s); }
+}
+
 mitk::PipInstaller::PipInstaller(QObject* parent)
   : QObject(parent),
     m_Process(new QProcess(this))
@@ -61,7 +66,7 @@ void mitk::PipInstaller::StartResolve()
 
 void mitk::PipInstaller::StartInstall()
 {
-  if (m_ResolvedPackages.isEmpty())
+  if (m_ResolvedPackages.empty())
   {
     emit installFinished(true);
     return;
@@ -71,7 +76,7 @@ void mitk::PipInstaller::StartInstall()
   m_CurrentPackage = 0;
   m_AnyFailed = false;
 
-  emit progressChanged(0, m_ResolvedPackages.size());
+  emit progressChanged(0, static_cast<int>(m_ResolvedPackages.size()));
   StartInstallPackage();
 }
 
@@ -114,7 +119,7 @@ bool mitk::PipInstaller::IsRunning() const
   return m_State != State::Idle && m_State != State::Done && m_State != State::Failed;
 }
 
-QList<mitk::PipPackageInfo> mitk::PipInstaller::ResolvedPackages() const
+std::vector<mitk::PipPackageInfo> mitk::PipInstaller::ResolvedPackages() const
 {
   return m_ResolvedPackages;
 }
@@ -134,6 +139,8 @@ void mitk::PipInstaller::OnStandardErrorReady()
 void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
   bool success = exitStatus == QProcess::NormalExit && exitCode == 0;
+  auto numPackages = static_cast<int>(m_ResolvedPackages.size());
+  auto numGroups = static_cast<int>(m_Spec.groups.size());
 
   switch (m_State)
   {
@@ -164,6 +171,8 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       return;
     }
 
+    numPackages = static_cast<int>(m_ResolvedPackages.size());
+
     // Emit the (growing) package list so the UI can update.
     emit resolveFinished(true, m_ResolvedPackages);
 
@@ -173,20 +182,20 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       // This ensures that when the next group is resolved, pip sees
       // the current group's packages as already installed (e.g. torch
       // from a CUDA index won't be re-resolved from PyPI).
-      if (m_GroupStartIndex < m_ResolvedPackages.size())
+      if (m_GroupStartIndex < numPackages)
       {
         m_State = State::Installing;
         m_CurrentPackage = m_GroupStartIndex;
-        emit progressChanged(m_GroupStartIndex, m_ResolvedPackages.size());
+        emit progressChanged(m_GroupStartIndex, numPackages);
         StartInstallPackage();
       }
       else
       {
         // No new packages in this group. Advance to next group.
         m_CurrentGroup++;
-        m_GroupStartIndex = m_ResolvedPackages.size();
+        m_GroupStartIndex = numPackages;
 
-        if (m_CurrentGroup < m_Spec.groups.size())
+        if (m_CurrentGroup < numGroups)
           StartResolveGroup();
         else
           emit installFinished(!m_AnyFailed);
@@ -197,9 +206,9 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       // Resolve-only mode: resolve all groups sequentially, then stop.
       m_CurrentGroup++;
 
-      if (m_CurrentGroup < m_Spec.groups.size())
+      if (m_CurrentGroup < numGroups)
       {
-        m_GroupStartIndex = m_ResolvedPackages.size();
+        m_GroupStartIndex = numPackages;
         StartResolveGroup();
       }
       else
@@ -213,15 +222,15 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   case State::Installing:
   {
     auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
-    emit packageStatusChanged(m_CurrentPackage, m_ResolvedPackages[m_CurrentPackage].name, status);
+    emit packageStatusChanged(m_CurrentPackage, toQ(m_ResolvedPackages[m_CurrentPackage].name), status);
 
     if (!success)
       m_AnyFailed = true;
 
     m_CurrentPackage++;
-    emit progressChanged(m_CurrentPackage, m_ResolvedPackages.size());
+    emit progressChanged(m_CurrentPackage, numPackages);
 
-    if (m_CurrentPackage < m_ResolvedPackages.size())
+    if (m_CurrentPackage < numPackages)
     {
       StartInstallPackage();
     }
@@ -231,10 +240,10 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       // Advance to the next group's resolve phase.
       m_CurrentGroup++;
 
-      if (m_CurrentGroup < m_Spec.groups.size())
+      if (m_CurrentGroup < numGroups)
       {
         m_State = State::Resolving;
-        m_GroupStartIndex = m_ResolvedPackages.size();
+        m_GroupStartIndex = numPackages;
         emit resolveStarted();
         StartResolveGroup();
       }
@@ -282,14 +291,14 @@ void mitk::PipInstaller::StartResolveGroup()
     return;
   }
 
-  if (m_CurrentGroup >= m_Spec.groups.size())
+  if (m_CurrentGroup >= static_cast<int>(m_Spec.groups.size()))
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
     emit installFinished(!m_AnyFailed);
     return;
   }
 
-  m_GroupStartIndex = m_ResolvedPackages.size();
+  m_GroupStartIndex = static_cast<int>(m_ResolvedPackages.size());
   const auto& group = m_Spec.groups[m_CurrentGroup];
 
   // Create a temporary file for the pip report.
@@ -309,7 +318,9 @@ void mitk::PipInstaller::StartResolveGroup()
 
   QStringList args = { "-m", "pip", "install", "--dry-run", "--report", reportPath };
   args = BuildPipArgs(args, group);
-  args.append(group.requirements);
+
+  for (const auto& req : group.requirements)
+    args.append(toQ(req));
 
   m_State = State::Resolving;
   m_Process->start(python, args);
@@ -327,7 +338,7 @@ void mitk::PipInstaller::StartInstallPackage()
     return;
   }
 
-  if (m_CurrentPackage >= m_ResolvedPackages.size())
+  if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
     emit installFinished(!m_AnyFailed);
@@ -335,12 +346,12 @@ void mitk::PipInstaller::StartInstallPackage()
   }
 
   const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
-  emit packageStatusChanged(m_CurrentPackage, pkg.name, PackageStatus::Installing);
+  emit packageStatusChanged(m_CurrentPackage, toQ(pkg.name), PackageStatus::Installing);
 
   const auto& group = m_Spec.groups[pkg.group];
 
   QStringList args = { "-m", "pip", "install", "--no-deps",
-                        pkg.name + "==" + pkg.version };
+                        toQ(pkg.name) + "==" + toQ(pkg.version) };
   args = BuildPipArgs(args, group);
 
   m_Process->start(python, args);
@@ -350,10 +361,11 @@ QStringList mitk::PipInstaller::BuildPipArgs(const QStringList& baseArgs, const 
 {
   QStringList args = baseArgs;
 
-  if (!group.indexUrl.isEmpty())
-    args.append({ "--index-url", group.indexUrl });
+  if (!group.indexUrl.empty())
+    args.append({ "--index-url", toQ(group.indexUrl) });
 
-  args.append(group.extraPipArgs);
+  for (const auto& arg : group.extraPipArgs)
+    args.append(toQ(arg));
 
   return args;
 }
@@ -392,10 +404,10 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
         const auto& metadata = entry["metadata"];
 
         if (metadata.contains("name"))
-          info.name = QString::fromStdString(metadata["name"].get<std::string>());
+          info.name = metadata["name"].get<std::string>();
 
         if (metadata.contains("version"))
-          info.version = QString::fromStdString(metadata["version"].get<std::string>());
+          info.version = metadata["version"].get<std::string>();
       }
 
       info.requested = entry.value("requested", false);
@@ -406,15 +418,17 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
 
       for (const auto& req : group.requirements)
       {
-        if (req.startsWith(info.name, Qt::CaseInsensitive) &&
-            (req.size() == info.name.size() || !req[info.name.size()].isLetterOrNumber()))
+        if (req.size() >= info.name.size() &&
+            std::equal(info.name.begin(), info.name.end(), req.begin(),
+                       [](char a, char b) { return std::tolower(a) == std::tolower(b); }) &&
+            (req.size() == info.name.size() || !std::isalnum(static_cast<unsigned char>(req[info.name.size()]))))
         {
           info.specifier = req;
           break;
         }
       }
 
-      m_ResolvedPackages.append(info);
+      m_ResolvedPackages.push_back(info);
     }
   }
   catch (const nlohmann::json::exception& e)

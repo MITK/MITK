@@ -313,17 +313,14 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.name = "nnInteractive";
 
   // PyTorch needs --index-url for CUDA builds on Windows, so it goes in its own group.
-  mitk::PipInstallGroup pytorchGroup;
-  pytorchGroup.requirements = { TORCH, TORCH_VISION };
-
 #if defined(_WIN32)
-  pytorchGroup.indexUrl = CUDA_INDEX_URL;
+  spec.groups.push_back({ { TORCH, TORCH_VISION }, CUDA_INDEX_URL });
+#else
+  spec.groups.push_back({ TORCH, TORCH_VISION });
 #endif
 
-  spec.groups.append(pytorchGroup);
-
   // nnInteractive installs from default PyPI.
-  spec.groups.append({ { NNINTERACTIVE }, {}, {} });
+  spec.groups.push_back({ NNINTERACTIVE });
 
   QmitkPipInstallDialog dialog(spec);
   return dialog.exec() == QDialog::Accepted;

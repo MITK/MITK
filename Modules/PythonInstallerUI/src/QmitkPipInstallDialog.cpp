@@ -16,11 +16,8 @@ found in the LICENSE file.
 #include <mitkPipInstaller.h>
 
 #include <QCloseEvent>
-#include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
-#include <QScrollBar>
-#include <QTreeWidgetItem>
+#include <QPushButton>
 
 QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
   : QDialog(parent),
@@ -30,28 +27,27 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
 {
   m_Ui->setupUi(this);
 
-  this->setWindowTitle("Install " + spec.name);
+  auto name = QString::fromStdString(spec.name);
+
+  this->setWindowTitle(name + " Installer");
+
   m_Ui->descriptionLabel->setText(
-    QString("<h3>Install %1?</h3>"
-            "<p>The required Python packages will be downloaded and installed. "
-            "This may take a while depending on your internet connection.</p>")
-      .arg(spec.name.toHtmlEscaped()));
+    QString("<h3>Do you want to install %1?</h3>"
+            "<p>This may take a while depending on your internet connection.</p>")
+      .arg(name.toHtmlEscaped()));
 
-  // Initially hide advanced settings and details.
-  m_Ui->advancedGroupBox->hide();
-  m_Ui->detailsTextEdit->hide();
-
-  // Package tree starts hidden until resolve finishes.
-  m_Ui->packageTree->hide();
+  // Hide progress elements until installation starts.
+  m_Ui->statusLabel->hide();
   m_Ui->progressBar->hide();
+  m_Ui->packageLabel->hide();
 
-  BuildAdvancedSettings();
+  // Rename the Yes button to "Install".
+  if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Yes))
+    button->setText("Install");
 
-  // Button connections.
+  // Wire the Install (Yes) button to our slot instead of the default accept.
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
-  connect(m_Ui->advancedButton, &QPushButton::clicked, this, &QmitkPipInstallDialog::OnShowAdvancedSettingsClicked);
-  connect(m_Ui->detailsButton, &QPushButton::clicked, this, &QmitkPipInstallDialog::OnShowDetailsClicked);
 
   // Installer connections.
   connect(m_Installer, &mitk::PipInstaller::pipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
@@ -60,7 +56,6 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &mitk::PipInstaller::resolveFinished, this, &QmitkPipInstallDialog::OnResolveFinished);
   connect(m_Installer, &mitk::PipInstaller::packageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
   connect(m_Installer, &mitk::PipInstaller::installFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
-  connect(m_Installer, &mitk::PipInstaller::outputReceived, this, &QmitkPipInstallDialog::OnOutputReceived);
   connect(m_Installer, &mitk::PipInstaller::progressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &mitk::PipInstaller::errorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
 }
@@ -76,7 +71,7 @@ void QmitkPipInstallDialog::closeEvent(QCloseEvent* event)
     auto answer = QMessageBox::question(
       this,
       "Cancel installation",
-      "<p><b>WARNING:</b> The installation is still in progress. "
+      "<p>The installation is still in progress. "
       "Closing now may leave packages in an incomplete state.</p>"
       "<p>Close anyway?</p>");
 
@@ -93,114 +88,74 @@ void QmitkPipInstallDialog::closeEvent(QCloseEvent* event)
 void QmitkPipInstallDialog::reject()
 {
   if (m_IsInstalling)
-  {
-    // Block Esc key during installation. The user must use the close button
-    // to get the confirmation dialog.
     return;
-  }
 
   QDialog::reject();
 }
 
-// --- Slots: user actions ---
-
 void QmitkPipInstallDialog::OnInstallClicked()
 {
-  // Read back any edits from the advanced settings form.
-  auto* formLayout = m_Ui->advancedGroupBox->findChild<QFormLayout*>("advancedFormLayout");
-
-  if (formLayout != nullptr)
-  {
-    int fieldIndex = 0;
-
-    for (int g = 0; g < m_Spec.groups.size(); ++g)
-    {
-      auto& group = m_Spec.groups[g];
-
-      for (int r = 0; r < group.requirements.size(); ++r)
-      {
-        auto* lineEdit = qobject_cast<QLineEdit*>(formLayout->itemAt(fieldIndex, QFormLayout::FieldRole)->widget());
-
-        if (lineEdit != nullptr && !lineEdit->text().isEmpty())
-          group.requirements[r] = lineEdit->text();
-
-        ++fieldIndex;
-      }
-
-      if (!group.indexUrl.isEmpty())
-      {
-        auto* lineEdit = qobject_cast<QLineEdit*>(formLayout->itemAt(fieldIndex, QFormLayout::FieldRole)->widget());
-
-        if (lineEdit != nullptr && !lineEdit->text().isEmpty())
-          group.indexUrl = lineEdit->text();
-
-        ++fieldIndex;
-      }
-    }
-  }
+  // Total steps: 1 (prepare) + 2 per group (resolve + install).
+  m_TotalSteps = 1 + 2 * static_cast<int>(m_Spec.groups.size());
+  m_CurrentStep = 0;
 
   m_Installer->SetInstallSpec(m_Spec);
   SetUiInstalling();
   m_Installer->StartResolveAndInstall();
 }
 
-// --- Slots: installer events ---
+// --- Installer event slots ---
 
 void QmitkPipInstallDialog::OnPipUpgradeStarted()
 {
-  m_Ui->statusLabel->setText("Upgrading pip...");
+  m_CurrentStep = 1;
+  SetStatus("Prepare installation");
 }
 
-void QmitkPipInstallDialog::OnPipUpgradeFinished(bool success)
+void QmitkPipInstallDialog::OnPipUpgradeFinished(bool /*success*/)
 {
-  if (!success)
-    m_Ui->statusLabel->setText("pip upgrade failed (non-fatal). Continuing...");
 }
 
 void QmitkPipInstallDialog::OnResolveStarted()
 {
-  m_Ui->statusLabel->setText("Resolving dependencies...");
+  ++m_CurrentStep;
+  SetStatus("Resolve dependencies");
+  m_Ui->progressBar->setRange(0, 0);
   m_Ui->progressBar->show();
-  m_Ui->progressBar->setRange(0, 0); // Indeterminate.
 }
 
-void QmitkPipInstallDialog::OnResolveFinished(bool success, const QList<mitk::PipPackageInfo>& packages)
+void QmitkPipInstallDialog::OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& /*packages*/)
 {
   if (!success)
   {
     SetUiFinished(false);
-    m_Ui->statusLabel->setText("Dependency resolution failed.");
+    m_Ui->statusLabel->setText("Installation failed. Could not resolve dependencies.");
+    m_Ui->packageLabel->hide();
     return;
   }
-
-  // resolveFinished is emitted once per group with the accumulated list.
-  // Only add packages that are new since the last call.
-  auto existingCount = m_Ui->packageTree->topLevelItemCount();
-
-  if (packages.size() > existingCount)
-  {
-    m_Ui->packageTree->show();
-
-    for (int i = existingCount; i < packages.size(); ++i)
-    {
-      const auto& pkg = packages[i];
-      auto* item = new QTreeWidgetItem(m_Ui->packageTree);
-      item->setText(0, pkg.name);
-      item->setText(1, pkg.version);
-      item->setText(2, "Pending");
-      item->setForeground(2, QColor(128, 128, 128));
-    }
-
-    m_Ui->packageTree->resizeColumnToContents(0);
-    m_Ui->packageTree->resizeColumnToContents(1);
-  }
-
-  m_Ui->statusLabel->setText("Installing packages...");
 }
 
-void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& /*name*/, mitk::PackageStatus status)
+void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status)
 {
-  SetPackageStatus(index, status);
+  if (status != mitk::PackageStatus::Installing)
+    return;
+
+  // Update the step label on the first package of each install phase.
+  auto resolvedPackages = m_Installer->ResolvedPackages();
+
+  if (index == 0 || (index > 0 && resolvedPackages[index].group != resolvedPackages[index - 1].group))
+  {
+    ++m_CurrentStep;
+    SetStatus("Install packages");
+  }
+
+  // Show name and version.
+  m_Ui->packageLabel->show();
+
+  if (index < static_cast<int>(resolvedPackages.size()) && !resolvedPackages[index].version.empty())
+    m_Ui->packageLabel->setText(QString("Installing %1 %2...").arg(name, QString::fromStdString(resolvedPackages[index].version)));
+  else
+    m_Ui->packageLabel->setText(QString("Installing %1...").arg(name));
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)
@@ -209,28 +164,15 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
 
   if (success)
   {
-    m_Ui->statusLabel->setText("All packages installed successfully.");
-
-    if (m_Ui->autoCloseCheckBox->isChecked())
-      this->accept();
+    m_Ui->statusLabel->setText(QString::fromStdString(m_Spec.name) + " was installed successfully.");
+    m_Ui->packageLabel->hide();
+    this->accept();
   }
   else
   {
-    m_Ui->statusLabel->setText("Some packages failed to install.");
+    m_Ui->statusLabel->setText("Installation failed. Please try again.");
+    m_Ui->packageLabel->hide();
   }
-}
-
-void QmitkPipInstallDialog::OnOutputReceived(const QString& text, bool isError)
-{
-  auto formatted = text.toHtmlEscaped().replace('\n', "<br>");
-  auto color = isError ? "red" : "inherit";
-
-  m_Ui->detailsTextEdit->moveCursor(QTextCursor::End);
-  m_Ui->detailsTextEdit->insertHtml(
-    QString("<span style=\"font-family: 'Courier New', monospace; color: %1\">%2</span>")
-      .arg(color, formatted));
-
-  AutoScrollOutput();
 }
 
 void QmitkPipInstallDialog::OnProgressChanged(int current, int total)
@@ -241,66 +183,25 @@ void QmitkPipInstallDialog::OnProgressChanged(int current, int total)
 
 void QmitkPipInstallDialog::OnErrorOccurred(const QString& message)
 {
-  m_Ui->statusLabel->setText("Error: " + message);
   SetUiFinished(false);
-}
-
-void QmitkPipInstallDialog::OnShowAdvancedSettingsClicked(bool checked)
-{
-  m_Ui->advancedGroupBox->setVisible(checked);
-  m_Ui->advancedButton->setText(checked
-    ? "Hide advanced settings"
-    : "Show advanced settings");
-}
-
-void QmitkPipInstallDialog::OnShowDetailsClicked(bool checked)
-{
-  m_Ui->detailsTextEdit->setVisible(checked);
-  m_Ui->detailsButton->setText(checked
-    ? "Hide details"
-    : "Show details");
+  m_Ui->statusLabel->setText("Installation failed: " + message);
+  m_Ui->packageLabel->hide();
 }
 
 // --- Private helpers ---
-
-void QmitkPipInstallDialog::SetPackageStatus(int index, mitk::PackageStatus status)
-{
-  auto* item = m_Ui->packageTree->topLevelItem(index);
-
-  if (item == nullptr)
-    return;
-
-  switch (status)
-  {
-  case mitk::PackageStatus::Pending:
-    item->setText(2, "Pending");
-    item->setForeground(2, QColor(128, 128, 128));
-    break;
-
-  case mitk::PackageStatus::Installing:
-    item->setText(2, "Installing...");
-    item->setForeground(2, QColor(0, 120, 215));
-    m_Ui->packageTree->scrollToItem(item);
-    break;
-
-  case mitk::PackageStatus::Installed:
-    item->setText(2, "Installed");
-    item->setForeground(2, QColor(0, 128, 0));
-    break;
-
-  case mitk::PackageStatus::Failed:
-    item->setText(2, "Failed");
-    item->setForeground(2, QColor(200, 0, 0));
-    break;
-  }
-}
 
 void QmitkPipInstallDialog::SetUiInstalling()
 {
   m_IsInstalling = true;
   m_Ui->buttonBox->setEnabled(false);
-  m_Ui->advancedButton->setEnabled(false);
-  m_Ui->detailsTextEdit->clear();
+  m_Ui->statusLabel->show();
+  m_Ui->packageLabel->setText("");
+}
+
+void QmitkPipInstallDialog::SetStatus(const QString& text)
+{
+  m_Ui->statusLabel->setText(
+    QString("<h4>Step %1 of %2: %3</h4>").arg(m_CurrentStep).arg(m_TotalSteps).arg(text));
 }
 
 void QmitkPipInstallDialog::SetUiFinished(bool success)
@@ -321,43 +222,4 @@ void QmitkPipInstallDialog::SetUiFinished(bool success)
   }
 
   m_Ui->buttonBox->setEnabled(true);
-  m_Ui->advancedButton->setEnabled(true);
-}
-
-void QmitkPipInstallDialog::AutoScrollOutput()
-{
-  if (auto* scrollBar = m_Ui->detailsTextEdit->verticalScrollBar(); scrollBar != nullptr)
-    scrollBar->setValue(scrollBar->maximum());
-}
-
-void QmitkPipInstallDialog::BuildAdvancedSettings()
-{
-  auto* formLayout = m_Ui->advancedGroupBox->findChild<QFormLayout*>("advancedFormLayout");
-
-  if (formLayout == nullptr)
-    return;
-
-  for (int g = 0; g < m_Spec.groups.size(); ++g)
-  {
-    const auto& group = m_Spec.groups[g];
-
-    for (const auto& req : group.requirements)
-    {
-      // Extract package name from specifier for the label.
-      auto name = req;
-      auto specEnd = req.indexOf(QRegularExpression("[><=!~;@\\[]"));
-
-      if (specEnd > 0)
-        name = req.left(specEnd);
-
-      auto* lineEdit = new QLineEdit(req, m_Ui->advancedGroupBox);
-      formLayout->addRow(name + ":", lineEdit);
-    }
-
-    if (!group.indexUrl.isEmpty())
-    {
-      auto* lineEdit = new QLineEdit(group.indexUrl, m_Ui->advancedGroupBox);
-      formLayout->addRow("--index-url:", lineEdit);
-    }
-  }
 }

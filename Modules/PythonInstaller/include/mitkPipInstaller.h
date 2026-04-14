@@ -55,15 +55,15 @@ namespace mitk
     /** \brief Start resolving dependencies for all groups.
      *
      * Upgrades pip first if PipInstallSpec::upgradePipFirst is true.
-     * Emits resolveFinished() with the accumulated package list once
+     * Emits ResolveFinished() with the accumulated package list once
      * all groups have been resolved.
      */
     void StartResolve();
 
     /** \brief Start installing all previously resolved packages.
      *
-     * Call after resolveFinished() has been emitted with success.
-     * Installs packages one-by-one, emitting packageStatusChanged()
+     * Call after ResolveFinished() has been emitted with success.
+     * Installs packages one-by-one, emitting PackageStatusChanged()
      * for each.
      */
     void StartInstall();
@@ -73,8 +73,8 @@ namespace mitk
 
     /** \brief Cancel the current operation.
      *
-     * Kills the running pip process. Emits installFinished(false) or
-     * resolveFinished(false) depending on the current phase.
+     * Kills the running pip process. Emits InstallFinished(false) or
+     * ResolveFinished(false) depending on the current phase.
      */
     void Cancel();
 
@@ -83,29 +83,38 @@ namespace mitk
 
     /** \brief The full list of resolved packages across all groups.
      *
-     * Populated after resolveFinished() is emitted.
+     * Populated after ResolveFinished() is emitted.
      */
-    std::vector<PipPackageInfo> ResolvedPackages() const;
+    std::vector<PipPackageInfo> GetResolvedPackages() const;
 
   signals:
+    /** \brief Emitted when virtual environment creation starts. */
+    void VirtualEnvCreationStarted();
+
+    /** \brief Emitted when virtual environment creation finishes.
+     *
+     * \param[in] success Whether creation succeeded.
+     */
+    void VirtualEnvCreationFinished(bool success);
+
     /** \brief Emitted when the pip upgrade step starts. */
-    void pipUpgradeStarted();
+    void PipUpgradeStarted();
 
     /** \brief Emitted when the pip upgrade step finishes.
      *
      * \param[in] success Whether the upgrade succeeded. Failure is non-fatal.
      */
-    void pipUpgradeFinished(bool success);
+    void PipUpgradeFinished(bool success);
 
     /** \brief Emitted when resolution of a group starts. */
-    void resolveStarted();
+    void ResolveStarted();
 
     /** \brief Emitted when all groups have been resolved (or resolution failed).
      *
      * \param[in] success Whether resolution succeeded.
      * \param[in] packages The accumulated list of resolved packages.
      */
-    void resolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
+    void ResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
 
     /** \brief Emitted when a package's installation status changes.
      *
@@ -113,30 +122,30 @@ namespace mitk
      * \param[in] name The package name.
      * \param[in] status The new status.
      */
-    void packageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
+    void PackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
 
     /** \brief Emitted when all packages have been installed (or installation failed).
      *
      * \param[in] success True only if every package installed successfully.
      */
-    void installFinished(bool success);
+    void InstallFinished(bool success);
 
     /** \brief Raw process output for display in a details view.
      *
      * \param[in] text The output text.
      * \param[in] isError True if the text came from stderr.
      */
-    void outputReceived(const QString& text, bool isError);
+    void OutputReceived(const QString& text, bool isError);
 
     /** \brief Overall installation progress.
      *
      * \param[in] current Number of packages installed so far.
      * \param[in] total Total number of packages to install.
      */
-    void progressChanged(int current, int total);
+    void ProgressChanged(int current, int total);
 
     /** \brief Emitted on fatal errors (e.g. Python executable not found). */
-    void errorOccurred(const QString& message);
+    void ErrorOccurred(const QString& message);
 
   private slots:
     void OnStandardOutputReady();
@@ -147,6 +156,7 @@ namespace mitk
     enum class State
     {
       Idle,
+      CreatingVirtualEnv,
       UpgradingPip,
       Resolving,
       Installing,
@@ -154,6 +164,7 @@ namespace mitk
       Failed
     };
 
+    void StartCreateVirtualEnv();
     void StartPipUpgrade();
     void StartResolveGroup();
     void StartInstallPackage();

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkPipInstallDialog.h>
 
 #include <mitkPipInstaller.h>
+#include <mitkPythonHelper.h>
 
 #include <QCloseEvent>
 #include <QMessageBox>
@@ -43,21 +44,23 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
 
   // Rename the Yes button to "Install".
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Yes))
-    button->setText("Install");
+    button->setText("Install " + name);
 
   // Wire the Install (Yes) button to our slot instead of the default accept.
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
 
   // Installer connections.
-  connect(m_Installer, &mitk::PipInstaller::pipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
-  connect(m_Installer, &mitk::PipInstaller::pipUpgradeFinished, this, &QmitkPipInstallDialog::OnPipUpgradeFinished);
-  connect(m_Installer, &mitk::PipInstaller::resolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
-  connect(m_Installer, &mitk::PipInstaller::resolveFinished, this, &QmitkPipInstallDialog::OnResolveFinished);
-  connect(m_Installer, &mitk::PipInstaller::packageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
-  connect(m_Installer, &mitk::PipInstaller::installFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
-  connect(m_Installer, &mitk::PipInstaller::progressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
-  connect(m_Installer, &mitk::PipInstaller::errorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
+  connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationStarted, this, &QmitkPipInstallDialog::OnVirtualEnvCreationStarted);
+  connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationFinished, this, &QmitkPipInstallDialog::OnVirtualEnvCreationFinished);
+  connect(m_Installer, &mitk::PipInstaller::PipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
+  connect(m_Installer, &mitk::PipInstaller::PipUpgradeFinished, this, &QmitkPipInstallDialog::OnPipUpgradeFinished);
+  connect(m_Installer, &mitk::PipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
+  connect(m_Installer, &mitk::PipInstaller::ResolveFinished, this, &QmitkPipInstallDialog::OnResolveFinished);
+  connect(m_Installer, &mitk::PipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
+  connect(m_Installer, &mitk::PipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
+  connect(m_Installer, &mitk::PipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
+  connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
 }
 
 QmitkPipInstallDialog::~QmitkPipInstallDialog()
@@ -95,8 +98,10 @@ void QmitkPipInstallDialog::reject()
 
 void QmitkPipInstallDialog::OnInstallClicked()
 {
-  // Total steps: 1 (prepare) + 2 per group (resolve + install).
-  m_TotalSteps = 1 + 2 * static_cast<int>(m_Spec.groups.size());
+  // Total steps: 1 (venv, if needed) + 1 (prepare) + 2 per group (resolve + install).
+  bool needsVirtualEnv = !m_Spec.venvName.empty() &&
+                   !mitk::PythonHelper::VirtualEnvExists(m_Spec.venvName);
+  m_TotalSteps = (needsVirtualEnv ? 1 : 0) + 1 + 2 * static_cast<int>(m_Spec.groups.size());
   m_CurrentStep = 0;
 
   m_Installer->SetInstallSpec(m_Spec);
@@ -106,10 +111,24 @@ void QmitkPipInstallDialog::OnInstallClicked()
 
 // --- Installer event slots ---
 
-void QmitkPipInstallDialog::OnPipUpgradeStarted()
+void QmitkPipInstallDialog::OnVirtualEnvCreationStarted()
 {
   m_CurrentStep = 1;
+  SetStatus("Create virtual environment");
+  m_Ui->progressBar->setRange(0, 0);
+  m_Ui->progressBar->show();
+}
+
+void QmitkPipInstallDialog::OnVirtualEnvCreationFinished(bool /*success*/)
+{
+}
+
+void QmitkPipInstallDialog::OnPipUpgradeStarted()
+{
+  ++m_CurrentStep;
   SetStatus("Prepare installation");
+  m_Ui->progressBar->setRange(0, 0);
+  m_Ui->progressBar->show();
 }
 
 void QmitkPipInstallDialog::OnPipUpgradeFinished(bool /*success*/)
@@ -121,7 +140,7 @@ void QmitkPipInstallDialog::OnResolveStarted()
   ++m_CurrentStep;
   SetStatus("Resolve dependencies");
   m_Ui->progressBar->setRange(0, 0);
-  m_Ui->progressBar->show();
+  m_Ui->packageLabel->hide();
 }
 
 void QmitkPipInstallDialog::OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& /*packages*/)
@@ -141,7 +160,7 @@ void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& nam
     return;
 
   // Update the step label on the first package of each install phase.
-  auto resolvedPackages = m_Installer->ResolvedPackages();
+  auto resolvedPackages = m_Installer->GetResolvedPackages();
 
   if (index == 0 || (index > 0 && resolvedPackages[index].group != resolvedPackages[index - 1].group))
   {

@@ -23,7 +23,6 @@ found in the LICENSE file.
 
 #include <QmitkPipInstallDialog.h>
 #include <mitkPipPackageInfo.h>
-#include <QmitkRun.h>
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
@@ -290,34 +289,30 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
-bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
-{
-  const auto venvName = this->GetTool()->GetVirtualEnvName();
-
-  if (mitk::PythonHelper::VirtualEnvExists(venvName))
-    return true;
-
-  const auto venvPath = QmitkRunAsyncBlocking<fs::path>("nnInteractive", "Creating virtual environment...", [&]() {
-    return mitk::PythonHelper::CreateVirtualEnv(venvName);
-  });
-
-  return !venvPath.empty();
-}
-
 bool QmitknnInteractiveToolGUI::Install()
 {
-  if (this->GetTool()->IsInstalled())
-    return true;
+  auto venvName = this->GetTool()->GetVirtualEnvName();
+
+  // If the venv already exists, check if packages are installed.
+  // This avoids showing the install dialog when everything is up to date.
+  if (mitk::PythonHelper::VirtualEnvExists(venvName))
+  {
+    this->GetTool()->CreatePythonContext();
+
+    if (this->GetTool()->IsInstalled())
+      return true;
+  }
 
   mitk::PipInstallSpec spec;
   spec.name = "nnInteractive";
+  spec.venvName = venvName;
 
   // PyTorch needs --index-url for CUDA builds on Windows, so it goes in its own group.
+  mitk::PipInstallGroup pytorchGroup({ TORCH, TORCH_VISION });
 #if defined(_WIN32)
-  spec.groups.push_back({ { TORCH, TORCH_VISION }, CUDA_INDEX_URL });
-#else
-  spec.groups.push_back({ TORCH, TORCH_VISION });
+  pytorchGroup.indexUrl = CUDA_INDEX_URL;
 #endif
+  spec.groups.push_back(std::move(pytorchGroup));
 
   // nnInteractive installs from default PyPI.
   spec.groups.push_back({ NNINTERACTIVE });
@@ -341,9 +336,8 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #else
   this->EnableInitializeButtons(false);
 
-  if (!CreateVirtualEnv() ||
-      !this->GetTool()->CreatePythonContext() ||
-      !Install())
+  if (!Install() ||
+      !this->GetTool()->CreatePythonContext())
   {
     this->EnableInitializeButtons(true);
     return;

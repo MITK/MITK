@@ -66,6 +66,8 @@ protected:
 private slots:
   void OnInstallClicked();
 
+  void OnVirtualEnvCreationStarted();
+  void OnVirtualEnvCreationFinished(bool success);
   void OnPipUpgradeStarted();
   void OnPipUpgradeFinished(bool success);
   void OnResolveStarted();

@@ -12,9 +12,7 @@ found in the LICENSE file.
 
 #include <mitkPipPackageInfo.h>
 
-mitk::PipInstallGroup::PipInstallGroup(std::initializer_list<std::string> requirements,
-                                       std::string indexUrl)
-  : requirements(requirements),
-    indexUrl(std::move(indexUrl))
+mitk::PipInstallGroup::PipInstallGroup(std::initializer_list<std::string> requirements)
+  : requirements(requirements)
 {
 }

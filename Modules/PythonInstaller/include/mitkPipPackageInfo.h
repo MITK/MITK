@@ -48,18 +48,17 @@ namespace mitk
    *
    * \code
    * // Simple: just requirements (default PyPI)
-   * PipInstallGroup({ "nninteractive>=1.1.2,<2.0.0" })
+   * PipInstallGroup group({ "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" });
    *
    * // With a custom index URL
-   * PipInstallGroup({ "torch>=2.8.0,<2.9.0" }, "https://download.pytorch.org/whl/cu128")
+   * group.indexUrl = "https://download.pytorch.org/whl/cu128";
    * \endcode
    */
   struct MITKPYTHONINSTALLER_EXPORT PipInstallGroup
   {
     PipInstallGroup() = default;
 
-    PipInstallGroup(std::initializer_list<std::string> requirements,
-                    std::string indexUrl = {});
+    PipInstallGroup(std::initializer_list<std::string> requirements);
 
     std::vector<std::string> requirements; /**< Package specifiers, e.g. {"torch>=2.8.0,<2.9.0"}. */
     std::string indexUrl;                  /**< Optional pip --index-url. Empty uses default PyPI. */
@@ -74,6 +73,7 @@ namespace mitk
   struct MITKPYTHONINSTALLER_EXPORT PipInstallSpec
   {
     std::string name;                      /**< Human-readable display name, e.g. "nnInteractive". */
+    std::string venvName;                  /**< If set, create and activate this venv before installing. */
     std::vector<PipInstallGroup> groups;   /**< Install groups, processed in order. */
     bool upgradePipFirst = true;           /**< Whether to upgrade pip before installing. */
   };

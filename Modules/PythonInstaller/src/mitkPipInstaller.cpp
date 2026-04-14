@@ -17,6 +17,8 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <iostream>
+
 #include <QFile>
 
 namespace
@@ -53,22 +55,14 @@ void mitk::PipInstaller::StartResolve()
   m_GroupStartIndex = 0;
   m_AnyFailed = false;
 
-  if (m_Spec.upgradePipFirst)
-  {
-    StartPipUpgrade();
-  }
-  else
-  {
-    emit resolveStarted();
-    StartResolveGroup();
-  }
+  StartCreateVirtualEnv();
 }
 
 void mitk::PipInstaller::StartInstall()
 {
   if (m_ResolvedPackages.empty())
   {
-    emit installFinished(true);
+    emit InstallFinished(true);
     return;
   }
 
@@ -76,7 +70,7 @@ void mitk::PipInstaller::StartInstall()
   m_CurrentPackage = 0;
   m_AnyFailed = false;
 
-  emit progressChanged(0, static_cast<int>(m_ResolvedPackages.size()));
+  emit ProgressChanged(0, static_cast<int>(m_ResolvedPackages.size()));
   StartInstallPackage();
 }
 
@@ -89,15 +83,7 @@ void mitk::PipInstaller::StartResolveAndInstall()
   m_GroupStartIndex = 0;
   m_AnyFailed = false;
 
-  if (m_Spec.upgradePipFirst)
-  {
-    StartPipUpgrade();
-  }
-  else
-  {
-    emit resolveStarted();
-    StartResolveGroup();
-  }
+  StartCreateVirtualEnv();
 }
 
 void mitk::PipInstaller::Cancel()
@@ -109,9 +95,9 @@ void mitk::PipInstaller::Cancel()
   m_State = State::Failed;
 
   if (previousState == State::Resolving)
-    emit resolveFinished(false, {});
+    emit ResolveFinished(false, {});
   else if (previousState == State::Installing)
-    emit installFinished(false);
+    emit InstallFinished(false);
 }
 
 bool mitk::PipInstaller::IsRunning() const
@@ -119,7 +105,7 @@ bool mitk::PipInstaller::IsRunning() const
   return m_State != State::Idle && m_State != State::Done && m_State != State::Failed;
 }
 
-std::vector<mitk::PipPackageInfo> mitk::PipInstaller::ResolvedPackages() const
+std::vector<mitk::PipPackageInfo> mitk::PipInstaller::GetResolvedPackages() const
 {
   return m_ResolvedPackages;
 }
@@ -128,12 +114,16 @@ std::vector<mitk::PipPackageInfo> mitk::PipInstaller::ResolvedPackages() const
 
 void mitk::PipInstaller::OnStandardOutputReady()
 {
-  emit outputReceived(QString::fromLocal8Bit(m_Process->readAllStandardOutput()), false);
+  auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
+  std::cout << output.toStdString();
+  emit OutputReceived(output, false);
 }
 
 void mitk::PipInstaller::OnStandardErrorReady()
 {
-  emit outputReceived(QString::fromLocal8Bit(m_Process->readAllStandardError()), true);
+  auto output = QString::fromLocal8Bit(m_Process->readAllStandardError());
+  std::cerr << output.toStdString();
+  emit OutputReceived(output, true);
 }
 
 void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -144,13 +134,38 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
   switch (m_State)
   {
+  case State::CreatingVirtualEnv:
+  {
+    if (!success)
+    {
+      m_State = State::Failed;
+      emit VirtualEnvCreationFinished(false);
+      emit ErrorOccurred("Failed to create virtual environment.");
+      return;
+    }
+
+    PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
+    emit VirtualEnvCreationFinished(true);
+
+    if (m_Spec.upgradePipFirst)
+    {
+      StartPipUpgrade();
+    }
+    else
+    {
+      emit ResolveStarted();
+      StartResolveGroup();
+    }
+    break;
+  }
+
   case State::UpgradingPip:
   {
-    emit pipUpgradeFinished(success);
+    emit PipUpgradeFinished(success);
 
     // pip upgrade failure is non-fatal - proceed to resolve first group.
     m_State = State::Resolving;
-    emit resolveStarted();
+    emit ResolveStarted();
     StartResolveGroup();
     break;
   }
@@ -160,21 +175,21 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     if (!success)
     {
       m_State = State::Failed;
-      emit resolveFinished(false, {});
+      emit ResolveFinished(false, {});
       return;
     }
 
     if (!ParseResolveReport(m_ReportFile.fileName(), m_CurrentGroup))
     {
       m_State = State::Failed;
-      emit resolveFinished(false, {});
+      emit ResolveFinished(false, {});
       return;
     }
 
     numPackages = static_cast<int>(m_ResolvedPackages.size());
 
     // Emit the (growing) package list so the UI can update.
-    emit resolveFinished(true, m_ResolvedPackages);
+    emit ResolveFinished(true, m_ResolvedPackages);
 
     if (m_AutoInstall)
     {
@@ -186,7 +201,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       {
         m_State = State::Installing;
         m_CurrentPackage = m_GroupStartIndex;
-        emit progressChanged(m_GroupStartIndex, numPackages);
+        emit ProgressChanged(m_GroupStartIndex, numPackages);
         StartInstallPackage();
       }
       else
@@ -198,7 +213,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
         if (m_CurrentGroup < numGroups)
           StartResolveGroup();
         else
-          emit installFinished(!m_AnyFailed);
+          emit InstallFinished(!m_AnyFailed);
       }
     }
     else
@@ -222,13 +237,13 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   case State::Installing:
   {
     auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
-    emit packageStatusChanged(m_CurrentPackage, toQ(m_ResolvedPackages[m_CurrentPackage].name), status);
+    emit PackageStatusChanged(m_CurrentPackage, toQ(m_ResolvedPackages[m_CurrentPackage].name), status);
 
     if (!success)
       m_AnyFailed = true;
 
     m_CurrentPackage++;
-    emit progressChanged(m_CurrentPackage, numPackages);
+    emit ProgressChanged(m_CurrentPackage, numPackages);
 
     if (m_CurrentPackage < numPackages)
     {
@@ -244,13 +259,13 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       {
         m_State = State::Resolving;
         m_GroupStartIndex = numPackages;
-        emit resolveStarted();
+        emit ResolveStarted();
         StartResolveGroup();
       }
       else
       {
         m_State = m_AnyFailed ? State::Failed : State::Done;
-        emit installFinished(!m_AnyFailed);
+        emit InstallFinished(!m_AnyFailed);
       }
     }
     break;
@@ -263,20 +278,59 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
 // --- Private helpers ---
 
+void mitk::PipInstaller::StartCreateVirtualEnv()
+{
+  if (m_Spec.venvName.empty() || PythonHelper::VirtualEnvExists(m_Spec.venvName))
+  {
+    // No venv needed or already exists — just activate and move on.
+    if (!m_Spec.venvName.empty())
+      PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
+
+    if (m_Spec.upgradePipFirst)
+    {
+      StartPipUpgrade();
+    }
+    else
+    {
+      emit ResolveStarted();
+      StartResolveGroup();
+    }
+    return;
+  }
+
+  auto python = PythonExecutable();
+
+  if (python.isEmpty())
+  {
+    emit ErrorOccurred("Python executable not found.");
+    return;
+  }
+
+  m_State = State::CreatingVirtualEnv;
+  emit VirtualEnvCreationStarted();
+
+  auto venvPath = PythonHelper::GetVirtualEnvPath(m_Spec.venvName);
+  QStringList args = { "-m", "venv", QString::fromStdString(venvPath.string()) };
+  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  m_Process->start(python, args);
+}
+
 void mitk::PipInstaller::StartPipUpgrade()
 {
   auto python = PythonExecutable();
 
   if (python.isEmpty())
   {
-    emit errorOccurred("Python executable not found.");
+    emit ErrorOccurred("Python executable not found.");
     return;
   }
 
   m_State = State::UpgradingPip;
-  emit pipUpgradeStarted();
+  emit PipUpgradeStarted();
 
-  m_Process->start(python, { "-m", "pip", "install", "--upgrade", "pip" });
+  QStringList args = { "-m", "pip", "install", "--upgrade", "pip" };
+  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  m_Process->start(python, args);
 }
 
 void mitk::PipInstaller::StartResolveGroup()
@@ -286,15 +340,15 @@ void mitk::PipInstaller::StartResolveGroup()
   if (python.isEmpty())
   {
     m_State = State::Failed;
-    emit errorOccurred("Python executable not found.");
-    emit resolveFinished(false, {});
+    emit ErrorOccurred("Python executable not found.");
+    emit ResolveFinished(false, {});
     return;
   }
 
   if (m_CurrentGroup >= static_cast<int>(m_Spec.groups.size()))
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
-    emit installFinished(!m_AnyFailed);
+    emit InstallFinished(!m_AnyFailed);
     return;
   }
 
@@ -307,8 +361,8 @@ void mitk::PipInstaller::StartResolveGroup()
   if (!m_ReportFile.open())
   {
     m_State = State::Failed;
-    emit errorOccurred("Could not create temporary file for pip report.");
-    emit resolveFinished(false, {});
+    emit ErrorOccurred("Could not create temporary file for pip report.");
+    emit ResolveFinished(false, {});
     return;
   }
 
@@ -323,6 +377,7 @@ void mitk::PipInstaller::StartResolveGroup()
     args.append(toQ(req));
 
   m_State = State::Resolving;
+  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
   m_Process->start(python, args);
 }
 
@@ -333,20 +388,20 @@ void mitk::PipInstaller::StartInstallPackage()
   if (python.isEmpty())
   {
     m_State = State::Failed;
-    emit errorOccurred("Python executable not found.");
-    emit installFinished(false);
+    emit ErrorOccurred("Python executable not found.");
+    emit InstallFinished(false);
     return;
   }
 
   if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
-    emit installFinished(!m_AnyFailed);
+    emit InstallFinished(!m_AnyFailed);
     return;
   }
 
   const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
-  emit packageStatusChanged(m_CurrentPackage, toQ(pkg.name), PackageStatus::Installing);
+  emit PackageStatusChanged(m_CurrentPackage, toQ(pkg.name), PackageStatus::Installing);
 
   const auto& group = m_Spec.groups[pkg.group];
 
@@ -354,6 +409,7 @@ void mitk::PipInstaller::StartInstallPackage()
                         toQ(pkg.name) + "==" + toQ(pkg.version) };
   args = BuildPipArgs(args, group);
 
+  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
   m_Process->start(python, args);
 }
 
@@ -376,8 +432,8 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
 
   if (!file.open(QIODevice::ReadOnly))
   {
-    MITK_ERROR << "PipInstaller: Could not open report file: " << reportPath.toStdString();
-    emit errorOccurred("Could not open pip resolve report.");
+    MITK_ERROR << "Could not open report file: " << reportPath.toStdString();
+    emit ErrorOccurred("Could not open pip resolve report.");
     return false;
   }
 
@@ -390,8 +446,8 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
 
     if (!report.contains("install") || !report["install"].is_array())
     {
-      MITK_ERROR << "PipInstaller: Report file has no 'install' array.";
-      emit errorOccurred("Unexpected pip report format.");
+      MITK_ERROR << "Report file has no 'install' array.";
+      emit ErrorOccurred("Unexpected pip report format.");
       return false;
     }
 
@@ -433,8 +489,8 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
   }
   catch (const nlohmann::json::exception& e)
   {
-    MITK_ERROR << "PipInstaller: Failed to parse report JSON: " << e.what();
-    emit errorOccurred(QString("Failed to parse pip report: %1").arg(e.what()));
+    MITK_ERROR << "Failed to parse report JSON: " << e.what();
+    emit ErrorOccurred(QString("Failed to parse pip report: %1").arg(e.what()));
     return false;
   }
 
@@ -443,7 +499,7 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
 
 QString mitk::PipInstaller::PythonExecutable() const
 {
-  auto path = mitk::PythonHelper::GetExecutablePath();
+  auto path = PythonHelper::GetExecutablePath();
 
   if (path.empty())
     return {};

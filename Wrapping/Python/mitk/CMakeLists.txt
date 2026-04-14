@@ -119,6 +119,12 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
     EXCLUDE_FROM_ALL
   )
 
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
+    DESTINATION mitk
+    COMPONENT wheel
+    EXCLUDE_FROM_ALL
+  )
+
   # Install auto-load modules into their expected subdirectories.
   # CppMicroServices looks for <module_name>/ subdirectory relative to
   # US_AUTOLOAD_PATHS (set to the package directory in __init__.py).
@@ -227,12 +233,12 @@ if(BUILD_TESTING)
     set(_venv_python "${CMAKE_BINARY_DIR}/python_venv/bin/python")
   endif()
 
-  add_test(NAME mitkPythonBindingsTest
+  add_test(NAME mitkPythonWrappingTest
     COMMAND "${_venv_python}" -m pytest
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/"
             --tb=short -q
   )
-  set_tests_properties(mitkPythonBindingsTest PROPERTIES
+  set_tests_properties(mitkPythonWrappingTest PROPERTIES
     REQUIRED_FILES   "${_venv_python}"
     LABELS           "Python"
     SKIP_RETURN_CODE 5

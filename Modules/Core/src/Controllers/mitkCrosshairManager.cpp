@@ -116,11 +116,7 @@ bool mitk::CrosshairManager::GetCrosshairVisibility(const BaseRenderer* baseRend
   }
 
   bool visibility = false;
-  if (m_CrosshairDataNode->GetVisibility(visibility, baseRenderer))
-  {
-    return false;
-  }
-
+  m_CrosshairDataNode->GetVisibility(visibility, baseRenderer);
   return visibility;
 }
 

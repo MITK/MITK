@@ -210,6 +210,8 @@ std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetRe
     if (std::regex_match(key, regEx))
     {
       auto refUIDProp = source->GetConstProperty(key);
+      if (refUIDProp == nullptr)
+        continue;
       if (destination==nullptr || *refUIDProp == *destInstanceUIDProp)
       {
         auto currentKeyPath = PropertyNameToPropertyKeyPath(key);

@@ -81,8 +81,9 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   v2[0] = 1.0;
   v2[1] = 0.0;
 
-  v0[0] = v0[0] * cos(0.001) - v0[1] * sin(0.001); // rotate one arm a bit
-  v0[1] = v0[0] * sin(0.001) + v0[1] * cos(0.001);
+  const double v0x = v0[0]; // save before overwriting for correct 2D rotation
+  v0[0] = v0x * cos(0.001) - v0[1] * sin(0.001);
+  v0[1] = v0x * sin(0.001) + v0[1] * cos(0.001);
   v0.Normalize();
   v1.Normalize();
   double testAngle = acos(v0 * v1);

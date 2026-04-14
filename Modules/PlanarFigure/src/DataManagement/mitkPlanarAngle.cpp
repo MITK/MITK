@@ -71,7 +71,7 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   m_HelperPolyLinesToBePainted->SetElement(0, true);
   radius = nonScalingRadius;
 
-  double angle = this->GetQuantity(FEATURE_ID_ANGLE);
+  double angle = this->GetQuantity(FEATURE_ID_ANGLE) * vnl_math::pi / 180.0;
 
   // Determine from which arm the angle should be drawn
 
@@ -150,7 +150,7 @@ void mitk::PlanarAngle::EvaluateFeaturesInternal()
 
   v0.Normalize();
   v1.Normalize();
-  double angle = acos(v0 * v1);
+  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
 }

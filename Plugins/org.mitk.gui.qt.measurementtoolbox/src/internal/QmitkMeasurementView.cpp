@@ -776,8 +776,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
   int j = 1;
 
   mitk::PlanarFigure::Pointer planarFigure;
-  mitk::PlanarAngle::Pointer planarAngle;
-  mitk::PlanarFourPointAngle::Pointer planarFourPointAngle;
   mitk::DataNode::Pointer node;
 
   for (int i = 0; i < d->m_CurrentSelection.size(); ++i, ++j)
@@ -795,11 +793,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
     infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(node->GetName())));
     plainInfoText.append(QString("%1").arg(QString::fromStdString(node->GetName())));
 
-    planarAngle = dynamic_cast<mitk::PlanarAngle*> (planarFigure.GetPointer());
-
-    if (planarAngle.IsNull())
-      planarFourPointAngle = dynamic_cast<mitk::PlanarFourPointAngle*> (planarFigure.GetPointer());
-
     double featureQuantity = 0.0;
 
     for (unsigned int k = 0; k < planarFigure->GetNumberOfFeatures(); ++k)
@@ -808,9 +801,6 @@ void QmitkMeasurementView::UpdateMeasurementText()
         continue;
 
       featureQuantity = planarFigure->GetQuantity(k);
-
-      if ((planarAngle.IsNotNull() && k == planarAngle->FEATURE_ID_ANGLE) || (planarFourPointAngle.IsNotNull() && k == planarFourPointAngle->FEATURE_ID_ANGLE))
-        featureQuantity = featureQuantity * 180 / vnl_math::pi;
 
       infoText.append(QString("<i>%1</i>: %2 %3")
         .arg(QString(planarFigure->GetFeatureName(k)))

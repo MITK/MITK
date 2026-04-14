@@ -59,7 +59,7 @@ void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
 
   v0.Normalize();
   v1.Normalize();
-  double angle = acos(v0 * v1);
+  double angle = acos(v0 * v1) * (180.0 / vnl_math::pi);
 
   this->SetQuantity(FEATURE_ID_ANGLE, angle);
 }

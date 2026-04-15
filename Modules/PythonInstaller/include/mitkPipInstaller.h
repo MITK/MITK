@@ -36,6 +36,10 @@ namespace mitk
    *
    * All operations are asynchronous. Progress is communicated through Qt signals.
    *
+   * \note This class is not thread-safe. Construct, use, and destroy from a
+   * single thread (typically the GUI thread). All Qt signal connections use
+   * direct dispatch unless the consumer explicitly requests queued connections.
+   *
    * \sa PipInstallSpec, PipInstallGroup, PipPackageInfo, QmitkPipInstallDialog
    */
   class MITKPYTHONINSTALLER_EXPORT PipInstaller : public QObject
@@ -48,35 +52,43 @@ namespace mitk
 
     /** \brief Set the installation specification.
      *
-     * Must be called before StartResolve() or StartResolveAndInstall().
+     * Must be called before StartInstall().
+     * Has no effect (and logs a warning) while an operation is running.
      */
     void SetInstallSpec(const PipInstallSpec& spec);
 
-    /** \brief Start resolving dependencies for all groups.
+    /** \brief Start the installation.
      *
-     * Upgrades pip first if PipInstallSpec::upgradePipFirst is true.
-     * Emits ResolveFinished() with the accumulated package list once
-     * all groups have been resolved.
-     */
-    void StartResolve();
-
-    /** \brief Start installing all previously resolved packages.
+     * For each install group in PipInstallSpec::groups, the engine first
+     * runs a \c pip \c install \c --dry-run \c --report to determine the
+     * full set of packages, then installs them one-by-one with
+     * \c --no-deps. Groups are processed sequentially so that the next
+     * group's resolve sees the previous group's packages already installed
+     * (essential for cases like a CUDA-specific PyTorch index).
      *
-     * Call after ResolveFinished() has been emitted with success.
-     * Installs packages one-by-one, emitting PackageStatusChanged()
-     * for each.
+     * Has no effect if an operation is already running.
      */
     void StartInstall();
 
-    /** \brief Convenience: resolve all groups, then install automatically. */
-    void StartResolveAndInstall();
-
     /** \brief Cancel the current operation.
      *
-     * Kills the running pip process. Emits InstallFinished(false) or
-     * ResolveFinished(false) depending on the current phase.
+     * Kills the running pip process and returns immediately. The actual
+     * cleanup (venv removal if one was created, InstallFinished(false)
+     * emission) happens asynchronously when the killed process finishes.
      */
     void Cancel();
+
+    /** \brief Tear down anything this installer created during a failed install.
+     *
+     * Intended to be called by the consumer when it gives up after a failed
+     * install (e.g. the user dismisses the install dialog instead of
+     * retrying). If a venv was created by this installer and the last
+     * operation ended in the Failed state, the venv is removed.
+     *
+     * Has no effect after a successful install (Done state) or while an
+     * operation is still running - in the latter case call Cancel() instead.
+     */
+    void AbandonInstall();
 
     /** \brief Whether an operation is currently running. */
     bool IsRunning() const;
@@ -85,7 +97,7 @@ namespace mitk
      *
      * Populated after ResolveFinished() is emitted.
      */
-    std::vector<PipPackageInfo> GetResolvedPackages() const;
+    const std::vector<PipPackageInfo>& GetResolvedPackages() const;
 
   signals:
     /** \brief Emitted when virtual environment creation starts. */
@@ -109,10 +121,16 @@ namespace mitk
     /** \brief Emitted when resolution of a group starts. */
     void ResolveStarted();
 
-    /** \brief Emitted when all groups have been resolved (or resolution failed).
+    /** \brief Emitted when a group's resolution finishes.
+     *
+     * In a multi-group spec this fires once per group on success, with the
+     * list growing as additional groups are resolved. Fires with success ==
+     * false if pip's dependency resolver could not satisfy the requirements.
+     * Setup failures (Python not found, etc.) surface via InstallFinished
+     * instead.
      *
      * \param[in] success Whether resolution succeeded.
-     * \param[in] packages The accumulated list of resolved packages.
+     * \param[in] packages The accumulated list of resolved packages so far.
      */
     void ResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
 
@@ -160,24 +178,26 @@ namespace mitk
       UpgradingPip,
       Resolving,
       Installing,
+      Cancelling,
       Done,
       Failed
     };
 
-    void StartCreateVirtualEnv();
+    void BeginVirtualEnvPhase();
     void StartPipUpgrade();
     void StartResolveGroup();
     void StartInstallPackage();
     QStringList BuildPipArgs(const QStringList& baseArgs, const PipInstallGroup& group) const;
     bool ParseResolveReport(const QString& reportPath, int groupIndex);
     QString PythonExecutable() const;
+    void FinalizeCancel();
+    void RemoveCreatedVirtualEnv();
 
     PipInstallSpec m_Spec;
     std::vector<PipPackageInfo> m_ResolvedPackages;
 
     QProcess* m_Process = nullptr;
     State m_State = State::Idle;
-    bool m_AutoInstall = false;
     bool m_AnyFailed = false;
     bool m_CreatedVirtualEnv = false;
 

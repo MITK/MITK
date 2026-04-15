@@ -23,7 +23,65 @@ found in the LICENSE file.
 
 namespace
 {
-  QString toQ(const std::string& s) { return QString::fromStdString(s); }
+  // Quote arguments containing whitespace so the logged command line is
+  // copy-pasteable into a shell for reproduction.
+  QString FormatCommand(const QString& program, const QStringList& args)
+  {
+    auto quote = [](const QString& token) {
+      return token.contains(QChar::Space) ? '"' + token + '"' : token;
+    };
+
+    QString result = quote(program);
+    for (const auto& arg : args)
+    {
+      result += ' ';
+      result += quote(arg);
+    }
+    return result;
+  }
+
+  // Canonicalize a package name per PEP 503: lowercase, and treat runs of
+  // '-', '_', '.' as a single '-'. Used to match resolved package names
+  // against the original requirement specifiers.
+  std::string CanonicalizePackageName(const std::string& name)
+  {
+    std::string result;
+    result.reserve(name.size());
+
+    for (char c : name)
+    {
+      if (c == '_' || c == '.' || c == '-')
+      {
+        if (!result.empty() && result.back() != '-')
+          result.push_back('-');
+      }
+      else
+      {
+        result.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+      }
+    }
+
+    while (!result.empty() && result.back() == '-')
+      result.pop_back();
+
+    return result;
+  }
+
+  // Extract the package-name prefix of a requirement specifier.
+  // Stops at the first character that is not part of a PEP 508 distribution name.
+  std::string ExtractPackageName(const std::string& requirement)
+  {
+    std::size_t end = 0;
+    while (end < requirement.size())
+    {
+      char c = requirement[end];
+      if (std::isalnum(static_cast<unsigned char>(c)) || c == '_' || c == '.' || c == '-')
+        ++end;
+      else
+        break;
+    }
+    return requirement.substr(0, end);
+  }
 }
 
 mitk::PipInstaller::PipInstaller(QObject* parent)
@@ -33,6 +91,10 @@ mitk::PipInstaller::PipInstaller(QObject* parent)
   connect(m_Process, &QProcess::readyReadStandardOutput, this, &PipInstaller::OnStandardOutputReady);
   connect(m_Process, &QProcess::readyReadStandardError, this, &PipInstaller::OnStandardErrorReady);
   connect(m_Process, &QProcess::finished, this, &PipInstaller::OnProcessFinished);
+  connect(m_Process, &QProcess::errorOccurred, this, [](QProcess::ProcessError error) {
+    if (error == QProcess::FailedToStart)
+      MITK_ERROR << "Failed to start pip subprocess.";
+  });
 }
 
 mitk::PipInstaller::~PipInstaller()
@@ -43,41 +105,23 @@ mitk::PipInstaller::~PipInstaller()
 
 void mitk::PipInstaller::SetInstallSpec(const PipInstallSpec& spec)
 {
+  if (this->IsRunning())
+  {
+    MITK_WARN << "Cannot change install spec while an operation is running.";
+    return;
+  }
+
   m_Spec = spec;
-}
-
-void mitk::PipInstaller::StartResolve()
-{
-  m_AutoInstall = false;
-  m_ResolvedPackages.clear();
-  m_CurrentGroup = 0;
-  m_CurrentPackage = 0;
-  m_GroupStartIndex = 0;
-  m_AnyFailed = false;
-  m_CreatedVirtualEnv = false;
-
-  StartCreateVirtualEnv();
 }
 
 void mitk::PipInstaller::StartInstall()
 {
-  if (m_ResolvedPackages.empty())
+  if (this->IsRunning())
   {
-    emit InstallFinished(true);
+    MITK_WARN << "PipInstaller is already running.";
     return;
   }
 
-  m_State = State::Installing;
-  m_CurrentPackage = 0;
-  m_AnyFailed = false;
-
-  emit ProgressChanged(0, static_cast<int>(m_ResolvedPackages.size()));
-  StartInstallPackage();
-}
-
-void mitk::PipInstaller::StartResolveAndInstall()
-{
-  m_AutoInstall = true;
   m_ResolvedPackages.clear();
   m_CurrentGroup = 0;
   m_CurrentPackage = 0;
@@ -85,30 +129,39 @@ void mitk::PipInstaller::StartResolveAndInstall()
   m_AnyFailed = false;
   m_CreatedVirtualEnv = false;
 
-  StartCreateVirtualEnv();
+  BeginVirtualEnvPhase();
+}
+
+void mitk::PipInstaller::AbandonInstall()
+{
+  // Only act after a failed install. After a successful install the venv
+  // belongs to the consumer; while an operation is in progress the consumer
+  // should call Cancel() instead.
+  if (m_State != State::Failed)
+    return;
+
+  this->RemoveCreatedVirtualEnv();
 }
 
 void mitk::PipInstaller::Cancel()
 {
-  auto previousState = m_State;
-  m_State = State::Failed;
+  if (m_State == State::Idle || m_State == State::Done ||
+      m_State == State::Failed || m_State == State::Cancelling)
+    return;
+
+  m_State = State::Cancelling;
 
   if (m_Process->state() != QProcess::NotRunning)
   {
+    // Async path: kill the process and let OnProcessFinished call FinalizeCancel.
     m_Process->kill();
-    m_Process->waitForFinished(5000);
   }
-
-  if (m_CreatedVirtualEnv && !m_Spec.venvName.empty())
+  else
   {
-    PythonHelper::RemoveVirtualEnv(m_Spec.venvName);
-    m_CreatedVirtualEnv = false;
+    // No process running (we were in a synchronous transition between phases).
+    // Finalize immediately.
+    FinalizeCancel();
   }
-
-  if (previousState == State::Resolving)
-    emit ResolveFinished(false, {});
-  else if (previousState != State::Idle && previousState != State::Done && previousState != State::Failed)
-    emit InstallFinished(false);
 }
 
 bool mitk::PipInstaller::IsRunning() const
@@ -116,29 +169,36 @@ bool mitk::PipInstaller::IsRunning() const
   return m_State != State::Idle && m_State != State::Done && m_State != State::Failed;
 }
 
-std::vector<mitk::PipPackageInfo> mitk::PipInstaller::GetResolvedPackages() const
+const std::vector<mitk::PipPackageInfo>& mitk::PipInstaller::GetResolvedPackages() const
 {
   return m_ResolvedPackages;
 }
 
-// --- Private slots ---
-
 void mitk::PipInstaller::OnStandardOutputReady()
 {
   auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
-  std::cout << output.toStdString();
+  //std::cout << output.toStdString();
   emit OutputReceived(output, false);
 }
 
 void mitk::PipInstaller::OnStandardErrorReady()
 {
   auto output = QString::fromLocal8Bit(m_Process->readAllStandardError());
-  std::cerr << output.toStdString();
+  //std::cerr << output.toStdString();
   emit OutputReceived(output, true);
 }
 
 void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+  // Cancellation: the process was killed by Cancel(). Run cleanup and emit the
+  // terminal signal here, off the original Cancel() call stack, so the UI
+  // thread is not blocked while we tear down the venv.
+  if (m_State == State::Cancelling)
+  {
+    FinalizeCancel();
+    return;
+  }
+
   bool success = exitStatus == QProcess::NormalExit && exitCode == 0;
   auto numPackages = static_cast<int>(m_ResolvedPackages.size());
   auto numGroups = static_cast<int>(m_Spec.groups.size());
@@ -152,6 +212,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       m_State = State::Failed;
       emit VirtualEnvCreationFinished(false);
       emit ErrorOccurred("Failed to create virtual environment.");
+      emit InstallFinished(false);
       return;
     }
 
@@ -199,47 +260,34 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
     numPackages = static_cast<int>(m_ResolvedPackages.size());
 
-    // Emit the (growing) package list so the UI can update.
+    // Per-group success notification with the list as it grows.
     emit ResolveFinished(true, m_ResolvedPackages);
 
-    if (m_AutoInstall)
+    // Install this group's packages before resolving the next group.
+    // This ensures that when the next group is resolved, pip sees
+    // the current group's packages as already installed (e.g. torch
+    // from a CUDA index won't be re-resolved from PyPI).
+    if (m_GroupStartIndex < numPackages)
     {
-      // Install this group's packages before resolving the next group.
-      // This ensures that when the next group is resolved, pip sees
-      // the current group's packages as already installed (e.g. torch
-      // from a CUDA index won't be re-resolved from PyPI).
-      if (m_GroupStartIndex < numPackages)
-      {
-        m_State = State::Installing;
-        m_CurrentPackage = m_GroupStartIndex;
-        emit ProgressChanged(m_GroupStartIndex, numPackages);
-        StartInstallPackage();
-      }
-      else
-      {
-        // No new packages in this group. Advance to next group.
-        m_CurrentGroup++;
-        m_GroupStartIndex = numPackages;
-
-        if (m_CurrentGroup < numGroups)
-          StartResolveGroup();
-        else
-          emit InstallFinished(!m_AnyFailed);
-      }
+      m_State = State::Installing;
+      m_CurrentPackage = m_GroupStartIndex;
+      emit ProgressChanged(m_GroupStartIndex, numPackages);
+      StartInstallPackage();
     }
     else
     {
-      // Resolve-only mode: resolve all groups sequentially, then stop.
+      // No new packages in this group. Advance to next group.
       m_CurrentGroup++;
+      m_GroupStartIndex = numPackages;
 
       if (m_CurrentGroup < numGroups)
       {
-        m_GroupStartIndex = numPackages;
         StartResolveGroup();
       }
       else
       {
-        m_State = State::Done;
+        m_State = m_AnyFailed ? State::Failed : State::Done;
+        emit InstallFinished(!m_AnyFailed);
       }
     }
     break;
@@ -248,7 +296,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   case State::Installing:
   {
     auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
-    emit PackageStatusChanged(m_CurrentPackage, toQ(m_ResolvedPackages[m_CurrentPackage].name), status);
+    emit PackageStatusChanged(m_CurrentPackage, QString::fromStdString(m_ResolvedPackages[m_CurrentPackage].name), status);
 
     if (!success)
       m_AnyFailed = true;
@@ -287,13 +335,14 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   }
 }
 
-// --- Private helpers ---
-
-void mitk::PipInstaller::StartCreateVirtualEnv()
+// Either kicks off a `python -m venv <path>` subprocess (asynchronous) or, if
+// the venv is unnecessary or already exists, activates it and dispatches
+// synchronously to the next phase.
+void mitk::PipInstaller::BeginVirtualEnvPhase()
 {
   if (m_Spec.venvName.empty() || PythonHelper::VirtualEnvExists(m_Spec.venvName))
   {
-    // No venv needed or already exists — just activate and move on.
+    // No venv needed or already exists - just activate and move on.
     if (!m_Spec.venvName.empty())
       PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
 
@@ -313,7 +362,9 @@ void mitk::PipInstaller::StartCreateVirtualEnv()
 
   if (python.isEmpty())
   {
+    m_State = State::Failed;
     emit ErrorOccurred("Python executable not found.");
+    emit InstallFinished(false);
     return;
   }
 
@@ -323,7 +374,7 @@ void mitk::PipInstaller::StartCreateVirtualEnv()
 
   auto venvPath = PythonHelper::GetVirtualEnvPath(m_Spec.venvName);
   QStringList args = { "-m", "venv", QString::fromStdString(venvPath.string()) };
-  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
 }
 
@@ -333,7 +384,9 @@ void mitk::PipInstaller::StartPipUpgrade()
 
   if (python.isEmpty())
   {
+    m_State = State::Failed;
     emit ErrorOccurred("Python executable not found.");
+    emit InstallFinished(false);
     return;
   }
 
@@ -341,7 +394,7 @@ void mitk::PipInstaller::StartPipUpgrade()
   emit PipUpgradeStarted();
 
   QStringList args = { "-m", "pip", "install", "--upgrade", "pip" };
-  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
 }
 
@@ -353,7 +406,7 @@ void mitk::PipInstaller::StartResolveGroup()
   {
     m_State = State::Failed;
     emit ErrorOccurred("Python executable not found.");
-    emit ResolveFinished(false, {});
+    emit InstallFinished(false);
     return;
   }
 
@@ -367,18 +420,20 @@ void mitk::PipInstaller::StartResolveGroup()
   m_GroupStartIndex = static_cast<int>(m_ResolvedPackages.size());
   const auto& group = m_Spec.groups[m_CurrentGroup];
 
-  // Create a temporary file for the pip report.
+  // m_ReportFile is reused across groups: the underlying temp file path is
+  // stable for the lifetime of this PipInstaller, but we close the Qt handle
+  // each time so pip can write to the path freely. The file is deleted when
+  // the QTemporaryFile object is destroyed.
   m_ReportFile.close();
 
   if (!m_ReportFile.open())
   {
     m_State = State::Failed;
     emit ErrorOccurred("Could not create temporary file for pip report.");
-    emit ResolveFinished(false, {});
+    emit InstallFinished(false);
     return;
   }
 
-  // Close immediately so pip can write to it. Keep the file name.
   auto reportPath = m_ReportFile.fileName();
   m_ReportFile.close();
 
@@ -386,10 +441,10 @@ void mitk::PipInstaller::StartResolveGroup()
   args = BuildPipArgs(args, group);
 
   for (const auto& req : group.requirements)
-    args.append(toQ(req));
+    args.append(QString::fromStdString(req));
 
   m_State = State::Resolving;
-  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
 }
 
@@ -413,15 +468,15 @@ void mitk::PipInstaller::StartInstallPackage()
   }
 
   const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
-  emit PackageStatusChanged(m_CurrentPackage, toQ(pkg.name), PackageStatus::Installing);
+  emit PackageStatusChanged(m_CurrentPackage, QString::fromStdString(pkg.name), PackageStatus::Installing);
 
   const auto& group = m_Spec.groups[pkg.group];
 
   QStringList args = { "-m", "pip", "install", "--no-deps",
-                        toQ(pkg.name) + "==" + toQ(pkg.version) };
+                        QString::fromStdString(pkg.name) + "==" + QString::fromStdString(pkg.version) };
   args = BuildPipArgs(args, group);
 
-  MITK_INFO << python.toStdString() << " " << args.join(' ').toStdString();
+  MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
 }
 
@@ -430,10 +485,10 @@ QStringList mitk::PipInstaller::BuildPipArgs(const QStringList& baseArgs, const 
   QStringList args = baseArgs;
 
   if (!group.indexUrl.empty())
-    args.append({ "--index-url", toQ(group.indexUrl) });
+    args.append({ "--index-url", QString::fromStdString(group.indexUrl) });
 
   for (const auto& arg : group.extraPipArgs)
-    args.append(toQ(arg));
+    args.append(QString::fromStdString(arg));
 
   return args;
 }
@@ -463,6 +518,8 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
       return false;
     }
 
+    const auto& group = m_Spec.groups[groupIndex];
+
     for (const auto& entry : report["install"])
     {
       PipPackageInfo info;
@@ -481,22 +538,24 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
       info.requested = entry.value("requested", false);
       info.group = groupIndex;
 
-      // Try to find the original specifier in the group's requirements.
-      const auto& group = m_Spec.groups[groupIndex];
+      // Match the resolved package against this group's requirements using
+      // PEP 503-canonicalized comparison so e.g. "scikit_learn", "scikit-learn"
+      // and "Scikit-Learn" all match the same resolved name.
+      auto canonicalName = CanonicalizePackageName(info.name);
 
       for (const auto& req : group.requirements)
       {
-        if (req.size() >= info.name.size() &&
-            std::equal(info.name.begin(), info.name.end(), req.begin(),
-                       [](char a, char b) { return std::tolower(a) == std::tolower(b); }) &&
-            (req.size() == info.name.size() || !std::isalnum(static_cast<unsigned char>(req[info.name.size()]))))
+        auto reqName = CanonicalizePackageName(ExtractPackageName(req));
+        if (reqName == canonicalName)
         {
           info.specifier = req;
           break;
         }
       }
 
+      auto index = static_cast<int>(m_ResolvedPackages.size());
       m_ResolvedPackages.push_back(info);
+      emit PackageStatusChanged(index, QString::fromStdString(info.name), PackageStatus::Pending);
     }
   }
   catch (const nlohmann::json::exception& e)
@@ -517,4 +576,20 @@ QString mitk::PipInstaller::PythonExecutable() const
     return {};
 
   return QString::fromStdString(path.string());
+}
+
+void mitk::PipInstaller::FinalizeCancel()
+{
+  m_State = State::Failed;
+  RemoveCreatedVirtualEnv();
+  emit InstallFinished(false);
+}
+
+void mitk::PipInstaller::RemoveCreatedVirtualEnv()
+{
+  if (m_CreatedVirtualEnv && !m_Spec.venvName.empty())
+  {
+    PythonHelper::RemoveVirtualEnv(m_Spec.venvName);
+    m_CreatedVirtualEnv = false;
+  }
 }

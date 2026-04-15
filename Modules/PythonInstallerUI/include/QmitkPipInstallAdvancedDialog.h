@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <QDialog>
 #include <vector>
 
+class QCheckBox;
 class QLineEdit;
 class QPlainTextEdit;
 
@@ -50,6 +51,7 @@ private:
 
   mitk::PipInstallSpec m_Spec;
   std::vector<GroupWidgets> m_GroupWidgets;
+  QCheckBox* m_UpgradePipFirstCheckBox = nullptr;
 };
 
 #endif

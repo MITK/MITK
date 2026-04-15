@@ -80,6 +80,22 @@
     </widget>
    </item>
    <item>
+    <widget class="QPlainTextEdit" name="detailsView">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>120</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -102,6 +118,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="detailsButton">
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Show details</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="bottomSpacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
@@ -120,7 +146,7 @@
         <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="standardButtons">
-        <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Yes</set>
+        <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
        </property>
       </widget>
      </item>

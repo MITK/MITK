@@ -12,12 +12,14 @@ found in the LICENSE file.
 
 #include <QmitkPipInstallAdvancedDialog.h>
 
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QVBoxLayout>
 
 QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
@@ -37,7 +39,7 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
 
     auto* requirements = new QPlainTextEdit;
     requirements->setTabChangesFocus(true);
-    requirements->setMaximumHeight(80);
+    requirements->setMinimumHeight(80);
 
     QStringList reqLines;
     for (const auto& req : group.requirements)
@@ -75,6 +77,10 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
     }
   }
 
+  m_UpgradePipFirstCheckBox = new QCheckBox("Upgrade pip before installing");
+  m_UpgradePipFirstCheckBox->setChecked(m_Spec.upgradePipFirst);
+  mainLayout->addWidget(m_UpgradePipFirstCheckBox);
+
   auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -101,15 +107,19 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
 
     group.indexUrl = widgets.indexUrl->text().trimmed().toStdString();
 
+    // Use shell-style tokenization so quoted arguments like
+    //   --find-links "D:/my packages"
+    // survive a round trip through the dialog.
     group.extraPipArgs.clear();
-    auto args = widgets.extraPipArgs->text().split(' ', Qt::SkipEmptyParts);
+    const auto args = QProcess::splitCommand(widgets.extraPipArgs->text());
     for (const auto& arg : args)
     {
-      auto trimmed = arg.trimmed();
-      if (!trimmed.isEmpty())
-        group.extraPipArgs.push_back(trimmed.toStdString());
+      if (!arg.isEmpty())
+        group.extraPipArgs.push_back(arg.toStdString());
     }
   }
+
+  spec.upgradePipFirst = m_UpgradePipFirstCheckBox->isChecked();
 
   return spec;
 }

@@ -67,35 +67,37 @@ protected:
 private slots:
   void OnInstallClicked();
   void OnAdvancedSettingsClicked();
+  void OnToggleDetailsClicked();
 
   void OnVirtualEnvCreationStarted();
-  void OnVirtualEnvCreationFinished(bool success);
   void OnPipUpgradeStarted();
-  void OnPipUpgradeFinished(bool success);
   void OnResolveStarted();
   void OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
+  void OnOutputReceived(const QString& text, bool isError);
   void OnDotTimer();
 
 private:
   bool ConfirmCancel();
   void SetUiInstalling();
   void SetUiFinished(bool success);
+  void OfferDetails();
 
   void SetStatus(const QString& text);
+  void SetTerminalStatus(const QString& text);
 
   std::unique_ptr<Ui::QmitkPipInstallDialog> m_Ui;
-  mitk::PipInstaller* m_Installer;
+  mitk::PipInstaller* m_Installer = nullptr;
   mitk::PipInstallSpec m_Spec;
-  QTimer* m_DotTimer;
+  QTimer* m_DotTimer = nullptr;
   QString m_PackageLabelBaseText;
   int m_DotCount = 0;
-  bool m_IsInstalling = false;
   int m_CurrentStep = 0;
   int m_TotalSteps = 0;
+  bool m_IsCancelling = false;
 };
 
 #endif

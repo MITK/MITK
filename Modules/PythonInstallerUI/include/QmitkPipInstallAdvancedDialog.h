@@ -27,7 +27,9 @@ class QPlainTextEdit;
 /** \brief Dialog for editing pip install groups before installation.
  *
  * Presents one section per PipInstallGroup with editable fields for
- * requirements, index URL, and extra pip arguments.
+ * requirements, index URL, and extra pip arguments. If the spec carries any
+ * Hugging Face downloads, an additional section per download lets the user
+ * edit the repository ID and allow patterns.
  *
  * \sa QmitkPipInstallDialog, mitk::PipInstallSpec
  */
@@ -49,8 +51,15 @@ private:
     QLineEdit* extraPipArgs;
   };
 
+  struct DownloadWidgets
+  {
+    QLineEdit* repoId;
+    QPlainTextEdit* allowPatterns;
+  };
+
   mitk::PipInstallSpec m_Spec;
   std::vector<GroupWidgets> m_GroupWidgets;
+  std::vector<DownloadWidgets> m_DownloadWidgets;
   QCheckBox* m_UpgradePipFirstCheckBox = nullptr;
 };
 

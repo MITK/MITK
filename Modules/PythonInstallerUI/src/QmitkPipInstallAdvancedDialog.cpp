@@ -29,7 +29,8 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
   setWindowTitle("Advanced Settings");
 
   auto* mainLayout = new QVBoxLayout(this);
-  bool singleGroup = m_Spec.groups.size() == 1;
+  const bool hasDownloads = !m_Spec.huggingFaceDownloads.empty();
+  const bool inlineGroup = m_Spec.groups.size() == 1 && !hasDownloads;
 
   for (int i = 0; i < static_cast<int>(m_Spec.groups.size()); ++i)
   {
@@ -39,7 +40,8 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
 
     auto* requirements = new QPlainTextEdit;
     requirements->setTabChangesFocus(true);
-    requirements->setMinimumHeight(80);
+    requirements->setMinimumHeight(60);
+    requirements->setPlaceholderText("One requirement per line (e.g. torch>=2.8.0,<2.9.0)");
 
     QStringList reqLines;
     for (const auto& req : group.requirements)
@@ -65,7 +67,7 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
 
     m_GroupWidgets.push_back({ requirements, indexUrl, extraPipArgs });
 
-    if (singleGroup)
+    if (inlineGroup)
     {
       mainLayout->addLayout(formLayout);
     }
@@ -77,6 +79,36 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
     }
   }
 
+  for (int i = 0; i < static_cast<int>(m_Spec.huggingFaceDownloads.size()); ++i)
+  {
+    const auto& download = m_Spec.huggingFaceDownloads[i];
+
+    auto* formLayout = new QFormLayout;
+
+    auto* repoId = new QLineEdit;
+    repoId->setPlaceholderText("e.g. owner/repository");
+    repoId->setText(QString::fromStdString(download.repoId));
+    formLayout->addRow("Repository ID:", repoId);
+
+    auto* allowPatterns = new QPlainTextEdit;
+    allowPatterns->setTabChangesFocus(true);
+    allowPatterns->setMinimumHeight(60);
+    allowPatterns->setPlaceholderText("One pattern per line, leave empty to download the whole repository");
+
+    QStringList patternLines;
+    for (const auto& p : download.allowPatterns)
+      patternLines.append(QString::fromStdString(p));
+    allowPatterns->setPlainText(patternLines.join('\n'));
+
+    formLayout->addRow("Allow patterns:", allowPatterns);
+
+    m_DownloadWidgets.push_back({ repoId, allowPatterns });
+
+    auto* groupBox = new QGroupBox(QString("Model Download %1").arg(i + 1));
+    groupBox->setLayout(formLayout);
+    mainLayout->addWidget(groupBox);
+  }
+
   m_UpgradePipFirstCheckBox = new QCheckBox("Upgrade pip before installing");
   m_UpgradePipFirstCheckBox->setChecked(m_Spec.upgradePipFirst);
   mainLayout->addWidget(m_UpgradePipFirstCheckBox);
@@ -85,6 +117,12 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
   connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
   mainLayout->addWidget(buttonBox);
+
+  // QPlainTextEdit::sizeHint() returns a size for several lines of text, which
+  // dominates the dialog's default height. Force the initial height to the
+  // layout minimum (honoring each QPlainTextEdit's minimumHeight above). The
+  // user can still drag the dialog larger.
+  this->resize(this->sizeHint().width(), mainLayout->minimumSize().height());
 }
 
 mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
@@ -116,6 +154,23 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
     {
       if (!arg.isEmpty())
         group.extraPipArgs.push_back(arg.toStdString());
+    }
+  }
+
+  for (int i = 0; i < static_cast<int>(m_DownloadWidgets.size()); ++i)
+  {
+    auto& download = spec.huggingFaceDownloads[i];
+    const auto& widgets = m_DownloadWidgets[i];
+
+    download.repoId = widgets.repoId->text().trimmed().toStdString();
+
+    download.allowPatterns.clear();
+    const auto lines = widgets.allowPatterns->toPlainText().split('\n', Qt::SkipEmptyParts);
+    for (const auto& line : lines)
+    {
+      const auto trimmed = line.trimmed();
+      if (!trimmed.isEmpty())
+        download.allowPatterns.push_back(trimmed.toStdString());
     }
   }
 

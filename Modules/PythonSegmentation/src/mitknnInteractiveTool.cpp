@@ -599,6 +599,16 @@ void mitk::nnInteractiveTool::StartSession()
   }
 
   {
+    // Set dummy nnU-Net paths to suppress warnings. These variables are required
+    // by nnU-Net for training workflows but are not needed for inference here.
+    std::ostringstream pyCommands; pyCommands
+      << "os.environ.setdefault('nnUNet_raw', '/tmp/nnUNet/raw')\n"
+      << "os.environ.setdefault('nnUNet_preprocessed', '/tmp/nnUNet/preprocessed')\n"
+      << "os.environ.setdefault('nnUNet_results', '/tmp/nnUNet/results')\n";
+    pythonContext->Execute(pyCommands.str());
+  }
+
+  {
     std::ostringstream pyCommands; pyCommands
       << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
       << "    inference_class = load_json(\n"

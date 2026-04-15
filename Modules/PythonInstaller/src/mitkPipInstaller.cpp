@@ -127,7 +127,12 @@ void mitk::PipInstaller::StartInstall()
   m_CurrentPackage = 0;
   m_GroupStartIndex = 0;
   m_AnyFailed = false;
-  m_CreatedVirtualEnv = false;
+
+  // m_CreatedVirtualEnv is intentionally not reset here. If a prior attempt
+  // created the venv, a retry reuses it (BeginVirtualEnvPhase sees it exists
+  // and skips creation), so cleanup responsibility must survive the retry.
+  // The flag is cleared only in RemoveCreatedVirtualEnv after the venv has
+  // actually been removed.
 
   BeginVirtualEnvPhase();
 }

@@ -65,10 +65,34 @@ namespace mitk
     std::vector<std::string> extraPipArgs; /**< Additional pip arguments, e.g. {"--no-cache-dir"}. */
   };
 
+  /** \brief Files to fetch from a Hugging Face repository after pip install.
+   *
+   * Processed by PipInstaller as a terminal phase once all pip groups have
+   * been installed successfully. The download runs `huggingface_hub`'s
+   * \c snapshot_download in the activated venv, so the venv must contain
+   * \c huggingface_hub (typically a transitive dependency of an ML package
+   * installed in one of the groups).
+   *
+   * \code
+   * HuggingFaceDownload model;
+   * model.repoId = "nnInteractive/nnInteractive";
+   * model.allowPatterns = { "nnInteractive_v1.0/*" };
+   * model.displayName = "nnInteractive model";
+   * spec.huggingFaceDownloads.push_back(std::move(model));
+   * \endcode
+   */
+  struct MITKPYTHONINSTALLER_EXPORT HuggingFaceDownload
+  {
+    std::string repoId;                     /**< Hugging Face repo id, e.g. "nnInteractive/nnInteractive". */
+    std::vector<std::string> allowPatterns; /**< Glob patterns to restrict the download. Empty = whole repo. */
+    std::string displayName;                /**< Label for the installer UI. Falls back to \c repoId if empty. */
+  };
+
   /** \brief Full specification for a pip installation run.
    *
    * Contains one or more install groups that are processed sequentially,
-   * plus global options like whether to upgrade pip first.
+   * plus global options like whether to upgrade pip first, plus an optional
+   * list of Hugging Face repositories to fetch after pip install completes.
    */
   struct MITKPYTHONINSTALLER_EXPORT PipInstallSpec
   {
@@ -76,6 +100,7 @@ namespace mitk
     std::string venvName;                  /**< If set, create and activate this venv before installing. */
     std::vector<PipInstallGroup> groups;   /**< Install groups, processed in order. */
     bool upgradePipFirst = true;           /**< Whether to upgrade pip before installing. */
+    std::vector<HuggingFaceDownload> huggingFaceDownloads; /**< Model weights to fetch after pip install. */
   };
 }
 

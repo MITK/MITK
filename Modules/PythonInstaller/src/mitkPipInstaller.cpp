@@ -82,6 +82,40 @@ namespace
     }
     return requirement.substr(0, end);
   }
+
+  // Format a std::string as a Python single-quoted string literal.
+  // Escapes backslashes and single quotes; everything else passes through.
+  QString PyQuote(const std::string& value)
+  {
+    QString result = "'";
+    for (char c : value)
+    {
+      if (c == '\\' || c == '\'')
+        result.append('\\');
+      result.append(QChar::fromLatin1(c));
+    }
+    result.append('\'');
+    return result;
+  }
+
+  // Format a vector<string> as a Python list literal, e.g.
+  // {"a", "b"} -> "['a', 'b']". An empty vector returns "None" so the
+  // caller can pass "allow_patterns=None" and get the whole-repo default.
+  QString PyListLiteralOrNone(const std::vector<std::string>& values)
+  {
+    if (values.empty())
+      return "None";
+
+    QString result = "[";
+    for (std::size_t i = 0; i < values.size(); ++i)
+    {
+      if (i > 0)
+        result.append(", ");
+      result.append(PyQuote(values[i]));
+    }
+    result.append(']');
+    return result;
+  }
 }
 
 mitk::PipInstaller::PipInstaller(QObject* parent)
@@ -126,6 +160,7 @@ void mitk::PipInstaller::StartInstall()
   m_CurrentGroup = 0;
   m_CurrentPackage = 0;
   m_GroupStartIndex = 0;
+  m_CurrentDownload = 0;
   m_AnyFailed = false;
 
   // m_CreatedVirtualEnv is intentionally not reset here. If a prior attempt
@@ -291,8 +326,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       }
       else
       {
-        m_State = m_AnyFailed ? State::Failed : State::Done;
-        emit InstallFinished(!m_AnyFailed);
+        BeginModelDownloadPhase();
       }
     }
     break;
@@ -328,9 +362,33 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       }
       else
       {
-        m_State = m_AnyFailed ? State::Failed : State::Done;
-        emit InstallFinished(!m_AnyFailed);
+        BeginModelDownloadPhase();
       }
+    }
+    break;
+  }
+
+  case State::DownloadingModels:
+  {
+    const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
+    auto displayName = QString::fromStdString(
+      download.displayName.empty() ? download.repoId : download.displayName);
+
+    emit ModelDownloadFinished(displayName, success);
+
+    if (!success)
+      m_AnyFailed = true;
+
+    m_CurrentDownload++;
+
+    if (m_CurrentDownload < static_cast<int>(m_Spec.huggingFaceDownloads.size()))
+    {
+      StartModelDownload();
+    }
+    else
+    {
+      m_State = m_AnyFailed ? State::Failed : State::Done;
+      emit InstallFinished(!m_AnyFailed);
     }
     break;
   }
@@ -417,8 +475,7 @@ void mitk::PipInstaller::StartResolveGroup()
 
   if (m_CurrentGroup >= static_cast<int>(m_Spec.groups.size()))
   {
-    m_State = m_AnyFailed ? State::Failed : State::Done;
-    emit InstallFinished(!m_AnyFailed);
+    BeginModelDownloadPhase();
     return;
   }
 
@@ -467,8 +524,7 @@ void mitk::PipInstaller::StartInstallPackage()
 
   if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
-    m_State = m_AnyFailed ? State::Failed : State::Done;
-    emit InstallFinished(!m_AnyFailed);
+    BeginModelDownloadPhase();
     return;
   }
 
@@ -571,6 +627,64 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
   }
 
   return true;
+}
+
+// Called once all pip groups have finished. If no Hugging Face downloads are
+// configured, immediately emits the terminal InstallFinished. Otherwise
+// enters the DownloadingModels state and kicks off the first download.
+void mitk::PipInstaller::BeginModelDownloadPhase()
+{
+  if (m_Spec.huggingFaceDownloads.empty())
+  {
+    m_State = m_AnyFailed ? State::Failed : State::Done;
+    emit InstallFinished(!m_AnyFailed);
+    return;
+  }
+
+  m_State = State::DownloadingModels;
+  m_CurrentDownload = 0;
+  StartModelDownload();
+}
+
+void mitk::PipInstaller::StartModelDownload()
+{
+  auto python = PythonExecutable();
+
+  if (python.isEmpty())
+  {
+    m_State = State::Failed;
+    emit ErrorOccurred("Python executable not found.");
+    emit InstallFinished(false);
+    return;
+  }
+
+  if (m_CurrentDownload >= static_cast<int>(m_Spec.huggingFaceDownloads.size()))
+  {
+    m_State = m_AnyFailed ? State::Failed : State::Done;
+    emit InstallFinished(!m_AnyFailed);
+    return;
+  }
+
+  const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
+  auto displayName = QString::fromStdString(
+    download.displayName.empty() ? download.repoId : download.displayName);
+
+  // Inline `python -c "<script>"`. QProcess::start with a QStringList handles
+  // argument quoting on Windows, so we only have to format repoId / patterns
+  // as Python literals. huggingface_hub writes tqdm progress to stderr, which
+  // our OnStandardErrorReady -> OutputReceived pipeline forwards to the UI
+  // details view. force_download=False keeps the cache authoritative: a
+  // re-run on a populated cache is effectively a no-op.
+  auto script = QString(
+    "from huggingface_hub import snapshot_download\n"
+    "snapshot_download(repo_id=%1, allow_patterns=%2, force_download=False)\n")
+    .arg(PyQuote(download.repoId), PyListLiteralOrNone(download.allowPatterns));
+
+  emit ModelDownloadStarted(displayName);
+
+  QStringList args = { "-c", script };
+  MITK_INFO << FormatCommand(python, args).toStdString();
+  m_Process->start(python, args);
 }
 
 QString mitk::PipInstaller::PythonExecutable() const

@@ -142,9 +142,33 @@ namespace mitk
      */
     void PackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
 
+    /** \brief Emitted when a Hugging Face model download starts.
+     *
+     * Fired once per entry in PipInstallSpec::huggingFaceDownloads, in order.
+     *
+     * \param[in] displayName The download's display name (repoId if none set).
+     */
+    void ModelDownloadStarted(const QString& displayName);
+
+    /** \brief Emitted when a Hugging Face model download finishes.
+     *
+     * Fired once per entry on completion or failure. A failure here flips the
+     * terminal InstallFinished to \c false but does not abort remaining
+     * downloads - each model's failure is independent (if a user cancelled,
+     * the Cancel path takes over before any more downloads start).
+     *
+     * \param[in] displayName The download's display name.
+     * \param[in] success Whether the download succeeded.
+     */
+    void ModelDownloadFinished(const QString& displayName, bool success);
+
     /** \brief Emitted when all packages have been installed (or installation failed).
      *
-     * \param[in] success True only if every package installed successfully.
+     * If the spec includes Hugging Face downloads, this fires only after
+     * those downloads have also finished.
+     *
+     * \param[in] success True only if every package installed successfully
+     *                    and every model download succeeded.
      */
     void InstallFinished(bool success);
 
@@ -178,6 +202,7 @@ namespace mitk
       UpgradingPip,
       Resolving,
       Installing,
+      DownloadingModels,
       Cancelling,
       Done,
       Failed
@@ -187,6 +212,8 @@ namespace mitk
     void StartPipUpgrade();
     void StartResolveGroup();
     void StartInstallPackage();
+    void BeginModelDownloadPhase();
+    void StartModelDownload();
     QStringList BuildPipArgs(const QStringList& baseArgs, const PipInstallGroup& group) const;
     bool ParseResolveReport(const QString& reportPath, int groupIndex);
     QString PythonExecutable() const;
@@ -204,6 +231,7 @@ namespace mitk
     int m_CurrentGroup = 0;
     int m_CurrentPackage = 0;
     int m_GroupStartIndex = 0;
+    int m_CurrentDownload = 0;
 
     QTemporaryFile m_ReportFile;
   };

@@ -74,6 +74,8 @@ private slots:
   void OnResolveStarted();
   void OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
+  void OnModelDownloadStarted(const QString& displayName);
+  void OnModelDownloadFinished(const QString& displayName, bool success);
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);

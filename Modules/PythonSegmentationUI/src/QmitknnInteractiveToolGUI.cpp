@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitknnInteractiveToolGUI.h>
 
 #include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
@@ -317,6 +318,19 @@ bool QmitknnInteractiveToolGUI::Install()
   // nnInteractive installs from default PyPI.
   spec.groups.push_back({ NNINTERACTIVE });
 
+  // Pre-fetch the model weights so the first StartSession() doesn't surprise
+  // the user with a silent multi-minute download. The checkpoint name mirrors
+  // the preference mitknnInteractiveTool::StartSession() reads.
+  auto* prefsService = mitk::CoreServices::GetPreferencesService();
+  auto* prefs = prefsService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  const auto checkpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+
+  mitk::HuggingFaceDownload model;
+  model.repoId = "nnInteractive/nnInteractive";
+  model.allowPatterns = { checkpoint + "/*" };
+  model.displayName = "model checkpoint " + checkpoint;
+  spec.huggingFaceDownloads.push_back(std::move(model));
+
   QmitkPipInstallDialog dialog(spec);
   return dialog.exec() == QDialog::Accepted;
 }
@@ -345,9 +359,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
   const auto initMessage = QString(
     "<h3 %1>Initializing nnInteractive</h3>"
-    "<p %1>Please wait a few seconds...</p>"
-    "<p %1><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
-    "instead. Please be patient.</small></p>").arg(LINE_HEIGHT_STYLE);
+    "<p %1>Please wait a few seconds until nnInteractive is fully initialized...</p>").arg(LINE_HEIGHT_STYLE);
  
   auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
   messageBox->setStandardButtons(QMessageBox::NoButton);

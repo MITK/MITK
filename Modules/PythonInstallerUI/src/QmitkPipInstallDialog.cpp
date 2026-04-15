@@ -71,6 +71,8 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &mitk::PipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
   connect(m_Installer, &mitk::PipInstaller::ResolveFinished, this, &QmitkPipInstallDialog::OnResolveFinished);
   connect(m_Installer, &mitk::PipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
+  connect(m_Installer, &mitk::PipInstaller::ModelDownloadStarted, this, &QmitkPipInstallDialog::OnModelDownloadStarted);
+  connect(m_Installer, &mitk::PipInstaller::ModelDownloadFinished, this, &QmitkPipInstallDialog::OnModelDownloadFinished);
   connect(m_Installer, &mitk::PipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
   connect(m_Installer, &mitk::PipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
@@ -125,11 +127,13 @@ void QmitkPipInstallDialog::OnAdvancedSettingsClicked()
 
 void QmitkPipInstallDialog::OnInstallClicked()
 {
-  // Total steps: 1 (venv, if needed) + 1 (pip upgrade, if requested) + 2 per group.
+  // Total steps: 1 (venv, if needed) + 1 (pip upgrade, if requested) + 2 per
+  // group + 1 per Hugging Face model download.
   bool needsVirtualEnv = !m_Spec.venvName.empty() &&
                    !mitk::PythonHelper::VirtualEnvExists(m_Spec.venvName);
   m_TotalSteps = (needsVirtualEnv ? 1 : 0) + (m_Spec.upgradePipFirst ? 1 : 0) +
-                 2 * static_cast<int>(m_Spec.groups.size());
+                 2 * static_cast<int>(m_Spec.groups.size()) +
+                 static_cast<int>(m_Spec.huggingFaceDownloads.size());
   m_CurrentStep = 0;
 
   m_Installer->SetInstallSpec(m_Spec);
@@ -205,6 +209,31 @@ void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& nam
   m_Ui->packageLabel->setText(m_PackageLabelBaseText);
   m_Ui->packageLabel->show();
   m_DotTimer->start();
+}
+
+void QmitkPipInstallDialog::OnModelDownloadStarted(const QString& displayName)
+{
+  m_DotTimer->stop();
+  ++m_CurrentStep;
+  this->SetStatus("Download model weights");
+
+  // Indeterminate while the download runs. tqdm progress from huggingface_hub
+  // shows up in the details view via OutputReceived.
+  m_Ui->progressBar->setRange(0, 0);
+  m_Ui->progressBar->show();
+
+  m_PackageLabelBaseText = QString("Downloading %1").arg(displayName);
+  m_DotCount = 0;
+  m_Ui->packageLabel->setText(m_PackageLabelBaseText);
+  m_Ui->packageLabel->show();
+  m_DotTimer->start();
+}
+
+void QmitkPipInstallDialog::OnModelDownloadFinished(const QString& /*displayName*/, bool /*success*/)
+{
+  // Per-download terminal: stop the dot animation. Aggregate success/failure
+  // is handled by OnInstallFinished, which runs after the last download.
+  m_DotTimer->stop();
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)

@@ -146,7 +146,6 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 
   this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)

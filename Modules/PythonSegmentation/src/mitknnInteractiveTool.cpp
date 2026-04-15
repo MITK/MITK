@@ -735,10 +735,12 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
 
   for (int i = 2; i >= 0; --i)
   {
+    // nnInteractive expects half-open bounding boxes [min, max).
+    // Our indices are inclusive, so we add +1 to the upper bound.
     pyCommands
       << "        ["
       << std::min(indices[0][i], indices[1][i]) << ", "
-      << std::max(indices[0][i], indices[1][i])
+      << std::max(indices[0][i], indices[1][i]) + 1
       << "],\n";
   }
 

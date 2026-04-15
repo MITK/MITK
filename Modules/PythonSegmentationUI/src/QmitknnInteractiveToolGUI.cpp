@@ -297,7 +297,8 @@ bool QmitknnInteractiveToolGUI::Install()
   // This avoids showing the install dialog when everything is up to date.
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
   {
-    this->GetTool()->CreatePythonContext();
+    if (!this->GetTool()->CreatePythonContext())
+      return false;
 
     if (this->GetTool()->IsInstalled())
       return true;
@@ -331,7 +332,13 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.huggingFaceDownloads.push_back(std::move(model));
 
   QmitkPipInstallDialog dialog(spec);
-  return dialog.exec() == QDialog::Accepted;
+
+  if (dialog.exec() != QDialog::Accepted)
+    return false;
+
+  // The dialog populated the venv (and possibly created it). Create a fresh
+  // context so the embedded interpreter picks up the newly installed packages.
+  return this->GetTool()->CreatePythonContext();
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
@@ -349,8 +356,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #else
   this->EnableInitializeButtons(false);
 
-  if (!Install() ||
-      !this->GetTool()->CreatePythonContext())
+  if (!Install())
   {
     this->EnableInitializeButtons(true);
     return;

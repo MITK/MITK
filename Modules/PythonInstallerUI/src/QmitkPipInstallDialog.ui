@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>447</width>
-    <height>226</height>
+    <width>500</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,17 +81,17 @@
    </item>
    <item>
     <widget class="QPlainTextEdit" name="detailsView">
-     <property name="visible">
-      <bool>false</bool>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
        <height>120</height>
       </size>
+     </property>
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

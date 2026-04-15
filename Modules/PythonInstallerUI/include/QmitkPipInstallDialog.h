@@ -85,6 +85,7 @@ private:
   void SetUiInstalling();
   void SetUiFinished(bool success);
   void OfferDetails();
+  void SetDetailsVisible(bool show);
 
   void SetStatus(const QString& text);
   void SetTerminalStatus(const QString& text);
@@ -97,6 +98,8 @@ private:
   int m_DotCount = 0;
   int m_CurrentStep = 0;
   int m_TotalSteps = 0;
+  int m_CompactHeight = 0;
+  int m_ExpandedHeight = 0;
   bool m_IsCancelling = false;
 };
 

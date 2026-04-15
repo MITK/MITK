@@ -75,6 +75,13 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &mitk::PipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
   connect(m_Installer, &mitk::PipInstaller::OutputReceived, this, &QmitkPipInstallDialog::OnOutputReceived);
+
+  // Lock the dialog to a constant compact height. The expanding spacer in
+  // mainLayout absorbs leftover space as widgets show/hide, so the dialog
+  // no longer has to refit via adjustSize() on every state change.
+  m_CompactHeight = this->height();
+  m_ExpandedHeight = m_CompactHeight + 200;
+  this->setFixedHeight(m_CompactHeight);
 }
 
 QmitkPipInstallDialog::~QmitkPipInstallDialog()
@@ -132,26 +139,8 @@ void QmitkPipInstallDialog::OnInstallClicked()
 
 void QmitkPipInstallDialog::OnToggleDetailsClicked()
 {
-  bool show = !m_Ui->detailsView->isVisible();
-
-  // When details is visible we want it to consume any extra vertical space.
-  // When it is hidden, the spacer should push the button row to the bottom.
-  m_Ui->verticalSpacer->changeSize(
-    0, 0, QSizePolicy::Minimum, show ? QSizePolicy::Fixed : QSizePolicy::Expanding);
-  m_Ui->mainLayout->invalidate();
-
-  m_Ui->detailsView->setVisible(show);
-  m_Ui->detailsButton->setText(show ? "Hide details" : "Show details");
-
-  // Preserve the user's chosen width across the toggle. adjustSize() would
-  // otherwise snap the dialog to the minimum width its layout currently
-  // supports, which is narrower than the typical install/failure layout.
-  auto width = this->width();
-  this->adjustSize();
-  this->resize(width, this->height());
+  this->SetDetailsVisible(!m_Ui->detailsView->isVisible());
 }
-
-// --- Installer event slots ---
 
 void QmitkPipInstallDialog::OnVirtualEnvCreationStarted()
 {
@@ -278,8 +267,6 @@ void QmitkPipInstallDialog::OnDotTimer()
   m_DotCount = (m_DotCount + 1) % 4;
 }
 
-// --- Private helpers ---
-
 bool QmitkPipInstallDialog::ConfirmCancel()
 {
   auto answer = QMessageBox::question(
@@ -319,30 +306,18 @@ void QmitkPipInstallDialog::SetUiInstalling()
   m_Ui->advancedSettingsButton->hide();
 
   // A previous attempt may have left the details visible / accumulated output.
-  // Reset the details area so a retry starts clean.
+  // Reset the details area so a retry starts clean. SetDetailsVisible(false)
+  // restores the spacer policy, hides the view, resets the button label, and
+  // shrinks the dialog back to the compact height.
   m_Ui->detailsButton->hide();
-  m_Ui->detailsButton->setText("Show details");
-  m_Ui->detailsView->hide();
+  this->SetDetailsVisible(false);
   m_Ui->detailsView->clear();
-
-  // Restore the spacer's expanding policy in case Show details flipped it to
-  // Fixed. Otherwise, with no Expanding item in the layout, Qt would distribute
-  // the leftover height across the Preferred-policy widgets and pad them out.
-  m_Ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  m_Ui->mainLayout->invalidate();
 
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Ok))
     button->setEnabled(false);
 
   m_Ui->statusLabel->show();
   m_Ui->packageLabel->clear();
-
-  // If a previous attempt grew the dialog (e.g. the user opened the details
-  // area), shrink back to the compact install layout so we don't start the
-  // retry with a tall, mostly-empty window.
-  auto width = this->width();
-  this->adjustSize();
-  this->resize(width, this->height());
 }
 
 void QmitkPipInstallDialog::SetStatus(const QString& text)
@@ -358,21 +333,22 @@ void QmitkPipInstallDialog::SetTerminalStatus(const QString& text)
 
 void QmitkPipInstallDialog::SetUiFinished(bool success)
 {
+  // Clear both possible accepted-slot bindings before rewiring so repeated
+  // fail/retry cycles don't accumulate duplicate connections. Otherwise the
+  // constructor's connect to OnInstallClicked survives the failure path and
+  // SetUiFinished(false) would stack a second connect on top of it, causing
+  // a single Retry click to fire OnInstallClicked twice.
+  disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
+  disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+
   if (success)
   {
     m_Ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-    // The Install→accept rewiring in OnInstallClicked left the OnInstallClicked
-    // slot connected. Disconnect it before wiring the standard accept handler.
-    disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
     connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   }
   else
   {
     m_Ui->buttonBox->setStandardButtons(QDialogButtonBox::Retry | QDialogButtonBox::Cancel);
-    // Defensive: a previous successful run could have left QDialog::accept
-    // connected. Drop it before reconnecting the retry handler. The disconnect
-    // is a no-op when nothing is connected.
-    disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkPipInstallDialog::OnInstallClicked);
   }
 
@@ -387,4 +363,19 @@ void QmitkPipInstallDialog::OfferDetails()
     return;
 
   m_Ui->detailsButton->show();
+}
+
+void QmitkPipInstallDialog::SetDetailsVisible(bool show)
+{
+  // When the details view is visible, it should consume the extra vertical
+  // space; the spacer becomes Fixed(0, 0). When the details view is hidden,
+  // the spacer takes over and pushes the button row to the bottom.
+  m_Ui->verticalSpacer->changeSize(
+    0, 0, QSizePolicy::Minimum, show ? QSizePolicy::Fixed : QSizePolicy::Expanding);
+  m_Ui->mainLayout->invalidate();
+
+  m_Ui->detailsView->setVisible(show);
+  m_Ui->detailsButton->setText(show ? "Hide details" : "Show details");
+
+  this->setFixedHeight(show ? m_ExpandedHeight : m_CompactHeight);
 }

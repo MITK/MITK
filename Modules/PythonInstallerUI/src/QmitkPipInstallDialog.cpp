@@ -213,7 +213,7 @@ void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& nam
     m_PackageLabelBaseText = QString("Installing %1").arg(name);
 
   m_DotCount = 0;
-  m_Ui->packageLabel->setText(m_PackageLabelBaseText + ".");
+  m_Ui->packageLabel->setText(m_PackageLabelBaseText);
   m_Ui->packageLabel->show();
   m_DotTimer->start();
 }
@@ -274,8 +274,8 @@ void QmitkPipInstallDialog::OnOutputReceived(const QString& text, bool /*isError
 
 void QmitkPipInstallDialog::OnDotTimer()
 {
-  m_DotCount = (m_DotCount + 1) % 3;
-  m_Ui->packageLabel->setText(m_PackageLabelBaseText + QString(m_DotCount + 1, '.'));
+  m_Ui->packageLabel->setText(m_PackageLabelBaseText + QString(m_DotCount, '.'));
+  m_DotCount = (m_DotCount + 1) % 4;
 }
 
 // --- Private helpers ---
@@ -335,7 +335,7 @@ void QmitkPipInstallDialog::SetUiInstalling()
     button->setEnabled(false);
 
   m_Ui->statusLabel->show();
-  m_Ui->packageLabel->setText("");
+  m_Ui->packageLabel->clear();
 
   // If a previous attempt grew the dialog (e.g. the user opened the details
   // area), shrink back to the compact install layout so we don't start the

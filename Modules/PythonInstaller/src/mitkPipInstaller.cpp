@@ -17,8 +17,6 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
-#include <iostream>
-
 #include <QFile>
 #include <QRegularExpression>
 
@@ -237,14 +235,12 @@ const std::vector<mitk::PipPackageInfo>& mitk::PipInstaller::GetResolvedPackages
 void mitk::PipInstaller::OnStandardOutputReady()
 {
   auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
-  //std::cout << output.toStdString();
   emit OutputReceived(output, false);
 }
 
 void mitk::PipInstaller::OnStandardErrorReady()
 {
   auto output = QString::fromLocal8Bit(m_Process->readAllStandardError());
-  //std::cerr << output.toStdString();
   emit OutputReceived(output, true);
 }
 
@@ -337,17 +333,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     else
     {
       // No new packages in this group. Advance to next group.
-      m_CurrentGroup++;
-      m_GroupStartIndex = numPackages;
-
-      if (m_CurrentGroup < numGroups)
-      {
-        StartResolveGroup();
-      }
-      else
-      {
-        BeginModelDownloadPhase();
-      }
+      AdvanceToNextGroup();
     }
     break;
   }
@@ -370,20 +356,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     else
     {
       // All packages in the current group are installed.
-      // Advance to the next group's resolve phase.
-      m_CurrentGroup++;
-
-      if (m_CurrentGroup < numGroups)
-      {
-        m_State = State::Resolving;
-        m_GroupStartIndex = numPackages;
-        emit ResolveStarted();
-        StartResolveGroup();
-      }
-      else
-      {
-        BeginModelDownloadPhase();
-      }
+      AdvanceToNextGroup();
     }
     break;
   }
@@ -441,15 +414,10 @@ void mitk::PipInstaller::BeginVirtualEnvPhase()
     return;
   }
 
-  auto python = PythonExecutable();
+  auto python = RequirePythonExecutable();
 
   if (python.isEmpty())
-  {
-    m_State = State::Failed;
-    emit ErrorOccurred("Python executable not found.");
-    emit InstallFinished(false);
     return;
-  }
 
   m_State = State::CreatingVirtualEnv;
   m_CreatedVirtualEnv = true;
@@ -463,15 +431,10 @@ void mitk::PipInstaller::BeginVirtualEnvPhase()
 
 void mitk::PipInstaller::StartPipUpgrade()
 {
-  auto python = PythonExecutable();
+  auto python = RequirePythonExecutable();
 
   if (python.isEmpty())
-  {
-    m_State = State::Failed;
-    emit ErrorOccurred("Python executable not found.");
-    emit InstallFinished(false);
     return;
-  }
 
   m_State = State::UpgradingPip;
   emit PipUpgradeStarted();
@@ -483,15 +446,10 @@ void mitk::PipInstaller::StartPipUpgrade()
 
 void mitk::PipInstaller::StartResolveGroup()
 {
-  auto python = PythonExecutable();
+  auto python = RequirePythonExecutable();
 
   if (python.isEmpty())
-  {
-    m_State = State::Failed;
-    emit ErrorOccurred("Python executable not found.");
-    emit InstallFinished(false);
     return;
-  }
 
   if (m_CurrentGroup >= static_cast<int>(m_Spec.groups.size()))
   {
@@ -532,15 +490,10 @@ void mitk::PipInstaller::StartResolveGroup()
 
 void mitk::PipInstaller::StartInstallPackage()
 {
-  auto python = PythonExecutable();
+  auto python = RequirePythonExecutable();
 
   if (python.isEmpty())
-  {
-    m_State = State::Failed;
-    emit ErrorOccurred("Python executable not found.");
-    emit InstallFinished(false);
     return;
-  }
 
   if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
@@ -684,6 +637,23 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
   return true;
 }
 
+void mitk::PipInstaller::AdvanceToNextGroup()
+{
+  m_CurrentGroup++;
+  m_GroupStartIndex = static_cast<int>(m_ResolvedPackages.size());
+
+  if (m_CurrentGroup < static_cast<int>(m_Spec.groups.size()))
+  {
+    m_State = State::Resolving;
+    emit ResolveStarted();
+    StartResolveGroup();
+  }
+  else
+  {
+    BeginModelDownloadPhase();
+  }
+}
+
 // Called once all pip groups have finished. If no Hugging Face downloads are
 // configured, immediately emits the terminal InstallFinished. Otherwise
 // enters the DownloadingModels state and kicks off the first download.
@@ -703,15 +673,10 @@ void mitk::PipInstaller::BeginModelDownloadPhase()
 
 void mitk::PipInstaller::StartModelDownload()
 {
-  auto python = PythonExecutable();
+  auto python = RequirePythonExecutable();
 
   if (python.isEmpty())
-  {
-    m_State = State::Failed;
-    emit ErrorOccurred("Python executable not found.");
-    emit InstallFinished(false);
     return;
-  }
 
   if (m_CurrentDownload >= static_cast<int>(m_Spec.huggingFaceDownloads.size()))
   {
@@ -750,6 +715,20 @@ QString mitk::PipInstaller::PythonExecutable() const
     return {};
 
   return QString::fromStdString(path.string());
+}
+
+QString mitk::PipInstaller::RequirePythonExecutable()
+{
+  auto python = PythonExecutable();
+
+  if (python.isEmpty())
+  {
+    m_State = State::Failed;
+    emit ErrorOccurred("Python executable not found.");
+    emit InstallFinished(false);
+  }
+
+  return python;
 }
 
 void mitk::PipInstaller::FinalizeCancel()

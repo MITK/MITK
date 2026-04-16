@@ -215,8 +215,10 @@ namespace mitk
     void BeginModelDownloadPhase();
     void StartModelDownload();
     QStringList BuildPipArgs(const QStringList& baseArgs, const PipInstallGroup& group) const;
+    void AdvanceToNextGroup();
     bool ParseResolveReport(const QString& reportPath, int groupIndex);
     QString PythonExecutable() const;
+    QString RequirePythonExecutable();
     void FinalizeCancel();
     void RemoveCreatedVirtualEnv();
 

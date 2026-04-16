@@ -14,131 +14,117 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QProcess>
+#include <QPushButton>
+#include <QScrollArea>
 #include <QVBoxLayout>
 
 QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
-  : QDialog(parent),
-    m_Spec(spec)
+  : QDialog(parent)
 {
   setWindowTitle("Advanced Settings");
 
-  auto* mainLayout = new QVBoxLayout(this);
-  const bool hasDownloads = !m_Spec.huggingFaceDownloads.empty();
-  const bool inlineGroup = m_Spec.groups.size() == 1 && !hasDownloads;
+  auto* outerLayout = new QVBoxLayout(this);
 
-  for (int i = 0; i < static_cast<int>(m_Spec.groups.size()); ++i)
-  {
-    const auto& group = m_Spec.groups[i];
+  // --- Scroll area ---
 
-    auto* formLayout = new QFormLayout;
+  auto* scrollArea = new QScrollArea;
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  outerLayout->addWidget(scrollArea, 1);
 
-    auto* requirements = new QPlainTextEdit;
-    requirements->setTabChangesFocus(true);
-    requirements->setMinimumHeight(60);
-    requirements->setPlaceholderText("One requirement per line (e.g. torch>=2.8.0,<2.9.0)");
+  auto* scrollWidget = new QWidget;
+  auto* mainLayout = new QVBoxLayout(scrollWidget);
+  scrollArea->setWidget(scrollWidget);
 
-    QStringList reqLines;
-    for (const auto& req : group.requirements)
-      reqLines.append(QString::fromStdString(req));
-    requirements->setPlainText(reqLines.join('\n'));
+  // --- General section ---
 
-    formLayout->addRow("Requirements:", requirements);
+  auto* generalBox = new QGroupBox("General");
+  auto* generalForm = new QFormLayout(generalBox);
 
-    auto* indexUrl = new QLineEdit;
-    indexUrl->setPlaceholderText("Default (PyPI)");
-    indexUrl->setText(QString::fromStdString(group.indexUrl));
-    formLayout->addRow("Index URL:", indexUrl);
+  m_NameEdit = new QLineEdit;
+  m_NameEdit->setPlaceholderText("e.g. nnInteractive");
+  generalForm->addRow("Name:", m_NameEdit);
 
-    auto* extraPipArgs = new QLineEdit;
-    extraPipArgs->setPlaceholderText("e.g. --no-cache-dir");
-
-    QStringList argsList;
-    for (const auto& arg : group.extraPipArgs)
-      argsList.append(QString::fromStdString(arg));
-    extraPipArgs->setText(argsList.join(' '));
-
-    formLayout->addRow("Extra pip arguments:", extraPipArgs);
-
-    m_GroupWidgets.push_back({ requirements, indexUrl, extraPipArgs });
-
-    if (inlineGroup)
-    {
-      mainLayout->addLayout(formLayout);
-    }
-    else
-    {
-      auto* groupBox = new QGroupBox(QString("Install Group %1").arg(i + 1));
-      groupBox->setLayout(formLayout);
-      mainLayout->addWidget(groupBox);
-    }
-  }
-
-  for (int i = 0; i < static_cast<int>(m_Spec.huggingFaceDownloads.size()); ++i)
-  {
-    const auto& download = m_Spec.huggingFaceDownloads[i];
-
-    auto* formLayout = new QFormLayout;
-
-    auto* repoId = new QLineEdit;
-    repoId->setPlaceholderText("e.g. owner/repository");
-    repoId->setText(QString::fromStdString(download.repoId));
-    formLayout->addRow("Repository ID:", repoId);
-
-    auto* allowPatterns = new QPlainTextEdit;
-    allowPatterns->setTabChangesFocus(true);
-    allowPatterns->setMinimumHeight(60);
-    allowPatterns->setPlaceholderText("One pattern per line, leave empty to download the whole repository");
-
-    QStringList patternLines;
-    for (const auto& p : download.allowPatterns)
-      patternLines.append(QString::fromStdString(p));
-    allowPatterns->setPlainText(patternLines.join('\n'));
-
-    formLayout->addRow("Allow patterns:", allowPatterns);
-
-    auto* optionalCheckBox = new QCheckBox("Optional (failure does not block installation)");
-    optionalCheckBox->setChecked(download.optional);
-    formLayout->addRow("", optionalCheckBox);
-
-    m_DownloadWidgets.push_back({ repoId, allowPatterns, optionalCheckBox });
-
-    auto* groupBox = new QGroupBox(QString("Hugging Face Download %1").arg(i + 1));
-    groupBox->setLayout(formLayout);
-    mainLayout->addWidget(groupBox);
-  }
+  m_VenvNameEdit = new QLineEdit;
+  m_VenvNameEdit->setPlaceholderText("Leave empty to install into the system Python");
+  generalForm->addRow("Virtual environment:", m_VenvNameEdit);
 
   m_UpgradePipFirstCheckBox = new QCheckBox("Upgrade pip before installing");
-  m_UpgradePipFirstCheckBox->setChecked(m_Spec.upgradePipFirst);
-  mainLayout->addWidget(m_UpgradePipFirstCheckBox);
+  generalForm->addRow("", m_UpgradePipFirstCheckBox);
+
+  mainLayout->addWidget(generalBox);
+
+  // --- Install Groups section ---
+
+  mainLayout->addWidget(new QLabel("<b>Install Groups</b>"));
+
+  m_GroupsLayout = new QVBoxLayout;
+  mainLayout->addLayout(m_GroupsLayout);
+
+  auto* addGroupButton = new QPushButton("Add Install Group");
+  mainLayout->addWidget(addGroupButton);
+  connect(addGroupButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnAddGroup);
+
+  // --- Hugging Face Downloads section ---
+
+  mainLayout->addWidget(new QLabel("<b>Hugging Face Downloads</b>"));
+
+  m_DownloadsLayout = new QVBoxLayout;
+  mainLayout->addLayout(m_DownloadsLayout);
+
+  auto* addDownloadButton = new QPushButton("Add Hugging Face Download");
+  mainLayout->addWidget(addDownloadButton);
+  connect(addDownloadButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnAddDownload);
+
+  mainLayout->addStretch();
+
+  // --- Bottom row: Load/Save on the left, Ok/Cancel on the right ---
+
+  auto* bottomLayout = new QHBoxLayout;
+
+  auto* loadButton = new QPushButton("Load...");
+  auto* saveButton = new QPushButton("Save...");
+  connect(loadButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnLoadSpec);
+  connect(saveButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnSaveSpec);
+  bottomLayout->addWidget(loadButton);
+  bottomLayout->addWidget(saveButton);
+
+  bottomLayout->addStretch();
 
   auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
-  mainLayout->addWidget(buttonBox);
+  bottomLayout->addWidget(buttonBox);
 
-  // QPlainTextEdit::sizeHint() returns a size for several lines of text, which
-  // dominates the dialog's default height. Force the initial height to the
-  // layout minimum (honoring each QPlainTextEdit's minimumHeight above). The
-  // user can still drag the dialog larger.
-  this->resize(this->sizeHint().width(), mainLayout->minimumSize().height());
+  outerLayout->addLayout(bottomLayout);
+
+  // Populate from spec.
+  RebuildFromSpec(spec);
+
+  resize(480, 500);
 }
 
 mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
 {
-  auto spec = m_Spec;
+  mitk::PipInstallSpec spec;
 
-  for (int i = 0; i < static_cast<int>(m_GroupWidgets.size()); ++i)
+  spec.name = m_NameEdit->text().trimmed().toStdString();
+  spec.venvName = m_VenvNameEdit->text().trimmed().toStdString();
+  spec.upgradePipFirst = m_UpgradePipFirstCheckBox->isChecked();
+
+  for (const auto& widgets : m_GroupWidgets)
   {
-    auto& group = spec.groups[i];
-    const auto& widgets = m_GroupWidgets[i];
+    mitk::PipInstallGroup group;
 
-    group.requirements.clear();
     auto lines = widgets.requirements->toPlainText().split('\n', Qt::SkipEmptyParts);
     for (const auto& line : lines)
     {
@@ -152,24 +138,24 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
     // Use shell-style tokenization so quoted arguments like
     //   --find-links "D:/my packages"
     // survive a round trip through the dialog.
-    group.extraPipArgs.clear();
     const auto args = QProcess::splitCommand(widgets.extraPipArgs->text());
     for (const auto& arg : args)
     {
       if (!arg.isEmpty())
         group.extraPipArgs.push_back(arg.toStdString());
     }
+
+    spec.groups.push_back(std::move(group));
   }
 
-  for (int i = 0; i < static_cast<int>(m_DownloadWidgets.size()); ++i)
+  for (const auto& widgets : m_DownloadWidgets)
   {
-    auto& download = spec.huggingFaceDownloads[i];
-    const auto& widgets = m_DownloadWidgets[i];
+    mitk::HuggingFaceDownload download;
 
+    download.displayName = widgets.displayName->text().trimmed().toStdString();
     download.repoId = widgets.repoId->text().trimmed().toStdString();
 
-    download.allowPatterns.clear();
-    const auto lines = widgets.allowPatterns->toPlainText().split('\n', Qt::SkipEmptyParts);
+    auto lines = widgets.allowPatterns->toPlainText().split('\n', Qt::SkipEmptyParts);
     for (const auto& line : lines)
     {
       const auto trimmed = line.trimmed();
@@ -178,9 +164,245 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
     }
 
     download.optional = widgets.optionalCheckBox->isChecked();
+
+    spec.huggingFaceDownloads.push_back(std::move(download));
   }
 
-  spec.upgradePipFirst = m_UpgradePipFirstCheckBox->isChecked();
-
   return spec;
+}
+
+QGroupBox* QmitkPipInstallAdvancedDialog::CreateGroupWidget(const mitk::PipInstallGroup& group, int index)
+{
+  auto* groupBox = new QGroupBox(QString("Install Group %1").arg(index + 1));
+  auto* layout = new QVBoxLayout(groupBox);
+  auto* formLayout = new QFormLayout;
+
+  auto* requirements = new QPlainTextEdit;
+  requirements->setTabChangesFocus(true);
+  requirements->setMinimumHeight(60);
+  requirements->setPlaceholderText("One requirement per line (e.g. torch>=2.8.0,<2.9.0)");
+
+  QStringList reqLines;
+  for (const auto& req : group.requirements)
+    reqLines.append(QString::fromStdString(req));
+  requirements->setPlainText(reqLines.join('\n'));
+
+  formLayout->addRow("Requirements:", requirements);
+
+  auto* indexUrl = new QLineEdit;
+  indexUrl->setPlaceholderText("Default (PyPI)");
+  indexUrl->setText(QString::fromStdString(group.indexUrl));
+  formLayout->addRow("Index URL:", indexUrl);
+
+  auto* extraPipArgs = new QLineEdit;
+  extraPipArgs->setPlaceholderText("e.g. --no-cache-dir");
+
+  QStringList argsList;
+  for (const auto& arg : group.extraPipArgs)
+    argsList.append(QString::fromStdString(arg));
+  extraPipArgs->setText(argsList.join(' '));
+
+  formLayout->addRow("Extra pip arguments:", extraPipArgs);
+
+  layout->addLayout(formLayout);
+
+  auto* removeButton = new QPushButton("Remove");
+  layout->addWidget(removeButton, 0, Qt::AlignRight);
+  connect(removeButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnRemoveGroup);
+
+  m_GroupWidgets.push_back({ requirements, indexUrl, extraPipArgs });
+  m_GroupBoxes.push_back(groupBox);
+
+  return groupBox;
+}
+
+QGroupBox* QmitkPipInstallAdvancedDialog::CreateDownloadWidget(const mitk::HuggingFaceDownload& download, int index)
+{
+  auto* groupBox = new QGroupBox(QString("Hugging Face Download %1").arg(index + 1));
+  auto* layout = new QVBoxLayout(groupBox);
+  auto* formLayout = new QFormLayout;
+
+  auto* displayName = new QLineEdit;
+  displayName->setPlaceholderText("Optional label (falls back to repository ID)");
+  displayName->setText(QString::fromStdString(download.displayName));
+  formLayout->addRow("Display name:", displayName);
+
+  auto* repoId = new QLineEdit;
+  repoId->setPlaceholderText("e.g. owner/repository");
+  repoId->setText(QString::fromStdString(download.repoId));
+  formLayout->addRow("Repository ID:", repoId);
+
+  auto* allowPatterns = new QPlainTextEdit;
+  allowPatterns->setTabChangesFocus(true);
+  allowPatterns->setMinimumHeight(60);
+  allowPatterns->setPlaceholderText("One pattern per line, leave empty to download the whole repository");
+
+  QStringList patternLines;
+  for (const auto& p : download.allowPatterns)
+    patternLines.append(QString::fromStdString(p));
+  allowPatterns->setPlainText(patternLines.join('\n'));
+
+  formLayout->addRow("Allow patterns:", allowPatterns);
+
+  auto* optionalCheckBox = new QCheckBox("Optional (failure does not block installation)");
+  optionalCheckBox->setChecked(download.optional);
+  formLayout->addRow("", optionalCheckBox);
+
+  layout->addLayout(formLayout);
+
+  auto* removeButton = new QPushButton("Remove");
+  layout->addWidget(removeButton, 0, Qt::AlignRight);
+  connect(removeButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnRemoveDownload);
+
+  m_DownloadWidgets.push_back({ displayName, repoId, allowPatterns, optionalCheckBox });
+  m_DownloadBoxes.push_back(groupBox);
+
+  return groupBox;
+}
+
+void QmitkPipInstallAdvancedDialog::RenumberGroupTitles()
+{
+  for (int i = 0; i < static_cast<int>(m_GroupBoxes.size()); ++i)
+    m_GroupBoxes[i]->setTitle(QString("Install Group %1").arg(i + 1));
+}
+
+void QmitkPipInstallAdvancedDialog::RenumberDownloadTitles()
+{
+  for (int i = 0; i < static_cast<int>(m_DownloadBoxes.size()); ++i)
+    m_DownloadBoxes[i]->setTitle(QString("Hugging Face Download %1").arg(i + 1));
+}
+
+void QmitkPipInstallAdvancedDialog::RebuildFromSpec(const mitk::PipInstallSpec& spec)
+{
+  // Clear existing groups.
+  for (auto* box : m_GroupBoxes)
+    delete box;
+
+  m_GroupWidgets.clear();
+  m_GroupBoxes.clear();
+
+  // Clear existing downloads.
+  for (auto* box : m_DownloadBoxes)
+    delete box;
+
+  m_DownloadWidgets.clear();
+  m_DownloadBoxes.clear();
+
+  // Populate general fields.
+  m_NameEdit->setText(QString::fromStdString(spec.name));
+  m_VenvNameEdit->setText(QString::fromStdString(spec.venvName));
+  m_UpgradePipFirstCheckBox->setChecked(spec.upgradePipFirst);
+
+  // Populate groups.
+  for (int i = 0; i < static_cast<int>(spec.groups.size()); ++i)
+    m_GroupsLayout->addWidget(CreateGroupWidget(spec.groups[i], i));
+
+  // Populate downloads.
+  for (int i = 0; i < static_cast<int>(spec.huggingFaceDownloads.size()); ++i)
+    m_DownloadsLayout->addWidget(CreateDownloadWidget(spec.huggingFaceDownloads[i], i));
+}
+
+void QmitkPipInstallAdvancedDialog::OnAddGroup()
+{
+  int index = static_cast<int>(m_GroupBoxes.size());
+  m_GroupsLayout->addWidget(CreateGroupWidget(mitk::PipInstallGroup(), index));
+}
+
+void QmitkPipInstallAdvancedDialog::OnRemoveGroup()
+{
+  auto* button = qobject_cast<QPushButton*>(sender());
+  if (!button)
+    return;
+
+  // Walk up from the button to find the QGroupBox it belongs to.
+  auto* groupBox = qobject_cast<QGroupBox*>(button->parentWidget());
+  if (!groupBox)
+    return;
+
+  auto it = std::find(m_GroupBoxes.begin(), m_GroupBoxes.end(), groupBox);
+  if (it == m_GroupBoxes.end())
+    return;
+
+  int index = static_cast<int>(std::distance(m_GroupBoxes.begin(), it));
+
+  m_GroupBoxes.erase(m_GroupBoxes.begin() + index);
+  m_GroupWidgets.erase(m_GroupWidgets.begin() + index);
+  delete groupBox;
+
+  RenumberGroupTitles();
+}
+
+void QmitkPipInstallAdvancedDialog::OnAddDownload()
+{
+  int index = static_cast<int>(m_DownloadBoxes.size());
+  m_DownloadsLayout->addWidget(CreateDownloadWidget(mitk::HuggingFaceDownload(), index));
+}
+
+void QmitkPipInstallAdvancedDialog::OnRemoveDownload()
+{
+  auto* button = qobject_cast<QPushButton*>(sender());
+  if (!button)
+    return;
+
+  auto* groupBox = qobject_cast<QGroupBox*>(button->parentWidget());
+  if (!groupBox)
+    return;
+
+  auto it = std::find(m_DownloadBoxes.begin(), m_DownloadBoxes.end(), groupBox);
+  if (it == m_DownloadBoxes.end())
+    return;
+
+  int index = static_cast<int>(std::distance(m_DownloadBoxes.begin(), it));
+
+  m_DownloadBoxes.erase(m_DownloadBoxes.begin() + index);
+  m_DownloadWidgets.erase(m_DownloadWidgets.begin() + index);
+  delete groupBox;
+
+  RenumberDownloadTitles();
+}
+
+void QmitkPipInstallAdvancedDialog::OnLoadSpec()
+{
+  auto path = QFileDialog::getOpenFileName(this, "Load Install Spec", QString(), "JSON Files (*.json)");
+
+  if (path.isEmpty())
+    return;
+
+  try
+  {
+    auto spec = mitk::PipInstallSpec::FromFile(path.toStdString());
+    RebuildFromSpec(spec);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox msgBox(QMessageBox::Warning, "Load failed",
+      QString("The file \"%1\" could not be loaded. Make sure it is a valid MITK pip install spec (JSON).").arg(path),
+      QMessageBox::Ok, this);
+    msgBox.setDetailedText(QString::fromUtf8(e.what()));
+    msgBox.exec();
+  }
+}
+
+void QmitkPipInstallAdvancedDialog::OnSaveSpec()
+{
+  auto defaultName = m_NameEdit->text().trimmed();
+
+  defaultName = !defaultName.isEmpty()
+    ? defaultName.toLower().replace(' ', '_') + "_install_spec"
+    : "install_spec";
+
+  auto path = QFileDialog::getSaveFileName(this, "Save Install Spec", defaultName + ".json", "JSON Files (*.json)");
+
+  if (path.isEmpty())
+    return;
+
+  try
+  {
+    auto spec = GetInstallSpec();
+    spec.SaveToFile(path.toStdString());
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, "Save failed", QString::fromUtf8(e.what()));
+  }
 }

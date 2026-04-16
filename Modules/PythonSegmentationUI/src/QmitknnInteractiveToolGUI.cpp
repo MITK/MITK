@@ -36,22 +36,13 @@ MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, 
 
 namespace
 {
-  // With PyTorch v2.9.0, nnInteractive has a 4x performance regression.
-  // Starting with PyTorch v2.9.1, support for the GeForce 10-series GPUs is dropped.
-  constexpr auto TORCH = "torch>=2.8.0,<2.9.0";
-
-  constexpr auto TORCH_VISION = "torchvision>=0.23.0,<1.0.0";
-  constexpr auto NNINTERACTIVE = "nninteractive>=1.1.2,<2.0.0";
-
-#if defined(_WIN32)
-  // Starting with CUDA v12.9 we get the following error on our lowest
-  // supported GPU architecture (e.g. GeForce 10 Series):
-  //   torch.AcceleratorError: CUDA error: no kernel image is available
-  //   for exec
-  constexpr auto CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu128";
-#endif
-
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
+
+  void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
+  {
+    for (std::string::size_type pos = 0; (pos = str.find(from, pos)) != std::string::npos; pos += to.size())
+      str.replace(pos, from.size(), to);
+  }
 
   void SetIcon(QAbstractButton* button, const char* icon)
   {
@@ -304,19 +295,23 @@ bool QmitknnInteractiveToolGUI::Install()
       return true;
   }
 
-  mitk::PipInstallSpec spec;
-  spec.name = "nnInteractive";
-  spec.venvName = venvName;
+  // Load the base spec from the embedded JSON resource and resolve placeholders.
+  auto spec = mitk::PipInstallSpec::FromResource(":/nnInteractive/install_spec.json");
 
-  // PyTorch needs --index-url for CUDA builds on Windows, so it goes in its own group.
-  mitk::PipInstallGroup pytorchGroup({ TORCH, TORCH_VISION });
+  // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
+  // the placeholder is cleared so pip uses the default PyPI index.
 #if defined(_WIN32)
-  pytorchGroup.indexUrl = CUDA_INDEX_URL;
+  // Starting with CUDA v12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
+#else
+  const std::string cudaIndexUrl;
 #endif
-  spec.groups.push_back(std::move(pytorchGroup));
 
-  // nnInteractive installs from default PyPI.
-  spec.groups.push_back({ NNINTERACTIVE });
+  for (auto& group : spec.groups)
+    ReplaceAll(group.indexUrl, "${cudaIndexUrl}", cudaIndexUrl);
 
   // Pre-fetch the model weights so the first StartSession() doesn't surprise
   // the user with a silent multi-minute download. The checkpoint name mirrors
@@ -325,12 +320,13 @@ bool QmitknnInteractiveToolGUI::Install()
   auto* prefs = prefsService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   const auto checkpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
 
-  mitk::HuggingFaceDownload model;
-  model.repoId = "nnInteractive/nnInteractive";
-  model.allowPatterns = { checkpoint + "/*" };
-  model.displayName = "model checkpoint " + checkpoint;
-  model.optional = true;
-  spec.huggingFaceDownloads.push_back(std::move(model));
+  for (auto& download : spec.huggingFaceDownloads)
+  {
+    for (auto& pattern : download.allowPatterns)
+      ReplaceAll(pattern, "${modelCheckpoint}", checkpoint);
+
+    ReplaceAll(download.displayName, "${modelCheckpoint}", checkpoint);
+  }
 
   QmitkPipInstallDialog dialog(spec);
 

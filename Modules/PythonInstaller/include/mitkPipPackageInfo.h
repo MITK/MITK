@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include <MitkPythonInstallerExports.h>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <string>
 #include <vector>
 
@@ -102,7 +104,39 @@ namespace mitk
     std::vector<PipInstallGroup> groups;   /**< Install groups, processed in order. */
     bool upgradePipFirst = true;           /**< Whether to upgrade pip before installing. */
     std::vector<HuggingFaceDownload> huggingFaceDownloads; /**< Model weights to fetch after pip install. */
+
+    /** \brief Load a PipInstallSpec from a JSON file.
+     *
+     * \param[in] path File system path to a .json file.
+     * \return The deserialized install spec.
+     * \throws std::runtime_error If the file cannot be read or parsed.
+     */
+    static PipInstallSpec FromFile(const std::string& path);
+
+    /** \brief Load a PipInstallSpec from a Qt resource path.
+     *
+     * \param[in] resourcePath Qt resource path, e.g. ":/nnInteractive/install_spec.json".
+     * \return The deserialized install spec.
+     * \throws std::runtime_error If the resource cannot be read or parsed.
+     */
+    static PipInstallSpec FromResource(const std::string& resourcePath);
+
+    /** \brief Save this PipInstallSpec to a JSON file.
+     *
+     * \param[in] path File system path to write.
+     * \throws std::runtime_error If the file cannot be written.
+     */
+    void SaveToFile(const std::string& path) const;
   };
+
+  MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, PipInstallGroup& g);
+  MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const PipInstallGroup& g);
+
+  MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, HuggingFaceDownload& d);
+  MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const HuggingFaceDownload& d);
+
+  MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, PipInstallSpec& s);
+  MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const PipInstallSpec& s);
 }
 
 #endif

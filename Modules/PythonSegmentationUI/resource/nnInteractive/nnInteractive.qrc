@@ -4,5 +4,6 @@
     <file alias="Negative">Negative.svg</file>
     <file alias="Positive">Positive.svg</file>
     <file alias="Reset">Reset.svg</file>
+    <file alias="install_spec.json">install_spec.json</file>
   </qresource>
 </RCC>

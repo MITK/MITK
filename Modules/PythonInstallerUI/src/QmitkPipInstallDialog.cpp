@@ -69,10 +69,8 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationStarted, this, &QmitkPipInstallDialog::OnVirtualEnvCreationStarted);
   connect(m_Installer, &mitk::PipInstaller::PipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
   connect(m_Installer, &mitk::PipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
-  connect(m_Installer, &mitk::PipInstaller::ResolveFinished, this, &QmitkPipInstallDialog::OnResolveFinished);
   connect(m_Installer, &mitk::PipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
   connect(m_Installer, &mitk::PipInstaller::ModelDownloadStarted, this, &QmitkPipInstallDialog::OnModelDownloadStarted);
-  connect(m_Installer, &mitk::PipInstaller::ModelDownloadFinished, this, &QmitkPipInstallDialog::OnModelDownloadFinished);
   connect(m_Installer, &mitk::PipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
   connect(m_Installer, &mitk::PipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
@@ -128,11 +126,15 @@ void QmitkPipInstallDialog::OnAdvancedSettingsClicked()
 void QmitkPipInstallDialog::OnInstallClicked()
 {
   // Total steps: 1 (venv, if needed) + 1 (pip upgrade, if requested) + 2 per
-  // group + 1 per Hugging Face model download.
+  // group + 1 per Hugging Face model download. The installer appends a
+  // synthetic huggingface_hub install group when Hugging Face downloads are
+  // present, so count that extra group here too.
   bool needsVirtualEnv = !m_Spec.venvName.empty() &&
                    !mitk::PythonHelper::VirtualEnvExists(m_Spec.venvName);
+  int effectiveGroups = static_cast<int>(m_Spec.groups.size()) +
+                        (m_Spec.huggingFaceDownloads.empty() ? 0 : 1);
   m_TotalSteps = (needsVirtualEnv ? 1 : 0) + (m_Spec.upgradePipFirst ? 1 : 0) +
-                 2 * static_cast<int>(m_Spec.groups.size()) +
+                 2 * effectiveGroups +
                  static_cast<int>(m_Spec.huggingFaceDownloads.size());
   m_CurrentStep = 0;
 
@@ -169,20 +171,6 @@ void QmitkPipInstallDialog::OnResolveStarted()
   this->SetStatus("Resolve dependencies");
   m_Ui->progressBar->setRange(0, 0);
   m_Ui->packageLabel->hide();
-}
-
-void QmitkPipInstallDialog::OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& /*packages*/)
-{
-  if (!success)
-  {
-    m_DotTimer->stop();
-    this->SetUiFinished(false);
-    this->SetTerminalStatus("Installation failed. Could not resolve dependencies.");
-    m_Ui->packageLabel->hide();
-    m_Ui->progressBar->hide();
-    this->OfferDetails();
-    return;
-  }
 }
 
 void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status)
@@ -227,13 +215,6 @@ void QmitkPipInstallDialog::OnModelDownloadStarted(const QString& displayName)
   m_Ui->packageLabel->setText(m_PackageLabelBaseText);
   m_Ui->packageLabel->show();
   m_DotTimer->start();
-}
-
-void QmitkPipInstallDialog::OnModelDownloadFinished(const QString& /*displayName*/, bool /*success*/)
-{
-  // Per-download terminal: stop the dot animation. Aggregate success/failure
-  // is handled by OnInstallFinished, which runs after the last download.
-  m_DotTimer->stop();
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)
@@ -322,8 +303,14 @@ bool QmitkPipInstallDialog::ConfirmCancel()
   // has run (it removes the venv that we created) and emits InstallFinished.
   // Without this, the dialog would close as soon as ConfirmCancel returned
   // and the engine would be destroyed before OnProcessFinished could fire.
+  //
+  // Safety cap: if the pip kill or the venv removal wedges (AV holding files
+  // open, zombie subprocess on Windows, etc.), quit the loop after 30 s so
+  // the dialog can close instead of locking forever. A legitimate
+  // fs::remove_all is comfortably inside that envelope even on a slow disk.
   QEventLoop loop;
   connect(m_Installer, &mitk::PipInstaller::InstallFinished, &loop, &QEventLoop::quit);
+  QTimer::singleShot(30000, &loop, &QEventLoop::quit);
   m_Installer->Cancel();
   loop.exec();
 
@@ -345,6 +332,9 @@ void QmitkPipInstallDialog::SetUiInstalling()
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Ok))
     button->setEnabled(false);
 
+  // Allow SetTerminalStatus to publish a new terminal message for this run.
+  m_TerminalStatusSet = false;
+
   m_Ui->statusLabel->show();
   m_Ui->packageLabel->clear();
 }
@@ -357,7 +347,16 @@ void QmitkPipInstallDialog::SetStatus(const QString& text)
 
 void QmitkPipInstallDialog::SetTerminalStatus(const QString& text)
 {
+  // The first specific terminal message wins. This lets OnErrorOccurred
+  // publish a precise cause (e.g. "Python executable not found") without
+  // the subsequent OnInstallFinished(false) overwriting it with the
+  // generic fallback. Reset in SetUiInstalling so retries can publish a
+  // new terminal message.
+  if (m_TerminalStatusSet)
+    return;
+
   m_Ui->statusLabel->setText(text);
+  m_TerminalStatusSet = true;
 }
 
 void QmitkPipInstallDialog::SetUiFinished(bool success)

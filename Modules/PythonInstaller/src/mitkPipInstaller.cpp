@@ -181,6 +181,20 @@ void mitk::PipInstaller::StartInstall()
   m_CurrentDownload = 0;
   m_AnyFailed = false;
 
+  // Build the working group list. If the spec has Hugging Face downloads,
+  // append a synthetic group that pulls huggingface_hub so the inline
+  // snapshot_download script in StartModelDownload can always import it.
+  // Pip fast-paths the "already satisfied" case when an earlier user group
+  // pulled huggingface_hub transitively, so this costs only a few seconds
+  // there and becomes load-bearing when no user group does.
+  m_Groups = m_Spec.groups;
+  if (!m_Spec.huggingFaceDownloads.empty())
+  {
+    PipInstallGroup hfGroup;
+    hfGroup.requirements = { "huggingface_hub" };
+    m_Groups.push_back(std::move(hfGroup));
+  }
+
   // m_CreatedVirtualEnv is intentionally not reset here. If a prior attempt
   // created the venv, a retry reuses it (BeginVirtualEnvPhase sees it exists
   // and skips creation), so cleanup responsibility must survive the retry.
@@ -265,14 +279,12 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     if (!success)
     {
       m_State = State::Failed;
-      emit VirtualEnvCreationFinished(false);
       emit ErrorOccurred("Failed to create virtual environment.");
       emit InstallFinished(false);
       return;
     }
 
     PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
-    emit VirtualEnvCreationFinished(true);
 
     if (m_Spec.upgradePipFirst)
     {
@@ -288,8 +300,6 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
   case State::UpgradingPip:
   {
-    emit PipUpgradeFinished(success);
-
     // pip upgrade failure is non-fatal - proceed to resolve first group.
     m_State = State::Resolving;
     emit ResolveStarted();
@@ -302,21 +312,20 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     if (!success)
     {
       m_State = State::Failed;
-      emit ResolveFinished(false, {});
+      emit ErrorOccurred("Could not resolve all dependencies.");
+      emit InstallFinished(false);
       return;
     }
 
     if (!ParseResolveReport(m_ReportFile.fileName(), m_CurrentGroup))
     {
+      // ParseResolveReport has already emitted ErrorOccurred with a specific message.
       m_State = State::Failed;
-      emit ResolveFinished(false, {});
+      emit InstallFinished(false);
       return;
     }
 
     numPackages = static_cast<int>(m_ResolvedPackages.size());
-
-    // Per-group success notification with the list as it grows.
-    emit ResolveFinished(true, m_ResolvedPackages);
 
     // Install this group's packages before resolving the next group.
     // This ensures that when the next group is resolved, pip sees
@@ -339,11 +348,21 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
   case State::Installing:
   {
+    const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
+    auto name = QString::fromStdString(pkg.name);
     auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
-    emit PackageStatusChanged(m_CurrentPackage, QString::fromStdString(m_ResolvedPackages[m_CurrentPackage].name), status);
+    emit PackageStatusChanged(m_CurrentPackage, name, status);
 
     if (!success)
+    {
+      // Report the first package failure so the UI's one-shot terminal
+      // status has something specific to display. Subsequent failures are
+      // still logged via PackageStatusChanged / OutputReceived, but the
+      // first one wins the headline.
+      if (!m_AnyFailed)
+        emit ErrorOccurred(QString("Failed to install %1.").arg(name));
       m_AnyFailed = true;
+    }
 
     m_CurrentPackage++;
     emit ProgressChanged(m_CurrentPackage, numPackages);
@@ -363,13 +382,15 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   case State::DownloadingModels:
   {
     const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
-    auto displayName = QString::fromStdString(
-      download.displayName.empty() ? download.repoId : download.displayName);
-
-    emit ModelDownloadFinished(displayName, success);
 
     if (!success && !download.optional)
+    {
+      auto displayName = QString::fromStdString(
+        download.displayName.empty() ? download.repoId : download.displayName);
+      if (!m_AnyFailed)
+        emit ErrorOccurred(QString("Failed to download %1.").arg(displayName));
       m_AnyFailed = true;
+    }
 
     m_CurrentDownload++;
 
@@ -450,14 +471,14 @@ void mitk::PipInstaller::StartResolveGroup()
   if (python.isEmpty())
     return;
 
-  if (m_CurrentGroup >= static_cast<int>(m_Spec.groups.size()))
+  if (m_CurrentGroup >= static_cast<int>(m_Groups.size()))
   {
     BeginModelDownloadPhase();
     return;
   }
 
   m_GroupStartIndex = static_cast<int>(m_ResolvedPackages.size());
-  const auto& group = m_Spec.groups[m_CurrentGroup];
+  const auto& group = m_Groups[m_CurrentGroup];
 
   // m_ReportFile is reused across groups: the underlying temp file path is
   // stable for the lifetime of this PipInstaller, but we close the Qt handle
@@ -503,7 +524,7 @@ void mitk::PipInstaller::StartInstallPackage()
   const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
   emit PackageStatusChanged(m_CurrentPackage, QString::fromStdString(pkg.name), PackageStatus::Installing);
 
-  const auto& group = m_Spec.groups[pkg.group];
+  const auto& group = m_Groups[pkg.group];
 
   // Direct references (VCS URLs, PEP 508 "name @ url") must be passed as-is
   // so pip fetches from the URL instead of searching PyPI for name==version.
@@ -547,34 +568,23 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
   auto data = file.readAll();
   file.close();
 
+  // The report format is specified at
+  // https://pip.pypa.io/en/stable/reference/installation-report/. We rely
+  // on the outer catch to surface any deviation - every field we access
+  // here is required by that spec (plus PEP 426 for name / version).
+  // `requested` is the one genuinely optional field.
   try
   {
     auto report = nlohmann::json::parse(data.constData(), data.constData() + data.size());
+    const auto& group = m_Groups[groupIndex];
 
-    if (!report.contains("install") || !report["install"].is_array())
-    {
-      MITK_ERROR << "Report file has no 'install' array.";
-      emit ErrorOccurred("Unexpected pip report format.");
-      return false;
-    }
-
-    const auto& group = m_Spec.groups[groupIndex];
-
-    for (const auto& entry : report["install"])
+    for (const auto& entry : report.at("install"))
     {
       PipPackageInfo info;
 
-      if (entry.contains("metadata"))
-      {
-        const auto& metadata = entry["metadata"];
-
-        if (metadata.contains("name"))
-          info.name = metadata["name"].get<std::string>();
-
-        if (metadata.contains("version"))
-          info.version = metadata["version"].get<std::string>();
-      }
-
+      const auto& metadata = entry.at("metadata");
+      info.name = metadata.at("name").get<std::string>();
+      info.version = metadata.at("version").get<std::string>();
       info.requested = entry.value("requested", false);
       info.group = groupIndex;
 
@@ -641,7 +651,7 @@ void mitk::PipInstaller::AdvanceToNextGroup()
   m_CurrentGroup++;
   m_GroupStartIndex = static_cast<int>(m_ResolvedPackages.size());
 
-  if (m_CurrentGroup < static_cast<int>(m_Spec.groups.size()))
+  if (m_CurrentGroup < static_cast<int>(m_Groups.size()))
   {
     m_State = State::Resolving;
     emit ResolveStarted();

@@ -39,7 +39,10 @@ namespace mitk
     std::string specifier;  /**< Original requirement, e.g. "torch>=2.8.0,<2.9.0".
                                  Empty for transitive dependencies. */
     bool requested = false; /**< True if explicitly requested, false if transitive. */
-    int group = 0;          /**< Index of the install group this package belongs to. */
+    int group = 0;          /**< Index of the install group this package belongs to.
+                                 Indexes the installer's working list, which may include
+                                 an implicit trailing group for huggingface_hub when the
+                                 spec carries Hugging Face downloads. */
   };
 
   /** \brief A set of packages that share the same pip options.

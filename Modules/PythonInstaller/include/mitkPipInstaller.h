@@ -95,7 +95,9 @@ namespace mitk
 
     /** \brief The full list of resolved packages across all groups.
      *
-     * Populated after ResolveFinished() is emitted.
+     * Grows as each group resolves: after ParseResolveReport emits the
+     * per-package Pending entries via PackageStatusChanged, those entries
+     * are present in this list. Fully populated before InstallFinished.
      */
     const std::vector<PipPackageInfo>& GetResolvedPackages() const;
 
@@ -103,38 +105,16 @@ namespace mitk
     /** \brief Emitted when virtual environment creation starts. */
     void VirtualEnvCreationStarted();
 
-    /** \brief Emitted when virtual environment creation finishes.
-     *
-     * \param[in] success Whether creation succeeded.
-     */
-    void VirtualEnvCreationFinished(bool success);
-
     /** \brief Emitted when the pip upgrade step starts. */
     void PipUpgradeStarted();
-
-    /** \brief Emitted when the pip upgrade step finishes.
-     *
-     * \param[in] success Whether the upgrade succeeded. Failure is non-fatal.
-     */
-    void PipUpgradeFinished(bool success);
 
     /** \brief Emitted when resolution of a group starts. */
     void ResolveStarted();
 
-    /** \brief Emitted when a group's resolution finishes.
-     *
-     * In a multi-group spec this fires once per group on success, with the
-     * list growing as additional groups are resolved. Fires with success ==
-     * false if pip's dependency resolver could not satisfy the requirements.
-     * Setup failures (Python not found, etc.) surface via InstallFinished
-     * instead.
-     *
-     * \param[in] success Whether resolution succeeded.
-     * \param[in] packages The accumulated list of resolved packages so far.
-     */
-    void ResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
-
     /** \brief Emitted when a package's installation status changes.
+     *
+     * During resolve, fires once per resolved package with status Pending.
+     * During install, fires with status Installing, Installed, or Failed.
      *
      * \param[in] index Index into the resolved packages list.
      * \param[in] name The package name.
@@ -150,25 +130,19 @@ namespace mitk
      */
     void ModelDownloadStarted(const QString& displayName);
 
-    /** \brief Emitted when a Hugging Face model download finishes.
+    /** \brief Emitted when the installation terminates.
      *
-     * Fired once per entry on completion or failure. A failure here flips the
-     * terminal InstallFinished to \c false but does not abort remaining
-     * downloads - each model's failure is independent (if a user cancelled,
-     * the Cancel path takes over before any more downloads start).
+     * Fires exactly once per StartInstall() call, covering both success and
+     * every failure mode (resolve failure, package install failure, model
+     * download failure of a non-optional download, setup errors).
      *
-     * \param[in] displayName The download's display name.
-     * \param[in] success Whether the download succeeded.
-     */
-    void ModelDownloadFinished(const QString& displayName, bool success);
-
-    /** \brief Emitted when all packages have been installed (or installation failed).
-     *
-     * If the spec includes Hugging Face downloads, this fires only after
-     * those downloads have also finished.
+     * Setup and failure messages arrive via ErrorOccurred before this
+     * signal; consumers that want to display a specific cause should use
+     * that signal (or accumulated OutputReceived) rather than relying on
+     * a per-phase Finished signal.
      *
      * \param[in] success True only if every package installed successfully
-     *                    and every model download succeeded.
+     *                    and every non-optional model download succeeded.
      */
     void InstallFinished(bool success);
 
@@ -223,6 +197,13 @@ namespace mitk
     void RemoveCreatedVirtualEnv();
 
     PipInstallSpec m_Spec;
+
+    // Working copy of the groups driving the current install run. Equals
+    // m_Spec.groups plus, when m_Spec.huggingFaceDownloads is non-empty,
+    // a trailing synthetic group with huggingface_hub so the inline
+    // snapshot_download script in StartModelDownload can always import it.
+    // Rebuilt in StartInstall() so the synthetic group survives retries.
+    std::vector<PipInstallGroup> m_Groups;
     std::vector<PipPackageInfo> m_ResolvedPackages;
 
     QProcess* m_Process = nullptr;

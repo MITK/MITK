@@ -72,10 +72,8 @@ private slots:
   void OnVirtualEnvCreationStarted();
   void OnPipUpgradeStarted();
   void OnResolveStarted();
-  void OnResolveFinished(bool success, const std::vector<mitk::PipPackageInfo>& packages);
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
   void OnModelDownloadStarted(const QString& displayName);
-  void OnModelDownloadFinished(const QString& displayName, bool success);
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
@@ -103,6 +101,7 @@ private:
   int m_CompactHeight = 0;
   int m_ExpandedHeight = 0;
   bool m_IsCancelling = false;
+  bool m_TerminalStatusSet = false;
 };
 
 #endif

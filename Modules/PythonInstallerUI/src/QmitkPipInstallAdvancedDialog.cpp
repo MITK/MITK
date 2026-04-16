@@ -108,7 +108,7 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
 
     m_DownloadWidgets.push_back({ repoId, allowPatterns, optionalCheckBox });
 
-    auto* groupBox = new QGroupBox(QString("Model Download %1").arg(i + 1));
+    auto* groupBox = new QGroupBox(QString("Hugging Face Download %1").arg(i + 1));
     groupBox->setLayout(formLayout);
     mainLayout->addWidget(groupBox);
   }

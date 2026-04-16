@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <iostream>
 
 #include <QFile>
+#include <QRegularExpression>
 
 namespace
 {
@@ -37,6 +38,10 @@ namespace
       result += ' ';
       result += quote(arg);
     }
+    // Redact credentials from URLs: "://user:password@" -> "://****:****@"
+    static QRegularExpression credentialPattern("://[^/@]+:[^/@]+@");
+    result.replace(credentialPattern, "://****:****@");
+
     return result;
   }
 
@@ -81,6 +86,21 @@ namespace
         break;
     }
     return requirement.substr(0, end);
+  }
+
+  // Check whether a requirement is a direct reference (VCS URL or PEP 508
+  // "name @ url" form) rather than a regular PyPI specifier.
+  bool IsDirectReference(const std::string& req)
+  {
+    // Bare VCS URL: git+https://..., hg+https://..., etc.
+    if (req.size() > 4 &&
+        (req.compare(0, 4, "git+") == 0 || req.compare(0, 3, "hg+") == 0 ||
+         req.compare(0, 4, "svn+") == 0 || req.compare(0, 4, "bzr+") == 0))
+      return true;
+
+    // PEP 508 direct reference: "name @ https://..." or "name @ git+https://..."
+    auto pos = req.find(" @ ");
+    return pos != std::string::npos && pos + 3 < req.size();
   }
 
   // Format a std::string as a Python single-quoted string literal.
@@ -533,8 +553,15 @@ void mitk::PipInstaller::StartInstallPackage()
 
   const auto& group = m_Spec.groups[pkg.group];
 
-  QStringList args = { "-m", "pip", "install", "--no-deps",
-                        QString::fromStdString(pkg.name) + "==" + QString::fromStdString(pkg.version) };
+  // Direct references (VCS URLs, PEP 508 "name @ url") must be passed as-is
+  // so pip fetches from the URL instead of searching PyPI for name==version.
+  QString installArg;
+  if (!pkg.specifier.empty() && IsDirectReference(pkg.specifier))
+    installArg = QString::fromStdString(pkg.specifier);
+  else
+    installArg = QString::fromStdString(pkg.name) + "==" + QString::fromStdString(pkg.version);
+
+  QStringList args = { "-m", "pip", "install", "--no-deps", installArg };
   args = BuildPipArgs(args, group);
 
   MITK_INFO << FormatCommand(python, args).toStdString();
@@ -611,6 +638,34 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
         {
           info.specifier = req;
           break;
+        }
+      }
+
+      // Bare VCS URLs (git+https://...) have no extractable package name, so
+      // the loop above cannot match them. Fall back to matching requested
+      // packages against unclaimed direct-reference requirements.
+      if (info.specifier.empty() && info.requested)
+      {
+        for (const auto& req : group.requirements)
+        {
+          if (!IsDirectReference(req))
+            continue;
+
+          bool alreadyClaimed = false;
+          for (const auto& existing : m_ResolvedPackages)
+          {
+            if (existing.specifier == req)
+            {
+              alreadyClaimed = true;
+              break;
+            }
+          }
+
+          if (!alreadyClaimed)
+          {
+            info.specifier = req;
+            break;
+          }
         }
       }
 

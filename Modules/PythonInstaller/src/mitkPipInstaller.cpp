@@ -257,7 +257,6 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
   bool success = exitStatus == QProcess::NormalExit && exitCode == 0;
   auto numPackages = static_cast<int>(m_ResolvedPackages.size());
-  auto numGroups = static_cast<int>(m_Spec.groups.size());
 
   switch (m_State)
   {

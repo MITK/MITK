@@ -55,6 +55,7 @@ private:
   {
     QLineEdit* repoId;
     QPlainTextEdit* allowPatterns;
+    QCheckBox* optionalCheckBox;
   };
 
   mitk::PipInstallSpec m_Spec;

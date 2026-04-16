@@ -396,7 +396,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
     emit ModelDownloadFinished(displayName, success);
 
-    if (!success)
+    if (!success && !download.optional)
       m_AnyFailed = true;
 
     m_CurrentDownload++;

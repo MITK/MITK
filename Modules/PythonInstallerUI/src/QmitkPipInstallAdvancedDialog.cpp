@@ -102,7 +102,11 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
 
     formLayout->addRow("Allow patterns:", allowPatterns);
 
-    m_DownloadWidgets.push_back({ repoId, allowPatterns });
+    auto* optionalCheckBox = new QCheckBox("Optional (failure does not block installation)");
+    optionalCheckBox->setChecked(download.optional);
+    formLayout->addRow("", optionalCheckBox);
+
+    m_DownloadWidgets.push_back({ repoId, allowPatterns, optionalCheckBox });
 
     auto* groupBox = new QGroupBox(QString("Model Download %1").arg(i + 1));
     groupBox->setLayout(formLayout);
@@ -172,6 +176,8 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
       if (!trimmed.isEmpty())
         download.allowPatterns.push_back(trimmed.toStdString());
     }
+
+    download.optional = widgets.optionalCheckBox->isChecked();
   }
 
   spec.upgradePipFirst = m_UpgradePipFirstCheckBox->isChecked();

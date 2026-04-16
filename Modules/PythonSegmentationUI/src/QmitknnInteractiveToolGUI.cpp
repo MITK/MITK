@@ -329,6 +329,7 @@ bool QmitknnInteractiveToolGUI::Install()
   model.repoId = "nnInteractive/nnInteractive";
   model.allowPatterns = { checkpoint + "/*" };
   model.displayName = "model checkpoint " + checkpoint;
+  model.optional = true;
   spec.huggingFaceDownloads.push_back(std::move(model));
 
   QmitkPipInstallDialog dialog(spec);

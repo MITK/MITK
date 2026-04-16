@@ -86,6 +86,7 @@ namespace mitk
     std::string repoId;                     /**< Hugging Face repo id, e.g. "nnInteractive/nnInteractive". */
     std::vector<std::string> allowPatterns; /**< Glob patterns to restrict the download. Empty = whole repo. */
     std::string displayName;                /**< Label for the installer UI. Falls back to \c repoId if empty. */
+    bool optional = false;                  /**< If true, a download failure does not fail the overall installation. */
   };
 
   /** \brief Full specification for a pip installation run.

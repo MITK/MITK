@@ -37,14 +37,14 @@ def test_ioutil_reader_preferences(tmp_path):
 
 class TestIOUtilLoad:
 
-    def test_load_image_returns_image(self, mitk_data_dir):
-        path = os.path.join(mitk_data_dir, "Pic3D.nrrd")
+    def test_load_image_returns_image(self, data_dir):
+        path = os.path.join(data_dir, "Pic3D.nrrd")
         results = mitk.IOUtil.load(path)
         assert len(results) >= 1
         assert isinstance(results[0], mitk.Image)
 
-    def test_load_segmentation_returns_multilabelsegmentation(self, mitk_data_dir):
-        path = os.path.join(mitk_data_dir, "Multilabel", "MultilabelSegmentation.nrrd")
+    def test_load_segmentation_returns_multilabelsegmentation(self, data_dir):
+        path = os.path.join(data_dir, "Multilabel", "MultilabelSegmentation.nrrd")
         results = mitk.IOUtil.load(path)
         assert len(results) >= 1
         assert isinstance(results[0], mitk.MultiLabelSegmentation)

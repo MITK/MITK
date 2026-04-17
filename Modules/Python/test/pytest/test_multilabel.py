@@ -703,20 +703,29 @@ class TestRelabelTo:
         assert result is not None
 
     def test_locked_label_ignored_with_regard_locks(self, ref_image):
-        """When overwrite_style=REGARD_LOCKS a locked destination is skipped."""
+        """REGARD_LOCKS protects existing destination voxels that hold a locked label.
+
+        MergeStyle=Replace normally clears destination voxels whose label is absent
+        from the source (i.e. source is background at those positions). With
+        REGARD_LOCKS those voxels must be left untouched when the label is locked.
+        """
         import numpy as np
         seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        # Destination is NOT cleared — it already has v2 pixels at row 1.
         dest = seg.clone()
-        dest.clear_group_images()
         dest.get_label(v2).locked = True
+        # Transfer v1 -> v2 with Replace style. Replace would normally blank the
+        # destination v2 pixels at row 1 (source is background there), but
+        # REGARD_LOCKS must prevent that because v2 is locked.
         result = seg.relabel_to(
             [(v1, v2)],
             dest_seg=dest,
+            merge_style=mitk.MergeStyle.REPLACE,
             overwrite_style=mitk.OverwriteStyle.REGARD_LOCKS,
         )
         arr = result.get_group_image(0).as_numpy()
-        # Destination label was locked — no pixels should be written
-        assert np.all(arr == 0)
+        # Row 1 originally held v2 in dest and v2 is locked — must survive.
+        assert np.all(arr[0, 1, :4] == v2)
 
     def test_label_objects_accepted_in_mapping(self, ref_image):
         """Mapping entries may use Label objects instead of bare ints."""

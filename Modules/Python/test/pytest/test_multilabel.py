@@ -71,6 +71,25 @@ class TestConstruction:
         loaded = mitk.MultiLabelSegmentation.load(path)
         assert loaded.num_groups >= 1
 
+    def test_load_from_plain_image_uses_initialize_by_labeled_image(self, data_dir):
+        # MultilabelSegmentation_group_0.nii.gz is a plain NIfTI image (not a
+        # MultiLabelSegmentation file).  load() must detect this and fall back
+        # to InitializeByLabeledImage, producing a segmentation whose label
+        # values match the unique non-zero pixel values in the image.
+        # According to MultilabelSegmentation_group.mitklabel.json group 0
+        # contains labels with values 1, 2, 3, 4 and 5.
+        path = str(data_dir / "Multilabel" / "MultilabelSegmentation_group_0.nii.gz")
+        seg = mitk.MultiLabelSegmentation.load(path)
+
+        assert seg is not None
+        assert seg.num_groups == 1
+
+        label_values = set(seg.label_values)
+        expected_values = {1, 2, 3, 4, 5}
+        assert expected_values == label_values, (
+            f"Expected label values {expected_values}, got {label_values}"
+        )
+
 
 # ---------------------------------------------------------------------------
 # Re-initialize
@@ -574,6 +593,168 @@ class TestTransferLabels:
             label_mapping=[(l_src.value, l_dst.value)],
             merge_style="merge",
             overwrite_style="ignore_locks")
+
+
+# ---------------------------------------------------------------------------
+# clone / clear_group_images
+# ---------------------------------------------------------------------------
+
+class TestClone:
+
+    def test_clone_preserves_label_structure(self, seg):
+        seg.add_label("A", (1.0, 0.0, 0.0), 0)
+        seg.add_label("B", (0.0, 1.0, 0.0), 0)
+        cloned = seg.clone()
+        assert cloned.num_groups == seg.num_groups
+        assert cloned.label_values == seg.label_values
+        assert cloned.get_label(cloned.label_values[0]).name == \
+               seg.get_label(seg.label_values[0]).name
+
+    def test_clone_is_independent(self, seg):
+        seg.add_label("Original", (1.0, 0.0, 0.0), 0)
+        cloned = seg.clone()
+        cloned.add_label("Extra", (0.0, 0.0, 1.0), 0)
+        assert len(seg.label_values) == 1
+        assert len(cloned.label_values) == 2
+
+    def test_clear_group_images_zeroes_pixels(self, seg):
+        lbl = seg.add_label("C", (1.0, 0.0, 0.0), 0)
+        # Write some pixels manually via numpy round-trip
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 0] = lbl.value
+        import mitk as _mitk
+        seg.update_group_image(0, _mitk.Image.from_numpy(arr), 0, 0)
+        assert seg.get_group_image(0).as_numpy()[0, 0, 0] == lbl.value
+
+        seg.clear_group_images()
+        assert seg.get_group_image(0).as_numpy()[0, 0, 0] == 0
+
+    def test_clear_group_images_timestep(self, seg):
+        seg.clear_group_images(time_step=0)  # should not raise
+
+
+# ---------------------------------------------------------------------------
+# relabel_to
+# ---------------------------------------------------------------------------
+
+class TestRelabelTo:
+
+    def _make_seg_with_pixels(self, ref_image):
+        """Helper: seg with two labels, each owning a distinct voxel region."""
+        import numpy as np
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        l1 = seg.add_label("L1", (1.0, 0.0, 0.0), 0)
+        l2 = seg.add_label("L2", (0.0, 1.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, :4] = l1.value
+        arr[0, 1, :4] = l2.value
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), 0, 0)
+        return seg, l1.value, l2.value
+
+    def test_auto_clone_default(self, ref_image):
+        """relabel_to with dest_seg=None returns a new independent segmentation."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        result = seg.relabel_to([(v1, v2)])
+        # result is a different object
+        assert result is not seg
+        # original is untouched
+        orig = seg.get_group_image(0).as_numpy()
+        assert np.any(orig == v1)
+
+    def test_pixels_transferred_to_destination_value(self, ref_image):
+        """Pixels of v1 in source appear as v2 in result."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        result = seg.relabel_to([(v1, v2)])
+        arr = result.get_group_image(0).as_numpy()
+        # The region formerly holding v1 should now hold v2
+        assert np.all(arr[0, 0, :4] == v2)
+
+    def test_unmapped_label_becomes_unlabeled(self, ref_image):
+        """Labels absent from the mapping are not transferred (remain 0)."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        # Only map v1 -> v2; the original v2 pixels (row 1) are not in the mapping
+        # as a source, so they should remain UNLABELED in the result.
+        result = seg.relabel_to([(v1, v2)])
+        arr = result.get_group_image(0).as_numpy()
+        assert np.all(arr[0, 1, :4] == 0)
+
+    def test_explicit_dest_seg(self, ref_image):
+        """Providing dest_seg uses it as the target and returns it."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        dest = seg.clone()
+        dest.clear_group_images()
+        returned = seg.relabel_to([(v1, v2)], dest_seg=dest)
+        assert returned is dest
+        arr = dest.get_group_image(0).as_numpy()
+        assert np.any(arr == v2)
+
+    def test_string_style_aliases(self, ref_image):
+        """merge_style and overwrite_style accept lowercase string aliases."""
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        result = seg.relabel_to(
+            [(v1, v2)],
+            merge_style="replace",
+            overwrite_style="ignore_locks",
+        )
+        assert result is not None
+
+    def test_locked_label_ignored_with_regard_locks(self, ref_image):
+        """When overwrite_style=REGARD_LOCKS a locked destination is skipped."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        dest = seg.clone()
+        dest.clear_group_images()
+        dest.get_label(v2).locked = True
+        result = seg.relabel_to(
+            [(v1, v2)],
+            dest_seg=dest,
+            overwrite_style=mitk.OverwriteStyle.REGARD_LOCKS,
+        )
+        arr = result.get_group_image(0).as_numpy()
+        # Destination label was locked — no pixels should be written
+        assert np.all(arr == 0)
+
+    def test_label_objects_accepted_in_mapping(self, ref_image):
+        """Mapping entries may use Label objects instead of bare ints."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        lbl1 = seg.get_label(v1)
+        lbl2 = seg.get_label(v2)
+        result = seg.relabel_to([(lbl1, lbl2)])
+        arr = result.get_group_image(0).as_numpy()
+        assert np.any(arr == v2)
+
+    def test_keep_untouched_labels_preserves_unmapped_pixels(self, ref_image):
+        """keep_untouched_labels=True leaves pixels of unmapped labels in place."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        # Only remap v1 -> v2; v2's own pixels must survive in the result.
+        result = seg.relabel_to([(v1, v2)], keep_untouched_labels=True)
+        arr = result.get_group_image(0).as_numpy()
+        # Row 0 (v1 source) is now v2; row 1 (original v2) is still v2.
+        assert np.all(arr[0, 0, :4] == v2)
+        assert np.all(arr[0, 1, :4] == v2)
+
+    def test_keep_untouched_labels_false_clears_unmapped(self, ref_image):
+        """keep_untouched_labels=False (default) clears unmapped label pixels."""
+        import numpy as np
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        result = seg.relabel_to([(v1, v2)], keep_untouched_labels=False)
+        arr = result.get_group_image(0).as_numpy()
+        # Row 1 originally held v2 as a source but v2 is not in the source
+        # side of the mapping, so those pixels must be 0 in the result.
+        assert np.all(arr[0, 1, :4] == 0)
+
+    def test_keep_untouched_labels_with_explicit_dest_raises(self, ref_image):
+        """keep_untouched_labels=True combined with dest_seg must raise."""
+        seg, v1, v2 = self._make_seg_with_pixels(ref_image)
+        dest = seg.clone()
+        with pytest.raises(ValueError, match="keep_untouched_labels"):
+            seg.relabel_to([(v1, v2)], dest_seg=dest, keep_untouched_labels=True)
 
 
 # ---------------------------------------------------------------------------

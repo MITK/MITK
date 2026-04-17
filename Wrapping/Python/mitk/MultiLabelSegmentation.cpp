@@ -631,7 +631,23 @@ void InitMultiLabelSegmentation(py::module_& m)
       py::arg("image"))
     .def_static("load",
       [](const std::string& path) {
-        auto s = IOUtil::Load<MultiLabelSegmentation>(path);
+
+        auto dv = IOUtil::Load(path);
+        if (dv.empty())
+          throw py::value_error("Could not load: " + path);
+
+        MultiLabelSegmentation::Pointer s = dynamic_cast<MultiLabelSegmentation*>(dv[0].GetPointer());
+
+        if (s.IsNull())
+        {
+          Image::Pointer i = dynamic_cast<Image*>(dv[0].GetPointer());
+          if (i.IsNotNull())
+          {
+            s = MultiLabelSegmentation::New();
+            s->InitializeByLabeledImage(i);
+          }
+        }
+
         if (s.IsNull())
           throw py::value_error("Could not load: " + path);
         return s;
@@ -872,6 +888,18 @@ void InitMultiLabelSegmentation(py::module_& m)
           seg.ClearGroupImage(index);
       },
       py::arg("index"), py::arg("time_step") = py::none())
+    .def("clear_group_images",
+      [](MultiLabelSegmentation& seg, std::optional<TimeStepType> timeStep) {
+        if (timeStep.has_value())
+          seg.ClearGroupImages(*timeStep);
+        else
+          seg.ClearGroupImages();
+      },
+      py::arg("time_step") = py::none())
+    .def("clone",
+      [](const MultiLabelSegmentation& seg) -> MultiLabelSegmentation::Pointer {
+        return seg.Clone();
+      })
     .def("update_group_image",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
          const Image* source, TimeStepType timeStep, TimeStepType sourceTimeStep) {

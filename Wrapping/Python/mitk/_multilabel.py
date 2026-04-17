@@ -200,3 +200,81 @@ def _patch(MultiLabelSegmentation):
         return _orig_split_class(self, group, labels)
     _split_class_wrapper.__name__ = _orig_split_class.__name__
     MultiLabelSegmentation.split_labels_by_class_name = _split_class_wrapper
+
+    # relabel_to: (label_mapping, *, dest_seg=None, keep_untouched_labels=False,
+    #              merge_style=None, overwrite_style=None)
+    def _relabel_to(self, label_mapping, *, dest_seg=None,
+                    keep_untouched_labels=False,
+                    merge_style=None, overwrite_style=None):
+        """Return a segmentation whose pixel content is the result of applying
+        *label_mapping* to *self*.
+
+        Parameters
+        ----------
+        label_mapping:
+            Iterable of ``(source_value, destination_value)`` pairs.  Each
+            entry is a ``(int|Label, int|Label)`` 2-tuple.
+        dest_seg:
+            Target ``MultiLabelSegmentation``.  If *None* (default), *self* is
+            cloned and used as the target (see *keep_untouched_labels* for how
+            the clone is prepared).  All destination label values referenced in
+            *label_mapping* must already exist in *dest_seg*.
+        keep_untouched_labels:
+            Only valid when *dest_seg* is *None*.  Controls what happens to
+            labels that are **not** listed as a source in *label_mapping*:
+
+            * ``False`` (default) — the clone's group images are cleared before
+              the transfer.  Only pixels of mapped labels appear in the result.
+            * ``True`` — the clone retains its original pixel content.  Mapped
+              labels are remapped in-place; every other label is left untouched.
+              Raises ``ValueError`` when combined with an explicit *dest_seg*
+              because the caller already controls the state of that object.
+        merge_style:
+            ``MergeStyle`` enum value or lowercase string alias
+            (``"replace"`` / ``"merge"``).  Defaults to ``REPLACE``.
+        overwrite_style:
+            ``OverwriteStyle`` enum value or lowercase string alias
+            (``"regard_locks"`` / ``"ignore_locks"``).  Defaults to
+            ``IGNORE_LOCKS``.
+
+        Returns
+        -------
+        MultiLabelSegmentation
+            The populated *dest_seg* (or the auto-created clone when
+            *dest_seg* was *None*).
+        """
+        import mitk
+
+        if keep_untouched_labels and dest_seg is not None:
+            raise ValueError(
+                "keep_untouched_labels=True is only allowed when dest_seg is None. "
+                "When an explicit dest_seg is provided the caller controls its "
+                "content; clear it manually beforehand if a clean slate is needed."
+            )
+
+        mapping = _normalize_mapping(label_mapping)
+
+        if merge_style is None:
+            merge_style = mitk.MergeStyle.REPLACE
+        else:
+            merge_style = _normalize_style(merge_style, mitk.MergeStyle)
+
+        if overwrite_style is None:
+            overwrite_style = mitk.OverwriteStyle.IGNORE_LOCKS
+        else:
+            overwrite_style = _normalize_style(overwrite_style, mitk.OverwriteStyle)
+
+        if dest_seg is None:
+            dest_seg = self.clone()
+            if not keep_untouched_labels:
+                dest_seg.clear_group_images()
+
+        mitk.mitk._transfer_labels_seg(
+            self, dest_seg,
+            label_mapping=mapping,
+            merge_style=merge_style,
+            overwrite_style=overwrite_style,
+        )
+        return dest_seg
+
+    MultiLabelSegmentation.relabel_to = _relabel_to

@@ -184,7 +184,7 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFNeighbourhoodGreyLeve
     params.m_Range = range;
     params.m_Direction = GetDirection();
     params.id = this->CreateTemplateFeatureID(std::to_string(range), { {GetOptionPrefix() + "::range", range} });
-    AccessByItk_3(image, CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures, mask, featureList, params);
+    AccessFixedDimensionByItk_3(image, CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures, 3, mask, featureList, params);
     MITK_INFO << "Finished calculating coocurence with range " << range << "....";
   }
 

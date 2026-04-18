@@ -420,7 +420,14 @@ namespace itk
     itk::Vector<float, 3> v;
     v[0] = m_EndIndex[0] - a[0];
     v[1] = m_EndIndex[1] - a[1];
-    v[2] = m_EndIndex[2] - a[2];
+    if constexpr (TInputImageType::ImageDimension >= 3)
+    {
+      v[2] = m_EndIndex[2] - a[2];
+    }
+    else
+    {
+      v[2] = 0;
+    }
 
     return m_CostFunction->GetMinCost() * v.GetNorm();
   }

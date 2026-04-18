@@ -93,7 +93,14 @@ void mitk::ImageToUnstructuredGridFilter::ExtractPoints(const itk::Image<TPixel,
 
       imagePoint[0] = it.GetIndex()[0];
       imagePoint[1] = it.GetIndex()[1];
-      imagePoint[2] = it.GetIndex()[2];
+      if constexpr (VImageDimension >= 3)
+      {
+        imagePoint[2] = it.GetIndex()[2];
+      }
+      else
+      {
+        imagePoint[2] = 0.0;
+      }
 
       m_Geometry->IndexToWorld(imagePoint, worldPoint);
 

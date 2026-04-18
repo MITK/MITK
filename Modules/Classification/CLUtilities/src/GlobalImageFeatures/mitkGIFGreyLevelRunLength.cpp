@@ -70,7 +70,10 @@ void
     {
       offset[0] = 0;
       offset[1] = 0;
-      offset[2] = 1;
+      if constexpr (VImageDimension >= 3)
+      {
+        offset[2] = 1;
+      }
       newOffset->push_back(offset);
       break;
     }

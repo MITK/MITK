@@ -243,8 +243,8 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::GIFVolumetricStatistics:
 
   auto featureID = this->CreateTemplateFeatureID();
 
-  AccessByItk_3(image, CalculateVolumeStatistic, mask, featureList, featureID);
-  AccessByItk_3(mask, CalculateLargestDiameter, image, featureList, featureID);
+  AccessFixedDimensionByItk_3(image, CalculateVolumeStatistic, 3, mask, featureList, featureID);
+  AccessFixedDimensionByItk_3(mask, CalculateLargestDiameter, 3, image, featureList, featureID);
 
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();

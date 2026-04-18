@@ -35,7 +35,7 @@ namespace mitk
   class MITKMODELFIT_EXPORT LinearModelFactory : public ConcreteModelFactoryBase<LinearModel>
   {
   public:
-    mitkClassMacroItkParent(LinearModelFactory, ConcreteModelFactoryBase<LinearModel>);
+    mitkClassMacro(LinearModelFactory, ConcreteModelFactoryBase<LinearModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)

@@ -32,7 +32,7 @@ namespace mitk
   class MITKMODELFIT_EXPORT ExpDecayOffsetModelFactory : public ConcreteModelFactoryBase<ExpDecayOffsetModel>
   {
   public:
-    mitkClassMacroItkParent(ExpDecayOffsetModelFactory, ConcreteModelFactoryBase<ExpDecayOffsetModel>);
+    mitkClassMacro(ExpDecayOffsetModelFactory, ConcreteModelFactoryBase<ExpDecayOffsetModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

@@ -122,7 +122,7 @@ namespace mitk
     std::string GetYAxisUnit() const override;
 
     mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
-      const mitk::ModelBase::ParametersType &parameters) const;
+      const mitk::ModelBase::ParametersType &parameters) const override;
 
   protected:
     ExponentialDecayModel() {};

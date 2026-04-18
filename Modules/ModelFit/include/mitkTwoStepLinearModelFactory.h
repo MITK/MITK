@@ -33,16 +33,16 @@ namespace mitk
   class MITKMODELFIT_EXPORT TwoStepLinearModelFactory : public ConcreteModelFactoryBase<TwoStepLinearModel>
   {
   public:
-    mitkClassMacroItkParent(TwoStepLinearModelFactory, ConcreteModelFactoryBase<TwoStepLinearModel>);
+    mitkClassMacro(TwoStepLinearModelFactory, ConcreteModelFactoryBase<TwoStepLinearModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)
      defined by the model developer for  for the given model.*/
-    virtual ParametersType GetDefaultInitialParameterization() const;
+    ParametersType GetDefaultInitialParameterization() const override;
 
   protected:
-    virtual ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
-    const;
+    ModelParameterizerBase::Pointer DoCreateParameterizer(const modelFit::ModelFitInfo* fit)
+    const override;
 
     TwoStepLinearModelFactory();
 

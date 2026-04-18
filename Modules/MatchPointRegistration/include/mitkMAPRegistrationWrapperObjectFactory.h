@@ -45,19 +45,19 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
     /**
      * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual std::string GetFileExtensions());
+    DEPRECATED(std::string GetFileExtensions() override);
     /**
      * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap());
+    DEPRECATED(mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override);
     /**
      * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual std::string GetSaveFileExtensions());
+    DEPRECATED(std::string GetSaveFileExtensions() override);
     /**
      * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap());
+    DEPRECATED(mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override);
 
     /**
      * \brief Creates a mapper for the given node and mapper slot.

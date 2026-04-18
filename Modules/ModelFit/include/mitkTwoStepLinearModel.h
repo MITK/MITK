@@ -139,13 +139,13 @@ namespace mitk
 
     mitkCloneMacro(TwoStepLinearModel);
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const;
-    virtual DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
-        parameters) const;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
+        parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
+    void SetStaticParameter(const ParameterNameType& name,
+                            const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
 
     static double ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2);
 

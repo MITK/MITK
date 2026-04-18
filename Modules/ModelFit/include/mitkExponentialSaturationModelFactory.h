@@ -34,7 +34,7 @@ namespace mitk
   class MITKMODELFIT_EXPORT ExponentialSaturationModelFactory : public ConcreteModelFactoryBase<ExponentialSaturationModel>
   {
   public:
-    mitkClassMacroItkParent(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
+    mitkClassMacro(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

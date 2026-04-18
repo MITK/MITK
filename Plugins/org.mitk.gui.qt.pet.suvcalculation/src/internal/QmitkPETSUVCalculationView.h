@@ -61,13 +61,13 @@ protected:
    *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
    *							subclass.
    */
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   /*!
    *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
    *			focus on the right widget.
    */
-  void SetFocus();
+  void SetFocus() override;
 
   /**updates the widgets according to the internal values.*/
   void UpdateWidgets();
@@ -79,7 +79,7 @@ protected:
 
   void UpdatePatientWeight();
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes) override;
 
   // Variables
 

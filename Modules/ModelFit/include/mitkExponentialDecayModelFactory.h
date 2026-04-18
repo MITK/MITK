@@ -35,7 +35,7 @@ namespace mitk
   class MITKMODELFIT_EXPORT ExponentialDecayModelFactory : public ConcreteModelFactoryBase<ExponentialDecayModel>
   {
   public:
-    mitkClassMacroItkParent(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
+    mitkClassMacro(ExponentialDecayModelFactory, ConcreteModelFactoryBase<ExponentialDecayModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

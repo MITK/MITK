@@ -33,14 +33,14 @@ namespace mitk
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-    itkSetStringMacro(FileName);
-    itkGetStringMacro(FileName);
+    mitkOverrideSetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
-    itkSetStringMacro(FilePrefix);
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
-    itkSetStringMacro(FilePattern);
-    itkGetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     /**
      * \brief Check if the given file can be read.

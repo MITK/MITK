@@ -59,7 +59,7 @@ namespace mitk
      * \brief Get the filename of the file to be written.
      * \return The output file name.
      */
-    itkGetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
@@ -90,25 +90,25 @@ namespace mitk
      * \brief Set the file prefix for multi-file writing.
      * \warning Multiple file write is not yet supported.
      */
-    itkSetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
 
     /**
      * \brief Get the file prefix.
      * \warning Multiple file write is not yet supported.
      */
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
     /**
      * \brief Set the file pattern for multi-file writing.
      * \warning Multiple file write is not yet supported.
      */
-    itkSetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
 
     /**
      * \brief Get the file pattern.
      * \warning Multiple file write is not yet supported.
      */
-    itkGetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     /**
      * \brief Set the 0th input object for the writer.

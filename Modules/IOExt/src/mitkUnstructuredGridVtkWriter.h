@@ -52,22 +52,22 @@ namespace mitk
       mitkWriterMacro;
 
     /** \brief Set the filename of the file to write. */
-    itkSetStringMacro(FileName);
+    mitkOverrideSetStringMacro(FileName);
 
     /** \brief Return the name of the file to be written to disk. */
-    itkGetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
     /** \brief Set the file prefix. \warning Multiple write not (yet) supported. */
-    itkSetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
 
     /** \brief Return the file prefix. \warning Multiple write not (yet) supported. */
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
     /** \brief Set the file pattern. \warning Multiple write not (yet) supported. */
-    itkSetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
 
     /** \brief Return the file pattern. \warning Multiple write not (yet) supported. */
-    itkGetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     using FileWriter::SetInput;
 

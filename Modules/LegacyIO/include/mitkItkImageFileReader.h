@@ -40,19 +40,19 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** \brief Set the file name of the image file to read. */
-    itkSetStringMacro(FileName);
+    mitkOverrideSetStringMacro(FileName);
     /** \brief Get the file name of the image file to read. */
-    itkGetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
     /** \brief Set the file prefix (for series reading). */
-    itkSetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
     /** \brief Get the file prefix. */
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
     /** \brief Set the file pattern (for series reading). */
-    itkSetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
     /** \brief Get the file pattern. */
-    itkGetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     /**
      * \brief Check whether the given file can be read by this reader.

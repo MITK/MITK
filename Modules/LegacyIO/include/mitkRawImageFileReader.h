@@ -45,29 +45,29 @@ namespace mitk
     /** \brief Set the file name of the raw image to read (std::string). */
     itkSetMacro(FileName, std::string);
     /** \brief Set the file name of the raw image to read (C-string). */
-    itkSetStringMacro(FileName);
+    mitkOverrideSetStringMacro(FileName);
     /** \brief Get the file name of the raw image. */
     itkGetMacro(FileName, std::string);
     /** \brief Get the file name of the raw image (C-string). */
-    itkGetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
     /** \brief Set the file prefix. */
     itkSetMacro(FilePrefix, std::string);
     /** \brief Set the file prefix (C-string). */
-    itkSetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
     /** \brief Get the file prefix. */
     itkGetMacro(FilePrefix, std::string);
     /** \brief Get the file prefix (C-string). */
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
     /** \brief Set the file pattern. */
     itkSetMacro(FilePattern, std::string);
     /** \brief Set the file pattern (C-string). */
-    itkSetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
     /** \brief Get the file pattern. */
     itkGetMacro(FilePattern, std::string);
     /** \brief Get the file pattern (C-string). */
-    itkGetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     /**
      * \brief Enumeration of supported pixel types for raw image reading.

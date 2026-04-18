@@ -59,37 +59,37 @@ namespace mitk
      * \brief Set the filename of the point set XML file to read.
      * \param[in] _arg The absolute path to the point set XML file.
      */
-    itkSetStringMacro(FileName);
+    mitkOverrideSetStringMacro(FileName);
 
     /**
      * \brief Get the filename of the point set XML file.
      * \return The file path that was set via SetFileName().
      */
-    itkGetStringMacro(FileName);
+    mitkOverrideGetStringMacro(FileName);
 
     /**
      * \brief Set the file prefix for multi-file loading.
      * \warning Multiple file loading is not yet supported.
      */
-    itkSetStringMacro(FilePrefix);
+    mitkOverrideSetStringMacro(FilePrefix);
 
     /**
      * \brief Get the file prefix.
      * \warning Multiple file loading is not yet supported.
      */
-    itkGetStringMacro(FilePrefix);
+    mitkOverrideGetStringMacro(FilePrefix);
 
     /**
      * \brief Set the file pattern for multi-file loading.
      * \warning Multiple file loading is not yet supported.
      */
-    itkSetStringMacro(FilePattern);
+    mitkOverrideSetStringMacro(FilePattern);
 
     /**
      * \brief Get the file pattern.
      * \warning Multiple file loading is not yet supported.
      */
-    itkGetStringMacro(FilePattern);
+    mitkOverrideGetStringMacro(FilePattern);
 
     /**
      * \brief Check whether the given file can be read by this reader.

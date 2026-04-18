@@ -190,6 +190,58 @@ calling object*/
 #define MITK_IGNORE_DEPRECATED_WARNING_END
 #endif
 
+/** Override-aware counterparts of the ITK property macros.
+ *
+ *  Use these in subclasses that implement a string / const-object
+ *  property whose signature is already declared as a virtual method by
+ *  a base class (e.g. mitk::FileReader::GetFileName() = 0). ITK's own
+ *  itkSet/GetStringMacro and itkSet/GetConstObjectMacro expand to
+ *  virtual methods without an explicit override keyword, which Apple
+ *  Clang flags under -Winconsistent-missing-override. Rather than
+ *  suppress the warning at every call site, these macros reimplement
+ *  the ITK expansions so the override keyword is part of the method
+ *  declaration.
+ */
+#define mitkOverrideSetStringMacro(name)                                                                               \
+  void Set##name(const char *_arg) override                                                                            \
+  {                                                                                                                    \
+    if (_arg && (_arg == this->m_##name))                                                                              \
+    {                                                                                                                  \
+      return;                                                                                                          \
+    }                                                                                                                  \
+    if (_arg)                                                                                                          \
+    {                                                                                                                  \
+      this->m_##name = _arg;                                                                                           \
+    }                                                                                                                  \
+    else                                                                                                               \
+    {                                                                                                                  \
+      this->m_##name = "";                                                                                             \
+    }                                                                                                                  \
+    this->Modified();                                                                                                  \
+  }                                                                                                                    \
+  void Set##name(const std::string &_arg) { this->Set##name(_arg.c_str()); }                                           \
+  ITK_MACROEND_NOOP_STATEMENT
+
+#define mitkOverrideGetStringMacro(name)                                                                               \
+  const char *Get##name() const override { return this->m_##name.c_str(); }                                            \
+  ITK_MACROEND_NOOP_STATEMENT
+
+#define mitkOverrideSetConstObjectMacro(name, type)                                                                    \
+  void Set##name(const type *_arg) override                                                                            \
+  {                                                                                                                    \
+    itkDebugMacro("setting " << #name " to " << _arg);                                                                 \
+    if (this->m_##name != _arg)                                                                                        \
+    {                                                                                                                  \
+      this->m_##name = _arg;                                                                                           \
+      this->Modified();                                                                                                \
+    }                                                                                                                  \
+  }                                                                                                                    \
+  ITK_MACROEND_NOOP_STATEMENT
+
+#define mitkOverrideGetConstObjectMacro(name, type)                                                                    \
+  const type *Get##name() const override { return this->m_##name.GetPointer(); }                                       \
+  ITK_MACROEND_NOOP_STATEMENT
+
 /**
  * Mark templates as exported to generate public RTTI symbols which are
  * needed for GCC and Clang to support e.g. dynamic_cast between DSOs.

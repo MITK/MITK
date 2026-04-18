@@ -391,7 +391,9 @@ void QmitkNewSegmentationDialog::OnAccept()
 
 void QmitkNewSegmentationDialog::OnFinished(int)
 {
-  auto autoFilter = m_EnforceSuggestions ? std::optional<bool>() : m_Ui->autoFilterCheckBox->isChecked();
+  std::optional<bool> autoFilter;
+  if (!m_EnforceSuggestions)
+    autoFilter = m_Ui->autoFilterCheckBox->isChecked();
 
   ::SavePreferences(this->saveGeometry(), autoFilter);
 }

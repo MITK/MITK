@@ -142,7 +142,7 @@ int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint(int indexOfP
 {
   const auto& polyLine = GetPolyLine(polyLineIndex);
 
-  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint >= static_cast<int>(polyLine.size()))
     return -1;
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;

@@ -348,7 +348,7 @@ void QmitkOverlayController::UpdateOverlayData(QmitkOverlay *overlay)
 
 void QmitkOverlayController::RemoveAllOverlays()
 {
-  foreach (QmitkOverlay *overlay, m_AllOverlays)
+  for (QmitkOverlay *overlay : m_AllOverlays)
   {
     overlay->GetWidget()->setParent(nullptr);
     overlay->GetWidget()->hide();
@@ -468,7 +468,7 @@ void QmitkOverlayController::RestackOverlays(QmitkOverlay::DisplayPosition pos)
 
 void QmitkOverlayController::UpdateAllOverlays()
 {
-  foreach (QmitkOverlay *overlay, m_AllOverlays)
+  for (QmitkOverlay *overlay : m_AllOverlays)
   {
     this->UpdateOverlayData(overlay);
   }
@@ -479,7 +479,7 @@ QSize QmitkOverlayController::GetMinimumSizeForWidget(QmitkOverlay::DisplayPosit
   int width = 0;
   int height = 0;
 
-  foreach (QmitkOverlay *overlay, m_AllOverlays)
+  for (QmitkOverlay *overlay : m_AllOverlays)
   {
     if (overlay->GetPosition() == displayPosition)
     {

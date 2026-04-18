@@ -155,24 +155,14 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
   auto imageNode = m_Controls->imageNodeSelector->GetSelectedNode();
   if (imageNode.IsNull())
-  {
-    QMessageBox::information(this, "Image Masking", "Please select an image node.", QMessageBox::Ok);
-    this->EnableButtons(true);
-    mitk::ProgressBar::GetInstance()->Progress(4);
-    return;
-  }
+    mitkThrow() << "QmitkImageMaskingWidget is in an invalid state. OnMaskImagePressed was called without a selected image node.";
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(imageNode->GetData());
 
   mitk::ProgressBar::GetInstance()->Progress();
 
   auto selectedLabels = m_Controls->labelInspector->GetSelectedLabels();
   if (selectedLabels.empty())
-  {
-    QMessageBox::information(this, "Image Masking", "Please select a label.", QMessageBox::Ok);
-    this->EnableButtons(true);
-    mitk::ProgressBar::GetInstance()->Progress(4);
-    return;
-  }
+    mitkThrow() << "QmitkImageMaskingWidget is in an invalid state. OnMaskImagePressed was called without a selected label.";
   auto labelImage = mitk::CreateLabelMask(segmentation, selectedLabels.front(), true);
   resultImage = this->MaskImage(referenceImage, labelImage);
 

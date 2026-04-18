@@ -35,6 +35,7 @@ namespace mitk
         typedef std::pair<KeyType, ValueType> EntryType;
 
         ScalarListLookupTable() {}
+        ScalarListLookupTable(const ScalarListLookupTable&) = default;
         virtual ~ScalarListLookupTable() {}
 
         virtual const char* GetNameOfClass() const;

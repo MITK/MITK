@@ -344,31 +344,13 @@ function(mitk_create_module)
       else()
         mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 
-        # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
-        # versions to "static-member-init"
-        #
-        # Also, older Clang and seemingly all gcc versions do not warn if unknown
-        # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
-        # command line. This may get confusing if unrelated compiler errors happen and
-        # the error output then additionally contains errors about unknown flags (which
-        # is not the case if there were no compile errors).
-        #
-        # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
-        # the compiler and if applicable, prints the specific warning as a real warning and
-        # not as an error (although -Werror was given).
+        # We use -Wno-error=* instead of -Wno-* so the compiler rejects unknown
+        # flag names: older Clang and all GCC versions silently accept unknown
+        # -Wno-* flags, which makes typos invisible until an actual warning of
+        # that name would have fired. -Wno-error=* is properly rejected and
+        # demotes the warning from error without hiding it.
 
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=class-memaccess" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-copy" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-function-type" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-volatile" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=volatile" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=type-limits" module_c_flags module_cxx_flags)
       endif()
     endif()
 

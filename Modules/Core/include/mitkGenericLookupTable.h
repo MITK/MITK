@@ -55,6 +55,9 @@ namespace mitk
     /** \brief Default constructor. */
     GenericLookupTable() {}
 
+    /** \brief Copy constructor. */
+    GenericLookupTable(const GenericLookupTable &) = default;
+
     /** \brief Virtual destructor. */
     virtual ~GenericLookupTable() {}
 
@@ -158,6 +161,7 @@ namespace mitk
     typedef GenericLookupTable<Type> Superclass;                                                                       \
     virtual const char *GetNameOfClass() const { return #LookupTableName; }                                            \
     LookupTableName() {}                                                                                               \
+    LookupTableName(const LookupTableName &) = default;                                                                \
     virtual Superclass &operator=(const Superclass &other) { return Superclass::operator=(other); }                    \
     virtual ~LookupTableName() {}                                                                                      \
   };                                                                                                                   \

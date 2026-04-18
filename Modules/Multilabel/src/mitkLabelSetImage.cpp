@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <mitkPixelTypeMultiplex.h>
 #include <mitkImagePixelReadAccessor.h>
 
-#include <itkLabelGeometryImageFilter.h>
+#include <itkLabelImageToShapeLabelMapFilter.h>
 #include <itkCommand.h>
 #include <itkBinaryFunctorImageFilter.h>
 
@@ -1255,16 +1255,27 @@ void mitk::MultiLabelSegmentation::CalculateCenterOfMassProcessing(ImageType *it
   auto label = this->GetLabel(pixelValue);
   if (label.IsNotNull())
   {
-    auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
-    labelGeometryFilter->SetInput(itkImage);
-    labelGeometryFilter->Update();
-    auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
+    using ShapeLabelMapFilterType = itk::LabelImageToShapeLabelMapFilter<ImageType>;
+    auto shapeLabelMapFilter = ShapeLabelMapFilterType::New();
+    shapeLabelMapFilter->SetInput(itkImage);
+    shapeLabelMapFilter->Update();
+    const auto *labelMap = shapeLabelMapFilter->GetOutput();
 
-    Point3D pos(centroid[0], centroid[1], centroid[2]);
-    mitk::Point3D coordinates;
+    if (labelMap->HasLabel(pixelValue))
+    {
+      const auto *labelObject = labelMap->GetLabelObject(pixelValue);
+      const auto &physicalCentroid = labelObject->GetCentroid();
 
-    this->GetSlicedGeometry()->IndexToWorld(pos, coordinates);
-    label->UpdateCenterOfMass(pos,coordinates);
+      mitk::Point3D coordinates;
+      coordinates[0] = physicalCentroid[0];
+      coordinates[1] = physicalCentroid[1];
+      coordinates[2] = physicalCentroid[2];
+
+      mitk::Point3D pos;
+      this->GetSlicedGeometry()->WorldToIndex(coordinates, pos);
+
+      label->UpdateCenterOfMass(pos, coordinates);
+    }
   }
 }
 

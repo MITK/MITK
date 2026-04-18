@@ -209,7 +209,9 @@ void mitk::ContourModelUtils::FillContourInSlice(
   vtkSmartPointer<vtkImageData> filledImage = imageStencil->GetOutput();
   vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
 
+  MITK_IGNORE_DEPRECATED_WARNING_BEGIN
   FillSliceInSlice(filledImage, resultImage, paintingPixelValue);
+  MITK_IGNORE_DEPRECATED_WARNING_END
 
   sliceImage->SetVolume(resultImage->GetScalarPointer());
 }

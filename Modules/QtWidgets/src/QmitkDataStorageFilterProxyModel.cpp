@@ -41,17 +41,16 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 
 void QmitkDataStorageFilterProxyModel::AddFilterPredicate(mitk::NodePredicateBase::Pointer pred)
 {
+  this->beginFilterChange();
   m_Predicates.insert(pred);
-  this->invalidateFilter();
+  this->endFilterChange();
 }
 
 bool QmitkDataStorageFilterProxyModel::RemoveFilterPredicate(mitk::NodePredicateBase::Pointer pred)
 {
+  this->beginFilterChange();
   bool removed = m_Predicates.erase(pred) != 0;
-  if (removed)
-  {
-    this->invalidateFilter();
-  }
+  this->endFilterChange();
   return removed;
 }
 

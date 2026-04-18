@@ -76,7 +76,7 @@ protected:
   void OnGenerationFinished();
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob);
   void OnRequestHistogramUpdate(unsigned int);
-  void OnIgnoreZeroValuedVoxelStateChanged(int state);
+  void OnIgnoreZeroValuedVoxelStateChanged(Qt::CheckState state);
   void OnButtonSelectionPressed();
   void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnROISelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);

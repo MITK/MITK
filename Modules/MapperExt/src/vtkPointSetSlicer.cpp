@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <vtkCellArray.h>
 #include <vtkCellArrayIterator.h>
 #include <vtkCellData.h>
+#include <vtkCellTypes.h>
 #include <vtkCutter.h>
 #include <vtkDataSet.h>
 #include <vtkDoubleArray.h>
@@ -277,7 +278,10 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
   //
   int cellType;
   unsigned char cellTypeDimensions[VTK_NUMBER_OF_CELL_TYPES];
-  vtkCutter::GetCellTypeDimensions(cellTypeDimensions);
+  for (int i = 0; i < VTK_NUMBER_OF_CELL_TYPES; ++i)
+  {
+    cellTypeDimensions[i] = vtkCellTypes::GetDimension(static_cast<unsigned char>(i));
+  }
   int dimensionality;
   // We skip 0d cells (points), because they cannot be cut (generate no data).
   for (dimensionality = 1; dimensionality <= 3; ++dimensionality)

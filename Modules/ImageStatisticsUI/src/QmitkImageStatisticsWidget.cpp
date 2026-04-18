@@ -35,7 +35,7 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent)
           &QmitkImageStatisticsTreeModel::modelChanged,
           m_Controls->treeViewStatistics,
           &QTreeView::expandAll);
-  connect(m_Controls->checkBoxIgnoreZeroValuedVoxel, &QCheckBox::stateChanged,
+  connect(m_Controls->checkBoxIgnoreZeroValuedVoxel, &QCheckBox::checkStateChanged,
       this, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged);
 }
 

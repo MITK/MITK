@@ -57,7 +57,7 @@ void mitk::ROIMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 
   localStorage->SetLastTimePoint(timePoint);
 
-  auto data = static_cast<const ROI*>(this->GetData());
+  auto data = static_cast<const ROI*>(dataNode->GetData());
 
   if (!data->GetTimeGeometry()->IsValidTimePoint(timePoint))
     return;

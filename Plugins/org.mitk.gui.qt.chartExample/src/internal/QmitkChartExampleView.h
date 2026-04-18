@@ -74,10 +74,10 @@ private:
   void OnXAxisLabelChanged();
   void OnYAxisLabelChanged();
   void OnYAxisScaleChanged(const QString &newYAxisScale);
-  void OnShowLegendChanged(int newState);
-  void OnStackedDataChanged(int newState);
-  void OnShowDataPointsChanged(int newState);
-  void OnShowSubchartChanged(int newState);
+  void OnShowLegendChanged(Qt::CheckState newState);
+  void OnStackedDataChanged(Qt::CheckState newState);
+  void OnShowDataPointsChanged(Qt::CheckState newState);
+  void OnShowSubchartChanged(Qt::CheckState newState);
 
   std::vector< std::pair<double, double> > CreatePairList(std::vector<double> keys, std::vector<double> values) const;
   std::string ConvertToText(std::vector<QVariant> numbers, std::string delimiter = ";") const;

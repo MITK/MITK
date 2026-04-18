@@ -175,6 +175,27 @@ calling object*/
 #define DEPRECATED(func) func
 #endif
 
+/** Cross-platform scoped suppression of deprecation warnings.
+ *  Use when a deprecated API must still be called intentionally (e.g. a
+ *  deprecated wrapper forwarding to its replacement, or a known-buggy
+ *  third-party filter kept until migration is possible).
+ */
+#if defined(__clang__)
+#define MITK_IGNORE_DEPRECATED_WARNING_BEGIN                                                                           \
+  _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#define MITK_IGNORE_DEPRECATED_WARNING_END _Pragma("clang diagnostic pop")
+#elif defined(__GNUC__)
+#define MITK_IGNORE_DEPRECATED_WARNING_BEGIN                                                                           \
+  _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define MITK_IGNORE_DEPRECATED_WARNING_END _Pragma("GCC diagnostic pop")
+#elif defined(_MSC_VER)
+#define MITK_IGNORE_DEPRECATED_WARNING_BEGIN __pragma(warning(push)) __pragma(warning(disable : 4996))
+#define MITK_IGNORE_DEPRECATED_WARNING_END __pragma(warning(pop))
+#else
+#define MITK_IGNORE_DEPRECATED_WARNING_BEGIN
+#define MITK_IGNORE_DEPRECATED_WARNING_END
+#endif
+
 /**
  * Mark templates as exported to generate public RTTI symbols which are
  * needed for GCC and Clang to support e.g. dynamic_cast between DSOs.

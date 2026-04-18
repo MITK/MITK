@@ -79,7 +79,7 @@ inline mitk::BaseProperty::Pointer pythonValueToProperty(py::object value)
     }
   }
 
-  throw py::type_error("Cannot auto-convert " + std::string(py::str(value.get_type())) +
+  throw py::type_error("Cannot auto-convert " + std::string(py::str(py::type::of(value))) +
                        " to a property. Pass a mitk.BaseProperty subclass explicitly "
                        "(e.g. mitk.StringProperty(...), mitk.ColorProperty(...)).");
 }
@@ -131,7 +131,7 @@ inline mitk::BaseProperty::Pointer pythonValueToPropertyWithType(py::object valu
     throw py::type_error("ColorProperty requires a mitk.Color or a 3-element (r,g,b) sequence.");
   }
 
-  throw py::type_error("Cannot coerce " + std::string(py::str(value.get_type())) + " to " + targetType +
+  throw py::type_error("Cannot coerce " + std::string(py::str(py::type::of(value))) + " to " + targetType +
                        ". Pass the new property value as a mitk." + targetType + " instance explicitly.");
 }
 

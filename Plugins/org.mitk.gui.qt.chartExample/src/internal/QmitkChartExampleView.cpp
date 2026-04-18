@@ -88,10 +88,10 @@ void QmitkChartExampleView::CreateConnectionsForGUIElements()
   connect(m_Controls->m_lineEditXAxisLabel, &QLineEdit::editingFinished, this, &QmitkChartExampleView::OnXAxisLabelChanged);
   connect(m_Controls->m_lineEditYAxisLabel, &QLineEdit::editingFinished, this, &QmitkChartExampleView::OnYAxisLabelChanged);
   connect(m_Controls->m_comboBoxYAxisScale, &QComboBox::currentTextChanged, this, &QmitkChartExampleView::OnYAxisScaleChanged);
-  connect(m_Controls->m_checkBoxShowLegend, &QCheckBox::stateChanged, this, &QmitkChartExampleView::OnShowLegendChanged);
-  connect(m_Controls->m_checkBoxStackedData, &QCheckBox::stateChanged, this, &QmitkChartExampleView::OnStackedDataChanged);
-  connect(m_Controls->m_checkBoxShowDataPoints, &QCheckBox::stateChanged, this, &QmitkChartExampleView::OnShowDataPointsChanged);
-  connect(m_Controls->m_checkBoxShowSubchart, &QCheckBox::stateChanged, this, &QmitkChartExampleView::OnShowSubchartChanged);
+  connect(m_Controls->m_checkBoxShowLegend, &QCheckBox::checkStateChanged, this, &QmitkChartExampleView::OnShowLegendChanged);
+  connect(m_Controls->m_checkBoxStackedData, &QCheckBox::checkStateChanged, this, &QmitkChartExampleView::OnStackedDataChanged);
+  connect(m_Controls->m_checkBoxShowDataPoints, &QCheckBox::checkStateChanged, this, &QmitkChartExampleView::OnShowDataPointsChanged);
+  connect(m_Controls->m_checkBoxShowSubchart, &QCheckBox::checkStateChanged, this, &QmitkChartExampleView::OnShowSubchartChanged);
 }
 
 void QmitkChartExampleView::AddData()
@@ -353,19 +353,19 @@ void QmitkChartExampleView::OnYAxisScaleChanged(const QString &newYAxisScale) {
   m_Controls->m_Chart->SetYAxisScale(yAxisScale);
 }
 
-void QmitkChartExampleView::OnShowLegendChanged(int newState) {
+void QmitkChartExampleView::OnShowLegendChanged(Qt::CheckState newState) {
   m_Controls->m_Chart->SetShowLegend(newState == Qt::Checked);
 }
 
-void QmitkChartExampleView::OnStackedDataChanged(int newState) {
+void QmitkChartExampleView::OnStackedDataChanged(Qt::CheckState newState) {
   m_Controls->m_Chart->SetStackedData(newState == Qt::Checked);
 }
 
-void QmitkChartExampleView::OnShowDataPointsChanged(int newState) {
+void QmitkChartExampleView::OnShowDataPointsChanged(Qt::CheckState newState) {
   m_Controls->m_Chart->SetShowDataPoints(newState == Qt::Checked);
 }
 
-void QmitkChartExampleView::OnShowSubchartChanged(int newState) {
+void QmitkChartExampleView::OnShowSubchartChanged(Qt::CheckState newState) {
   m_Controls->m_Chart->SetShowSubchart(newState == Qt::Checked);
 }
 

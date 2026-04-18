@@ -219,6 +219,15 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkCompilerFlags)
   endif()
 
+  # CTK's UseCTK.cmake injects CTK_INCLUDE_DIRS into the directory scope via
+  # a plain include_directories() call, which arrives as non-SYSTEM -I. Re-
+  # add the same dirs to the plugin target as SYSTEM so warnings from CTK
+  # headers (e.g. ctkServiceTracker.tpp's volatile compound assignments
+  # under C++20) are suppressed without per-plugin target_compile_options.
+  if(CTK_INCLUDE_DIRS)
+    target_include_directories(${PLUGIN_TARGET} SYSTEM PRIVATE ${CTK_INCLUDE_DIRS})
+  endif()
+
   if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
     foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
       if("${CMAKE_CURRENT_SOURCE_DIR}/" MATCHES "^${MITK_EXTENSION_DIR}/.*")

@@ -209,10 +209,15 @@
 #define US_MZ_LITTLE_ENDIAN 1
 #endif
 
-#if US_MZ_X86_OR_X64_CPU
-// Set US_MZ_USE_UNALIGNED_LOADS_AND_STORES to 1 on CPU's that permit efficient integer loads and stores from unaligned addresses.
-#define US_MZ_USE_UNALIGNED_LOADS_AND_STORES 1
-#endif
+// The unaligned-loads code paths below read 16/32/64-bit words through
+// reinterpret_cast-style pointer casts on uint8 buffers, which Clang flags
+// as -Wcast-align. They would be faster than the byte-wise fallback on
+// x86/x64 but this decompressor only runs during CppMicroServices resource
+// loading, so the perf delta is negligible. Stay on the portable path on
+// every platform.
+// #if US_MZ_X86_OR_X64_CPU
+// #define US_MZ_USE_UNALIGNED_LOADS_AND_STORES 1
+// #endif
 
 #if defined(_M_X64) || defined(_WIN64) || defined(__MINGW64__) || defined(_LP64) || defined(__LP64__) || defined(__ia64__) || defined(__x86_64__)
 // Set US_MZ_HAS_64BIT_REGISTERS to 1 if operations on 64-bit integers are reasonably fast (and don't involve compiler generated calls to helper functions).
@@ -2322,7 +2327,9 @@ static US_MZ_FORCEINLINE void us_tdefl_find_match(us_tdefl_compressor *d, us_mz_
         if ((d->m_dict[probe_pos + match_len] == c0) && (d->m_dict[probe_pos + match_len - 1] == c1)) break;
       US_TDEFL_PROBE; US_TDEFL_PROBE; US_TDEFL_PROBE;
     }
-    if (!dist) break; p = s; q = d->m_dict + probe_pos; for (probe_len = 0; probe_len < max_match_len; probe_len++) if (*p++ != *q++) break;
+    if (!dist) break;
+    p = s; q = d->m_dict + probe_pos;
+    for (probe_len = 0; probe_len < max_match_len; probe_len++) if (*p++ != *q++) break;
     if (probe_len > match_len)
     {
       *pMatch_dist = dist; if ((*pMatch_len = match_len = probe_len) == max_match_len) return;

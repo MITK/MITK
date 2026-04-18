@@ -285,7 +285,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       std::string l = pointLabel;
       if (input->GetSize() > 1)
       {
-        sprintf(buffer, "%d", ptIdx + 1);
+        snprintf(buffer, sizeof(buffer), "%d", ptIdx + 1);
         l.append(buffer);
       }
       // Define the text for the label

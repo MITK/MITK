@@ -400,7 +400,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell *cell,
     POLY_CASES *polyCase;
     EDGE_LIST *edge;
     int i, j, index, *vert;
-    volatile int pnum;
+    int pnum;
     int v1, v2, newCellId;
     double t, x1[3], x2[3], x[3], deltaScalar;
     vtkIdType offset = verts->GetNumberOfCells() + lines->GetNumberOfCells();

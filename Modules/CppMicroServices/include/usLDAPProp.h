@@ -25,6 +25,7 @@ class MITKCPPMICROSERVICES_EXPORT LDAPPropExpr
 public:
 
   explicit LDAPPropExpr(const std::string& expr);
+  LDAPPropExpr(const LDAPPropExpr&) = default;
 
   LDAPPropExpr& operator!();
 

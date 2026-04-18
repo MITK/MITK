@@ -20,7 +20,9 @@ found in the LICENSE file.
 namespace mitk
 {
   /** \brief Event fired on any affine interaction (translate, rotate, scale). */
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(AffineInteractionEvent, itk::AnyEvent);
   /** \brief Event fired when a scale operation occurs. */
   itkEventMacroDeclaration(ScaleEvent, AffineInteractionEvent);
@@ -28,7 +30,9 @@ namespace mitk
   itkEventMacroDeclaration(RotateEvent, AffineInteractionEvent);
   /** \brief Event fired when a translation operation occurs. */
   itkEventMacroDeclaration(TranslateEvent, AffineInteractionEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /**
    * \brief Affine interaction with mitk::BaseGeometry.

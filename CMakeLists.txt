@@ -915,10 +915,11 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(WIN32)
-  mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
-  mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
-  mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
-  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS) # warning C4251: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+  # C4251: 'identifier' : class 'type' needs to have dll-interface to be used by
+  # clients of class 'type2'. Structural on Windows: MITK_EXPORT classes contain
+  # STL members by design, and the STL has no stable ABI across MSVC builds.
+  # This is not a defect to fix per-class; keep the suppression.
+  mitkFunctionCheckCompilerFlags("/wd4251" MITK_CXX_FLAGS)
 endif()
 
 if(NOT MSVC_VERSION)
@@ -1170,6 +1171,10 @@ if(APPLE)
 endif()
 
 if(MSVC)
+  # TODO: removing these would force a tree-wide migration to the
+  # _s variants (fopen_s, strcpy_s, ...) and iterator-debug-aware
+  # STL algorithms. Out of scope for warning cleanup; revisit as a
+  # dedicated hardening pass.
   target_compile_definitions(MitkCompilerFlags INTERFACE
     _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS _SCL_SECURE_NO_WARNINGS)
 endif()

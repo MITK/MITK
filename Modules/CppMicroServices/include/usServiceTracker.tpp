@@ -29,11 +29,6 @@ ServiceTracker<S,TTT>::~ServiceTracker()
   delete d;
 }
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
-
 template<class S, class TTT>
 ServiceTracker<S,TTT>::ServiceTracker(ModuleContext* context,
                                       const ServiceReferenceType& reference,
@@ -63,10 +58,6 @@ ServiceTracker<S,TTT>::ServiceTracker(ModuleContext *context, _ServiceTrackerCus
   std::string clazz = us_service_interface_iid<S>();
   if (clazz.empty()) throw ServiceException("The service interface class has no US_DECLARE_SERVICE_INTERFACE macro");
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 template<class S, class TTT>
 void ServiceTracker<S,TTT>::Open()

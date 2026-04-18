@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#define NOMINMAX
 #include "berryInternalJob.h"
 
 #include <Poco/Thread.h>

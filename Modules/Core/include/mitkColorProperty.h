@@ -22,11 +22,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Standard RGB color typedef using float components.
    *
@@ -162,9 +157,6 @@ namespace mitk
     bool Assign(const BaseProperty &property) override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

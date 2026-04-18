@@ -12,10 +12,6 @@ found in the LICENSE file.
 #ifndef itkIntelligentBinaryClosingFilter_h
 #define itkIntelligentBinaryClosingFilter_h
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4786)
-#endif
-
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryErodeImageFilter.h>

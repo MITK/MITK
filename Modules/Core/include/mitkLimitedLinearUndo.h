@@ -20,9 +20,13 @@ found in the LICENSE file.
 // STL header
 #include <vector>
 // ITK header
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <deque>
 
@@ -156,7 +160,9 @@ namespace mitk
 
   };
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
   /** \brief ITK events to notify listening GUI elements when the undo or redo stack
    *         is empty (disable button) or when there are items in the stack (enable button).
@@ -170,7 +176,9 @@ namespace mitk
   itkEventMacroDeclaration(UndoFullEvent, UndoStackEvent);    ///< \brief Undo stack is full.
   itkEventMacroDeclaration(RedoFullEvent, UndoStackEvent);    ///< \brief Redo stack is full.
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 } // namespace mitk
 

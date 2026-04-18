@@ -10,10 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4786)
-#endif
-
 #include <mitkBaseDataIOFactory.h>
 
 #include <mitkIOUtil.h>

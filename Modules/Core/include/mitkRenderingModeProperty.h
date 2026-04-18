@@ -17,11 +17,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * Encapsulates the enumeration for rendering modes. The property human-readable name (which is
    * used in the mitkWorkbench inside the Property View) is "Image Rendering.Mode". This property
@@ -162,9 +157,6 @@ namespace mitk
     RenderingModeProperty &operator=(const RenderingModeProperty &);
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

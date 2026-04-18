@@ -25,11 +25,6 @@ found in the LICENSE file.
 #include <QMutex>
 #include <QAtomicInt>
 
-#ifdef _MSC_VER
-// disable inheritance by dominance warnings
-#pragma warning( disable : 4250 4275 )
-#endif
-
 class QDebug;
 class QTextStream;
 

@@ -19,11 +19,6 @@ found in the LICENSE file.
 
 #include <itksys/SystemTools.hxx>
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
-#pragma warning(disable : 4355)
-#endif
-
 namespace mitk
 {
   MimeTypeProvider::MimeTypeProvider() : m_Tracker(nullptr) {}

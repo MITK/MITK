@@ -23,11 +23,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Template class for generating properties for simple value types (int, float, bool, etc.).
    *
@@ -136,9 +131,6 @@ namespace mitk
     }
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

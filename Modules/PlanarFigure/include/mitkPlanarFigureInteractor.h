@@ -19,9 +19,13 @@ found in the LICENSE file.
 #include <mitkDataInteractor.h>
 #include <mitkNumericTypes.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 namespace mitk
 {
@@ -33,7 +37,9 @@ namespace mitk
   class InteractionPositionEvent;
   class StateMachineAction;
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
   // Define events for PlanarFigure interaction notifications
   itkEventMacroDeclaration(PlanarFigureEvent, itk::AnyEvent);
@@ -47,7 +53,9 @@ namespace mitk
   itkEventMacroDeclaration(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(PointMovedPlanarFigureEvent, PlanarFigureEvent);
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /**
    * \brief Interactor for creating, editing, and manipulating PlanarFigure objects.

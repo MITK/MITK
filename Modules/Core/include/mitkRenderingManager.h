@@ -577,12 +577,16 @@ namespace mitk
     AntiAliasing m_AntiAliasing;
   };
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
   itkEventMacroDeclaration(RenderingManagerEvent, itk::AnyEvent);
   itkEventMacroDeclaration(RenderingManagerViewsInitializedEvent, RenderingManagerEvent);
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent);
 

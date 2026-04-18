@@ -12,10 +12,6 @@ found in the LICENSE file.
 #ifndef mitkVtkVolumeTimeSeriesIOFactory_h
 #define mitkVtkVolumeTimeSeriesIOFactory_h
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4786)
-#endif
-
 #include <itkObjectFactoryBase.h>
 #include <mitkBaseData.h>
 

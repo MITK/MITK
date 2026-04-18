@@ -25,10 +25,6 @@ found in the LICENSE file.
 
 #include <cassert>
 
-#ifdef _MSC_VER
-#pragma warning(disable:4503) // decorated name length exceeded, name was truncated
-#endif
-
 namespace us {
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)

@@ -18,11 +18,6 @@ found in the LICENSE file.
 #include <map>
 #include <string>
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable: 4522) // "multiple assignment operators specified"
-#endif
-
 namespace mitk
 {
   /**
@@ -244,8 +239,5 @@ namespace mitk
   };
 }
 
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif

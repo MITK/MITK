@@ -12,10 +12,6 @@ found in the LICENSE file.
 #ifndef mitkVtkImageIOFactory_h
 #define mitkVtkImageIOFactory_h
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4786)
-#endif
-
 #include <MitkLegacyIOExports.h>
 
 #include <itkObjectFactoryBase.h>

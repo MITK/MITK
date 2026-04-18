@@ -23,11 +23,6 @@ found in the LICENSE file.
 namespace mitk
 {
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
-#endif
-
 /**
  * \brief Enumeration property defining the wipe style for the Wipe registration evaluation mode.
  *
@@ -94,9 +89,6 @@ private:
   RegEvalWipeStyleProperty& operator=(const RegEvalWipeStyleProperty&);
 };
 
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

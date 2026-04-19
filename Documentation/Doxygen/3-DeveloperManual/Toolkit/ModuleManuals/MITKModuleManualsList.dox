@@ -10,7 +10,6 @@ The modules are shared libraries that provide functionality that can be used by 
 <ul>
   <li> \subpage AnnotationModulePage
   <li> \subpage ChartModule
-  <li> \subpage LegacyGLModule
 </ul>
 
 \section MITKModuleManualsListPage_AdditionalInformationOnCertainModules Additional Information on Certain Modules

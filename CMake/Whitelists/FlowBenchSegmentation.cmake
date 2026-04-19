@@ -20,7 +20,6 @@ set(enabled_modules
   ImageExtraction
   ImageStatistics
   IOExt
-  LegacyGL
   Log
   MapperExt
   ModelFit

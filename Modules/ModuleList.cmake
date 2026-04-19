@@ -12,7 +12,6 @@ set(MITK_MODULES
   AppUtil
   DataTypesExt
   Annotation
-  LegacyGL
   AlgorithmsExt
   MapperExt
   DICOM

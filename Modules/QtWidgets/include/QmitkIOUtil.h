@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <mitkBaseData.h>
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
-#include <mitkFileWriterWithInformation.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
 #include <mitkPointSet.h>

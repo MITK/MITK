@@ -21,7 +21,6 @@ set(enabled_modules
   ImageStatistics
   IOExt
   LegacyGL
-  LegacyIO
   Log
   MapperExt
   ModelFit

@@ -22,12 +22,10 @@ set(H_FILES
   mitkEventInformer.h
   mitkExceptionMacro.h
   mitkFileSystem.h
-  mitkFileWriterWithInformation.h
   mitkGenericLookupTable.h
   mitkGenericProperty.h
   mitkGetClassHierarchy.h
   mitkINodeSelectionListener.h
-  mitkIOAdapter.h
   mitkITKImageImport.h
   mitkImageAccessByItk.h
   mitkImageCast.h
@@ -300,11 +298,9 @@ set(CPP_FILES
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
   IO/mitkCustomMimeType.cpp
-  IO/mitkFileReader.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp
   IO/mitkFileReaderWriterBase.cpp
-  IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
   IO/mitkGeometry3DToXML.cpp
@@ -326,8 +322,6 @@ set(CPP_FILES
   IO/mitkIPreferencesStorage.cpp
   IO/mitkItkImageIO.cpp
   IO/mitkItkLoggingAdapter.cpp
-  IO/mitkLegacyFileReaderService.cpp
-  IO/mitkLegacyFileWriterService.cpp
   IO/mitkLocaleSwitch.cpp
   IO/mitkLogBackend.cpp
   IO/mitkMimeType.cpp

@@ -14,41 +14,18 @@ found in the LICENSE file.
 
 #include <mitkCoreObjectFactory.h>
 
-#include "mitkParRecFileIOFactory.h"
-#include "mitkStlVolumeTimeSeriesIOFactory.h"
-#include "mitkVtkVolumeTimeSeriesIOFactory.h"
-
-#include "mitkUnstructuredGridVtkWriterFactory.h"
-
 #include <mitkVolumeMapperVtkSmart3D.h>
 #include <mitkUnstructuredGridMapper2D.h>
 #include <mitkUnstructuredGridVtkMapper3D.h>
 #include <mitkVtkGLMapperWrapper.h>
 
 mitk::IOExtObjectFactory::IOExtObjectFactory()
-  : CoreObjectFactoryBase(),
-    m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer()),
-    m_StlVolumeTimeSeriesIOFactory(StlVolumeTimeSeriesIOFactory::New().GetPointer()),
-    m_VtkVolumeTimeSeriesIOFactory(VtkVolumeTimeSeriesIOFactory::New().GetPointer()),
-    m_UnstructuredGridVtkWriterFactory(UnstructuredGridVtkWriterFactory::New().GetPointer())
+  : CoreObjectFactoryBase()
 {
   MITK_DEBUG << "IOExtObjectFactory c'tor" << std::endl;
-
-  itk::ObjectFactoryBase::RegisterFactory(m_ParRecFileIOFactory);
-  itk::ObjectFactoryBase::RegisterFactory(m_StlVolumeTimeSeriesIOFactory);
-  itk::ObjectFactoryBase::RegisterFactory(m_VtkVolumeTimeSeriesIOFactory);
-
-  itk::ObjectFactoryBase::RegisterFactory(m_UnstructuredGridVtkWriterFactory);
 }
 
-mitk::IOExtObjectFactory::~IOExtObjectFactory()
-{
-  itk::ObjectFactoryBase::UnRegisterFactory(m_ParRecFileIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_StlVolumeTimeSeriesIOFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_VtkVolumeTimeSeriesIOFactory);
-
-  itk::ObjectFactoryBase::UnRegisterFactory(m_UnstructuredGridVtkWriterFactory);
-}
+mitk::IOExtObjectFactory::~IOExtObjectFactory() = default;
 
 mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {

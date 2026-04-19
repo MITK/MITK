@@ -20,8 +20,8 @@ namespace mitk
   /**
    * \brief Object factory for extended IO types.
    *
-   * Registers mappers, default properties, and legacy IO factories for
-   * extended data types such as UnstructuredGrid and various volume time series.
+   * Registers mappers and default rendering properties for extended data types
+   * such as UnstructuredGrid.
    */
   class IOExtObjectFactory : public CoreObjectFactoryBase
   {
@@ -39,13 +39,6 @@ namespace mitk
   private:
     IOExtObjectFactory();
     ~IOExtObjectFactory() override;
-
-    itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
-    itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;
-
-    itk::ObjectFactoryBase::Pointer m_UnstructuredGridVtkWriterFactory;
   };
 }
 

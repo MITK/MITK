@@ -91,9 +91,6 @@ private:
   /** \brief Register VTK-based image and surface reader/writer services. */
   void RegisterVtkReaderWriter();
 
-  /** \brief Register legacy mitk::FileWriter instances as micro services. */
-  void RegisterLegacyWriter();
-
   // mitk::RenderingManager::Pointer m_RenderingManager;
   std::unique_ptr<mitk::NodeSelectionService> m_NodeSelectionService;
   std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
@@ -111,7 +108,6 @@ private:
   std::vector<mitk::IFileReader *> m_FileReaders;
   std::vector<mitk::IFileWriter *> m_FileWriters;
   std::vector<mitk::AbstractFileIO *> m_FileIOs;
-  std::vector<mitk::IFileWriter *> m_LegacyWriters;
 
   std::vector<mitk::CustomMimeType *> m_DefaultMimeTypes;
 

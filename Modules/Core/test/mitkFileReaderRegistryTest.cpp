@@ -191,12 +191,6 @@ int mitkFileReaderRegistryTest(int /*argc*/, char * /*argv*/ [])
   // >("F://Build//MITK-Data//pointSet.mps");
   // MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
 
-  // And now for something completely different... (Debug)
-  // mitk::LegacyFileReaderService::Pointer lfr = mitk::LegacyFileReaderService::New(".nrrd", "Nearly Raw Raster Data");
-  // returned = mitk::FileReaderRegistry::GetReader(".nrrd");
-  // MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileReader with Options: Low
-  // priority reader with specific option");
-
   // std::vector<mitk::BaseData::Pointer> image =
   // mitk::FileReaderRegistry::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
   // MITK_TEST_CONDITION_REQUIRED(image.size() > 0, "Testing whether image was returned or not");

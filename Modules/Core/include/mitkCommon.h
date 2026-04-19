@@ -158,7 +158,7 @@ calling object*/
  *
  *  Use these in subclasses that implement a string / const-object
  *  property whose signature is already declared as a virtual method by
- *  a base class (e.g. mitk::FileReader::GetFileName() = 0). ITK's own
+ *  a base class (e.g. a pure virtual GetFileName() = 0). ITK's own
  *  itkSet/GetStringMacro and itkSet/GetConstObjectMacro expand to
  *  virtual methods without an explicit override keyword, which Apple
  *  Clang flags under -Winconsistent-missing-override. Rather than

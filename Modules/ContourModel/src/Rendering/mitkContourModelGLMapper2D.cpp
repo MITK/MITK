@@ -19,8 +19,6 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <vtkLinearTransform.h>
 
-#include <mitkGL.h>
-
 mitk::ContourModelGLMapper2D::ContourModelGLMapper2D()
   : m_SubdivisionContour(mitk::ContourModel::New()), m_InitSubdivisionCurve(true)
 {

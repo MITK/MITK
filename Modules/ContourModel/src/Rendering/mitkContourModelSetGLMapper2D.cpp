@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <vtkLinearTransform.h>
 
-#include <mitkGL.h>
-
 mitk::ContourModelSetGLMapper2D::ContourModelSetGLMapper2D()
 {
 }

@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureMapper2D.h>
 #include <mitkPlanarFigureVtkMapper3D.h>
-#include <mitkVtkGLMapperWrapper.h>
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 {

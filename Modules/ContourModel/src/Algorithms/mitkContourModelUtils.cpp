@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <mitkContourModelUtils.h>
 
 #include <mitkContourModelToSurfaceFilter.h>
-#include <mitkLabelSetImage.h>
 #include <mitkSurface.h>
 #include <vtkImageStencil.h>
 #include <vtkPointData.h>
@@ -149,83 +148,6 @@ void mitk::ContourModelUtils::FillContourInSlice2(
   vtkSmartPointer<vtkImageData> filledImage = imageStencil->GetOutput();
 
   sliceImage->SetVolume(filledImage->GetScalarPointer());
-}
-
-void mitk::ContourModelUtils::FillContourInSlice(
-  const ContourModel *projectedContour, TimeStepType contourTimeStep, Image *sliceImage, int paintingPixelValue)
-{
-  if (nullptr == projectedContour)
-  {
-    mitkThrow() << "Cannot fill contour in slice. Passed contour is invalid";
-  }
-
-  if (nullptr == sliceImage)
-  {
-    mitkThrow() << "Cannot fill contour in slice. Passed slice is invalid";
-  }
-
-  auto contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
-  contourModelFilter->SetInput(projectedContour);
-  contourModelFilter->Update();
-
-  auto surface = mitk::Surface::New();
-  surface = contourModelFilter->GetOutput();
-
-  if (nullptr == surface->GetVtkPolyData(contourTimeStep))
-  {
-    MITK_WARN << "Could not create surface from contour model.";
-    return;
-  }
-
-  auto surface2D = vtkSmartPointer<vtkPolyData>::New();
-  surface2D->SetPoints(surface->GetVtkPolyData(contourTimeStep)->GetPoints());
-  surface2D->SetLines(surface->GetVtkPolyData(contourTimeStep)->GetLines());
-
-  auto image = vtkSmartPointer<vtkImageData>::New();
-  image->DeepCopy(sliceImage->GetVtkImageData());
-
-  const double FOREGROUND_VALUE = 255.0;
-  const double BACKGROUND_VALUE = 0.0;
-
-  const vtkIdType count = image->GetNumberOfPoints();
-  for (std::remove_const_t<decltype(count)> i = 0; i < count; ++i)
-    image->GetPointData()->GetScalars()->SetTuple1(i, FOREGROUND_VALUE);
-
-  auto polyDataToImageStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-
-  // Set a minimal tolerance, so that clipped pixels will be added to contour as well.
-  polyDataToImageStencil->SetTolerance(mitk::eps);
-  polyDataToImageStencil->SetInputData(surface2D);
-  polyDataToImageStencil->Update();
-
-  auto imageStencil = vtkSmartPointer<vtkImageStencil>::New();
-
-  imageStencil->SetInputData(image);
-  imageStencil->SetStencilConnection(polyDataToImageStencil->GetOutputPort());
-  imageStencil->ReverseStencilOff();
-  imageStencil->SetBackgroundValue(BACKGROUND_VALUE);
-  imageStencil->Update();
-
-  vtkSmartPointer<vtkImageData> filledImage = imageStencil->GetOutput();
-  vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
-
-  MITK_IGNORE_DEPRECATED_WARNING_BEGIN
-  FillSliceInSlice(filledImage, resultImage, paintingPixelValue);
-  MITK_IGNORE_DEPRECATED_WARNING_END
-
-  sliceImage->SetVolume(resultImage->GetScalarPointer());
-}
-
-void mitk::ContourModelUtils::FillSliceInSlice(
-  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, int paintingPixelValue, double fillForegroundThreshold)
-{
-  const auto numberOfPoints = filledImage->GetNumberOfPoints();
-
-  for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
-  {
-    if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
-      resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
-  }
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType t)

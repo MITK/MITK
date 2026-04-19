@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCorrectorAlgorithm.h>
-#include <mitkContourUtils.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>

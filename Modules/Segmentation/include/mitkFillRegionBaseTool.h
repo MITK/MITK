@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkContourModelUtils.h>
-#include <mitkContourUtils.h> //TODO remove legacy support
 #include <mitkImage.h>
 #include <mitkSegTool2D.h>
 #include <MitkSegmentationExports.h>

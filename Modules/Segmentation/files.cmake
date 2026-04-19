@@ -12,8 +12,6 @@ set(H_FILES
 set(CPP_FILES
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourModelSetToImageFilter.cpp
-  Algorithms/mitkContourSetToPointSetFilter.cpp
-  Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
   Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
@@ -21,7 +19,6 @@ set(CPP_FILES
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Algorithms/mitkSegmentationHelper.cpp
-  Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkSegChangeOperationBase.cpp
   Algorithms/mitkSegChangeOperationApplier.cpp
   Algorithms/mitkSegGroupInsertOperation.cpp
@@ -38,9 +35,6 @@ set(CPP_FILES
   Controllers/mitkSegmentationModuleActivator.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkToolManagerProvider.cpp
-  DataManagement/mitkContour.cpp
-  DataManagement/mitkContourSet.cpp
-  DataManagement/mitkExtrudedContour.cpp
   DataManagement/mitkSegmentationTaskList.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
@@ -83,10 +77,6 @@ set(CPP_FILES
   Interactions/mitkToolCommand.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkLabelSelectionTool.cpp
-  Rendering/mitkContourMapper2D.cpp
-  Rendering/mitkContourSetMapper2D.cpp
-  Rendering/mitkContourSetVtkMapper3D.cpp
-  Rendering/mitkContourVtkMapper3D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )

@@ -20,7 +20,7 @@ namespace mitk
 {
   /** \brief Object factory that registers mappers and I/O for contour model types.
    *
-   * Registers ContourModelGLMapper2D, ContourModelMapper3D and their set counterparts
+   * Registers ContourModelMapper2D, ContourModelMapper3D and their set counterparts
    * with the MITK core object factory so that ContourModel and ContourModelSet data
    * can be rendered and serialized.
    *

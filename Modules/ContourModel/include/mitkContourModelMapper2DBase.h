@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkContourModelGLMapper2DBase_h
-#define mitkContourModelGLMapper2DBase_h
+#ifndef mitkContourModelMapper2DBase_h
+#define mitkContourModelMapper2DBase_h
 
 #include <mitkCommon.h>
 #include <mitkMapper.h>
@@ -32,16 +32,16 @@ namespace mitk
    * \brief Abstract base class for OpenGL-based 2D contour mappers.
    *
    * Provides shared functionality for drawing contour models in 2D render windows
-   * using OpenGL. Subclasses such as ContourModelGLMapper2D and ContourModelSetGLMapper2D
+   * using OpenGL. Subclasses such as ContourModelMapper2D and ContourModelSetMapper2D
    * implement the MitkRender method to handle specific data types.
    *
-   * \sa ContourModelGLMapper2D, ContourModelSetGLMapper2D, ContourModel
+   * \sa ContourModelMapper2D, ContourModelSetMapper2D, ContourModel
    * \ingroup MitkContourModelModule
    */
-  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2DBase : public Mapper
+  class MITKCONTOURMODEL_EXPORT ContourModelMapper2DBase : public Mapper
   {
   public:
-    mitkClassMacro(ContourModelGLMapper2DBase, Mapper);
+    mitkClassMacro(ContourModelMapper2DBase, Mapper);
 
     /** \brief Apply color and opacity properties from the data node to the rendering context.
      * \param[in] renderer The base renderer providing the rendering context.
@@ -52,9 +52,9 @@ namespace mitk
   protected:
     typedef TextAnnotation2D::Pointer TextAnnotationPointerType;
 
-    ContourModelGLMapper2DBase();
+    ContourModelMapper2DBase();
 
-    ~ContourModelGLMapper2DBase() override;
+    ~ContourModelMapper2DBase() override;
 
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
 

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkContourModelSetGLMapper2D.h>
+#include <mitkContourModelSetMapper2D.h>
 
 #include <mitkColorProperty.h>
 #include <mitkContourModelSet.h>
@@ -18,15 +18,15 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <vtkLinearTransform.h>
 
-mitk::ContourModelSetGLMapper2D::ContourModelSetGLMapper2D()
+mitk::ContourModelSetMapper2D::ContourModelSetMapper2D()
 {
 }
 
-mitk::ContourModelSetGLMapper2D::~ContourModelSetGLMapper2D()
+mitk::ContourModelSetMapper2D::~ContourModelSetMapper2D()
 {
 }
 
-void mitk::ContourModelSetGLMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
+void mitk::ContourModelSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
 {
     BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
@@ -62,12 +62,12 @@ void mitk::ContourModelSetGLMapper2D::MitkRender(mitk::BaseRenderer *renderer, m
     ls->UpdateGenerateDataTime();
 }
 
-mitk::ContourModelSet *mitk::ContourModelSetGLMapper2D::GetInput(void)
+mitk::ContourModelSet *mitk::ContourModelSetMapper2D::GetInput(void)
 {
   return static_cast<mitk::ContourModelSet *>(GetDataNode()->GetData());
 }
 
-void mitk::ContourModelSetGLMapper2D::SetDefaultProperties(mitk::DataNode *node,
+void mitk::ContourModelSetMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                            mitk::BaseRenderer *renderer,
                                                            bool overwrite)
 {

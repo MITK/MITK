@@ -23,8 +23,6 @@ set(CPP_FILES
   mitkMultiStepper.cpp
   mitkPlane.cpp
   mitkSurfaceDeformationDataInteractor3D.cpp
-  mitkUnstructuredGrid.cpp
-  mitkUnstructuredGridSource.cpp
   mitkVideoSource.cpp
 
   mitkColorConversions.cpp

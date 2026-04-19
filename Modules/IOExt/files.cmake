@@ -5,5 +5,4 @@ set(CPP_FILES
   mitkPlyFileWriterService.cpp
   mitkPlyFileReaderService.cpp
   mitkSceneFileReader.cpp
-  mitkVtkUnstructuredGridReader.cpp
 )

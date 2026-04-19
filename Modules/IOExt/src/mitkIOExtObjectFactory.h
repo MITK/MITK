@@ -20,8 +20,7 @@ namespace mitk
   /**
    * \brief Object factory for extended IO types.
    *
-   * Registers mappers and default rendering properties for extended data types
-   * such as UnstructuredGrid.
+   * Registers mappers and default rendering properties for extended data types.
    */
   class IOExtObjectFactory : public CoreObjectFactoryBase
   {

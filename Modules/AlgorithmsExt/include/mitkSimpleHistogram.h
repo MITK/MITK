@@ -35,7 +35,6 @@ namespace mitk
    * can be cached using SimpleHistogramCache.
    *
    * \sa SimpleImageHistogram
-   * \sa SimpleUnstructuredGridHistogram
    * \sa SimpleHistogramCache
    */
   class MITKALGORITHMSEXT_EXPORT SimpleHistogram

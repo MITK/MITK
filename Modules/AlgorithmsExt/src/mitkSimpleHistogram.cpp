@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include <mitkSimpleHistogram.h>
 
 #include <mitkImageReadAccessor.h>
-#include <mitkSimpleUnstructuredGridHistogram.h>
-#include <mitkUnstructuredGrid.h>
 #include <mitkHistogramGenerator.h>
 
 namespace mitk
@@ -93,14 +91,6 @@ namespace mitk
     SimpleImageHistogram histogram;
   };
 
-  class UnstructuredGridHistogramCacheElement : public SimpleHistogramCache::Element
-  {
-  public:
-    void ComputeFromBaseData(BaseData *baseData) override { histogram.ComputeFromBaseData(baseData); }
-    SimpleHistogram *GetHistogram() override { return &histogram; }
-    SimpleUnstructuredGridHistogram histogram;
-  };
-
   SimpleHistogram *SimpleHistogramCache::operator[](BaseData::Pointer sp_BaseData)
   {
     BaseData *p_BaseData = sp_BaseData.GetPointer();
@@ -145,13 +135,10 @@ namespace mitk
     {
       elementToUpdate = new ImageHistogramCacheElement();
     }
-    else if (dynamic_cast<UnstructuredGrid *>(p_BaseData))
-    {
-      elementToUpdate = new UnstructuredGridHistogramCacheElement();
-    }
     else
     {
       MITK_WARN << "not supported: " << p_BaseData->GetNameOfClass();
+      return nullptr;
     }
 
     elementToUpdate->baseData = p_BaseData;

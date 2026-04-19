@@ -279,7 +279,6 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\"" \
                          "minimumCMakeVersionWindows=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS@" \
                          "minimumCMakeVersionOther=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER@" \
                          "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
@@ -738,7 +737,7 @@ GENERATE_BUGLIST       = @MITK_DOXYGEN_GENERATE_BUGLIST@
 # the documentation.
 # The default value is: YES.
 
-GENERATE_DEPRECATEDLIST= @MITK_DOXYGEN_GENERATE_DEPRECATEDLIST@
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>

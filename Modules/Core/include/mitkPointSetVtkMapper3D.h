@@ -124,12 +124,6 @@ namespace mitk
      */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    /**
-    * \deprecated Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead.
-    * \deprecatedSince{2013_12}
-    */
-    DEPRECATED(void ReleaseGraphicsResources(vtkWindow *renWin));
-
     /** \brief Releases VTK graphics resources associated with the given renderer.
      *
      * \param renderer the renderer whose resources should be released.

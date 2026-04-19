@@ -58,13 +58,6 @@ namespace mitk
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief Apply visual properties to the actor.
-     *
-     * \param[in] actor    The VTK actor to apply properties to.
-     * \param[in] renderer The renderer context.
-     */
-    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
-
     /** \brief Set default rendering properties for volume visualization.
      *
      * \param[in] node      The data node to configure.

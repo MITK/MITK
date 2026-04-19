@@ -2,7 +2,6 @@
 
 set(H_FILES
   mitkGL.h
-  mitkGLMapper2D.h
 )
 
 set(CPP_FILES

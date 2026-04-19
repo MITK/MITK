@@ -19,17 +19,8 @@ found in the LICENSE file.
 #include <mitkPlanarFigureVtkMapper3D.h>
 #include <mitkVtkGLMapperWrapper.h>
 
-typedef std::multimap<std::string, std::string> MultimapType;
-
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    CreateFileExtensionsMap();
-
-    alreadyDone = true;
-  }
 }
 
 mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
@@ -75,32 +66,6 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode *node)
     node->AddProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0), nullptr, true);
     node->AddProperty("opacity", mitk::FloatProperty::New(0.8), nullptr, true);
   }
-}
-
-std::string mitk::PlanarFigureObjectFactory::GetFileExtensions()
-{
-  return "";
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetFileExtensionsMap()
-{
-  return {};
-}
-
-std::string mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions({}, fileExtension);
-  return fileExtension.c_str();
-};
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetSaveFileExtensionsMap()
-{
-  return {};
-}
-
-void mitk::PlanarFigureObjectFactory::CreateFileExtensionsMap()
-{
 }
 
 struct RegisterPlanarFigureObjectFactory

@@ -48,7 +48,6 @@ namespace mitk
    *         vtkPolyDataWriter, vtkXMLPolyDataWriter).
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::SurfaceVtkWriterFactory, mitk::Surface, mitk::FileWriterWithInformation
    */
   template <class VTKWRITER>
@@ -66,10 +65,7 @@ namespace mitk
     /** \brief The VTK writer type used for output. */
     typedef VTKWRITER VtkWriterType;
 
-    /**
-     * \brief Set the filename of the file to write.
-     * \param[in] _arg The name of the file to write.
-     */
+    /** \brief Set the output file name. */
     mitkOverrideSetStringMacro(FileName);
 
     /**

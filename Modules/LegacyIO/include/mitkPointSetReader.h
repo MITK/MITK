@@ -43,7 +43,6 @@ namespace mitk
    *       is not yet supported.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::PointSetWriter, mitk::PointSetIOFactory, mitk::PointSetSource
    */
   class MITKLEGACYIO_EXPORT PointSetReader : public PointSetSource, public FileReader
@@ -55,10 +54,7 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-    /**
-     * \brief Set the filename of the point set XML file to read.
-     * \param[in] _arg The absolute path to the point set XML file.
-     */
+    /** \brief Set the absolute path to the point set XML file to read. */
     mitkOverrideSetStringMacro(FileName);
 
     /**

@@ -27,15 +27,7 @@ found in the LICENSE file.
 
 mitk::SegmentationObjectFactory::SegmentationObjectFactory() : CoreObjectFactoryBase()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
-
-    CreateFileExtensionsMap();
-
-    alreadyDone = true;
-  }
+  MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
 }
 
 mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
@@ -74,38 +66,6 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 }
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *)
-{
-}
-
-std::string mitk::SegmentationObjectFactory::GetFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetFileExtensionsMap()
-{
-  return m_FileExtensionsMap;
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSaveFileExtensionsMap()
-{
-  return m_SaveFileExtensionsMap;
-}
-
-void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
-{
-}
-
-std::string mitk::SegmentationObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
-}
-
-void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
 }
 

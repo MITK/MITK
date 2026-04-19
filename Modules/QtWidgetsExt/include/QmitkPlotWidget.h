@@ -43,8 +43,8 @@ found in the LICENSE file.
  *   widget->Replot();
  * \endcode
  *
- * \deprecated Since 2018.04. Use QmitkChartWidget instead.
- * \sa QmitkPlotDialog, QwtPlot
+ * \note QmitkChartWidget is the preferred alternative for new code.
+ * \sa QmitkPlotDialog, QwtPlot, QmitkChartWidget
  */
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget

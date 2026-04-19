@@ -52,51 +52,6 @@ namespace mitk
   class UndoController;
 
   /**
-   * \class TActionFunctor
-   * \brief Base class of ActionFunctors, to provide an easy to connect actions with functions.
-   *
-   * \deprecatedSince{2013_03} Use mitk::Message classes instead.
-   */
-  class TActionFunctor
-  {
-  public:
-    virtual bool DoAction(StateMachineAction *, InteractionEvent *) = 0;
-    virtual ~TActionFunctor() {}
-  };
-
-  ///**
-  // * \class TSpecificActionFunctor
-  // * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed.
-  // It
-  // takes two arguments:
-  // * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused
-  // the
-  // transition.
-  // */
-  // template<class T>
-  // class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
-  //{
-  // public:
-
-  //  TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, InteractionEvent*)) :
-  //      m_Object(object), m_MemberFunctionPointer(memberFunctionPointer)
-  //  {
-  //  }
-
-  //  virtual ~TSpecificActionFunctor()
-  //  {
-  //  }
-  //  virtual bool DoAction(StateMachineAction* action, InteractionEvent* event) override
-  //  {
-  //    return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
-  //  }
-
-  // private:
-  //  T* m_Object;
-  //  bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
-  //};
-
-  /**
    * \class EventStateMachine
    *
    * \brief Provides state machine functionality for DataInteractors.
@@ -120,8 +75,6 @@ namespace mitk
   {
   public:
     mitkClassMacro(EventStateMachine, InteractionEventHandler);
-
-      typedef std::map<std::string, TActionFunctor *> DEPRECATED(ActionFunctionsMapType);
 
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
@@ -179,8 +132,6 @@ namespace mitk
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be
      * executed.
      */
-    DEPRECATED(void AddActionFunction(const std::string &action, TActionFunctor *functor));
-
     void AddActionFunction(const std::string &action, const ActionFunctionDelegate &delegate);
 
     void AddConditionFunction(const std::string &condition, const ConditionFunctionDelegate &delegate);
@@ -270,7 +221,6 @@ namespace mitk
 
     StateMachineContainer
       *m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
-    std::map<std::string, TActionFunctor *> m_ActionFunctionsMap; // stores association between action string
     ActionDelegatesMapType m_ActionDelegatesMap;
     ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;

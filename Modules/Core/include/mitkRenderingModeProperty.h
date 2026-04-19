@@ -24,7 +24,6 @@ namespace mitk
    * rendering mode is applied to images.
    * Valid values are:
    *
-   * \li LEVELWINDOW_COLOR is DEPRECATED and mapped to LOOKUPTABLE_LEVELWINDOW_COLOR.
    * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
    * As lookup table, the table object supplied by the property "LookupTable" will be used. As default,
    * we apply a GRAYSCALE mitk::LookupTable. Note, if you want to use a former rainbow-like lookup table,

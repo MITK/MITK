@@ -28,11 +28,9 @@ found in the LICENSE file.
  * \param[in] itkImage Pointer to the ITK image to write.
  * \param[in] fileName The output file path including the extension that determines
  *            the image format.
- *
- * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 template <typename TPixel, unsigned int VImageDimension>
-DEPRECATED(void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkImage, const std::string &fileName));
+void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkImage, const std::string &fileName);
 
 /**
  * \brief Write an ITK image with single-component or composite pixel type to a picture file.
@@ -45,11 +43,9 @@ DEPRECATED(void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkIma
  * \param[in] itkImage Pointer to the ITK image to write.
  * \param[in] fileName The output file path including the extension that determines
  *            the image format.
- *
- * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
 template <typename TPixel, unsigned int VImageDimension>
-DEPRECATED(void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,
-                                              const std::string &fileName));
+void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,
+                                   const std::string &fileName);
 
 #endif

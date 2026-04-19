@@ -24,11 +24,8 @@ namespace mitk
   /**
    * \brief Registers mappers and assigns default properties for mitk::Gizmo.
    *
-   * This class is still required by MITK to register custom mappers.
-   * The base class interface requires also methods that describe file
-   * reader/writer extensions, but this is already deprecated. We do
-   * not implement those methods but use the new micro-service registration
-   * via GizmoActivator.
+   * This class is still required by MITK to register custom mappers. Micro-service
+   * registration for IO happens in GizmoActivator.
    */
   class MITKGIZMO_EXPORT GizmoObjectFactory : public mitk::CoreObjectFactoryBase
   {
@@ -50,24 +47,6 @@ namespace mitk
      * \param node The data node to set default properties on.
      */
     void SetDefaultProperties(mitk::DataNode *node) override;
-
-    /** \brief Return an empty string (deprecated but required by interface). */
-    std::string GetFileExtensions() override { return ""; }
-
-    /** \brief Return an empty map (deprecated but required by interface). */
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
-    {
-      return CoreObjectFactoryBase::MultimapType();
-    }
-
-    /** \brief Return an empty string (deprecated but required by interface). */
-    std::string GetSaveFileExtensions() override { return ""; }
-
-    /** \brief Return an empty map (deprecated but required by interface). */
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
-    {
-      return CoreObjectFactoryBase::MultimapType();
-    }
   };
 }
 

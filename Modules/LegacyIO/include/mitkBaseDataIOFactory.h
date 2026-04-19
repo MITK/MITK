@@ -28,10 +28,9 @@ namespace mitk
    * using the registered IO factories. Internally delegates to mitk::IOUtil::Load().
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::IOUtil, mitk::FileReaderRegistry
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
+  class MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
   {
   public:
     /** \brief Standard ITK self type. */

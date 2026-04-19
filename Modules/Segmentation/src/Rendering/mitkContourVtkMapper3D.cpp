@@ -115,7 +115,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
     }
     for (i = 0, ccur = cstart; i < numPts; ++i, ccur += cstep)
     {
-      itk2vtk(path->Evaluate(ccur), vtkpoint);
+      mitk::ToArray(vtkpoint, path->Evaluate(ccur));
       points->InsertPoint(ptIndex, vtkpoint);
       if (ptIndex > 0)
       {

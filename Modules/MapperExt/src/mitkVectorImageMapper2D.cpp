@@ -102,8 +102,8 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
   }
 
   double vp[3], vp_slice[3], vnormal[3];
-  vnl2vtk(point.GetVnlVector(), vp);
-  vnl2vtk(normal.GetVnlVector(), vnormal);
+  mitk::ToArray(vp, point);
+  mitk::ToArray(vnormal, normal);
   // std::cout << "Origin: " << vp[0] <<" "<< vp[1] <<" "<< vp[2] << std::endl;
   // std::cout << "Normal: " << vnormal[0] <<" "<< vnormal[1] <<" "<< vnormal[2] << std::endl;
 
@@ -244,7 +244,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
     vectorMagnitudes->SetNumberOfTuples(numPoints);
     double inVector[3], outVector[3], wnormal[3]; //, tmpVector[ 3 ], outVector[ 3 ];
     double k = 0.0;
-    vnl2vtk(normal.GetVnlVector(), wnormal);
+    mitk::ToArray(wnormal, normal);
     vtkMath::Normalize(wnormal);
     bool normalizeVecs;
     m_DataNode->GetBoolProperty("NormalizeVecs", normalizeVecs);
@@ -254,9 +254,11 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
       if (normalizeVecs)
       {
         vnl_vector<double> tmp(3);
-        vtk2vnl(inVector, tmp);
+        for (unsigned int i = 0; i < 3; ++i)
+          tmp[i] = inVector[i];
         tmp.normalize();
-        vnl2vtk(tmp, inVector);
+        for (unsigned int i = 0; i < 3; ++i)
+          inVector[i] = tmp[i];
       }
       k = vtkMath::Dot(wnormal, inVector);
       // Remove non orthogonal component.
@@ -445,7 +447,7 @@ void mitk::VectorImageMapper2D::PaintCells(vtkPolyData *glyphs,
         double tmp[3];
         vtktransform->TransformPoint(vp, tmp);
 
-        vtk2itk(vp, p);
+        mitk::FillArray(p, vp);
 
         // convert 3D point (in mm) to display coordinates (units )
         renderer->WorldToDisplay(p, p2d);

@@ -52,7 +52,7 @@ namespace mitk
     itkSetClampMacro(BendAngle, ScalarType, -360, 360);
 
     itkGetMacro(BendDirection, Vector2D);
-    mitkSetConstReferenceMacro(BendDirection, Vector2D);
+    itkSetMacro(BendDirection, Vector2D);
 
     itkGetMacro(FlipDirection, bool);
     itkSetMacro(FlipDirection, bool);

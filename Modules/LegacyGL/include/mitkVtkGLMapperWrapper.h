@@ -30,7 +30,6 @@ namespace mitk
    * the modern VTK-based rendering pipeline. Internally, the GLMapper's Paint()
    * method is called through a vtkGLMapperProp.
    *
-   * \deprecated GLMappers are no longer recommended. Use VtkMapper directly.
    * \sa GLMapper, vtkGLMapperProp, VtkMapper
    */
   class MITKLEGACYGL_EXPORT VtkGLMapperWrapper : public VtkMapper

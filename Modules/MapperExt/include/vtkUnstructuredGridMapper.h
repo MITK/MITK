@@ -54,10 +54,11 @@ public:
 
   /** \brief Release graphics resources consumed by this mapper.
    *
-   * \param[in] window The render window (unused).
-   * \deprecated Use ReleaseGraphicsResources(mitk::BaseRenderer*) instead.
+   * Invoked by VTK when a render window is torn down.
+   *
+   * \param[in] window The render window.
    */
-  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *window) override);
+  void ReleaseGraphicsResources(vtkWindow *window) override;
 
   /** \brief Release graphics resources for the given renderer.
    *

@@ -29,6 +29,7 @@ class vtkGlyphSource2D;
 class vtkGlyph3D;
 class vtkFloatArray;
 class vtkCellArray;
+class vtkTextActor;
 
 namespace mitk
 {

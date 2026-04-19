@@ -36,7 +36,7 @@ namespace py = pybind11;
  * - BaseProperty subclasses -> used directly
  *
  * For property types without a scalar equivalent (Vector3D, Point*, ...),
- * callers must pass an explicit mitk.<Name>Property instance.
+ * callers must pass an explicit mitk.\<Name\>Property instance.
  *
  * \throws py::type_error if the Python type cannot be auto-wrapped.
  */

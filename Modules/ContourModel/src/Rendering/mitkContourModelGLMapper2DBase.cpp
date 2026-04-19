@@ -167,9 +167,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
 
       point = (*pointsIt)->Coordinates;
 
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
 
       renderer->WorldToView(p, pt2d);
 
@@ -316,9 +316,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
     {
       lastPt2d = pt2d;
       point = renderingContour->GetVertexAt(0, timestep)->Coordinates;
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
       renderer->WorldToDisplay(p, pt2d);
 
       localStorage->Context->GetPen()->SetWidth(lineWidth);
@@ -332,9 +332,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
       // transform selected vertex
       point = renderingContour->GetSelectedVertex()->Coordinates;
 
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
 
       renderer->WorldToDisplay(p, pt2d);
 

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkImageToItk_tpp
 
 #include <itkImportMitkImageContainer.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkException.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageToItk.h>
@@ -214,7 +214,7 @@ void mitk::ImageToItk<TOutputImage>::GenerateOutputInformation()
 
   // copy as much information as possible into origin
   const mitk::Point3D &mitkorigin = input->GetGeometry()->GetOrigin();
-  itk2vtk(mitkorigin, origin);
+  mitk::ToArray(origin, mitkorigin);
 
   // copy as much information as possible into direction
   direction.SetIdentity();

@@ -27,7 +27,6 @@ namespace mitk
    * image data is provided as a mitk::Image.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::ItkImageFileIOFactory, mitk::ImageSource, mitk::FileReader
    */
   class MITKLEGACYIO_EXPORT ItkImageFileReader : public ImageSource, public FileReader

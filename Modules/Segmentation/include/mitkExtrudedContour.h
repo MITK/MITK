@@ -36,9 +36,6 @@ namespace mitk
    * reaching m_ClippingGeometry.
    *
    * \ingroup Data
-   *
-   * \deprecatedSince{2015_05} ExtrudedContour is deprecated. It will be removed in the next release.
-   *  Becomes obsolete. Refer to https://docs.mitk.org/nightly/InteractionMigration.html .
    */
 
   class MITKSEGMENTATION_EXPORT ExtrudedContour : public BoundingObject
@@ -58,17 +55,17 @@ namespace mitk
     itkSetObjectMacro(Contour, mitk::Contour);
 
     /** \brief Vector to specify the direction of the extrusion. */
-    mitkGetVectorMacro(Vector, mitk::Vector3D);
+    itkGetConstReferenceMacro(Vector, mitk::Vector3D);
     /** \brief Sets the direction vector for extrusion. */
-    mitkSetVectorMacro(Vector, mitk::Vector3D);
+    itkSetMacro(Vector, mitk::Vector3D);
     itkGetConstMacro(AutomaticVectorGeneration, bool);
     itkSetMacro(AutomaticVectorGeneration, bool);
     itkBooleanMacro(AutomaticVectorGeneration);
 
     /** \brief Optional vector to specify the orientation of the bounding-box. */
-    mitkGetVectorMacro(RightVector, mitk::Vector3D);
+    itkGetConstReferenceMacro(RightVector, mitk::Vector3D);
     /** \brief Sets the optional orientation vector. */
-    mitkSetVectorMacro(RightVector, mitk::Vector3D);
+    itkSetMacro(RightVector, mitk::Vector3D);
 
     /** \brief Optional geometry for clipping the extruded contour. */
     itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);

@@ -71,13 +71,6 @@ namespace mitk
      */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    /** \brief Apply visual properties to the given actor.
-     *
-     * \param[in] actor    The VTK actor to apply properties to.
-     * \param[in] renderer The renderer context.
-     */
-    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
-
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
@@ -89,6 +82,9 @@ namespace mitk
     void ResetMapper(BaseRenderer * /*renderer*/) override;
 
     void SetProperties(mitk::BaseRenderer *renderer);
+
+    /** \brief Apply visual properties to this mapper's actors. */
+    void ApplyProperties(mitk::BaseRenderer *renderer);
 
     vtkAssembly *m_Assembly;
     vtkActor *m_Actor;

@@ -195,7 +195,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   //
   // apply properties read from the PropertyList
   //
-  ApplyProperties(nullptr, renderer);
+  ApplyProperties(renderer);
 }
 
 void mitk::UnstructuredGridVtkMapper3D::ResetMapper(BaseRenderer * /*renderer*/)
@@ -203,7 +203,7 @@ void mitk::UnstructuredGridVtkMapper3D::ResetMapper(BaseRenderer * /*renderer*/)
   m_Assembly->VisibilityOff();
 }
 
-void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor * /*actor*/, mitk::BaseRenderer *renderer)
+void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(mitk::BaseRenderer *renderer)
 {
   mitk::DataNode::Pointer node = this->GetDataNode();
   ApplyColorAndOpacityProperties(renderer, m_Actor);

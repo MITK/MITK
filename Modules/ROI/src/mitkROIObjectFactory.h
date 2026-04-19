@@ -32,18 +32,6 @@ namespace mitk
     /** \brief Set default rendering properties on the given node. */
     void SetDefaultProperties(DataNode *node) override;
 
-    /** \brief Return supported file read extensions. */
-    std::string GetFileExtensions() override;
-
-    /** \brief Return a map of file read extensions to descriptions. */
-    MultimapType GetFileExtensionsMap() override;
-
-    /** \brief Return supported file write extensions. */
-    std::string GetSaveFileExtensions() override;
-
-    /** \brief Return a map of file write extensions to descriptions. */
-    MultimapType GetSaveFileExtensionsMap() override;
-
   protected:
     ROIObjectFactory();
     ~ROIObjectFactory() override;

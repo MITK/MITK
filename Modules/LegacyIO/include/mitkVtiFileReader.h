@@ -26,10 +26,9 @@ namespace mitk
    * vtkXMLImageDataReader and converts the result to a mitk::Image.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::VtiFileIOFactory, mitk::ImageSource, mitk::FileReader
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT VtiFileReader : public ImageSource, public FileReader
+  class MITKLEGACYIO_EXPORT VtiFileReader : public ImageSource, public FileReader
   {
   public:
     mitkClassMacro(VtiFileReader, FileReader);

@@ -364,17 +364,6 @@ void mitk::Surface::PrintSelf(std::ostream &os, itk::Indent indent) const
   }
 }
 
-bool mitk::Equal(vtkPolyData *leftHandSide, vtkPolyData *rightHandSide, mitk::ScalarType eps, bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work for nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
-}
-
 bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::ScalarType eps, bool verbose)
 {
   bool noDifferenceFound = true;
@@ -462,17 +451,6 @@ bool mitk::Equal(vtkPolyData &leftHandSide, vtkPolyData &rightHandSide, mitk::Sc
     }
   }
   return noDifferenceFound;
-}
-
-bool mitk::Equal(mitk::Surface *leftHandSide, mitk::Surface *rightHandSide, mitk::ScalarType eps, bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
 bool mitk::Equal(mitk::Surface &leftHandSide, mitk::Surface &rightHandSide, mitk::ScalarType eps, bool verbose)

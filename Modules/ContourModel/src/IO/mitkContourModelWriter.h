@@ -15,8 +15,6 @@ found in the LICENSE file.
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkContourModel.h>
-
-// DEPRECATED
 #include <mitkTimeGeometry.h>
 
 namespace mitk

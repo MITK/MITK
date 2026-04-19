@@ -23,9 +23,8 @@ namespace mitk
    * \brief Create instances of VtkSurfaceReader objects using an object factory.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT VtkSurfaceIOFactory : public itk::ObjectFactoryBase
+  class MITKLEGACYIO_EXPORT VtkSurfaceIOFactory : public itk::ObjectFactoryBase
   {
   public:
     /** Standard class typedefs. */
@@ -43,16 +42,6 @@ namespace mitk
     static VtkSurfaceIOFactory *FactoryNew() { return new VtkSurfaceIOFactory; }
     /** Run-time type information (and related methods). */
     itkTypeMacro(VtkSurfaceIOFactory, ObjectFactoryBase);
-
-    /**
-     * Register one factory of this type
-     * \deprecatedSince{2013_09}
-     */
-    DEPRECATED(static void RegisterOneFactory(void))
-    {
-      VtkSurfaceIOFactory::Pointer VtkSurfaceIOFactory = VtkSurfaceIOFactory::New();
-      ObjectFactoryBase::RegisterFactory(VtkSurfaceIOFactory);
-    }
 
   protected:
     /** \brief Default constructor. */

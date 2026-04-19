@@ -91,14 +91,6 @@ namespace mitk
       */
       virtual mitk::PlaneGeometry *GetPlaneGeometry(int s) const;
     /**
-  * \deprecatedSince{2014_10} Please use GetPlaneGeometry
-  */
-    DEPRECATED(const PlaneGeometry *GetGeometry2D(int s)) { return GetPlaneGeometry(s); }
-    /**
-    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
-    */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry *geo, int s)) { SetPlaneGeometry(geo, s); }
-    /**
      * \brief Switch between image geometry and normal geometry with origin correction.
      *
      * Overrides BaseGeometry to also propagate the change to all

@@ -34,7 +34,6 @@ namespace mitk
    *       yet supported.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::PointSetReader, mitk::PointSetWriterFactory, mitk::FileWriter
    */
   class MITKLEGACYIO_EXPORT PointSetWriter : public mitk::FileWriter

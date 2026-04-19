@@ -20,7 +20,6 @@ namespace mitk
 {
   /** \brief Interface class of readers that read from files.
    * \ingroup DeprecatedIO
-   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
    */
   class MITKCORE_EXPORT FileReader
   {

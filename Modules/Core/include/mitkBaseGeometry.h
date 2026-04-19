@@ -438,35 +438,10 @@ namespace mitk
     }
 
     /**
-     * \brief Convert index coordinates of a vector to world coordinates (mm).
-     *
-     * \deprecated The first parameter \a atPt3d_units is unused.
-     *             Use IndexToWorld(const Vector3D&, Vector3D&) instead.
-     *
-     * \param[in] atPt3d_units Unused point parameter.
-     * \param[in] vec_units Vector in index coordinates.
-     * \param[out] vec_mm Vector in world coordinates (mm).
-     */
-    void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
-
-    /**
-     * \brief Convert world coordinates (mm) of a vector to continuous index coordinates.
-     *
-     * \deprecated The first parameter \a atPt3d_mm is unused.
-     *             Use WorldToIndex(const Vector3D&, Vector3D&) instead.
-     *
-     * \param[in] atPt3d_mm Unused point parameter.
-     * \param[in] vec_mm Vector in world coordinates (mm).
-     * \param[out] vec_units Vector in continuous index coordinates.
-     */
-    void WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
-
-    /**
      * \brief Convert an ITK physical point to MITK world coordinates.
      *
-     * \deprecated Since ITK 3.10 this is a no-op identity copy because
-     *             ITK physical coordinates and MITK world coordinates
-     *             are equivalent.
+     * Since ITK 3.10, ITK physical coordinates and MITK world coordinates
+     * are equivalent, so this is a plain coordinate copy.
      *
      * \tparam TCoordRep Coordinate representation type of the ITK point.
      * \param[in] itkPhysicalPoint Point in ITK physical coordinates (mm).
@@ -477,19 +452,16 @@ namespace mitk
     template <class TCoordRep>
     void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3> &itkPhysicalPoint, mitk::Point3D &pt_mm) const
     {
-      mitk::vtk2itk(itkPhysicalPoint, pt_mm);
+      mitk::FillArray(pt_mm, itkPhysicalPoint);
     }
 
     /**
      * \brief Convert MITK world coordinates to ITK physical coordinates.
      *
-     * \deprecated Since ITK 3.10 this is a no-op identity copy because
-     *             ITK physical coordinates and MITK world coordinates
-     *             are equivalent.
-     *
-     * Historically, ITK did not support rotated images; only origin and
-     * spacing were used.  This method was needed to convert from the full
-     * MITK transform (including rotation) to an ITK-compatible coordinate.
+     * Since ITK 3.10, ITK physical coordinates and MITK world coordinates
+     * are equivalent, so this is a plain coordinate copy. Historically,
+     * ITK did not support rotated images; only origin and spacing were
+     * used, and this method performed the full rotation-aware conversion.
      *
      * \tparam TCoordRep Coordinate representation type of the ITK point.
      * \param[in] pt_mm Point in MITK world coordinates (mm).
@@ -500,7 +472,7 @@ namespace mitk
     template <class TCoordRep>
     void WorldToItkPhysicalPoint(const mitk::Point3D &pt_mm, itk::Point<TCoordRep, 3> &itkPhysicalPoint) const
     {
-      mitk::vtk2itk(pt_mm, itkPhysicalPoint);
+      mitk::FillArray(itkPhysicalPoint, pt_mm);
     }
 
     // ********************************** BoundingBox **********************************

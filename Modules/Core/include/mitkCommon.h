@@ -154,21 +154,6 @@ calling object*/
     return smartPtr.GetPointer();                                                                                      \
   }
 
-/** cross-platform deprecation macro
-
-  \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
-*/
-#ifdef MITK_NO_DEPRECATED_WARNINGS
-#define DEPRECATED(func) func
-#elif defined(__GNUC__)
-#define DEPRECATED(...) __VA_ARGS__ __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED(...) __declspec(deprecated)##__VA_ARGS__
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for your compiler!")
-#define DEPRECATED(func) func
-#endif
-
 /** Override-aware counterparts of the ITK property macros.
  *
  *  Use these in subclasses that implement a string / const-object

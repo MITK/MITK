@@ -18,7 +18,7 @@ found in the LICENSE file.
  * \brief Convenience header that includes all MITK numeric types.
  *
  * Includes Vector, Point, Matrix, AffineTransform3D, Quaternion, Equal,
- * NumericConstants, and the deprecated VectorDeprecated conversions.
+ * and NumericConstants.
  */
 
 #include <mitkAffineTransform3D.h>
@@ -28,9 +28,5 @@ found in the LICENSE file.
 #include <mitkPoint.h>
 #include <mitkQuaternion.h>
 #include <mitkVector.h>
-
-// This include holds the old deprecated ways to convert from itk to vtk and the likes.
-// Calls to these functions shall be removed in future bug squashings so that this include can be removed.
-#include <mitkVectorDeprecated.h>
 
 #endif

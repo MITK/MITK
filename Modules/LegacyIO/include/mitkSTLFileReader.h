@@ -24,7 +24,6 @@ namespace mitk
    * mitk::Surface output. Uses VTK's vtkSTLReader internally.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::STLFileIOFactory, mitk::SurfaceSource
    */
   class MITKLEGACYIO_EXPORT STLFileReader : public SurfaceSource

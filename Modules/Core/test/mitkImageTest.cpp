@@ -377,7 +377,7 @@ int mitkImageTest(int argc, char *argv[])
   double vtkorigin[] = {-350, -358.203, -1363.5};
   vtkimage->SetOrigin(vtkorigin);
   mitk::Point3D vtkoriginAsMitkPoint;
-  mitk::vtk2itk(vtkorigin, vtkoriginAsMitkPoint);
+  mitk::FillArray(vtkoriginAsMitkPoint, vtkorigin);
   double vtkspacing[] = {1.367, 1.367, 2};
   vtkimage->SetSpacing(vtkspacing);
   vtkimage->AllocateScalars(VTK_SHORT, 1);
@@ -392,7 +392,7 @@ int mitkImageTest(int argc, char *argv[])
   MITK_TEST_OUTPUT(<< " Testing whether spacing has been correctly initialized from vtkImageData");
   mitk::Vector3D spacing2 = mitkByVtkImage->GetGeometry()->GetSpacing();
   mitk::Vector3D vtkspacingAsMitkVector;
-  mitk::vtk2itk(vtkspacing, vtkspacingAsMitkVector);
+  mitk::FillArray(vtkspacingAsMitkVector, vtkspacing);
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(spacing2, vtkspacingAsMitkVector), "");
 
   MITK_TEST_OUTPUT(

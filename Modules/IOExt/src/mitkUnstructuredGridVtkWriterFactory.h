@@ -33,21 +33,6 @@ namespace mitk
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
 
-    /**
-     * Register one factory of this type
-     * \deprecatedSince{2013_09}
-     */
-    DEPRECATED(static void RegisterOneFactory(void))
-    {
-      static bool IsRegistered = false;
-      if (!IsRegistered)
-      {
-        UnstructuredGridVtkWriterFactory::Pointer ugVtkWriterFactory = UnstructuredGridVtkWriterFactory::New();
-        ObjectFactoryBase::RegisterFactory(ugVtkWriterFactory);
-        IsRegistered = true;
-      }
-    }
-
   protected:
     UnstructuredGridVtkWriterFactory();
     ~UnstructuredGridVtkWriterFactory() override;

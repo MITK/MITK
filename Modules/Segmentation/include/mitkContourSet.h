@@ -24,7 +24,7 @@ namespace mitk
   /**
    * \brief Holds a collection of mitk::Contour objects indexed by ID.
    *
-   * \deprecated Use ContourModelSet instead.
+   * \note mitk::ContourModelSet is the preferred alternative for new code.
    * \sa ContourModelSet, Contour
    */
   class MITKSEGMENTATION_EXPORT ContourSet : public BaseData

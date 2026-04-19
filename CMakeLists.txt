@@ -90,7 +90,6 @@ include(FindPackageHandleStandardArgs)
 
 # MITK macros
 include(mitkFunctionCheckCompilerFlags)
-include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)

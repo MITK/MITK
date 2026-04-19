@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkGeometryData.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkTimeGeometry.h>
 
 mitk::GeometryData::GeometryData()

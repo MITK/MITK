@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkExtrudedContour.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkNumericTypes.h>
 #include <mitkProportionalTimeGeometry.h>
 
@@ -88,7 +88,7 @@ bool mitk::ExtrudedContour::IsInside(const Point3D &worldPoint) const
 
   // project point onto plane
   float xt[3];
-  itk2vtk(worldPoint, xt);
+  mitk::ToArray(xt, worldPoint);
 
   xt[0] = worldPoint[0] - m_Origin[0];
   xt[1] = worldPoint[1] - m_Origin[1];
@@ -216,7 +216,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   // Part I: guarantee/calculate legal vectors
 
   m_Vector.Normalize();
-  itk2vtk(m_Vector, m_Normal);
+  mitk::ToArray(m_Normal, m_Vector);
   // check m_Vector
   if (mitk::Equal(m_Vector, nullvector) || m_AutomaticVectorGeneration)
   {
@@ -230,7 +230,7 @@ void mitk::ExtrudedContour::BuildGeometry()
     unsigned int i = 0;
     for (i = 0, ccur = cstart; i < numPts; ++i, ccur += cstep)
     {
-      itk2vtk(path->Evaluate(ccur), vtkpoint);
+      mitk::ToArray(vtkpoint, path->Evaluate(ccur));
       loopPoints->InsertNextPoint(vtkpoint);
     }
 
@@ -238,7 +238,7 @@ void mitk::ExtrudedContour::BuildGeometry()
     vtkPolygon::ComputeNormal(loopPoints, m_Normal);
     loopPoints->Delete();
 
-    vtk2itk(m_Normal, m_Vector);
+    mitk::FillArray(m_Vector, m_Normal);
     if (mitk::Equal(m_Vector, nullvector))
     {
       itkExceptionMacro("Cannot calculate normal of polygon");
@@ -272,10 +272,12 @@ void mitk::ExtrudedContour::BuildGeometry()
   // calculate down-vector
   VnlVector rightDV = m_RightVector.GetVnlVector();
   rightDV.normalize();
-  vnl2vtk(rightDV, m_Right);
+  for (unsigned int i = 0; i < 3; ++i)
+    m_Right[i] = rightDV[i];
   VnlVector downDV = vnl_cross_3d(m_Vector.GetVnlVector(), rightDV);
   downDV.normalize();
-  vnl2vtk(downDV, m_Down);
+  for (unsigned int i = 0; i < 3; ++i)
+    m_Down[i] = downDV[i];
 
   // Part II: calculate plane as base for extrusion, project the contour
   // on this plane and store as polygon for IsInside test and BoundingBox calculation
@@ -357,7 +359,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   else
     bounds[5] = 20;
 
-  itk2vtk(origin, m_Origin);
+  mitk::ToArray(m_Origin, origin);
 
   mitk::BaseGeometry::Pointer g3d = GetGeometry(0);
   assert(g3d.IsNotNull());

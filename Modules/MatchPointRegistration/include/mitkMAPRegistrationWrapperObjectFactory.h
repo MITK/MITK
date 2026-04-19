@@ -43,23 +43,6 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
     void SetDefaultProperties(mitk::DataNode* node) override;
 
     /**
-     * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    DEPRECATED(std::string GetFileExtensions() override);
-    /**
-     * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    DEPRECATED(mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override);
-    /**
-     * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    DEPRECATED(std::string GetSaveFileExtensions() override);
-    /**
-     * \deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    DEPRECATED(mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override);
-
-    /**
      * \brief Creates a mapper for the given node and mapper slot.
      *
      * Returns the appropriate 2D or 3D registration wrapper mapper depending on the slot ID.

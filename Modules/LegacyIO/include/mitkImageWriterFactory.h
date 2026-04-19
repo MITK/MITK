@@ -28,10 +28,9 @@ namespace mitk
    * requested through itk::ObjectFactoryBase.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::ImageWriter
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
+  class MITKLEGACYIO_EXPORT ImageWriterFactory : public itk::ObjectFactoryBase
   {
   public:
     mitkClassMacroItkParent(mitk::ImageWriterFactory, itk::ObjectFactoryBase);
@@ -50,24 +49,6 @@ namespace mitk
 
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
-
-    /**
-     * \brief Register one instance of this factory with the ITK object factory system.
-     *
-     * Ensures the factory is only registered once. Subsequent calls have no effect.
-     *
-     * \deprecatedSince{2013_09}
-     */
-    DEPRECATED(static void RegisterOneFactory(void))
-    {
-      static bool IsRegistered = false;
-      if (!IsRegistered)
-      {
-        ImageWriterFactory::Pointer imageWriterFactory = ImageWriterFactory::New();
-        ObjectFactoryBase::RegisterFactory(imageWriterFactory);
-        IsRegistered = true;
-      }
-    }
 
   protected:
     ImageWriterFactory();

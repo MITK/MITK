@@ -65,12 +65,6 @@ namespace mitk
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
 
     /**
-    * \brief Returns whether this is an vtk-based mapper
-    * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
-    */
-    DEPRECATED(virtual bool IsVtkBased() const override);
-
-    /**
      * \brief Determine the render pass type and call the appropriate render method.
      *
      * Dispatches to MitkRenderOpaqueGeometry(), MitkRenderTranslucentGeometry(),
@@ -130,21 +124,6 @@ namespace mitk
     * from vtkProp.
     */
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
-
-    /**
-    * \brief Apply color and opacity properties read from the PropertyList
-    * \deprecatedSince{2013_03} Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor)
-    * instead
-    */
-    DEPRECATED(inline virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer))
-    {
-      ApplyColorAndOpacityProperties(renderer, actor);
-    }
-
-    /**
-    * \deprecatedSince{2018_04}
-    */
-    DEPRECATED(void ApplyShaderProperties(mitk::BaseRenderer *)){}
 
     /**
      * \brief Apply color and opacity properties read from the PropertyList to the given vtkActor.

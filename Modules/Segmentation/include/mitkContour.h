@@ -24,8 +24,8 @@ namespace mitk
 {
   /**
     \brief Stores vertices for drawing a contour.
-    \deprecated Use class mitk::ContourModel instead.
 
+    \note mitk::ContourModel is the preferred alternative for new code.
     \sa ContourModel
   */
   class MITKSEGMENTATION_EXPORT Contour : public BaseData

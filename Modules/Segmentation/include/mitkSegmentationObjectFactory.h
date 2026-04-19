@@ -34,17 +34,9 @@ namespace mitk
     itkCloneMacro(Self) Mapper::Pointer
       CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;
-    std::string GetFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-    void RegisterIOFactories();
 
   protected:
     SegmentationObjectFactory();
-    void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
   };
 }
 

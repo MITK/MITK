@@ -38,17 +38,8 @@ namespace mitk
 
     void SetDefaultProperties(mitk::DataNode *node) override;
 
-    std::string GetFileExtensions() override;
-
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-
-    std::string GetSaveFileExtensions() override;
-
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-
   protected:
     PlanarFigureObjectFactory();
-    void CreateFileExtensionsMap();
   };
 }
 

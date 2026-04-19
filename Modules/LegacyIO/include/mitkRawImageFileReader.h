@@ -30,10 +30,9 @@ namespace mitk
    * Internally uses itk::RawImageIO for the actual file reading.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::ImageSource, mitk::FileReader
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
+  class MITKLEGACYIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
   {
   public:
     mitkClassMacro(RawImageFileReader, FileReader);

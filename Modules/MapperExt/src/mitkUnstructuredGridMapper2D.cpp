@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkUnstructuredGrid.h>
-#include <mitkVtkMapper3D.h>
+#include <mitkVtkMapper.h>
 #include <mitkVtkScalarModeProperty.h>
 
 #include <vtkAbstractMapper3D.h>
@@ -174,8 +174,8 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
 
   double vp[3], vnormal[3];
 
-  vnl2vtk(point.GetVnlVector(), vp);
-  vnl2vtk(normal.GetVnlVector(), vnormal);
+  mitk::ToArray(vp, point);
+  mitk::ToArray(vnormal, normal);
 
   // normally, we would need to transform the surface and cut the transformed surface with the cutter.
   // This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
@@ -268,7 +268,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
       // take transformation via vtktransform into account
       vtktransform->TransformPoint(vp, vp);
 
-      vtk2itk(vp, p);
+      mitk::FillArray(p, vp);
 
       // convert 3D point (in mm) to display coordinates (units )
       renderer->WorldToDisplay(p, p2d);
@@ -341,7 +341,7 @@ void mitk::UnstructuredGridMapper2D::Paint(mitk::BaseRenderer *renderer)
         // take transformation via vtktransform into account
         vtktransform->TransformPoint(vp, vp);
 
-        vtk2itk(vp, p);
+        mitk::FillArray(p, vp);
 
         // convert 3D point (in mm) to display coordinates (units )
         renderer->WorldToDisplay(p, p2d);

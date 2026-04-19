@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef mitkIOAdapter_h
 #define mitkIOAdapter_h
 
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 
 #include <itkObject.h>
 
@@ -22,7 +22,6 @@ namespace mitk
    * \brief Abstract adapter base class for IO process objects.
    *
    * \ingroup DeprecatedIO
-   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
    *
    * \sa IOAdapter
    * \sa IFileReader
@@ -77,7 +76,6 @@ namespace mitk
    * \tparam T The IO process object type to adapt.
    *
    * \ingroup IO
-   * \deprecatedSince{2014_10} Use mitk::IFileReader instead.
    *
    * \sa IOAdapterBase
    * \sa IFileReader

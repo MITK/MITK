@@ -65,26 +65,6 @@ void mitk::ROIObjectFactory::SetDefaultProperties(DataNode* node)
   ROIMapper3D::SetDefaultProperties(node);
 }
 
-std::string mitk::ROIObjectFactory::GetFileExtensions()
-{
-  return "";
-}
-
-mitk::ROIObjectFactory::MultimapType mitk::ROIObjectFactory::GetFileExtensionsMap()
-{
-  return {};
-}
-
-std::string mitk::ROIObjectFactory::GetSaveFileExtensions()
-{
-  return "";
-}
-
-mitk::ROIObjectFactory::MultimapType mitk::ROIObjectFactory::GetSaveFileExtensionsMap()
-{
-  return {};
-}
-
 namespace mitk
 {
   class RegisterROIObjectFactory

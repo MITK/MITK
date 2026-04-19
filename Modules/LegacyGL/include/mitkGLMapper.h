@@ -33,9 +33,6 @@ namespace mitk
   * ApplyColorAndOpacity() can be used in the subclasses to apply color and opacity properties
   * read from the PropertyList.
   *
-  * \deprecatedSince{2015_05} GLMappers are no longer supported in the rendering pipeline.
-  * Please use mitkVtkMapper instead or consider writing your own vtk classes, such as vtkActor
-  * or vtkMapper
   * \ingroup Mapper
   */
   class MITKLEGACYGL_EXPORT GLMapper : public Mapper
@@ -52,14 +49,6 @@ namespace mitk
      */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
-    /** \brief Apply color and opacity properties read from the PropertyList
-   *  \deprecatedSince{2013_03} Use ApplyColorAndOpacityProperties(...) instead
-   */
-    DEPRECATED(inline virtual void ApplyProperties(mitk::BaseRenderer *renderer))
-    {
-      ApplyColorAndOpacityProperties(renderer);
-    }
-
     /** \brief Apply color and opacity properties read from the PropertyList.
     * The actor is not used in the GLMappers. Called by mapper subclasses.
     */
@@ -71,12 +60,6 @@ namespace mitk
     * single render pass.
     */
     void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
-
-    /** \brief Returns  whether this is a vtk-based mapper
-    *  \return false, since all mappers deriving from this class are OpenGL mappers
-    *  \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
-    */
-    DEPRECATED(virtual bool IsVtkBased() const override);
 
     /** \brief Returns whether this mapper allows picking in the renderwindow
     virtual bool IsPickable() const { return false; }*/

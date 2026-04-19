@@ -56,7 +56,7 @@ namespace mitk
    *
    * \note If you want to apply the mitk::ColorProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which
-   * supports color (e.g. LEVELWINDOW_COLOR). For an example, see
+   * supports color (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR). For an example, see
    * mitkImageVtkMapper2DColorTest.cpp in Core/Code/Rendering.
    *
    * \sa BaseProperty

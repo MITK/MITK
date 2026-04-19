@@ -15,11 +15,9 @@ found in the LICENSE file.
 #include <mitkCoreObjectFactory.h>
 
 #include "mitkParRecFileIOFactory.h"
-//#include "mitkObjFileIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
-#include "mitkUnstructuredGridVtkWriter.h"
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 
 #include <mitkVolumeMapperVtkSmart3D.h>
@@ -27,38 +25,20 @@ found in the LICENSE file.
 #include <mitkUnstructuredGridVtkMapper3D.h>
 #include <mitkVtkGLMapperWrapper.h>
 
-#include <vtkUnstructuredGridWriter.h>
-#include <vtkXMLPUnstructuredGridWriter.h>
-#include <vtkXMLUnstructuredGridWriter.h>
-
 mitk::IOExtObjectFactory::IOExtObjectFactory()
   : CoreObjectFactoryBase(),
-    m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer())
-    //, m_ObjFileIOFactory(ObjFileIOFactory::New().GetPointer())
-    ,
+    m_ParRecFileIOFactory(ParRecFileIOFactory::New().GetPointer()),
     m_StlVolumeTimeSeriesIOFactory(StlVolumeTimeSeriesIOFactory::New().GetPointer()),
     m_VtkVolumeTimeSeriesIOFactory(VtkVolumeTimeSeriesIOFactory::New().GetPointer()),
     m_UnstructuredGridVtkWriterFactory(UnstructuredGridVtkWriterFactory::New().GetPointer())
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    MITK_DEBUG << "IOExtObjectFactory c'tor" << std::endl;
+  MITK_DEBUG << "IOExtObjectFactory c'tor" << std::endl;
 
-    itk::ObjectFactoryBase::RegisterFactory(m_ParRecFileIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_StlVolumeTimeSeriesIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_VtkVolumeTimeSeriesIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_ParRecFileIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_StlVolumeTimeSeriesIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_VtkVolumeTimeSeriesIOFactory);
 
-    itk::ObjectFactoryBase::RegisterFactory(m_UnstructuredGridVtkWriterFactory);
-
-    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::New().GetPointer());
-    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::New().GetPointer());
-    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::New().GetPointer());
-
-    CreateFileExtensionsMap();
-
-    alreadyDone = true;
-  }
+  itk::ObjectFactoryBase::RegisterFactory(m_UnstructuredGridVtkWriterFactory);
 }
 
 mitk::IOExtObjectFactory::~IOExtObjectFactory()
@@ -116,41 +96,6 @@ void mitk::IOExtObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   {
     mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
   }
-}
-
-std::string mitk::IOExtObjectFactory::GetFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::IOExtObjectFactory::GetFileExtensionsMap()
-{
-  return m_FileExtensionsMap;
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::IOExtObjectFactory::GetSaveFileExtensionsMap()
-{
-  return m_SaveFileExtensionsMap;
-}
-
-void mitk::IOExtObjectFactory::CreateFileExtensionsMap()
-{
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));
-
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Parallel XML Unstructured Grid"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK XML Unstructured Grid"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Legacy Unstructured Grid"));
-}
-
-std::string mitk::IOExtObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
 }
 
 struct RegisterIOExtObjectFactory

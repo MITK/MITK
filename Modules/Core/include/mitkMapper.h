@@ -72,62 +72,6 @@ namespace mitk
      */
     virtual DataNode *GetDataNode() const;
 
-    /**\brief Get the data to map
-    *
-    * Returns the mitk::BaseData object associated with this mapper.
-    * \return the mitk::BaseData associated with this mapper.
-    * \deprecatedSince{2013_03} Use GetDataNode()->GetData() instead to access the data
-    */
-    DEPRECATED(BaseData *GetData() const);
-
-    /** \brief Convenience access method for color properties (instances of
-    * ColorProperty)
-    * \return \a true property was found
-    * \deprecatedSince{2013_03} Use GetDataNode()->GetColor(...) instead to get the color
-    */
-    DEPRECATED(virtual bool GetColor(float rgb[3], BaseRenderer *renderer, const char *name = "color") const);
-
-    /** \brief Convenience access method for visibility properties (instances
-    * of BoolProperty)
-    * \return \a true property was found
-    * \sa IsVisible
-    * \deprecatedSince{2013_03} Use GetDataNode()->GetVisibility(...) instead to get the visibility
-    */
-    DEPRECATED(virtual bool GetVisibility(bool &visible, BaseRenderer *renderer, const char *name = "visible") const);
-
-    /** \brief Convenience access method for opacity properties (instances of
-    * FloatProperty)
-    * \return \a true property was found
-    * \deprecatedSince{2013_03} Use GetDataNode()->GetOpacity(...) instead to get the opacity
-    */
-    DEPRECATED(virtual bool GetOpacity(float &opacity, BaseRenderer *renderer, const char *name = "opacity") const);
-
-    /** \brief Convenience access method for color properties (instances of
-    * LevelWindoProperty)
-    * \return \a true property was found
-    * \deprecatedSince{2013_03} Use GetDataNode->GetLevelWindow(...) instead to get the levelwindow
-    */
-    DEPRECATED(virtual bool GetLevelWindow(LevelWindow &levelWindow,
-                                           BaseRenderer *renderer,
-                                           const char *name = "levelwindow") const);
-
-    /** \brief Convenience access method for visibility properties (instances
-    * of BoolProperty). Return value is the visibility. Default is
-    * visible==true, i.e., true is returned even if the property (\a
-    * propertyKey) is not found.
-    *
-    * Thus, the return value has a different meaning than in the
-    * GetVisibility method!
-    * \sa GetVisibility
-    * \deprecatedSince{2013_03} Use GetDataNode()->GetVisibility(...) instead
-    */
-    DEPRECATED(virtual bool IsVisible(BaseRenderer *renderer, const char *name = "visible") const);
-
-    /** \brief Returns whether this is an vtk-based mapper
-   * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
-   */
-    virtual bool IsVtkBased() const { return true; }
-
     /**
      * \brief Calculate the time step for the current renderer and generate rendering data.
      *
@@ -196,10 +140,6 @@ namespace mitk
     /** \brief virtual destructor in order to derive from this class */
     ~Mapper() override;
 
-    /** \brief Generate the data needed for rendering (independent of a specific renderer)
-     *  \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
-     */
-    DEPRECATED(virtual void GenerateData()) {}
     /** \brief Generate the data needed for rendering into \a renderer */
     virtual void GenerateDataForRenderer(BaseRenderer * /* renderer */) {}
     /** \brief Updates the time step, which is sometimes needed in subclasses */

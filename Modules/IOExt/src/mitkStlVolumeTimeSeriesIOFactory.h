@@ -39,16 +39,6 @@ namespace mitk
     /** Run-time type information (and related methods). */
     itkTypeMacro(StlVolumeTimeSeriesIOFactory, ObjectFactoryBase);
 
-    /**
-     * Register one factory of this type
-     * \deprecatedSince{2013_09}
-     */
-    DEPRECATED(static void RegisterOneFactory(void))
-    {
-      StlVolumeTimeSeriesIOFactory::Pointer StlVolumeTimeSeriesIOFactory = StlVolumeTimeSeriesIOFactory::New();
-      ObjectFactoryBase::RegisterFactory(StlVolumeTimeSeriesIOFactory);
-    }
-
   protected:
     StlVolumeTimeSeriesIOFactory();
     ~StlVolumeTimeSeriesIOFactory() override;

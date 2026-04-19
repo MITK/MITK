@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMProperty.h>
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #define BOOST_DATE_TIME_NO_LIB
 //Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild

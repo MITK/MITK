@@ -32,7 +32,6 @@ namespace mitk
    * then load each file in sequence.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10}
    * \sa mitk::FileReader
    */
   class MITKLEGACYIO_EXPORT FileSeriesReader : public FileReader

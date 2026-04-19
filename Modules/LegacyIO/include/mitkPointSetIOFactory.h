@@ -26,10 +26,9 @@ namespace mitk
    * enabling automatic creation of readers for MITK point set XML files.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    * \sa mitk::PointSetReader
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT PointSetIOFactory : public itk::ObjectFactoryBase
+  class MITKLEGACYIO_EXPORT PointSetIOFactory : public itk::ObjectFactoryBase
   {
   public:
     /** \brief Standard ITK self type. */
@@ -64,19 +63,6 @@ namespace mitk
 
     /** \brief Run-time type information (and related methods). */
     itkTypeMacro(PointSetIOFactory, ObjectFactoryBase);
-
-    /**
-     * \brief Register one instance of this factory with the ITK object factory system.
-     *
-     * Ensures the factory is only registered once. Subsequent calls have no effect.
-     *
-     * \deprecatedSince{2013_09}
-     */
-    DEPRECATED(static void RegisterOneFactory(void))
-    {
-      PointSetIOFactory::Pointer PointSetIOFactory = PointSetIOFactory::New();
-      ObjectFactoryBase::RegisterFactory(PointSetIOFactory);
-    }
 
   protected:
     PointSetIOFactory();

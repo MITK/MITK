@@ -91,9 +91,9 @@ void mitk::ContourMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPr
       //      point = input->GetContourPath()->Evaluate(idx);
       point = pointsIt.Value();
 
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
 
       renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
       bool projectmode = false;

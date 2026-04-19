@@ -30,9 +30,8 @@ namespace mitk
    * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
    */
-  class DEPRECATED() MITKLEGACYIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
+  class MITKLEGACYIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
   {
   public:
     vtkTypeMacro(vtkPointSetXMLParser, vtkXMLParser);

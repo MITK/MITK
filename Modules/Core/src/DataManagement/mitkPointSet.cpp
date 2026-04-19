@@ -900,21 +900,6 @@ bool mitk::PointSet::PointDataType::operator==(const mitk::PointSet::PointDataTy
   return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
 }
 
-bool mitk::Equal(const mitk::PointSet *leftHandSide,
-                 const mitk::PointSet *rightHandSide,
-                 mitk::ScalarType eps,
-                 bool verbose,
-                 bool checkGeometry)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, "
-                  "mitk::ScalarType eps, bool verbose ) does not work with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose, checkGeometry);
-}
-
 bool mitk::Equal(const mitk::PointSet &leftHandSide,
                  const mitk::PointSet &rightHandSide,
                  mitk::ScalarType eps,

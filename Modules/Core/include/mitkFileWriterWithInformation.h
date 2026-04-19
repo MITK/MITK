@@ -24,8 +24,6 @@ namespace mitk
    * Extends FileWriter with methods providing default filename, dialog pattern,
    * and direct write capability for BaseData objects.
    *
-   * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
-   *
    * \sa FileWriter
    * \sa IFileWriter
    */

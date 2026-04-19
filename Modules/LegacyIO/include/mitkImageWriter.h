@@ -29,7 +29,6 @@ namespace mitk
    * and supports optional compression.
    *
    * \ingroup MitkLegacyIOModule
-   * \deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
    * \sa mitk::FileWriterWithInformation, mitk::IOUtil
    */
   class MITKLEGACYIO_EXPORT ImageWriter : public mitk::FileWriterWithInformation

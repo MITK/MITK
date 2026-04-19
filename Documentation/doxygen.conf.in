@@ -279,7 +279,6 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \"\" \"Functions deprecated as of \1\" \deprecated (as of \1)" \
                          "minimumCMakeVersionWindows=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_WINDOWS@" \
                          "minimumCMakeVersionOther=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER@" \
                          "minimumQt6Version=@MITK_QT6_MINIMUM_VERSION@" \
@@ -738,7 +737,7 @@ GENERATE_BUGLIST       = @MITK_DOXYGEN_GENERATE_BUGLIST@
 # the documentation.
 # The default value is: YES.
 
-GENERATE_DEPRECATEDLIST= @MITK_DOXYGEN_GENERATE_DEPRECATEDLIST@
+GENERATE_DEPRECATEDLIST= NO
 
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
@@ -2406,7 +2405,6 @@ PREDEFINED             = itkNotUsed(x)= \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
-                         "DEPRECATED(func)=func" \
                          "mitkSegmentationTaskValueMacro(type, name)=bool Has##name() const; type Get##name() const; void Set##name(const type& value);" \
                          "mitkSegmentationTaskListValueMacro(type, name)=bool Has##name(size_t index) const; type Get##name(size_t index) const; void SetDefault##name(const type& value);" \
                          @US_PLATFORM@

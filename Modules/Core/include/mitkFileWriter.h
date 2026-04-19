@@ -23,7 +23,6 @@ namespace mitk
    * \brief Interface class of writers that write data to files.
    *
    * \ingroup DeprecatedIO
-   * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
    *
    * \sa IFileWriter
    */

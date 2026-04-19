@@ -46,37 +46,9 @@ namespace mitk
      */
     void SetDefaultProperties(mitk::DataNode *node) override;
 
-    /** \brief Return supported file extensions for reading.
-     * \return String of supported file extensions.
-     */
-    std::string GetFileExtensions() override;
-
-    /** \brief Return the file extension map for reading.
-     * \return Multimap of file extension to description.
-     */
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-
-    /** \brief Return supported file extensions for saving.
-     * \return String of supported save file extensions.
-     */
-    std::string GetSaveFileExtensions() override;
-
-    /** \brief Return the file extension map for saving.
-     * \return Multimap of save file extension to description.
-     */
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-
-    /** \deprecatedSince{2013_09} */
-    DEPRECATED(void RegisterIOFactories());
-
   protected:
     ContourObjectFactory();
     ~ContourObjectFactory() override;
-    void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-  private:
   };
 }
 

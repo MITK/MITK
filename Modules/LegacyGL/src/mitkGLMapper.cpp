@@ -36,11 +36,6 @@ void mitk::GLMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRende
     Paint(renderer);
 }
 
-bool mitk::GLMapper::IsVtkBased() const
-{
-  return false;
-}
-
 void mitk::GLMapper::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
 {
   float rgba[4] = {1.0f, 1.0f, 1.0f, 1.0f};

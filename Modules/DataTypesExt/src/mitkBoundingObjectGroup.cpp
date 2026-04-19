@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkBoundingObjectGroup.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkProportionalTimeGeometry.h>
 #include <vtkLinearTransform.h>
 

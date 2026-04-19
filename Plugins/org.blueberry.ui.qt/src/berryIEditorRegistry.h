@@ -97,16 +97,6 @@ struct BERRY_UI_QT IEditorRegistry {
     virtual IEditorDescriptor::Pointer FindEditor(const QString& editorId) = 0;
 
     /**
-     * Returns the default editor. The default editor always exist.
-     *
-     * @return the descriptor of the default editor
-     * @deprecated The system external editor is the default editor.
-     * Use <code>findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID)</code>
-     * instead.
-     */
-    virtual IEditorDescriptor::Pointer GetDefaultEditor() = 0;
-
-    /**
    * Returns the default editor for a given file name. This method assumes an
    * unknown content type for the given file.
    * <p>

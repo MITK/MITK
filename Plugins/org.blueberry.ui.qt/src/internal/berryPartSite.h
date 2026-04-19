@@ -264,13 +264,6 @@ protected: virtual void SetRegisteredName(const QString& name);
    */
 public: void SetSelectionProvider(ISelectionProvider::Pointer provider) override;
 
-  /*
-   * @see IWorkbenchPartSite#getKeyBindingService()
-   *
-   * TODO deprecated: use IHandlerService instead
-   */
-//public: virtual  IKeyBindingService GetKeyBindingService();
-
 protected: virtual QString GetInitialScopeId();
 
   /**

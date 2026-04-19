@@ -112,8 +112,6 @@ public:
      * and maximize buttons and one tab.
      *
      * @return the minimum size for this stack (not null)
-     *
-     * @deprecated replaced by computePreferredSize
      */
     virtual QSize ComputeMinimumSize();
 

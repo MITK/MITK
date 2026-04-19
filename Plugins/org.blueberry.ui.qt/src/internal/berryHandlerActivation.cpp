@@ -39,11 +39,6 @@ HandlerActivation::HandlerActivation(const QString& commandId, const SmartPointe
   }
 }
 
-void HandlerActivation::ClearActive()
-{
-  ClearResult();
-}
-
 bool HandlerActivation::operator<(const Object* object) const
 {
   const HandlerActivation* activation = dynamic_cast<const HandlerActivation*>(object);

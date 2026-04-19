@@ -42,12 +42,10 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * A named preference for how a new perspective is opened.
    * <p>
    * Value is of type <code>std::string</code>. The possible values are defined
-   * by <code>OPEN_PERSPECTIVE_WINDOW, OPEN_PERSPECTIVE_PAGE and
-   * OPEN_PERSPECTIVE_REPLACE</code>.
+   * by <code>OPEN_PERSPECTIVE_WINDOW and OPEN_PERSPECTIVE_REPLACE</code>.
    * </p>
    *
    * @see #OPEN_PERSPECTIVE_WINDOW
-   * @see #OPEN_PERSPECTIVE_PAGE
    * @see #OPEN_PERSPECTIVE_REPLACE
    * @see #NO_NEW_PERSPECTIVE
    */
@@ -58,14 +56,6 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * perspective in a new window.
    */
   static const std::string OPEN_PERSPECTIVE_WINDOW; // "OPEN_PERSPECTIVE_WINDOW";
-
-  /**
-   * A preference value indicating that an action should open a new
-   * perspective in a new page.
-   * @deprecated Opening a Perspective in a new page is no longer supported
-   *             functionality as of 2.0.
-   */
-  static const std::string OPEN_PERSPECTIVE_PAGE; // "OPEN_PERSPECTIVE_PAGE";
 
   /**
    * A preference value indicating that an action should open a new

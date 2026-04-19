@@ -70,18 +70,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
   ~IWorkbenchPage() override;
 
   /**
-   * An optional attribute within a workspace marker (<code>IMarker</code>)
-   * which identifies the preferred editor type to be opened when
-   * <code>openEditor</code> is called.
-   *
-   * @see #OpenEditor
-   * @deprecated in 3.0 since the notion of markers this is not generally
-   *             applicable. Use the IDE-specific constant
-   *             <code>IDE.EDITOR_ID_ATTR</code>.
-   */
-  static const QString EDITOR_ID_ATTR; // = "org.blueberry.ui.editorID";
-
-  /**
    * Change event id when the perspective is reset to its original state.
    *
    * @see IPerspectiveListener
@@ -354,19 +342,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
       int matchFlags) = 0;
 
   /**
-   * Returns a list of the editors open in this page.
-   * <p>
-   * Note that each page has its own editors; editors are never shared between
-   * pages.
-   * </p>
-   *
-   * @return a list of open editors
-   *
-   * @deprecated use #GetEditorReferences instead
-   */
-  virtual QList<IEditorPart::Pointer> GetEditors() = 0;
-
-  /**
    * Returns an array of references to open editors in this page.
    * <p>
    * Note that each page has its own editors; editors are never shared between
@@ -419,19 +394,6 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
    * @return a list of references to visible views
    */
   virtual QList<IViewReference::Pointer> GetViewReferences() = 0;
-
-  /**
-   * Returns a list of the views visible on this page.
-   * <p>
-   * Note that each page has its own views; views are never shared between
-   * pages.
-   * </p>
-   *
-   * @return a list of visible views
-   *
-   * @deprecated use #GetViewReferences() instead.
-   */
-  virtual QList<IViewPart::Pointer> GetViews() = 0;
 
   /**
    * Returns the workbench window of this page.

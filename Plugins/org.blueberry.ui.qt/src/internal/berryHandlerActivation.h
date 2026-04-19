@@ -104,8 +104,6 @@ public:
                     const SmartPointer<Expression>& expression, int depth,
                     IHandlerService* handlerService);
 
-  void ClearActive() override;
-
   /**
    * Implement {@link Object#operator<(const Object*)}.
    * <p>

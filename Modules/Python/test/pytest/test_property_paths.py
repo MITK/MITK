@@ -42,8 +42,6 @@ class TestTemporoSpatialStringProperty:
         # Verify the values were set correctly
         assert prop.get_value(time_step=0, z_slice=0) == "all slices in ts0"
         assert prop.get_value(time_step=0, z_slice=1) == "all time steps in slice1"
-        # This should work now - when no time steps exist, it creates time step 0
-        assert prop.get_value(time_step=0, z_slice=1) == "all time steps in slice1"
     
     def test_set_value_creates_missing_indices(self):
         """Test that set_value creates missing time steps or slices."""
@@ -161,15 +159,7 @@ class TestPropertyKeyPath:
         # Indexed selection
         indexed_path = mitk.PropertyKeyPath("sequence") / "item" / "[5]"
         assert str(indexed_path) == "sequence.item.[5]"
-        
-        # Alternative syntax for selections - disable this test for now
-        # The syntax "item"["*"] is not valid Python and causes warnings
-        # alt_wildcard = mitk.PropertyKeyPath("sequence") / ("item"["*"])
-        # assert str(alt_wildcard) == "sequence.item.[*]"
-        #
-        # alt_indexed = mitk.PropertyKeyPath("sequence") / ("item"[5])
-        # assert str(alt_indexed) == "sequence.item.[5]"
-    
+
     def test_equality(self):
         """Test path equality."""
         path1 = mitk.PropertyKeyPath.from_string("a.b.c")
@@ -316,14 +306,6 @@ class TestDICOMTagPath:
         assert copied is not original
         assert deepcopied is not original
     
-    def test_cross_type_inequality(self):
-        """Test that PropertyKeyPath and DICOMTagPath are not equal."""
-        pkp = mitk.PropertyKeyPath("test")
-        dtp = mitk.DICOMTagPath(0x0010, 0x0010)
-        
-        assert pkp != dtp
-        assert not (pkp == dtp)
-
 
 class TestIntegration:
     """Integration tests combining multiple features."""

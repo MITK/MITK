@@ -106,7 +106,8 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     return; //nothing to fill;
   }
 
-  if (labelSetImage->IsLabelLocked(m_SeedLabelValue) && m_SeedLabelValue!=labelSetImage->GetActiveLabel()->GetValue())
+  auto activeLabel = labelSetImage->GetActiveLabel();
+  if (labelSetImage->IsLabelLocked(m_SeedLabelValue) && (nullptr == activeLabel || m_SeedLabelValue != activeLabel->GetValue()))
   {
     ErrorMessage.Send("Label of selected region is locked. Tool operation has no effect.");
     return;

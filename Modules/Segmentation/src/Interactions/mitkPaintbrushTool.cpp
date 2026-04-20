@@ -476,7 +476,10 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
     return;
 
   auto workingSeg = this->GetWorkingData();
-  Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
+  auto activeLabel = workingSeg->GetActiveLabel();
+  if (nullptr == activeLabel)
+    return;
+  Label::PixelType activePixelValue = activeLabel->GetValue();
   if (!m_FillMode)
   {
     activePixelValue = MultiLabelSegmentation::UNLABELED_VALUE;
@@ -588,7 +591,12 @@ void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* eve
     return;
   }
 
-  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()))->Clone();
+  auto affectedSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()));
+  if (affectedSlice.IsNull())
+  {
+    return;
+  }
+  m_WorkingSlice = affectedSlice->Clone();
 
   m_PaintingSlice = Image::New();
   m_PaintingSlice->Initialize(m_WorkingSlice);

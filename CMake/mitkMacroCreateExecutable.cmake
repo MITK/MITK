@@ -29,7 +29,6 @@ macro(mitk_create_executable)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # deprecated, unused
       INCLUDE_DIRS           # additional include dirs
       DEPENDS                # list of modules this module depends on
       PACKAGE_DEPENDS        # list of "packages" this module depends on (e.g. Qt, VTK, etc.)

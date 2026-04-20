@@ -1469,11 +1469,6 @@ set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${a
 set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
   endif()
 
-  get_target_property(deprecated_module ${target_to_export} MITK_MODULE_DEPRECATED_SINCE)
-  if(deprecated_module)
-    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
-set_target_properties(${target_to_export} PROPERTIES MITK_MODULE_DEPRECATED_SINCE \"${deprecated_module}\")")
-  endif()
 endforeach()
 
 # ---------------- External projects -----------------

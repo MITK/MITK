@@ -64,7 +64,6 @@ usFunctionCheckResourceLinking()
 #! \param VERSION Module version number, e.g. "1.2.0"
 #! \param AUTOLOAD_WITH A module target name identifying the module which will
 #!        trigger the automatic loading of this module
-#! \param DEPRECATED_SINCE Marks this modules as deprecated since <arg>
 #! \param DESCRIPTION A description for this module
 #!
 #! Multi-value Parameters (all optional):
@@ -111,7 +110,6 @@ function(mitk_create_module)
                              # automatic loading of this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
      )
 
@@ -552,10 +550,6 @@ function(mitk_create_module)
             set_target_properties(${MODULE_TARGET} PROPERTIES INSTALL_RPATH "@loader_path/..")
           endif()
         endif()
-      endif()
-
-      if(MODULE_DEPRECATED_SINCE)
-        set_property(TARGET ${MODULE_TARGET} PROPERTY MITK_MODULE_DEPRECATED_SINCE ${MODULE_DEPRECATED_SINCE})
       endif()
 
       # create export macros

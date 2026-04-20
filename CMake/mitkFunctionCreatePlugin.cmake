@@ -53,7 +53,6 @@ function(mitk_create_plugin)
     TARGET_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
-    SUBPROJECTS # deprecated
   )
 
   cmake_parse_arguments(_PLUGIN "${arg_options}" "${arg_single}" "${arg_multiple}" ${ARGN})

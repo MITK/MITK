@@ -191,7 +191,7 @@ void mitk::LookupTable::ChangeOpacityForAll(float opacity)
 void mitk::LookupTable::ChangeOpacity(int index, float opacity)
 {
   int noValues = m_LookupTable->GetNumberOfTableValues();
-  if (index > noValues)
+  if (index >= noValues)
   {
     MITK_INFO << "could not change opacity. index exceed size of lut ... " << std::endl;
     return;

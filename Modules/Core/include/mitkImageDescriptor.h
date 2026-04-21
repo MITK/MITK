@@ -111,8 +111,8 @@ namespace mitk
      * \brief Get the pixel type of a channel identified by name.
      *
      * \param[in] name The channel name to search for.
-     * \return The PixelType of the matching channel. If no channel with the
-     *         given name is found, the behavior is undefined.
+     * \return The PixelType of the matching channel.
+     * \throw std::invalid_argument If no channel with the given name is found.
      */
     PixelType GetChannelTypeByName(const char *name) const;
 
@@ -129,6 +129,7 @@ namespace mitk
      * \brief Get the ChannelDescriptor for a specific channel.
      * \param[in] id Zero-based channel index (default: 0).
      * \return A copy of the ChannelDescriptor.
+     * \throw std::invalid_argument If \p id exceeds the number of active channels.
      */
     ChannelDescriptor GetChannelDescriptor(unsigned int id = 0) const;
 

@@ -228,14 +228,14 @@ bool QmitkStdMultiWidget::GetCrosshairVisibility() const
   if (m_PlaneNode2.IsNotNull())
   {
     bool visibilityProperty = false;
-    crosshairVisibility &= m_PlaneNode2->GetVisibility(visibilityProperty, nullptr);
+    m_PlaneNode2->GetVisibility(visibilityProperty, nullptr);
     crosshairVisibility &= visibilityProperty;
   }
 
   if (m_PlaneNode3.IsNotNull())
   {
     bool visibilityProperty = false;
-    crosshairVisibility &= m_PlaneNode3->GetVisibility(visibilityProperty, nullptr);
+    m_PlaneNode3->GetVisibility(visibilityProperty, nullptr);
     crosshairVisibility &= visibilityProperty;
   }
 

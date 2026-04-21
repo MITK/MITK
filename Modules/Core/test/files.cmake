@@ -37,6 +37,7 @@ set(MODULE_TESTS
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkImageCastTest.cpp
   mitkImageDataItemTest.cpp
+  mitkImageDescriptorTest.cpp
   mitkImageGeneratorTest.cpp
   mitkIOUtilTest.cpp
   mitkITKEventObserverGuardTest.cpp

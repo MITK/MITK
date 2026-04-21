@@ -286,6 +286,10 @@ namespace mitk
      * \brief Insert a point with the given ID, world coordinates, and
      * PointSpecificationType.
      *
+     * If \a t is beyond the current number of time steps the PointSet is
+     * automatically expanded to accommodate it, matching the behaviour of
+     * SetPoint() and the other InsertPoint() overloads.
+     *
      * \param[in] id The point identifier.
      * \param[in] point The point in world coordinates.
      * \param[in] spec The point specification type.

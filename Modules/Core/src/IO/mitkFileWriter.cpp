@@ -38,6 +38,8 @@ std::string mitk::FileWriter::GetFileExtension()
 std::string mitk::FileWriter::GetPossibleFileExtensionsAsString()
 {
   std::vector<std::string> possibleFileExtensions = this->GetPossibleFileExtensions();
+  if (possibleFileExtensions.empty())
+    return "";
   std::stringstream stream;
   for (unsigned int i = 0; i < possibleFileExtensions.size() - 1; i++)
   {

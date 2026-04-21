@@ -76,26 +76,29 @@ void mitk::ImageDescriptor::Initialize(const unsigned int *dims, const unsigned 
 
 mitk::ChannelDescriptor mitk::ImageDescriptor::GetChannelDescriptor(unsigned int id) const
 {
+  if (id >= this->m_NumberOfChannels)
+  {
+    throw std::invalid_argument("The given id exceeds the number of active channel.");
+  }
   return this->m_ChannelDesc[id];
 }
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) const
 {
-  unsigned int idFound = 0;
   const std::string search_str(name);
 
-  for (auto iter = this->m_ChannelNames.begin(); iter < this->m_ChannelNames.end(); iter++)
+  for (auto iter = this->m_ChannelNames.begin(); iter != this->m_ChannelNames.end(); ++iter)
   {
-    if (search_str.compare(*iter))
-      idFound = iter - this->m_ChannelNames.begin();
+    if (search_str == *iter)
+      return (m_ChannelDesc[iter - this->m_ChannelNames.begin()]).GetPixelType();
   }
 
-  return (m_ChannelDesc[idFound]).GetPixelType();
+  throw std::invalid_argument("No channel found with the given name.");
 }
 
 mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id) const
 {
-  if (id > this->m_NumberOfChannels)
+  if (id >= this->m_NumberOfChannels)
   {
     throw std::invalid_argument("The given id exceeds the number of active channel.");
   }
@@ -108,7 +111,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeById(const unsigned int id)
 
 const std::string mitk::ImageDescriptor::GetChannelName(unsigned int id) const
 {
-  if (id > this->m_ChannelNames.size())
+  if (id >= this->m_ChannelNames.size())
     return "Out-of-range-access";
   else
     return this->m_ChannelNames.at(id);

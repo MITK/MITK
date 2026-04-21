@@ -335,27 +335,26 @@ void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, int t)
 
 void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpecificationType spec, int t)
 {
-  if ((unsigned int)t < m_PointSetSeries.size())
-  {
-    mitk::Point3D indexPoint;
-    mitk::BaseGeometry *tempGeometry = this->GetGeometry(t);
-    if (tempGeometry == nullptr)
-    {
-      MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned nullptr!" << std::endl;
-      return;
-    }
-    tempGeometry->WorldToIndex(point, indexPoint);
-    m_PointSetSeries[t]->GetPoints()->InsertElement(id, indexPoint);
-    PointDataType defaultPointData;
-    defaultPointData.id = id;
-    defaultPointData.selected = false;
-    defaultPointData.pointSpec = spec;
-    m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
+  this->Expand(t + 1);
 
-    // boundingbox has to be computed anyway
-    m_CalculateBoundingBox = true;
-    this->Modified();
+  mitk::Point3D indexPoint;
+  mitk::BaseGeometry *tempGeometry = this->GetGeometry(t);
+  if (tempGeometry == nullptr)
+  {
+    MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned nullptr!" << std::endl;
+    return;
   }
+  tempGeometry->WorldToIndex(point, indexPoint);
+  m_PointSetSeries[t]->GetPoints()->InsertElement(id, indexPoint);
+  PointDataType defaultPointData;
+  defaultPointData.id = id;
+  defaultPointData.selected = false;
+  defaultPointData.pointSpec = spec;
+  m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
+
+  // boundingbox has to be computed anyway
+  m_CalculateBoundingBox = true;
+  this->Modified();
 }
 
 mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint(PointType point, int t)

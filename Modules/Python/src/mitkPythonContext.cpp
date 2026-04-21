@@ -41,6 +41,36 @@ namespace
 
     MITK_INFO << "Using virtual environment: " << venvName;
   }
+
+  // Inserts a key into a dict on construction and removes it on
+  // destruction. GIL must be held by the caller for both. Used to scope
+  // __file__/__name__ during ExecuteFile so they never leak into the
+  // shared dictionary, even if py::exec or dict assignment throws.
+  class ScopedDictKey
+  {
+  public:
+    ScopedDictKey(py::dict& dict, const char* key, py::object value)
+      : m_Dict(dict), m_Key(key)
+    {
+      m_Dict[py::str(m_Key)] = std::move(value);
+    }
+
+    ~ScopedDictKey() noexcept
+    {
+      if (m_Dict.contains(m_Key))
+        PyDict_DelItemString(m_Dict.ptr(), m_Key);
+
+      if (PyErr_Occurred())
+        PyErr_Clear();
+    }
+
+    ScopedDictKey(const ScopedDictKey&) = delete;
+    ScopedDictKey& operator=(const ScopedDictKey&) = delete;
+
+  private:
+    py::dict& m_Dict;
+    const char* m_Key;
+  };
 }
 
 struct mitk::PythonContext::Impl
@@ -120,7 +150,17 @@ void mitk::PythonContext::Activate()
 
 mitk::PythonContext::~PythonContext()
 {
-  m_Impl->Dictionary.clear();
+  if (!Py_IsInitialized())
+  {
+    // The interpreter is already finalized. Destroying the py::dict in
+    // m_Impl would Py_DECREF objects backed by a dead interpreter (UB).
+    // Leak instead; this only happens during abnormal shutdown.
+    (void)m_Impl.release();
+    return;
+  }
+
+  py::gil_scoped_acquire gil;
+  m_Impl.reset();
 }
 
 void mitk::PythonContext::Execute(const std::string &expression)
@@ -151,14 +191,15 @@ void mitk::PythonContext::ExecuteFile(const fs::path& filePath)
 
   py::gil_scoped_acquire gil;
 
-  // __file__ and __name__ are script-scoped: set them for the duration of
-  // execution so scripts can use Path(__file__) and `if __name__ == "__main__"`,
-  // then remove them so subsequent Execute() calls don't see stale values.
-  // User-defined globals intentionally persist in the shared dictionary.
-  m_Impl->Dictionary[py::str("__file__")] = py::str(normalizedPath.generic_string());
-  m_Impl->Dictionary[py::str("__name__")] = py::str("__main__");
-
-  std::string errorMessage;
+  // __file__ and __name__ are script-scoped: the guards below insert them
+  // for the duration of execution so scripts can use Path(__file__) and
+  // `if __name__ == "__main__"`, then remove them on destruction so
+  // subsequent Execute() calls don't see stale values. User-defined
+  // globals intentionally persist in the shared dictionary.
+  ScopedDictKey fileKey(m_Impl->Dictionary, "__file__",
+                        py::str(normalizedPath.generic_string()));
+  ScopedDictKey nameKey(m_Impl->Dictionary, "__name__",
+                        py::str("__main__"));
 
   try
   {
@@ -166,15 +207,9 @@ void mitk::PythonContext::ExecuteFile(const fs::path& filePath)
   }
   catch (py::error_already_set& e)
   {
-    errorMessage = e.what();
-  }
-
-  PyDict_DelItemString(m_Impl->Dictionary.ptr(), "__file__");
-  PyDict_DelItemString(m_Impl->Dictionary.ptr(), "__name__");
-
-  if (!errorMessage.empty())
     mitkThrow() << "An error occurred while executing Python file \""
-                << normalizedPath.string() << "\": " << errorMessage;
+                << normalizedPath.string() << "\": " << e.what();
+  }
 }
 
 void mitk::PythonContext::BindImage(Image* image, const std::string& varName)

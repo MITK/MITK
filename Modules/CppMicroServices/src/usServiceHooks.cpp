@@ -65,25 +65,35 @@ void ServiceHooks::RemovedService(const ServiceReferenceType& reference, Tracked
 
 void ServiceHooks::Open()
 {
+  // The tracker's Open() registers a service listener, whose registration
+  // re-enters this object through HandleServiceListenerReg -> IsOpen(). The
+  // Lock class wraps a non-recursive mutex, so holding it across the call
+  // would self-deadlock. Drive the tracker unlocked and publish the result
+  // under the lock. Callbacks observing bOpen == false while we are still
+  // driving the tracker short-circuit cleanly in HandleServiceListenerReg.
+  ServiceTracker<ServiceListenerHook>* tracker =
+      new ServiceTracker<ServiceListenerHook>(GetModuleContext(), this);
+  tracker->Open();
+
   Lock lock(this);
-
-  listenerHookTracker = new ServiceTracker<ServiceListenerHook>(GetModuleContext(), this);
-  listenerHookTracker->Open();
-
+  listenerHookTracker = tracker;
   bOpen = true;
 }
 
 void ServiceHooks::Close()
 {
-  Lock lock(this);
-  if (listenerHookTracker)
+  ServiceTracker<ServiceListenerHook>* tracker = nullptr;
   {
-    listenerHookTracker->Close();
-    delete listenerHookTracker;
+    Lock lock(this);
+    tracker = listenerHookTracker;
     listenerHookTracker = nullptr;
+    bOpen = false;
   }
-
-  bOpen = false;
+  if (tracker)
+  {
+    tracker->Close();
+    delete tracker;
+  }
 }
 
 bool ServiceHooks::IsOpen() const

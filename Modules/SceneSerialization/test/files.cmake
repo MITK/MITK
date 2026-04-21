@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   mitkSceneIOTest2.cpp
+  mitkSceneJsonReaderTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

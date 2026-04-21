@@ -241,16 +241,6 @@ private:
   /** \brief Re-checks the last-active interactor button, if any. */
   void ReEnableLastInteractor();
 
-  /** \brief Syncs the Multi-Label Inspector's view selection to the given label.
-   *
-   * External changes to MultiLabelSegmentation::SetActiveLabel do not
-   * automatically update the inspector's tree-view highlight, so we have to
-   * push the change explicitly. Finds all QmitkMultiLabelInspector widgets
-   * in the application and calls SetSelectedLabel on each. Safe no-op if
-   * the inspector is not currently visible.
-   */
-  void SyncMultiLabelInspectorSelection(mitk::MultiLabelSegmentation::LabelValueType value);
-
   struct ShortcutLabel
   {
     QPushButton* button;

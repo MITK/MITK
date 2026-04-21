@@ -246,13 +246,13 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   };
   m_PromptTypeBaseTitle = m_Ui->promptTypeGroupBox->title();
 
-  this->ApplyShortcutLabels();
-
   auto prefService = mitk::CoreServices::GetPreferencesService();
   m_Preferences = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   m_Preferences->OnPropertyChanged +=
     mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::IPreferences::ChangeEvent&>(
       this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
+
+  this->ApplyShortcutLabels();
 }
 
 void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
@@ -750,16 +750,12 @@ void QmitknnInteractiveToolGUI::OnPreviewUpdated()
 
 bool QmitknnInteractiveToolGUI::IsAutoCreateNextLabelEnabled() const
 {
-  auto prefService = mitk::CoreServices::GetPreferencesService();
-  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
-  return prefs->GetBool("nnInteractive/autoCreateNextLabel", true);
+  return m_Preferences->GetBool("nnInteractive/autoCreateNextLabel", true);
 }
 
 bool QmitknnInteractiveToolGUI::AreShortcutsShownInLabels() const
 {
-  auto prefService = mitk::CoreServices::GetPreferencesService();
-  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
-  return prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
+  return m_Preferences->GetBool("nnInteractive/showShortcutsInLabels", true);
 }
 
 void QmitknnInteractiveToolGUI::ApplyShortcutLabels()
@@ -786,9 +782,7 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const
 {
-  auto prefService = mitk::CoreServices::GetPreferencesService();
-  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
-  return prefs->GetBool("nnInteractive/autoConfirm", false);
+  return m_Preferences->GetBool("nnInteractive/autoConfirm", false);
 }
 
 void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
@@ -860,17 +854,6 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
   m_AutoCreatedLabelSegmentation = segmentation;
   m_AutoCreatedLabelSegmentation.SetDeleteEventCallback(
     [this] { this->OnAutoCreatedSegmentationDeleted(); });
-}
-
-
-void QmitknnInteractiveToolGUI::SyncMultiLabelInspectorSelection(mitk::MultiLabelSegmentation::LabelValueType value)
-{
-  for (QWidget* topWidget : QApplication::topLevelWidgets())
-  {
-    const auto inspectors = topWidget->findChildren<QmitkMultiLabelInspector*>();
-    for (auto* inspector : inspectors)
-      inspector->SetSelectedLabel(value);
-  }
 }
 
 void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()

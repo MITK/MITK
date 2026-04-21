@@ -76,6 +76,10 @@ void mitk::ImageDescriptor::Initialize(const unsigned int *dims, const unsigned 
 
 mitk::ChannelDescriptor mitk::ImageDescriptor::GetChannelDescriptor(unsigned int id) const
 {
+  if (id >= this->m_NumberOfChannels)
+  {
+    throw std::invalid_argument("The given id exceeds the number of active channel.");
+  }
   return this->m_ChannelDesc[id];
 }
 

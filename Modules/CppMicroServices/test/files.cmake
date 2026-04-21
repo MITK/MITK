@@ -5,7 +5,10 @@ set(MODULE_TESTS
   usModuleHooksTest.cpp
   usModuleManifestTest.cpp
   usModuleTest.cpp
+  usModuleResourceContainerTest.cpp
   usModuleResourceTest.cpp
+  usModuleVersionTest.cpp
+  usNullEventTest.cpp
   usServiceFactoryTest.cpp
   usServiceHooksTest.cpp
   usServiceListenerTest.cpp

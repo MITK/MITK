@@ -15,9 +15,11 @@ found in the LICENSE file.
 #include "usTestingMacros.h"
 #include <usServiceInterface.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
 
 #include <stdexcept>
+#include <vector>
 
 using namespace us;
 
@@ -119,6 +121,55 @@ void TestServicePropertiesUpdate()
 }
 
 
+void TestInvalidServiceReference()
+{
+  // Regression: GetProperty/GetPropertyKeys/GetUsingModules on a default-
+  // constructed (invalid) ServiceReferenceBase must not crash.
+  ServiceReferenceU invalidRef;
+  US_TEST_CONDITION_REQUIRED(!invalidRef, "Default-constructed reference is invalid")
+  US_TEST_CONDITION(invalidRef.GetProperty("anything").Empty(),
+                    "GetProperty on invalid ref returns empty Any")
+
+  std::vector<std::string> keys;
+  keys.push_back("sentinel");
+  invalidRef.GetPropertyKeys(keys);
+  US_TEST_CONDITION(keys.size() == 1 && keys[0] == "sentinel",
+                    "GetPropertyKeys on invalid ref does not touch output")
+
+  std::vector<Module*> modules;
+  modules.push_back(nullptr);
+  invalidRef.GetUsingModules(modules);
+  US_TEST_CONDITION(modules.size() == 1 && modules[0] == nullptr,
+                    "GetUsingModules on invalid ref does not touch output")
+}
+
+void TestPropertyKeyPrefixCollision()
+{
+  // Regression: ServicePropertiesImpl::Find compared only key.size()
+  // characters, so a lookup for "mykey_long" would falsely match a stored
+  // "mykey" (prefix collision).
+  struct TestServiceA : public ITestServiceA
+  {
+  };
+
+  ModuleContext* context = GetModuleContext();
+
+  TestServiceA s;
+  ServiceProperties props;
+  props["mykey"] = std::string("short");
+  ServiceRegistration<ITestServiceA> reg = context->RegisterService<ITestServiceA>(&s, props);
+  ServiceReference<ITestServiceA> ref = reg.GetReference();
+
+  US_TEST_CONDITION(any_cast<std::string>(ref.GetProperty("mykey")) == "short",
+                    "Stored key resolves to its value")
+  US_TEST_CONDITION(ref.GetProperty("mykey_long").Empty(),
+                    "Longer key with stored key as prefix must not resolve")
+  US_TEST_CONDITION(ref.GetProperty("myk").Empty(),
+                    "Shorter key that is a prefix of a stored key must not resolve")
+
+  reg.Unregister();
+}
+
 int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryTest");
@@ -126,6 +177,8 @@ int usServiceRegistryTest(int /*argc*/, char* /*argv*/[])
   TestServiceInterfaceId();
   TestMultipleServiceRegistrations();
   TestServicePropertiesUpdate();
+  TestInvalidServiceReference();
+  TestPropertyKeyPrefixCollision();
 
   US_TEST_END()
 }

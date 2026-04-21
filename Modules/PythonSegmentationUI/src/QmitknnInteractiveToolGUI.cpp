@@ -28,8 +28,6 @@ found in the LICENSE file.
 #include <mitkPipPackageInfo.h>
 #include <QmitkStyleManager.h>
 
-#include <itkCommand.h>
-
 #include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
@@ -649,9 +647,9 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
   if (!m_AutoCreatedLabelValue.has_value())
     return;
 
-  // Capture state locally and clear our tracking (plus DeleteEvent observer).
-  // A SmartPointer keeps the segmentation alive for the deferred call.
-  mitk::MultiLabelSegmentation::Pointer segmentationPtr(m_AutoCreatedLabelSegmentation.GetPointer());
+  // Capture state locally and clear our tracking. Lock() returns a
+  // SmartPointer that keeps the segmentation alive for the deferred call.
+  auto segmentationPtr = m_AutoCreatedLabelSegmentation.Lock();
   const auto value = *m_AutoCreatedLabelValue;
   const auto previousActive = m_PreviousActiveLabelValue;
   this->InvalidateAutoCreatedLabel();
@@ -860,13 +858,8 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
   m_AutoCreatedLabelValue = addedLabel->GetValue();
   m_PreviousActiveLabelValue = previousActiveValue;
   m_AutoCreatedLabelSegmentation = segmentation;
-
-  // itk::WeakPointer does not auto-null on destruction, so register a
-  // DeleteEvent observer to clear our tracking when the segmentation goes
-  // away (e.g., via data-storage teardown on application exit).
-  auto deleteCommand = itk::SimpleMemberCommand<QmitknnInteractiveToolGUI>::New();
-  deleteCommand->SetCallbackFunction(this, &QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted);
-  m_AutoCreatedSegmentationDeleteTag = segmentation->AddObserver(itk::DeleteEvent(), deleteCommand);
+  m_AutoCreatedLabelSegmentation.SetDeleteEventCallback(
+    [this] { this->OnAutoCreatedSegmentationDeleted(); });
 }
 
 
@@ -882,14 +875,6 @@ void QmitknnInteractiveToolGUI::SyncMultiLabelInspectorSelection(mitk::MultiLabe
 
 void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()
 {
-  if (m_AutoCreatedSegmentationDeleteTag.has_value())
-  {
-    if (auto* segmentation = m_AutoCreatedLabelSegmentation.GetPointer())
-      segmentation->RemoveObserver(m_AutoCreatedSegmentationDeleteTag.value());
-
-    m_AutoCreatedSegmentationDeleteTag.reset();
-  }
-
   m_AutoCreatedLabelValue.reset();
   m_PreviousActiveLabelValue.reset();
   m_AutoCreatedLabelSegmentation = nullptr;
@@ -897,12 +882,8 @@ void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()
 
 void QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted()
 {
-  // Runs from inside the segmentation's destructor; do not call RemoveObserver
-  // (the observer is already being torn down).
-  m_AutoCreatedSegmentationDeleteTag.reset();
   m_AutoCreatedLabelValue.reset();
   m_PreviousActiveLabelValue.reset();
-  m_AutoCreatedLabelSegmentation = nullptr;
 }
 
 void QmitknnInteractiveToolGUI::ReEnableLastInteractor()

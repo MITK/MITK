@@ -17,9 +17,8 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkLabelSetImage.h>
 #include <mitknnInteractiveTool.h>
+#include <mitkWeakPointer.h>
 #include <MitkPythonSegmentationUIExports.h>
-
-#include <itkWeakPointer.h>
 
 #include <QString>
 
@@ -266,8 +265,7 @@ private:
 
   std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_AutoCreatedLabelValue;
   std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_PreviousActiveLabelValue;
-  itk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
-  std::optional<unsigned long> m_AutoCreatedSegmentationDeleteTag;
+  mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
 

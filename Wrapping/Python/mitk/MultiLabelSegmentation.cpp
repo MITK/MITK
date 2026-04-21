@@ -146,25 +146,6 @@ PyLabelVector MakeLabelVector(const LabelVector& src)
   return result;
 }
 
-PyLabelVector MakeLabelVectorFromConst(const ConstLabelVector& src)
-{
-  PyLabelVector result;
-  result.items.reserve(src.size());
-  for (const auto& lbl : src)
-  {
-    // Clone to get mutable pointer (labels are snapshots anyway)
-    auto clone = lbl->Clone();
-    result.items.push_back(clone);
-  }
-
-  std::sort(result.items.begin(), result.items.end(),
-    [](const Label::Pointer& a, const Label::Pointer& b) {
-      return a->GetValue() < b->GetValue();
-    });
-
-  return result;
-}
-
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------

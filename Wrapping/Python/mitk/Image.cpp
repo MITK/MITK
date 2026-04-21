@@ -120,7 +120,7 @@ std::vector<py::ssize_t> ComputeNumpyShape(const Image& img)
   return shape;
 }
 
-py::array BuildNumpyArray(const Image& img, void* data, bool writeable, py::capsule capsule)
+py::array BuildNumpyArray(const Image& img, const void* data, bool writeable, py::capsule capsule)
 {
   auto dtype = PixelTypeToDType(img.GetPixelType());
   auto format = PixelTypeFormat(img.GetPixelType());
@@ -131,9 +131,13 @@ py::array BuildNumpyArray(const Image& img, void* data, bool writeable, py::caps
   for (py::ssize_t i = static_cast<py::ssize_t>(shape.size()) - 2; i >= 0; --i)
     strides[i] = strides[i + 1] * shape[i + 1];
 
+  // pybind11's buffer_info stores a non-const void*. Mirror what the
+  // library itself does in its typed buffer_info(const T*, ...) overload:
+  // const_cast the pointer here and let the readonly flag enforce
+  // const-ness at the Python boundary.
   py::array arr(
     py::buffer_info(
-      data,
+      const_cast<void*>(data),
       dtype.itemsize(),
       format,
       shape.size(),
@@ -169,14 +173,18 @@ py::array AsNumpyAccessor(Image& img, bool writeable)
 {
   auto holder = std::make_unique<ImageAccessorHolder>();
 
-  if (writeable)
-    holder->write = std::make_unique<ImageWriteAccessor>(&img);
-  else
-    holder->read = std::make_unique<ImageReadAccessor>(&img);
+  {
+    py::gil_scoped_release release;
 
-  void* data = writeable
+    if (writeable)
+      holder->write = std::make_unique<ImageWriteAccessor>(&img);
+    else
+      holder->read = std::make_unique<ImageReadAccessor>(&img);
+  }
+
+  const void* data = writeable
     ? holder->GetMutableData()
-    : const_cast<void*>(holder->GetData());
+    : holder->GetData();
 
   if (data == nullptr)
     mitkThrow() << "Could not access image data";
@@ -366,7 +374,12 @@ Image::Pointer ImageFromNumpy(py::array array,
 
 Image::Pointer LoadImage(const std::string& path)
 {
-  auto img = mitk::IOUtil::Load<Image>(path);
+  Image::Pointer img;
+
+  {
+    py::gil_scoped_release release;
+    img = mitk::IOUtil::Load<Image>(path);
+  }
 
   if (img.IsNull())
     throw py::value_error("Could not load Image from: " + path);
@@ -379,6 +392,7 @@ void SaveImage(const Image* img, const std::string& path)
   if (img == nullptr)
     throw py::value_error("Cannot save a null image");
 
+  py::gil_scoped_release release;
   mitk::IOUtil::Save(img, path);
 }
 

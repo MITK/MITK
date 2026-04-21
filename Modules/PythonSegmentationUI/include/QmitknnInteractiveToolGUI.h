@@ -158,8 +158,8 @@ protected:
 
   /** \brief Handles the tool's PreviewUpdatedEvent.
    *
-   * In Superfast mode, schedules an auto-click of the Confirm button on the
-   * next event-loop tick. No-op otherwise.
+   * When "auto-confirm" is enabled, schedules an auto-click of the Confirm
+   * button on the next event-loop tick. No-op otherwise.
    */
   void OnPreviewUpdated();
 

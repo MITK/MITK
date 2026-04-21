@@ -523,7 +523,7 @@ void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionT
     this->UncheckOtherInteractorButtons(m_InteractorButtons[interactionType]);
     this->GetTool()->EnableInteractor(interactionType, m_PromptType);
 
-    // Remember this button so Fast/Superfast can re-enable it after an auto-confirm.
+    // Remember this button so automation can re-enable it after an auto-confirm.
     m_LastInteractorButton = m_InteractorButtons[interactionType];
 
     // Set the cursor to the interactor's cursor.
@@ -741,25 +741,50 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
     return;
 
   const auto previousActiveValue = activeLabel->GetValue();
-  const auto groupID = segmentation->GetGroupIndexOfLabel(previousActiveValue);
 
-  auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(segmentation);
-  if (newLabel.IsNull())
-    return;
+  // Delegate to the Segmentation view's QmitkMultiLabelInspector so the
+  // "default label naming" and "enforce suggestions" preferences are honored
+  // (including the naming/color dialog), matching the behavior of the
+  // "New label" button in the Segmentation plugin.
+  QmitkMultiLabelInspector* inspector = nullptr;
+  for (QWidget* topWidget : QApplication::topLevelWidgets())
+  {
+    inspector = topWidget->findChild<QmitkMultiLabelInspector*>();
+    if (inspector != nullptr)
+      break;
+  }
 
-  auto addedLabel = segmentation->AddLabel(newLabel, groupID, false);
+  mitk::Label* addedLabel = nullptr;
+
+  if (inspector != nullptr)
+  {
+    // Align the inspector's selection with the active label so that
+    // AddNewLabel() derives the correct group for the new label.
+    inspector->SetSelectedLabel(previousActiveValue);
+    addedLabel = inspector->AddNewLabel();
+  }
+  else
+  {
+    // Fallback for contexts where no inspector is reachable (e.g., the
+    // Segmentation view was closed while the tool is still alive). Create
+    // the label directly without consulting the naming preferences.
+    const auto groupID = segmentation->GetGroupIndexOfLabel(previousActiveValue);
+
+    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(segmentation);
+    if (newLabel.IsNull())
+      return;
+
+    addedLabel = segmentation->AddLabel(newLabel, groupID, false);
+    if (addedLabel == nullptr)
+      return;
+
+    segmentation->SetActiveLabel(addedLabel->GetValue());
+    workingNode->Modified();
+  }
+
+  // Dialog canceled or creation failed; keep the previous label active.
   if (addedLabel == nullptr)
     return;
-
-  segmentation->SetActiveLabel(addedLabel->GetValue());
-
-  // Sync the Multi-Label Inspector's highlighted row to the new active label.
-  // The inspector does not passively observe MultiLabelSegmentation active-label
-  // changes, so without this the old label would remain highlighted.
-  this->SyncMultiLabelInspectorSelection(addedLabel->GetValue());
-
-  // Trigger node-modified observers (renderers, etc.) to pick up the change.
-  workingNode->Modified();
 
   m_AutoCreatedLabelValue = addedLabel->GetValue();
   m_PreviousActiveLabelValue = previousActiveValue;

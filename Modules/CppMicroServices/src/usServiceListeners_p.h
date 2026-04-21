@@ -15,6 +15,7 @@ found in the LICENSE file.
 #define USSERVICELISTENERS_H
 
 #include <list>
+#include <optional>
 #include <string>
 #include <set>
 #include <unordered_map>
@@ -178,10 +179,18 @@ public:
 
 private:
 
-  /** \brief Remove a service listener without acquiring the lock.
-   *  \param[in] entryToRemove The listener entry to remove.
+  /**
+   * \brief Remove a service listener without acquiring the lock.
+   *
+   * The caller must hold the lock for this instance. The hook-notification
+   * callback (ServiceHooks::HandleServiceListenerUnreg) must be invoked by
+   * the caller after the lock is released, because it runs user code that
+   * may re-enter the listener API.
+   *
+   * \param[in] entryToRemove The listener entry to remove.
+   * \return A copy of the removed entry if one was found, otherwise empty.
    */
-  void RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove);
+  std::optional<ServiceListenerEntry> RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove);
 
   /**
    * \brief Remove all references to a service listener from the cache.

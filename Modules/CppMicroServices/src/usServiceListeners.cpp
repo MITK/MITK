@@ -35,35 +35,52 @@ ServiceListeners::ServiceListeners(CoreModuleContext* coreCtx)
 void ServiceListeners::AddServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                           void* data, const std::string& filter)
 {
-  Lock lock(this);
-
+  // Hook callbacks run user code that can re-enter the listener API, which
+  // would deadlock on our non-recursive mutex. Scope the lock to the data
+  // mutations and dispatch the hooks after releasing it.
   ServiceListenerEntry sle(mc, listener, data, filter);
-  RemoveServiceListener_unlocked(sle);
-
-  serviceSet.insert(sle);
+  std::optional<ServiceListenerEntry> replaced;
+  {
+    Lock lock(this);
+    replaced = RemoveServiceListener_unlocked(sle);
+    serviceSet.insert(sle);
+    CheckSimple(sle);
+  }
+  if (replaced)
+  {
+    coreCtx->serviceHooks.HandleServiceListenerUnreg(*replaced);
+  }
   coreCtx->serviceHooks.HandleServiceListenerReg(sle);
-  CheckSimple(sle);
 }
 
 void ServiceListeners::RemoveServiceListener(ModuleContext* mc, const ServiceListenerEntry::ServiceListener& listener,
                                              void* data)
 {
   ServiceListenerEntry entryToRemove(mc, listener, data);
-
-  Lock lock(this);
-  RemoveServiceListener_unlocked(entryToRemove);
+  std::optional<ServiceListenerEntry> removed;
+  {
+    Lock lock(this);
+    removed = RemoveServiceListener_unlocked(entryToRemove);
+  }
+  if (removed)
+  {
+    coreCtx->serviceHooks.HandleServiceListenerUnreg(*removed);
+  }
 }
 
-void ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove)
+std::optional<ServiceListenerEntry>
+ServiceListeners::RemoveServiceListener_unlocked(const ServiceListenerEntry& entryToRemove)
 {
   ServiceListenerEntries::const_iterator it = serviceSet.find(entryToRemove);
-  if (it != serviceSet.end())
+  if (it == serviceSet.end())
   {
-    it->SetRemoved(true);
-    coreCtx->serviceHooks.HandleServiceListenerUnreg(*it);
-    RemoveFromCache(*it);
-    serviceSet.erase(it);
+    return std::nullopt;
   }
+  it->SetRemoved(true);
+  ServiceListenerEntry removed = *it;
+  RemoveFromCache(*it);
+  serviceSet.erase(it);
+  return removed;
 }
 
 void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
@@ -133,16 +150,20 @@ void ServiceListeners::RemoveAllListeners(ModuleContext* mc)
 
 void ServiceListeners::HooksModuleStopped(ModuleContext* mc)
 {
-  Lock lock(this);
   std::vector<ServiceListenerEntry> entries;
-  for (ServiceListenerEntries::iterator it = serviceSet.begin();
-       it != serviceSet.end(); ++it)
   {
-    if (it->GetModuleContext() == mc)
+    Lock lock(this);
+    for (ServiceListenerEntries::iterator it = serviceSet.begin();
+         it != serviceSet.end(); ++it)
     {
-      entries.push_back(*it);
+      if (it->GetModuleContext() == mc)
+      {
+        entries.push_back(*it);
+      }
     }
   }
+  // Dispatch the hook callback outside the lock; it runs user code that
+  // may re-enter the listener API.
   coreCtx->serviceHooks.HandleServiceListenerUnreg(entries);
 }
 
@@ -188,11 +209,21 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, ServiceListenerEntries& set,
                                                    bool lockProps)
 {
-  Lock lock(this);
-
-  // Filter the original set of listeners
-  ServiceListenerEntries receivers = serviceSet;
+  // Snapshot the current listener set under the lock so we can invoke the
+  // event-hook callback without holding it: user hooks may re-enter the
+  // listener API and would deadlock on our non-recursive mutex.
+  ServiceListenerEntries receivers;
+  {
+    Lock lock(this);
+    receivers = serviceSet;
+  }
   coreCtx->serviceHooks.FilterServiceEventReceivers(evt, receivers);
+
+  // Re-acquire the lock for reading complicatedListeners and the simple-filter
+  // cache. Concurrent modifications between the two critical sections are
+  // tolerated: receivers holds a stable local copy, and any listener removed
+  // concurrently is already filtered out by the IsRemoved() check at dispatch.
+  Lock lock(this);
 
   // Check complicated or empty listener filters
   for (std::list<ServiceListenerEntry>::const_iterator sse = complicatedListeners.begin();
@@ -206,8 +237,6 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt, Serv
       set.insert(*sse);
     }
   }
-
-  //         << " listeners with complicated filters";
 
   // Check the cache
   const std::vector<std::string> c(any_cast<std::vector<std::string> >

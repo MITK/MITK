@@ -653,7 +653,7 @@ void mitk::nnInteractiveTool::StartSession()
 
   {
     pythonContext->Execute(
-      "image = mitk_image.as_numpy()\n"
+      "image = mitk_image.as_numpy(writeable=True)\n"
       "spacing = list(reversed(mitk_image.spacing))\n"
       "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
       "torch_target_buffer = torch.from_numpy(target_buffer)\n"

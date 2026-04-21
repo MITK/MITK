@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define USMODULERESOURCECONTAINER_P_H
 
 #include <usGlobalConfig.h>
+#include <MitkCppMicroServicesExports.h>
 #include <cstdint>
 
 #include <ctime>
@@ -131,16 +132,25 @@ public:
   void FindNodes(const std::string& path, const std::string& filePattern,
                  bool recurse, std::vector<ModuleResource>& resources) const;
 
-private:
-
   /**
    * \brief Check if a resource name matches the given glob pattern.
+   *
+   * Supports \c '*' as a wildcard matching any sequence of characters. The
+   * pattern is anchored at both ends: unless the pattern begins with \c '*',
+   * the name must start with the leading literal segment, and unless the
+   * pattern ends with \c '*', the name must end with the trailing literal
+   * segment.
+   *
+   * Exposed as a static helper so it can be covered by unit tests without
+   * going through FindNodes.
    *
    * \param[in] name Resource name to test.
    * \param[in] filePattern Glob pattern.
    * \return \c true if the name matches.
    */
-  bool Matches(const std::string& name, const std::string& filePattern) const;
+  MITKCPPMICROSERVICES_EXPORT static bool Matches(const std::string& name, const std::string& filePattern);
+
+private:
 
   ModuleResourceContainerPrivate* d; ///< \brief Private implementation data.
 

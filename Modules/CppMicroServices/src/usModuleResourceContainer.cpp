@@ -199,45 +199,70 @@ void ModuleResourceContainer::FindNodes(const std::string& path, const std::stri
   }
 }
 
-bool ModuleResourceContainer::Matches(const std::string& name, const std::string& filePattern) const
+bool ModuleResourceContainer::Matches(const std::string& name, const std::string& filePattern)
 {
   // short-cut
   if (filePattern == "*") return true;
 
   std::vector<std::string> tokens;
-  std::stringstream ss(filePattern);
-  std::string tok;
-  while(std::getline(ss, tok, '*'))
   {
-    tokens.push_back(tok);
+    std::stringstream ss(filePattern);
+    std::string tok;
+    while (std::getline(ss, tok, '*'))
+    {
+      tokens.push_back(tok);
+    }
   }
 
   if (tokens.empty()) return true;
 
-  bool startsWithWild = !filePattern.empty() && filePattern[0] == '*';
-  bool endsWithWild = !filePattern.empty() && filePattern[filePattern.size()-1] == '*';
+  const bool startsWithWild = !filePattern.empty() && filePattern[0] == '*';
+  const bool endsWithWild = !filePattern.empty() && filePattern[filePattern.size()-1] == '*';
+
+  // Locate the last non-empty token. Empty tokens result from consecutive
+  // '*' characters and act like a single wildcard.
+  std::size_t lastNonEmpty = tokens.size();
+  while (lastNonEmpty > 0 && tokens[lastNonEmpty - 1].empty())
+  {
+    --lastNonEmpty;
+  }
+  if (lastNonEmpty == 0) return true; // pattern is all wildcards
 
   std::size_t pos = 0;
-  for (std::size_t i = 0; i < tokens.size(); ++i)
+  for (std::size_t i = 0; i < lastNonEmpty; ++i)
   {
-    if (tokens[i].empty()) continue;
+    const std::string& tok = tokens[i];
+    if (tok.empty()) continue;
 
-    if (i == 0 && !startsWithWild)
+    const bool isFirstAnchored = (i == 0) && !startsWithWild;
+    const bool isLastAnchored = (i == lastNonEmpty - 1) && !endsWithWild;
+
+    if (isFirstAnchored && isLastAnchored)
     {
-      // First token must match at the start of name
-      if (name.compare(0, tokens[i].size(), tokens[i]) != 0) return false;
-      pos = tokens[i].size();
+      // Pattern has no wildcards: name must equal the token exactly.
+      if (name.size() != tok.size() || name.compare(0, tok.size(), tok) != 0) return false;
+      pos = name.size();
+    }
+    else if (isFirstAnchored)
+    {
+      if (tok.size() > name.size() || name.compare(0, tok.size(), tok) != 0) return false;
+      pos = tok.size();
+    }
+    else if (isLastAnchored)
+    {
+      // Anchor the final literal segment to the end of name.
+      if (tok.size() > name.size() - pos) return false;
+      const std::size_t expected = name.size() - tok.size();
+      if (name.compare(expected, tok.size(), tok) != 0) return false;
+      pos = name.size();
     }
     else
     {
-      std::size_t index = name.find(tokens[i], pos);
-      if (index == std::string::npos) return false;
-      pos = index + tokens[i].size();
+      const std::size_t idx = name.find(tok, pos);
+      if (idx == std::string::npos) return false;
+      pos = idx + tok.size();
     }
   }
-
-  // Last token must match at the end of name (unless pattern ends with *)
-  if (!endsWithWild && pos != name.size()) return false;
 
   return true;
 }

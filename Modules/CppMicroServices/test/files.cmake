@@ -1,5 +1,6 @@
 set(MODULE_TESTS
   usAnyTest.cpp
+  usHookReentranceTest.cpp
   usLDAPFilterTest.cpp
   usModuleAutoLoadTest.cpp
   usModuleHooksTest.cpp

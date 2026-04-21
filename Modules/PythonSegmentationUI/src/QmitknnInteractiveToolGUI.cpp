@@ -44,6 +44,35 @@ namespace
 {
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 
+  // Qt::Key_A..Qt::Key_Z are 0x41..0x5a and coincide with the ASCII codes
+  // of the uppercase letters, so the same constant drives the QShortcut,
+  // the tooltip hint, and the label suffix.
+  constexpr Qt::Key RESET_KEY       = Qt::Key_R;
+  constexpr Qt::Key CONFIRM_KEY     = Qt::Key_C;
+  constexpr Qt::Key PROMPT_TYPE_KEY = Qt::Key_T;
+  constexpr Qt::Key POINT_KEY       = Qt::Key_P;
+  constexpr Qt::Key BOX_KEY         = Qt::Key_B;
+  constexpr Qt::Key SCRIBBLE_KEY    = Qt::Key_S;
+  constexpr Qt::Key LASSO_KEY       = Qt::Key_L;
+
+  QChar KeyChar(Qt::Key key)
+  {
+    return QChar(static_cast<int>(key));
+  }
+
+  QString LabelWithShortcut(const QString& baseText, Qt::Key key)
+  {
+    return QString("%1 (%2)").arg(baseText, KeyChar(key));
+  }
+
+  void BindShortcut(QWidget* parent, Qt::Key key, QPushButton* button,
+                    const QString& tooltipTemplate)
+  {
+    button->setToolTip(tooltipTemplate.arg(KeyChar(key)));
+    auto shortcut = new QShortcut(QKeySequence(key), parent);
+    QObject::connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+  }
+
   void SetIcon(QAbstractButton* button, const char* icon)
   {
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
@@ -152,6 +181,13 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
     tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
       this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
   }
+
+  if (m_Preferences != nullptr)
+  {
+    m_Preferences->OnPropertyChanged -=
+      mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::IPreferences::ChangeEvent&>(
+        this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
+  }
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -189,19 +225,36 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   Superclass::InitializeUI(mainLayout);
 
-  // Set shortcut to reset all interactions.
-
-  m_Ui->resetButton->setToolTip("Press R to reset all interactions");
-  auto reset = new QShortcut(QKeySequence(Qt::Key_R), this);
-  connect(reset, &QShortcut::activated, m_Ui->resetButton, &QPushButton::click);
-
-  // Set shortcut to confirm a segmentation.
-  // TODO: Once we agree on a common shortcut concept, this should be moved to the base class.
+  // TODO: Once we agree on a common shortcut concept, the confirm binding
+  // should be moved to the base class.
 
   auto confirmButton = this->GetConfirmSegmentationButton();
-  confirmButton->setToolTip("Press C to confirm a segmentation");
-  auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_C), this);
-  connect(confirmSegmentation, &QShortcut::activated, confirmButton, &QPushButton::click);
+
+  BindShortcut(this, RESET_KEY, m_Ui->resetButton, "Press %1 to reset all interactions");
+  BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
+
+  // Cache the base label of each shortcut-bound widget as seen from the
+  // .ui file (and, for the confirm button, from the base class). The cache
+  // is the single source of truth for ApplyShortcutLabels, so repeated
+  // invocations never accumulate suffixes.
+
+  m_ShortcutLabels = {
+    { m_Ui->resetButton,    RESET_KEY,    m_Ui->resetButton->text() },
+    { m_Ui->pointButton,    POINT_KEY,    m_Ui->pointButton->text() },
+    { m_Ui->boxButton,      BOX_KEY,      m_Ui->boxButton->text() },
+    { m_Ui->scribbleButton, SCRIBBLE_KEY, m_Ui->scribbleButton->text() },
+    { m_Ui->lassoButton,    LASSO_KEY,    m_Ui->lassoButton->text() },
+    { confirmButton,        CONFIRM_KEY,  confirmButton->text() },
+  };
+  m_PromptTypeBaseTitle = m_Ui->promptTypeGroupBox->title();
+
+  this->ApplyShortcutLabels();
+
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  m_Preferences = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  m_Preferences->OnPropertyChanged +=
+    mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::IPreferences::ChangeEvent&>(
+      this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
 }
 
 void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
@@ -242,11 +295,11 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
 
   // Set shortcut to toggle the prompt type.
 
-  const QString toolTip("Press T to switch the prompt types");
+  const QString toolTip = QString("Press %1 to switch the prompt types").arg(KeyChar(PROMPT_TYPE_KEY));
   m_Ui->positiveButton->setToolTip(toolTip);
   m_Ui->negativeButton->setToolTip(toolTip);
 
-  auto togglePromptType = new QShortcut(QKeySequence(Qt::Key_T), this);
+  auto togglePromptType = new QShortcut(QKeySequence(PROMPT_TYPE_KEY), this);
 
   connect(togglePromptType, &QShortcut::activated, this, [this]() {
     if (m_Ui->positiveButton->isChecked())
@@ -264,21 +317,10 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
 {
   // Set shortcuts to toggle interactor buttons.
 
-  m_Ui->pointButton->setToolTip("Press P to toggle the point interaction");
-  auto togglePointInteractor = new QShortcut(QKeySequence(Qt::Key_P), this);
-  connect(togglePointInteractor, &QShortcut::activated, m_Ui->pointButton, &QPushButton::click);
-
-  m_Ui->boxButton->setToolTip("Press B to toggle the box interaction");
-  auto toggleBoxInteractor = new QShortcut(QKeySequence(Qt::Key_B), this);
-  connect(toggleBoxInteractor, &QShortcut::activated, m_Ui->boxButton, &QPushButton::click);
-
-  m_Ui->scribbleButton->setToolTip("Press S to toggle the scribble interaction");
-  auto toggleScribbleInteractor = new QShortcut(QKeySequence(Qt::Key_S), this);
-  connect(toggleScribbleInteractor, &QShortcut::activated, m_Ui->scribbleButton, &QPushButton::click);
-
-  m_Ui->lassoButton->setToolTip("Press L to toggle the lasso interaction");
-  auto toggleLassoInteractor = new QShortcut(QKeySequence(Qt::Key_L), this);
-  connect(toggleLassoInteractor, &QShortcut::activated, m_Ui->lassoButton, &QPushButton::click);
+  BindShortcut(this, POINT_KEY,    m_Ui->pointButton,    "Press %1 to toggle the point interaction");
+  BindShortcut(this, BOX_KEY,      m_Ui->boxButton,      "Press %1 to toggle the box interaction");
+  BindShortcut(this, SCRIBBLE_KEY, m_Ui->scribbleButton, "Press %1 to toggle the scribble interaction");
+  BindShortcut(this, LASSO_KEY,    m_Ui->lassoButton,    "Press %1 to toggle the lasso interaction");
 
   m_InteractorButtons[InteractionType::Point] = m_Ui->pointButton;
   m_InteractorButtons[InteractionType::Box] = m_Ui->boxButton;
@@ -713,6 +755,35 @@ bool QmitknnInteractiveToolGUI::IsAutoCreateNextLabelEnabled() const
   auto prefService = mitk::CoreServices::GetPreferencesService();
   auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   return prefs->GetBool("nnInteractive/autoCreateNextLabel", true);
+}
+
+bool QmitknnInteractiveToolGUI::AreShortcutsShownInLabels() const
+{
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  return prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
+}
+
+void QmitknnInteractiveToolGUI::ApplyShortcutLabels()
+{
+  const bool show = this->AreShortcutsShownInLabels();
+
+  for (const auto& entry : m_ShortcutLabels)
+  {
+    entry.button->setText(show
+      ? LabelWithShortcut(entry.baseText, entry.key)
+      : entry.baseText);
+  }
+
+  m_Ui->promptTypeGroupBox->setTitle(show
+    ? LabelWithShortcut(m_PromptTypeBaseTitle, PROMPT_TYPE_KEY)
+    : m_PromptTypeBaseTitle);
+}
+
+void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)
+{
+  if (event.GetProperty() == "nnInteractive/showShortcutsInLabels")
+    this->ApplyShortcutLabels();
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

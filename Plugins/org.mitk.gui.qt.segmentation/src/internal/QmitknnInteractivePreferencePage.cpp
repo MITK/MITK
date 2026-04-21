@@ -58,6 +58,7 @@ bool QmitknnInteractivePreferencePage::PerformOk()
 
   prefs->PutBool("nnInteractive/autoCreateNextLabel", m_Ui->autoCreateNextLabelCheckBox->isChecked());
   prefs->PutBool("nnInteractive/autoConfirm", m_Ui->autoConfirmCheckBox->isChecked());
+  prefs->PutBool("nnInteractive/showShortcutsInLabels", m_Ui->showShortcutsInLabelsCheckBox->isChecked());
 
   if (m_Ui->cpuBackendRadioButton->isChecked())
   {
@@ -98,12 +99,14 @@ void QmitknnInteractivePreferencePage::Update()
   const auto prefs = GetPreferences();
   const auto autoCreateNextLabel = prefs->GetBool("nnInteractive/autoCreateNextLabel", true);
   const auto autoConfirm = prefs->GetBool("nnInteractive/autoConfirm", false);
+  const auto showShortcutsInLabels = prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
   const auto backend = prefs->Get("nnInteractive/backend", "auto");
   const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
 
   m_Ui->autoCreateNextLabelCheckBox->setChecked(autoCreateNextLabel);
   m_Ui->autoConfirmCheckBox->setChecked(autoConfirm);
+  m_Ui->showShortcutsInLabelsCheckBox->setChecked(showShortcutsInLabels);
 
   if (backend == "cpu")
   {

@@ -14,14 +14,18 @@ found in the LICENSE file.
 #define QmitknnInteractiveToolGUI_h
 
 #include <QmitkSegWithPreviewToolGUIBase.h>
+#include <mitkIPreferences.h>
 #include <mitkLabelSetImage.h>
 #include <mitknnInteractiveTool.h>
 #include <MitkPythonSegmentationUIExports.h>
 
 #include <itkWeakPointer.h>
 
+#include <QString>
+
 #include <memory>
 #include <optional>
+#include <vector>
 
 class QAbstractButton;
 class QButtonGroup;
@@ -202,6 +206,22 @@ private:
   /** \brief Reads the "auto-confirm after single interaction" preference. Not cached. */
   bool IsAutoConfirmEnabled() const;
 
+  /** \brief Reads the "show shortcuts in button labels" preference. Not cached. */
+  bool AreShortcutsShownInLabels() const;
+
+  /** \brief Decorates each shortcut-bound widget's text with its key, or
+   *         restores the plain base text, based on the current preference.
+   *
+   * Idempotent: labels are always derived from the cached base text in
+   * \c m_ShortcutLabels, never from the widget's current text.
+   */
+  void ApplyShortcutLabels();
+
+  /** \brief Reacts to preference node changes and refreshes shortcut labels
+   *         when the relevant key changes. Other keys are ignored.
+   */
+  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event);
+
   /** \brief Creates a new label in the working segmentation and selects it.
    *
    * The new label is placed into the group of the previously-active label.
@@ -232,6 +252,13 @@ private:
    */
   void SyncMultiLabelInspectorSelection(mitk::MultiLabelSegmentation::LabelValueType value);
 
+  struct ShortcutLabel
+  {
+    QPushButton* button;
+    Qt::Key key;
+    QString baseText;
+  };
+
   std::unique_ptr<Ui::QmitknnInteractiveToolGUI> m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
   PromptType m_PromptType;
@@ -243,6 +270,10 @@ private:
   std::optional<unsigned long> m_AutoCreatedSegmentationDeleteTag;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
+
+  mitk::IPreferences* m_Preferences = nullptr;
+  std::vector<ShortcutLabel> m_ShortcutLabels;
+  QString m_PromptTypeBaseTitle;
 };
 
 #endif

@@ -330,6 +330,26 @@ namespace mitk
      */
     Message1<bool> ConfirmCleanUpEvent;
 
+    /** \brief Event triggered after the preview has been updated from a user interaction.
+     *
+     * Emitted at the end of DoUpdatePreview() when the update was driven by
+     * an enabled interactor (i.e., the user placed a point/box/scribble/lasso)
+     * and the prediction result has been written to the preview image.
+     *
+     * Not emitted for initial-mask-based updates or reset operations.
+     */
+    Message<> PreviewUpdatedEvent;
+
+    /** \brief Event triggered at the end of Deactivated().
+     *
+     * Emitted after the tool has released interactors and ended its Python
+     * session. GUI code can subscribe to run teardown logic that must happen
+     * on a proper user-initiated deactivation (as opposed to the GUI's Qt
+     * destructor, which may run during application shutdown when observers
+     * and widgets are in a partially-destructed state).
+     */
+    Message<> DeactivatedEvent;
+
   protected:
     /** \brief Default constructor. Initializes interactors and connects events.
      */

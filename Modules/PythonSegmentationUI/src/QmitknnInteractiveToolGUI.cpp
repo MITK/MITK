@@ -17,20 +17,26 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
+#include <QmitkMultiLabelInspector.h>
 #include <QmitkPipInstallDialog.h>
 #include <mitkPipPackageInfo.h>
 #include <QmitkStyleManager.h>
 
+#include <itkCommand.h>
+
+#include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QTimer>
+#include <QWidget>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -129,8 +135,23 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 {
   this->UncheckOtherInteractorButtons(nullptr); // Ensure override cursor restoration.
 
-  this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+  // Note: unused-auto-label cleanup is handled on the tool's DeactivatedEvent
+  // (deferred via QTimer::singleShot), not here. Running RemoveLabel in the
+  // destructor is unsafe because Qt widgets and itk::Object observers may be
+  // in a partially-destructed state during application shutdown, which
+  // causes crashes when segmentation events fan out to dead observers.
+
+  if (auto* tool = this->GetTool())
+  {
+    tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+    tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+    tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+  }
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -159,6 +180,12 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   this->GetTool()->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+
+  this->GetTool()->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+  this->GetTool()->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
 
   Superclass::InitializeUI(mainLayout);
 
@@ -407,6 +434,12 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
     messageBox->accept();
 
+    // Re-enable the settings button so the user can adjust preferences that
+    // apply mid-session (e.g., interaction mode). The initialize button
+    // stays disabled because re-initialization within the same session is
+    // not supported.
+    m_Ui->settingsButton->setEnabled(true);
+
     m_Ui->resetButton->setEnabled(true);
     m_Ui->promptTypeGroupBox->setEnabled(true);
     m_Ui->interactionToolsGroupBox->setEnabled(true);
@@ -450,6 +483,10 @@ void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
 {
+  // An explicit reset invalidates any pending auto-created-label tracking
+  // so the empty label survives (the user chose to reset, not confirm).
+  this->InvalidateAutoCreatedLabel();
+
   // Uncheck any interactor button.
   for (const auto& [interactor, button] : m_InteractorButtons)
     button->setChecked(false);
@@ -485,6 +522,9 @@ void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionT
     // Ensure that only a single interactor is enabled at any time.
     this->UncheckOtherInteractorButtons(m_InteractorButtons[interactionType]);
     this->GetTool()->EnableInteractor(interactionType, m_PromptType);
+
+    // Remember this button so Fast/Superfast can re-enable it after an auto-confirm.
+    m_LastInteractorButton = m_InteractorButtons[interactionType];
 
     // Set the cursor to the interactor's cursor.
     auto svg = this->GetTool()->GetInteractor(interactionType)->GetCursor(m_PromptType);
@@ -543,6 +583,234 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
 
 void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
 {
-  if (isConfirmed)
-    this->OnResetInteractionsButtonClicked();
+  if (!isConfirmed)
+    return;
+
+  // Read flags fresh so a mid-session preference change takes effect
+  // on the next Confirm without requiring tool reactivation.
+  const bool autoCreate = this->IsAutoCreateNextLabelEnabled();
+  const bool autoConfirm = this->IsAutoConfirmEnabled();
+
+  this->OnResetInteractionsButtonClicked();
+
+  if (autoCreate)
+    this->AutoCreateAndSelectNewLabel();
+
+  // Re-enable the last interactor so either automation can continue without
+  // the user having to re-select Point/Box/Scribble/Lasso after every Confirm.
+  if (autoCreate || autoConfirm)
+    this->ReEnableLastInteractor();
+}
+
+void QmitknnInteractiveToolGUI::OnToolDeactivated()
+{
+  if (!m_AutoCreatedLabelValue.has_value())
+    return;
+
+  // Capture state locally and clear our tracking (plus DeleteEvent observer).
+  // A SmartPointer keeps the segmentation alive for the deferred call.
+  mitk::MultiLabelSegmentation::Pointer segmentationPtr(m_AutoCreatedLabelSegmentation.GetPointer());
+  const auto value = *m_AutoCreatedLabelValue;
+  const auto previousActive = m_PreviousActiveLabelValue;
+  this->InvalidateAutoCreatedLabel();
+
+  if (segmentationPtr.IsNull())
+    return;
+
+  // Defer the destructive part to the next event-loop tick.
+  //
+  // - Normal user-initiated tool switch: the Qt event loop is alive, so the
+  //   lambda fires a tick later, after any synchronous BlueBerry chatter
+  //   from the tool-switch path has settled.
+  //
+  // - Workbench close: BlueBerry's Workbench::Close() runs synchronously and
+  //   tears down views/widgets in a sequence that leaves some segmentation
+  //   observers (renderer mappers, etc.) dangling. When it eventually quits
+  //   the Qt event loop, pending single-shot timers are discarded, so our
+  //   lambda never fires and RemoveLabel is never called. Harmless: the
+  //   unused label vanishes with the application anyway.
+  QTimer::singleShot(0, qApp, [segmentationPtr, value, previousActive]() {
+    if (QCoreApplication::closingDown())
+      return;
+
+    auto* segmentation = segmentationPtr.GetPointer();
+
+    if (segmentation == nullptr || !segmentation->ExistLabel(value))
+      return;
+
+    if (!segmentation->IsEmpty(value, 0))
+      return;
+
+    const auto* activeLabel = segmentation->GetActiveLabel();
+    if (activeLabel != nullptr && activeLabel->GetValue() == value)
+    {
+      mitk::MultiLabelSegmentation::LabelValueType fallback = 0;
+      bool haveFallback = false;
+
+      if (previousActive.has_value() && *previousActive != value && segmentation->ExistLabel(*previousActive))
+      {
+        fallback = *previousActive;
+        haveFallback = true;
+      }
+      else
+      {
+        for (const auto& label : segmentation->GetLabels())
+        {
+          if (label.IsNotNull() && label->GetValue() != value)
+          {
+            fallback = label->GetValue();
+            haveFallback = true;
+            break;
+          }
+        }
+      }
+
+      if (haveFallback)
+      {
+        segmentation->SetActiveLabel(fallback);
+
+        for (QWidget* topWidget : QApplication::topLevelWidgets())
+        {
+          const auto inspectors = topWidget->findChildren<QmitkMultiLabelInspector*>();
+          for (auto* inspector : inspectors)
+            inspector->SetSelectedLabel(fallback);
+        }
+      }
+    }
+
+    segmentation->RemoveLabel(value);
+  });
+}
+
+void QmitknnInteractiveToolGUI::OnPreviewUpdated()
+{
+  if (m_AutoConfirmInProgress)
+    return;
+
+  if (!this->IsAutoConfirmEnabled())
+    return;
+
+  auto tool = this->GetTool();
+  if (tool == nullptr || !tool->HasInteractions())
+    return;
+
+  auto confirmButton = this->GetConfirmSegmentationButton();
+  if (confirmButton == nullptr)
+    return;
+
+  m_AutoConfirmInProgress = true;
+
+  // Defer the click to the next event-loop tick so the current
+  // DoUpdatePreview call can fully unwind before Confirm fires.
+  QTimer::singleShot(0, this, [this, confirmButton]() {
+    confirmButton->click();
+    m_AutoConfirmInProgress = false;
+  });
+}
+
+bool QmitknnInteractiveToolGUI::IsAutoCreateNextLabelEnabled() const
+{
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  return prefs->GetBool("nnInteractive/autoCreateNextLabel", true);
+}
+
+bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const
+{
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  auto prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  return prefs->GetBool("nnInteractive/autoConfirm", false);
+}
+
+void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
+{
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  if (toolManager == nullptr)
+    return;
+
+  auto workingNode = toolManager->GetWorkingData(0);
+  if (workingNode == nullptr)
+    return;
+
+  auto segmentation = workingNode->GetDataAs<mitk::MultiLabelSegmentation>();
+  if (segmentation == nullptr)
+    return;
+
+  const auto* activeLabel = segmentation->GetActiveLabel();
+  if (activeLabel == nullptr)
+    return;
+
+  const auto previousActiveValue = activeLabel->GetValue();
+  const auto groupID = segmentation->GetGroupIndexOfLabel(previousActiveValue);
+
+  auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(segmentation);
+  if (newLabel.IsNull())
+    return;
+
+  auto addedLabel = segmentation->AddLabel(newLabel, groupID, false);
+  if (addedLabel == nullptr)
+    return;
+
+  segmentation->SetActiveLabel(addedLabel->GetValue());
+
+  // Sync the Multi-Label Inspector's highlighted row to the new active label.
+  // The inspector does not passively observe MultiLabelSegmentation active-label
+  // changes, so without this the old label would remain highlighted.
+  this->SyncMultiLabelInspectorSelection(addedLabel->GetValue());
+
+  // Trigger node-modified observers (renderers, etc.) to pick up the change.
+  workingNode->Modified();
+
+  m_AutoCreatedLabelValue = addedLabel->GetValue();
+  m_PreviousActiveLabelValue = previousActiveValue;
+  m_AutoCreatedLabelSegmentation = segmentation;
+
+  // itk::WeakPointer does not auto-null on destruction, so register a
+  // DeleteEvent observer to clear our tracking when the segmentation goes
+  // away (e.g., via data-storage teardown on application exit).
+  auto deleteCommand = itk::SimpleMemberCommand<QmitknnInteractiveToolGUI>::New();
+  deleteCommand->SetCallbackFunction(this, &QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted);
+  m_AutoCreatedSegmentationDeleteTag = segmentation->AddObserver(itk::DeleteEvent(), deleteCommand);
+}
+
+
+void QmitknnInteractiveToolGUI::SyncMultiLabelInspectorSelection(mitk::MultiLabelSegmentation::LabelValueType value)
+{
+  for (QWidget* topWidget : QApplication::topLevelWidgets())
+  {
+    const auto inspectors = topWidget->findChildren<QmitkMultiLabelInspector*>();
+    for (auto* inspector : inspectors)
+      inspector->SetSelectedLabel(value);
+  }
+}
+
+void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()
+{
+  if (m_AutoCreatedSegmentationDeleteTag.has_value())
+  {
+    if (auto* segmentation = m_AutoCreatedLabelSegmentation.GetPointer())
+      segmentation->RemoveObserver(m_AutoCreatedSegmentationDeleteTag.value());
+
+    m_AutoCreatedSegmentationDeleteTag.reset();
+  }
+
+  m_AutoCreatedLabelValue.reset();
+  m_PreviousActiveLabelValue.reset();
+  m_AutoCreatedLabelSegmentation = nullptr;
+}
+
+void QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted()
+{
+  // Runs from inside the segmentation's destructor; do not call RemoveObserver
+  // (the observer is already being torn down).
+  m_AutoCreatedSegmentationDeleteTag.reset();
+  m_AutoCreatedLabelValue.reset();
+  m_PreviousActiveLabelValue.reset();
+  m_AutoCreatedLabelSegmentation = nullptr;
+}
+
+void QmitknnInteractiveToolGUI::ReEnableLastInteractor()
+{
+  if (m_LastInteractorButton != nullptr)
+    m_LastInteractorButton->setChecked(true);
 }

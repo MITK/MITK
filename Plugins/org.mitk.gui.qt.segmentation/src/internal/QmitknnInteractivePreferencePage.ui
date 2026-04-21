@@ -15,6 +15,65 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
+    <widget class="QGroupBox" name="automationGroupBox">
+     <property name="title">
+      <string>Automation</string>
+     </property>
+     <layout class="QVBoxLayout" name="automationLayout">
+      <item>
+       <widget class="QCheckBox" name="autoCreateNextLabelCheckBox">
+        <property name="text">
+         <string>Auto-create next label</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="autoCreateNextLabelDescriptionLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Once you confirm a label, a new empty label is ready so you can keep segmenting right away. Unused auto-created labels are removed when you leave the tool.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="autoConfirmCheckBox">
+        <property name="text">
+         <string>Auto-confirm after single interaction</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="autoConfirmDescriptionLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Confirm automatically after the first successful interaction. Best when a single interaction is enough per label.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="modelGroupBox">
      <property name="title">
       <string>Model</string>
@@ -43,6 +102,24 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="modelRestartNoteLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -94,6 +171,24 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QLabel" name="backendRestartNoteLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -113,6 +208,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>autoCreateNextLabelCheckBox</tabstop>
+  <tabstop>autoConfirmCheckBox</tabstop>
   <tabstop>autoBackendRadioButton</tabstop>
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>

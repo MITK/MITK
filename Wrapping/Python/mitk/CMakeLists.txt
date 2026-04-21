@@ -22,10 +22,14 @@ pybind11_add_module(mitk_python_bindings
   PropertyOwnerBindings.h
   SmartPointer.h
   Vectors.cpp
+  TemporoSpatialStringProperty.cpp
+  PropertyKeyPath.cpp
+  DICOMTagPath.cpp
+  TemporoSpatialStringSerialization.h
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore Python3::Module
+  PRIVATE MitkCore MitkDICOM Python3::Module
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES
@@ -110,6 +114,12 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
   )
 
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
+    DESTINATION mitk
+    COMPONENT wheel
+    EXCLUDE_FROM_ALL
+  )
+
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
     DESTINATION mitk
     COMPONENT wheel
     EXCLUDE_FROM_ALL

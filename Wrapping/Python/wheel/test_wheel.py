@@ -75,12 +75,28 @@ def test_sanity_create_image():
     print("  Image creation sanity check OK")
 
 
+def test_property_view_packaged():
+    """property_view.py is shipped in the wheel.
+
+    Accessing .properties on an Image triggers ``from mitk.property_view
+    import PropertyView``.  If property_view.py is absent from the wheel
+    this raises ModuleNotFoundError."""
+    import mitk
+
+    img = mitk.Image()
+    img.set_property("name", "wheel-test")
+    view = img.properties
+    assert view["name"] == "wheel-test"
+    print("  property_view import and .properties access OK")
+
+
 def run_tests():
     """Execute all test functions and return exit code."""
     tests = [
         test_import,
         test_autoload_modules,
         test_sanity_create_image,
+        test_property_view_packaged,
     ]
 
     passed = 0

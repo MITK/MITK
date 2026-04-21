@@ -58,6 +58,13 @@ void InitColor(py::module_ &m)
         c[i] = v;
       })
     .def("__len__", [](const mitk::Color &) { return 3; })
+    // __iter__ completes the sequence protocol alongside __getitem__ and __len__.
+    // It enables tuple(color), list(color), and unpacking: r, g, b = color.
+    .def("__iter__",
+         [](const mitk::Color &c)
+         {
+           return py::iter(py::make_tuple(c[0], c[1], c[2]));
+         })
     .def("__eq__", [](const mitk::Color &a, const mitk::Color &b) { return a == b; })
     .def("__repr__",
          [](const mitk::Color &c)

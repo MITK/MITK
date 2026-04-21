@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "PropertyAutoWrap.h"
+#include "PropertyConversionUtils.h"
 #include "SmartPointer.h"
+#include "TemporoSpatialStringSerialization.h"
 #include <mitkPropertyList.h>
 #include <nlohmann/json.hpp>
 #include <pybind11/pybind11.h>
@@ -39,11 +41,23 @@ void InitPropertyList(py::module_ &m)
   propertyList_class.def(py::init([]() { return mitk::PropertyList::New(); }))
     .def(
       "get_property",
-      [](const mitk::PropertyList &pl, const std::string &key) -> mitk::BaseProperty::Pointer
+      [](const mitk::PropertyList &pl, const std::string &key, bool raw) -> py::object
       {
-        return pl.GetProperty(key); // returns nullptr -> None if not found
+        auto prop = pl.GetProperty(key);
+        if (!prop)
+          return py::none();
+        // raw=True preserves the old behaviour and returns the mitk.BaseProperty object.
+        if (raw)
+          return py::cast(prop, py::return_value_policy::reference);
+        return mitk::python::propertyToPythonValue(*prop);
       },
-      py::arg("key"))
+      py::arg("key"),
+      py::arg("raw") = false,
+      "Return the property value for *key*, or None if not set.\n\n"
+      "By default returns a coerced Python-native value: ``bool``, ``int``, ``float``,\n"
+      "``str``, or an ``(r, g, b)`` tuple for ColorProperty. For types without a known\n"
+      "Python equivalent the raw ``mitk.BaseProperty`` object is returned.\n\n"
+      "Pass ``raw=True`` to always get the underlying ``mitk.BaseProperty`` object.")
     .def(
       "property_is_owned",
       [](const mitk::PropertyList &pl, const std::string &key)
@@ -69,7 +83,45 @@ void InitPropertyList(py::module_ &m)
       "from_json",
       [](const std::string &json)
       { return mitk::ConvertPropertyListFromSelfContainedJson(nlohmann::json::parse(json)); },
-      py::arg("json"));
+      py::arg("json"))
+    .def(
+      "to_dict",
+      [](const mitk::PropertyList &pl)
+      {
+        py::dict result;
+        for (const auto &key : pl.GetPropertyKeys())
+        {
+          const auto *prop = pl.GetProperty(key);
+          py::dict propDict;
+          if (!mitk::python::tryTemporoSpatialStringToDict(*prop, propDict))
+            propDict = mitk::python::propertyToDict(*prop);
+          result[py::str(key)] = propDict;
+        }
+        return result;
+      },
+      "Serialize all properties to a Python dict keyed by property name.")
+    .def_static(
+      "from_dict",
+      [](const py::dict &d)
+      {
+        auto pl = mitk::PropertyList::New();
+        for (const auto &item : d)
+        {
+          const std::string key = item.first.cast<std::string>();
+          const py::dict propDict = item.second.cast<py::dict>();
+          mitk::BaseProperty::Pointer prop;
+          if (propDict.contains("type") &&
+              propDict["type"].cast<std::string>() == "TemporoSpatialStringProperty")
+            prop = mitk::python::tryDictToTemporoSpatialString(propDict);
+          else
+            prop = mitk::python::dictToProperty(propDict);
+          if (prop)
+            pl->SetProperty(key, prop);
+        }
+        return pl;
+      },
+      py::arg("d"),
+      "Reconstruct a PropertyList from a dict produced by to_dict().");
 
   // Attach properties view
   propertyList_class.def_property_readonly(

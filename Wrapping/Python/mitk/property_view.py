@@ -31,7 +31,9 @@ class PropertyView(MutableMapping):
     def __init__(self, owner: Any) -> None:
         self._owner = owner
 
-    def __getitem__(self, key: str) -> "mitk.BaseProperty":
+    def __getitem__(self, key: str) -> Any:
+        # get_property returns a coerced Python-native value (str, bool, int, float,
+        # (r,g,b) tuple for colours, or a mitk.BaseProperty for unknown types).
         prop = self._owner.get_property(key)
         if prop is None:
             raise KeyError(key)

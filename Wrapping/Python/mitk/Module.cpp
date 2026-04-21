@@ -25,6 +25,9 @@ void InitImage(py::module_&);
 void InitIOUtil(py::module_&);
 void InitProperty(py::module_&);
 void InitPropertyList(py::module_&);
+void InitTemporoSpatialStringProperty(py::module_&);
+void InitPropertyKeyPath(py::module_&);
+void InitDICOMTagPath(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -44,4 +47,7 @@ PYBIND11_MODULE(mitk, m)
   InitIOUtil(m);
   InitProperty(m);
   InitPropertyList(m);
+  InitTemporoSpatialStringProperty(m);
+  InitPropertyKeyPath(m);
+  InitDICOMTagPath(m);
 }

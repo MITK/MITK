@@ -10,8 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "PropertyConversionUtils.h"
 #include "PropertyNotOwnedError.h"
 #include "SmartPointer.h"
+#include "TemporoSpatialStringSerialization.h"
+#include <Python.h>
 #include <mitkBaseProperty.h>
 #include <mitkColorProperty.h>
 #include <mitkProperties.h>
@@ -52,6 +55,7 @@ void InitProperty(py::module_ &m)
       py::arg("json"),
       "Reconstruct a BaseProperty subclass instance from the self-contained JSON\n"
       "representation produced by to_json().")
+    .def_property_readonly("value", nullptr) // Overridden by subclasses
     .def("clone", [](const mitk::BaseProperty &p) { return p.Clone(); });
 
   py::class_<mitk::StringProperty, mitk::BaseProperty, mitk::StringProperty::Pointer>(m, "StringProperty")
@@ -86,4 +90,16 @@ void InitProperty(py::module_ &m)
                   return mitk::ColorProperty::New(color);
                 })
     .def_property_readonly("value", &mitk::ColorProperty::GetColor);
+
+  m.def(
+    "property_from_dict",
+    [](const py::dict &d) -> mitk::BaseProperty::Pointer
+    {
+      if (d.contains("type") &&
+          d["type"].cast<std::string>() == "TemporoSpatialStringProperty")
+        return mitk::python::tryDictToTemporoSpatialString(d);
+      return mitk::python::dictToProperty(d);
+    },
+    py::arg("d"),
+    "Reconstruct a BaseProperty subclass from a dict produced by a property's to_dict().");
 }

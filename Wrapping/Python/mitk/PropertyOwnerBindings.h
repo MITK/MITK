@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define PropertyOwnerBindings_h
 
 #include "PropertyAutoWrap.h"
+#include "PropertyConversionUtils.h"
 #include "PropertyNotOwnedError.h"
 #include <mitkIPropertyOwner.h>
 #include <pybind11/pybind11.h>
@@ -38,11 +39,24 @@ void bind_property_owner(PyClass &cls)
 
   cls.def(
     "get_property",
-    [](const CppClass &obj, const std::string &key) -> mitk::BaseProperty::ConstPointer
+    [](const CppClass &obj, const std::string &key, bool raw) -> py::object
     {
-      return obj.GetConstProperty(key); // None if not found
+      auto prop = obj.GetConstProperty(key);
+      if (!prop)
+        return py::none();
+      // raw=True preserves the old behaviour and returns the mitk.BaseProperty object.
+      if (raw)
+        return py::cast(prop, py::return_value_policy::reference);
+      return mitk::python::propertyToPythonValue(*prop);
     },
-    py::arg("key"));
+    py::arg("key"),
+    py::arg("raw") = false,
+    "Return the property value for *key*, or None if not set.\n\n"
+    "By default returns a coerced Python-native value: ``bool``, ``int``, ``float``,\n"
+    "``str``, or an ``(r, g, b)`` tuple for ColorProperty. For types without a known\n"
+    "Python equivalent the raw ``mitk.BaseProperty`` object is returned.\n\n"
+    "Pass ``raw=True`` to always get the underlying ``mitk.BaseProperty`` object\n"
+    "(e.g. to access metadata or pass it to a C++ function that expects one).");
 
   cls.def(
     "property_is_owned",

@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <QEventLoop>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShowEvent>
 #include <QTextCursor>
 
 QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
@@ -76,12 +77,22 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
   connect(m_Installer, &mitk::PipInstaller::OutputReceived, this, &QmitkPipInstallDialog::OnOutputReceived);
 
-  // Lock the dialog to a constant compact height. The expanding spacer in
-  // mainLayout absorbs leftover space as widgets show/hide, so the dialog
-  // no longer has to refit via adjustSize() on every state change.
-  m_CompactHeight = this->height();
-  m_ExpandedHeight = m_CompactHeight + 200;
-  this->setFixedHeight(m_CompactHeight);
+  // Compact / expanded heights are captured on first show (see showEvent),
+  // after Qt has run layout/DPI/font metrics; querying height() here would
+  // return the .ui-declared value rather than the laid-out height.
+}
+
+void QmitkPipInstallDialog::showEvent(QShowEvent* event)
+{
+  QDialog::showEvent(event);
+
+  if (!m_HeightsCaptured)
+  {
+    m_CompactHeight = this->height();
+    m_ExpandedHeight = m_CompactHeight + 200;
+    this->setFixedHeight(m_CompactHeight);
+    m_HeightsCaptured = true;
+  }
 }
 
 QmitkPipInstallDialog::~QmitkPipInstallDialog()
@@ -233,7 +244,21 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
   {
     this->SetTerminalStatus(QString::fromStdString(m_Spec.name) + " was installed successfully.");
     m_Ui->packageLabel->hide();
-    this->accept();
+    // The last phase may have left the bar in indeterminate (spinning) mode
+    // (HF downloads use setRange(0, 0)), so hide it once we're done.
+    m_Ui->progressBar->hide();
+
+    if (m_Ui->autoCloseCheckBox->isChecked())
+    {
+      this->accept();
+    }
+    else
+    {
+      // User opted out of auto-close so they can inspect the log. Offer the
+      // details toggle for a successful run too - the raw pip output may still
+      // be useful (deprecation warnings, resolved versions, etc.).
+      this->OfferDetails();
+    }
   }
   else
   {
@@ -308,8 +333,12 @@ bool QmitkPipInstallDialog::ConfirmCancel()
   // open, zombie subprocess on Windows, etc.), quit the loop after 30 s so
   // the dialog can close instead of locking forever. A legitimate
   // fs::remove_all is comfortably inside that envelope even on a slow disk.
+  // Queued connection so the synchronous Cancel() path (no QProcess running)
+  // that emits InstallFinished directly from inside Cancel() still reaches
+  // the loop: the queued slot is posted as an event and delivered once
+  // loop.exec() starts spinning.
   QEventLoop loop;
-  connect(m_Installer, &mitk::PipInstaller::InstallFinished, &loop, &QEventLoop::quit);
+  connect(m_Installer, &mitk::PipInstaller::InstallFinished, &loop, &QEventLoop::quit, Qt::QueuedConnection);
   QTimer::singleShot(30000, &loop, &QEventLoop::quit);
   m_Installer->Cancel();
   loop.exec();
@@ -328,6 +357,13 @@ void QmitkPipInstallDialog::SetUiInstalling()
   m_Ui->detailsButton->hide();
   this->SetDetailsVisible(false);
   m_Ui->detailsView->clear();
+
+  // Reset the cancellation latch so a retry after a cancelled-then-abandoned
+  // attempt is not silently swallowed by the m_IsCancelling gate in
+  // OnInstallFinished. Also re-enable the button box that ConfirmCancel
+  // disables during teardown.
+  m_IsCancelling = false;
+  m_Ui->buttonBox->setEnabled(true);
 
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Ok))
     button->setEnabled(false);

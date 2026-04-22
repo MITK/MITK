@@ -108,7 +108,7 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
   outerLayout->addLayout(bottomLayout);
 
   // Populate from spec.
-  RebuildFromSpec(spec);
+  this->RebuildFromSpec(spec);
 
   resize(480, 500);
 }
@@ -295,17 +295,17 @@ void QmitkPipInstallAdvancedDialog::RebuildFromSpec(const mitk::PipInstallSpec& 
 
   // Populate groups.
   for (int i = 0; i < static_cast<int>(spec.groups.size()); ++i)
-    m_GroupsLayout->addWidget(CreateGroupWidget(spec.groups[i], i));
+    m_GroupsLayout->addWidget(this->CreateGroupWidget(spec.groups[i], i));
 
   // Populate downloads.
   for (int i = 0; i < static_cast<int>(spec.huggingFaceDownloads.size()); ++i)
-    m_DownloadsLayout->addWidget(CreateDownloadWidget(spec.huggingFaceDownloads[i], i));
+    m_DownloadsLayout->addWidget(this->CreateDownloadWidget(spec.huggingFaceDownloads[i], i));
 }
 
 void QmitkPipInstallAdvancedDialog::OnAddGroup()
 {
-  int index = static_cast<int>(m_GroupBoxes.size());
-  m_GroupsLayout->addWidget(CreateGroupWidget(mitk::PipInstallGroup(), index));
+  const int index = static_cast<int>(m_GroupBoxes.size());
+  m_GroupsLayout->addWidget(this->CreateGroupWidget(mitk::PipInstallGroup(), index));
 }
 
 void QmitkPipInstallAdvancedDialog::OnRemoveGroup()
@@ -329,13 +329,13 @@ void QmitkPipInstallAdvancedDialog::OnRemoveGroup()
   m_GroupWidgets.erase(m_GroupWidgets.begin() + index);
   delete groupBox;
 
-  RenumberGroupTitles();
+  this->RenumberGroupTitles();
 }
 
 void QmitkPipInstallAdvancedDialog::OnAddDownload()
 {
-  int index = static_cast<int>(m_DownloadBoxes.size());
-  m_DownloadsLayout->addWidget(CreateDownloadWidget(mitk::HuggingFaceDownload(), index));
+  const int index = static_cast<int>(m_DownloadBoxes.size());
+  m_DownloadsLayout->addWidget(this->CreateDownloadWidget(mitk::HuggingFaceDownload(), index));
 }
 
 void QmitkPipInstallAdvancedDialog::OnRemoveDownload()
@@ -358,7 +358,7 @@ void QmitkPipInstallAdvancedDialog::OnRemoveDownload()
   m_DownloadWidgets.erase(m_DownloadWidgets.begin() + index);
   delete groupBox;
 
-  RenumberDownloadTitles();
+  this->RenumberDownloadTitles();
 }
 
 void QmitkPipInstallAdvancedDialog::OnLoadSpec()
@@ -370,8 +370,8 @@ void QmitkPipInstallAdvancedDialog::OnLoadSpec()
 
   try
   {
-    auto spec = mitk::PipInstallSpec::FromFile(path.toStdString());
-    RebuildFromSpec(spec);
+    const auto spec = mitk::PipInstallSpec::FromFile(path.toStdString());
+    this->RebuildFromSpec(spec);
   }
   catch (const std::exception& e)
   {
@@ -398,7 +398,7 @@ void QmitkPipInstallAdvancedDialog::OnSaveSpec()
 
   try
   {
-    auto spec = GetInstallSpec();
+    const auto spec = this->GetInstallSpec();
     spec.SaveToFile(path.toStdString());
   }
   catch (const std::exception& e)

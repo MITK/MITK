@@ -38,12 +38,6 @@ namespace
 {
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 
-  void ReplaceAll(std::string& str, const std::string& from, const std::string& to)
-  {
-    for (std::string::size_type pos = 0; (pos = str.find(from, pos)) != std::string::npos; pos += to.size())
-      str.replace(pos, from.size(), to);
-  }
-
   void SetIcon(QAbstractButton* button, const char* icon)
   {
     button->setIcon(QmitkStyleManager::ThemeIcon(QString(":/nnInteractive/%1").arg(icon)));
@@ -282,7 +276,7 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
 
 bool QmitknnInteractiveToolGUI::Install()
 {
-  auto venvName = this->GetTool()->GetVirtualEnvName();
+  const auto venvName = this->GetTool()->GetVirtualEnvName();
 
   // If the venv already exists, check if packages are installed.
   // This avoids showing the install dialog when everything is up to date.
@@ -295,11 +289,8 @@ bool QmitknnInteractiveToolGUI::Install()
       return true;
   }
 
-  // Load the base spec from the embedded JSON resource and resolve placeholders.
-  auto spec = mitk::PipInstallSpec::FromResource(":/nnInteractive/install_spec.json");
-
   // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
-  // the placeholder is cleared so pip uses the default PyPI index.
+  // pip uses the default PyPI index.
 #if defined(_WIN32)
   // Starting with CUDA v12.9 we get the following error on our lowest
   // supported GPU architecture (e.g. GeForce 10 Series):
@@ -310,31 +301,51 @@ bool QmitknnInteractiveToolGUI::Install()
   const std::string cudaIndexUrl;
 #endif
 
-  for (auto& group : spec.groups)
-    ReplaceAll(group.indexUrl, "${cudaIndexUrl}", cudaIndexUrl);
-
   // Pre-fetch the model weights so the first StartSession() doesn't surprise
   // the user with a silent multi-minute download. The checkpoint name mirrors
-  // the preference mitknnInteractiveTool::StartSession() reads.
-  auto* prefsService = mitk::CoreServices::GetPreferencesService();
-  auto* prefs = prefsService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
-  const auto checkpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
-
-  for (auto& download : spec.huggingFaceDownloads)
+  // the preference mitknnInteractiveTool::StartSession() reads. Guard each
+  // link in the preferences chain so a missing preferences service doesn't
+  // crash the installer before it even starts.
+  std::string checkpoint = "nnInteractive_v1.0";
+  if (auto* prefsService = mitk::CoreServices::GetPreferencesService())
   {
-    for (auto& pattern : download.allowPatterns)
-      ReplaceAll(pattern, "${modelCheckpoint}", checkpoint);
-
-    ReplaceAll(download.displayName, "${modelCheckpoint}", checkpoint);
+    if (auto* system = prefsService->GetSystemPreferences())
+    {
+      if (auto* prefs = system->Node("org.mitk.views.segmentation"))
+        checkpoint = prefs->Get("nnInteractive/modelCheckpoint", checkpoint);
+    }
   }
 
-  QmitkPipInstallDialog dialog(spec);
+  mitk::PipInstallSpec spec;
+  spec.name = "nnInteractive";
+  spec.venvName = venvName;
+  spec.upgradePipFirst = true;
+
+  mitk::PipInstallGroup torchGroup;
+  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+  torchGroup.indexUrl = cudaIndexUrl;
+  spec.groups.push_back(std::move(torchGroup));
+
+  mitk::PipInstallGroup nnInteractiveGroup;
+  nnInteractiveGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
+  spec.groups.push_back(std::move(nnInteractiveGroup));
+
+  mitk::HuggingFaceDownload modelDownload;
+  modelDownload.repoId = "nnInteractive/nnInteractive";
+  modelDownload.allowPatterns = { checkpoint + "/*" };
+  modelDownload.displayName = "model checkpoint " + checkpoint;
+  modelDownload.optional = true;
+  spec.huggingFaceDownloads.push_back(std::move(modelDownload));
+
+  QmitkPipInstallDialog dialog(spec, this);
 
   if (dialog.exec() != QDialog::Accepted)
     return false;
 
   // The dialog populated the venv (and possibly created it). Create a fresh
   // context so the embedded interpreter picks up the newly installed packages.
+  // PythonContext checks Py_IsInitialized internally, so calling this a second
+  // time after the early-return path above is safe.
   return this->GetTool()->CreatePythonContext();
 }
 

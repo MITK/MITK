@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>200</height>
+    <width>640</width>
+    <height>240</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -124,6 +124,16 @@
        </property>
        <property name="text">
         <string>Show details</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="autoCloseCheckBox">
+       <property name="text">
+        <string>Close automatically on success</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

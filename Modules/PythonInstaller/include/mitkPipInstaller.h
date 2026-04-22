@@ -72,9 +72,13 @@ namespace mitk
 
     /** \brief Cancel the current operation.
      *
-     * Kills the running pip process and returns immediately. The actual
-     * cleanup (venv removal if one was created, InstallFinished(false)
-     * emission) happens asynchronously when the killed process finishes.
+     * Kills the running pip process and returns immediately. The terminal
+     * InstallFinished(false) signal is deferred until the killed process
+     * reports finished, at which point venv removal (if one was created)
+     * runs synchronously on the calling thread inside the finished slot.
+     * For a GUI consumer this means the event loop is briefly blocked by
+     * \c fs::remove_all; in practice this is fast but can stall on a slow
+     * disk or if an antivirus scanner holds a handle open.
      */
     void Cancel();
 
@@ -153,10 +157,15 @@ namespace mitk
      */
     void OutputReceived(const QString& text, bool isError);
 
-    /** \brief Overall installation progress.
+    /** \brief Per-package progress during the install phase only.
      *
-     * \param[in] current Number of packages installed so far.
-     * \param[in] total Total number of packages to install.
+     * Fires during the Installing state for each resolved package as the
+     * installer advances through the combined resolved list. Not emitted
+     * during virtual-env creation, pip upgrade, resolve, or model
+     * download - those phases are treated as indeterminate by the dialog.
+     *
+     * \param[in] current Number of packages finished so far in the install phase.
+     * \param[in] total Total number of resolved packages across all groups.
      */
     void ProgressChanged(int current, int total);
 

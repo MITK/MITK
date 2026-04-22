@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <memory>
 
 class QCloseEvent;
+class QShowEvent;
 
 namespace Ui
 {
@@ -43,10 +44,17 @@ namespace mitk
  * \code
  * mitk::PipInstallSpec spec;
  * spec.name = "nnInteractive";
- * spec.groups.push_back({ {"torch>=2.8.0,<2.9.0"}, cudaIndexUrl, {} });
- * spec.groups.push_back({ {"nninteractive>=1.1.2,<2.0.0"}, {}, {} });
  *
- * QmitkPipInstallDialog dialog(spec);
+ * mitk::PipInstallGroup torchGroup;
+ * torchGroup.requirements = { "torch>=2.8.0,<2.9.0" };
+ * torchGroup.indexUrl = "https://download.pytorch.org/whl/cu128";
+ * spec.groups.push_back(torchGroup);
+ *
+ * mitk::PipInstallGroup appGroup;
+ * appGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
+ * spec.groups.push_back(appGroup);
+ *
+ * QmitkPipInstallDialog dialog(spec, parent);
  * if (dialog.exec() == QDialog::Accepted) { ... }
  * \endcode
  *
@@ -62,6 +70,7 @@ public:
 
 protected:
   void closeEvent(QCloseEvent* event) override;
+  void showEvent(QShowEvent* event) override;
   void reject() override;
 
 private slots:
@@ -100,6 +109,7 @@ private:
   int m_TotalSteps = 0;
   int m_CompactHeight = 0;
   int m_ExpandedHeight = 0;
+  bool m_HeightsCaptured = false;
   bool m_IsCancelling = false;
   bool m_TerminalStatusSet = false;
 };

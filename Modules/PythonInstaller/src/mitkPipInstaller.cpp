@@ -26,7 +26,7 @@ namespace
   // copy-pasteable into a shell for reproduction.
   QString FormatCommand(const QString& program, const QStringList& args)
   {
-    auto quote = [](const QString& token) {
+    const auto quote = [](const QString& token) {
       return token.contains(QChar::Space) ? '"' + token + '"' : token;
     };
 
@@ -96,24 +96,25 @@ namespace
          req.compare(0, 4, "svn+") == 0 || req.compare(0, 4, "bzr+") == 0))
       return true;
 
-    // PEP 508 direct reference: "name @ https://..." or "name @ git+https://..."
-    auto pos = req.find(" @ ");
-    return pos != std::string::npos && pos + 3 < req.size();
+    // PEP 508 direct reference: name and URL separated by an '@' with arbitrary
+    // whitespace on either side (e.g. "name @ https://...", "name@url",
+    // "name\t@ git+https://..."). Require at least one alphanumeric character
+    // before the '@' and something after it to avoid false positives on stray
+    // '@' characters.
+    static const QRegularExpression directRef(R"(^\s*[A-Za-z0-9][\w\-.]*\s*@\s*\S)");
+    return directRef.match(QString::fromStdString(req)).hasMatch();
   }
 
   // Format a std::string as a Python single-quoted string literal.
   // Escapes backslashes and single quotes; everything else passes through.
   QString PyQuote(const std::string& value)
   {
-    QString result = "'";
-    for (char c : value)
-    {
-      if (c == '\\' || c == '\'')
-        result.append('\\');
-      result.append(QChar::fromLatin1(c));
-    }
-    result.append('\'');
-    return result;
+    // Decode as UTF-8 so multi-byte code points round-trip intact; escape `\`
+    // first to avoid double-escaping backslashes introduced by the `'` escape.
+    QString result = QString::fromUtf8(value.c_str(), static_cast<int>(value.size()));
+    result.replace('\\', "\\\\");
+    result.replace('\'', "\\'");
+    return '\'' + result + '\'';
   }
 
   // Format a vector<string> as a Python list literal, e.g.
@@ -143,9 +144,17 @@ mitk::PipInstaller::PipInstaller(QObject* parent)
   connect(m_Process, &QProcess::readyReadStandardOutput, this, &PipInstaller::OnStandardOutputReady);
   connect(m_Process, &QProcess::readyReadStandardError, this, &PipInstaller::OnStandardErrorReady);
   connect(m_Process, &QProcess::finished, this, &PipInstaller::OnProcessFinished);
-  connect(m_Process, &QProcess::errorOccurred, this, [](QProcess::ProcessError error) {
-    if (error == QProcess::FailedToStart)
-      MITK_ERROR << "Failed to start pip subprocess.";
+  // QProcess::FailedToStart is the one error that does not also produce a
+  // finished() signal, so we must drive the state machine from here for that
+  // case. Every other error code (Crashed, Timedout, ...) is handled by
+  // OnProcessFinished via the subsequent finished() emission.
+  connect(m_Process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+    if (error != QProcess::FailedToStart)
+      return;
+
+    m_State = State::Failed;
+    emit ErrorOccurred("Failed to start pip subprocess.");
+    emit InstallFinished(false);
   });
 }
 
@@ -201,7 +210,7 @@ void mitk::PipInstaller::StartInstall()
   // The flag is cleared only in RemoveCreatedVirtualEnv after the venv has
   // actually been removed.
 
-  BeginVirtualEnvPhase();
+  this->BeginVirtualEnvPhase();
 }
 
 void mitk::PipInstaller::AbandonInstall()
@@ -232,7 +241,7 @@ void mitk::PipInstaller::Cancel()
   {
     // No process running (we were in a synchronous transition between phases).
     // Finalize immediately.
-    FinalizeCancel();
+    this->FinalizeCancel();
   }
 }
 
@@ -248,13 +257,13 @@ const std::vector<mitk::PipPackageInfo>& mitk::PipInstaller::GetResolvedPackages
 
 void mitk::PipInstaller::OnStandardOutputReady()
 {
-  auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
+  const auto output = QString::fromLocal8Bit(m_Process->readAllStandardOutput());
   emit OutputReceived(output, false);
 }
 
 void mitk::PipInstaller::OnStandardErrorReady()
 {
-  auto output = QString::fromLocal8Bit(m_Process->readAllStandardError());
+  const auto output = QString::fromLocal8Bit(m_Process->readAllStandardError());
   emit OutputReceived(output, true);
 }
 
@@ -265,7 +274,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
   // thread is not blocked while we tear down the venv.
   if (m_State == State::Cancelling)
   {
-    FinalizeCancel();
+    this->FinalizeCancel();
     return;
   }
 
@@ -284,16 +293,22 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       return;
     }
 
-    PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
+    if (!PythonHelper::ActivateVirtualEnv(m_Spec.venvName))
+    {
+      m_State = State::Failed;
+      emit ErrorOccurred("Failed to activate virtual environment.");
+      emit InstallFinished(false);
+      return;
+    }
 
     if (m_Spec.upgradePipFirst)
     {
-      StartPipUpgrade();
+      this->StartPipUpgrade();
     }
     else
     {
       emit ResolveStarted();
-      StartResolveGroup();
+      this->StartResolveGroup();
     }
     break;
   }
@@ -303,7 +318,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
     // pip upgrade failure is non-fatal - proceed to resolve first group.
     m_State = State::Resolving;
     emit ResolveStarted();
-    StartResolveGroup();
+    this->StartResolveGroup();
     break;
   }
 
@@ -317,7 +332,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       return;
     }
 
-    if (!ParseResolveReport(m_ReportFile.fileName(), m_CurrentGroup))
+    if (!this->ParseResolveReport(m_ReportFile.fileName(), m_CurrentGroup))
     {
       // ParseResolveReport has already emitted ErrorOccurred with a specific message.
       m_State = State::Failed;
@@ -336,21 +351,30 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
       m_State = State::Installing;
       m_CurrentPackage = m_GroupStartIndex;
       emit ProgressChanged(m_GroupStartIndex, numPackages);
-      StartInstallPackage();
+      this->StartInstallPackage();
     }
     else
     {
       // No new packages in this group. Advance to next group.
-      AdvanceToNextGroup();
+      this->AdvanceToNextGroup();
     }
     break;
   }
 
   case State::Installing:
   {
+    // Defensive: in the documented state machine m_CurrentPackage always
+    // indexes into m_ResolvedPackages here, but guard against a stray slot
+    // fire so we don't read out of range.
+    if (m_CurrentPackage < 0 || m_CurrentPackage >= numPackages)
+    {
+      MITK_WARN << "OnProcessFinished(Installing) with out-of-range m_CurrentPackage; ignoring.";
+      return;
+    }
+
     const auto& pkg = m_ResolvedPackages[m_CurrentPackage];
-    auto name = QString::fromStdString(pkg.name);
-    auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
+    const auto name = QString::fromStdString(pkg.name);
+    const auto status = success ? PackageStatus::Installed : PackageStatus::Failed;
     emit PackageStatusChanged(m_CurrentPackage, name, status);
 
     if (!success)
@@ -369,12 +393,12 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
     if (m_CurrentPackage < numPackages)
     {
-      StartInstallPackage();
+      this->StartInstallPackage();
     }
     else
     {
       // All packages in the current group are installed.
-      AdvanceToNextGroup();
+      this->AdvanceToNextGroup();
     }
     break;
   }
@@ -385,7 +409,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
     if (!success && !download.optional)
     {
-      auto displayName = QString::fromStdString(
+      const auto displayName = QString::fromStdString(
         download.displayName.empty() ? download.repoId : download.displayName);
       if (!m_AnyFailed)
         emit ErrorOccurred(QString("Failed to download %1.").arg(displayName));
@@ -396,7 +420,7 @@ void mitk::PipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus ex
 
     if (m_CurrentDownload < static_cast<int>(m_Spec.huggingFaceDownloads.size()))
     {
-      StartModelDownload();
+      this->StartModelDownload();
     }
     else
     {
@@ -419,22 +443,27 @@ void mitk::PipInstaller::BeginVirtualEnvPhase()
   if (m_Spec.venvName.empty() || PythonHelper::VirtualEnvExists(m_Spec.venvName))
   {
     // No venv needed or already exists - just activate and move on.
-    if (!m_Spec.venvName.empty())
-      PythonHelper::ActivateVirtualEnv(m_Spec.venvName);
+    if (!m_Spec.venvName.empty() && !PythonHelper::ActivateVirtualEnv(m_Spec.venvName))
+    {
+      m_State = State::Failed;
+      emit ErrorOccurred("Failed to activate virtual environment.");
+      emit InstallFinished(false);
+      return;
+    }
 
     if (m_Spec.upgradePipFirst)
     {
-      StartPipUpgrade();
+      this->StartPipUpgrade();
     }
     else
     {
       emit ResolveStarted();
-      StartResolveGroup();
+      this->StartResolveGroup();
     }
     return;
   }
 
-  auto python = RequirePythonExecutable();
+  const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
@@ -443,7 +472,7 @@ void mitk::PipInstaller::BeginVirtualEnvPhase()
   m_CreatedVirtualEnv = true;
   emit VirtualEnvCreationStarted();
 
-  auto venvPath = PythonHelper::GetVirtualEnvPath(m_Spec.venvName);
+  const auto venvPath = PythonHelper::GetVirtualEnvPath(m_Spec.venvName);
   QStringList args = { "-m", "venv", QString::fromStdString(venvPath.string()) };
   MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
@@ -451,7 +480,7 @@ void mitk::PipInstaller::BeginVirtualEnvPhase()
 
 void mitk::PipInstaller::StartPipUpgrade()
 {
-  auto python = RequirePythonExecutable();
+  const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
@@ -466,14 +495,14 @@ void mitk::PipInstaller::StartPipUpgrade()
 
 void mitk::PipInstaller::StartResolveGroup()
 {
-  auto python = RequirePythonExecutable();
+  const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
 
   if (m_CurrentGroup >= static_cast<int>(m_Groups.size()))
   {
-    BeginModelDownloadPhase();
+    this->BeginModelDownloadPhase();
     return;
   }
 
@@ -494,11 +523,11 @@ void mitk::PipInstaller::StartResolveGroup()
     return;
   }
 
-  auto reportPath = m_ReportFile.fileName();
+  const auto reportPath = m_ReportFile.fileName();
   m_ReportFile.close();
 
   QStringList args = { "-m", "pip", "install", "--dry-run", "--report", reportPath };
-  args = BuildPipArgs(args, group);
+  args = this->BuildPipArgs(args, group);
 
   for (const auto& req : group.requirements)
     args.append(QString::fromStdString(req));
@@ -510,14 +539,14 @@ void mitk::PipInstaller::StartResolveGroup()
 
 void mitk::PipInstaller::StartInstallPackage()
 {
-  auto python = RequirePythonExecutable();
+  const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
 
   if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
-    BeginModelDownloadPhase();
+    this->BeginModelDownloadPhase();
     return;
   }
 
@@ -535,7 +564,7 @@ void mitk::PipInstaller::StartInstallPackage()
     installArg = QString::fromStdString(pkg.name) + "==" + QString::fromStdString(pkg.version);
 
   QStringList args = { "-m", "pip", "install", "--no-deps", installArg };
-  args = BuildPipArgs(args, group);
+  args = this->BuildPipArgs(args, group);
 
   MITK_INFO << FormatCommand(python, args).toStdString();
   m_Process->start(python, args);
@@ -565,7 +594,7 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
     return false;
   }
 
-  auto data = file.readAll();
+  const auto data = file.readAll();
   file.close();
 
   // The report format is specified at
@@ -575,7 +604,7 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
   // `requested` is the one genuinely optional field.
   try
   {
-    auto report = nlohmann::json::parse(data.constData(), data.constData() + data.size());
+    const auto report = nlohmann::json::parse(data.constData(), data.constData() + data.size());
     const auto& group = m_Groups[groupIndex];
 
     for (const auto& entry : report.at("install"))
@@ -591,11 +620,11 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
       // Match the resolved package against this group's requirements using
       // PEP 503-canonicalized comparison so e.g. "scikit_learn", "scikit-learn"
       // and "Scikit-Learn" all match the same resolved name.
-      auto canonicalName = CanonicalizePackageName(info.name);
+      const auto canonicalName = CanonicalizePackageName(info.name);
 
       for (const auto& req : group.requirements)
       {
-        auto reqName = CanonicalizePackageName(ExtractPackageName(req));
+        const auto reqName = CanonicalizePackageName(ExtractPackageName(req));
         if (reqName == canonicalName)
         {
           info.specifier = req;
@@ -631,7 +660,7 @@ bool mitk::PipInstaller::ParseResolveReport(const QString& reportPath, int group
         }
       }
 
-      auto index = static_cast<int>(m_ResolvedPackages.size());
+      const auto index = static_cast<int>(m_ResolvedPackages.size());
       m_ResolvedPackages.push_back(info);
       emit PackageStatusChanged(index, QString::fromStdString(info.name), PackageStatus::Pending);
     }
@@ -655,11 +684,11 @@ void mitk::PipInstaller::AdvanceToNextGroup()
   {
     m_State = State::Resolving;
     emit ResolveStarted();
-    StartResolveGroup();
+    this->StartResolveGroup();
   }
   else
   {
-    BeginModelDownloadPhase();
+    this->BeginModelDownloadPhase();
   }
 }
 
@@ -677,12 +706,12 @@ void mitk::PipInstaller::BeginModelDownloadPhase()
 
   m_State = State::DownloadingModels;
   m_CurrentDownload = 0;
-  StartModelDownload();
+  this->StartModelDownload();
 }
 
 void mitk::PipInstaller::StartModelDownload()
 {
-  auto python = RequirePythonExecutable();
+  const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
@@ -695,7 +724,7 @@ void mitk::PipInstaller::StartModelDownload()
   }
 
   const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
-  auto displayName = QString::fromStdString(
+  const auto displayName = QString::fromStdString(
     download.displayName.empty() ? download.repoId : download.displayName);
 
   // Inline `python -c "<script>"`. QProcess::start with a QStringList handles
@@ -704,7 +733,7 @@ void mitk::PipInstaller::StartModelDownload()
   // our OnStandardErrorReady -> OutputReceived pipeline forwards to the UI
   // details view. force_download=False keeps the cache authoritative: a
   // re-run on a populated cache is effectively a no-op.
-  auto script = QString(
+  const auto script = QString(
     "from huggingface_hub import snapshot_download\n"
     "snapshot_download(repo_id=%1, allow_patterns=%2, force_download=False)\n")
     .arg(PyQuote(download.repoId), PyListLiteralOrNone(download.allowPatterns));
@@ -718,7 +747,7 @@ void mitk::PipInstaller::StartModelDownload()
 
 QString mitk::PipInstaller::PythonExecutable() const
 {
-  auto path = PythonHelper::GetExecutablePath();
+  const auto path = PythonHelper::GetExecutablePath();
 
   if (path.empty())
     return {};
@@ -728,7 +757,7 @@ QString mitk::PipInstaller::PythonExecutable() const
 
 QString mitk::PipInstaller::RequirePythonExecutable()
 {
-  auto python = PythonExecutable();
+  const auto python = this->PythonExecutable();
 
   if (python.isEmpty())
   {
@@ -743,7 +772,7 @@ QString mitk::PipInstaller::RequirePythonExecutable()
 void mitk::PipInstaller::FinalizeCancel()
 {
   m_State = State::Failed;
-  RemoveCreatedVirtualEnv();
+  this->RemoveCreatedVirtualEnv();
   emit InstallFinished(false);
 }
 

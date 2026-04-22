@@ -395,11 +395,12 @@ void InitImage(py::module_& m)
   // IPropertyOwner methods.
   bind_property_owner(image_class);
 
-  // Live properties view (delegates to PropertyView in mitk.property_view).  // Geometry helpers
+  // Geometry helpers.
   // Image-specific: ndim and shape are bound manually because Image
   // has a numpy-compatible shape property and overloaded GetDimension().
   BindGeometryAccessors<decltype(image_class), Image, false>(image_class);
 
+  // Live properties view (delegates to PropertyView in mitk.property_view).
   image_class.def_property_readonly(
     "properties",
     [](Image& self)

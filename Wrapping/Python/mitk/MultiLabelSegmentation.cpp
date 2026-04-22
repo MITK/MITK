@@ -116,6 +116,36 @@ std::tuple<double, double, double> Point3DToTuple(const mitk::Point3D& p)
   return {p[0], p[1], p[2]};
 }
 
+// Accept MergeStyle enum or case-insensitive string alias ("replace" / "merge")
+MultiLabelSegmentation::MergeStyle ToMergeStyle(py::handle h)
+{
+  if (py::isinstance<MultiLabelSegmentation::MergeStyle>(h))
+    return h.cast<MultiLabelSegmentation::MergeStyle>();
+  const auto s = h.cast<std::string>();
+  std::string upper;
+  upper.reserve(s.size());
+  for (const char c : s)
+    upper.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
+  if (upper == "REPLACE") return MultiLabelSegmentation::MergeStyle::Replace;
+  if (upper == "MERGE")   return MultiLabelSegmentation::MergeStyle::Merge;
+  throw py::value_error("Unknown MergeStyle: " + s);
+}
+
+// Accept OverwriteStyle enum or case-insensitive string alias ("regard_locks" / "ignore_locks")
+MultiLabelSegmentation::OverwriteStyle ToOverwriteStyle(py::handle h)
+{
+  if (py::isinstance<MultiLabelSegmentation::OverwriteStyle>(h))
+    return h.cast<MultiLabelSegmentation::OverwriteStyle>();
+  const auto s = h.cast<std::string>();
+  std::string upper;
+  upper.reserve(s.size());
+  for (const char c : s)
+    upper.push_back(static_cast<char>(std::toupper(static_cast<unsigned char>(c))));
+  if (upper == "REGARD_LOCKS") return MultiLabelSegmentation::OverwriteStyle::RegardLocks;
+  if (upper == "IGNORE_LOCKS") return MultiLabelSegmentation::OverwriteStyle::IgnoreLocks;
+  throw py::value_error("Unknown OverwriteStyle: " + s);
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -146,6 +176,37 @@ PyLabelVector MakeLabelVector(const LabelVector& src)
   return result;
 }
 
+Label::AlgorithmType ParseAlgorithmType(const std::string& s)
+{
+  if (s == "MANUAL") return Label::AlgorithmType::MANUAL;
+  if (s == "SEMIAUTOMATIC") return Label::AlgorithmType::SEMIAUTOMATIC;
+  if (s == "AUTOMATIC") return Label::AlgorithmType::AUTOMATIC;
+  throw py::value_error("Unknown algorithm type string: " + s);
+}
+
+MultiLabelSegmentation::Pointer LoadSegmentationOrInitializeFromImage(const std::string& path)
+{
+  auto dv = IOUtil::Load(path);
+  if (dv.empty())
+    throw py::value_error("Could not load: " + path);
+
+  MultiLabelSegmentation::Pointer seg = dynamic_cast<MultiLabelSegmentation*>(dv[0].GetPointer());
+
+  if (seg.IsNull())
+  {
+    Image::Pointer image = dynamic_cast<Image*>(dv[0].GetPointer());
+    if (image.IsNotNull())
+    {
+      seg = MultiLabelSegmentation::New();
+      seg->InitializeByLabeledImage(image);
+    }
+  }
+
+  if (seg.IsNull())
+    throw py::value_error("Could not load: " + path);
+  return seg;
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -160,6 +221,20 @@ struct LabelGroup
   std::vector<std::string> class_names;
   Image::Pointer image;
 };
+
+namespace
+{
+LabelGroup MakeLabelGroup(MultiLabelSegmentation& seg, unsigned int index)
+{
+  LabelGroup g;
+  g.index = index;
+  g.name = seg.GetGroupName(index);
+  g.labels = MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(index)));
+  g.class_names = seg.GetLabelClassNamesByGroup(index);
+  g.image = seg.GetGroupImage(index);
+  return g;
+}
+} // namespace
 
 // ---------------------------------------------------------------------------
 // Module init
@@ -297,22 +372,10 @@ void InitMultiLabelSegmentation(py::module_& m)
     .def_property("algorithm_name", &Label::GetAlgorithmName, &Label::SetAlgorithmName)
     .def("add_tool_use",
       [](Label& l, py::handle algoType, const std::string& algoName) {
-        if (py::isinstance<Label::AlgorithmType>(algoType))
-        {
-          l.AddToolUse(algoType.cast<Label::AlgorithmType>(), algoName);
-        }
-        else
-        {
-          const auto s = algoType.cast<std::string>();
-          if (s == "MANUAL")
-            l.AddToolUse(Label::AlgorithmType::MANUAL, algoName);
-          else if (s == "SEMIAUTOMATIC")
-            l.AddToolUse(Label::AlgorithmType::SEMIAUTOMATIC, algoName);
-          else if (s == "AUTOMATIC")
-            l.AddToolUse(Label::AlgorithmType::AUTOMATIC, algoName);
-          else
-            throw py::value_error("Unknown algorithm type string: " + s);
-        }
+        const auto t = py::isinstance<Label::AlgorithmType>(algoType)
+          ? algoType.cast<Label::AlgorithmType>()
+          : ParseAlgorithmType(algoType.cast<std::string>());
+        l.AddToolUse(t, algoName);
       },
       py::arg("algorithm_type"), py::arg("algorithm_name"))
 
@@ -425,6 +488,15 @@ void InitMultiLabelSegmentation(py::module_& m)
       [](const Label& l) { return std::hash<Label::PixelType>{}(l.GetValue()); })
     .def("__repr__",
       [](const Label& l) {
+        // Compare against a freshly-constructed Label so defaults stay in sync
+        // if Label::New() ever changes them.
+        static const Label::Pointer defaults = Label::New();
+        const auto colorsDiffer = [](const mitk::Color& a, const mitk::Color& b) {
+          return std::abs(a.GetRed() - b.GetRed()) > 1e-5f ||
+                 std::abs(a.GetGreen() - b.GetGreen()) > 1e-5f ||
+                 std::abs(a.GetBlue() - b.GetBlue()) > 1e-5f;
+        };
+
         std::ostringstream os;
         os << "Label(value=" << l.GetValue()
            << ", name='" << l.GetName() << "'";
@@ -439,17 +511,15 @@ void InitMultiLabelSegmentation(py::module_& m)
           os << ", algorithm_type=AlgorithmType." << l.GetAlgorithmTypeStr();
         if (l.GetConstProperty("algorithm_name").IsNotNull())
           os << ", algorithm_name='" << l.GetAlgorithmName() << "'";
-        if (!l.GetLocked())
-          os << ", locked=False";
-        if (!l.GetVisible())
-          os << ", visible=False";
+        if (l.GetLocked() != defaults->GetLocked())
+          os << ", locked=" << (l.GetLocked() ? "True" : "False");
+        if (l.GetVisible() != defaults->GetVisible())
+          os << ", visible=" << (l.GetVisible() ? "True" : "False");
         const auto opacity = l.GetOpacity();
-        if (std::abs(opacity - 0.6f) > 1e-5f)
+        if (std::abs(opacity - defaults->GetOpacity()) > 1e-5f)
           os << ", opacity=" << opacity;
         const auto color = l.GetColor();
-        if (std::abs(color.GetRed() - 1.0f) > 1e-5f ||
-            std::abs(color.GetGreen() - 1.0f) > 1e-5f ||
-            std::abs(color.GetBlue() - 1.0f) > 1e-5f)
+        if (colorsDiffer(color, defaults->GetColor()))
           os << ", color=(" << color.GetRed() << ", " << color.GetGreen() << ", " << color.GetBlue() << ")";
 
         os << ")";
@@ -593,10 +663,7 @@ void InitMultiLabelSegmentation(py::module_& m)
       }),
       py::arg("base_geometry"))
     .def(py::init([](const std::filesystem::path& p) {
-        auto s = IOUtil::Load<MultiLabelSegmentation>(p.string());
-        if (s.IsNull())
-          throw py::value_error("Could not load: " + p.string());
-        return s;
+        return LoadSegmentationOrInitializeFromImage(p.string());
       }),
       py::arg("path"))
 
@@ -612,26 +679,7 @@ void InitMultiLabelSegmentation(py::module_& m)
       py::arg("image"))
     .def_static("load",
       [](const std::string& path) {
-
-        auto dv = IOUtil::Load(path);
-        if (dv.empty())
-          throw py::value_error("Could not load: " + path);
-
-        MultiLabelSegmentation::Pointer s = dynamic_cast<MultiLabelSegmentation*>(dv[0].GetPointer());
-
-        if (s.IsNull())
-        {
-          Image::Pointer i = dynamic_cast<Image*>(dv[0].GetPointer());
-          if (i.IsNotNull())
-          {
-            s = MultiLabelSegmentation::New();
-            s->InitializeByLabeledImage(i);
-          }
-        }
-
-        if (s.IsNull())
-          throw py::value_error("Could not load: " + path);
-        return s;
+        return LoadSegmentationOrInitializeFromImage(path);
       },
       py::arg("path"))
 
@@ -639,10 +687,8 @@ void InitMultiLabelSegmentation(py::module_& m)
     // Save / re-initialize
     // ----------------------------------------------------------------
     .def("save",
-      [](const MultiLabelSegmentation* seg, const std::string& path) {
-        if (seg == nullptr)
-          throw py::value_error("Cannot save a null segmentation");
-        IOUtil::Save(seg, path);
+      [](const MultiLabelSegmentation& seg, const std::string& path) {
+        IOUtil::Save(&seg, path);
       },
       py::arg("path"))
     .def("initialize",
@@ -711,13 +757,7 @@ void InitMultiLabelSegmentation(py::module_& m)
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
         if (!seg.ExistGroup(index))
           throw py::value_error("Group index " + std::to_string(index) + " does not exist");
-        LabelGroup g;
-        g.index = index;
-        g.name = seg.GetGroupName(index);
-        g.labels = MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(index)));
-        g.class_names = seg.GetLabelClassNamesByGroup(index);
-        g.image = seg.GetGroupImage(index);
-        return g;
+        return MakeLabelGroup(seg, index);
       },
       py::arg("index"))
     .def_property_readonly("groups",
@@ -726,15 +766,7 @@ void InitMultiLabelSegmentation(py::module_& m)
         const auto n = seg.GetNumberOfGroups();
         groups.reserve(n);
         for (unsigned int i = 0; i < n; ++i)
-        {
-          LabelGroup g;
-          g.index = i;
-          g.name = seg.GetGroupName(i);
-          g.labels = MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(i)));
-          g.class_names = seg.GetLabelClassNamesByGroup(i);
-          g.image = seg.GetGroupImage(i);
-          groups.push_back(std::move(g));
-        }
+          groups.push_back(MakeLabelGroup(seg, i));
         return groups;
       })
     .def("get_group_by_name",
@@ -743,15 +775,7 @@ void InitMultiLabelSegmentation(py::module_& m)
         for (unsigned int i = 0; i < n; ++i)
         {
           if (seg.GetGroupName(i) == name)
-          {
-            LabelGroup g;
-            g.index = i;
-            g.name = name;
-            g.labels = MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(i)));
-            g.class_names = seg.GetLabelClassNamesByGroup(i);
-            g.image = seg.GetGroupImage(i);
-            return g;
-          }
+            return MakeLabelGroup(seg, i);
         }
         return std::nullopt;
       },
@@ -808,8 +832,8 @@ void InitMultiLabelSegmentation(py::module_& m)
       },
       py::arg("name"), py::arg("color"), py::arg("group") = 0)
     .def("remove_label",
-      [](MultiLabelSegmentation& seg, Label::PixelType value) {
-        seg.RemoveLabel(value);
+      [](MultiLabelSegmentation& seg, py::handle value) {
+        seg.RemoveLabel(ToLabelValue(value));
       },
       py::arg("value"))
     .def("remove_labels",
@@ -818,8 +842,8 @@ void InitMultiLabelSegmentation(py::module_& m)
       },
       py::arg("values"))
     .def("erase_label",
-      [](MultiLabelSegmentation& seg, Label::PixelType value) {
-        seg.EraseLabel(value);
+      [](MultiLabelSegmentation& seg, py::handle value) {
+        seg.EraseLabel(ToLabelValue(value));
       },
       py::arg("value"))
     .def("erase_labels",
@@ -828,15 +852,15 @@ void InitMultiLabelSegmentation(py::module_& m)
       },
       py::arg("values"))
     .def("rename_label",
-      [](MultiLabelSegmentation& seg, Label::PixelType value,
+      [](MultiLabelSegmentation& seg, py::handle value,
          const std::string& name, const std::tuple<float, float, float>& color) {
-        seg.RenameLabel(value, name, TupleToColor(color));
+        seg.RenameLabel(ToLabelValue(value), name, TupleToColor(color));
       },
       py::arg("value"), py::arg("name"), py::arg("color"))
     .def("merge_labels",
-      [](MultiLabelSegmentation& seg, Label::PixelType target, py::iterable sources,
-         MultiLabelSegmentation::OverwriteStyle overwriteStyle) {
-        seg.MergeLabels(target, ToLabelValues(sources), overwriteStyle);
+      [](MultiLabelSegmentation& seg, py::handle target, py::iterable sources,
+         py::handle overwriteStyle) {
+        seg.MergeLabels(ToLabelValue(target), ToLabelValues(sources), ToOverwriteStyle(overwriteStyle));
       },
       py::arg("target"), py::arg("sources"),
       py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks)
@@ -881,6 +905,76 @@ void InitMultiLabelSegmentation(py::module_& m)
       [](const MultiLabelSegmentation& seg) -> MultiLabelSegmentation::Pointer {
         return seg.Clone();
       })
+    .def("relabel_to",
+      [](const MultiLabelSegmentation& self, py::iterable labelMapping,
+         py::object destSeg,
+         bool keepUntouchedLabels,
+         py::handle mergeStyle, py::handle overwriteStyle) -> py::object {
+        const bool destProvided = !destSeg.is_none();
+        if (keepUntouchedLabels && destProvided)
+          throw py::value_error(
+            "keep_untouched_labels=True is only allowed when dest_seg is None. "
+            "When an explicit dest_seg is provided the caller controls its "
+            "content; clear it manually beforehand if a clean slate is needed.");
+
+        py::object targetObj;
+        MultiLabelSegmentation* targetPtr = nullptr;
+        if (destProvided)
+        {
+          targetObj = destSeg;
+          targetPtr = destSeg.cast<MultiLabelSegmentation*>();
+        }
+        else
+        {
+          MultiLabelSegmentation::Pointer clone = self.Clone();
+          if (!keepUntouchedLabels)
+            clone->ClearGroupImages();
+          targetPtr = clone.GetPointer();
+          targetObj = py::cast(clone);
+        }
+
+        TransferLabelContent(&self, targetPtr,
+          ToLabelMapping(labelMapping),
+          ToMergeStyle(mergeStyle),
+          ToOverwriteStyle(overwriteStyle));
+        return targetObj;
+      },
+      py::arg("label_mapping"),
+      py::arg("dest_seg") = py::none(),
+      py::arg("keep_untouched_labels") = false,
+      py::arg("merge_style") = MultiLabelSegmentation::MergeStyle::Replace,
+      py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::IgnoreLocks,
+      "Return a segmentation whose pixel content is the result of applying "
+      "label_mapping to self.\n\n"
+      "Parameters\n"
+      "----------\n"
+      "label_mapping:\n"
+      "    Iterable of (source_value, destination_value) pairs. Each entry is a\n"
+      "    (int|Label, int|Label) 2-tuple.\n"
+      "dest_seg:\n"
+      "    Target MultiLabelSegmentation. If None (default), self is cloned and\n"
+      "    used as the target (see keep_untouched_labels for how the clone is\n"
+      "    prepared). All destination label values referenced in label_mapping\n"
+      "    must already exist in dest_seg.\n"
+      "keep_untouched_labels:\n"
+      "    Only valid when dest_seg is None. Controls what happens to labels\n"
+      "    that are not listed as a source in label_mapping:\n"
+      "    * False (default) - the clone's group images are cleared before the\n"
+      "      transfer. Only pixels of mapped labels appear in the result.\n"
+      "    * True - the clone retains its original pixel content. Mapped labels\n"
+      "      are remapped in-place; every other label is left untouched. Raises\n"
+      "      ValueError when combined with an explicit dest_seg because the\n"
+      "      caller already controls the state of that object.\n"
+      "merge_style:\n"
+      "    MergeStyle enum value or lowercase string alias ('replace' / 'merge').\n"
+      "    Defaults to REPLACE.\n"
+      "overwrite_style:\n"
+      "    OverwriteStyle enum value or lowercase string alias ('regard_locks' /\n"
+      "    'ignore_locks'). Defaults to IGNORE_LOCKS.\n\n"
+      "Returns\n"
+      "-------\n"
+      "MultiLabelSegmentation\n"
+      "    The populated dest_seg (or the auto-created clone when dest_seg was None).")
     .def("update_group_image",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
          const Image* source, TimeStepType timeStep, TimeStepType sourceTimeStep) {
@@ -957,86 +1051,92 @@ void InitMultiLabelSegmentation(py::module_& m)
     py::arg("source"), py::arg("target"), py::arg("label_mapping"));
 
   // ----------------------------------------------------------------
-  // transfer_labels — underscore-prefixed C++ bindings
+  // transfer_labels — type-dispatched (Segmentation or Image)
   // ----------------------------------------------------------------
 
-  // Segmentation -> Segmentation (all time steps)
-  m.def("_transfer_labels_seg",
-    [](const MultiLabelSegmentation* src, MultiLabelSegmentation* dst,
+  m.def("transfer_labels",
+    [](py::object source, py::object destination,
        py::iterable labelMapping,
-       MultiLabelSegmentation::MergeStyle mergeStyle,
-       MultiLabelSegmentation::OverwriteStyle overwriteStyle) {
-      TransferLabelContent(src, dst, ToLabelMapping(labelMapping), mergeStyle, overwriteStyle);
+       py::handle mergeStyle, py::handle overwriteStyle,
+       py::object destinationLabels,
+       Label::PixelType srcBg,
+       Label::PixelType dstBg,
+       bool dstBgLocked) {
+      const auto mapping = ToLabelMapping(labelMapping);
+      const auto ms = ToMergeStyle(mergeStyle);
+      const auto os = ToOverwriteStyle(overwriteStyle);
+
+      if (py::isinstance<MultiLabelSegmentation>(source))
+      {
+        TransferLabelContent(
+          source.cast<const MultiLabelSegmentation*>(),
+          destination.cast<MultiLabelSegmentation*>(),
+          mapping, ms, os);
+        return;
+      }
+
+      ConstLabelVector dstLabelVec;
+      if (!destinationLabels.is_none())
+      {
+        for (auto item : destinationLabels.cast<py::iterable>())
+          dstLabelVec.push_back(Label::ConstPointer(item.cast<Label*>()));
+      }
+      TransferLabelContent(
+        source.cast<const Image*>(),
+        destination.cast<Image*>(),
+        dstLabelVec, srcBg, dstBg, dstBgLocked,
+        mapping, ms, os);
     },
     py::arg("source"), py::arg("destination"),
     py::arg("label_mapping"),
     py::arg("merge_style") = MultiLabelSegmentation::MergeStyle::Replace,
-    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+    py::arg("destination_labels") = py::none(),
+    py::arg("source_background") = MultiLabelSegmentation::UNLABELED_VALUE,
+    py::arg("destination_background") = MultiLabelSegmentation::UNLABELED_VALUE,
+    py::arg("destination_background_locked") = false);
 
-  // Segmentation -> Segmentation (single time step)
-  m.def("_transfer_labels_at_time_step_seg",
-    [](const MultiLabelSegmentation* src, MultiLabelSegmentation* dst,
+  m.def("transfer_labels_at_time_step",
+    [](py::object source, py::object destination,
        TimeStepType timeStep,
        py::iterable labelMapping,
-       MultiLabelSegmentation::MergeStyle mergeStyle,
-       MultiLabelSegmentation::OverwriteStyle overwriteStyle) {
-      TransferLabelContentAtTimeStep(src, dst, timeStep, ToLabelMapping(labelMapping), mergeStyle, overwriteStyle);
+       py::handle mergeStyle, py::handle overwriteStyle,
+       py::object destinationLabels,
+       Label::PixelType srcBg,
+       Label::PixelType dstBg,
+       bool dstBgLocked) {
+      const auto mapping = ToLabelMapping(labelMapping);
+      const auto ms = ToMergeStyle(mergeStyle);
+      const auto os = ToOverwriteStyle(overwriteStyle);
+
+      if (py::isinstance<MultiLabelSegmentation>(source))
+      {
+        TransferLabelContentAtTimeStep(
+          source.cast<const MultiLabelSegmentation*>(),
+          destination.cast<MultiLabelSegmentation*>(),
+          timeStep, mapping, ms, os);
+        return;
+      }
+
+      ConstLabelVector dstLabelVec;
+      if (!destinationLabels.is_none())
+      {
+        for (auto item : destinationLabels.cast<py::iterable>())
+          dstLabelVec.push_back(Label::ConstPointer(item.cast<Label*>()));
+      }
+      TransferLabelContentAtTimeStep(
+        source.cast<const Image*>(),
+        destination.cast<Image*>(),
+        dstLabelVec, timeStep, srcBg, dstBg, dstBgLocked,
+        mapping, ms, os);
     },
     py::arg("source"), py::arg("destination"),
     py::arg("time_step"),
     py::arg("label_mapping"),
     py::arg("merge_style") = MultiLabelSegmentation::MergeStyle::Replace,
-    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
-
-  // Image -> Image (all time steps)
-  m.def("_transfer_labels_image",
-    [](const Image* src, Image* dst,
-       py::list destinationLabels,
-       py::iterable labelMapping,
-       Label::PixelType srcBg,
-       Label::PixelType dstBg,
-       bool dstBgLocked,
-       MultiLabelSegmentation::MergeStyle mergeStyle,
-       MultiLabelSegmentation::OverwriteStyle overwriteStyle) {
-      ConstLabelVector dstLabelVec;
-      for (auto item : destinationLabels)
-        dstLabelVec.push_back(Label::ConstPointer(item.cast<Label*>()));
-      TransferLabelContent(src, dst, dstLabelVec, srcBg, dstBg, dstBgLocked,
-        ToLabelMapping(labelMapping), mergeStyle, overwriteStyle);
-    },
-    py::arg("source"), py::arg("destination"),
-    py::arg("destination_labels"),
-    py::arg("label_mapping"),
+    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+    py::arg("destination_labels") = py::none(),
     py::arg("source_background") = MultiLabelSegmentation::UNLABELED_VALUE,
     py::arg("destination_background") = MultiLabelSegmentation::UNLABELED_VALUE,
-    py::arg("destination_background_locked") = false,
-    py::arg("merge_style") = MultiLabelSegmentation::MergeStyle::Replace,
-    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
-
-  // Image -> Image (single time step)
-  m.def("_transfer_labels_at_time_step_image",
-    [](const Image* src, Image* dst,
-       py::list destinationLabels,
-       TimeStepType timeStep,
-       py::iterable labelMapping,
-       Label::PixelType srcBg,
-       Label::PixelType dstBg,
-       bool dstBgLocked,
-       MultiLabelSegmentation::MergeStyle mergeStyle,
-       MultiLabelSegmentation::OverwriteStyle overwriteStyle) {
-      ConstLabelVector dstLabelVec;
-      for (auto item : destinationLabels)
-        dstLabelVec.push_back(Label::ConstPointer(item.cast<Label*>()));
-      TransferLabelContentAtTimeStep(src, dst, dstLabelVec, timeStep, srcBg, dstBg, dstBgLocked,
-        ToLabelMapping(labelMapping), mergeStyle, overwriteStyle);
-    },
-    py::arg("source"), py::arg("destination"),
-    py::arg("destination_labels"),
-    py::arg("time_step"),
-    py::arg("label_mapping"),
-    py::arg("source_background") = MultiLabelSegmentation::UNLABELED_VALUE,
-    py::arg("destination_background") = MultiLabelSegmentation::UNLABELED_VALUE,
-    py::arg("destination_background_locked") = false,
-    py::arg("merge_style") = MultiLabelSegmentation::MergeStyle::Replace,
-    py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+    py::arg("destination_background_locked") = false);
 }

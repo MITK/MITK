@@ -90,6 +90,16 @@ class TestConstruction:
             f"Expected label values {expected_values}, got {label_values}"
         )
 
+    def test_constructor_from_plain_image_uses_initialize_by_labeled_image(self, data_dir):
+        # Same fallback semantics as load(): a plain NIfTI image passed to the
+        # constructor must be auto-initialized via InitializeByLabeledImage.
+        path = str(data_dir / "Multilabel" / "MultilabelSegmentation_group_0.nii.gz")
+        seg = mitk.MultiLabelSegmentation(path)
+
+        assert seg is not None
+        assert seg.num_groups == 1
+        assert set(seg.label_values) == {1, 2, 3, 4, 5}
+
 
 # ---------------------------------------------------------------------------
 # Re-initialize
@@ -203,7 +213,7 @@ class TestGroupCRUD:
         lbl = mitk.Label(10, "InGroup")
         idx = seg.add_group(labels=[lbl])
         group_vals = seg.get_group_label_values(idx)
-        assert len(group_vals) >= 1
+        assert len(group_vals) == 1
 
     def test_add_group_with_image(self, seg):
         group_img = seg.get_group_image(0)
@@ -594,6 +604,80 @@ class TestTransferLabels:
             merge_style="merge",
             overwrite_style="ignore_locks")
 
+    # --- Image-variant (source is a plain Image, not a MultiLabelSegmentation) ---
+
+    @staticmethod
+    def _seed_image_with_label(ref_image, label_value):
+        """Return a plain Image with a small patch filled with *label_value*."""
+        arr = np.zeros(ref_image.as_numpy().shape, dtype=np.uint16)
+        arr[0, 0, :2] = label_value
+        return mitk.Image.from_numpy(arr, spacing=ref_image.spacing)
+
+    def test_image_source_basic_mapping(self, ref_image):
+        src_img = self._seed_image_with_label(ref_image, 1)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+
+        mitk.transfer_labels(
+            src_img, dst.get_group_image(0),
+            label_mapping=[(1, l_dst.value)],
+            destination_labels=[l_dst])
+        assert np.all(dst.get_group_image(0).as_numpy()[0, 0, :2] == l_dst.value)
+
+    def test_image_source_accepts_label_objects_in_mapping(self, ref_image):
+        src_img = self._seed_image_with_label(ref_image, 1)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+
+        # label_mapping entries pass through _normalize_mapping: Label works as
+        # either source or destination
+        mitk.transfer_labels(
+            src_img, dst.get_group_image(0),
+            label_mapping=[(1, l_dst)],
+            destination_labels=[l_dst])
+        assert np.all(dst.get_group_image(0).as_numpy()[0, 0, :2] == l_dst.value)
+
+    def test_image_source_full_kwargs(self, ref_image):
+        src_img = self._seed_image_with_label(ref_image, 1)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+
+        mitk.transfer_labels(
+            src_img, dst.get_group_image(0),
+            label_mapping=[(1, l_dst.value)],
+            destination_labels=[l_dst],
+            source_background=0,
+            destination_background=0,
+            destination_background_locked=False,
+            merge_style=mitk.MergeStyle.REPLACE,
+            overwrite_style=mitk.OverwriteStyle.IGNORE_LOCKS)
+
+    def test_image_source_at_time_step(self, ref_image):
+        src_img = self._seed_image_with_label(ref_image, 1)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+
+        mitk.transfer_labels_at_time_step(
+            src_img, dst.get_group_image(0), time_step=0,
+            label_mapping=[(1, l_dst.value)],
+            destination_labels=[l_dst])
+        assert np.all(dst.get_group_image(0).as_numpy()[0, 0, :2] == l_dst.value)
+
+    def test_image_source_at_time_step_full_kwargs(self, ref_image):
+        src_img = self._seed_image_with_label(ref_image, 1)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+
+        mitk.transfer_labels_at_time_step(
+            src_img, dst.get_group_image(0), time_step=0,
+            label_mapping=[(1, l_dst.value)],
+            destination_labels=[l_dst],
+            source_background=0,
+            destination_background=0,
+            destination_background_locked=False,
+            merge_style="replace",
+            overwrite_style="ignore_locks")
+
 
 # ---------------------------------------------------------------------------
 # clone / clear_group_images
@@ -770,6 +854,38 @@ class TestRelabelTo:
 # Error paths
 # ---------------------------------------------------------------------------
 
+class TestBoundButUntestedAPI:
+    """Coverage for bindings that other tests don't exercise directly."""
+
+    def test_update_group_image_writes_pixels(self, seg):
+        lbl = seg.add_label("U", (1.0, 0.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 0] = lbl.value
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), time_step=0, source_time_step=0)
+        assert seg.get_group_image(0).as_numpy()[0, 0, 0] == lbl.value
+
+    def test_get_label_values_at_coordinate(self, seg):
+        lbl = seg.add_label("L", (1.0, 0.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 0] = lbl.value
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), time_step=0, source_time_step=0)
+
+        # Voxel (x=0, y=0, z=0) with unit spacing → world coords (0, 0, 0).
+        values = seg.get_label_values_at((0.0, 0.0, 0.0))
+        assert lbl.value in values
+
+    def test_split_label_value_mapping_by_source_and_target_group(self, ref_image):
+        src = mitk.MultiLabelSegmentation(ref_image)
+        dst = mitk.MultiLabelSegmentation(ref_image)
+        l_src = src.add_label("S", (1.0, 0.0, 0.0), 0)
+        l_dst = dst.add_label("D", (0.0, 1.0, 0.0), 0)
+        result = mitk.mitk.split_label_value_mapping_by_source_and_target_group(
+            src, dst, [(l_src.value, l_dst.value)])
+        # Result is a per-(source_group, target_group) bucket; there is at least
+        # one entry corresponding to (0, 0) since both labels live in group 0.
+        assert result  # not empty / truthy
+
+
 class TestErrorPaths:
 
     def test_get_label_invalid_value(self, seg):
@@ -777,7 +893,7 @@ class TestErrorPaths:
             seg.get_label(65000)
 
     def test_get_group_invalid_index(self, seg):
-        with pytest.raises((ValueError, RuntimeError)):
+        with pytest.raises(ValueError):
             seg.get_group(999)
 
 
@@ -1007,7 +1123,7 @@ class TestLabelCenterOfMass:
         lbl = mitk.Label(1, "Test")
         lbl.update_center_of_mass(index=(5.0, 5.0, 5.0), coordinates=(1.0, 1.0, 1.0))
         lbl.reset_center_of_mass()
-        # After reset mtime should change
+        # mtime resets to 0 (the two CoM properties are removed).
         assert lbl.center_of_mass_mtime == 0
 
 

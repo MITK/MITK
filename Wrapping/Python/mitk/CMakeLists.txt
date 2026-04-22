@@ -9,9 +9,12 @@ pybind11_add_module(mitk_python_bindings
   CppMicroServices.cpp
   Exception.cpp
   Geometries.cpp
+  GeometryHelpers.cpp
+  GeometryHelpers.h
   Image.cpp
   IOUtil.cpp
   Module.cpp
+  MultiLabelSegmentation.cpp
   PixelType.cpp
   PixelType.h
   Points.cpp
@@ -29,7 +32,7 @@ pybind11_add_module(mitk_python_bindings
 )
 
 target_link_libraries(mitk_python_bindings
-  PRIVATE MitkCore MitkDICOM Python3::Module
+  PRIVATE MitkCore MitkDICOM MitkMultilabel Python3::Module
 )
 
 set_target_properties(mitk_python_bindings PROPERTIES
@@ -119,11 +122,12 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
     EXCLUDE_FROM_ALL
   )
 
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
-    DESTINATION mitk
-    COMPONENT wheel
-    EXCLUDE_FROM_ALL
-  )
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/property_view.py"
+  DESTINATION mitk
+  COMPONENT wheel
+  EXCLUDE_FROM_ALL
+)
 
   # Install auto-load modules into their expected subdirectories.
   # CppMicroServices looks for <module_name>/ subdirectory relative to

@@ -354,9 +354,8 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 
 void mitk::Label::ResetCenterOfMass()
 {
-  Point3D pnt(0, 0, 0);
-  SetCenterOfMassCoordinates(pnt);
-  SetCenterOfMassIndex(pnt);
+  this->RemoveProperty("center.index");
+  this->RemoveProperty("center.coordinates");
 }
 
 itk::ModifiedTimeType mitk::Label::GetCenterOfMassMTime() const

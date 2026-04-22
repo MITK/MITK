@@ -28,6 +28,7 @@ void InitPropertyList(py::module_&);
 void InitTemporoSpatialStringProperty(py::module_&);
 void InitPropertyKeyPath(py::module_&);
 void InitDICOMTagPath(py::module_&);
+void InitMultiLabelSegmentation(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -50,4 +51,5 @@ PYBIND11_MODULE(mitk, m)
   InitTemporoSpatialStringProperty(m);
   InitPropertyKeyPath(m);
   InitDICOMTagPath(m);
+  InitMultiLabelSegmentation(m);
 }

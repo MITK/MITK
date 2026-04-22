@@ -19,11 +19,6 @@ found in the LICENSE file.
 #include <usGlobalConfig.h>
 #include <MitkCppMicroServicesExports.h>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4275)
-#endif
-
 namespace us {
 
 /**
@@ -106,10 +101,6 @@ private:
 };
 
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 /**
  * \ingroup MicroServices

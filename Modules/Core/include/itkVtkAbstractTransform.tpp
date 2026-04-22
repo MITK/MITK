@@ -73,11 +73,10 @@ namespace itk
     assert(m_VtkAbstractTransform != nullptr);
 
     OutputPointType outputpoint;
-    vnl_vector<TScalarType> vnl_vec;
     mitk::ScalarType vtkpt[3];
-    mitk::itk2vtk(point, vtkpt);
+    mitk::ToArray(vtkpt, point);
     m_VtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
-    mitk::vtk2itk(vtkpt, outputpoint);
+    mitk::FillArray(outputpoint, vtkpt);
     return outputpoint;
   }
 
@@ -89,12 +88,11 @@ namespace itk
     assert(m_VtkAbstractTransform != nullptr);
 
     OutputVectorType outputvector;
-    vnl_vector<TScalarType> vnl_vec;
     mitk::ScalarType vtkpt[3] = {0, 0, 0};
     mitk::ScalarType vtkvec[3];
-    mitk::vnl2vtk<TScalarType, mitk::ScalarType>(vect.GetVnlVector(), vtkvec);
+    mitk::ToArray(vtkvec, vect);
     m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-    mitk::vtk2itk(vtkvec, outputvector);
+    mitk::FillArray(outputvector, vtkvec);
     return outputvector;
   }
 
@@ -108,9 +106,11 @@ namespace itk
     OutputVnlVectorType outputvector;
     mitk::ScalarType vtkpt[3] = {0, 0, 0};
     mitk::ScalarType vtkvec[3];
-    mitk::vnl2vtk<TScalarType, mitk::ScalarType>(vect, vtkvec);
+    for (unsigned int i = 0; i < 3; ++i)
+      vtkvec[i] = static_cast<mitk::ScalarType>(vect[i]);
     m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-    mitk::vtk2itk(vtkvec, outputvector);
+    for (unsigned int i = 0; i < 3; ++i)
+      outputvector[i] = static_cast<TScalarType>(vtkvec[i]);
     return outputvector;
   }
 
@@ -142,9 +142,9 @@ namespace itk
 
     OutputPointType outputpoint;
     mitk::ScalarType vtkpt[3];
-    mitk::itk2vtk(point, vtkpt);
+    mitk::ToArray(vtkpt, point);
     m_InverseVtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
-    mitk::vtk2itk(vtkpt, outputpoint);
+    mitk::FillArray(outputpoint, vtkpt);
     return outputpoint;
   }
 
@@ -158,9 +158,9 @@ namespace itk
     OutputVectorType outputvector;
     mitk::ScalarType vtkpt[3] = {0, 0, 0};
     mitk::ScalarType vtkvec[3];
-    mitk::itk2vtk(vect, vtkvec);
+    mitk::ToArray(vtkvec, vect);
     m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-    mitk::vtk2itk(vtkvec, outputvector);
+    mitk::FillArray(outputvector, vtkvec);
     return outputvector;
   }
 
@@ -174,9 +174,11 @@ namespace itk
     OutputVnlVectorType outputvector;
     mitk::ScalarType vtkpt[3] = {0, 0, 0};
     mitk::ScalarType vtkvec[3];
-    mitk::itk2vtk(vect, vtkvec);
+    for (unsigned int i = 0; i < 3; ++i)
+      vtkvec[i] = static_cast<mitk::ScalarType>(vect[i]);
     m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-    mitk::vtk2itk(vtkvec, outputvector);
+    for (unsigned int i = 0; i < 3; ++i)
+      outputvector[i] = static_cast<TScalarType>(vtkvec[i]);
     return outputvector;
   }
 

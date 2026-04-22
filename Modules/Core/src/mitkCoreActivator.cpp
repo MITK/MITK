@@ -32,9 +32,6 @@ found in the LICENSE file.
 #include "mitkSurfaceVtkLegacyIO.h"
 #include "mitkSurfaceVtkXmlIO.h"
 
-#include "mitkLegacyFileWriterService.h"
-#include <mitkFileWriter.h>
-
 #include <itkGDCMImageIO.h>
 #include <itkNiftiImageIO.h>
 
@@ -314,8 +311,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
     vtkObjectFactory::RegisterFactory( textureFactory );
     textureFactory->Delete();
     */
-
-  this->RegisterLegacyWriter();
 }
 
 void MitkCoreActivator::Unload(us::ModuleContext *)
@@ -331,11 +326,6 @@ void MitkCoreActivator::Unload(us::ModuleContext *)
   }
 
   for (auto &elem : m_FileIOs)
-  {
-    delete elem;
-  }
-
-  for (auto &elem : m_LegacyWriters)
   {
     delete elem;
   }
@@ -418,26 +408,6 @@ void MitkCoreActivator::RegisterVtkReaderWriter()
 
   m_FileIOs.push_back(new mitk::ImageVtkXmlIO());
   m_FileIOs.push_back(new mitk::ImageVtkLegacyIO());
-}
-
-void MitkCoreActivator::RegisterLegacyWriter()
-{
-  std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
-
-  for (auto i = allobjects.begin(); i != allobjects.end(); ++i)
-  {
-    mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter *>(i->GetPointer());
-    if (io)
-    {
-      std::string description = std::string("Legacy ") + io->GetNameOfClass() + " Writer";
-      mitk::IFileWriter *writer = new mitk::LegacyFileWriterService(io, description);
-      m_LegacyWriters.push_back(writer);
-    }
-    else
-    {
-      MITK_ERROR << "Error IOWriter override is not of type mitk::FileWriter: " << (*i)->GetNameOfClass() << std::endl;
-    }
-  }
 }
 
 US_EXPORT_MODULE_ACTIVATOR(MitkCoreActivator)

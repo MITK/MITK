@@ -108,6 +108,7 @@ found in the LICENSE file.
     dynamicITKOrigin[0]=tempImage->GetGeometry()->GetOrigin()[0];
     dynamicITKOrigin[1]=tempImage->GetGeometry()->GetOrigin()[1];
     dynamicITKOrigin[2]=tempImage->GetGeometry()->GetOrigin()[2];
+    dynamicITKOrigin[3]=0.0;
 
     dynamicITKImage->SetOrigin(dynamicITKOrigin);
     dynamicITKImage->SetSpacing(dynamicITKSpacing);

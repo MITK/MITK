@@ -47,17 +47,6 @@ namespace mitk
     bool AddTransition(StateMachineTransition::Pointer transition);
 
     /**
-     * \brief Return the first transition matching the given event description.
-     *
-     * \param[in] eventClass the event class to match.
-     * \param[in] eventVariant the event variant to match.
-     * \return The matching transition, or nullptr if none found.
-     * \deprecatedSince{2013_09} Use method GetTransitionList() instead.
-     */
-    DEPRECATED(StateMachineTransition::Pointer GetTransition(const std::string &eventClass,
-                                                             const std::string &eventVariant));
-
-    /**
      * \brief Return all transitions matching the given event description.
      *
      * \param[in] eventClass the event class to match.

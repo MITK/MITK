@@ -23,11 +23,6 @@ found in the LICENSE file.
 namespace mitk
 {
 
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
-#endif
-
 /**
  * \brief Enumeration property defining the mapping direction for registration visualization.
  *
@@ -93,9 +88,6 @@ private:
   RegVisDirectionProperty& operator=(const RegVisDirectionProperty&);
 };
 
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

@@ -37,8 +37,6 @@ found in the LICENSE file.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageWriteAccessor.h>
-#include <mitkPlaneProposer.h>
-#include <mitkUnstructuredGridClusteringFilter.h>
 #include <mitkVtkImageOverwrite.h>
 #include <mitkShapeBasedInterpolationAlgorithm.h>
 #include <itkCommand.h>
@@ -64,7 +62,6 @@ found in the LICENSE file.
 #include <vtkDoubleArray.h>
 #include <vtkFieldData.h>
 #include <vtkPolyVertex.h>
-#include <vtkUnstructuredGrid.h>
 #include <vtkPolyData.h>
 
 #include <array>

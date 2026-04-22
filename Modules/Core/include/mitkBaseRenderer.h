@@ -37,9 +37,13 @@ namespace mitk
   class Mapper;
   class BaseLocalStorageHandler;
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(RendererResetEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /**
    * \brief Organizes the rendering process.

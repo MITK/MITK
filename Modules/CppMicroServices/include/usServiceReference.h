@@ -92,6 +92,9 @@ public:
     }
   }
 
+  ServiceReference(const ServiceReference&) = default;
+  ServiceReference& operator=(const ServiceReference&) = default;
+
   using ServiceReferenceBase::operator=;
 
 };
@@ -127,6 +130,9 @@ public:
     : ServiceReferenceBase(base)
   {
   }
+
+  ServiceReference(const ServiceReference&) = default;
+  ServiceReference& operator=(const ServiceReference&) = default;
 
   using ServiceReferenceBase::operator=;
 

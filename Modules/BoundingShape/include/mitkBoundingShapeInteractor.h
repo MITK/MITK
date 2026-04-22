@@ -24,9 +24,13 @@ found in the LICENSE file.
 namespace mitk
 {
 // create events for interactions
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(BoundingShapeInteractionEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /** \brief Interactor for manipulating bounding shapes (GeometryData).
    *

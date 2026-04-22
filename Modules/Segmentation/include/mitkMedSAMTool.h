@@ -57,7 +57,7 @@ namespace mitk
     /**
      * \brief Deletes the bounding box from the render window.
      */
-    void OnDelete(StateMachineAction *, InteractionEvent *);
+    void OnDelete(StateMachineAction *, InteractionEvent *) override;
 
     void OnMove(StateMachineAction *, InteractionEvent *);
     void OnRelease(StateMachineAction *, InteractionEvent *);

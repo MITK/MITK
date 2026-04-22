@@ -16,19 +16,16 @@ set(H_FILES
   mitkAntiAliasing.h
   mitkArray.h
   mitkBaseDataTestImplementation.h
-  mitkBaseProcess.h
   mitkCommon.h
   mitkDisplayActionEvents.h
   mitkEqual.h
   mitkEventInformer.h
   mitkExceptionMacro.h
   mitkFileSystem.h
-  mitkFileWriterWithInformation.h
   mitkGenericLookupTable.h
   mitkGenericProperty.h
   mitkGetClassHierarchy.h
   mitkINodeSelectionListener.h
-  mitkIOAdapter.h
   mitkITKImageImport.h
   mitkImageAccessByItk.h
   mitkImageCast.h
@@ -43,11 +40,9 @@ set(H_FILES
   mitkLexicalCast.h
   mitkLine.h
   mitkLocalStorageHandler.h
-  mitkLogMacros.h
   mitkMatrix.h
   mitkMatrixConvert.h
   mitkMessage.h
-  mitkMoveSurfaceInteractor.h
   mitkNumericTypes.h
   mitkOperationActor.h
   mitkPPArgCount.h
@@ -67,9 +62,6 @@ set(H_FILES
   mitkTimeHelper.h
   mitkUndoModel.h
   mitkVector.h
-  mitkVectorDeprecated.h
-  mitkVtkMapper2D.h
-  mitkVtkMapper3D.h
   mitkWeakPointer.h
 )
 
@@ -274,7 +266,6 @@ set(CPP_FILES
   Interactions/mitkDisplayActionEventHandlerDesynchronized.cpp
   Interactions/mitkDisplayActionEventHandlerStd.cpp
   Interactions/mitkDisplayActionEventHandlerSynchronized.cpp
-  Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
@@ -307,11 +298,9 @@ set(CPP_FILES
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
   IO/mitkCustomMimeType.cpp
-  IO/mitkFileReader.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp
   IO/mitkFileReaderWriterBase.cpp
-  IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
   IO/mitkGeometry3DToXML.cpp
@@ -333,8 +322,6 @@ set(CPP_FILES
   IO/mitkIPreferencesStorage.cpp
   IO/mitkItkImageIO.cpp
   IO/mitkItkLoggingAdapter.cpp
-  IO/mitkLegacyFileReaderService.cpp
-  IO/mitkLegacyFileWriterService.cpp
   IO/mitkLocaleSwitch.cpp
   IO/mitkLogBackend.cpp
   IO/mitkMimeType.cpp
@@ -363,7 +350,6 @@ set(CPP_FILES
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkBaseRendererHelper.cpp
   Rendering/mitkCrosshairVtkMapper2D.cpp
-  Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp

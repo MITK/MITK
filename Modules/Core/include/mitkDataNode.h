@@ -205,7 +205,8 @@ namespace mitk
     /**
      * \brief Get the transformation applied prior to displaying the data as
      * a vtkTransform
-     * \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
+     *
+     * Convenience shortcut for \c GetData()->GetGeometry(t)->GetVtkTransform().
      */
     vtkLinearTransform *GetVtkTransform(int t = 0) const;
 

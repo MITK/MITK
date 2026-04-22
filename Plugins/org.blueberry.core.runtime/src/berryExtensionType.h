@@ -108,13 +108,13 @@ public:
 };
 
 template <typename T>
-void extensionTypeDeleteHelper(T* t)
+void extensionTypeDeleteHelper(QObject* obj)
 {
-  delete t;
+  delete static_cast<T*>(obj);
 }
 
 template <typename T>
-QObject* extensionTypeConstructHelper(const T* /*t*/)
+QObject* extensionTypeConstructHelper()
 {
   return new T;
 }
@@ -171,13 +171,8 @@ int registerExtensionType(const char* typeName
   if (typedefOf != -1)
     return ExtensionType::registerTypedef(typeName, typedefOf);
 
-  typedef QObject*(*ConstructPtr)(const T*);
-  ConstructPtr cptr = extensionTypeConstructHelper<T>;
-  typedef void(*DeletePtr)(T*);
-  DeletePtr dptr = extensionTypeDeleteHelper<T>;
-
-  return ExtensionType::registerType(typeName, reinterpret_cast<ExtensionType::Destructor>(dptr),
-                                     reinterpret_cast<ExtensionType::Constructor>(cptr));
+  return ExtensionType::registerType(typeName, &extensionTypeDeleteHelper<T>,
+                                     &extensionTypeConstructHelper<T>);
 }
 
 } // end namespace berry

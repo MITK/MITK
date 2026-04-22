@@ -183,13 +183,6 @@ IEditorDescriptor::Pointer EditorRegistry::FindEditor(const QString& id)
   return mapIDtoEditor[id];
 }
 
-IEditorDescriptor::Pointer EditorRegistry::GetDefaultEditor()
-{
-  // the default editor will always be the system external editor
-  // this should never return null
-  return this->FindEditor(IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID);
-}
-
 IEditorDescriptor::Pointer EditorRegistry::GetDefaultEditor(
     const QString& fileName)
 {

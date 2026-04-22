@@ -207,12 +207,6 @@ const QString WorkbenchConstants::TAG_LAUNCHER = "launcher";
 
 const QString WorkbenchConstants::TAG_PLUGIN = "plugin";
 
-/** deprecated - use TAG_OPEN_MODE */
-const QString WorkbenchConstants::TAG_INTERNAL = "internal";
-
-/** deprecated - use TAG_OPEN_MODE */
-const QString WorkbenchConstants::TAG_OPEN_IN_PLACE = "open_in_place";
-
 const QString WorkbenchConstants::TAG_PROGRAM_NAME = "program_name";
 
 const QString WorkbenchConstants::TAG_FAST_VIEWS = "fastViews";

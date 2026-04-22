@@ -29,7 +29,7 @@ namespace mitk
    *
    * The bounding box is automatically updated when contour models are added or removed.
    *
-   * \sa ContourModel, ContourModelSetSource, ContourModelSetGLMapper2D, ContourModelSetMapper3D
+   * \sa ContourModel, ContourModelSetSource, ContourModelSetMapper2D, ContourModelSetMapper3D
    * \ingroup MitkContourModelModule
    */
   class MITKCONTOURMODEL_EXPORT ContourModelSet : public mitk::BaseData

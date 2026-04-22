@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkPlaneGeometryData.h>
 #include <mitkAbstractTransformGeometry.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkProportionalTimeGeometry.h>
 
 mitk::PlaneGeometryData::PlaneGeometryData()

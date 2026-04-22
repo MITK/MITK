@@ -47,7 +47,7 @@ protected slots:
 
   void OnNewToolAssociated(mitk::Tool *);
 
-  void OnCheckChanged(int checked);
+  void OnCheckChanged(Qt::CheckState checked);
 
 protected:
   void OnIndicatedLabelsChanged();

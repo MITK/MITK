@@ -121,7 +121,7 @@ namespace itk
     * below.
     *
     * \sa ProcessObject::GenerateOutputInformaton()  */
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** IndexedUnaryFunctorImageFilter can be implemented as a multithreaded filter.
     * Therefore, this implementation provides a ThreadedGenerateData() routine
@@ -134,7 +134,7 @@ namespace itk
     * \sa ImageToImageFilter::ThreadedGenerateData(),
     *     ImageToImageFilter::GenerateData()  */
     void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-      ThreadIdType threadId);
+      ThreadIdType threadId) override;
 
   private:
     IndexedUnaryFunctorImageFilter(const Self &); //purposely not implemented

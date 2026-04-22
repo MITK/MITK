@@ -104,9 +104,9 @@ public:
 signals:
   /**
    * \brief Emitted when the user toggles the "ignore zero-valued voxels" checkbox.
-   * \param[in] status The new checkbox state (Qt::CheckState).
+   * \param[in] status The new checkbox state.
    */
-  void IgnoreZeroValuedVoxelStateChanged(int status);
+  void IgnoreZeroValuedVoxelStateChanged(Qt::CheckState status);
 
 private:
   void CreateConnections();

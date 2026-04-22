@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #if defined(_WIN32)
 #include <array>
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #else
 #include <dlfcn.h>

@@ -66,10 +66,6 @@ namespace mitk
    * \ingroup Geometry
    */
 
-  class PlaneGeometry;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometry instead. */
-  DEPRECATED(typedef PlaneGeometry Geometry2D);
-
   /**
   * \brief Describes a two-dimensional, rectangular plane
   *
@@ -107,38 +103,10 @@ namespace mitk
     /**
      * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
      *
-     * \deprecated The first parameter \a atPt2d_untis is unused.
-     *             Use IndexToWorld(const Vector2D&, Vector2D&) instead.
-     *
-     * \param[in] atPt2d_untis Unused point parameter.
-     * \param[in] vec_units Vector in index coordinates.
-     * \param[out] vec_mm Vector in world coordinates (mm).
-     */
-    virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis,
-                              const mitk::Vector2D &vec_units,
-                              mitk::Vector2D &vec_mm) const;
-
-    /**
-     * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
-     *
      * \param[in] vec_units Vector in index coordinates.
      * \param[out] vec_mm Vector in world coordinates (mm).
      */
     virtual void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
-
-    /**
-     * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.
-     *
-     * \deprecated The first parameter \a atPt2d_mm is unused.
-     *             Use WorldToIndex(const Vector2D&, Vector2D&) instead.
-     *
-     * \param[in] atPt2d_mm Unused point parameter.
-     * \param[in] vec_mm Vector in world coordinates (mm).
-     * \param[out] vec_units Vector in continuous index coordinates.
-     */
-    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm,
-                              const mitk::Vector2D &vec_mm,
-                              mitk::Vector2D &vec_units) const;
 
     /**
      * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.
@@ -569,18 +537,6 @@ namespace mitk
     * IndexToWorld.
     */
     virtual void Map(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
-
-    /**
-    * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
-    * geometry. The result is a 3D vector in mm (\a projectedVec3d_mm).
-    *
-    * DEPRECATED. Use Project(vector,vector) instead
-    *
-    * \return true projection was possible
-    */
-    virtual bool Project(const mitk::Point3D &atPt3d_mm,
-                         const mitk::Vector3D &vec3d_mm,
-                         mitk::Vector3D &projectedVec3d_mm) const;
 
     /**
     * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D

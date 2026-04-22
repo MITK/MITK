@@ -22,11 +22,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Property for storing string values.
    *
@@ -109,10 +104,6 @@ namespace mitk
     bool IsEqual(const BaseProperty &property) const override;
     bool Assign(const BaseProperty &property) override;
   };
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

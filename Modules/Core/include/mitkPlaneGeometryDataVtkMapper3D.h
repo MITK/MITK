@@ -37,10 +37,6 @@ namespace mitk
   class ImageVtkMapper2D;
   class DataStorage;
 
-  class PlaneGeometryDataVtkMapper3D;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataVTKMapper3D instead. */
-  DEPRECATED(typedef PlaneGeometryDataVtkMapper3D Geometry2DDataVtkMapper3D);
-
   /**
   *  \brief Vtk-based mapper to display a PlaneGeometry in a 3D window
   *  \ingroup Mapper

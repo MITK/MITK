@@ -38,7 +38,7 @@ namespace mitk
    * Creates VTK polydata from each ContourModel in the set and assembles them
    * into a single vtkAssembly for 3D rendering with tube filtering.
    *
-   * \sa ContourModelSet, ContourModelMapper3D, ContourModelSetGLMapper2D
+   * \sa ContourModelSet, ContourModelMapper3D, ContourModelSetMapper2D
    * \ingroup MitkContourModelModule
    */
   class MITKCONTOURMODEL_EXPORT ContourModelSetMapper3D : public VtkMapper

@@ -481,30 +481,6 @@ namespace mitk
 
   /**
    * @brief Equal A function comparing two pointsets for being identical.
-   * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
-   * mitk::PointSet& p1, const mitk::PointSet& p2) instead.
-   *
-   * @ingroup MITKTestingAPI
-   *
-   * The function compares the Geometry, the size and all points element-wise.
-   * The parameter eps is a tolarence value for all methods which are internally used for comparison.
-   *
-   * @param rightHandSide Compare this against leftHandSide.
-   * @param leftHandSide Compare this against rightHandSide.
-   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-   * @param verbose Flag indicating if the user wants detailed console output or not.
-   * @param checkGeometry if comparing point sets loaded from a file, the geometries might be different and must not be
-   * compared. In all other cases, you should compare the geometries.
-   * @return True, if all subsequent comparisons are true, false otherwise
-   */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::PointSet *leftHandSide,
-                                        const mitk::PointSet *rightHandSide,
-                                        mitk::ScalarType eps,
-                                        bool verbose,
-                                        bool checkGeometry = true));
-
-  /**
-   * @brief Equal A function comparing two pointsets for being identical.
    *
    * @ingroup MITKTestingAPI
    *

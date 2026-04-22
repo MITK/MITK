@@ -17,11 +17,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Encapsulates the thick slices reslice method as an enumeration property.
    *
@@ -76,9 +71,6 @@ namespace mitk
     ResliceMethodProperty &operator=(const ResliceMethodProperty &);
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

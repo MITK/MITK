@@ -26,7 +26,7 @@ namespace mitk
    * \brief Module activator for the IOExt module.
    *
    * Registers various file reader and writer services for formats such as
-   * MITK scene files, VTK unstructured grids, OBJ, and PLY when the module is loaded.
+   * MITK scene files, OBJ, and PLY when the module is loaded.
    */
   class IOExtActivator : public us::ModuleActivator
   {
@@ -39,7 +39,6 @@ namespace mitk
 
   private:
     std::unique_ptr<IFileReader> m_SceneReader;
-    std::unique_ptr<IFileReader> m_VtkUnstructuredGridReader;
     std::unique_ptr<IFileReader> m_ObjReader;
     std::unique_ptr<IFileWriter> m_ObjWriter;
 

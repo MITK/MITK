@@ -21,12 +21,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   /**
     \brief Can be observed by GUI class to update button states when type is changed programmatically.
   */
   itkEventMacroDeclaration(InteractionSchemeChangedEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /***********************************************************************
   *

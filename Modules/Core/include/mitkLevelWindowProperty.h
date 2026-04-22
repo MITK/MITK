@@ -17,11 +17,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Property for storing a mitk::LevelWindow value.
    *
@@ -33,7 +28,7 @@ namespace mitk
    *
    * \note If you want to apply the mitk::LevelWindowProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which supports
-   * level window (e.g. LEVELWINDOW_COLOR). Check the documentation of
+   * level window (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR). Check the documentation of
    * mitk::RenderingModeProperty. For a code example see
    * mitkImageVtkMapper2DLevelWindowTest.cpp in Core/Code/Testing.
    *
@@ -129,9 +124,6 @@ namespace mitk
     bool Assign(const BaseProperty &property) override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

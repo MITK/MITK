@@ -342,9 +342,9 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
     // transform point
     {
       float vtkp[3];
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       dataNodeTransform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, point);
+      mitk::FillArray(point, vtkp);
     }
 
     p[0] = point[0];

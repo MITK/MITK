@@ -163,7 +163,8 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing(const itk::Image<TPi
 
   mitk::BaseGeometry *newGeometry = m_ResultImage->GetSlicedGeometry();
   mitk::Point3D origin;
-  vtk2itk(cropIndex, origin);
+  for (unsigned int i = 0; i < 3; ++i)
+    origin[i] = cropIndex[i];
   this->GetInput()->GetGeometry()->IndexToWorld(origin, origin);
   newGeometry->SetOrigin(origin);
 

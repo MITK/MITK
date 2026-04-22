@@ -7,7 +7,7 @@
 #
 macro(MITK_CREATE_MODULE_TESTS)
   cmake_parse_arguments(MODULE_TEST
-                        "US_MODULE;NO_INIT" "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "EXTRA_DEPENDS;DEPENDS;PACKAGE_DEPENDS;TARGET_DEPENDS" ${ARGN})
+                        "NO_INIT" "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "EXTRA_DEPENDS;DEPENDS;PACKAGE_DEPENDS;TARGET_DEPENDS" ${ARGN})
 
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
     include(files.cmake)
@@ -21,14 +21,6 @@ macro(MITK_CREATE_MODULE_TESTS)
       set(xvfb_run ${MITK_XVFB_TESTING_COMMAND})
     else()
       set(xvfb_run )
-    endif()
-
-    if(MODULE_TEST_US_MODULE)
-      message(WARNING "The US_MODULE argument is deprecated and should be removed")
-    endif()
-
-    if(MODULE_TEST_US_MODULE AND MODULE_TEST_NO_INIT)
-      message(WARNING "Conflicting arguments US_MODULE and NO_INIT: NO_INIT wins.")
     endif()
 
     set(_no_init)

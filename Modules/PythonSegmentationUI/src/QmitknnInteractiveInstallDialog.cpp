@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitknnInteractiveInstallDialog.h>
 #include <ui_QmitknnInteractiveInstallDialog.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
 #include <QProcess>

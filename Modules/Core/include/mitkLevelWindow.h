@@ -37,7 +37,7 @@ namespace mitk
   *
   * @note If you want to apply the mitk::LevelWindow to an mitk::Image, make sure
   * to use the mitk::LevelWindowProperty and set the mitk::RenderingModeProperty
-  * to a mode which supports level window (e.g. LEVELWINDOW_COLOR).
+  * to a mode which supports level window (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR).
   * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
   * code example how to use the mitk::LevelWindowProperty check the
   * mitkImageVtkMapper2DLevelWindowTest.cpp in Core/Code/Testing.

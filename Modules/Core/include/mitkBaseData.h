@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <itkDataObject.h>
 
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 #include <mitkIdentifiable.h>
 #include <mitkIPropertyOwner.h>
 #include <mitkOperationActor.h>

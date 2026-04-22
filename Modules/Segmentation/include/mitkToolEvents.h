@@ -13,9 +13,13 @@ found in the LICENSE file.
 #ifndef mitkToolEvents_h
 #define mitkToolEvents_h
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 namespace mitk
 {
@@ -47,9 +51,13 @@ class MyTool : public Tool
 \endcode
 */
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(ToolEvent, itk::ModifiedEvent); // Definition is in mitkTool.cpp
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /**
     \brief Tool event with 1 parameter

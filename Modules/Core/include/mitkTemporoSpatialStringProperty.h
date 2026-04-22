@@ -24,11 +24,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Property for storing string values resolved by time step and slice index.
    *
@@ -278,9 +273,6 @@ namespace mitk
   * @result Returns a TemporoSpatialStringProperty instance that only contains the values of the indicated time step. In the result the time step is always time step 0.*/
   TemporoSpatialStringProperty::Pointer MITKCORE_EXPORT ExtractTimeStepFromTemporoSpatialStringProperty(const TemporoSpatialStringProperty* tsProperty, TimeStepType ts);
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

@@ -10,12 +10,11 @@ set(CPP_FILES
   DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourModelSet.cpp
   DataManagement/mitkContourElement.cpp
-  Rendering/mitkContourModelGLMapper2D.cpp
   Rendering/mitkContourModelMapper2D.cpp
+  Rendering/mitkContourModelMapper2DBase.cpp
   Rendering/mitkContourModelMapper3D.cpp
+  Rendering/mitkContourModelSetMapper2D.cpp
   Rendering/mitkContourModelSetMapper3D.cpp
-  Rendering/mitkContourModelSetGLMapper2D.cpp
-  Rendering/mitkContourModelGLMapper2DBase.cpp
   IO/mitkContourModelSerializer.cpp
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp

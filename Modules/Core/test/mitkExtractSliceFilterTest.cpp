@@ -992,11 +992,12 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   double cosines[9];
 
-  mitk::vnl2vtk(right.GetVnlVector(), cosines); // x
-
-  mitk::vnl2vtk(bottom.GetVnlVector(), cosines + 3); // y
-
-  mitk::vnl2vtk(normal.GetVnlVector(), cosines + 6); // n
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    cosines[i]     = right[i];  // x
+    cosines[i + 3] = bottom[i]; // y
+    cosines[i + 6] = normal[i]; // n
+  }
 
   slicer->SetResliceAxesDirectionCosines(cosines);
 

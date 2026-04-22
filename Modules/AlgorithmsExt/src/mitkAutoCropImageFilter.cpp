@@ -129,7 +129,8 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // PART II: initialize output image
   unsigned int dimension = input->GetDimension();
   auto dimensions = new unsigned int[dimension];
-  itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
+  for (unsigned int i = 0; i < 3; ++i)
+    dimensions[i] = static_cast<unsigned int>(m_InputRequestedRegion.GetSize(i));
   if (dimension > 3)
     memcpy(dimensions + 3, input->GetDimensions() + 3, (dimension - 3) * sizeof(unsigned int));
 
@@ -149,7 +150,8 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   mitk::SlicedGeometry3D::Pointer inputGeometry = input->GetSlicedGeometry();
   const mitk::SlicedData::IndexType &start = m_InputRequestedRegion.GetIndex();
   mitk::Point3D origin;
-  vtk2itk(start, origin);
+  for (unsigned int i = 0; i < 3; ++i)
+    origin[i] = start[i];
   input->GetSlicedGeometry()->IndexToWorld(origin, origin);
   slicedGeometry->SetOrigin(origin);
 

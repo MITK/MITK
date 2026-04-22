@@ -99,7 +99,10 @@ namespace mitk
 
       m_CentroidVector[pixel][0] += index[0];
       m_CentroidVector[pixel][1] += index[1];
-      m_CentroidVector[pixel][2] += index[2];
+      if constexpr (VImageDimension >= 3)
+      {
+        m_CentroidVector[pixel][2] += index[2];
+      }
     }
 
     // Calculate voxel volume from spacing

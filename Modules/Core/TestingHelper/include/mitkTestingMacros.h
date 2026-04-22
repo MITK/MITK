@@ -54,7 +54,6 @@ namespace mitk
  * \brief Do some general test preparations. Must be called first in the
  *    main test function.
  *
- *  \deprecatedSince{2013_09} Use MITK_TEST_SUITE_REGISTRATION instead.
  *  \ingroup MITKTestingAPI
  */
 #define MITK_TEST_BEGIN(testName)                                                                                      \
@@ -65,7 +64,6 @@ namespace mitk
 /**
  * \brief Fail and finish test with message MSG
  *
- * \deprecatedSince{2013_09} Use CPPUNIT_FAIL instead
  * \ingroup MITKTestingAPI
  */
 #define MITK_TEST_FAILED_MSG(MSG)                                                                                      \
@@ -75,7 +73,6 @@ namespace mitk
 /**
  * \brief Must be called last in the main test function.
  *
- * \deprecatedSince{2013_09} Use MITK_TEST_SUITE_REGISTRATION instead.
  * \ingroup MITKTestingAPI
  */
 #define MITK_TEST_END()                                                                                                \
@@ -105,9 +102,6 @@ namespace mitk
     return EXIT_SUCCESS;                                                                                               \
   }
 
-/**
- * \deprecatedSince{2013_09} Use CPPUNIT_ASSERT or CPPUNIT_ASSERT_MESSAGE instead.
- */
 #define MITK_TEST_CONDITION(COND, MSG)                                                                                 \
   MITK_TEST_OUTPUT_NO_ENDL(<< MSG)                                                                                     \
   if (!(COND))                                                                                                         \
@@ -126,9 +120,6 @@ namespace mitk
     mitk::TestManager::GetInstance()->TestPassed();                                                                    \
   }
 
-/**
- * \deprecatedSince{2013_09} Use CPPUNIT_ASSERT or CPPUNIT_ASSERT_MESSAGE instead.
- */
 #define MITK_TEST_CONDITION_REQUIRED(COND, MSG)                                                                        \
   MITK_TEST_OUTPUT_NO_ENDL(<< MSG)                                                                                     \
   if (!(COND))                                                                                                         \
@@ -149,7 +140,6 @@ namespace mitk
 /**
  * \brief Begin block which should be checked for exceptions
  *
- * \deprecatedSince{2013_09} Use CPPUNIT_ASSERT_THROW instead.
  * \ingroup MITKTestingAPI
  *
  * This macro, together with MITK_TEST_FOR_EXCEPTION_END, can be used
@@ -169,9 +159,6 @@ namespace mitk
 #define MITK_TEST_FOR_EXCEPTION_BEGIN(EXCEPTIONCLASS)                                                                  \
   try                                                                                                                  \
   {
-/**
- * \deprecatedSince{2013_09}
- */
 #define MITK_TEST_FOR_EXCEPTION_END(EXCEPTIONCLASS)                                                                    \
   mitk::TestManager::GetInstance()->TestFailed();                                                                      \
   MITK_TEST_OUTPUT(<< "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]")                                   \
@@ -186,7 +173,6 @@ namespace mitk
  * \brief Simplified version of MITK_TEST_FOR_EXCEPTION_BEGIN / END for
  * a single statement
  *
- * \deprecatedSince{2013_09} Use CPPUNIT_ASSERT_THROW instead.
  * \ingroup MITKTestingAPI
  */
 #define MITK_TEST_FOR_EXCEPTION(EXCEPTIONCLASS, STATEMENT)                                                             \
@@ -222,8 +208,6 @@ namespace mitk
  *
  * This macro uses mitk::eps and the corresponding mitk::Equal methods for all
  * comparisons and will give verbose output on the dashboard/console.
- *
- * \deprecatedSince{2013_09} Use MITK_ASSERT_NOT_EQUAL instead.
  *
  * \param OBJ1 First object.
  * \param OBJ2 Second object.

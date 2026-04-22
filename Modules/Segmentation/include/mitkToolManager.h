@@ -20,9 +20,13 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkLabelSetImage.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <vector>
 

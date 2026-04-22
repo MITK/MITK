@@ -38,27 +38,6 @@ bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer tran
   return true;
 }
 
-mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(const std::string &eventClass,
-                                                                             const std::string &eventVariant)
-{
-  TransitionVector transitions = this->GetTransitionList(eventClass, eventVariant);
-
-  if (transitions.size() > 1)
-  {
-    MITK_WARN << "Multiple transitions have been found for event. Use non-deprecated method "
-                 "StateMachineState::GetTransitionList() instead!";
-  }
-
-  if (transitions.empty())
-  {
-    return nullptr;
-  }
-  else
-  {
-    return transitions.at(0);
-  }
-}
-
 mitk::StateMachineState::TransitionVector mitk::StateMachineState::GetTransitionList(const std::string &eventClass,
                                                                                      const std::string &eventVariant)
 {

@@ -53,7 +53,7 @@ namespace mitk
       \param argumentList The list of command-line arguments (first element is the executable).
       \return True if the process completed successfully.
     */
-    bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
+    bool Execute(const std::string &executionPath, const ArgumentListType &argumentList) override;
 
     /** \brief Set the timeout duration for the process execution.
       \param timeout The timeout in seconds.

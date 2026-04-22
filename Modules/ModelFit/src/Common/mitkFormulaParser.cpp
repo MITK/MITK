@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix.hpp>
 #include <boost/version.hpp>
 
 #include <mitkFormulaParser.h>

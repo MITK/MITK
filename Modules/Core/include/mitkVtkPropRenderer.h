@@ -28,8 +28,6 @@ class vtkLightKit;
 class vtkWorldPointPicker;
 class vtkPointPicker;
 class vtkCellPicker;
-class vtkTextActor;
-class vtkTextProperty;
 class vtkAssemblyPath;
 
 #include <vtkAssemblyPaths.h>
@@ -173,35 +171,6 @@ namespace mitk
      */
     mitk::DataNode *PickObject(const Point2D &displayPosition, Point3D &worldPosition) const override;
 
-    /**
-     * \brief Write 2D text as an overlay in the render window.
-     *
-     * Returns a unique text ID for each call, which can be used via
-     * GetTextLabelProperty() to obtain a vtkTextProperty for configuring
-     * font, font size, etc.
-     *
-     * \deprecated Since 2015_05. Use mitkTextOverlay2D instead.
-     * \sa mitkTextOverlay2DRenderingTest
-     */
-    DEPRECATED(int WriteSimpleText(std::string text,
-                                   double posX,
-                                   double posY,
-                                   double color1 = 0.0,
-                                   double color2 = 1.0,
-                                   double color3 = 0.0,
-                                   float opacity = 1.0));
-
-    /**
-     * \brief Return the vtkTextProperty for a given text ID.
-     *
-     * The returned property enables configuration of font, font size, etc.
-     *
-     * \param[in] text_id The ID of the text property (returned by WriteSimpleText).
-     * \deprecated Since 2015_05. Use mitkTextOverlay2D instead.
-     * \sa mitkTextOverlay2DRenderingTest
-     */
-    DEPRECATED(vtkTextProperty *GetTextLabelProperty(int text_id));
-
     /** This method calculates the bounds of the DataStorage (if it contains any
      * valid data), creates a geometry from these bounds and sets it as world
      * geometry of the renderer.
@@ -309,11 +278,6 @@ namespace mitk
 
     // sorted list of mappers
     MappersMapType m_MappersMap;
-
-    // rendering of text
-    vtkRenderer *m_TextRenderer;
-    typedef std::map<unsigned int, vtkTextActor *> TextMapType;
-    TextMapType m_TextCollection;
 
    /** \brief Information passed from VTK's rendering to props.
 

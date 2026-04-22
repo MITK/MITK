@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include "mitkPlyFileReaderService.h"
 #include "mitkPlyFileWriterService.h"
 #include "mitkSceneFileReader.h"
-#include "mitkVtkUnstructuredGridReader.h"
 
 namespace mitk
 {
@@ -24,7 +23,6 @@ namespace mitk
   {
     m_SceneReader.reset(new SceneFileReader());
 
-    m_VtkUnstructuredGridReader.reset(new VtkUnstructuredGridReader());
     m_ObjReader.reset(new ObjFileReaderService());
 
     m_PlyReader.reset(new PlyFileReaderService());

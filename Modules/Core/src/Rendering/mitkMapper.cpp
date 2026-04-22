@@ -23,57 +23,9 @@ mitk::Mapper::~Mapper()
 {
 }
 
-mitk::BaseData *mitk::Mapper::GetData() const
-{
-  return m_DataNode == nullptr ? nullptr : m_DataNode->GetData();
-}
-
 mitk::DataNode *mitk::Mapper::GetDataNode() const
 {
   return this->m_DataNode;
-}
-
-bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer *renderer, const char *name) const
-{
-  const mitk::DataNode *node = GetDataNode();
-  if (node == nullptr)
-    return false;
-
-  return node->GetColor(rgb, renderer, name);
-}
-
-bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer *renderer, const char *name) const
-{
-  const mitk::DataNode *node = GetDataNode();
-  if (node == nullptr)
-    return false;
-
-  return node->GetVisibility(visible, renderer, name);
-}
-
-bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer *renderer, const char *name) const
-{
-  const mitk::DataNode *node = GetDataNode();
-  if (node == nullptr)
-    return false;
-
-  return node->GetOpacity(opacity, renderer, name);
-}
-
-bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer *renderer, const char *name) const
-{
-  const mitk::DataNode *node = GetDataNode();
-  if (node == nullptr)
-    return false;
-
-  return node->GetLevelWindow(levelWindow, renderer, name);
-}
-
-bool mitk::Mapper::IsVisible(mitk::BaseRenderer *renderer, const char *name) const
-{
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, name);
-  return visible;
 }
 
 void mitk::Mapper::CalculateTimeStep(mitk::BaseRenderer *renderer)

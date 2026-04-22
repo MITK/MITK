@@ -34,13 +34,6 @@ struct BERRY_UI_QT IQtStyleManager
     Style(const QString& name, const QString& fn)
     : name(name), fileName(fn) {}
 
-    Style& operator=(const Style& s)
-    {
-      this->name = s.name;
-      this->fileName = s.fileName;
-      return *this;
-    }
-
     bool operator<(const Style& s) const
     { return name < s.name; }
 

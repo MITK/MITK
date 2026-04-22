@@ -70,6 +70,7 @@ namespace mitk
       : itk::Point<TCoordRep, NPointDimension>(r)
     {
     }
+    Point &operator=(const mitk::Point<TCoordRep, NPointDimension> &) = default;
     Point(const TCoordRep r[NPointDimension]) : itk::Point<TCoordRep, NPointDimension>(r) {}
     Point(const TCoordRep &v) : itk::Point<TCoordRep, NPointDimension>(v) {}
     Point(const itk::Point<TCoordRep, NPointDimension> &p)

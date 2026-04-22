@@ -71,7 +71,7 @@ public:
   {
     std::size_t index = static_cast<std::size_t>(A + 0.5);
     double samplingRate = 0;
-    if (index >= 0 && index < m_SamplingRateVector.size())
+    if (index < m_SamplingRateVector.size())
     {
       samplingRate = m_SamplingRateVector[index];
     }

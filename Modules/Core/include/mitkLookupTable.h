@@ -188,25 +188,6 @@ namespace mitk
     ~LookupTable() override;
 
     /**
-     * \brief Create a color transfer function from this lookup table.
-     * \deprecated Since 2014_03. Use the overload returning vtkSmartPointer instead.
-     * \param[out] colorFunction Pointer that will be set to the new function.
-     */
-    DEPRECATED(void CreateColorTransferFunction(vtkColorTransferFunction *&colorFunction));
-    /**
-     * \brief Create an opacity transfer function from this lookup table.
-     * \deprecated Since 2014_03. Use the overload returning vtkSmartPointer instead.
-     * \param[out] opacityFunction Pointer that will be set to the new function.
-     */
-    DEPRECATED(void CreateOpacityTransferFunction(vtkPiecewiseFunction *&opacityFunction));
-    /**
-     * \brief Create a gradient transfer function from this lookup table.
-     * \deprecated Since 2014_03. Use the overload returning vtkSmartPointer instead.
-     * \param[out] gradientFunction Pointer that will be set to the new function.
-     */
-    DEPRECATED(void CreateGradientTransferFunction(vtkPiecewiseFunction *&gradientFunction));
-
-    /**
      * \brief Create a vtkColorTransferFunction from this lookup table.
      * \return Smart pointer to the new color transfer function.
      */

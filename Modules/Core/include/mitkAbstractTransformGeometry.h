@@ -93,20 +93,6 @@ namespace mitk
     bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const override;
 
     /**
-     * \brief Project a 3D vector at a given point onto the curved surface.
-     *
-     * \warning Not yet satisfactorily implemented; throws an exception.
-     *
-     * \param[in] atPt3d_mm The point of application in world coordinates (mm).
-     * \param[in] vec3d_mm The vector to project (mm).
-     * \param[out] projectedVec3d_mm The projected vector on the surface (mm).
-     * \return true if projection was possible.
-     */
-    bool Project(const mitk::Point3D &atPt3d_mm,
-                         const mitk::Vector3D &vec3d_mm,
-                         mitk::Vector3D &projectedVec3d_mm) const override;
-
-    /**
      * \brief Project a 3D vector onto the curved surface.
      *
      * \warning Not yet satisfactorily implemented; throws an exception.
@@ -182,38 +168,10 @@ namespace mitk
     /**
      * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
      *
-     * \deprecated The first parameter \a atPt2d_units is unused.
-     *             Use IndexToWorld(const Vector2D&, Vector2D&) instead.
-     *
-     * \param[in] atPt2d_units Unused point parameter.
-     * \param[in] vec_units Vector in index coordinates.
-     * \param[out] vec_mm Vector in world coordinates (mm).
-     */
-    void IndexToWorld(const mitk::Point2D &atPt2d_units,
-                              const mitk::Vector2D &vec_units,
-                              mitk::Vector2D &vec_mm) const override;
-
-    /**
-     * \brief Convert 2D index coordinates of a vector to world coordinates (mm).
-     *
      * \param[in] vec_units Vector in index coordinates.
      * \param[out] vec_mm Vector in world coordinates (mm).
      */
     void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const override;
-
-    /**
-     * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.
-     *
-     * \deprecated The first parameter \a atPt2d_mm is unused.
-     *             Use WorldToIndex(const Vector2D&, Vector2D&) instead.
-     *
-     * \param[in] atPt2d_mm Unused point parameter.
-     * \param[in] vec_mm Vector in world coordinates (mm).
-     * \param[out] vec_units Vector in continuous index coordinates.
-     */
-    void WorldToIndex(const mitk::Point2D &atPt2d_mm,
-                              const mitk::Vector2D &vec_mm,
-                              mitk::Vector2D &vec_units) const override;
 
     /**
      * \brief Convert world coordinates (mm) of a 2D vector to continuous index coordinates.

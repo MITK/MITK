@@ -37,10 +37,10 @@ namespace mitk
    *
    * \section mitkContourModelDisplayOptions Display Options
    *
-   * The default mappers are mitk::ContourModelGLMapper2D and mitk::ContourModelMapper3D.
+   * The default mappers are mitk::ContourModelMapper2D and mitk::ContourModelMapper3D.
    * See those classes for display properties that can be configured via DataNode properties.
    *
-   * \sa ContourElement, ContourModelSet, ContourModelGLMapper2D, ContourModelMapper3D
+   * \sa ContourElement, ContourModelSet, ContourModelMapper2D, ContourModelMapper3D
    * \ingroup MitkContourModelModule
    */
   class MITKCONTOURMODEL_EXPORT ContourModel : public BaseData

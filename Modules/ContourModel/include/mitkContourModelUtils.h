@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkContourModel.h>
 #include <mitkImage.h>
-#include <mitkLabelSetImage.h>
 
 #include <vtkSmartPointer.h>
 
@@ -64,21 +63,6 @@ namespace mitk
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
-    This overloaded version uses the contour at the passed contourTimeStep
-    to fill the passed image slice.
-    \deprecated This function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContentAtTimeStep()) instead.
-    \pre sliceImage points to a valid instance
-    \pre projectedContour points to a valid instance
-    */
-    //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel* projectedContour,
-      TimeStepType contourTimeStep,
-      Image* sliceImage,
-      int paintingPixelValue = 1));
-
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value.
     This version always uses the contour of time step 0 and fills the image.
     \param projectedContour Pointer to the contour that should be projected.
     \param sliceImage Pointer to the image which content should be altered by
@@ -107,25 +91,6 @@ namespace mitk
       TimeStepType contourTimeStep,
       Image* sliceImage,
       int paintingPixelValue = 1);
-
-    /**
-    \brief Fills the paintingPixelValue into every pixel of resultImage as indicated by filledImage.
-    If a LableSet image is specified it also by incorporating the rules of LabelSet images when filling the content.
-    \param filledImage Pointer to the image content that should be checked to decide if a pixel in resultImage should
-    be filled with paintingPixelValue or not.
-    \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
-    If an LabelSet instance is passed its states (e.g. locked labels etc...) will be used. If nullptr or an normal image
-    is passed, then simply any pixel position indicated by filledImage will be overwritten.
-    \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
-    \param fillForegroundThreshold The threshold value that decides if a pixel in the filled image counts
-    as foreground (>=fillForegroundThreshold) or not.
-    \deprecated This function is deprecated. Use TransferLabelContent() instead.
-    */
-    [[deprecated]]
-    static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
-                                 vtkSmartPointer<vtkImageData> resultImage,
-                                 int paintingPixelValue,
-                                 double fillForegroundThreshold = 1.0);
 
     /** \brief Create a new contour model with the contour from time step 0 placed at the specified time step.
      * \param[in] contour The source contour model whose time step 0 data is used.

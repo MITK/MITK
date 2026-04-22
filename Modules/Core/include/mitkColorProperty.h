@@ -22,11 +22,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
    * \brief Standard RGB color typedef using float components.
    *
@@ -61,7 +56,7 @@ namespace mitk
    *
    * \note If you want to apply the mitk::ColorProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which
-   * supports color (e.g. LEVELWINDOW_COLOR). For an example, see
+   * supports color (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR). For an example, see
    * mitkImageVtkMapper2DColorTest.cpp in Core/Code/Rendering.
    *
    * \sa BaseProperty
@@ -162,9 +157,6 @@ namespace mitk
     bool Assign(const BaseProperty &property) override;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

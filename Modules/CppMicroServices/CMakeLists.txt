@@ -5,7 +5,6 @@ mitk_create_module(
   DEPENDS PUBLIC MitkLog
   PACKAGE_DEPENDS
     PRIVATE nlohmann_json
-  WARNINGS_NO_ERRORS
   NO_INIT # CppMicroServices initializes itself in usModuleRegistry.cpp
 )
 

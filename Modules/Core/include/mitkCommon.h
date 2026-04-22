@@ -13,12 +13,6 @@ found in the LICENSE file.
 #ifndef mitkCommon_h
 #define mitkCommon_h
 
-#ifdef _MSC_VER
-// This warns about truncation to 255 characters in debug/browse info
-#pragma warning(disable : 4786)
-#pragma warning(disable : 4068) /* disable unknown pragma warnings */
-#endif
-
 // add only those headers here that are really necessary for all classes!
 #include <itkObject.h>
 #include <mitkConfig.h>
@@ -160,20 +154,57 @@ calling object*/
     return smartPtr.GetPointer();                                                                                      \
   }
 
-/** cross-platform deprecation macro
+/** Override-aware counterparts of the ITK property macros.
+ *
+ *  Use these in subclasses that implement a string / const-object
+ *  property whose signature is already declared as a virtual method by
+ *  a base class (e.g. a pure virtual GetFileName() = 0). ITK's own
+ *  itkSet/GetStringMacro and itkSet/GetConstObjectMacro expand to
+ *  virtual methods without an explicit override keyword, which Apple
+ *  Clang flags under -Winconsistent-missing-override. Rather than
+ *  suppress the warning at every call site, these macros reimplement
+ *  the ITK expansions so the override keyword is part of the method
+ *  declaration.
+ */
+#define mitkOverrideSetStringMacro(name)                                                                               \
+  void Set##name(const char *_arg) override                                                                            \
+  {                                                                                                                    \
+    if (_arg && (_arg == this->m_##name))                                                                              \
+    {                                                                                                                  \
+      return;                                                                                                          \
+    }                                                                                                                  \
+    if (_arg)                                                                                                          \
+    {                                                                                                                  \
+      this->m_##name = _arg;                                                                                           \
+    }                                                                                                                  \
+    else                                                                                                               \
+    {                                                                                                                  \
+      this->m_##name = "";                                                                                             \
+    }                                                                                                                  \
+    this->Modified();                                                                                                  \
+  }                                                                                                                    \
+  void Set##name(const std::string &_arg) { this->Set##name(_arg.c_str()); }                                           \
+  ITK_MACROEND_NOOP_STATEMENT
 
-  \todo maybe there is something in external toolkits (ITK, VTK,...) that we could reulse -- would be much preferable
-*/
-#ifdef MITK_NO_DEPRECATED_WARNINGS
-#define DEPRECATED(func) func
-#elif defined(__GNUC__)
-#define DEPRECATED(...) __VA_ARGS__ __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define DEPRECATED(...) __declspec(deprecated)##__VA_ARGS__
-#else
-#pragma message("WARNING: You need to implement DEPRECATED for your compiler!")
-#define DEPRECATED(func) func
-#endif
+#define mitkOverrideGetStringMacro(name)                                                                               \
+  const char *Get##name() const override { return this->m_##name.c_str(); }                                            \
+  ITK_MACROEND_NOOP_STATEMENT
+
+#define mitkOverrideSetConstObjectMacro(name, type)                                                                    \
+  void Set##name(const type *_arg) override                                                                            \
+  {                                                                                                                    \
+    itkDebugMacro("setting " << #name " to " << _arg);                                                                 \
+    if (this->m_##name != _arg)                                                                                        \
+    {                                                                                                                  \
+      this->m_##name = _arg;                                                                                           \
+      this->Modified();                                                                                                \
+    }                                                                                                                  \
+  }                                                                                                                    \
+  ITK_MACROEND_NOOP_STATEMENT
+
+#define mitkOverrideGetConstObjectMacro(name, type)                                                                    \
+  const type *Get##name() const override { return this->m_##name.GetPointer(); }                                       \
+  ITK_MACROEND_NOOP_STATEMENT
 
 /**
  * Mark templates as exported to generate public RTTI symbols which are

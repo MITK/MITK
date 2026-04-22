@@ -46,26 +46,6 @@ namespace mitk
      */
     void SetDefaultProperties(DataNode *node) override;
 
-    /** \brief Get supported file extensions (empty for bounding shapes).
-     * \return An empty string.
-     */
-    std::string GetFileExtensions() override;
-
-    /** \brief Get the file extensions map.
-     * \return An empty multimap.
-     */
-    CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-
-    /** \brief Get supported save file extensions (empty for bounding shapes).
-     * \return An empty string.
-     */
-    std::string GetSaveFileExtensions() override;
-
-    /** \brief Get the save file extensions map.
-     * \return An empty multimap.
-     */
-    CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-
     /** \brief Get a human-readable description of this factory.
      * \return A description string.
      */
@@ -74,12 +54,6 @@ namespace mitk
   protected:
     BoundingShapeObjectFactory();
     ~BoundingShapeObjectFactory() override;
-
-    void CreateFileExtensionsMap();
-
-  private:
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
   };
 
   /** \brief Register the BoundingShapeObjectFactory with the CoreObjectFactory.

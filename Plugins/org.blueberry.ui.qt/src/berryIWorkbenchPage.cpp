@@ -14,8 +14,6 @@ found in the LICENSE file.
 
 namespace berry {
 
-const QString IWorkbenchPage::EDITOR_ID_ATTR = "org.blueberry.ui.editorID";
-
 const QString IWorkbenchPage::CHANGE_RESET = "reset";
 
 const QString IWorkbenchPage::CHANGE_RESET_COMPLETE = "resetComplete";

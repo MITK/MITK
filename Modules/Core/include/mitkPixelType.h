@@ -265,10 +265,9 @@ namespace mitk
   /**
    * \brief Create a PixelType with a compile-time number of components.
    *
-   * \deprecated Use MakePixelType<ComponentT, PixelT>(std::size_t) instead.
-   *
-   * \tparam ComponentT     The C++ scalar component type.
-   * \tparam PixelT         The pixel type.
+   * \tparam ComponentT       The C++ scalar component type.
+   * \tparam PixelT           The pixel type.
+   * \tparam numOfComponents  Compile-time number of components.
    * \return The constructed PixelType.
    */
   template <typename ComponentT, typename PixelT, std::size_t numOfComponents>

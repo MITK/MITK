@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkContourModelUtils.h>
-#include <mitkContourUtils.h> //TODO remove legacy support
 #include <mitkImage.h>
 #include <mitkSegTool2D.h>
 #include <MitkSegmentationExports.h>
@@ -40,7 +39,7 @@ namespace mitk
      - Providing a feedback contour that might be added or removed from the visible scene (SetFeedbackContourVisible).
      - Filling of a contour into a 2D slice
 
-     These helper methods are actually implemented in ContourUtils now. FeedbackContourTool only forwards such requests.
+     These helper methods are actually implemented in ContourModelUtils now. FeedbackContourTool only forwards such requests.
 
     \warning Only to be instantiated by mitk::ToolManager.
 

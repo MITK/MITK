@@ -12,11 +12,6 @@ found in the LICENSE file.
 
 #include "usServiceRegistrationBasePrivate.h"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4355)
-#endif
-
 namespace us {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
@@ -61,7 +56,3 @@ void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId)
 }
 
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

@@ -33,7 +33,7 @@ namespace mitk
    * via SetNumberOfIterations(). At least 4 input vertices are required for
    * the filter to produce output; otherwise the input is passed through unchanged.
    *
-   * \sa ContourModel, ContourModelSource, ContourModelGLMapper2D
+   * \sa ContourModel, ContourModelSource, ContourModelMapper2D
    * \ingroup MitkContourModelModule
    */
   class MITKCONTOURMODEL_EXPORT ContourModelSubDivisionFilter : public ContourModelSource

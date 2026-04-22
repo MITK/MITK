@@ -33,9 +33,6 @@ class vtkContourTriangulator;
 namespace mitk
 {
   class PlaneGeometryData;
-  class PlaneGeometryDataToSurfaceFilter;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataToSurfaceFilter instead. */
-  DEPRECATED(typedef PlaneGeometryDataToSurfaceFilter Geometry2DDataToSurfaceFilter);
   /** \brief Superclass of all classes having a PlaneGeometryData as input and
   *  generating Images as output
   *

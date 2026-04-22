@@ -33,7 +33,7 @@ namespace mitk
     ConcreteModelFactoryBase<GenericParamModel>
   {
   public:
-    mitkClassMacroItkParent(GenericParamModelFactory, ConcreteModelFactoryBase<GenericParamModel>);
+    mitkClassMacro(GenericParamModelFactory, ConcreteModelFactoryBase<GenericParamModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)

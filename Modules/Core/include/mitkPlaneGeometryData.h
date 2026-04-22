@@ -20,10 +20,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class PlaneGeometryData;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryData instead. */
-  DEPRECATED(typedef PlaneGeometryData Geometry2DData);
-
   /**
    * \brief Data class containing PlaneGeometry objects.
    *
@@ -60,20 +56,10 @@ namespace mitk
     virtual void SetPlaneGeometry(mitk::PlaneGeometry *geometry2d);
 
     /**
-     * \deprecatedSince{2014_10} Please use SetPlaneGeometry
-     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry *geo)) { SetPlaneGeometry(geo); };
-
-    /**
      * \brief Get the reference to the PlaneGeometry that is stored by the object.
      * \return Pointer to the stored PlaneGeometry, or nullptr if none is set.
      */
     virtual mitk::PlaneGeometry *GetPlaneGeometry() const { return static_cast<mitk::PlaneGeometry *>(GetGeometry()); };
-
-    /**
-     * \deprecatedSince{2014_10} Please use GetPlaneGeometry
-     */
-    DEPRECATED(const PlaneGeometry *GetGeometry2D()) { return GetPlaneGeometry(); };
 
     /** \brief Update output information from the stored geometry. */
     void UpdateOutputInformation() override;

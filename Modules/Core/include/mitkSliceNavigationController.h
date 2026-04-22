@@ -21,9 +21,13 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkTimeGeometry.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <itkCommand.h>
 

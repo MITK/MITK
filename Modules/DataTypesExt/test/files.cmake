@@ -1,7 +1,6 @@
 set(MODULE_TESTS
   mitkColorSequenceRainbowTest.cpp
   mitkMultiStepperTest.cpp
-  mitkUnstructuredGridTest.cpp
 )
 
 set(MODULE_IMAGE_TESTS

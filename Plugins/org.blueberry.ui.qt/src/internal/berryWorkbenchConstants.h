@@ -200,12 +200,6 @@ struct BERRY_UI_QT WorkbenchConstants
 
   static const QString TAG_PLUGIN; // = "plugin";
 
-  /** deprecated - use TAG_OPEN_MODE */
-  static const QString TAG_INTERNAL; // = "internal";
-
-  /** deprecated - use TAG_OPEN_MODE */
-  static const QString TAG_OPEN_IN_PLACE; // = "open_in_place";
-
   static const QString TAG_PROGRAM_NAME; // = "program_name";
 
   static const QString TAG_FAST_VIEWS; // = "fastViews";

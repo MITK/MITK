@@ -228,7 +228,7 @@ void QmitkVideoBackground::Modified()
   {
     (*it).videoImport->Update();
     (*it).videoActor->SetInputData((*it).videoImport->GetOutput());
-    (*it).videoRenderer->AddActor2D((*it).videoActor);
+    (*it).videoRenderer->AddViewProp((*it).videoActor);
     (*it).videoRenderer->ResetCamera();
     (*it).videoRenderer->InteractiveOff();
     (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();

@@ -10,10 +10,8 @@ set(MITK_MODULES
   CommandLine
   CoreCmdApps
   AppUtil
-  LegacyIO
   DataTypesExt
   Annotation
-  LegacyGL
   AlgorithmsExt
   MapperExt
   DICOM

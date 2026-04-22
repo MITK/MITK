@@ -142,13 +142,9 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::ATT_OS = "os"; //$NON-NLS-1$
 
-  const QString WorkbenchRegistryConstants::ATT_PARENT = "parent"; //$NON-NLS-1$
-
   const QString WorkbenchRegistryConstants::ATT_PARENT_CATEGORY = "parentCategory"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_PARENT_ID = "parentId"; //$NON-NLS-1$
-
-  const QString WorkbenchRegistryConstants::ATT_PARENT_SCOPE = "parentScope"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_PATH = "path"; //$NON-NLS-1$
 
@@ -304,9 +300,6 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::PL_WORKINGSETS = "workingSets"; //$NON-NLS-1$
 
-//  const QString WorkbenchRegistryConstants::EXTENSION_ACCELERATOR_CONFIGURATIONS = PlatformUI::PLUGIN_ID
-//      + '.' + PL_ACCELERATOR_CONFIGURATIONS;
-//
 //  const QString WorkbenchRegistryConstants::EXTENSION_ACCELERATOR_SCOPES = PlatformUI::PLUGIN_ID
 //      + '.' + PL_ACCELERATOR_SCOPES;
 
@@ -359,10 +352,6 @@ namespace berry {
   const QString WorkbenchRegistryConstants::STYLE_RADIO = "radio"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::STYLE_TOGGLE = "toggle"; //$NON-NLS-1$
-
-  const QString WorkbenchRegistryConstants::TAG_ACCELERATOR_CONFIGURATION = "acceleratorConfiguration"; //$NON-NLS-1$
-
-  const QString WorkbenchRegistryConstants::TAG_ACCELERATOR_SCOPE = "acceleratorScope"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_ACTION = "action"; //$NON-NLS-1$
 
@@ -418,8 +407,6 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::TAG_EDITOR = "editor";//$NON-NLS-1$
 
-  const QString WorkbenchRegistryConstants::TAG_EDITOR_CONTRIBUTION = "editorContribution"; //$NON-NLS-1$
-
   const QString WorkbenchRegistryConstants::TAG_ENABLED_WHEN = "enabledWhen"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_ENABLEMENT = "enablement"; //$NON-NLS-1$
@@ -449,8 +436,6 @@ namespace berry {
   const QString WorkbenchRegistryConstants::TAG_KEY = "key"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_KEY_BINDING = "keyBinding"; //$NON-NLS-1$
-
-  const QString WorkbenchRegistryConstants::TAG_KEY_CONFIGURATION = "keyConfiguration"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_LOCATION = "location"; //$NON-NLS-1$
 
@@ -483,8 +468,6 @@ namespace berry {
   const QString WorkbenchRegistryConstants::TAG_REFERENCE = "reference"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_SCHEME = "scheme"; //$NON-NLS-1$
-
-  const QString WorkbenchRegistryConstants::TAG_SCOPE = "scope"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::TAG_SELECTION = "selection"; //$NON-NLS-1$
 

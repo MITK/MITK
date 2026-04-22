@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkContourModelSetGLMapper2D.h>
+#include <mitkContourModelSetMapper2D.h>
 
 #include <mitkColorProperty.h>
 #include <mitkContourModelSet.h>
@@ -26,17 +26,17 @@ found in the LICENSE file.
 #include <mitkContourModel.h>
 #include <mitkTextAnnotation2D.h>
 
-mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
+mitk::ContourModelMapper2DBase::ContourModelMapper2DBase()
 {
   m_PointNumbersAnnotation = mitk::TextAnnotation2D::New();
   m_ControlPointNumbersAnnotation = mitk::TextAnnotation2D::New();
 }
 
-mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
+mitk::ContourModelMapper2DBase::~ContourModelMapper2DBase()
 {
 }
 
-void mitk::ContourModelGLMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
+void mitk::ContourModelMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
 {
   auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
@@ -53,7 +53,7 @@ void mitk::ContourModelGLMapper2DBase::ApplyColorAndOpacityProperties(mitk::Base
   localStorage->Context->GetPen()->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
-void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
+void mitk::ContourModelMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
 {
   if (std::find(m_RendererList.begin(), m_RendererList.end(), renderer) == m_RendererList.end())
   {
@@ -69,7 +69,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *rendering
   InternalDrawContour(renderingContour, renderer);
 }
 
-void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *renderingContour,
+void mitk::ContourModelMapper2DBase::InternalDrawContour(mitk::ContourModel *renderingContour,
                                                            mitk::BaseRenderer *renderer)
 {
   if (!renderingContour)
@@ -167,9 +167,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
 
       point = (*pointsIt)->Coordinates;
 
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
 
       renderer->WorldToView(p, pt2d);
 
@@ -316,9 +316,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
     {
       lastPt2d = pt2d;
       point = renderingContour->GetVertexAt(0, timestep)->Coordinates;
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
       renderer->WorldToDisplay(p, pt2d);
 
       localStorage->Context->GetPen()->SetWidth(lineWidth);
@@ -332,9 +332,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
       // transform selected vertex
       point = renderingContour->GetSelectedVertex()->Coordinates;
 
-      itk2vtk(point, vtkp);
+      mitk::ToArray(vtkp, point);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp, p);
+      mitk::FillArray(p, vtkp);
 
       renderer->WorldToDisplay(p, pt2d);
 
@@ -371,7 +371,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
   localStorage->Device = nullptr;
 }
 
-void mitk::ContourModelGLMapper2DBase::WriteTextWithAnnotation(TextAnnotationPointerType textAnnotation,
+void mitk::ContourModelMapper2DBase::WriteTextWithAnnotation(TextAnnotationPointerType textAnnotation,
                                                             const char *text,
                                                             float rgb[3],
                                                             Point2D /*pt2d*/,

@@ -50,26 +50,6 @@ const char *mitk::BoundingShapeObjectFactory::GetDescription() const
   return "BoundingShape Object Factory";
 }
 
-std::string mitk::BoundingShapeObjectFactory::GetFileExtensions()
-{
-  return "";
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetFileExtensionsMap()
-{
-  return MultimapType();
-}
-
-std::string mitk::BoundingShapeObjectFactory::GetSaveFileExtensions()
-{
-  return "";
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetSaveFileExtensionsMap()
-{
-  return MultimapType();
-}
-
 void mitk::BoundingShapeObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
   if (node == nullptr)

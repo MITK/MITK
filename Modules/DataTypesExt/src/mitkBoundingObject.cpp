@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkBoundingObject.h>
-#include <mitkBaseProcess.h>
+#include <mitkBaseDataSource.h>
 
 mitk::BoundingObject::BoundingObject() : Surface(), m_Positive(true)
 {

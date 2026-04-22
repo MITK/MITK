@@ -1,5 +1,5 @@
 mitk_create_module(
-  DEPENDS MitkDataTypesExt MitkLegacyGL
+  DEPENDS MitkDataTypesExt
   PACKAGE_DEPENDS
     PRIVATE ANN VTK|ImagingGeneral
 )

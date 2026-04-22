@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkContourModelSetGLMapper2D_h
-#define mitkContourModelSetGLMapper2D_h
+#ifndef mitkContourModelSetMapper2D_h
+#define mitkContourModelSetMapper2D_h
 
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
-#include <mitkContourModelGLMapper2DBase.h>
+#include <mitkContourModelMapper2DBase.h>
 #include <mitkContourModelSet.h>
 #include <MitkContourModelExports.h>
 
@@ -29,13 +29,13 @@ namespace mitk
    * Iterates over all ContourModel instances in the ContourModelSet and draws each
    * one onto the current 2D slice using OpenGL primitives.
    *
-   * \sa ContourModelSet, ContourModelGLMapper2DBase, ContourModelGLMapper2D
+   * \sa ContourModelSet, ContourModelMapper2DBase, ContourModelMapper2D
    * \ingroup MitkContourModelModule
    */
-  class MITKCONTOURMODEL_EXPORT ContourModelSetGLMapper2D : public ContourModelGLMapper2DBase
+  class MITKCONTOURMODEL_EXPORT ContourModelSetMapper2D : public ContourModelMapper2DBase
   {
   public:
-    mitkClassMacro(ContourModelSetGLMapper2D, ContourModelGLMapper2DBase);
+    mitkClassMacro(ContourModelSetMapper2D, ContourModelMapper2DBase);
 
     itkFactorylessNewMacro(Self);
 
@@ -58,9 +58,9 @@ namespace mitk
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
-    ContourModelSetGLMapper2D();
+    ContourModelSetMapper2D();
 
-    ~ContourModelSetGLMapper2D() override;
+    ~ContourModelSetMapper2D() override;
 
   private:
     /**

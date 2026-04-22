@@ -24,8 +24,6 @@ The REST API View allows you to:
 - See the last request processed
 - View which nodes have been accessed or modified via the API
 
-\imageMacro{QmitkRestApiView_Overview.png,"REST API View overview",16.00}
-
 \section org_mitk_views_restapi_serverstatus Server Status
 
 The Server Status section displays the current state of the REST API server:
@@ -89,8 +87,6 @@ These lists help you track which parts of your data have been touched by externa
 \section org_mitk_views_restapi_preferences Preferences
 
 The REST API preferences can be accessed via <b>Window > Preferences > REST API</b> or by pressing <tt>Ctrl+P</tt> and navigating to REST API.
-
-\imageMacro{QmitkRestApiView_Preferences.png,"REST API Preferences",16.00}
 
 \subsection org_mitk_views_restapi_prefs_general General Settings
 

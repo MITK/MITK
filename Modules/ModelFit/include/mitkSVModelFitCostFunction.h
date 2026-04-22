@@ -72,8 +72,8 @@ public:
      */
     unsigned int GetNumberOfParameters (void) const override;
 
-    itkSetConstObjectMacro(Model, ModelBase);
-    itkGetConstObjectMacro(Model, ModelBase);
+    mitkOverrideSetConstObjectMacro(Model, ModelBase);
+    mitkOverrideGetConstObjectMacro(Model, ModelBase);
 
     itkSetMacro(DerivativeStepLength, double);
     itkGetConstMacro(DerivativeStepLength, double);

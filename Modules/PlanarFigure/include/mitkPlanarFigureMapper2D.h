@@ -122,7 +122,7 @@ namespace mitk
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Apply color and opacity properties read from the PropertyList.
-    * The actor is not used in the GLMappers. Called by mapper subclasses.
+    * The actor parameter is unused; color and opacity are applied via vtkContext2D.
     */
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
 

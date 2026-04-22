@@ -20,8 +20,7 @@ namespace mitk
   /**
    * \brief Object factory for extended IO types.
    *
-   * Registers mappers, default properties, and legacy IO factories for
-   * extended data types such as UnstructuredGrid and various volume time series.
+   * Registers mappers and default rendering properties for extended data types.
    */
   class IOExtObjectFactory : public CoreObjectFactoryBase
   {
@@ -36,32 +35,9 @@ namespace mitk
     /** \brief Set default rendering properties on the given node. */
     void SetDefaultProperties(mitk::DataNode *node) override;
 
-    /** \brief Return supported file read extensions as a string. */
-    std::string GetFileExtensions() override;
-
-    /** \brief Return a map of file read extensions to descriptions. */
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-
-    /** \brief Return supported file write extensions as a string. */
-    std::string GetSaveFileExtensions() override;
-
-    /** \brief Return a map of file write extensions to descriptions. */
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-
   private:
     IOExtObjectFactory();
     ~IOExtObjectFactory() override;
-
-    void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-    itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
-    itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;
-
-    itk::ObjectFactoryBase::Pointer m_UnstructuredGridVtkWriterFactory;
   };
 }
 

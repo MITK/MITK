@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 
 class vtkTextActor;
+class vtkTextProperty;
 class vtkPropAssembly;
 
 namespace mitk

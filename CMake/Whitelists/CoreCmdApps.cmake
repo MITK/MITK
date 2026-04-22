@@ -13,7 +13,6 @@ list(APPEND enabled_modules
   RT
   ModelFit
   Multilabel
-  LegacyGL
   SceneSerialization
   SceneSerializationBase
   ROI

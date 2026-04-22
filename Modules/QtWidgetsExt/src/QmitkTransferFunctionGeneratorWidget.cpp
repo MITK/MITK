@@ -19,11 +19,8 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkUnstructuredGrid.h>
 
 #include <mitkTransferFunctionPropertySerializer.h>
-
-#include <vtkUnstructuredGrid.h>
 
 QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f), deltaScale(1.0), deltaMax(1024), deltaMin(1)
@@ -340,16 +337,6 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node, mit
       mitk::ImageStatisticsHolder *statistics = inputImage->GetStatistics();
       histoMinimum = statistics->GetScalarValueMin();
       histoMaximum = statistics->GetScalarValueMax();
-    }
-    else if (mitk::UnstructuredGrid *grid = dynamic_cast<mitk::UnstructuredGrid *>(node->GetData()))
-    {
-      double *range = grid->GetVtkUnstructuredGrid()->GetScalarRange();
-      histoMinimum = range[0];
-      histoMaximum = range[1];
-      double histoRange = histoMaximum - histoMinimum;
-      deltaMax = histoRange / 4.0;
-      deltaMin = histoRange / 400.0;
-      deltaScale = histoRange / 1024.0;
     }
     else
     {

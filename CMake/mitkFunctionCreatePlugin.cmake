@@ -53,7 +53,6 @@ function(mitk_create_plugin)
     TARGET_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
-    SUBPROJECTS # deprecated
   )
 
   cmake_parse_arguments(_PLUGIN "${arg_options}" "${arg_single}" "${arg_multiple}" ${ARGN})
@@ -219,6 +218,15 @@ function(mitk_create_plugin)
     target_link_libraries(${PLUGIN_TARGET} PRIVATE MitkCompilerFlags)
   endif()
 
+  # CTK's UseCTK.cmake injects CTK_INCLUDE_DIRS into the directory scope via
+  # a plain include_directories() call, which arrives as non-SYSTEM -I. Re-
+  # add the same dirs to the plugin target as SYSTEM so warnings from CTK
+  # headers (e.g. ctkServiceTracker.tpp's volatile compound assignments
+  # under C++20) are suppressed without per-plugin target_compile_options.
+  if(CTK_INCLUDE_DIRS)
+    target_include_directories(${PLUGIN_TARGET} SYSTEM PRIVATE ${CTK_INCLUDE_DIRS})
+  endif()
+
   if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}/.*")
     foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
       if("${CMAKE_CURRENT_SOURCE_DIR}/" MATCHES "^${MITK_EXTENSION_DIR}/.*")
@@ -239,15 +247,7 @@ function(mitk_create_plugin)
       mitkFunctionCheckCAndCXXCompilerFlags("/WX" plugin_c_flags plugin_cxx_flags)
     else()
       mitkFunctionCheckCAndCXXCompilerFlags(-Werror plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" plugin_c_flags plugin_cxx_flags)
       mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-function-type" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-volatile" plugin_c_flags plugin_cxx_flags)
-      mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=volatile" plugin_c_flags plugin_cxx_flags)
     endif()
   endif()
 

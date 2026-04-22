@@ -48,8 +48,6 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
 #include <vtkTransform.h>
 #include <vtkWorldPointPicker.h>
 
@@ -74,11 +72,6 @@ mitk::VtkPropRenderer::VtkPropRenderer(const char *name, vtkRenderWindow *renWin
   m_LightKit = vtkLightKit::New();
   m_LightKit->AddLightsToRenderer(m_VtkRenderer);
   m_PickingMode = WorldPointPicking;
-
-  m_TextRenderer = vtkRenderer::New();
-  m_TextRenderer->SetRenderWindow(renWin);
-  m_TextRenderer->SetInteractive(0);
-  m_TextRenderer->SetErase(0);
 }
 
 /*!
@@ -112,8 +105,6 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_PointPicker->Delete();
   if (m_CellPicker != nullptr)
     m_CellPicker->Delete();
-  if (m_TextRenderer != nullptr)
-    m_TextRenderer->Delete();
 }
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage *storage)
@@ -177,17 +168,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     mapper->MitkRender(this, type);
   }
 
-  // Render text
-  if (type == VtkPropRenderer::Overlay)
-  {
-    if (m_TextCollection.size() > 0)
-    {
-      m_TextRenderer->SetViewport(this->GetVtkRenderer()->GetViewport());
-      for (auto it = m_TextCollection.begin(); it != m_TextCollection.end(); ++it)
-        m_TextRenderer->AddViewProp((*it).second);
-      m_TextRenderer->Render();
-    }
-  }
   return 1;
 }
 
@@ -209,15 +189,6 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   }
   else if (m_MapperID >= 1 && m_MapperID < 6)
     Update();
-
-  // remove all text properties before mappers will add new ones
-  m_TextRenderer->RemoveAllViewProps();
-
-  for (unsigned int i = 0; i < m_TextCollection.size(); i++)
-  {
-    m_TextCollection[i]->Delete();
-  }
-  m_TextCollection.clear();
 
   // clear priority_queue
   m_MappersMap.clear();
@@ -382,30 +353,6 @@ void mitk::VtkPropRenderer::InitSize(int w, int h)
   this->GetCameraController()->Fit();
 }
 
-int mitk::VtkPropRenderer::WriteSimpleText(
-  std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
-{
-  this->GetVtkRenderer()->ViewToDisplay();
-  if (!text.empty())
-  {
-    Point2D p;
-    vtkTextActor *textActor = vtkTextActor::New();
-
-    textActor->SetDisplayPosition(posX, posY);
-    textActor->SetInput(text.c_str());
-    textActor->SetTextScaleModeToNone();
-    textActor->GetTextProperty()->SetColor(color1, color2, color3); // TODO: Read color from node property
-    textActor->GetTextProperty()->SetOpacity(opacity);
-    int text_id = m_TextCollection.size();
-    m_TextCollection.insert(TextMapType::value_type(text_id, textActor));
-    return text_id;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
 void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   if (m_MapperID != mapperId)
@@ -434,19 +381,19 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D &displayPoint, mi
     case (WorldPointPicking):
     {
       m_WorldPointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-      vtk2itk(m_WorldPointPicker->GetPickPosition(), worldPoint);
+      mitk::FillArray(worldPoint, m_WorldPointPicker->GetPickPosition());
       break;
     }
     case (PointPicking):
     {
       m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-      vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
+      mitk::FillArray(worldPoint, m_PointPicker->GetPickPosition());
       break;
     }
     case (CellPicking):
     {
       m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
-      vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
+      mitk::FillArray(worldPoint, m_CellPicker->GetPickPosition());
       break;
     }
   }
@@ -488,7 +435,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
   m_CellPicker->Pick(displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer);
   m_CellPicker->PickFromListOff();
 
-  vtk2itk(m_CellPicker->GetPickPosition(), worldPosition);
+  mitk::FillArray(worldPosition, m_CellPicker->GetPickPosition());
   vtkProp *prop = m_CellPicker->GetViewProp();
 
   if (prop == nullptr)
@@ -523,11 +470,6 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
 }
 // todo: is this 2D renderwindow picking?
 //    return Superclass::PickObject( displayPosition, worldPosition );
-
-vtkTextProperty *mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
-{
-  return this->m_TextCollection[text_id]->GetTextProperty();
-}
 
 void mitk::VtkPropRenderer::InitPathTraversal()
 {

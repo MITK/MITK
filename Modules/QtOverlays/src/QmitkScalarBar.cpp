@@ -118,7 +118,7 @@ void QmitkScalarBar::SetupGeometry(alignment align)
 
 void QmitkScalarBar::CleanUpLines()
 {
-  foreach (QLine *line, m_SubDivisionLines)
+  for (QLine *line : m_SubDivisionLines)
   {
     delete line; // QLine is not a QObject
     line = nullptr;
@@ -205,7 +205,7 @@ void QmitkScalarBar::paintEvent(QPaintEvent * /*event*/)
 
       painter.drawLine(m_MainLine->p1(), m_MainLine->p2());
 
-      foreach (QLine *line, m_SubDivisionLines)
+      for (const QLine *line : m_SubDivisionLines)
       {
         painter.drawLine(line->p1(), line->p2());
       }

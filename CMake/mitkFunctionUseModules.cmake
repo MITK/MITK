@@ -95,18 +95,6 @@ function(mitk_use_modules)
   set(package_depends ${USE_PACKAGES})
 
   if(depends)
-    # Iterate over all module dependencies
-    foreach(dependency ${depends})
-      if(TARGET ${dependency} AND NOT MODULE_IS_DEPRECATED)
-        get_target_property(_is_interface_lib ${dependency} TYPE)
-        if(NOT _is_interface_lib)
-          get_target_property(_dependency_deprecated_since ${dependency} MITK_MODULE_DEPRECATED_SINCE)
-          if(_dependency_deprecated_since)
-            message(WARNING "Module ${dependency} is deprecated since ${_dependency_deprecated_since}")
-          endif()
-        endif()
-      endif()
-    endforeach()
     target_link_libraries(${USE_TARGET} PUBLIC ${depends})
   endif()
 

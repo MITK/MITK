@@ -51,13 +51,15 @@ namespace mitk
 
     // first convert the index
     typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];
-    itk2vtk(cutter->m_InputRequestedRegion.GetIndex(), tmpIndex);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpIndex[i] = cutter->m_InputRequestedRegion.GetIndex()[i];
     typename ItkRegionType::IndexType index;
     index.SetIndex(tmpIndex);
 
     // then convert the size
     typename ItkRegionType::SizeType::SizeValueType tmpSize[3];
-    itk2vtk(cutter->m_InputRequestedRegion.GetSize(), tmpSize);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpSize[i] = cutter->m_InputRequestedRegion.GetSize()[i];
     typename ItkRegionType::SizeType size;
     size.SetSize(tmpSize);
 
@@ -100,7 +102,8 @@ namespace mitk
       // yes, use a fixed value for each inside pixel (create a binary mask of the bounding object)
       for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
-        vtk2itk(inputIt.GetIndex(), p);
+        for (unsigned int i = 0; i < 3; ++i)
+          p[i] = inputIt.GetIndex()[i];
         inputGeometry->IndexToWorld(p, p);
         if (cutter->m_BoundingObject->IsInside(p))
         {
@@ -119,7 +122,8 @@ namespace mitk
       // no, use the pixel value of the original image (normal cutting)
       for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
-        vtk2itk(inputIt.GetIndex(), p);
+        for (unsigned int i = 0; i < 3; ++i)
+          p[i] = inputIt.GetIndex()[i];
         inputGeometry->IndexToWorld(p, p);
         if (cutter->m_BoundingObject->IsInside(p))
         {
@@ -167,13 +171,15 @@ namespace mitk
 
     // first convert the index
     typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];
-    itk2vtk(cutter->m_InputRequestedRegion.GetIndex(), tmpIndex);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpIndex[i] = cutter->m_InputRequestedRegion.GetIndex()[i];
     typename ItkRegionType::IndexType index;
     index.SetIndex(tmpIndex);
 
     // then convert the size
     typename ItkRegionType::SizeType::SizeValueType tmpSize[3];
-    itk2vtk(cutter->m_InputRequestedRegion.GetSize(), tmpSize);
+    for (unsigned int i = 0; i < 3; ++i)
+      tmpSize[i] = cutter->m_InputRequestedRegion.GetSize()[i];
     typename ItkRegionType::SizeType size;
     size.SetSize(tmpSize);
 
@@ -218,7 +224,8 @@ namespace mitk
       // yes, use a fixed value for each inside pixel (create a binary mask of the bounding object)
       for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
-        vtk2itk(inputIt.GetIndex(), p);
+        for (unsigned int i = 0; i < 3; ++i)
+          p[i] = inputIt.GetIndex()[i];
         inputGeometry->IndexToWorld(p, p);
         if (cutter->m_BoundingObject->IsInside(p))
         {
@@ -237,7 +244,8 @@ namespace mitk
       // no, use the pixel value of the original image (normal cutting)
       for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
-        vtk2itk(inputIt.GetIndex(), p);
+        for (unsigned int i = 0; i < 3; ++i)
+          p[i] = inputIt.GetIndex()[i];
         inputGeometry->IndexToWorld(p, p);
         if (cutter->m_BoundingObject->IsInside(p))
         {

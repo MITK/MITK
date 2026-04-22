@@ -37,6 +37,10 @@ public:
   void PerformCancel() override;
   void Update() override;
 
+private Q_SLOTS:
+  void OnModelSourceToggled();
+  void OnBrowseLocalModelPath();
+
 private:
   void OnUninstallButtonClicked();
   void UpdateUninstallButton();

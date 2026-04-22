@@ -50,6 +50,23 @@ namespace
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
+
+  // Format a std::string as a Python single-quoted string literal so a Windows
+  // path like C:\foo\bar round-trips safely through the generated Python code.
+  std::string PyQuote(const std::string& value)
+  {
+    std::string result;
+    result.reserve(value.size() + 2);
+    result.push_back('\'');
+    for (char c : value)
+    {
+      if (c == '\\' || c == '\'')
+        result.push_back('\\');
+      result.push_back(c);
+    }
+    result.push_back('\'');
+    return result;
+  }
 }
 
 namespace mitk
@@ -566,7 +583,7 @@ void mitk::nnInteractiveTool::StartSession()
   }
 
   {
-    const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+    const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
 
     std::ostringstream pyCommands; pyCommands
       << "import torch\n"
@@ -575,16 +592,39 @@ void mitk::nnInteractiveTool::StartSession()
       << "from pathlib import Path\n"
       << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
       << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-      << "from huggingface_hub import snapshot_download\n"
-      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n"
-      << "print('Model checkpoint: " << modelCheckpoint << "')\n"
-      << "repo_id = 'nnInteractive/nnInteractive'\n"
-      << "download_path = snapshot_download(\n"
-      << "    repo_id = repo_id,\n"
-      << "    allow_patterns = ['" << modelCheckpoint << "/*'],\n"
-      << "    force_download = False\n"
-      << ")\n"
-      << "checkpoint_path = Path(download_path).joinpath('" << modelCheckpoint << "')\n";
+      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n";
+
+    if (modelSource == "local")
+    {
+      const auto localPath = prefs->Get("nnInteractive/localModelPath", "");
+
+      if (localPath.empty())
+        mitkThrow() << "nnInteractive: Local model mode is selected but no checkpoint folder is configured. "
+                       "Set the path in Preferences -> Segmentation -> nnInteractive.";
+
+      pyCommands
+        << "print('Model source: local folder')\n"
+        << "checkpoint_path = Path(" << PyQuote(localPath) << ")\n"
+        << "if not checkpoint_path.is_dir():\n"
+        << "    raise RuntimeError(f'nnInteractive checkpoint folder not found: {checkpoint_path}')\n";
+    }
+    else
+    {
+      const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+
+      pyCommands
+        << "from huggingface_hub import snapshot_download\n"
+        << "print('Model source: Hugging Face')\n"
+        << "print('Model checkpoint: " << modelCheckpoint << "')\n"
+        << "repo_id = 'nnInteractive/nnInteractive'\n"
+        << "download_path = snapshot_download(\n"
+        << "    repo_id = repo_id,\n"
+        << "    allow_patterns = ['" << modelCheckpoint << "/*'],\n"
+        << "    force_download = False\n"
+        << ")\n"
+        << "checkpoint_path = Path(download_path).joinpath('" << modelCheckpoint << "')\n";
+    }
+
     pythonContext->Execute(pyCommands.str());
   }
 

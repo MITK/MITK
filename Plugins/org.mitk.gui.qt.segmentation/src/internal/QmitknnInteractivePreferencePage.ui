@@ -164,6 +164,19 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
+           <widget class="QRadioButton" name="hfSourceRadioButton">
+            <property name="toolTip">
+             <string>Download the selected checkpoint from Hugging Face on demand.</string>
+            </property>
+            <property name="text">
+             <string>Hugging Face download</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QLabel" name="checkpointLabel">
@@ -182,6 +195,44 @@
               </property>
               <property name="placeholderText">
                <string>nnInteractive_v1.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="localSourceRadioButton">
+            <property name="toolTip">
+             <string>Use a checkpoint folder already present on disk.</string>
+            </property>
+            <property name="text">
+             <string>Local folder</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="localModelPathLayout">
+            <item>
+             <widget class="QLabel" name="localModelPathLabel">
+              <property name="text">
+               <string>Folder:</string>
+              </property>
+              <property name="buddy">
+               <cstring>localModelPathLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="localModelPathLineEdit">
+              <property name="placeholderText">
+               <string>Path to nnInteractive checkpoint folder</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="localModelPathBrowseButton">
+              <property name="text">
+               <string>Browse...</string>
               </property>
              </widget>
             </item>
@@ -347,7 +398,11 @@
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendLineEdit</tabstop>
+  <tabstop>hfSourceRadioButton</tabstop>
   <tabstop>checkpointLineEdit</tabstop>
+  <tabstop>localSourceRadioButton</tabstop>
+  <tabstop>localModelPathLineEdit</tabstop>
+  <tabstop>localModelPathBrowseButton</tabstop>
   <tabstop>uninstallButton</tabstop>
  </tabstops>
  <resources/>

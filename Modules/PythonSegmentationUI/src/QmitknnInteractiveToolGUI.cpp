@@ -377,14 +377,19 @@ bool QmitknnInteractiveToolGUI::Install()
   // the user with a silent multi-minute download. The checkpoint name mirrors
   // the preference mitknnInteractiveTool::StartSession() reads. Guard each
   // link in the preferences chain so a missing preferences service doesn't
-  // crash the installer before it even starts.
+  // crash the installer before it even starts. In local mode the user points
+  // at a checkpoint folder on disk, so no Hugging Face download is queued.
+  std::string modelSource = "huggingface";
   std::string checkpoint = "nnInteractive_v1.0";
   if (auto* prefsService = mitk::CoreServices::GetPreferencesService())
   {
     if (auto* system = prefsService->GetSystemPreferences())
     {
       if (auto* prefs = system->Node("org.mitk.views.segmentation"))
+      {
+        modelSource = prefs->Get("nnInteractive/modelSource", modelSource);
         checkpoint = prefs->Get("nnInteractive/modelCheckpoint", checkpoint);
+      }
     }
   }
 
@@ -402,12 +407,15 @@ bool QmitknnInteractiveToolGUI::Install()
   nnInteractiveGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
-  mitk::HuggingFaceDownload modelDownload;
-  modelDownload.repoId = "nnInteractive/nnInteractive";
-  modelDownload.allowPatterns = { checkpoint + "/*" };
-  modelDownload.displayName = "model checkpoint " + checkpoint;
-  modelDownload.optional = true;
-  spec.huggingFaceDownloads.push_back(std::move(modelDownload));
+  if (modelSource != "local")
+  {
+    mitk::HuggingFaceDownload modelDownload;
+    modelDownload.repoId = "nnInteractive/nnInteractive";
+    modelDownload.allowPatterns = { checkpoint + "/*" };
+    modelDownload.displayName = "model checkpoint " + checkpoint;
+    modelDownload.optional = true;
+    spec.huggingFaceDownloads.push_back(std::move(modelDownload));
+  }
 
   QmitkPipInstallDialog dialog(spec, this);
 

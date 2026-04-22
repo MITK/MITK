@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <mitkPipInstaller.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
 #include <nlohmann/json.hpp>

@@ -88,13 +88,6 @@ public:
    * \param[in] service The prototype scope service pointer.
    * \return \c true if the service was removed, \c false otherwise.
    */
-  bool UngetPrototypeService(Module* module, void* service);
-
-  /** \brief Unget a prototype scope service object (InterfaceMap overload).
-   *  \param[in] module The module releasing the prototype scope service.
-   *  \param[in] service The prototype scope service InterfaceMap.
-   *  \return \c true if the service was removed, \c false otherwise.
-   */
   bool UngetPrototypeService(Module* module, const InterfaceMap& service);
 
   /**

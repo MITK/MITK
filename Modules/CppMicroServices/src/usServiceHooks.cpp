@@ -65,30 +65,40 @@ void ServiceHooks::RemovedService(const ServiceReferenceType& reference, Tracked
 
 void ServiceHooks::Open()
 {
-  (void)(Lock(this));
+  // The tracker's Open() registers a service listener, whose registration
+  // re-enters this object through HandleServiceListenerReg -> IsOpen(). The
+  // Lock class wraps a non-recursive mutex, so holding it across the call
+  // would self-deadlock. Drive the tracker unlocked and publish the result
+  // under the lock. Callbacks observing bOpen == false while we are still
+  // driving the tracker short-circuit cleanly in HandleServiceListenerReg.
+  ServiceTracker<ServiceListenerHook>* tracker =
+      new ServiceTracker<ServiceListenerHook>(GetModuleContext(), this);
+  tracker->Open();
 
-  listenerHookTracker = new ServiceTracker<ServiceListenerHook>(GetModuleContext(), this);
-  listenerHookTracker->Open();
-
+  Lock lock(this);
+  listenerHookTracker = tracker;
   bOpen = true;
 }
 
 void ServiceHooks::Close()
 {
-  (void)(Lock(this));
-  if (listenerHookTracker)
+  ServiceTracker<ServiceListenerHook>* tracker = nullptr;
   {
-    listenerHookTracker->Close();
-    delete listenerHookTracker;
+    Lock lock(this);
+    tracker = listenerHookTracker;
     listenerHookTracker = nullptr;
+    bOpen = false;
   }
-
-  bOpen = false;
+  if (tracker)
+  {
+    tracker->Close();
+    delete tracker;
+  }
 }
 
 bool ServiceHooks::IsOpen() const
 {
-  (void)(Lock(this));
+  Lock lock(this);
   return bOpen;
 }
 
@@ -204,6 +214,7 @@ void ServiceHooks::HandleServiceListenerReg(const ServiceListenerEntry& sle)
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* lh = listenerHookTracker->GetService(*srIter);
+      if (lh == nullptr) continue;
       try
       {
         lh->Added(set);
@@ -256,6 +267,7 @@ void ServiceHooks::HandleServiceListenerUnreg(const std::vector<ServiceListenerE
          srEnd = srl.rend(); srIter != srEnd; ++srIter)
     {
       ServiceListenerHook* const lh = listenerHookTracker->GetService(*srIter);
+      if (lh == nullptr) continue;
       try
       {
         lh->Removed(lis);

@@ -40,7 +40,7 @@ void ModuleAbstractTracked<S,TTT,R>::TrackInitial()
   {
     S item;
     {
-      (void)(Lock(this));
+      Lock lock(this);
       if (closed || (initial.size() == 0))
       {
         /*
@@ -88,7 +88,7 @@ void ModuleAbstractTracked<S,TTT,R>::Track(S item, R related)
 {
   T object = TTT::DefaultValue();
   {
-    (void)(Lock(this));
+    Lock lock(this);
     if (closed)
     {
       return;
@@ -129,7 +129,7 @@ void ModuleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
 {
   T object = TTT::DefaultValue();
   {
-    (void)(Lock(this));
+    Lock lock(this);
     std::size_t initialSize = initial.size();
     initial.remove(item);
     if (initialSize != initial.size())
@@ -224,7 +224,7 @@ void ModuleAbstractTracked<S,TTT,R>::CopyEntries(TrackingMap& map) const
 template<class S, class TTT, class R>
 bool ModuleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const T& custom)
 {
-  (void)(Lock(this));
+  Lock lock(this);
   std::size_t addingSize = adding.size();
   adding.remove(item);
   if (addingSize != adding.size() && !closed)

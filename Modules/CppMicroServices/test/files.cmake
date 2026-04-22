@@ -1,11 +1,15 @@
 set(MODULE_TESTS
   usAnyTest.cpp
+  usHookReentranceTest.cpp
   usLDAPFilterTest.cpp
   usModuleAutoLoadTest.cpp
   usModuleHooksTest.cpp
   usModuleManifestTest.cpp
   usModuleTest.cpp
+  usModuleResourceContainerTest.cpp
   usModuleResourceTest.cpp
+  usModuleVersionTest.cpp
+  usNullEventTest.cpp
   usServiceFactoryTest.cpp
   usServiceHooksTest.cpp
   usServiceListenerTest.cpp

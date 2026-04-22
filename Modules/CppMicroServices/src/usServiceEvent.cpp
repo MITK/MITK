@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <usServiceProperties.h>
 
+#include <stdexcept>
+
 namespace us {
 
 class ServiceEventData : public SharedData
@@ -77,11 +79,13 @@ ServiceEvent& ServiceEvent::operator=(const ServiceEvent& other)
 
 ServiceReferenceU ServiceEvent::GetServiceReference() const
 {
+  if (!d) return ServiceReferenceU();
   return d->reference;
 }
 
 ServiceEvent::Type ServiceEvent::GetType() const
 {
+  if (!d) throw std::logic_error("ServiceEvent is null");
   return d->type;
 }
 

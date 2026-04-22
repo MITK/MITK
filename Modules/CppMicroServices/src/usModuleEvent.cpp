@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <usModule.h>
 
+#include <stdexcept>
+
 namespace us {
 
 class ModuleEventData : public SharedData
@@ -77,11 +79,13 @@ ModuleEvent& ModuleEvent::operator=(const ModuleEvent& other)
 
 Module* ModuleEvent::GetModule() const
 {
+  if (!d) return nullptr;
   return d->module;
 }
 
 ModuleEvent::Type ModuleEvent::GetType() const
 {
+  if (!d) throw std::logic_error("ModuleEvent is null");
   return d->type;
 }
 

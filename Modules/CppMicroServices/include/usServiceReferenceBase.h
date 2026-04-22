@@ -72,11 +72,12 @@ public:
    * been unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
-   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   * If this ServiceReferenceBase is invalid (default-constructed), returns
+   * an empty Any.
    *
    * \param[in] key The property key.
    * \return The property value to which the key is mapped; an invalid Any
-   *         if there is no property named after the key.
+   *         if there is no property named after the key or the reference is invalid.
    */
   Any GetProperty(const std::string& key) const;
 
@@ -90,7 +91,8 @@ public:
    * unregistered. This is so references to unregistered services can
    * still be interrogated.
    *
-   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   * If this ServiceReferenceBase is invalid (default-constructed), \c keys
+   * is left unchanged.
    *
    * \param[out] keys A vector being filled with the property keys.
    */
@@ -117,7 +119,8 @@ public:
    * <code>ServiceReferenceBase</code> object. Specifically, this method returns
    * the modules whose usage count for that service is greater than zero.
    *
-   * \pre This ServiceReferenceBase is valid (not default-constructed).
+   * If this ServiceReferenceBase is invalid (default-constructed), \c modules
+   * is left unchanged.
    *
    * \param[out] modules A list of modules whose usage count for the service referenced
    *         by this <code>ServiceReferenceBase</code> object is greater than

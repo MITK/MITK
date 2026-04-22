@@ -209,8 +209,7 @@ bool ModuleVersion::operator==(const ModuleVersion& other) const
   }
 
   if (other.undefined && this->undefined) return true;
-  if (this->undefined) throw std::logic_error("Version undefined");
-  if (other.undefined) return false;
+  if (this->undefined || other.undefined) return false;
 
   return (majorVersion == other.majorVersion) && (minorVersion == other.minorVersion) && (microVersion
       == other.microVersion) && qualifier == other.qualifier;

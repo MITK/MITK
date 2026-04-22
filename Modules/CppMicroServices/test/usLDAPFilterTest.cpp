@@ -148,6 +148,28 @@ void TestLDAPExpressions()
   US_TEST_CONDITION(filter1 == filter2, "test null expressions")
 }
 
+void TestBoolComparison()
+{
+  // Regression: std::equal only checked pattern.size() characters, so a
+  // shorter pattern could falsely match a longer bool literal. Both
+  // "(key=tru)" and "(key=fals)" must reject bool true/false.
+  ServiceProperties propsTrue;
+  propsTrue["key"] = true;
+  ServiceProperties propsFalse;
+  propsFalse["key"] = false;
+
+  US_TEST_CONDITION( LDAPFilter("(key=true)").Match(propsTrue),
+                     "full bool literal matches true")
+  US_TEST_CONDITION(!LDAPFilter("(key=tru)").Match(propsTrue),
+                     "truncated bool pattern must not match true")
+  US_TEST_CONDITION(!LDAPFilter("(key=trueX)").Match(propsTrue),
+                     "longer bool pattern must not match true")
+  US_TEST_CONDITION( LDAPFilter("(key=false)").Match(propsFalse),
+                     "full bool literal matches false")
+  US_TEST_CONDITION(!LDAPFilter("(key=fals)").Match(propsFalse),
+                     "truncated bool pattern must not match false")
+}
+
 int usLDAPFilterTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("LDAPFilterTest");
@@ -155,6 +177,7 @@ int usLDAPFilterTest(int /*argc*/, char* /*argv*/[])
   TestLDAPExpressions();
   US_TEST_CONDITION(TestParsing() == EXIT_SUCCESS, "Parsing LDAP expressions: ")
   US_TEST_CONDITION(TestEvaluate() == EXIT_SUCCESS, "Evaluating LDAP expressions: ")
+  TestBoolComparison();
 
   US_TEST_END()
 }

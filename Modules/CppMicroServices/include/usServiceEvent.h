@@ -143,8 +143,8 @@ public:
    * lifecycle.
    * <p>
    * This reference is the source of the event.
-   *
-   * \pre IsNull() returns \c false.
+   * If this is a null event (default-constructed), returns an invalid
+   * ServiceReference.
    *
    * \return Reference to the service that had a lifecycle change.
    */
@@ -165,7 +165,7 @@ public:
   /**
    * \brief Returns the type of event.
    *
-   * \pre IsNull() returns \c false.
+   * \throws std::logic_error If this ServiceEvent is null (default-constructed).
    *
    * The event type values are:
    * <ul>

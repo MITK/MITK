@@ -22,6 +22,11 @@ int usAnyTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("AnyTest");
 
+  Any empty;
+  US_TEST_CONDITION(empty.Empty(), "Default-constructed Any is empty")
+  US_TEST_CONDITION(empty.ToString() == "", "Empty Any.ToString() returns empty string")
+  US_TEST_CONDITION(empty.ToJSON() == "null", "Empty Any.ToJSON() returns JSON null literal")
+
   Any anyBool = true;
   US_TEST_CONDITION(anyBool.Type() == typeid(bool), "Any[bool].Type()")
   US_TEST_CONDITION(any_cast<bool>(anyBool) == true, "any_cast<bool>()")

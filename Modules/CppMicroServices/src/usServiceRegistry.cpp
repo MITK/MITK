@@ -31,6 +31,7 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
                                                                long sid)
 {
   static long nextServiceID = 1;
+  static Mutex nextServiceIDMutex;
   ServiceProperties props(in);
 
   if (!classes.empty())
@@ -38,7 +39,12 @@ ServicePropertiesImpl ServiceRegistry::CreateServiceProperties(const ServiceProp
     props.insert(std::make_pair(ServiceConstants::OBJECTCLASS(), classes));
   }
 
-  props.insert(std::make_pair(ServiceConstants::SERVICE_ID(), sid != -1 ? sid : nextServiceID++));
+  if (sid == -1)
+  {
+    MutexLock lock(nextServiceIDMutex);
+    sid = nextServiceID++;
+  }
+  props.insert(std::make_pair(ServiceConstants::SERVICE_ID(), sid));
 
   if (isPrototypeFactory)
   {

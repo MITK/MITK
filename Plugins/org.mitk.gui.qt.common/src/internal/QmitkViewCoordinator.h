@@ -114,8 +114,11 @@ private:
 private:
 
   mitk::IZombieViewPart* m_ActiveZombieView;
-  mitk::IRenderWindowPart* m_ActiveRenderWindowPart;
-  mitk::IRenderWindowPart* m_VisibleRenderWindowPart;
+
+  // The render window part listeners were last notified as activated, i.e.,
+  // listener dispatch is driven by render-window-part availability
+  // (open/visible vs closed), not by focus changes or transient hides.
+  mitk::IRenderWindowPart* m_CurrentRenderWindowPart;
 
   QSet<mitk::IRenderWindowPartListener*> m_RenderWindowListeners;
 

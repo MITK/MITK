@@ -692,11 +692,11 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_RenderingManagerObserverTag =
      mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
-   m_RenderWindowPart = this->GetRenderWindowPart();
-   if (nullptr != m_RenderWindowPart)
-   {
-     this->RenderWindowPartActivated(m_RenderWindowPart);
-   }
+   // Call unconditionally so m_Parent is put into a known-enabled state even
+   // when GetRenderWindowPart() returns null at construction time (e.g. when
+   // the view is restored from a perspective before the render window editor
+   // is opened during CLI startup).
+   this->RenderWindowPartActivated(this->GetRenderWindowPart());
 
    // Make sure the GUI notices if appropriate data is already present on creation.
    // Should be done last, if everything else is configured because it triggers the autoselection of data.

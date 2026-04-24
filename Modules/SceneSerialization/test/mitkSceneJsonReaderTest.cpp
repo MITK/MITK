@@ -81,6 +81,12 @@ class mitkSceneJsonReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestInlineAndFileMutuallyExclusive);
   MITK_TEST(TestContextPropertiesApplied);
   MITK_TEST(TestParentChildRelationship);
+  MITK_TEST(TestEmptyContextKeyRejected);
+  MITK_TEST(TestNullContextKeyRejected);
+  MITK_TEST(TestTransferRequiresFilePath);
+  MITK_TEST(TestTransferRejectsUnknownMode);
+  MITK_TEST(TestOrphanDataPropertiesWarnedNonFatal);
+  MITK_TEST(TestLayerAcceptsPrimitiveAndTaggedForms);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -303,6 +309,100 @@ public:
       }
     }
     CPPUNIT_ASSERT(foundParent);
+  }
+
+  void TestEmptyContextKeyRejected()
+  {
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"context_properties":{"":{"opacity":0.5}}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT_THROW(reader->LoadScene(file.Path(), storage), mitk::Exception);
+  }
+
+  void TestNullContextKeyRejected()
+  {
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"context_properties":{"null":{"opacity":0.5}}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT_THROW(reader->LoadScene(file.Path(), storage), mitk::Exception);
+  }
+
+  void TestTransferRequiresFilePath()
+  {
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"transfer":{"mode":"file-reference"}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT_THROW(reader->LoadScene(file.Path(), storage), mitk::Exception);
+  }
+
+  void TestTransferRejectsUnknownMode()
+  {
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"transfer":{"mode":"shared-memory","file_path":"does-not-matter.nrrd"}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT_THROW(reader->LoadScene(file.Path(), storage), mitk::Exception);
+  }
+
+  void TestLayerAcceptsPrimitiveAndTaggedForms()
+  {
+    // Layer is read pre-Add to determine wave ordering. Both the primitive
+    // form ("layer": 2) and the tagged IntProperty form must produce the
+    // same ordering, otherwise authors using the shorthand would get
+    // non-deterministic stacking.
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"uid":"a","properties":{"name":"primitive","layer":5}},
+      {"uid":"b","properties":{"name":"tagged","layer":{"type":"IntProperty","value":1}}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT(reader->LoadScene(file.Path(), storage));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), storage->GetAll()->Size());
+
+    auto primitive = storage->GetNamedNode("primitive");
+    auto tagged = storage->GetNamedNode("tagged");
+    CPPUNIT_ASSERT(primitive != nullptr);
+    CPPUNIT_ASSERT(tagged != nullptr);
+
+    int layer = 0;
+    CPPUNIT_ASSERT(primitive->GetIntProperty("layer", layer));
+    CPPUNIT_ASSERT_EQUAL(5, layer);
+    CPPUNIT_ASSERT(tagged->GetIntProperty("layer", layer));
+    CPPUNIT_ASSERT_EQUAL(1, layer);
+  }
+
+  void TestOrphanDataPropertiesWarnedNonFatal()
+  {
+    // data_properties on a node without 'transfer' is an orphan: ignored,
+    // warned, and the overall load reports non-fatal errors (returns false).
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"data_properties":{"modality":"CT"},"properties":{"name":"orphan"}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    const bool ok = reader->LoadScene(file.Path(), storage);
+    CPPUNIT_ASSERT(!ok);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), storage->GetAll()->Size());
+    CPPUNIT_ASSERT_EQUAL(std::string("orphan"), storage->GetAll()->GetElement(0)->GetName());
   }
 };
 

@@ -45,9 +45,11 @@ namespace
 
   const std::set<std::string> kRootKnownKeys = {"type", "version", "metadata", "nodes"};
   const std::set<std::string> kMetadataKnownKeys = {"description"};
-  const std::set<std::string> kNodeKnownKeys = {"uid", "parent_uid", "data", "properties", "context_properties"};
-  const std::set<std::string> kDataKnownKeys = {"data_type", "_file", "uid", "properties"};
+  const std::set<std::string> kNodeKnownKeys = {
+    "uid", "parent_uid", "data_type", "data_uid", "transfer", "data_properties", "properties", "context_properties"};
+  const std::set<std::string> kTransferKnownKeys = {"mode", "file_path", "size_bytes", "directory_path"};
   const std::set<std::string> kKnownPropertyMapMetaKeys = {"_loadstyle", "_file"};
+  constexpr const char *kSupportedTransferMode = "file-reference";
 
   struct SceneNodeEntry
   {
@@ -58,14 +60,23 @@ namespace
     mitk::DataNode::Pointer dataNode;   // created in pass 1
   };
 
+  /**
+   * \brief Resolve a scene-relative path against \p basePath.
+   *
+   * Absolute paths are returned as-is. Relative paths are joined to
+   * \p basePath and lexically normalised, so `..` segments are allowed
+   * and collapsed against the scene directory's own path. Scene files
+   * are user documents — callers are responsible for not loading
+   * scenes from untrusted sources.
+   */
   fs::path ResolvePath(const fs::path &basePath, const std::string &relativeOrAbsolute)
   {
-    fs::path p(relativeOrAbsolute);
+    const fs::path p(relativeOrAbsolute);
     if (p.is_absolute())
     {
       return p;
     }
-    return basePath / p;
+    return (basePath / p).lexically_normal();
   }
 
   void WarnUnknownKeys(const json &obj, const std::set<std::string> &known, const std::string &context)
@@ -86,6 +97,60 @@ namespace
     Modify,
     Replace
   };
+
+  /**
+   * \brief Structural (I/O-free) validation of a property-map JSON object.
+   *
+   * Checks the invariants that do not require reading any external file:
+   *  - the node is a JSON object,
+   *  - `_loadstyle`, if present, is the string `"modify"` or `"replace"`,
+   *  - if `_file` is present, no non-meta keys appear beside it.
+   *
+   * Called from the Pass-1 pre-validation so that these structural errors
+   * throw before Pass 2 starts mutating the DataStorage. I/O-bound errors
+   * (missing `_file` target, invalid JSON in the external map, nested
+   * `_file`) remain non-fatal per-node errors in Pass 2.
+   */
+  void ValidatePropertyMapShape(const json &mapJson, const std::string &context)
+  {
+    if (!mapJson.is_object())
+    {
+      mitkThrow() << "Property map in " << context << " must be a JSON object.";
+    }
+
+    const auto loadstyleIt = mapJson.find("_loadstyle");
+    if (loadstyleIt != mapJson.end() && !loadstyleIt->is_null())
+    {
+      if (!loadstyleIt->is_string())
+      {
+        mitkThrow() << "Invalid '_loadstyle' in " << context << ": expected string ('modify' or 'replace').";
+      }
+      const std::string value = loadstyleIt->get<std::string>();
+      if (value != "modify" && value != "replace")
+      {
+        mitkThrow() << "Invalid '_loadstyle' value '" << value << "' in " << context
+                    << ". Expected 'modify' or 'replace'.";
+      }
+    }
+
+    const auto fileIt = mapJson.find("_file");
+    if (fileIt != mapJson.end() && !fileIt->is_null())
+    {
+      if (!fileIt->is_string())
+      {
+        mitkThrow() << "'_file' in property map (" << context << ") must be a string.";
+      }
+      for (auto it = mapJson.begin(); it != mapJson.end(); ++it)
+      {
+        if (!it.key().empty() && it.key().front() != '_')
+        {
+          mitkThrow() << "Property map in " << context
+                      << " specifies '_file' but also contains inline property '" << it.key()
+                      << "'. Mixing the two is not allowed.";
+        }
+      }
+    }
+  }
 
   LoadStyle ParseLoadStyle(const json &propertyMap, const std::string &context)
   {
@@ -108,12 +173,15 @@ namespace
   }
 
   /**
-   * \brief Resolve a property-map JSON object, optionally following `_file`.
+   * \brief Resolve `_file` indirection in a property-map JSON object.
    *
    * Returns a self-contained JSON object that no longer references external
    * files. Inline `_`-meta keys take precedence over the external file's meta
    * keys. If `_file` is set, the external file must contain a property map
-   * and the inline object must not contain any non-meta keys.
+   * and the inline object must not contain any non-meta keys. Only one level
+   * of indirection is allowed: an externally referenced map must not itself
+   * contain `_file`. `_loadstyle` is not interpreted here; it is resolved by
+   * the caller once the map has been assembled.
    */
   json ResolvePropertyMap(const json &mapJson, const fs::path &basePath, const std::string &context)
   {
@@ -464,113 +532,246 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     }
   }
 
+  // ---- 3b. Shape-only pre-validation of node-level property maps.
+  //
+  // Anything that would cause Pass 2 to throw after `storage->Add` is
+  // caught here instead, so a structural error can never leave the storage
+  // half-populated. Property *value* errors (unknown type tag, failed
+  // conversion) remain non-fatal and are logged in Pass 2.
+  for (const auto &entry : entries)
+  {
+    const json &nodeJson = *entry.nodeJson;
+
+    const auto dataPropsIt = nodeJson.find("data_properties");
+    if (dataPropsIt != nodeJson.end() && !dataPropsIt->is_null())
+    {
+      if (!dataPropsIt->is_object())
+      {
+        mitkThrow() << "Node '" << entry.uid << "': 'data_properties' must be a JSON object.";
+      }
+      ValidatePropertyMapShape(*dataPropsIt, "node '" + entry.uid + "'.data_properties");
+    }
+
+    const auto propsIt = nodeJson.find("properties");
+    if (propsIt != nodeJson.end() && !propsIt->is_null())
+    {
+      if (!propsIt->is_object())
+      {
+        mitkThrow() << "Node '" << entry.uid << "': 'properties' must be a JSON object.";
+      }
+      ValidatePropertyMapShape(*propsIt, "node '" + entry.uid + "'.properties");
+    }
+
+    const auto ctxIt = nodeJson.find("context_properties");
+    if (ctxIt != nodeJson.end() && !ctxIt->is_null())
+    {
+      if (!ctxIt->is_object())
+      {
+        mitkThrow() << "Node '" << entry.uid << "': 'context_properties' must be a JSON object.";
+      }
+      for (auto cit = ctxIt->begin(); cit != ctxIt->end(); ++cit)
+      {
+        const std::string &contextName = cit.key();
+        if (contextName.empty() || contextName == "null")
+        {
+          mitkThrow() << "Node '" << entry.uid << "': invalid 'context_properties' key '"
+                      << contextName << "'. Use the top-level 'properties' field for the default context.";
+        }
+        if (!cit.value().is_object())
+        {
+          mitkThrow() << "Node '" << entry.uid << "': 'context_properties[\"" << contextName
+                      << "\"]' must be a JSON object.";
+        }
+        ValidatePropertyMapShape(cit.value(),
+                                 "node '" + entry.uid + "'.context_properties['" + contextName + "']");
+      }
+    }
+  }
+
   bool nonFatalError = false;
 
-  // ---- 4. Pass 1: create nodes, load data, apply data-level properties,
-  //                 apply "replace" style property maps (before storage Add) --
+  // ---- 4. Pass 1: create nodes, load data, apply data-level properties.
+  //
+  // Data-level properties are applied here because they live on the loaded
+  // BaseData's own property list, which mappers do not touch.
+  //
+  // Node-level property maps (`properties`, `context_properties`) are
+  // deliberately deferred to Pass 2 (after storage->Add). The rationale is
+  // that when a RenderingManager is observing the storage, Add triggers
+  // mapper instantiation whose SetDefaultProperties populates the node's
+  // property lists synchronously; Pass 2's `modify` then merges on top of
+  // those defaults and `replace` clears them on purpose. In headless
+  // contexts (unit tests, CLI, REST server) no such defaults exist, so
+  // `modify` and `replace` behave identically on an empty list. This is the
+  // intended contract.
 
   for (auto &entry : entries)
   {
     const json &nodeJson = *entry.nodeJson;
     entry.dataNode = DataNode::New();
 
-    auto dataIt = nodeJson.find("data");
-    if (dataIt != nodeJson.end() && !dataIt->is_null())
+    // Validate the optional informative data_type field.
+    auto dataTypeIt = nodeJson.find("data_type");
+    if (dataTypeIt != nodeJson.end() && !dataTypeIt->is_null() && !dataTypeIt->is_string())
     {
-      if (!dataIt->is_object())
-      {
-        mitkThrow() << "Node '" << entry.uid << "': 'data' must be a JSON object.";
-      }
-      const json &dataJson = *dataIt;
-      WarnUnknownKeys(dataJson, kDataKnownKeys, "node '" + entry.uid + "'.data");
-
-      // data_type is optional in v1 and currently informative only. If present,
-      // it must be a string; stricter validation (matching the loaded BaseData
-      // class against it) is reserved for a future version.
-      auto dataTypeIt = dataJson.find("data_type");
-      if (dataTypeIt != dataJson.end() && !dataTypeIt->is_null() && !dataTypeIt->is_string())
-      {
-        mitkThrow() << "Node '" << entry.uid << "': 'data.data_type' must be a string if present.";
-      }
-
-      auto fileIt = dataJson.find("_file");
-      if (fileIt == dataJson.end() || !fileIt->is_string() || fileIt->get<std::string>().empty())
-      {
-        mitkThrow() << "Node '" << entry.uid
-                    << "': 'data._file' is required (inline data sources are not yet supported).";
-      }
-
-      const fs::path dataPath = ResolvePath(basePath, fileIt->get<std::string>());
-      if (!fs::exists(dataPath))
-      {
-        mitkThrow() << "Node '" << entry.uid << "': data file '" << dataPath.string() << "' does not exist.";
-      }
-
-      // Pre-parse data-level properties so the IO reader can see them as
-      // read-only meta data (analogous to SceneReaderV1). The same parsed
-      // PropertyList is later transferred onto the loaded BaseData's own
-      // property list according to _loadstyle, so the JSON is parsed once.
-      PropertyList::Pointer preloadedDataProps;
-      LoadStyle dataStyle = LoadStyle::Modify;
-      auto dataPropsIt = dataJson.find("properties");
-      const std::string dataPropsCtx = "node '" + entry.uid + "'.data.properties";
-      if (dataPropsIt != dataJson.end() && !dataPropsIt->is_null())
-      {
-        const json resolvedDataMap = ResolvePropertyMap(*dataPropsIt, basePath, dataPropsCtx);
-        dataStyle = ParseLoadStyle(resolvedDataMap, dataPropsCtx);
-        preloadedDataProps = PropertyList::New();
-        ApplyResolvedPropertyMap(*preloadedDataProps, resolvedDataMap, dataPropsCtx);
-      }
-
-      try
-      {
-        auto baseData = IOUtil::Load(dataPath.string(), preloadedDataProps.GetPointer());
-        entry.dataNode->SetData(baseData);
-      }
-      catch (const std::exception &e)
-      {
-        mitkThrow() << "Node '" << entry.uid << "': failed to read data file '" << dataPath.string()
-                    << "': " << e.what();
-      }
-
-      if (entry.dataNode->GetData() == nullptr)
-      {
-        mitkThrow() << "Node '" << entry.uid << "': data file '" << dataPath.string()
-                    << "' could not be loaded.";
-      }
-
-      auto dataUidIt = dataJson.find("uid");
-      if (dataUidIt != dataJson.end() && !dataUidIt->is_null())
-      {
-        if (!dataUidIt->is_string())
-        {
-          mitkThrow() << "Node '" << entry.uid << "': 'data.uid' must be a string.";
-        }
-        UIDManipulator manip(entry.dataNode->GetData());
-        manip.SetUID(dataUidIt->get<std::string>());
-      }
-
-      // Transfer the pre-parsed data-level properties onto the loaded
-      // BaseData's PropertyList. The same PropertyList was handed to
-      // IOUtil::Load above as read-only hints; authoring it onto the loaded
-      // object is what makes the properties persist. JSON is parsed once.
-      if (preloadedDataProps.IsNotNull())
-      {
-        BaseData *loaded = entry.dataNode->GetData();
-        if (loaded->GetPropertyList() == nullptr)
-        {
-          loaded->SetPropertyList(PropertyList::New());
-        }
-        PropertyList *existing = loaded->GetPropertyList();
-        if (dataStyle == LoadStyle::Replace)
-        {
-          existing->Clear();
-        }
-        existing->ConcatenatePropertyList(preloadedDataProps, true);
-      }
-
-      mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(entry.dataNode->GetData());
+      mitkThrow() << "Node '" << entry.uid << "': 'data_type' must be a string or null.";
     }
+    const bool hasDataType = dataTypeIt != nodeJson.end() && !dataTypeIt->is_null();
+
+    auto transferIt = nodeJson.find("transfer");
+    const bool hasTransfer = transferIt != nodeJson.end() && !transferIt->is_null();
+    auto dataUidIt = nodeJson.find("data_uid");
+    const bool hasDataUid = dataUidIt != nodeJson.end() && !dataUidIt->is_null();
+    auto dataPropsIt = nodeJson.find("data_properties");
+    const bool hasDataProps = dataPropsIt != nodeJson.end() && !dataPropsIt->is_null();
+
+    if (!hasTransfer)
+    {
+      // Data-less node. data_type (if present) has been validated as a
+      // string or null above but is not persisted — it is author-facing
+      // documentation only. data_uid / data_properties are meaningless
+      // here and warned about.
+      if (hasDataUid)
+      {
+        MITK_WARN << "Node '" << entry.uid
+                  << "': 'data_uid' is ignored because the node carries no 'transfer' block.";
+        nonFatalError = true;
+      }
+      if (hasDataProps)
+      {
+        MITK_WARN << "Node '" << entry.uid
+                  << "': 'data_properties' is ignored because the node carries no 'transfer' block.";
+        nonFatalError = true;
+      }
+      continue;
+    }
+
+    // transfer is present -> load data.
+    if (!transferIt->is_object())
+    {
+      mitkThrow() << "Node '" << entry.uid << "': 'transfer' must be a JSON object.";
+    }
+    const json &transferJson = *transferIt;
+    WarnUnknownKeys(transferJson, kTransferKnownKeys, "node '" + entry.uid + "'.transfer");
+
+    auto modeIt = transferJson.find("mode");
+    if (modeIt != transferJson.end() && !modeIt->is_null())
+    {
+      if (!modeIt->is_string())
+      {
+        mitkThrow() << "Node '" << entry.uid << "': 'transfer.mode' must be a string.";
+      }
+      const std::string mode = modeIt->get<std::string>();
+      if (mode != kSupportedTransferMode)
+      {
+        mitkThrow() << "Node '" << entry.uid << "': unsupported 'transfer.mode' value '" << mode
+                    << "' (v1 supports only '" << kSupportedTransferMode << "').";
+      }
+    }
+
+    auto filePathIt = transferJson.find("file_path");
+    if (filePathIt == transferJson.end() || !filePathIt->is_string() || filePathIt->get<std::string>().empty())
+    {
+      mitkThrow() << "Node '" << entry.uid
+                  << "': 'transfer.file_path' is required and must be a non-empty string.";
+    }
+
+    const fs::path dataPath = ResolvePath(basePath, filePathIt->get<std::string>());
+    if (!fs::exists(dataPath))
+    {
+      mitkThrow() << "Node '" << entry.uid << "': data file '" << dataPath.string() << "' does not exist.";
+    }
+
+    // Pre-parse data-level properties so the IO reader can see them as
+    // read-only meta data (analogous to SceneReaderV1). The same parsed
+    // PropertyList is later transferred onto the loaded BaseData's own
+    // property list according to _loadstyle, so the JSON is parsed once.
+    PropertyList::Pointer preloadedDataProps;
+    LoadStyle dataStyle = LoadStyle::Modify;
+    const std::string dataPropsCtx = "node '" + entry.uid + "'.data_properties";
+    if (hasDataProps)
+    {
+      const json resolvedDataMap = ResolvePropertyMap(*dataPropsIt, basePath, dataPropsCtx);
+      dataStyle = ParseLoadStyle(resolvedDataMap, dataPropsCtx);
+      preloadedDataProps = PropertyList::New();
+      ApplyResolvedPropertyMap(*preloadedDataProps, resolvedDataMap, dataPropsCtx);
+    }
+
+    try
+    {
+      auto baseData = IOUtil::Load(dataPath.string(), preloadedDataProps.GetPointer());
+      entry.dataNode->SetData(baseData);
+    }
+    catch (const std::exception &e)
+    {
+      mitkThrow() << "Node '" << entry.uid << "': failed to read data file '" << dataPath.string()
+                  << "': " << e.what();
+    }
+
+    if (entry.dataNode->GetData() == nullptr)
+    {
+      mitkThrow() << "Node '" << entry.uid << "': data file '" << dataPath.string()
+                  << "' could not be loaded.";
+    }
+
+    // Informative-only: if the author declared data_type, compare against the
+    // class the IO layer actually produced. A leading 'mitk::' on the declared
+    // name is stripped so that the canonical REST form ('mitk::Image') matches
+    // BaseData::GetNameOfClass() ('Image'). Mismatches are warnings, never
+    // errors — data_type never drives loader dispatch.
+    if (hasDataType)
+    {
+      const std::string declared = dataTypeIt->get<std::string>();
+      const std::string observed = entry.dataNode->GetData()->GetNameOfClass();
+      std::string declaredSuffix = declared;
+      const std::string mitkNs("mitk::");
+      if (declaredSuffix.compare(0, mitkNs.size(), mitkNs) == 0)
+      {
+        declaredSuffix = declaredSuffix.substr(mitkNs.size());
+      }
+      if (declaredSuffix != observed)
+      {
+        MITK_WARN << "Node '" << entry.uid << "': declared 'data_type' is '" << declared
+                  << "' but the loaded object is of class '" << observed
+                  << "'. 'data_type' is informative and did not influence loading.";
+        nonFatalError = true;
+      }
+    }
+
+    if (hasDataUid)
+    {
+      if (!dataUidIt->is_string())
+      {
+        mitkThrow() << "Node '" << entry.uid << "': 'data_uid' must be a string.";
+      }
+      UIDManipulator manip(entry.dataNode->GetData());
+      manip.SetUID(dataUidIt->get<std::string>());
+    }
+
+    // Transfer the pre-parsed data-level properties onto the loaded
+    // BaseData's PropertyList. The same PropertyList was handed to
+    // IOUtil::Load above as read-only hints; authoring it onto the loaded
+    // object is what makes the properties persist. JSON is parsed once.
+    //
+    // Note: `replace` here clears the BaseData's PropertyList wholesale,
+    // including keys populated by the file reader itself (e.g. DICOM tags).
+    // That matches the author's declared intent of taking full ownership.
+    if (preloadedDataProps.IsNotNull())
+    {
+      BaseData *loaded = entry.dataNode->GetData();
+      if (loaded->GetPropertyList() == nullptr)
+      {
+        loaded->SetPropertyList(PropertyList::New());
+      }
+      PropertyList *existing = loaded->GetPropertyList();
+      if (dataStyle == LoadStyle::Replace)
+      {
+        existing->Clear();
+      }
+      existing->ConcatenatePropertyList(preloadedDataProps, true);
+    }
+
+    mitk::SceneReaderHelpers::ApplyProportionalTimeGeometryProperties(entry.dataNode->GetData());
   }
 
   // ---- 5. Pass 2: topological add + apply property maps ------------------
@@ -621,24 +822,38 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       added[i] = true;
       ++addedCount;
 
-      // Mapper-assigned defaults are now in place on the node; 'replace'
-      // clears them and 'modify' merges on top of them.
+      // If a RenderingManager observes `storage`, mapper defaults are now in
+      // place on the node; `replace` clears them and `modify` merges on top
+      // of them. In headless contexts the property lists are still empty at
+      // this point and the two styles coincide (see the Pass-1 note).
       const json &nodeJson = *entry.nodeJson;
 
+      // Property-map application can still throw on semantic errors that
+      // aren't checkable without I/O (bad `_file` target, nested `_file`,
+      // invalid `_loadstyle`). We downgrade these to non-fatal per-node
+      // errors so that storage is never left partially populated after a
+      // node has already been added.
       auto propsIt = nodeJson.find("properties");
       if (propsIt != nodeJson.end() && !propsIt->is_null())
       {
-        PropertyList *defaultList = entry.dataNode->GetPropertyList();
-        ApplyPropertyMap(*defaultList, *propsIt, basePath, "node '" + entry.uid + "'.properties");
+        const std::string ctx = "node '" + entry.uid + "'.properties";
+        try
+        {
+          PropertyList *defaultList = entry.dataNode->GetPropertyList();
+          ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
+        }
+        catch (const mitk::Exception &e)
+        {
+          MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
+          nonFatalError = true;
+        }
       }
 
       auto ctxIt = nodeJson.find("context_properties");
       if (ctxIt != nodeJson.end() && !ctxIt->is_null())
       {
-        if (!ctxIt->is_object())
-        {
-          mitkThrow() << "Node '" << entry.uid << "': 'context_properties' must be a JSON object.";
-        }
+        // Structural shape of `context_properties` was validated in step 3b
+        // so Pass 2 never throws structurally after storage->Add.
         for (auto cit = ctxIt->begin(); cit != ctxIt->end(); ++cit)
         {
           const std::string contextName = cit.key();
@@ -650,8 +865,16 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
             nonFatalError = true;
             continue;
           }
-          ApplyPropertyMap(*ctxList, cit.value(), basePath,
-                           "node '" + entry.uid + "'.context_properties['" + contextName + "']");
+          const std::string ctx = "node '" + entry.uid + "'.context_properties['" + contextName + "']";
+          try
+          {
+            ApplyPropertyMap(*ctxList, cit.value(), basePath, ctx);
+          }
+          catch (const mitk::Exception &e)
+          {
+            MITK_ERROR << "Failed to apply " << ctx << ": " << e.what();
+            nonFatalError = true;
+          }
         }
       }
     }

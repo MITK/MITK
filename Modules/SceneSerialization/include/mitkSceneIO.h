@@ -63,21 +63,31 @@ namespace mitk
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
 
     /**
-     * \brief Loads a scene from a .mitk scene file (ZIP archive).
+     * \brief Loads a scene from an MITK scene file.
      *
-     * Unzips the archive to a temporary directory, reads the index.xml,
-     * and reconstructs all DataNodes with their data, properties, and
-     * parent/child relationships into a DataStorage.
+     * Accepts either a `.mitk` ZIP archive (unpacked to a temporary
+     * directory, then dispatched via index.json if present, else
+     * index.xml) or a standalone `.mitkscene.json` file.
      *
-     * \param[in] filename         Full path to the .mitk scene file.
+     * \param[in] filename         Full path to the scene file.
      * \param[in] storage          If non-null, this DataStorage is populated instead of
      *                             creating a new StandaloneDataStorage.
      * \param[in] clearStorageFirst If true, the provided DataStorage is cleared before
-     *                             loading new objects into it.
+     *                             loading new objects into it. For the JSON path,
+     *                             clearing is deferred until after the scene
+     *                             descriptor has been validated so that a malformed
+     *                             file does not wipe the caller's session.
      *
      * \return A DataStorage containing all successfully loaded scene objects and
-     *         their relationships. If loading partially or completely failed,
-     *         query GetFailedNodes() and GetFailedProperties() for details.
+     *         their relationships. Per-node load failures are reported via
+     *         MITK_ERROR log output; GetFailedNodes() / GetFailedProperties()
+     *         reflect save-side failures only and are not populated here.
+     *
+     * \note This method does not throw. Exceptions raised by underlying
+     *       readers (including JSON parse errors, missing data files, and
+     *       property-map resolution errors from SceneJsonReader) are caught
+     *       and logged as MITK_ERROR; the returned DataStorage may in that
+     *       case be empty or partially populated.
      *
      * \post The temporary directory is deleted after loading.
      */
@@ -99,8 +109,9 @@ namespace mitk
      *                             loading new objects into it.
      *
      * \return A DataStorage containing all successfully loaded scene objects and
-     *         their relationships. If loading partially or completely failed,
-     *         query GetFailedNodes() and GetFailedProperties() for details.
+     *         their relationships. Per-node load failures are reported via
+     *         MITK_ERROR log output; GetFailedNodes() / GetFailedProperties()
+     *         reflect save-side failures only and are not populated here.
      */
     virtual DataStorage::Pointer LoadSceneUnzipped(const std::string &indexfilename,
       DataStorage *storage = nullptr,
@@ -132,25 +143,28 @@ namespace mitk
                            const std::string &filename);
 
     /**
-     * \brief Returns DataNodes whose BaseData failed to be read or written.
+     * \brief Returns DataNodes whose BaseData failed to be written during the
+     *        most recent SaveScene() call.
      *
-     * After a call to LoadScene() or SaveScene(), this method returns all
-     * DataNodes containing BaseData objects that could not be serialized
-     * or deserialized.
+     * \note These accessors currently reflect save-side failures only. Load
+     *       paths (both the legacy XML reader and SceneJsonReader) report
+     *       per-node errors via MITK_ERROR log output and the reader's return
+     *       value, not via this list.
      *
      * \return Pointer to the list of failed nodes, or nullptr if none failed.
      */
     const FailedBaseDataListType *GetFailedNodes();
 
     /**
-     * \brief Returns properties that failed to be read or written.
+     * \brief Returns properties that failed to be written during the most
+     *        recent SaveScene() call.
      *
-     * After a call to LoadScene() or SaveScene(), this method returns a
-     * PropertyList containing all properties that could not be (de)serialized.
      * The properties may originate from:
      * - The BaseData's PropertyList
      * - The DataNode's PropertyList
      * - Any of a DataNode's render-window-specific PropertyLists
+     *
+     * \note See GetFailedNodes() — load paths do not populate this list.
      *
      * \return Pointer to the PropertyList of failed properties, or nullptr if none failed.
      */

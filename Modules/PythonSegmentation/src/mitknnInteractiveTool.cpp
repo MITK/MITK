@@ -599,6 +599,16 @@ void mitk::nnInteractiveTool::StartSession()
   }
 
   {
+    // Set dummy nnU-Net paths to suppress warnings. These variables are required
+    // by nnU-Net for training workflows but are not needed for inference here.
+    std::ostringstream pyCommands; pyCommands
+      << "os.environ.setdefault('nnUNet_raw', '/tmp/nnUNet/raw')\n"
+      << "os.environ.setdefault('nnUNet_preprocessed', '/tmp/nnUNet/preprocessed')\n"
+      << "os.environ.setdefault('nnUNet_results', '/tmp/nnUNet/results')\n";
+    pythonContext->Execute(pyCommands.str());
+  }
+
+  {
     std::ostringstream pyCommands; pyCommands
       << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
       << "    inference_class = load_json(\n"
@@ -725,10 +735,12 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
 
   for (int i = 2; i >= 0; --i)
   {
+    // nnInteractive expects half-open bounding boxes [min, max).
+    // Our indices are inclusive, so we add +1 to the upper bound.
     pyCommands
       << "        ["
       << std::min(indices[0][i], indices[1][i]) << ", "
-      << std::max(indices[0][i], indices[1][i])
+      << std::max(indices[0][i], indices[1][i]) + 1
       << "],\n";
   }
 

@@ -281,3 +281,19 @@ bool mitk::PythonHelper::ActivateVirtualEnv(const fs::path& path)
 
   return true;
 }
+
+bool mitk::PythonHelper::RemoveVirtualEnv(const std::string& name)
+{
+  return RemoveVirtualEnv(GetVirtualEnvPath(name));
+}
+
+bool mitk::PythonHelper::RemoveVirtualEnv(const fs::path& path)
+{
+  if (path.empty() || !fs::exists(path))
+    return false;
+
+  std::error_code error;
+  fs::remove_all(path, error);
+
+  return !error;
+}

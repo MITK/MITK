@@ -40,7 +40,7 @@ namespace Ui
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
  * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
- *     QmitknnInteractiveInstallDialog
+ *     QmitkPipInstallDialog
  */
 class MITKPYTHONSEGMENTATIONUI_EXPORT QmitknnInteractiveToolGUI : public QmitkSegWithPreviewToolGUIBase
 {
@@ -163,14 +163,9 @@ protected:
    */
   void UncheckOtherInteractorButtons(QPushButton* interactorButton);
 
-  /** \brief Creates the Python virtual environment if it does not already exist.
-   *
-   * \return \c true if the virtual environment exists or was successfully
-   *         created, \c false otherwise.
-   */
-  bool CreateVirtualEnv();
-
   /** \brief Checks if nnInteractive is installed and shows the install dialog if not.
+   *
+   * Creates the virtual environment and installs all required packages.
    *
    * \return \c true if nnInteractive is installed (or was successfully
    *         installed), \c false otherwise.

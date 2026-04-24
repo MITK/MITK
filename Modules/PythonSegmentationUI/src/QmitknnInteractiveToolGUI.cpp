@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitknnInteractiveToolGUI.h>
 
 #include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
@@ -21,8 +22,8 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
-#include <QmitknnInteractiveInstallDialog.h>
-#include <QmitkRun.h>
+#include <QmitkPipInstallDialog.h>
+#include <mitkPipPackageInfo.h>
 #include <QmitkStyleManager.h>
 
 #include <QBoxLayout>
@@ -130,7 +131,6 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 
   this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
-
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -274,27 +274,79 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
-bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
+bool QmitknnInteractiveToolGUI::Install()
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
 
+  // If the venv already exists, check if packages are installed.
+  // This avoids showing the install dialog when everything is up to date.
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
-    return true;
+  {
+    if (!this->GetTool()->CreatePythonContext())
+      return false;
 
-  const auto venvPath = QmitkRunAsyncBlocking<fs::path>("nnInteractive", "Creating virtual environment...", [&]() {
-    return mitk::PythonHelper::CreateVirtualEnv(venvName);
-  });
+    if (this->GetTool()->IsInstalled())
+      return true;
+  }
 
-  return !venvPath.empty();
-}
+  // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
+  // pip uses the default PyPI index.
+#if defined(_WIN32)
+  // Starting with CUDA v12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
+#else
+  const std::string cudaIndexUrl;
+#endif
 
-bool QmitknnInteractiveToolGUI::Install()
-{
-  if (this->GetTool()->IsInstalled())
-    return true;
+  // Pre-fetch the model weights so the first StartSession() doesn't surprise
+  // the user with a silent multi-minute download. The checkpoint name mirrors
+  // the preference mitknnInteractiveTool::StartSession() reads. Guard each
+  // link in the preferences chain so a missing preferences service doesn't
+  // crash the installer before it even starts.
+  std::string checkpoint = "nnInteractive_v1.0";
+  if (auto* prefsService = mitk::CoreServices::GetPreferencesService())
+  {
+    if (auto* system = prefsService->GetSystemPreferences())
+    {
+      if (auto* prefs = system->Node("org.mitk.views.segmentation"))
+        checkpoint = prefs->Get("nnInteractive/modelCheckpoint", checkpoint);
+    }
+  }
 
-  QmitknnInteractiveInstallDialog installDialog;
-  return installDialog.exec() == QDialog::Accepted;
+  mitk::PipInstallSpec spec;
+  spec.name = "nnInteractive";
+  spec.venvName = venvName;
+  spec.upgradePipFirst = true;
+
+  mitk::PipInstallGroup torchGroup;
+  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+  torchGroup.indexUrl = cudaIndexUrl;
+  spec.groups.push_back(std::move(torchGroup));
+
+  mitk::PipInstallGroup nnInteractiveGroup;
+  nnInteractiveGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
+  spec.groups.push_back(std::move(nnInteractiveGroup));
+
+  mitk::HuggingFaceDownload modelDownload;
+  modelDownload.repoId = "nnInteractive/nnInteractive";
+  modelDownload.allowPatterns = { checkpoint + "/*" };
+  modelDownload.displayName = "model checkpoint " + checkpoint;
+  modelDownload.optional = true;
+  spec.huggingFaceDownloads.push_back(std::move(modelDownload));
+
+  QmitkPipInstallDialog dialog(spec, this);
+
+  if (dialog.exec() != QDialog::Accepted)
+    return false;
+
+  // The dialog populated the venv (and possibly created it). Create a fresh
+  // context so the embedded interpreter picks up the newly installed packages.
+  // PythonContext checks Py_IsInitialized internally, so calling this a second
+  // time after the early-return path above is safe.
+  return this->GetTool()->CreatePythonContext();
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
@@ -312,9 +364,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #else
   this->EnableInitializeButtons(false);
 
-  if (!CreateVirtualEnv() ||
-      !this->GetTool()->CreatePythonContext() ||
-      !Install())
+  if (!Install())
   {
     this->EnableInitializeButtons(true);
     return;
@@ -322,9 +372,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
   const auto initMessage = QString(
     "<h3 %1>Initializing nnInteractive</h3>"
-    "<p %1>Please wait a few seconds...</p>"
-    "<p %1><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
-    "instead. Please be patient.</small></p>").arg(LINE_HEIGHT_STYLE);
+    "<p %1>Please wait a few seconds until nnInteractive is fully initialized...</p>").arg(LINE_HEIGHT_STYLE);
  
   auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
   messageBox->setStandardButtons(QMessageBox::NoButton);

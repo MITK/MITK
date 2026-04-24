@@ -57,6 +57,8 @@ set(MITK_MODULES
   ROI
   PET
   PythonHelper
+  PythonInstaller
+  PythonInstallerUI
   Python
   PythonSegmentation
   PythonSegmentationUI

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include <QmitkPipInstallDialog.h>
 #include <ui_QmitkPipInstallDialog.h>
 
-#include <mitkPipInstaller.h>
+#include <QmitkPipInstaller.h>
 #include <mitkPythonHelper.h>
 
 #include <QmitkPipInstallAdvancedDialog.h>
@@ -28,7 +28,7 @@ found in the LICENSE file.
 QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
   : QDialog(parent),
     m_Ui(std::make_unique<Ui::QmitkPipInstallDialog>()),
-    m_Installer(new mitk::PipInstaller(this)),
+    m_Installer(new QmitkPipInstaller(this)),
     m_Spec(spec)
 {
   m_Ui->setupUi(this);
@@ -67,15 +67,15 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_DotTimer, &QTimer::timeout, this, &QmitkPipInstallDialog::OnDotTimer);
 
   // Installer connections.
-  connect(m_Installer, &mitk::PipInstaller::VirtualEnvCreationStarted, this, &QmitkPipInstallDialog::OnVirtualEnvCreationStarted);
-  connect(m_Installer, &mitk::PipInstaller::PipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
-  connect(m_Installer, &mitk::PipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
-  connect(m_Installer, &mitk::PipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
-  connect(m_Installer, &mitk::PipInstaller::ModelDownloadStarted, this, &QmitkPipInstallDialog::OnModelDownloadStarted);
-  connect(m_Installer, &mitk::PipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
-  connect(m_Installer, &mitk::PipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
-  connect(m_Installer, &mitk::PipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
-  connect(m_Installer, &mitk::PipInstaller::OutputReceived, this, &QmitkPipInstallDialog::OnOutputReceived);
+  connect(m_Installer, &QmitkPipInstaller::VirtualEnvCreationStarted, this, &QmitkPipInstallDialog::OnVirtualEnvCreationStarted);
+  connect(m_Installer, &QmitkPipInstaller::PipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
+  connect(m_Installer, &QmitkPipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
+  connect(m_Installer, &QmitkPipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
+  connect(m_Installer, &QmitkPipInstaller::ModelDownloadStarted, this, &QmitkPipInstallDialog::OnModelDownloadStarted);
+  connect(m_Installer, &QmitkPipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
+  connect(m_Installer, &QmitkPipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
+  connect(m_Installer, &QmitkPipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
+  connect(m_Installer, &QmitkPipInstaller::OutputReceived, this, &QmitkPipInstallDialog::OnOutputReceived);
 
   // Compact / expanded heights are captured on first show (see showEvent),
   // after Qt has run layout/DPI/font metrics; querying height() here would
@@ -338,7 +338,7 @@ bool QmitkPipInstallDialog::ConfirmCancel()
   // the loop: the queued slot is posted as an event and delivered once
   // loop.exec() starts spinning.
   QEventLoop loop;
-  connect(m_Installer, &mitk::PipInstaller::InstallFinished, &loop, &QEventLoop::quit, Qt::QueuedConnection);
+  connect(m_Installer, &QmitkPipInstaller::InstallFinished, &loop, &QEventLoop::quit, Qt::QueuedConnection);
   QTimer::singleShot(30000, &loop, &QEventLoop::quit);
   m_Installer->Cancel();
   loop.exec();

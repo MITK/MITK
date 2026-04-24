@@ -23,15 +23,11 @@ found in the LICENSE file.
 
 class QCloseEvent;
 class QShowEvent;
+class QmitkPipInstaller;
 
 namespace Ui
 {
   class QmitkPipInstallDialog;
-}
-
-namespace mitk
-{
-  class PipInstaller;
 }
 
 /** \brief Reusable dialog for installing Python packages via pip.
@@ -58,7 +54,7 @@ namespace mitk
  * if (dialog.exec() == QDialog::Accepted) { ... }
  * \endcode
  *
- * \sa mitk::PipInstaller, mitk::PipInstallSpec
+ * \sa QmitkPipInstaller, mitk::PipInstallSpec
  */
 class MITKPYTHONINSTALLERUI_EXPORT QmitkPipInstallDialog : public QDialog
 {
@@ -100,7 +96,7 @@ private:
   void SetTerminalStatus(const QString& text);
 
   std::unique_ptr<Ui::QmitkPipInstallDialog> m_Ui;
-  mitk::PipInstaller* m_Installer = nullptr;
+  QmitkPipInstaller* m_Installer = nullptr;
   mitk::PipInstallSpec m_Spec;
   QTimer* m_DotTimer = nullptr;
   QString m_PackageLabelBaseText;

@@ -1,4 +1,4 @@
 set(CPP_FILES
-  mitkPipInstaller.cpp
+  QmitkPipInstaller.cpp
   mitkPipPackageInfo.cpp
 )

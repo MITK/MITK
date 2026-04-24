@@ -4,5 +4,4 @@ set(CPP_FILES
   mitkObjFileReaderService.cpp
   mitkPlyFileWriterService.cpp
   mitkPlyFileReaderService.cpp
-  mitkSceneFileReader.cpp
 )

@@ -1569,6 +1569,8 @@ Rendering endpoints control how MITK Workbench render windows refresh and orient
 
 All rendering calls are dispatched to the main/UI thread by the server — callers do not need to account for threading.
 
+The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). A symmetric MxN hierarchy is reserved for a future work package and is not documented here.
+
 #### POST /api/v1/rendering/update
 
 Request a redraw of all registered render windows.
@@ -1817,6 +1819,125 @@ GET /api/v1/rendering/screenshot?format=jpeg&width=1280&height=720
 | 400 | `INVALID_REQUEST` | Invalid `format` value, non-positive or non-integer `width`/`height`, dimensions exceeding 8192, or only one of `width`/`height` provided |
 | 500 | `INTERNAL_ERROR` | Screenshot capture failed |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No screenshot provider connected (headless mode or Qt plugin not loaded) |
+
+---
+
+#### GET /api/v1/rendering/editors
+
+Lists all known editor aliases with their current activity state. The alias list is always complete even if no editor is open, so clients can discover capabilities without polling sub-resources.
+
+**Response 200 (`application/json`):**
+
+```json
+[
+  { "alias": "stdmulti", "plugin_id": "org.mitk.editors.stdmultiwidget", "active": true  },
+  { "alias": "mxn",      "plugin_id": "org.mitk.editors.mxnmultiwidget", "active": false }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `alias` | string | Stable short alias used in URL paths (`stdmulti`, `mxn`) |
+| `plugin_id` | string | Berry editor plugin id |
+| `active` | boolean | `true` if an editor instance is currently open |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No editor list provider registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error walking the workbench |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti
+
+Returns metadata about the StdMultiWidget editor, including its current window names. `alias` is the sole editor discriminator — no separate `type` field is reported.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "alias": "stdmulti",
+  "plugin_id": "org.mitk.editors.stdmultiwidget",
+  "active": true,
+  "windows": ["axial", "sagittal", "coronal", "3d"]
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows
+
+Lists the StdMultiWidget render windows. No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane. Live orientation, when needed, is derivable from the window's `/camera`.
+
+**Response 200 (`application/json`):**
+
+```json
+[
+  { "name": "axial",    "kind": "2d" },
+  { "name": "sagittal", "kind": "2d" },
+  { "name": "coronal",  "kind": "2d" },
+  { "name": "3d",       "kind": "3d" }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Render window name (URL segment for sub-resources) |
+| `kind` | string | `"2d"` or `"3d"` — drives which sub-resources apply |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}
+
+Per-window summary.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}. Any other value returns 404 `RENDER_WINDOW_NOT_FOUND` at the controller layer before any bridge dispatch.
+
+**Response 200 (`application/json`) — 2D window:**
+
+```json
+{ "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+```
+
+**Response 200 — 3D window:**
+
+```json
+{ "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Echo of the path parameter |
+| `kind` | string | `"2d"` or `"3d"` |
+| `has_camera` | boolean | Always `true` in StdMulti |
+| `has_selected_slice` | boolean | `true` for 2D, `false` for `3d` |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | `{name}` is not a known StdMulti window |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
 
 ---
 

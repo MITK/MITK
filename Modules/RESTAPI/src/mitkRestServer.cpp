@@ -973,6 +973,44 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
+  // Editor discovery (WP2 E1/E2/E4/E5). Register the list path before the
+  // parameterised path so the list isn't captured as a window name.
+  m_Server->Get(apiBase + "/rendering/editors",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_editors(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiInfo(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindows(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindow(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiCamera(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_stdmultiCamera(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
   // Documentation endpoints (Swagger UI and OpenAPI spec)
   // Redirect /docs to /docs/ so relative URLs in the HTML resolve correctly
   // regardless of any reverse-proxy prefix (proxy-agnostic relative redirect).

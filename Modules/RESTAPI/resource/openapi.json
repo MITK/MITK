@@ -2891,9 +2891,61 @@
             "description": "Field selection (present only when fields parameter is used)"
           }
         }
+      },
+      "EditorListItem": {
+        "type": "object",
+        "description": "Editor list entry returned by GET /rendering/editors.",
+        "required": ["alias", "plugin_id", "active"],
+        "properties": {
+          "alias":     { "type": "string", "description": "Stable short alias used in URL paths", "example": "stdmulti" },
+          "plugin_id": { "type": "string", "description": "Berry editor plugin id", "example": "org.mitk.editors.stdmultiwidget" },
+          "active":    { "type": "boolean", "description": "True if an editor instance is currently open" }
+        }
+      },
+      "EditorInfo": {
+        "type": "object",
+        "description": "Editor metadata returned by GET /rendering/editors/{alias}.",
+        "required": ["alias", "plugin_id", "active", "windows"],
+        "properties": {
+          "alias":     { "type": "string", "example": "stdmulti" },
+          "plugin_id": { "type": "string", "example": "org.mitk.editors.stdmultiwidget" },
+          "active":    { "type": "boolean" },
+          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window names" }
+        }
+      },
+      "WindowListItem": {
+        "type": "object",
+        "description": "Window list entry returned by GET /rendering/editors/stdmulti/windows.",
+        "required": ["name", "kind"],
+        "properties": {
+          "name": { "type": "string", "description": "Render window name (URL segment for sub-resources)" },
+          "kind": { "type": "string", "enum": ["2d", "3d"], "description": "Window kind — drives which sub-resources apply" }
+        }
+      },
+      "WindowInfo": {
+        "type": "object",
+        "description": "Per-window summary returned by GET /rendering/editors/stdmulti/windows/{name}.",
+        "required": ["name", "kind", "has_camera", "has_selected_slice"],
+        "properties": {
+          "name": { "type": "string" },
+          "kind": { "type": "string", "enum": ["2d", "3d"] },
+          "has_camera":         { "type": "boolean" },
+          "has_selected_slice": { "type": "boolean", "description": "True for 2D windows, false for the 3D window" }
+        }
       }
     },
     "parameters": {
+      "StdMultiWindowName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "description": "StdMultiWidget render window name.",
+        "schema": {
+          "type": "string",
+          "enum": ["axial", "sagittal", "coronal", "3d"]
+        },
+        "example": "axial"
+      },
       "NodeUid": {
         "name": "uid",
         "in": "path",
@@ -3261,6 +3313,75 @@
                 "message": "Path outside allowed directories",
                 "status": 403,
                 "instance": "/api/v1/datastorage/nodes/node_1/data"
+              }
+            }
+          }
+        }
+      },
+      "RenderWindowNotAvailable": {
+        "description": "No render window bridge callback is registered (headless mode or Qt workbench plugin not loaded).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                "title": "Render Window Not Available",
+                "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                "status": 503
+              }
+            }
+          }
+        }
+      },
+      "EditorOrBridgeUnavailable": {
+        "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE) or the addressed editor is not currently open (EDITOR_NOT_ACTIVE).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "renderWindowNotAvailable": {
+                "summary": "No callback registered",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                    "status": 503
+                  }
+                }
+              },
+              "editorNotActive": {
+                "summary": "Editor not open",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
+                    "code": "EDITOR_NOT_ACTIVE",
+                    "title": "Editor Not Active",
+                    "message": "StdMultiWidgetEditor is not open",
+                    "status": 503
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RenderWindowNotFound": {
+        "description": "The URL addressed a render window name that is not known to the editor.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                "code": "RENDER_WINDOW_NOT_FOUND",
+                "title": "Render Window Not Found",
+                "message": "No render window named 'bogus' in the addressed editor",
+                "status": 404,
+                "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus"
               }
             }
           }

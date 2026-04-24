@@ -299,6 +299,30 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_screenshot(req, res);
       };
+    m_EndpointRegistry[{"/rendering/editors", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_editors(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiInfo(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindows(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindow(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiCamera(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_stdmultiCamera(req, res);
+      };
   }
 
   /// Read required fields from components.schemas.<schemaName>.required.
@@ -461,7 +485,10 @@ private:
       mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED,
       mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_TIME_NAVIGATION_NOT_AVAILABLE,
-      mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE
+      mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_EDITOR_NOT_ACTIVE,
+      mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_FOUND,
+      mitk::ErrorResponse::CODE_UNSUPPORTED_OPERATION
     };
   }
 
@@ -1269,7 +1296,11 @@ public:
 
     // NOT_IMPLEMENTED is an internal sentinel code used for unimplemented features;
     // no endpoint exposes it as a normal response, so it has no spec example.
-    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED"};
+    // UNSUPPORTED_OPERATION is introduced by the WP2 selected-slice endpoints
+    // (Phase 4) — the constant exists now so the controller can reference it,
+    // but no endpoint documentation emits it yet. Remove this exemption when
+    // the selected-slice spec examples land.
+    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED", "UNSUPPORTED_OPERATION"};
 
     for (const auto& code : codeCodes)
     {

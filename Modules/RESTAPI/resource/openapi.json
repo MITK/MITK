@@ -2375,6 +2375,104 @@
         }
       }
     },
+    "/rendering/editors/stdmulti/windows/{name}/selected-slice": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get selected slice of a StdMultiWidget 2D window",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "operationId": "getRenderingStdmultiSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slice state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SliceState" },
+                "example": {
+                  "step": 45,
+                  "position": [127.5, 83.2, 45.0],
+                  "bounds": {
+                    "steps": 90,
+                    "min_position": [0.0, 0.0, 0.0],
+                    "max_position": [255.0, 255.0, 90.0]
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Set selected slice of a StdMultiWidget 2D window",
+        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked — out-of-range values are clamped/snapped by MITK.",
+        "operationId": "putRenderingStdmultiSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["step"],
+                "properties": {
+                  "step": { "type": "integer", "minimum": 0, "description": "Target step index" }
+                }
+              },
+              "example": { "step": 42 }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Slice updated" },
+          "400": {
+            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti — use /rendering/selected-position).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/INVALID_REQUEST",
+                    "code": "INVALID_REQUEST",
+                    "title": "Invalid Request",
+                    "message": "'position' is not accepted on StdMulti selected-slice. Use PUT /rendering/selected-position to move by world coordinates.",
+                    "status": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "422": {
+            "description": "MITK rendering framework raised an error while applying the step.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Slice update failed: ...",
+                    "status": 422
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
     "/rendering/selected-time": {
       "get": {
         "tags": ["Rendering"],
@@ -3034,6 +3132,24 @@
           "perspective_angle": { "type": "number", "description": "Vertical FOV in degrees; 3D window only." }
         }
       },
+      "SliceState": {
+        "type": "object",
+        "description": "Slice navigator state returned by GET .../selected-slice. `bounds.min_position` / `bounds.max_position` are null when no geometry is loaded.",
+        "required": ["step", "position", "bounds"],
+        "properties": {
+          "step":     { "type": "integer", "minimum": 0, "description": "Current step index" },
+          "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "World position on the live slice plane" },
+          "bounds": {
+            "type": "object",
+            "required": ["steps", "min_position", "max_position"],
+            "properties": {
+              "steps":        { "type": "integer", "minimum": 0, "description": "Total step count" },
+              "min_position": { "oneOf": [ { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" } ] },
+              "max_position": { "oneOf": [ { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" } ] }
+            }
+          }
+        }
+      },
       "CameraPatch": {
         "type": "object",
         "description": "Partial camera update. At least one field must be present. `standard_view` is applied before any other field.",
@@ -3499,6 +3615,40 @@
                 "message": "No render window named 'bogus' in the addressed editor",
                 "status": 404,
                 "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus"
+              }
+            }
+          }
+        }
+      },
+      "WindowNotFoundOrUnsupported": {
+        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window — e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "renderWindowNotFound": {
+                "summary": "Unknown window name",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                    "code": "RENDER_WINDOW_NOT_FOUND",
+                    "title": "Render Window Not Found",
+                    "message": "No render window named 'bogus' in the addressed editor",
+                    "status": 404
+                  }
+                }
+              },
+              "unsupportedOperation": {
+                "summary": "Sub-resource not applicable",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/UNSUPPORTED_OPERATION",
+                    "code": "UNSUPPORTED_OPERATION",
+                    "title": "Unsupported Operation",
+                    "message": "selected-slice is not applicable to the 3D window.",
+                    "status": 404
+                  }
+                }
               }
             }
           }

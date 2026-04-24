@@ -323,6 +323,14 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandlePUT_stdmultiCamera(req, res);
       };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
+      };
   }
 
   /// Read required fields from components.schemas.<schemaName>.required.
@@ -1296,11 +1304,7 @@ public:
 
     // NOT_IMPLEMENTED is an internal sentinel code used for unimplemented features;
     // no endpoint exposes it as a normal response, so it has no spec example.
-    // UNSUPPORTED_OPERATION is introduced by the WP2 selected-slice endpoints
-    // (Phase 4) — the constant exists now so the controller can reference it,
-    // but no endpoint documentation emits it yet. Remove this exemption when
-    // the selected-slice spec examples land.
-    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED", "UNSUPPORTED_OPERATION"};
+    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED"};
 
     for (const auto& code : codeCodes)
     {

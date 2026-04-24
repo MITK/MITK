@@ -20,6 +20,10 @@ found in the LICENSE file.
 #include <mitkTimeNavigationController.h>
 #include <mitkCameraController.h>
 #include <mitkBaseRenderer.h>
+#include <mitkSliceNavigationController.h>
+#include <mitkStepper.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkBaseGeometry.h>
 #include <QmitkRenderWindow.h>
 
 #include <vtkCamera.h>
@@ -110,6 +114,34 @@ namespace
     return renderer;
   }
 
+  /**
+   * @brief Read the scene AABB from the TimeNavigationController's input world
+   *        time geometry. Returns nullopt if no input geometry is available.
+   */
+  std::optional<mitk::WorldBounds> ReadSceneBoundsFromTnc()
+  {
+    auto* const tnc = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    if (tnc == nullptr) return std::nullopt;
+    const auto tg = tnc->GetInputWorldTimeGeometry();
+    if (tg == nullptr) return std::nullopt;
+    const auto baseGeom = tg->GetGeometryForTimeStep(tnc->GetSelectedTimeStep());
+    if (baseGeom.IsNull()) return std::nullopt;
+
+    mitk::WorldBounds bounds;
+    bounds.min.Fill(std::numeric_limits<double>::max());
+    bounds.max.Fill(std::numeric_limits<double>::lowest());
+    for (int cornerId = 0; cornerId < 8; ++cornerId)
+    {
+      const auto corner = baseGeom->GetCornerPoint(cornerId);
+      for (int i = 0; i < 3; ++i)
+      {
+        bounds.min[i] = std::min(bounds.min[i], corner[i]);
+        bounds.max[i] = std::max(bounds.max[i], corner[i]);
+      }
+    }
+    return bounds;
+  }
+
   mitk::CameraController::StandardView StandardViewFromName(const std::string& v)
   {
     if (v == "anterior")  return mitk::CameraController::ANTERIOR;
@@ -159,33 +191,7 @@ namespace
 
         mitk::SelectedPositionInfo info;
         info.position = rwp->GetSelectedPosition();
-
-        auto* const tnc = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-        if (tnc != nullptr)
-        {
-          const auto tg = tnc->GetInputWorldTimeGeometry();
-          if (tg != nullptr)
-          {
-            const auto baseGeom = tg->GetGeometryForTimeStep(tnc->GetSelectedTimeStep());
-            if (baseGeom.IsNotNull())
-            {
-              mitk::WorldBounds bounds;
-              bounds.min.Fill(std::numeric_limits<double>::max());
-              bounds.max.Fill(std::numeric_limits<double>::lowest());
-              for (int cornerId = 0; cornerId < 8; ++cornerId)
-              {
-                const auto corner = baseGeom->GetCornerPoint(cornerId);
-                for (int i = 0; i < 3; ++i)
-                {
-                  bounds.min[i] = std::min(bounds.min[i], corner[i]);
-                  bounds.max[i] = std::max(bounds.max[i], corner[i]);
-                }
-              }
-              info.bounds = bounds;
-            }
-          }
-        }
-
+        info.bounds = ReadSceneBoundsFromTnc();
         return info;
       });
 
@@ -287,6 +293,55 @@ namespace
           cam->SetViewAngle(*patch.perspectiveAngle);
 
         mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+      });
+
+    rwb->SetStdMultiSelectedSliceGetter(
+      [](const std::string& windowName) -> mitk::SliceState
+      {
+        if (windowName == "3d")
+          throw mitk::RenderWindowBridgeUnsupportedOperationException(
+            "selected-slice is not applicable to the 3D window");
+
+        auto* const renderer = ResolveStdMultiRenderer(windowName);
+        auto* const snc = renderer->GetSliceNavigationController();
+        if (snc == nullptr)
+          throw std::runtime_error("SliceNavigationController unavailable for " + windowName);
+        auto* const stepper = snc->GetStepper();
+        if (stepper == nullptr)
+          throw std::runtime_error("Stepper unavailable for " + windowName);
+
+        mitk::SliceState state;
+        state.step = stepper->GetPos();
+        state.bounds.steps = stepper->GetSteps();
+
+        if (const auto* const plane = snc->GetCurrentPlaneGeometry())
+          state.position = plane->GetCenter();
+
+        if (const auto b = ReadSceneBoundsFromTnc())
+        {
+          state.bounds.minPosition = b->min;
+          state.bounds.maxPosition = b->max;
+          state.bounds.hasPositions = true;
+        }
+        return state;
+      });
+
+    rwb->SetStdMultiSelectedSliceStepSetter(
+      [](const std::string& windowName, unsigned int step)
+      {
+        if (windowName == "3d")
+          throw mitk::RenderWindowBridgeUnsupportedOperationException(
+            "selected-slice is not applicable to the 3D window");
+
+        auto* const renderer = ResolveStdMultiRenderer(windowName);
+        auto* const snc = renderer->GetSliceNavigationController();
+        if (snc == nullptr)
+          throw std::runtime_error("SliceNavigationController unavailable for " + windowName);
+        auto* const stepper = snc->GetStepper();
+        if (stepper == nullptr)
+          throw std::runtime_error("Stepper unavailable for " + windowName);
+
+        stepper->SetPos(step);
       });
 
     rwb->SetStdMultiWindowListProvider(

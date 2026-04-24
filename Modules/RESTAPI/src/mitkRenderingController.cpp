@@ -742,6 +742,64 @@ namespace
     return std::nullopt;
   }
 
+  nlohmann::json SliceStateToJson(const mitk::SliceState& s)
+  {
+    nlohmann::json j;
+    j["step"] = s.step;
+    j["position"] = {s.position[0], s.position[1], s.position[2]};
+    j["bounds"]["steps"] = s.bounds.steps;
+    if (s.bounds.hasPositions)
+    {
+      j["bounds"]["min_position"] = {s.bounds.minPosition[0], s.bounds.minPosition[1], s.bounds.minPosition[2]};
+      j["bounds"]["max_position"] = {s.bounds.maxPosition[0], s.bounds.maxPosition[1], s.bounds.maxPosition[2]};
+    }
+    else
+    {
+      j["bounds"]["min_position"] = nullptr;
+      j["bounds"]["max_position"] = nullptr;
+    }
+    return j;
+  }
+
+  /**
+   * \brief Parse a selected-slice PUT body. Only `{"step": N}` is accepted
+   *        for StdMulti. Presence of `position` → hint to use selected-position.
+   *
+   * On success, fills `step`. On failure, returns the 400 error detail string.
+   */
+  std::optional<std::string> ParseSliceStepBody(const nlohmann::json& body, unsigned int& step)
+  {
+    if (!body.is_object())
+      return "Request body must be a JSON object.";
+
+    // `position` is reserved for /rendering/selected-position — explicit hint.
+    if (body.contains("position"))
+    {
+      return "'position' is not accepted on StdMulti selected-slice. "
+             "Use PUT /rendering/selected-position to move by world coordinates.";
+    }
+
+    for (auto it = body.begin(); it != body.end(); ++it)
+    {
+      if (it.key() != "step")
+        return "Unknown field '" + it.key() + "'.";
+    }
+
+    if (!body.contains("step"))
+      return "'step' field is required.";
+
+    const auto& s = body["step"];
+    if (!s.is_number_integer())
+      return "'step' must be a non-negative integer.";
+
+    const auto raw = s.get<long long>();
+    if (raw < 0)
+      return "'step' must be a non-negative integer.";
+
+    step = static_cast<unsigned int>(raw);
+    return std::nullopt;
+  }
+
   nlohmann::json CameraStateToJson(const mitk::CameraState& s)
   {
     nlohmann::json j;
@@ -1010,6 +1068,122 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
   {
     const auto error = ErrorResponse::RenderingError(
       std::string("Camera update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (IsStd3dWindow(name))
+  {
+    const auto error = ErrorResponse::UnsupportedOperation(
+      "selected-slice is not applicable to the 3D window.", req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiSelectedSliceGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  SliceState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetStdMultiSelectedSlice(name);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  const auto j = SliceStateToJson(state);
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (IsStd3dWindow(name))
+  {
+    const auto error = ErrorResponse::UnsupportedOperation(
+      "selected-slice is not applicable to the 3D window.", req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  unsigned int step = 0;
+  if (const auto err = ParseSliceStepBody(body, step))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiSelectedSliceStepSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStep(name, step);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Slice update failed: ") + e.what(), req.path);
     this->SendErrorResponse(res, 422, error);
   }
   catch (const std::exception& e)

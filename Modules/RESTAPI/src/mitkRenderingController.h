@@ -211,6 +211,22 @@ namespace mitk
     void HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
 
     /**
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/selected-slice (WP2 E9).
+     *
+     * Returns {step, position, bounds}. Returns 404 UNSUPPORTED_OPERATION for the 3D window.
+     */
+    void HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/selected-slice (WP2 E10).
+     *
+     * Body accepts only `{"step": N}`. A `position` field triggers 400 with a
+     * hint pointing at /rendering/selected-position (StdMulti slices are coupled).
+     * The 3D window returns 404 UNSUPPORTED_OPERATION.
+     */
+    void HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
      * \brief Handle GET /rendering/screenshot request.
      *
      * Captures a screenshot of the active application window.

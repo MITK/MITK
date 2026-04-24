@@ -107,6 +107,24 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutCameraOn3dReturns204);
   MITK_TEST(PutCameraStandardViewAppliedFirst);
 
+  // WP2 selected-slice tests
+  MITK_TEST(GetSliceUnknownWindowReturns404);
+  MITK_TEST(GetSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(GetSliceWithoutGetterReturns503);
+  MITK_TEST(GetSliceForAxialReturns200);
+  MITK_TEST(GetSliceNoGeometryBoundsNull);
+  MITK_TEST(PutSliceUnknownWindowReturns404);
+  MITK_TEST(PutSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(PutSliceInvalidJsonReturns400);
+  MITK_TEST(PutSliceEmptyBodyReturns400);
+  MITK_TEST(PutSliceMissingStepReturns400);
+  MITK_TEST(PutSliceNegativeStepReturns400);
+  MITK_TEST(PutSliceNonIntegerStepReturns400);
+  MITK_TEST(PutSlicePositionFieldReturns400WithHint);
+  MITK_TEST(PutSliceUnknownFieldReturns400);
+  MITK_TEST(PutSliceWithoutSetterReturns503);
+  MITK_TEST(PutSliceOnAxialReturns204);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1204,6 +1222,240 @@ public:
     CPPUNIT_ASSERT(captured.standardView.has_value());
     CPPUNIT_ASSERT_EQUAL(std::string("anterior"), *captured.standardView);
     CPPUNIT_ASSERT(captured.parallelScale.has_value());
+  }
+  // ===== WP2: selected-slice =====
+
+  static mitk::SliceState MakeFakeSliceState(bool withBounds)
+  {
+    mitk::SliceState s;
+    s.step = 5;
+    s.position[0] = 10.0; s.position[1] = 20.0; s.position[2] = 30.0;
+    s.bounds.steps = 90;
+    if (withBounds)
+    {
+      s.bounds.minPosition[0] = 0.0;  s.bounds.minPosition[1] = 0.0;  s.bounds.minPosition[2] = 0.0;
+      s.bounds.maxPosition[0] = 100.0; s.bounds.maxPosition[1] = 100.0; s.bounds.maxPosition[2] = 100.0;
+      s.bounds.hasPositions = true;
+    }
+    return s;
+  }
+
+  void GetSliceUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceOn3dReturns404UnsupportedOperation()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceForAxialReturns200()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceGetter(
+      [](const std::string&) { return MakeFakeSliceState(/*withBounds=*/true); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(5, json["step"].get<int>());
+    CPPUNIT_ASSERT(json["position"].is_array());
+    CPPUNIT_ASSERT_EQUAL(90, json["bounds"]["steps"].get<int>());
+    CPPUNIT_ASSERT(json["bounds"]["min_position"].is_array());
+    CPPUNIT_ASSERT(json["bounds"]["max_position"].is_array());
+    // RF4: no `plane` field on slice response.
+    CPPUNIT_ASSERT(!json.contains("plane"));
+  }
+
+  void GetSliceNoGeometryBoundsNull()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceGetter(
+      [](const std::string&) { return MakeFakeSliceState(/*withBounds=*/false); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json["bounds"]["min_position"].is_null());
+    CPPUNIT_ASSERT(json["bounds"]["max_position"].is_null());
+  }
+
+  void PutSliceUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice",
+      R"({"step": 0})", {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+  }
+
+  void PutSliceOn3dReturns404UnsupportedOperation()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice",
+      R"({"step": 0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "not-json", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceMissingStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "{}", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceNegativeStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": -1})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceNonIntegerStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 1.5})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSlicePositionFieldReturns400WithHint()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"position": [1.0, 2.0, 3.0]})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    const auto msg = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(msg.find("selected-position") != std::string::npos);
+  }
+
+  void PutSliceUnknownFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"mystery": 0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceWithoutSetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 5})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+  }
+
+  void PutSliceOnAxialReturns204()
+  {
+    std::string capturedName;
+    unsigned int capturedStep = 0;
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStepSetter(
+      [&](const std::string& n, unsigned int s) { capturedName = n; capturedStep = s; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 42})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(42u, capturedStep);
   }
 };
 

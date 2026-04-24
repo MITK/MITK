@@ -1011,6 +1011,18 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
     });
 
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
   // Documentation endpoints (Swagger UI and OpenAPI spec)
   // Redirect /docs to /docs/ so relative URLs in the HTML resolve correctly
   // regardless of any reverse-proxy prefix (proxy-agnostic relative redirect).

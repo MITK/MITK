@@ -2026,6 +2026,77 @@ Content-Type: application/json
 
 ---
 
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+
+Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "step": 45,
+  "position": [127.5, 83.2, 45.0],
+  "bounds": {
+    "steps": 90,
+    "min_position": [0.0, 0.0, 0.0],
+    "max_position": [255.0, 255.0, 90.0]
+  }
+}
+```
+
+When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window name identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+
+For StdMulti only `{"step": N}` is accepted — the three 2D slices are coupled, so moving by world coordinate is done via `PUT /rendering/selected-position`. Sending a `position` field returns 400 with a hint. `step` is not range-checked; out-of-range values are clamped/snapped by MITK.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+
+**Request body (required, `application/json`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `step` | integer ≥ 0 | Target step index |
+
+**Example:**
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/axial/selected-slice
+Content-Type: application/json
+
+{ "step": 42 }
+```
+
+**Response: 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 422 | `RENDERING_ERROR` | MITK raised an error while applying the step |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
 ## 9. Error Handling
 
 ### 9.1 Error Response Format

@@ -195,6 +195,22 @@ namespace mitk
     void HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const;
 
     /**
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/camera (WP2 E7).
+     *
+     * 2D windows return `parallel_scale`, the 3D window returns `perspective_angle`.
+     */
+    void HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/camera (WP2 E8).
+     *
+     * Partial update. Rejects: unknown fields, 2D-only field on 3D and vice
+     * versa, unknown `standard_view` values, non-positive `parallel_scale`,
+     * out-of-range `perspective_angle`, invalid JSON, empty body.
+     */
+    void HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
      * \brief Handle GET /rendering/screenshot request.
      *
      * Captures a screenshot of the active application window.

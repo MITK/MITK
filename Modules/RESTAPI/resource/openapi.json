@@ -2286,6 +2286,95 @@
         }
       }
     },
+    "/rendering/editors/stdmulti/windows/{name}/camera": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get camera state of a StdMultiWidget window",
+        "description": "Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.",
+        "operationId": "getRenderingStdmultiCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Camera state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CameraState" },
+                "examples": {
+                  "twoD": {
+                    "summary": "2D window",
+                    "value": {
+                      "position":       [127.5,  83.2, 200.0],
+                      "focal_point":    [127.5,  83.2,  45.0],
+                      "view_up":        [0.0,    1.0,   0.0],
+                      "parallel_scale": 120.0
+                    }
+                  },
+                  "threeD": {
+                    "summary": "3D window",
+                    "value": {
+                      "position":          [200.0, 200.0, 200.0],
+                      "focal_point":       [127.5,  83.2,  45.0],
+                      "view_up":           [0.0,    0.0,   1.0],
+                      "perspective_angle": 30.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Update camera state of a StdMultiWidget window",
+        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` is applied first, remaining fields after. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked.",
+        "operationId": "putRenderingStdmultiCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CameraPatch" },
+              "examples": {
+                "twoD": { "summary": "2D window", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
+                "threeD": { "summary": "3D window", "value": { "perspective_angle": 45.0 } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Camera updated" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "422": {
+            "description": "MITK rendering framework raised an error while applying the patch.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Camera update failed: ...",
+                    "status": 422
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
     "/rendering/selected-time": {
       "get": {
         "tags": ["Rendering"],
@@ -2931,6 +3020,34 @@
           "kind": { "type": "string", "enum": ["2d", "3d"] },
           "has_camera":         { "type": "boolean" },
           "has_selected_slice": { "type": "boolean", "description": "True for 2D windows, false for the 3D window" }
+        }
+      },
+      "CameraState": {
+        "type": "object",
+        "description": "Camera state of a single render window. 2D windows carry `parallel_scale`; the 3D window carries `perspective_angle`.",
+        "required": ["position", "focal_point", "view_up"],
+        "properties": {
+          "position":    { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "focal_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "view_up":     { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "parallel_scale":    { "type": "number", "description": "Orthographic zoom; 2D windows only." },
+          "perspective_angle": { "type": "number", "description": "Vertical FOV in degrees; 3D window only." }
+        }
+      },
+      "CameraPatch": {
+        "type": "object",
+        "description": "Partial camera update. At least one field must be present. `standard_view` is applied before any other field.",
+        "additionalProperties": false,
+        "properties": {
+          "position":    { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "focal_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "view_up":     { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "parallel_scale":    { "type": "number", "exclusiveMinimum": 0, "description": "2D windows only." },
+          "perspective_angle": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180, "description": "3D window only." },
+          "standard_view": {
+            "type": "string",
+            "enum": ["anterior", "posterior", "left", "right", "cranial", "caudal"]
+          }
         }
       }
     },

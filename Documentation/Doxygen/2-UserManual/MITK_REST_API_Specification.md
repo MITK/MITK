@@ -1941,6 +1941,91 @@ Per-window summary.
 
 ---
 
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+
+Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
+
+**Response 200 — 2D window:**
+
+```json
+{
+  "position":       [127.5,  83.2, 200.0],
+  "focal_point":    [127.5,  83.2,  45.0],
+  "view_up":        [0.0,    1.0,   0.0],
+  "parallel_scale": 120.0
+}
+```
+
+**Response 200 — 3D window:**
+
+```json
+{
+  "position":          [200.0, 200.0, 200.0],
+  "focal_point":       [127.5,  83.2,  45.0],
+  "view_up":           [0.0,    0.0,   1.0],
+  "perspective_angle": 30.0
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+
+Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` is applied first, remaining fields after. World coordinates are not range-checked.
+
+**Request body (`application/json`, at least one field required):**
+
+| Field | Type | Applies to | Notes |
+|-------|------|------------|-------|
+| `position` | number[3] | 2D, 3D | |
+| `focal_point` | number[3] | 2D, 3D | |
+| `view_up` | number[3] | 2D, 3D | |
+| `parallel_scale` | number > 0 | 2D | Orthographic zoom |
+| `perspective_angle` | number in (0, 180) | 3D | Vertical FOV in degrees |
+| `standard_view` | string | 2D, 3D | One of `anterior`, `posterior`, `left`, `right`, `cranial`, `caudal` |
+
+**Examples:**
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/axial/camera
+Content-Type: application/json
+
+{ "standard_view": "anterior", "parallel_scale": 120.0 }
+```
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/3d/camera
+Content-Type: application/json
+
+{ "perspective_angle": 45.0 }
+```
+
+**Response: 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Invalid JSON; empty body; unknown field; wrong type or length; 2D-only field on 3D (or vice versa); unknown `standard_view`; non-positive `parallel_scale`; `perspective_angle` out of range |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 422 | `RENDERING_ERROR` | MITK rendering framework raised an error while applying the patch |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
 ## 9. Error Handling
 
 ### 9.1 Error Response Format

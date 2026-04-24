@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <functional>
 #include <optional>
+#include <set>
 #include <vector>
 
 namespace mitk
@@ -606,6 +607,151 @@ namespace
     }
     return j;
   }
+
+  bool IsValidStandardViewName(const std::string& v)
+  {
+    // Restricted to the six values CameraController::StandardView exposes.
+    return v == "anterior" || v == "posterior" ||
+           v == "left"     || v == "right"     ||
+           v == "cranial"  || v == "caudal";
+  }
+
+  // Read a JSON array of exactly 3 numbers into `out`. Returns nullopt on OK,
+  // or a diagnostic fragment (appended by the caller to the field name) on failure.
+  std::optional<std::string> ReadPoint3D(const nlohmann::json& arr, mitk::Point3D& out)
+  {
+    if (!arr.is_array())
+      return "must be an array of 3 numbers";
+    if (arr.size() != 3)
+      return "must have exactly 3 elements, got " + std::to_string(arr.size());
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      if (!arr[i].is_number())
+        return "element " + std::to_string(i) + " is not a number";
+      out[i] = arr[i].get<double>();
+    }
+    return std::nullopt;
+  }
+
+  std::optional<std::string> ReadVector3D(const nlohmann::json& arr, mitk::Vector3D& out)
+  {
+    if (!arr.is_array())
+      return "must be an array of 3 numbers";
+    if (arr.size() != 3)
+      return "must have exactly 3 elements, got " + std::to_string(arr.size());
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      if (!arr[i].is_number())
+        return "element " + std::to_string(i) + " is not a number";
+      out[i] = arr[i].get<double>();
+    }
+    return std::nullopt;
+  }
+
+  /**
+   * \brief Parse and validate a camera patch body for a given window kind.
+   *
+   * On success, fills `patch` and returns nullopt. On failure, returns the
+   * HTTP 400 error payload (the caller already knows the status).
+   *
+   * Rules:
+   * - Unknown top-level fields → 400.
+   * - position/focal_point/view_up: array of 3 numbers if present.
+   * - parallel_scale: number > 0, only for 2D windows.
+   * - perspective_angle: number in (0, 180), only for 3D windows.
+   * - standard_view: one of anterior/posterior/left/right/cranial/caudal.
+   * - Empty body (no recognised field) → 400.
+   */
+  std::optional<std::string> ParseCameraPatch(
+    const nlohmann::json& body, bool is3d, mitk::CameraPatch& patch)
+  {
+    static const std::set<std::string> knownFields = {
+      "position", "focal_point", "view_up",
+      "parallel_scale", "perspective_angle", "standard_view"
+    };
+
+    if (!body.is_object())
+      return "Request body must be a JSON object.";
+
+    for (auto it = body.begin(); it != body.end(); ++it)
+    {
+      if (!knownFields.count(it.key()))
+        return "Unknown field '" + it.key() + "'.";
+    }
+
+    if (body.contains("position"))
+    {
+      mitk::Point3D p;
+      if (const auto err = ReadPoint3D(body["position"], p))
+        return "'position' " + *err + ".";
+      patch.position = p;
+    }
+    if (body.contains("focal_point"))
+    {
+      mitk::Point3D p;
+      if (const auto err = ReadPoint3D(body["focal_point"], p))
+        return "'focal_point' " + *err + ".";
+      patch.focalPoint = p;
+    }
+    if (body.contains("view_up"))
+    {
+      mitk::Vector3D v;
+      if (const auto err = ReadVector3D(body["view_up"], v))
+        return "'view_up' " + *err + ".";
+      patch.viewUp = v;
+    }
+    if (body.contains("parallel_scale"))
+    {
+      if (is3d)
+        return "'parallel_scale' is not applicable to the 3D window.";
+      if (!body["parallel_scale"].is_number())
+        return "'parallel_scale' must be a positive number.";
+      const double s = body["parallel_scale"].get<double>();
+      if (!(s > 0.0))
+        return "'parallel_scale' must be a positive number.";
+      patch.parallelScale = s;
+    }
+    if (body.contains("perspective_angle"))
+    {
+      if (!is3d)
+        return "'perspective_angle' is only applicable to the 3D window.";
+      if (!body["perspective_angle"].is_number())
+        return "'perspective_angle' must be a number in (0, 180).";
+      const double a = body["perspective_angle"].get<double>();
+      if (!(a > 0.0 && a < 180.0))
+        return "'perspective_angle' must be a number in (0, 180).";
+      patch.perspectiveAngle = a;
+    }
+    if (body.contains("standard_view"))
+    {
+      if (!body["standard_view"].is_string())
+        return "'standard_view' must be a string.";
+      const auto v = body["standard_view"].get<std::string>();
+      if (!IsValidStandardViewName(v))
+        return "'standard_view' has unknown value '" + v + "'. "
+               "Allowed: anterior, posterior, left, right, cranial, caudal.";
+      patch.standardView = v;
+    }
+
+    if (!patch.position && !patch.focalPoint && !patch.viewUp &&
+        !patch.parallelScale && !patch.perspectiveAngle && !patch.standardView)
+    {
+      return "Request body must set at least one camera field.";
+    }
+
+    return std::nullopt;
+  }
+
+  nlohmann::json CameraStateToJson(const mitk::CameraState& s)
+  {
+    nlohmann::json j;
+    j["position"]    = {s.position[0],    s.position[1],    s.position[2]};
+    j["focal_point"] = {s.focalPoint[0],  s.focalPoint[1],  s.focalPoint[2]};
+    j["view_up"]     = {s.viewUp[0],      s.viewUp[1],      s.viewUp[2]};
+    if (s.parallelScale.has_value())    j["parallel_scale"]    = *s.parallelScale;
+    if (s.perspectiveAngle.has_value()) j["perspective_angle"] = *s.perspectiveAngle;
+    return j;
+  }
 }
 
 void RenderingController::HandleGET_editors(const httplib::Request& req, httplib::Response& res) const
@@ -771,6 +917,106 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
 
   res.status = 200;
   res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiCameraGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  CameraState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetStdMultiCamera(name);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  const auto j = CameraStateToJson(state);
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  CameraPatch patch;
+  if (const auto err = ParseCameraPatch(body, IsStd3dWindow(name), patch))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiCameraSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetStdMultiCamera(name, patch);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Camera update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
 }
 
 void RenderingController::HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const

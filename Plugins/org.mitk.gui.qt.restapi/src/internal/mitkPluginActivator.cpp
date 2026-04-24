@@ -18,6 +18,12 @@ found in the LICENSE file.
 #include <mitkRenderWindowBridge.h>
 #include <mitkRenderingManager.h>
 #include <mitkTimeNavigationController.h>
+#include <mitkCameraController.h>
+#include <mitkBaseRenderer.h>
+#include <QmitkRenderWindow.h>
+
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
 
 #include <algorithm>
 #include <limits>
@@ -78,6 +84,42 @@ namespace
       }
     }
     return nullptr;
+  }
+
+  /**
+   * @brief Resolve the BaseRenderer for a given StdMulti window name.
+   *
+   * @throws mitk::RenderWindowBridgeNoEditorException if the editor is not open.
+   * @throws mitk::RenderWindowBridgeUnknownWindowException if the name is unknown.
+   */
+  mitk::BaseRenderer* ResolveStdMultiRenderer(const std::string& windowName)
+  {
+    auto* const rwp = GetStdMultiWidgetRenderWindowPart();
+    if (rwp == nullptr)
+      throw mitk::RenderWindowBridgeNoEditorException(
+        "StdMultiWidgetEditor is not open");
+
+    auto* const qrw = rwp->GetQmitkRenderWindow(QString::fromStdString(windowName));
+    if (qrw == nullptr)
+      throw mitk::RenderWindowBridgeUnknownWindowException(windowName);
+
+    auto* const renderer = qrw->GetRenderer();
+    if (renderer == nullptr)
+      throw mitk::RenderWindowBridgeUnknownWindowException(windowName);
+
+    return renderer;
+  }
+
+  mitk::CameraController::StandardView StandardViewFromName(const std::string& v)
+  {
+    if (v == "anterior")  return mitk::CameraController::ANTERIOR;
+    if (v == "posterior") return mitk::CameraController::POSTERIOR;
+    if (v == "left")      return mitk::CameraController::SINISTER;
+    if (v == "right")     return mitk::CameraController::DEXTER;
+    if (v == "cranial")   return mitk::CameraController::CRANIAL;
+    if (v == "caudal")    return mitk::CameraController::CAUDAL;
+    // Controller validated the value before dispatch; unreachable if contract holds.
+    throw std::runtime_error("Unknown standard_view: " + v);
   }
 
   void SetRenderWindowBridgeCallbacks(mitk::RenderWindowBridge* rwb)
@@ -182,6 +224,69 @@ namespace
         // mxn.active stays false until WP3.
 
         return {stdmulti, mxn};
+      });
+
+    rwb->SetStdMultiCameraGetter(
+      [](const std::string& windowName) -> mitk::CameraState
+      {
+        auto* const renderer = ResolveStdMultiRenderer(windowName);
+        auto* const vtkRen = renderer->GetVtkRenderer();
+        if (vtkRen == nullptr)
+          throw std::runtime_error("vtkRenderer unavailable for window " + windowName);
+        auto* const cam = vtkRen->GetActiveCamera();
+        if (cam == nullptr)
+          throw std::runtime_error("vtkCamera unavailable for window " + windowName);
+
+        mitk::CameraState state;
+
+        double pos[3];    cam->GetPosition(pos);
+        double foc[3];    cam->GetFocalPoint(foc);
+        double up[3];     cam->GetViewUp(up);
+        for (int i = 0; i < 3; ++i)
+        {
+          state.position[i]   = pos[i];
+          state.focalPoint[i] = foc[i];
+          state.viewUp[i]     = up[i];
+        }
+
+        const bool is3d = (windowName == "3d");
+        if (is3d)
+          state.perspectiveAngle = cam->GetViewAngle();
+        else
+          state.parallelScale = cam->GetParallelScale();
+
+        return state;
+      });
+
+    rwb->SetStdMultiCameraSetter(
+      [](const std::string& windowName, const mitk::CameraPatch& patch)
+      {
+        auto* const renderer = ResolveStdMultiRenderer(windowName);
+        auto* const cc = renderer->GetCameraController();
+        auto* const vtkRen = renderer->GetVtkRenderer();
+        if (cc == nullptr || vtkRen == nullptr)
+          throw std::runtime_error("CameraController unavailable for window " + windowName);
+        auto* const cam = vtkRen->GetActiveCamera();
+        if (cam == nullptr)
+          throw std::runtime_error("vtkCamera unavailable for window " + windowName);
+
+        // Apply standard_view first so explicit position/focal/view_up/etc.
+        // overrides win over it (concept §8).
+        if (patch.standardView)
+          cc->SetStandardView(StandardViewFromName(*patch.standardView));
+
+        if (patch.position)
+          cam->SetPosition((*patch.position)[0], (*patch.position)[1], (*patch.position)[2]);
+        if (patch.focalPoint)
+          cam->SetFocalPoint((*patch.focalPoint)[0], (*patch.focalPoint)[1], (*patch.focalPoint)[2]);
+        if (patch.viewUp)
+          cam->SetViewUp((*patch.viewUp)[0], (*patch.viewUp)[1], (*patch.viewUp)[2]);
+        if (patch.parallelScale)
+          cam->SetParallelScale(*patch.parallelScale);
+        if (patch.perspectiveAngle)
+          cam->SetViewAngle(*patch.perspectiveAngle);
+
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
       });
 
     rwb->SetStdMultiWindowListProvider(

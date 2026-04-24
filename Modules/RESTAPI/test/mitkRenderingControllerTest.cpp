@@ -86,6 +86,27 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetStdmultiWindowForAxialReturns200With2d);
   MITK_TEST(GetStdmultiWindowFor3dReturns200NoSelectedSlice);
 
+  // WP2 camera tests
+  MITK_TEST(GetCameraUnknownWindowReturns404);
+  MITK_TEST(GetCameraWithoutGetterReturns503);
+  MITK_TEST(GetCameraForAxialReturns200With2dFields);
+  MITK_TEST(GetCameraFor3dReturns200With3dFields);
+  MITK_TEST(GetCameraEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(PutCameraUnknownWindowReturns404);
+  MITK_TEST(PutCameraInvalidJsonReturns400);
+  MITK_TEST(PutCameraEmptyBodyReturns400);
+  MITK_TEST(PutCameraUnknownFieldReturns400);
+  MITK_TEST(PutCameraParallelScaleOn3dReturns400);
+  MITK_TEST(PutCameraPerspectiveAngleOn2dReturns400);
+  MITK_TEST(PutCameraNonPositiveParallelScaleReturns400);
+  MITK_TEST(PutCameraPerspectiveAngleOutOfRangeReturns400);
+  MITK_TEST(PutCameraUnknownStandardViewReturns400);
+  MITK_TEST(PutCameraWrongArrayLengthReturns400);
+  MITK_TEST(PutCameraWithoutSetterReturns503);
+  MITK_TEST(PutCameraOnAxialReturns204);
+  MITK_TEST(PutCameraOn3dReturns204);
+  MITK_TEST(PutCameraStandardViewAppliedFirst);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -895,6 +916,294 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["kind"].get<std::string>());
     CPPUNIT_ASSERT(json["has_camera"].get<bool>());
     CPPUNIT_ASSERT(!json["has_selected_slice"].get<bool>());
+  }
+  // ===== WP2: camera =====
+
+  static mitk::CameraState MakeFakeCameraState(bool is3d)
+  {
+    mitk::CameraState s;
+    s.position[0] = 1.0;  s.position[1] = 2.0;  s.position[2] = 3.0;
+    s.focalPoint[0] = 4.0; s.focalPoint[1] = 5.0; s.focalPoint[2] = 6.0;
+    s.viewUp[0] = 0.0;    s.viewUp[1] = 1.0;    s.viewUp[2] = 0.0;
+    if (is3d) s.perspectiveAngle = 30.0;
+    else      s.parallelScale    = 120.0;
+    return s;
+  }
+
+  void GetCameraUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/camera", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetCameraWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetCameraForAxialReturns200With2dFields()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) { return MakeFakeCameraState(/*is3d=*/false); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("position"));
+    CPPUNIT_ASSERT(json.contains("focal_point"));
+    CPPUNIT_ASSERT(json.contains("view_up"));
+    CPPUNIT_ASSERT(json.contains("parallel_scale"));
+    CPPUNIT_ASSERT(!json.contains("perspective_angle"));
+  }
+
+  void GetCameraFor3dReturns200With3dFields()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) { return MakeFakeCameraState(/*is3d=*/true); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("perspective_angle"));
+    CPPUNIT_ASSERT(!json.contains("parallel_scale"));
+  }
+
+  void GetCameraEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) -> mitk::CameraState
+      {
+        throw mitk::RenderWindowBridgeNoEditorException("editor not open");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/camera",
+      R"({"parallel_scale": 120.0})",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+  }
+
+  void PutCameraInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      "not-json", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      "{}", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraUnknownFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"mystery": 42})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraParallelScaleOn3dReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
+      R"({"parallel_scale": 100.0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraPerspectiveAngleOn2dReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"perspective_angle": 30.0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraNonPositiveParallelScaleReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"parallel_scale": 0.0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraPerspectiveAngleOutOfRangeReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
+      R"({"perspective_angle": 180.0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraUnknownStandardViewReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"standard_view": "oblique"})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraWrongArrayLengthReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"position": [1.0, 2.0]})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraWithoutSetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraOnAxialReturns204()
+  {
+    mitk::CameraPatch captured;
+    std::string capturedName;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string& n, const mitk::CameraPatch& p)
+      { capturedName = n; captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"position": [1.0, 2.0, 3.0], "parallel_scale": 150.0})",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT(captured.position.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, (*captured.position)[0], 1e-6);
+    CPPUNIT_ASSERT(captured.parallelScale.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(150.0, *captured.parallelScale, 1e-6);
+    CPPUNIT_ASSERT(!captured.perspectiveAngle.has_value());
+  }
+
+  void PutCameraOn3dReturns204()
+  {
+    mitk::CameraPatch captured;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string&, const mitk::CameraPatch& p) { captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
+      R"({"perspective_angle": 45.0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT(captured.perspectiveAngle.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(45.0, *captured.perspectiveAngle, 1e-6);
+  }
+
+  void PutCameraStandardViewAppliedFirst()
+  {
+    mitk::CameraPatch captured;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string&, const mitk::CameraPatch& p) { captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"standard_view": "anterior", "parallel_scale": 120.0})",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    // The controller forwards both fields; ordering is a plugin-side concern
+    // (standard_view applied first before individual fields). We assert the
+    // wire contract: both fields were sent through intact.
+    CPPUNIT_ASSERT(captured.standardView.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("anterior"), *captured.standardView);
+    CPPUNIT_ASSERT(captured.parallelScale.has_value());
   }
 };
 

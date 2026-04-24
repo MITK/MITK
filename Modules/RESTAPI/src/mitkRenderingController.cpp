@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
+#include <algorithm>
 #include <functional>
 #include <optional>
 #include <vector>
@@ -269,6 +270,12 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
   {
     posInfo = m_RenderWindowBridge->GetSelectedPosition();
   }
+  catch (const RenderWindowBridgeNoEditorException& e)
+  {
+    const auto error = ErrorResponse::EditorNotActive(e.what(), req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
   catch (const std::exception& e)
   {
     const auto error = ErrorResponse::InternalError(
@@ -360,6 +367,11 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
   {
     m_RenderWindowBridge->SetSelectedPosition(newPos);
     res.status = 204;
+  }
+  catch (const RenderWindowBridgeNoEditorException& e)
+  {
+    const auto error = ErrorResponse::EditorNotActive(e.what(), req.path);
+    this->SendErrorResponse(res, 503, error);
   }
   catch (const std::exception& e)
   {
@@ -578,6 +590,189 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
   }
 }
 
+namespace
+{
+  nlohmann::json EditorInfoToJson(const mitk::EditorInfo& info, bool includeWindowList)
+  {
+    nlohmann::json j;
+    j["alias"] = info.alias;
+    j["plugin_id"] = info.pluginId;
+    j["active"] = info.active;
+    if (includeWindowList)
+    {
+      j["windows"] = nlohmann::json::array();
+      for (const auto& n : info.windowNames)
+        j["windows"].push_back(n);
+    }
+    return j;
+  }
+}
+
+void RenderingController::HandleGET_editors(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<EditorInfo> editors;
+  try
+  {
+    editors = m_RenderWindowBridge->ListEditors();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  nlohmann::json arr = nlohmann::json::array();
+  for (const auto& ed : editors)
+    arr.push_back(EditorInfoToJson(ed, /*includeWindowList=*/false));
+
+  res.status = 200;
+  res.set_content(arr.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<EditorInfo> editors;
+  try
+  {
+    editors = m_RenderWindowBridge->ListEditors();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  for (const auto& ed : editors)
+  {
+    if (ed.alias == "stdmulti")
+    {
+      if (!ed.active)
+      {
+        const auto error = ErrorResponse::EditorNotActive(
+          "StdMultiWidgetEditor is not open", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
+      res.status = 200;
+      res.set_content(j.dump(), "application/json");
+      return;
+    }
+  }
+
+  // The alias list is authoritative; stdmulti missing means the provider is broken.
+  const auto error = ErrorResponse::InternalError(
+    "Editor list does not contain 'stdmulti'.", req.path);
+  this->SendErrorResponse(res, 500, error);
+}
+
+void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<WindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListStdMultiWindows();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  nlohmann::json arr = nlohmann::json::array();
+  for (const auto& w : windows)
+  {
+    nlohmann::json wj;
+    wj["name"] = w.name;
+    wj["kind"] = WindowKindToString(w.kind);
+    arr.push_back(wj);
+  }
+
+  res.status = 200;
+  res.set_content(arr.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  // Compose summary locally; the bridge already exposes enough state via the
+  // windows-list provider, and no per-window "summary" callback is needed.
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<WindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListStdMultiWindows();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  // The controller-side name validation already accepts only canonical names,
+  // so an empty window list at this point means the editor reports no windows
+  // — that is an editor state we also surface as RENDER_WINDOW_NOT_FOUND.
+  const bool present = std::any_of(windows.begin(), windows.end(),
+    [&](const WindowInfo& w) { return w.name == name; });
+  if (!present)
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  const bool is3d = IsStd3dWindow(name);
+
+  nlohmann::json j;
+  j["name"] = name;
+  j["kind"] = is3d ? "3d" : "2d";
+  j["has_camera"] = true;
+  j["has_selected_slice"] = !is3d;
+
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
 void RenderingController::HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const
 {
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasScreenshotProvider())
@@ -696,6 +891,31 @@ void RenderingController::SendErrorResponse(httplib::Response& res, int status, 
 {
   res.status = status;
   res.set_content(error.dump(), "application/json");
+}
+
+bool RenderingController::IsValidStdMultiWindowName(const std::string& name)
+{
+  return name == "axial" || name == "sagittal" || name == "coronal" || name == "3d";
+}
+
+bool RenderingController::IsStd3dWindow(const std::string& name)
+{
+  return name == "3d";
+}
+
+std::pair<int, nlohmann::json> RenderingController::MapBridgeException(
+  const std::exception& e, const std::string& instance)
+{
+  if (const auto* ne = dynamic_cast<const RenderWindowBridgeNoEditorException*>(&e))
+    return {503, ErrorResponse::EditorNotActive(ne->what(), instance)};
+
+  if (const auto* uw = dynamic_cast<const RenderWindowBridgeUnknownWindowException*>(&e))
+    return {404, ErrorResponse::RenderWindowNotFound(uw->what(), instance)};
+
+  if (const auto* us = dynamic_cast<const RenderWindowBridgeUnsupportedOperationException*>(&e))
+    return {404, ErrorResponse::UnsupportedOperation(us->what(), instance)};
+
+  return {500, ErrorResponse::InternalError(e.what(), instance)};
 }
 
 }

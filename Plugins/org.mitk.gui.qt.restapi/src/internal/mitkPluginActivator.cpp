@@ -112,7 +112,8 @@ namespace
       {
         auto* const rwp = GetStdMultiWidgetRenderWindowPart();
         if (rwp == nullptr)
-          throw std::runtime_error("StdMultiWidgetEditor is not open — cannot read crosshair position");
+          throw mitk::RenderWindowBridgeNoEditorException(
+            "StdMultiWidgetEditor is not open — cannot read crosshair position");
 
         mitk::SelectedPositionInfo info;
         info.position = rwp->GetSelectedPosition();
@@ -151,8 +152,57 @@ namespace
       {
         auto* const rwp = GetStdMultiWidgetRenderWindowPart();
         if (rwp == nullptr)
-          throw std::runtime_error("StdMultiWidgetEditor is not open — cannot set crosshair position");
+          throw mitk::RenderWindowBridgeNoEditorException(
+            "StdMultiWidgetEditor is not open — cannot set crosshair position");
         rwp->SetSelectedPosition(pos);
+      });
+
+    rwb->SetEditorListProvider(
+      []() -> std::vector<mitk::EditorInfo>
+      {
+        // Two editor aliases are known up front. The MxN entry appears in the
+        // list regardless of state so clients can discover it, but stays inactive
+        // until WP3.
+        mitk::EditorInfo stdmulti;
+        stdmulti.alias = "stdmulti";
+        stdmulti.pluginId = "org.mitk.editors.stdmultiwidget";
+
+        if (auto* const rwp = GetStdMultiWidgetRenderWindowPart())
+        {
+          stdmulti.active = true;
+          const auto hash = rwp->GetQmitkRenderWindows();
+          stdmulti.windowNames.reserve(hash.size());
+          for (auto it = hash.keyBegin(); it != hash.keyEnd(); ++it)
+            stdmulti.windowNames.push_back(it->toStdString());
+        }
+
+        mitk::EditorInfo mxn;
+        mxn.alias = "mxn";
+        mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
+        // mxn.active stays false until WP3.
+
+        return {stdmulti, mxn};
+      });
+
+    rwb->SetStdMultiWindowListProvider(
+      []() -> std::vector<mitk::WindowInfo>
+      {
+        auto* const rwp = GetStdMultiWidgetRenderWindowPart();
+        if (rwp == nullptr)
+          throw mitk::RenderWindowBridgeNoEditorException(
+            "StdMultiWidgetEditor is not open — cannot list render windows");
+
+        std::vector<mitk::WindowInfo> result;
+        const auto hash = rwp->GetQmitkRenderWindows();
+        result.reserve(hash.size());
+        for (auto it = hash.keyBegin(); it != hash.keyEnd(); ++it)
+        {
+          mitk::WindowInfo wi;
+          wi.name = it->toStdString();
+          wi.kind = (wi.name == "3d") ? mitk::WindowKind::ThreeD : mitk::WindowKind::TwoD;
+          result.push_back(wi);
+        }
+        return result;
       });
 
   }

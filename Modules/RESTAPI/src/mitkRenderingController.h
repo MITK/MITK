@@ -164,6 +164,37 @@ namespace mitk
     void HandlePUT_selectedTime(const httplib::Request& req, httplib::Response& res) const;
 
     /**
+     * \brief Handle GET /rendering/editors request.
+     *
+     * Returns the full list of known editor aliases with their current
+     * activity state. Concept §3 / WP2 E1.
+     *
+     * Response 200: [{"alias":..., "plugin_id":..., "active":...}, ...]
+     */
+    void HandleGET_editors(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/stdmulti request (WP2 E2).
+     *
+     * Returns metadata about the StdMultiWidgetEditor.
+     */
+    void HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/stdmulti/windows request (WP2 E4).
+     *
+     * Returns the list of render windows of the StdMultiWidget editor.
+     */
+    void HandleGET_stdmultiWindows(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name} request (WP2 E5).
+     *
+     * Per-window summary. Controller-side validates {name} before bridge dispatch.
+     */
+    void HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
      * \brief Handle GET /rendering/screenshot request.
      *
      * Captures a screenshot of the active application window.
@@ -190,6 +221,36 @@ namespace mitk
     void Dispatch(std::function<void()> task) const;
 
     void SendErrorResponse(httplib::Response& res, int status, const nlohmann::json& error) const;
+
+    /**
+     * \brief Map a bridge exception thrown by a RenderWindowBridge callback to
+     *        a matching HTTP status and RFC 7807 error payload.
+     *
+     * Recognises the three typed bridge exceptions:
+     * - RenderWindowBridgeNoEditorException           -> 503 EDITOR_NOT_ACTIVE
+     * - RenderWindowBridgeUnknownWindowException      -> 404 RENDER_WINDOW_NOT_FOUND
+     * - RenderWindowBridgeUnsupportedOperationException -> 404 UNSUPPORTED_OPERATION
+     *
+     * Any other std::exception is reported as 500 INTERNAL_ERROR.
+     *
+     * \param e    The caught exception.
+     * \param instance The request path for the RFC 7807 "instance" field.
+     * \return A pair of {HTTP status, JSON payload} ready for SendErrorResponse.
+     */
+    static std::pair<int, nlohmann::json> MapBridgeException(
+      const std::exception& e, const std::string& instance);
+
+    /**
+     * \brief True if the given window name is a known StdMultiWidget window.
+     *
+     * The set is {"axial", "sagittal", "coronal", "3d"}. Used by handlers to
+     * reject unknown window names at the controller layer with 404
+     * RENDER_WINDOW_NOT_FOUND (before any bridge dispatch).
+     */
+    static bool IsValidStdMultiWindowName(const std::string& name);
+
+    /** True if the given StdMulti window is the 3D window. */
+    static bool IsStd3dWindow(const std::string& name);
 
     DataStorageBridge& m_Bridge;
     RenderWindowBridge* m_RenderWindowBridge = nullptr;

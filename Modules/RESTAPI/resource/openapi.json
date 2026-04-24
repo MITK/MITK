@@ -2014,7 +2014,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get crosshair position and scene bounds",
-        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "getRenderingSelectedPosition",
         "responses": {
           "200": {
@@ -2064,18 +2064,36 @@
           },
           "500": { "$ref": "#/components/responses/InternalError" },
           "503": {
-            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
+            "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE — headless mode or Qt plugin not loaded) or the StdMultiWidgetEditor is not currently open (EDITOR_NOT_ACTIVE).",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "StdMultiWidgetEditor is not open — cannot read crosshair position.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/selected-position"
+                "examples": {
+                  "renderWindowNotAvailable": {
+                    "summary": "No callback registered",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                        "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                        "title": "Render Window Not Available",
+                        "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                        "status": 503,
+                        "instance": "/api/v1/rendering/selected-position"
+                      }
+                    }
+                  },
+                  "editorNotActive": {
+                    "summary": "Editor not open",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
+                        "code": "EDITOR_NOT_ACTIVE",
+                        "title": "Editor Not Active",
+                        "message": "StdMultiWidgetEditor is not open — cannot read crosshair position",
+                        "status": 503,
+                        "instance": "/api/v1/rendering/selected-position"
+                      }
+                    }
                   }
                 }
               }
@@ -2086,7 +2104,7 @@
       "put": {
         "tags": ["Rendering"],
         "summary": "Set crosshair position",
-        "description": "Moves the crosshair to the given 3D world position via IRenderWindowPart::SetSelectedPosition() on the StdMultiWidgetEditor. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "description": "Moves the crosshair to the given 3D world position via IRenderWindowPart::SetSelectedPosition() on the StdMultiWidgetEditor. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "putRenderingSelectedPosition",
         "requestBody": {
           "required": true,
@@ -2114,23 +2132,157 @@
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
           "503": {
-            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
+            "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE — headless mode or Qt plugin not loaded) or the StdMultiWidgetEditor is not currently open (EDITOR_NOT_ACTIVE).",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "StdMultiWidgetEditor is not open — cannot set crosshair position.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/selected-position"
+                "examples": {
+                  "renderWindowNotAvailable": {
+                    "summary": "No callback registered",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                        "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                        "title": "Render Window Not Available",
+                        "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                        "status": 503,
+                        "instance": "/api/v1/rendering/selected-position"
+                      }
+                    }
+                  },
+                  "editorNotActive": {
+                    "summary": "Editor not open",
+                    "value": {
+                      "error": {
+                        "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
+                        "code": "EDITOR_NOT_ACTIVE",
+                        "title": "Editor Not Active",
+                        "message": "StdMultiWidgetEditor is not open — cannot set crosshair position",
+                        "status": 503,
+                        "instance": "/api/v1/rendering/selected-position"
+                      }
+                    }
                   }
                 }
               }
             }
           }
+        }
+      }
+    },
+    "/rendering/editors": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "List known editors",
+        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors.",
+        "operationId": "getRenderingEditors",
+        "responses": {
+          "200": {
+            "description": "List of editor aliases and activity state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/EditorListItem" }
+                },
+                "example": [
+                  { "alias": "stdmulti", "plugin_id": "org.mitk.editors.stdmultiwidget", "active": true },
+                  { "alias": "mxn",      "plugin_id": "org.mitk.editors.mxnmultiwidget", "active": false }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get StdMultiWidget editor info",
+        "description": "Returns metadata about the StdMultiWidget editor, including its current window names when the editor is open.",
+        "operationId": "getRenderingStdmultiInfo",
+        "responses": {
+          "200": {
+            "description": "StdMultiWidget editor info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EditorInfo" },
+                "example": {
+                  "alias": "stdmulti",
+                  "plugin_id": "org.mitk.editors.stdmultiwidget",
+                  "active": true,
+                  "windows": ["axial", "sagittal", "coronal", "3d"]
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "List StdMultiWidget render windows",
+        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window name (URL segment for sub-resources) and its kind (2D or 3D). No `plane` field is reported — under swivel mode the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
+        "operationId": "getRenderingStdmultiWindows",
+        "responses": {
+          "200": {
+            "description": "List of StdMultiWidget render windows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/WindowListItem" }
+                },
+                "example": [
+                  { "name": "axial",    "kind": "2d" },
+                  { "name": "sagittal", "kind": "2d" },
+                  { "name": "coronal",  "kind": "2d" },
+                  { "name": "3d",       "kind": "3d" }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get StdMultiWidget window summary",
+        "description": "Per-window summary. `kind` drives which sub-resources apply. `has_selected_slice` is false for the 3D window.",
+        "operationId": "getRenderingStdmultiWindow",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Window summary",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WindowInfo" },
+                "examples": {
+                  "axial": {
+                    "summary": "2D window",
+                    "value": { "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+                  },
+                  "threeD": {
+                    "summary": "3D window",
+                    "value": { "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       }
     },

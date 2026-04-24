@@ -1658,7 +1658,7 @@ Content-Type: application/json
 
 Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
 
-Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
+Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
 
 **Response 200 (`application/json`):**
 
@@ -1676,7 +1676,8 @@ Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to b
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless mode or Qt workbench plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open in the workbench |
 | 500 | `INTERNAL_ERROR` | Unexpected error reading crosshair or geometry state |
 
 ---
@@ -1685,7 +1686,7 @@ Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to b
 
 Moves the crosshair to the given 3D world position via `IRenderWindowPart::SetSelectedPosition()` on the StdMultiWidgetEditor, which updates all synchronized views.
 
-Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).
+Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise).
 
 **Request body (required, `application/json`):**
 
@@ -1708,7 +1709,8 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Body missing, not valid JSON, `position` field absent, or not an array of exactly 3 numbers |
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless mode or Qt workbench plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open in the workbench |
 | 500 | `INTERNAL_ERROR` | Unexpected error setting crosshair position |
 
 ---
@@ -1853,6 +1855,8 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window name is not known to the editor |
+| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed window (e.g. `selected-slice` on `3d`) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
@@ -1867,7 +1871,8 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
 | 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | Qt workbench plugin not loaded or StdMultiWidgetEditor not open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 | 503 | `SERVICE_UNAVAILABLE` | Server temporarily unavailable |
 

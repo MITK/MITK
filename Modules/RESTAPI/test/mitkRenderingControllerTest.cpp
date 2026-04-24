@@ -52,8 +52,10 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   // GET /rendering/selected-position tests
   MITK_TEST(GetSelectedPositionWithoutBridgeReturns503);
   MITK_TEST(GetSelectedPositionWithGetterReturns200);
+  MITK_TEST(GetSelectedPositionEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(PutSelectedPositionWithoutBridgeReturns503);
   MITK_TEST(PutSelectedPositionWithSetterReturns204);
+  MITK_TEST(PutSelectedPositionEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(PutSelectedPositionMissingPositionFieldReturns400);
   MITK_TEST(PutSelectedPositionWrongArrayLengthReturns400);
   MITK_TEST(PutSelectedPositionInvalidJsonReturns400);
@@ -71,6 +73,18 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetScreenshotWithInvalidFormatReturns400);
   MITK_TEST(GetScreenshotWithNonPositiveWidthReturns400);
   MITK_TEST(GetScreenshotWithExcessiveDimensionsReturns400);
+
+  // WP2 editor discovery tests
+  MITK_TEST(GetEditorsWithoutProviderReturns503);
+  MITK_TEST(GetEditorsReturns200WithAliases);
+  MITK_TEST(GetStdmultiInfoWithEditorActiveReturns200);
+  MITK_TEST(GetStdmultiInfoWhenEditorInactiveReturns503EditorNotActive);
+  MITK_TEST(GetStdmultiWindowsWithoutProviderReturns503);
+  MITK_TEST(GetStdmultiWindowsEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetStdmultiWindowsReturns200);
+  MITK_TEST(GetStdmultiWindowForUnknownNameReturns404);
+  MITK_TEST(GetStdmultiWindowForAxialReturns200With2d);
+  MITK_TEST(GetStdmultiWindowFor3dReturns200NoSelectedSlice);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -405,6 +419,26 @@ public:
     CPPUNIT_ASSERT(json["bounds"].contains("max"));
   }
 
+  void GetSelectedPositionEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetPositionGetter(
+      []() -> mitk::SelectedPositionInfo
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open — cannot read crosshair position");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
+    httplib::Response res;
+
+    m_Controller->HandleGET_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
   void PutSelectedPositionWithoutBridgeReturns503()
   {
     m_Controller->SetRenderWindowBridge(nullptr);
@@ -438,6 +472,27 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, capturedPos[0], 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, capturedPos[1], 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, capturedPos[2], 1e-6);
+  }
+
+  void PutSelectedPositionEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetPositionSetter(
+      [](const mitk::Point3D&)
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open — cannot set crosshair position");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
+                                       R"({"position": [1.0, 2.0, 3.0]})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
   }
 
   void PutSelectedPositionMissingPositionFieldReturns400()
@@ -629,6 +684,217 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  // ===== WP2: editor discovery =====
+
+  static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive)
+  {
+    mitk::EditorInfo stdmulti;
+    stdmulti.alias = "stdmulti";
+    stdmulti.pluginId = "org.mitk.editors.stdmultiwidget";
+    stdmulti.active = stdmultiActive;
+    if (stdmultiActive)
+      stdmulti.windowNames = {"axial", "sagittal", "coronal", "3d"};
+
+    mitk::EditorInfo mxn;
+    mxn.alias = "mxn";
+    mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
+    mxn.active = false;
+
+    return {stdmulti, mxn};
+  }
+
+  void GetEditorsWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors");
+    httplib::Response res;
+    m_Controller->HandleGET_editors(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorsReturns200WithAliases()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors");
+    httplib::Response res;
+    m_Controller->HandleGET_editors(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), json.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("stdmulti"), json[0]["alias"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn"), json[1]["alias"].get<std::string>());
+    CPPUNIT_ASSERT(json[0]["active"].get<bool>());
+    CPPUNIT_ASSERT(!json[1]["active"].get<bool>());
+    // E1 never reports the windows list (that is an E2-only field).
+    CPPUNIT_ASSERT(!json[0].contains("windows"));
+  }
+
+  void GetStdmultiInfoWithEditorActiveReturns200()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("stdmulti"), json["alias"].get<std::string>());
+    CPPUNIT_ASSERT(json["active"].get<bool>());
+    CPPUNIT_ASSERT(json["windows"].is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), json["windows"].size());
+  }
+
+  void GetStdmultiInfoWhenEditorInactiveReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/false); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() -> std::vector<mitk::WindowInfo>
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsReturns200()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), json.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json[0]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"), json[0]["kind"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["kind"].get<std::string>());
+    // RF3: no `plane` field on window list items.
+    CPPUNIT_ASSERT(!json[0].contains("plane"));
+  }
+
+  void GetStdmultiWindowForUnknownNameReturns404()
+  {
+    // No providers set — unknown name must still be rejected controller-side.
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowForAxialReturns200With2d()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT(json["has_camera"].get<bool>());
+    CPPUNIT_ASSERT(json["has_selected_slice"].get<bool>());
+    CPPUNIT_ASSERT(!json.contains("plane"));
+  }
+
+  void GetStdmultiWindowFor3dReturns200NoSelectedSlice()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT(json["has_camera"].get<bool>());
+    CPPUNIT_ASSERT(!json["has_selected_slice"].get<bool>());
   }
 };
 

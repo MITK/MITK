@@ -10,36 +10,43 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSceneJsonMimeType.h"
+#include "mitkSceneFileReader.h"
+#include "mitkSceneJsonFileReader.h"
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usServiceProperties.h>
+
+#include <memory>
 
 namespace mitk
 {
   /**
-   * \brief Registers MIME types contributed by SceneSerialization.
+   * \brief Registers scene-file readers contributed by SceneSerialization.
    *
-   * Intentionally does not register any AbstractFileReader / Writer: scene
-   * loading is dispatched through SceneIO, not the microservice-based file
-   * reader registry (see AbstractSceneReader).
+   * Makes `.mitk` (ZIP archive) and `.mitkscene.json` (standalone JSON)
+   * scene files loadable through the regular microservice file-reader
+   * registry (i.e. via IOUtil::Load, QmitkIOUtil::Load, and the File >
+   * Open action). Both readers ultimately delegate to the in-module scene
+   * loaders (SceneIO resp. SceneJsonReader).
    */
   class SceneSerializationIOModuleActivator : public us::ModuleActivator
   {
   public:
-    void Load(us::ModuleContext *context) override
+    void Load(us::ModuleContext *) override
     {
-      us::ServiceProperties props;
-      props[us::ServiceConstants::SERVICE_RANKING()] = 10;
-
-      auto *mimeType = new SceneJsonMimeType();
-      context->RegisterService(static_cast<CustomMimeType *>(mimeType), props);
+      m_SceneReader.reset(new SceneFileReader());
+      m_SceneJsonReader.reset(new SceneJsonFileReader());
     }
 
     void Unload(us::ModuleContext *) override
     {
+      m_SceneJsonReader.reset();
+      m_SceneReader.reset();
     }
+
+  private:
+    std::unique_ptr<SceneFileReader> m_SceneReader;
+    std::unique_ptr<SceneJsonFileReader> m_SceneJsonReader;
   };
 }
 

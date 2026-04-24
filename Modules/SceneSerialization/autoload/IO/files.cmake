@@ -1,4 +1,5 @@
 set(CPP_FILES
-  mitkSceneJsonMimeType.cpp
+  mitkSceneFileReader.cpp
+  mitkSceneJsonFileReader.cpp
   mitkSceneSerializationIOActivator.cpp
 )

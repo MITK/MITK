@@ -22,8 +22,7 @@ found in the LICENSE file.
 
 QmitkViewCoordinator::QmitkViewCoordinator()
   : m_ActiveZombieView(nullptr)
-  , m_ActiveRenderWindowPart(nullptr)
-  , m_VisibleRenderWindowPart(nullptr)
+  , m_CurrentRenderWindowPart(nullptr)
 {
 }
 
@@ -63,20 +62,11 @@ berry::IPartListener::Events::Types QmitkViewCoordinator::GetPartEventTypes() co
 
 void QmitkViewCoordinator::PartActivated(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartActivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
-  // Check for a render window part and inform IRenderWindowPartListener views
-  // that it was activated
-  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
-  {
-    if (m_VisibleRenderWindowPart != renderPart)
-    {
-      RenderWindowPartActivated(renderPart);
-      m_ActiveRenderWindowPart = renderPart;
-      m_VisibleRenderWindowPart = renderPart;
-    }
-  }
+  // Render-window listener dispatch is driven by PartVisible/PartClosed, not by
+  // focus changes: a focus-driven deactivation should not disable views that
+  // depend on a render window part. See PartVisible/PartClosed below.
 
   // Check if the activated part wants to be notified
   if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
@@ -98,20 +88,7 @@ void QmitkViewCoordinator::PartActivated(const berry::IWorkbenchPartReference::P
 
 void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartDeactivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
-
-  // Check for a render window part and inform IRenderWindowPartListener views
-  // that it was deactivated
-  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
-  {
-    if (m_ActiveRenderWindowPart == renderPart)
-    {
-      this->RenderWindowPartDeactivated(renderPart);
-      m_ActiveRenderWindowPart = nullptr;
-      m_VisibleRenderWindowPart = nullptr;
-    }
-  }
 
   if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
   {
@@ -121,7 +98,6 @@ void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference:
 
 void QmitkViewCoordinator::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartOpened (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
   if (mitk::IRenderWindowPartListener* renderWindowListener = dynamic_cast<mitk::IRenderWindowPartListener*>(part))
@@ -132,8 +108,18 @@ void QmitkViewCoordinator::PartOpened(const berry::IWorkbenchPartReference::Poin
 
 void QmitkViewCoordinator::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartClosed (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
+
+  // If the closing part is the render window part we last notified listeners
+  // about, notify them that it is gone.
+  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
+  {
+    if (m_CurrentRenderWindowPart == renderPart)
+    {
+      RenderWindowPartDeactivated(renderPart);
+      m_CurrentRenderWindowPart = nullptr;
+    }
+  }
 
   if (mitk::IRenderWindowPartListener* renderWindowListener = dynamic_cast<mitk::IRenderWindowPartListener*>(part))
   {
@@ -143,19 +129,12 @@ void QmitkViewCoordinator::PartClosed(const berry::IWorkbenchPartReference::Poin
 
 void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartHidden (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
-  // Check for a render window part and if it is the currently active on.
-  // Inform IRenderWindowPartListener views that it has been hidden.
-  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
-  {
-    if (!m_ActiveRenderWindowPart && m_VisibleRenderWindowPart == renderPart)
-    {
-      RenderWindowPartDeactivated(renderPart);
-      m_VisibleRenderWindowPart = nullptr;
-    }
-  }
+  // Do not dispatch RenderWindowPartDeactivated on transient hide. During
+  // startup the Welcome page can cover the render window editor, which
+  // would otherwise spuriously disable listener views. PartClosed is the
+  // authoritative signal that a render window part is gone.
 
   if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
   {
@@ -165,17 +144,18 @@ void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Poin
 
 void QmitkViewCoordinator::PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
-  //MITK_INFO << "*** PartVisible (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
-  // Check for a render window part and inform IRenderWindowPartListener views
-  // that it was activated
   if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
   {
-    if (!m_ActiveRenderWindowPart)
+    if (m_CurrentRenderWindowPart != renderPart)
     {
+      if (nullptr != m_CurrentRenderWindowPart)
+      {
+        RenderWindowPartDeactivated(m_CurrentRenderWindowPart);
+      }
       RenderWindowPartActivated(renderPart);
-      m_VisibleRenderWindowPart = renderPart;
+      m_CurrentRenderWindowPart = renderPart;
     }
   }
 
@@ -189,11 +169,9 @@ void QmitkViewCoordinator::PartInputChanged(const berry::IWorkbenchPartReference
 {
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
-  // Check for a render window part and inform IRenderWindowPartListener views
-  // that it was changed
   if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
   {
-    if (!m_ActiveRenderWindowPart)
+    if (m_CurrentRenderWindowPart == renderPart)
     {
       RenderWindowPartInputChanged(renderPart);
     }

@@ -35,15 +35,19 @@ namespace mitk {
     virtual ~IRenderWindowPartListener();
 
     /**
-     * Called when an IRenderWindowPart is activated or if it becomes visible and no
-     * other IRenderWindowPart was activated before.
+     * Called when an IRenderWindowPart becomes the current active part. Fired
+     * once when a part first becomes visible, and on transition from one active
+     * part to another. Not fired on focus changes or on re-visibility after a
+     * transient hide.
      *
      * \param renderWindowPart The newly activated IRenderWindowPart.
      */
     virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) = 0;
 
     /**
-     * Called when an IRenderWindowPart becomes invisible and if it was active before.
+     * Called when the currently active IRenderWindowPart is closed, or when a
+     * different IRenderWindowPart becomes visible and takes its place. Not
+     * fired on transient hides or focus loss.
      *
      * \param renderWindowPart The deactivated IRenderWindowPart.
      */

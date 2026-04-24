@@ -15,15 +15,12 @@ found in the LICENSE file.
 #include "mitkObjFileReaderService.h"
 #include "mitkPlyFileReaderService.h"
 #include "mitkPlyFileWriterService.h"
-#include "mitkSceneFileReader.h"
 #include "mitkVtkUnstructuredGridReader.h"
 
 namespace mitk
 {
   void IOExtActivator::Load(us::ModuleContext *)
   {
-    m_SceneReader.reset(new SceneFileReader());
-
     m_VtkUnstructuredGridReader.reset(new VtkUnstructuredGridReader());
     m_ObjReader.reset(new ObjFileReaderService());
 

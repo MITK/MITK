@@ -29,9 +29,11 @@ found in the LICENSE file.
 namespace
 {
   // Internal event fired when a contour stroke is completed. Carries the
-  // closed contour (in 3D world coords, for persistent display), the small
-  // 3D bounding-box-sized uint8 mask (for nnInteractive forwarding), and
-  // the corresponding interaction bounding box.
+  // closed contour (in 3D world coords, for persistent display), the 2D
+  // uint8 painting slice and its slicing plane (for the outer Impl to
+  // build the bbox-sized mask), and the corresponding interaction bounding
+  // box. Mirrors ScribbleStrokeEvent so both interactors keep mask
+  // construction outside the inner state machine.
   class LassoContourEvent : public itk::AnyEvent
   {
   public:
@@ -41,16 +43,18 @@ namespace
     LassoContourEvent() = default;
 
     LassoContourEvent(mitk::ContourModel* contour,
-                       mitk::Image* mask,
+                       mitk::Image* slice,
+                       const mitk::PlaneGeometry* plane,
                        const mitk::nnInteractive::InteractionBoundingBox& boundingBox)
-      : m_Contour(contour), m_Mask(mask), m_BoundingBox(boundingBox)
+      : m_Contour(contour), m_Slice(slice), m_Plane(plane), m_BoundingBox(boundingBox)
     {
     }
 
     LassoContourEvent(const Self& other)
       : Superclass(other),
         m_Contour(other.m_Contour),
-        m_Mask(other.m_Mask),
+        m_Slice(other.m_Slice),
+        m_Plane(other.m_Plane),
         m_BoundingBox(other.m_BoundingBox)
     {
     }
@@ -67,12 +71,14 @@ namespace
     itk::EventObject* MakeObject() const override { return new Self(*this); }
 
     mitk::ContourModel* GetContour() const { return m_Contour; }
-    mitk::Image* GetMask() const { return m_Mask; }
+    mitk::Image* GetSlice() const { return m_Slice; }
+    const mitk::PlaneGeometry* GetPlane() const { return m_Plane; }
     const mitk::nnInteractive::InteractionBoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
   private:
     mitk::ContourModel::Pointer m_Contour;
-    mitk::Image::Pointer m_Mask;
+    mitk::Image::Pointer m_Slice;
+    mitk::PlaneGeometry::ConstPointer m_Plane;
     mitk::nnInteractive::InteractionBoundingBox m_BoundingBox{};
   };
 
@@ -195,7 +201,7 @@ namespace
         return;
       }
 
-      this->FinalizeContour();
+      this->FinalizeContour(positionEvent);
       this->RequestRendererUpdate(positionEvent);
     }
 
@@ -204,12 +210,13 @@ namespace
       // Prompt-type switching is handled externally via the interactor swap.
     }
 
-    void FinalizeContour()
+    void FinalizeContour(const mitk::InteractionPositionEvent* positionEvent)
     {
       // Extract a uint8 2D slice of the reference image at the current
-      // plane to capture the right extent and world geometry.
-      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(
-        m_CurrentPlane, m_ReferenceImage, 0.0);
+      // renderer's time point. The event-based overload picks up the
+      // correct time step for 4D data; the previous time-point-based
+      // overload was hardcoded to 0.0.
+      auto refSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(positionEvent, m_ReferenceImage);
       if (refSlice.IsNull())
       {
         this->DiscardCurrentContour();
@@ -254,12 +261,9 @@ namespace
       if (!haveBoundingBox)
         return;
 
-      auto mask = mitk::nnInteractive::BuildBoundingBoxMaskImage(
-        paintingSlice, handoffPlane, m_ReferenceImage, boundingBox);
-      if (mask.IsNull())
-        return;
-
-      this->InvokeEvent(LassoContourEvent(contourCopy, mask, boundingBox));
+      // Hand off slice + plane + bbox to the outer Impl, which builds the
+      // bbox-sized 3D mask. Mirrors ScribbleStrokeEvent.
+      this->InvokeEvent(LassoContourEvent(contourCopy, paintingSlice, handoffPlane, boundingBox));
     }
 
     void DiscardCurrentContour()
@@ -362,8 +366,20 @@ namespace mitk::nnInteractive
     {
       const auto* contourEvent = static_cast<const LassoContourEvent*>(&event);
       auto contour = contourEvent->GetContour();
-      auto mask = contourEvent->GetMask();
-      if (contour == nullptr || mask == nullptr)
+      auto slice = contourEvent->GetSlice();
+      if (contour == nullptr || slice == nullptr)
+        return;
+
+      auto referenceNode = m_Owner->GetToolManager()->GetReferenceData(0);
+      auto referenceImage = referenceNode != nullptr ? referenceNode->GetDataAs<Image>() : nullptr;
+      if (referenceImage == nullptr)
+        return;
+
+      // Build the small 3D bounding-box-sized mask here (in the outer Impl)
+      // rather than inside the inner state machine, mirroring the Scribble
+      // path so both interactors keep mask construction symmetrical.
+      auto mask = BuildBoundingBoxMaskImage(slice, contourEvent->GetPlane(), referenceImage, contourEvent->GetBoundingBox());
+      if (mask.IsNull())
         return;
 
       const auto promptType = m_Owner->GetCurrentPromptType();
@@ -379,7 +395,7 @@ namespace mitk::nnInteractive
       node->SetBoolProperty("includeInBoundingBox", false);
 
       m_LassoNodes[promptType].push_back(node);
-      m_Owner->GetDataStorage()->Add(node, m_Owner->GetToolManager()->GetReferenceData(0));
+      m_Owner->GetDataStorage()->Add(node, referenceNode);
 
       m_LastLassoMask = mask;
       m_LastLassoBoundingBox = contourEvent->GetBoundingBox();

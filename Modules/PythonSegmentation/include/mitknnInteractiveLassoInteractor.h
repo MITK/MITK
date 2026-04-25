@@ -13,8 +13,7 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveLassoInteractor_h
 #define mitknnInteractiveLassoInteractor_h
 
-#include <array>
-
+#include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
 
 namespace mitk
@@ -81,10 +80,9 @@ namespace mitk::nnInteractive
      * \return Pointer to the bounding box, or \c nullptr if no contour has
      *         been drawn yet.
      */
-    const std::array<std::array<int, 2>, 3>* GetLastLassoBoundingBox() const;
+    const InteractionBoundingBox* GetLastLassoBoundingBox() const;
 
   private:
-    void OnSetToolManager() override;
     void OnHandleEvent(InteractionEvent* event) override;
     void OnEnable() override;
     void OnDisable() override;

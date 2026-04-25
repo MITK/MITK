@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkImageReadAccessor.h>
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
+#include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveBoxInteractor.h>
 #include <mitknnInteractiveLassoInteractor.h>
 #include <mitknnInteractivePointInteractor.h>
@@ -28,8 +29,6 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 
 #include <regex>
-
-#include "mitknnInteractiveBoundingBox.h"
 
 using namespace mitk::nnInteractive;
 

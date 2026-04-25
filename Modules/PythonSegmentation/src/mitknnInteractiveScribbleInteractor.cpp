@@ -28,7 +28,7 @@ found in the LICENSE file.
 
 #include <cmath>
 
-#include "mitknnInteractiveBoundingBox.h"
+#include "mitknnInteractiveBoundingBoxHelpers.h"
 
 namespace
 {
@@ -593,7 +593,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::ScribbleInteractor::ScribbleInteractor()
-  : Interactor(InteractionType::Scribble, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Scribble),
     m_Impl(std::make_unique<Impl>(this))
 {
 }
@@ -613,15 +613,9 @@ const mitk::Image* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleMask(
   return m_Impl->m_LastStrokeMask;
 }
 
-const std::array<std::array<int, 2>, 3>* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleBoundingBox() const
+const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleBoundingBox() const
 {
   return m_Impl->m_LastStrokeBoundingBox.has_value() ? &m_Impl->m_LastStrokeBoundingBox.value() : nullptr;
-}
-
-void mitk::nnInteractive::ScribbleInteractor::OnSetToolManager()
-{
-  // Nothing to do: state machine is loaded once in Impl's ctor and the
-  // reference image / data storage are plumbed in OnEnable().
 }
 
 void mitk::nnInteractive::ScribbleInteractor::OnHandleEvent(InteractionEvent* event)

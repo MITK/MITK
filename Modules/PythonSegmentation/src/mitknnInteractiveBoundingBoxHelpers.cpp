@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitknnInteractiveBoundingBox.h"
+#include "mitknnInteractiveBoundingBoxHelpers.h"
 
 #include <mitkBaseGeometry.h>
 #include <mitkImageReadAccessor.h>

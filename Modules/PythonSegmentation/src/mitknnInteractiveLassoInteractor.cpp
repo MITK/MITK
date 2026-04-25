@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
-#include "mitknnInteractiveBoundingBox.h"
+#include "mitknnInteractiveBoundingBoxHelpers.h"
 
 namespace
 {
@@ -398,7 +398,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::LassoInteractor::LassoInteractor()
-  : Interactor(InteractionType::Lasso, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Lasso),
     m_Impl(std::make_unique<Impl>(this))
 {
 }
@@ -418,15 +418,9 @@ const mitk::Image* mitk::nnInteractive::LassoInteractor::GetLastLassoMask() cons
   return m_Impl->m_LastLassoMask;
 }
 
-const std::array<std::array<int, 2>, 3>* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const
+const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const
 {
   return m_Impl->m_LastLassoBoundingBox.has_value() ? &m_Impl->m_LastLassoBoundingBox.value() : nullptr;
-}
-
-void mitk::nnInteractive::LassoInteractor::OnSetToolManager()
-{
-  // State machine is already loaded in Impl's ctor; reference image and
-  // data storage are plumbed in OnEnable().
 }
 
 void mitk::nnInteractive::LassoInteractor::OnHandleEvent(InteractionEvent* event)

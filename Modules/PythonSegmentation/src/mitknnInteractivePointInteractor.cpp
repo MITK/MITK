@@ -114,7 +114,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::PointInteractor::PointInteractor()
-  : Interactor(InteractionType::Point, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Point),
     m_Impl(std::make_unique<Impl>(this))
 {
 }

@@ -107,7 +107,7 @@ http(s)://{host}:{port}/api/v{major}
 ### Version Discovery
 
 ```http
-GET /api/v1/
+GET /api/v1/info
 ```
 
 Returns API metadata including supported versions and deprecation notices.
@@ -118,10 +118,14 @@ Returns API metadata including supported versions and deprecation notices.
 
 ### Phase 1: API Token Authentication
 
+The server expects an [RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750) Bearer token in the `Authorization` header:
+
 ```http
 GET /api/v1/datastorage/nodes
-X-MITK-API-Token: {token}
+Authorization: Bearer {token}
 ```
+
+When authentication fails, the server responds with `401 Unauthorized` and a `WWW-Authenticate: Bearer` header. When `requireAuth` is disabled (development mode), the header may be omitted.
 
 ### Future: OAuth2/OIDC
 
@@ -146,8 +150,8 @@ security:
 |--------|----------|-------------|
 | `Content-Type` | For POST/PUT/PATCH | `application/json` for metadata |
 | `Accept` | Optional | Desired response format |
-| `X-MITK-API-Token` | When auth enabled | Authentication token |
-| `X-MITK-Transfer-Mode` | For data endpoints | `direct`, `file-reference`, `shared-memory` |
+| `Authorization` | When auth enabled | `Bearer {token}` — see §4 |
+| `X-MITK-Transfer-Mode` | For data endpoints | `direct`, `file-reference` (`shared-memory` is planned, not yet accepted by the server) |
 
 ### 5.2 Standard Response Envelope
 
@@ -195,7 +199,7 @@ Pagination links (`links.prev`, `links.next`) are only included when applicable.
 **System field filters** use direct parameters:
 
 ```
-?data_type=mitk::Image&parent_uid=node-001
+?data_type=Image&parent_uid=node-001
 ```
 
 **Property filters** use the `filter.` prefix:
@@ -206,7 +210,7 @@ Pagination links (`links.prev`, `links.next`) are only included when applicable.
 
 **Combined example:**
 ```http
-GET /api/v1/datastorage/nodes?data_type=mitk::Image&filter.visible=true
+GET /api/v1/datastorage/nodes?data_type=Image&filter.visible=true
 ```
 
 Supported filter operators:
@@ -216,7 +220,7 @@ Supported filter operators:
 - Wildcard `?` (exactly one character): `filter.name=Node_0?`, `filter.name=????`
 
 **Supported system field filters:**
-- `data_type` — MITK class name (e.g., `mitk::Image`, `mitk::LabelSetImage`, `mitk::Surface`)
+- `data_type` — Unqualified MITK class name as returned by `BaseData::GetNameOfClass()` (e.g., `Image`, `LabelSetImage`, `Surface` — note: no `mitk::` prefix)
 - `parent_uid` — Filter by parent (use `null` for top-level nodes)
 - `path` — Path-based lookup
 
@@ -303,7 +307,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661400
     }
   ],
@@ -324,7 +328,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661400
     },
     {
@@ -332,7 +336,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661700
     }
   ],
@@ -353,7 +357,7 @@ Node responses contain **system information only**. The `name` property is inclu
   "name": "CT_Scan",
   "path": "/CT_Scan",
   "parent_uid": null,
-  "data_type": "mitk::Image",
+  "data_type": "Image",
   "children_count": 2,
   "timestamp": 1705661400
 }
@@ -367,7 +371,7 @@ Node responses contain **system information only**. The `name` property is inclu
 | `name` | string | Node name (shortcut to name property) |
 | `path` | string | Full path in hierarchy |
 | `parent_uid` | string | Parent node UID (null for top-level) |
-| `data_type` | string | MITK data class (e.g., `mitk::Image`) |
+| `data_type` | string | Unqualified MITK data class name (e.g., `Image`, `LabelSetImage`, `Surface`) |
 | `children_count` | integer | Number of child nodes |
 | `timestamp` | integer | ITK modified time (ever-increasing integer within session; higher values are newer) |
 
@@ -571,7 +575,7 @@ The server accepts any file format supported by MITK I/O. Format detection is ba
 
 ### 8.1 Discovery and Health
 
-#### GET /api/v1/
+#### GET /api/v1/info
 
 API information and capabilities.
 
@@ -581,18 +585,26 @@ API information and capabilities.
   "data": {
     "name": "MITK Workbench REST API",
     "api_version": "v1",
-    "mitk_version": "2024.12",
+    "mitk_version": "2026.02.0",
     "capabilities": {
       "transfer_modes": ["direct", "file-reference"],
       "authentication": ["api-token"]
     },
-    "documentation_url": "https://docs.mitk.org/api/v1"
+    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html"
   }
 }
 ```
 
+The `documentation_url` is constructed from the running MITK version as `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`.
+
 > **Note:** The `capabilities.events` section with `zeromq_endpoint` is planned for a future version when ZeroMQ event notification support is implemented. Currently, this field is not included in the response.
-```
+
+#### Interactive Documentation
+
+The server also exposes the OpenAPI document and a Swagger UI for live exploration. These resources are not part of the versioned contract:
+
+- `GET /api/v1/openapi.json` — raw OpenAPI 3 document
+- `GET /api/v1/docs/` — interactive Swagger UI (with associated CSS/JS assets under `/api/v1/docs/`)
 
 #### GET /api/v1/health
 
@@ -676,7 +688,7 @@ List all nodes in the data storage. Always returns an array.
 
 **Example Request:**
 ```http
-GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.visible=true
+GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=Image&filter.visible=true
 ```
 
 **Response:**
@@ -688,7 +700,7 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
       "name": "CT_Scan",
       "path": "/CT_Scan",
       "parent_uid": null,
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 2,
       "timestamp": 1705659600
     },
@@ -697,7 +709,7 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
       "name": "MRI_T1",
       "path": "/MRI_T1",
       "parent_uid": null,
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 0,
       "timestamp": 1705659900
     }
@@ -738,8 +750,8 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
     "limit": 50,
     "offset": 50,
     "links": {
-      "prev": "/api/v1/datastorage/nodes?data_type=mitk::Image&limit=50&offset=0",
-      "next": "/api/v1/datastorage/nodes?data_type=mitk::Image&limit=50&offset=100"
+      "prev": "/api/v1/datastorage/nodes?data_type=Image&limit=50&offset=0",
+      "next": "/api/v1/datastorage/nodes?data_type=Image&limit=50&offset=100"
     }
   }
 }
@@ -784,7 +796,7 @@ X-MITK-Data-Format: nrrd
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705661400
   },
@@ -840,7 +852,7 @@ Get node system information.
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 2,
     "timestamp": 1705661400
   },
@@ -882,7 +894,7 @@ Content-Type: application/json
     "name": "CT_Scan",
     "path": "/Parent_Node/CT_Scan",
     "parent_uid": "node-010",
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 2,
     "timestamp": 1705663500
   }
@@ -1031,7 +1043,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705663200
   }
@@ -1046,7 +1058,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705663200
   },
@@ -1081,7 +1093,7 @@ Same filtering/pagination as `GET /datastorage/nodes`.
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "children_count": 0,
       "timestamp": 1705661400
     },
@@ -1090,7 +1102,7 @@ Same filtering/pagination as `GET /datastorage/nodes`.
       "name": "Mask",
       "path": "/CT_Scan/Mask",
       "parent_uid": "node-001",
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 0,
       "timestamp": 1705661700
     }
@@ -1140,7 +1152,7 @@ Content-Type: application/json
     "name": "Segmentation",
     "path": "/CT_Scan/Segmentation",
     "parent_uid": "node-001",
-    "data_type": "mitk::LabelSetImage",
+    "data_type": "LabelSetImage",
     "children_count": 0,
     "timestamp": 1705663200
   },
@@ -2218,7 +2230,7 @@ For validation failures, include field-level details:
 import requests
 
 BASE_URL = "http://localhost:8080/api/v1"
-HEADERS = {"X-MITK-API-Token": "my-token"}
+HEADERS = {"Authorization": "Bearer my-token"}
 
 # Load image
 response = requests.post(
@@ -2308,7 +2320,7 @@ response = requests.get(
     headers=HEADERS,
     params={
         "hierarchy": "toplevel",
-        "data_type": "mitk::Image",
+        "data_type": "Image",
         "filter.visible": "true",
         "fields": "uid,name,data_type"
     }
@@ -2411,7 +2423,7 @@ The API is designed for extension:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/` | API info |
+| `GET` | `/api/v1/info` | API info |
 | `GET` | `/api/v1/health` | Health check |
 | `GET` | `/api/v1/config/file-access` | File access configuration |
 | `GET` | `/api/v1/datastorage/nodes` | List nodes |
@@ -2431,6 +2443,21 @@ The API is designed for extension:
 | `DELETE` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Delete property |
 | `POST` | `/api/v1/rendering/update` | Trigger render window update |
 | `POST` | `/api/v1/rendering/reinit` | Fit all views to visible data, or to one/multiple nodes when `uids` body field is given |
+| `GET` | `/api/v1/rendering/selected-position` | Get the workbench's globally selected world position |
+| `PUT` | `/api/v1/rendering/selected-position` | Set the workbench's globally selected world position |
+| `GET` | `/api/v1/rendering/selected-time` | Get the workbench's globally selected time step |
+| `PUT` | `/api/v1/rendering/selected-time` | Set the workbench's globally selected time step |
+| `GET` | `/api/v1/rendering/screenshot` | Screenshot of the active editor's primary window |
+| `GET` | `/api/v1/rendering/editors` | List render-window editors that expose a REST surface |
+| `GET` | `/api/v1/rendering/editors/stdmulti` | StdMultiWidgetEditor metadata |
+| `GET` | `/api/v1/rendering/editors/stdmulti/screenshot` | Composite screenshot of the StdMultiWidget editor |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows` | List render windows of the StdMultiWidget editor |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}` | Metadata of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/screenshot` | Screenshot of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Get camera state of a StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Update camera state of a StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Get selected slice index of a 2D StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Set selected slice index of a 2D StdMultiWidget render window |
 
 ### Query Parameters Summary
 
@@ -2457,8 +2484,8 @@ The API is designed for extension:
 |--------|-----------|--------|-------------|
 | `Content-Type` | POST/PUT/PATCH | `application/json`, `application/octet-stream` | Request body format |
 | `Accept` | GET | `application/json`, `application/octet-stream` | Desired response format |
-| `X-MITK-API-Token` | All | Token string | Authentication (when enabled) |
-| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference`, `shared-memory` | Data transfer mode |
+| `Authorization` | All | `Bearer {token}` | Authentication (when enabled) |
+| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference` (`shared-memory` planned) | Data transfer mode |
 
 ### HTTP Methods by Endpoint
 
@@ -2466,7 +2493,7 @@ All endpoints are relative to the base URL `/api/v1`.
 
 | Endpoint | GET | POST | PUT | PATCH | DELETE |
 |----------|-----|------|-----|-------|--------|
-| `/` | ✓ Info | — | — | — | — |
+| `/info` | ✓ Info | — | — | — | — |
 | `/health` | ✓ Health | — | — | — | — |
 | `/config/file-access` | ✓ Config | — | — | — | — |
 | `/datastorage/nodes` | ✓ List | ✓ Create | — | — | — |
@@ -2477,6 +2504,17 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/datastorage/nodes/{uid}/properties/{name}` | ✓ Read | — | ✓ Set | — | ✓ Delete |
 | `/rendering/update` | — | ✓ Update | — | — | — |
 | `/rendering/reinit` | — | ✓ Reinit (global or node-scoped) | — | — | — |
+| `/rendering/selected-position` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/selected-time` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/screenshot` | ✓ Active editor | — | — | — | — |
+| `/rendering/editors` | ✓ List | — | — | — | — |
+| `/rendering/editors/stdmulti` | ✓ Metadata | — | — | — | — |
+| `/rendering/editors/stdmulti/screenshot` | ✓ Composite | — | — | — | — |
+| `/rendering/editors/stdmulti/windows` | ✓ List | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}` | ✓ Read | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/screenshot` | ✓ Screenshot | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/camera` | ✓ Read | — | ✓ Update | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/selected-slice` | ✓ Read | — | ✓ Set | — | — |
 
 ---
 

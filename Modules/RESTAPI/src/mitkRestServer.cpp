@@ -106,7 +106,6 @@ namespace
   {
     return path == "/api/v1/health" ||
            path == "/api/v1/info" ||
-           path == "/api/v1/" ||
            path == "/api/v1/docs" ||
            path == "/api/v1/docs/" ||
            path == "/api/v1/docs/swagger-ui.css" ||
@@ -817,13 +816,6 @@ void RestServer::RegisterRoutes()
     });
 
   m_Server->Get(apiBase + "/info",
-    [this](const httplib::Request& req, httplib::Response& res) {
-      m_HealthController->HandleGET_info(req, res);
-      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
-    });
-
-  // API root info
-  m_Server->Get(apiBase + "/",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_HealthController->HandleGET_info(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);

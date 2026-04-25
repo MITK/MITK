@@ -14,16 +14,18 @@ found in the LICENSE file.
 #define mitkRenderingController_h
 
 #include <mitkDataStorageBridge.h>
+#include <mitkRenderWindowBridge.h>
 #include <mitkStorageThreadDispatcherBase.h>
 #include <httplib.h>
 
 #include <functional>
+#include <optional>
+#include <utility>
 
 #include <MitkRESTAPIExports.h>
 
 namespace mitk
 {
-  class RenderWindowBridge;
 
   /**
    * \brief Handles all /api/v1/rendering endpoints.
@@ -225,6 +227,20 @@ namespace mitk
      * The 3D window returns 404 UNSUPPORTED_OPERATION.
      */
     void HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/stdmulti/screenshot (WP2 E3).
+     *
+     * Editor-canvas grab. Query contract identical to /rendering/screenshot.
+     */
+    void HandleGET_stdmultiScreenshot(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/screenshot (WP2 E6).
+     *
+     * Single-window offscreen grab. Query contract identical to /rendering/screenshot.
+     */
+    void HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * \brief Handle GET /rendering/screenshot request.

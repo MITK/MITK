@@ -742,6 +742,91 @@ namespace
     return std::nullopt;
   }
 
+  constexpr const char* ContentTypeFor(mitk::ScreenshotFormat f)
+  {
+    return (f == mitk::ScreenshotFormat::Jpeg) ? "image/jpeg" : "image/png";
+  }
+
+  /**
+   * \brief Resolved query parameters for the screenshot endpoints.
+   *
+   * Shared between /rendering/screenshot, /rendering/editors/stdmulti/screenshot,
+   * and /rendering/editors/stdmulti/windows/{name}/screenshot — the contract
+   * is intentionally identical (concept D17 / plan section 14 RF2).
+   */
+  struct ScreenshotQueryParams
+  {
+    mitk::ScreenshotFormat format = mitk::ScreenshotFormat::Png;
+    std::optional<std::pair<int, int>> size;
+  };
+
+  /**
+   * \brief Thrown by ParseScreenshotQueryParams on invalid query parameters.
+   *
+   * Carries the human-readable detail string that the handler turns into a
+   * 400 InvalidRequest response. Internal to this translation unit.
+   */
+  struct InvalidScreenshotRequest
+  {
+    std::string detail;
+  };
+
+  /**
+   * \brief Parse `format` / `width` / `height` query parameters.
+   *
+   * \throws InvalidScreenshotRequest if any parameter is malformed.
+   */
+  ScreenshotQueryParams ParseScreenshotQueryParams(const httplib::Request& req)
+  {
+    ScreenshotQueryParams p;
+
+    if (req.has_param("format"))
+    {
+      const auto formatStr = req.get_param_value("format");
+      if (formatStr == "png")
+        p.format = mitk::ScreenshotFormat::Png;
+      else if (formatStr == "jpeg")
+        p.format = mitk::ScreenshotFormat::Jpeg;
+      else
+        throw InvalidScreenshotRequest{
+          "Invalid format '" + formatStr + "'. Must be 'png' or 'jpeg'."};
+    }
+
+    const bool hasWidth = req.has_param("width");
+    const bool hasHeight = req.has_param("height");
+    if (hasWidth != hasHeight)
+      throw InvalidScreenshotRequest{
+        "Both 'width' and 'height' must be provided together."};
+
+    if (hasWidth)
+    {
+      int width = 0;
+      int height = 0;
+      try
+      {
+        width = std::stoi(req.get_param_value("width"));
+        height = std::stoi(req.get_param_value("height"));
+      }
+      catch (const std::exception&)
+      {
+        throw InvalidScreenshotRequest{"'width' and 'height' must be integers."};
+      }
+
+      if (width <= 0 || height <= 0)
+        throw InvalidScreenshotRequest{
+          "'width' and 'height' must be positive integers."};
+
+      static constexpr int maxDimension = 8192;
+      if (width > maxDimension || height > maxDimension)
+        throw InvalidScreenshotRequest{
+          "'width' and 'height' must not exceed " + std::to_string(maxDimension) + "."};
+
+      p.size = {width, height};
+    }
+
+    return p;
+  }
+
   nlohmann::json SliceStateToJson(const mitk::SliceState& s)
   {
     nlohmann::json j;
@@ -1202,95 +1287,112 @@ void RenderingController::HandleGET_screenshot(const httplib::Request& req, http
     return;
   }
 
-  // Parse format parameter (default: png).
-  ScreenshotFormat format = ScreenshotFormat::Png;
-  if (req.has_param("format"))
+  ScreenshotQueryParams params;
+  try
   {
-    const auto formatStr = req.get_param_value("format");
-    if (formatStr == "png")
-    {
-      format = ScreenshotFormat::Png;
-    }
-    else if (formatStr == "jpeg")
-    {
-      format = ScreenshotFormat::Jpeg;
-    }
-    else
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "Invalid format '" + formatStr + "'. Must be 'png' or 'jpeg'.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
+    params = ParseScreenshotQueryParams(req);
   }
-
-  const std::string contentType = (format == ScreenshotFormat::Jpeg) ? "image/jpeg" : "image/png";
-
-  // Parse optional width/height — both must be given together.
-  const bool hasWidth = req.has_param("width");
-  const bool hasHeight = req.has_param("height");
-
-  if (hasWidth != hasHeight)
+  catch (const InvalidScreenshotRequest& e)
   {
-    const auto error = ErrorResponse::InvalidRequest(
-      "Both 'width' and 'height' must be provided together.", req.path);
-    this->SendErrorResponse(res, 400, error);
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
     return;
   }
 
-  std::optional<std::pair<int, int>> size;
-  if (hasWidth)
-  {
-    int width = 0;
-    int height = 0;
-    try
-    {
-      width = std::stoi(req.get_param_value("width"));
-      height = std::stoi(req.get_param_value("height"));
-    }
-    catch (const std::exception&)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must be integers.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    if (width <= 0 || height <= 0)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must be positive integers.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    static constexpr int maxDimension = 8192;
-    if (width > maxDimension || height > maxDimension)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must not exceed " + std::to_string(maxDimension) + ".", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    size = {width, height};
-  }
-
-  // Take screenshot — the bridge dispatches to the UI thread internally.
   try
   {
-    const auto imageData = m_RenderWindowBridge->TakeScreenshot(size, format);
+    const auto imageData = m_RenderWindowBridge->TakeScreenshot(params.size, params.format);
     res.status = 200;
     res.set_content(
       reinterpret_cast<const char*>(imageData.data()),
       imageData.size(),
-      contentType);
+      ContentTypeFor(params.format));
   }
   catch (const std::exception& e)
   {
-    const auto error = ErrorResponse::InternalError(
-      std::string("Screenshot capture failed: ") + e.what(), req.path);
-    this->SendErrorResponse(res, 500, error);
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiEditorScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeStdMultiEditorScreenshot(params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  const auto nameIt = req.path_params.find("name");
+  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeStdMultiWindowScreenshot(name, params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
   }
 }
 

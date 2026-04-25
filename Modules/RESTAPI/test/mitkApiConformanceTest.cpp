@@ -331,6 +331,14 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
       };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiScreenshot(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
+      };
   }
 
   /// Read required fields from components.schemas.<schemaName>.required.

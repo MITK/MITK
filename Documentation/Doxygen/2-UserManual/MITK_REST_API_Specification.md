@@ -1875,6 +1875,20 @@ Returns metadata about the StdMultiWidget editor, including its current window n
 
 ---
 
+#### GET /api/v1/rendering/editors/stdmulti/screenshot
+
+Captures the StdMultiWidget editor canvas (all four render windows together, no side panels).
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`. Only the capture surface differs. Any future change to the global screenshot contract must be applied to this endpoint in the same commit.
+
+**Editor-specific error (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+
+---
+
 #### GET /api/v1/rendering/editors/stdmulti/windows
 
 Lists the StdMultiWidget render windows. No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane. Live orientation, when needed, is derivable from the window's `/camera`.
@@ -2094,6 +2108,23 @@ Content-Type: application/json
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/screenshot
+
+Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact (concept D17).
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`.
+
+**Window-specific errors (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 
 ---
 

@@ -125,6 +125,17 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutSliceWithoutSetterReturns503);
   MITK_TEST(PutSliceOnAxialReturns204);
 
+  // WP2 screenshot tests
+  MITK_TEST(GetEditorScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetEditorScreenshotEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetEditorScreenshotReturns200Png);
+  MITK_TEST(GetEditorScreenshotWithJpegAndSizeReturns200);
+  MITK_TEST(GetEditorScreenshotInvalidFormatReturns400);
+  MITK_TEST(GetEditorScreenshotExcessiveDimensionsReturns400);
+  MITK_TEST(GetWindowScreenshotUnknownWindowReturns404);
+  MITK_TEST(GetWindowScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetWindowScreenshotReturns200Png);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1456,6 +1467,162 @@ public:
     CPPUNIT_ASSERT_EQUAL(204, res.status);
     CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
     CPPUNIT_ASSERT_EQUAL(42u, capturedStep);
+  }
+  // ===== WP2: screenshots =====
+
+  void GetEditorScreenshotWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorScreenshotEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) -> std::vector<unsigned char>
+      {
+        throw mitk::RenderWindowBridgeNoEditorException("editor not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [fakeBytes](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return fakeBytes; });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    // Content-Type is set via set_content; body bytes match provider output.
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
+  }
+
+  void GetEditorScreenshotWithJpegAndSizeReturns200()
+  {
+    mitk::ScreenshotFormat capturedFormat = mitk::ScreenshotFormat::Png;
+    std::optional<std::pair<int, int>> capturedSize;
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [&](std::optional<std::pair<int, int>> s, mitk::ScreenshotFormat f) {
+        capturedSize = s; capturedFormat = f;
+        return std::vector<unsigned char>{0xFF, 0xD8};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("format", "jpeg");
+    req.params.emplace("width", "640");
+    req.params.emplace("height", "480");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT(capturedFormat == mitk::ScreenshotFormat::Jpeg);
+    CPPUNIT_ASSERT(capturedSize.has_value());
+    CPPUNIT_ASSERT_EQUAL(640, capturedSize->first);
+    CPPUNIT_ASSERT_EQUAL(480, capturedSize->second);
+  }
+
+  void GetEditorScreenshotInvalidFormatReturns400()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("format", "bmp");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetEditorScreenshotExcessiveDimensionsReturns400()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("width", "9000");
+    req.params.emplace("height", "9000");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetWindowScreenshotUnknownWindowReturns404()
+  {
+    // Provider must be bound: bridge-availability (503) is checked before
+    // window-name validation (404), matching the editor-level handler.
+    m_RenderWindowBridge->SetStdMultiWindowScreenshotProvider(
+      [](const std::string&, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat)
+      {
+        return std::vector<unsigned char>{};
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/screenshot", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetWindowScreenshotWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+  }
+
+  void GetWindowScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    std::string capturedName;
+    m_RenderWindowBridge->SetStdMultiWindowScreenshotProvider(
+      [fakeBytes, &capturedName](
+        const std::string& name, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat)
+      {
+        capturedName = name;
+        return fakeBytes;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
   }
 };
 

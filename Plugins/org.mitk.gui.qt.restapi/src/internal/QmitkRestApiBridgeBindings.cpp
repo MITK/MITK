@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkBaseGeometry.h>
+#include <QmitkAbstractMultiWidget.h>
 #include <QmitkRenderWindow.h>
 
 #include <vtkCamera.h>
@@ -34,6 +35,7 @@ found in the LICENSE file.
 
 #include <QBuffer>
 #include <QIODevice>
+#include <QImage>
 #include <QPixmap>
 #include <QWidget>
 
@@ -130,6 +132,30 @@ namespace
     return bounds;
   }
 
+  /**
+   * @brief Encode a QPixmap to PNG/JPEG bytes, optionally scaling first.
+   *
+   * Shared by the editor and per-window screenshot providers. Scaling is done
+   * on the captured image rather than by resizing the live render surface
+   * (concept D17: never resize the live window).
+   */
+  std::vector<unsigned char> EncodePixmap(
+    QPixmap px,
+    std::optional<std::pair<int, int>> size,
+    mitk::ScreenshotFormat format)
+  {
+    if (size.has_value())
+      px = px.scaled(size->first, size->second, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    const char* const formatStr = (format == mitk::ScreenshotFormat::Jpeg) ? "JPEG" : "PNG";
+    QByteArray bytes;
+    QBuffer buf(&bytes);
+    buf.open(QIODevice::WriteOnly);
+    if (!px.save(&buf, formatStr))
+      throw std::runtime_error(std::string("Failed to encode screenshot as ") + formatStr);
+    return std::vector<unsigned char>(bytes.begin(), bytes.end());
+  }
+
   mitk::CameraController::StandardView StandardViewFromName(const std::string& v)
   {
     if (v == "anterior")  return mitk::CameraController::ANTERIOR;
@@ -158,18 +184,7 @@ namespace mitk
         if (w == nullptr)
           throw std::runtime_error("No workbench window widget available for screenshot");
 
-        QPixmap px = w->grab();
-
-        if (size.has_value())
-          px = px.scaled(size->first, size->second, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-        const char* const formatStr = (format == mitk::ScreenshotFormat::Jpeg) ? "JPEG" : "PNG";
-        QByteArray bytes;
-        QBuffer buf(&bytes);
-        buf.open(QIODevice::WriteOnly);
-        px.save(&buf, formatStr);
-
-        return std::vector<unsigned char>(bytes.begin(), bytes.end());
+        return EncodePixmap(w->grab(), size, format);
       });
 
     rwb->SetPositionGetter(
@@ -194,6 +209,52 @@ namespace mitk
           throw mitk::RenderWindowBridgeNoEditorException(
             "StdMultiWidgetEditor is not open — cannot set crosshair position");
         rwp->SetSelectedPosition(pos);
+      });
+
+    rwb->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>> size, mitk::ScreenshotFormat format) -> std::vector<unsigned char>
+      {
+        auto* const rwp = GetStdMultiWidgetRenderWindowPart();
+        if (rwp == nullptr)
+          throw mitk::RenderWindowBridgeNoEditorException(
+            "StdMultiWidgetEditor is not open — cannot capture editor screenshot");
+
+        // Grab the multi-widget container (the editor's canvas area). The
+        // active QmitkRenderWindow's parent widget is expected to be the
+        // QmitkAbstractMultiWidget that hosts all four windows — grabbing it
+        // includes the full editor area without side panels. The qobject_cast
+        // guards against future layout changes that insert intermediate widgets.
+        auto* const active = rwp->GetActiveQmitkRenderWindow();
+        auto* const canvas = (active != nullptr)
+          ? qobject_cast<QmitkAbstractMultiWidget*>(active->parentWidget())
+          : nullptr;
+        if (canvas == nullptr)
+          throw std::runtime_error(
+            "Unexpected widget hierarchy — cannot locate QmitkAbstractMultiWidget canvas");
+
+        return EncodePixmap(canvas->grab(), size, format);
+      });
+
+    rwb->SetStdMultiWindowScreenshotProvider(
+      [](const std::string& windowName,
+         std::optional<std::pair<int, int>> size,
+         mitk::ScreenshotFormat format) -> std::vector<unsigned char>
+      {
+        auto* const rwp = GetStdMultiWidgetRenderWindowPart();
+        if (rwp == nullptr)
+          throw mitk::RenderWindowBridgeNoEditorException(
+            "StdMultiWidgetEditor is not open");
+
+        auto* const qrw = rwp->GetQmitkRenderWindow(QString::fromStdString(windowName));
+        if (qrw == nullptr)
+          throw mitk::RenderWindowBridgeUnknownWindowException(windowName);
+
+        // QmitkRenderWindow is a QVTKOpenGLNativeWidget (QOpenGLWidget). Capturing
+        // via grabFramebuffer() reads the current OpenGL framebuffer without
+        // resizing the live render window (concept D17); we scale the resulting
+        // image afterwards if a different size was requested.
+        QImage img = qrw->grabFramebuffer();
+        return EncodePixmap(QPixmap::fromImage(std::move(img)), size, format);
       });
 
     rwb->SetEditorListProvider(

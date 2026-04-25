@@ -1023,6 +1023,18 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
     });
 
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiScreenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
   // Documentation endpoints (Swagger UI and OpenAPI spec)
   // Redirect /docs to /docs/ so relative URLs in the HTML resolve correctly
   // regardless of any reverse-proxy prefix (proxy-agnostic relative redirect).

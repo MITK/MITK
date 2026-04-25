@@ -37,6 +37,7 @@ class mitkRenderWindowBridgeWP2TestSuite : public mitk::TestFixture
   MITK_TEST(CameraSetterTransportsUnknownWindowException);
   MITK_TEST(SelectedSliceGetterTransportsUnsupportedOperationException);
   MITK_TEST(InvokersThrowWhenNoCallbackSet);
+  MITK_TEST(PostResetInvocationThrowsCleanlyForEveryWP2Invoker);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -227,6 +228,50 @@ public:
       CPPUNIT_ASSERT_EQUAL(std::string("3d has no slice"), std::string(e.what()));
     }
     CPPUNIT_ASSERT(caught);
+  }
+
+  /**
+   * Shutdown-race regression (plan §6.4): after ResetCallbacks() clears every
+   * WP2 callback, a concurrent invocation attempt on any WP2 invoker must
+   * terminate with a std::runtime_error instead of crashing on a null
+   * std::function. The throw path, not the call path, is the contract during
+   * service UNREGISTERING.
+   */
+  void PostResetInvocationThrowsCleanlyForEveryWP2Invoker()
+  {
+    // Install every WP2 callback, then reset.
+    m_Bridge->SetEditorListProvider([]() { return std::vector<mitk::EditorInfo>{}; });
+    m_Bridge->SetStdMultiWindowListProvider([]() { return std::vector<mitk::WindowInfo>{}; });
+    m_Bridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int,int>>, mitk::ScreenshotFormat) {
+        return std::vector<unsigned char>{};
+      });
+    m_Bridge->SetStdMultiWindowScreenshotProvider(
+      [](const std::string&, std::optional<std::pair<int,int>>, mitk::ScreenshotFormat) {
+        return std::vector<unsigned char>{};
+      });
+    m_Bridge->SetStdMultiCameraGetter([](const std::string&) { mitk::CameraState s; return s; });
+    m_Bridge->SetStdMultiCameraSetter([](const std::string&, const mitk::CameraPatch&) {});
+    m_Bridge->SetStdMultiSelectedSliceGetter([](const std::string&) { mitk::SliceState s; return s; });
+    m_Bridge->SetStdMultiSelectedSliceStepSetter([](const std::string&, unsigned int) {});
+
+    m_Bridge->ResetCallbacks();
+
+    // Every WP2 invoker must now throw a plain std::runtime_error — not any of
+    // the typed bridge exceptions (which are callback-generated signals), and
+    // not an access violation.
+    CPPUNIT_ASSERT_THROW(m_Bridge->ListEditors(), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(m_Bridge->ListStdMultiWindows(), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(
+      m_Bridge->TakeStdMultiEditorScreenshot(std::nullopt, mitk::ScreenshotFormat::Png),
+      std::runtime_error);
+    CPPUNIT_ASSERT_THROW(
+      m_Bridge->TakeStdMultiWindowScreenshot("axial", std::nullopt, mitk::ScreenshotFormat::Png),
+      std::runtime_error);
+    CPPUNIT_ASSERT_THROW(m_Bridge->GetStdMultiCamera("axial"), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(m_Bridge->SetStdMultiCamera("axial", mitk::CameraPatch{}), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(m_Bridge->GetStdMultiSelectedSlice("axial"), std::runtime_error);
+    CPPUNIT_ASSERT_THROW(m_Bridge->SetStdMultiSelectedSliceStep("axial", 0u), std::runtime_error);
   }
 
   void InvokersThrowWhenNoCallbackSet()

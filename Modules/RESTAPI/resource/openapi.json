@@ -2578,60 +2578,55 @@
         "description": "Captures a screenshot of the active Qt application window. Requires the Qt workbench plugin to be running. Returns binary image data in PNG or JPEG format.",
         "operationId": "getRenderingScreenshot",
         "parameters": [
-          {
-            "name": "format",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "enum": ["png", "jpeg"], "default": "png" },
-            "description": "Image encoding format"
-          },
-          {
-            "name": "width",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
-            "description": "Output width in pixels. Must be provided together with 'height'."
-          },
-          {
-            "name": "height",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
-            "description": "Output height in pixels. Must be provided together with 'width'."
-          }
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
         ],
         "responses": {
-          "200": {
-            "description": "Screenshot image",
-            "content": {
-              "image/png": {
-                "schema": { "type": "string", "format": "binary" }
-              },
-              "image/jpeg": {
-                "schema": { "type": "string", "format": "binary" }
-              }
-            }
-          },
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "No screenshot provider connected (headless mode or Qt plugin not loaded)",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/screenshot"
-                  }
-                }
-              }
-            }
-          }
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of the StdMultiWidget editor canvas",
+        "description": "Grabs the StdMultiWidget editor's canvas area (all four render windows together, no side panels). Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingStdmultiScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of a single StdMultiWidget render window",
+        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingStdmultiWindowScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" },
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       }
     }
@@ -3168,6 +3163,27 @@
       }
     },
     "parameters": {
+      "ScreenshotFormat": {
+        "name": "format",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "string", "enum": ["png", "jpeg"], "default": "png" },
+        "description": "Image encoding format."
+      },
+      "ScreenshotWidth": {
+        "name": "width",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "description": "Output width in pixels. Must be provided together with 'height'."
+      },
+      "ScreenshotHeight": {
+        "name": "height",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "description": "Output height in pixels. Must be provided together with 'width'."
+      },
       "StdMultiWindowName": {
         "name": "name",
         "in": "path",
@@ -3618,6 +3634,13 @@
               }
             }
           }
+        }
+      },
+      "ScreenshotImage": {
+        "description": "Screenshot image. Content-Type is `image/png` or `image/jpeg` depending on the `format` query parameter.",
+        "content": {
+          "image/png":  { "schema": { "type": "string", "format": "binary" } },
+          "image/jpeg": { "schema": { "type": "string", "format": "binary" } }
         }
       },
       "WindowNotFoundOrUnsupported": {

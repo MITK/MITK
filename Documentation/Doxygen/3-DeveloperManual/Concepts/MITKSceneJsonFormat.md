@@ -215,11 +215,23 @@ Loadstyle is **per property map**. A node may use `modify` in its default
 context and `replace` in a renderer context (or vice versa). `data_properties`
 honors `_loadstyle` analogously on the BaseData's own property list.
 
-> **Note on `data_properties` with `"_loadstyle": "replace"`:** this clears the
-> BaseData's property list wholesale, including keys populated by the file
-> reader itself (for example DICOM tags carried as properties). That matches
-> the author's declared intent of taking full ownership. If you want to keep
-> file-reader-populated keys, use `"modify"` (the default).
+> **Important — `data_properties` with `"_loadstyle": "replace"` discards
+> reader-populated metadata.**
+>
+> The `data_properties` map is forwarded to mitk::IOUtil::Load as
+> read-only hints for the file reader, **and** transferred onto the loaded
+> BaseData's own property list afterwards. With `"_loadstyle": "replace"`
+> the second step performs a wholesale `PropertyList::Clear()` on the
+> BaseData first, which removes every key the file reader populated
+> (for example DICOM tags carried as properties, or any metadata derived
+> from the file's header) before re-applying only the keys listed in the
+> JSON.
+>
+> This is the declared intent of `replace`: the JSON author takes full
+> ownership of the property list. Authors who want to keep file-reader
+> output **must** use `"_loadstyle": "modify"` (the default) and only list
+> keys they intend to override; `replace` will silently drop any reader
+> metadata that is not re-listed in the JSON.
 
 ### Property values {#MITKSceneJsonFormatPropertyValues}
 
@@ -331,12 +343,27 @@ field instead.
   `"file-reference"`.
 - `transfer.file_path` refers to a missing or unreadable file, or the file
   fails to load.
+- A property-map error (see list below) inside `data_properties`. Because
+  `data_properties` is consumed during data loading, errors there abort the
+  load.
+
+### Per-node non-fatal errors (load proceeds, returns failure)
+
+The following property-map errors affecting a node's `properties` or
+`context_properties` are logged via `MITK_ERROR`, the affected node's
+property map is left in a partial state, the load continues with the
+remaining nodes, and `LoadScene` returns `false` to surface the failure
+to the caller:
+
 - `_file` in a property map refers to a missing / unreadable file, or the
   file's content is not a valid property map.
 - Nested `_file` in an externally referenced property-map file.
 - Inline property keys present in a property map that also specifies `_file`.
 - `_loadstyle` value other than `"modify"` or `"replace"`.
 - `context_properties` key is `""` or `"null"`.
+
+The same errors occurring inside `data_properties` are hard errors (see
+above) since `data_properties` participates in data loading.
 
 ### Soft conditions (warnings, loading proceeds)
 

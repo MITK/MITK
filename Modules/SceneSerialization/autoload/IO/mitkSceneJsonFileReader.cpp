@@ -64,6 +64,11 @@ namespace mitk
 
   std::vector<BaseData::Pointer> SceneJsonFileReader::DoRead()
   {
+    // The AbstractFileReader::DoRead contract returns BaseData only, so
+    // node properties and parent/child relationships are intentionally
+    // lost on this code path. Callers that need the scene graph should
+    // use Read(DataStorage&) instead. Data-less nodes are skipped here
+    // to avoid handing nullptrs back to IOUtil::Load.
     std::vector<BaseData::Pointer> result;
 
     DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
@@ -73,7 +78,10 @@ namespace mitk
       iter != iterEnd;
       ++iter)
     {
-      result.push_back(iter.Value()->GetData());
+      if (BaseData::Pointer data = iter.Value()->GetData())
+      {
+        result.push_back(data);
+      }
     }
     return result;
   }

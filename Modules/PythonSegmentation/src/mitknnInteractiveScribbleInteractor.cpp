@@ -19,14 +19,13 @@ found in the LICENSE file.
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkMatrixConvert.h>
+#include <mitkPaintbrushTool.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkSegTool2D.h>
 #include <mitkToolManager.h>
 
 #include <usModuleRegistry.h>
-
-#include <cmath>
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
 
@@ -81,20 +80,12 @@ namespace
     mitk::nnInteractive::InteractionBoundingBox m_BoundingBox{};
   };
 
-  // Half-pixel corner correction, matches PaintbrushTool::upperLeft.
-  mitk::Point2D UpperLeft(mitk::Point2D p)
-  {
-    p[0] -= 0.5;
-    p[1] += 0.5;
-    return p;
-  }
-
   // Paints brushstrokes directly into a 2D uint8 Image sized to the current
   // slicing plane of the reference image. Replaces the former
   // DrawPaintbrushTool wrapper -- no 3D working segmentation is required,
-  // which eliminates the full-volume ScribbleNode allocation. The circle
-  // shape, gap fill, and per-slice reset logic are ported from
-  // mitkPaintbrushTool.cpp.
+  // which eliminates the full-volume ScribbleNode allocation. Brush circle
+  // and gap-fill geometry are obtained from PaintbrushTool::CreateBrushContour
+  // and CreateGapContour so the two stay in sync.
   class ScribbleBrushInteractor : public mitk::EventStateMachine
   {
   public:
@@ -308,86 +299,7 @@ namespace
       if (m_LastContourSize == m_Size && m_MasterContour.IsNotNull())
         return;
 
-      // Port of PaintbrushTool::UpdateContour. Pure index-space circle
-      // construction; no working-data coupling.
-      m_MasterContour = mitk::ContourModel::New();
-      m_MasterContour->SetClosed(true);
-
-      const int radius = m_Size / 2;
-      const float fradius = static_cast<float>(m_Size) / 2.0f;
-      const bool evenSize = (m_Size % 2 == 0);
-
-      mitk::Point2D centerCorrection;
-      centerCorrection.Fill(0);
-      if (evenSize)
-      {
-        centerCorrection[0] += 0.5;
-        centerCorrection[1] += 0.5;
-      }
-
-      std::vector<mitk::Point2D> qUR, qLR, qLL, qUL;
-      mitk::Point2D curPoint;
-      bool curPointIsInside = true;
-      curPoint[0] = 0;
-      curPoint[1] = radius;
-      qUR.push_back(UpperLeft(curPoint));
-
-      while (curPoint[1] > 0)
-      {
-        float cx2 = 0.0f;
-        float cy2 = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
-        while (curPointIsInside)
-        {
-          curPoint[0]++;
-          cx2 = (curPoint[0] - centerCorrection[0]) * (curPoint[0] - centerCorrection[0]);
-          if (std::sqrt(cx2 + cy2) > fradius)
-            curPointIsInside = false;
-        }
-        qUR.push_back(UpperLeft(curPoint));
-
-        while (!curPointIsInside)
-        {
-          curPoint[1]--;
-          cy2 = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
-          if (std::sqrt(cx2 + cy2) <= fradius)
-          {
-            curPointIsInside = true;
-            qUR.push_back(UpperLeft(curPoint));
-          }
-          if (curPoint[1] <= 0) break;
-        }
-      }
-
-      if (!evenSize)
-      {
-        for (const auto& p0 : qUR)
-        {
-          mitk::Point2D p = p0;
-          p[1] *= -1; qLR.push_back(p);
-          p[0] *= -1; qLL.push_back(p);
-          p[1] *= -1; qUL.push_back(p);
-        }
-      }
-      else
-      {
-        for (const auto& p0 : qUR)
-        {
-          mitk::Point2D q;
-          q = p0; q[1] = -1.0f * q[1] + 1; qLR.push_back(q);
-          q = p0; q[1] = -1.0f * q[1] + 1; q[0] = -1.0f * q[0] + 1; qLL.push_back(q);
-          q = p0; q[0] = -1.0f * q[0] + 1; qUL.push_back(q);
-        }
-      }
-
-      mitk::Point3D tmp;
-      tmp[2] = 0;
-      for (const auto& p : qUR) { tmp[0] = p[0]; tmp[1] = p[1]; m_MasterContour->AddVertex(tmp); }
-      for (int i = static_cast<int>(qLR.size()) - 1; i >= 0; --i)
-        { tmp[0] = qLR[i][0]; tmp[1] = qLR[i][1]; m_MasterContour->AddVertex(tmp); }
-      for (const auto& p : qLL) { tmp[0] = p[0]; tmp[1] = p[1]; m_MasterContour->AddVertex(tmp); }
-      for (int i = static_cast<int>(qUL.size()) - 1; i >= 0; --i)
-        { tmp[0] = qUL[i][0]; tmp[1] = qUL[i][1]; m_MasterContour->AddVertex(tmp); }
-
+      m_MasterContour = mitk::PaintbrushTool::CreateBrushContour(m_Size);
       m_LastContourSize = m_Size;
     }
 
@@ -416,47 +328,11 @@ namespace
       }
       mitk::ContourModelUtils::FillContourInSlice2(stamp, m_PaintingSlice, 1);
 
-      // Gap-fill rectangle when motion exceeds brush radius (ported from
-      // PaintbrushTool::MouseMoved).
       const double dist = indexCoord.EuclideanDistanceTo(m_LastPosition);
       const double radius = static_cast<double>(m_Size) / 2.0;
       if (dist > radius)
       {
-        mitk::Point3D direction;
-        direction[0] = indexCoord[0] - m_LastPosition[0];
-        direction[1] = indexCoord[1] - m_LastPosition[1];
-        direction[2] = 0;
-        const auto dirVec = direction.GetVnlVector().normalize();
-        direction[0] = dirVec[0];
-        direction[1] = dirVec[1];
-
-        mitk::Point3D normal;
-        normal[0] = -1.0 * direction[1];
-        normal[1] = direction[0];
-        normal[2] = 0;
-
-        auto gap = mitk::ContourModel::New();
-        gap->SetClosed(true);
-
-        mitk::Point3D vertex;
-        vertex[2] = 0;
-
-        vertex[0] = m_LastPosition[0] + normal[0] * radius;
-        vertex[1] = m_LastPosition[1] + normal[1] * radius;
-        gap->AddVertex(vertex);
-
-        vertex[0] = indexCoord[0] + normal[0] * radius;
-        vertex[1] = indexCoord[1] + normal[1] * radius;
-        gap->AddVertex(vertex);
-
-        vertex[0] = indexCoord[0] - normal[0] * radius;
-        vertex[1] = indexCoord[1] - normal[1] * radius;
-        gap->AddVertex(vertex);
-
-        vertex[0] = m_LastPosition[0] - normal[0] * radius;
-        vertex[1] = m_LastPosition[1] - normal[1] * radius;
-        gap->AddVertex(vertex);
-
+        auto gap = mitk::PaintbrushTool::CreateGapContour(m_LastPosition, indexCoord, radius);
         mitk::ContourModelUtils::FillContourInSlice2(gap, m_PaintingSlice, 1);
       }
 

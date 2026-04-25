@@ -29,6 +29,8 @@ found in the LICENSE file.
 
 #include <regex>
 
+#include "mitknnInteractiveBoundingBox.h"
+
 using namespace mitk::nnInteractive;
 
 namespace
@@ -130,8 +132,8 @@ namespace mitk
     void SetAutoZoom() const;
     void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
     void AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const;
-    void AddScribbleInteraction(const Image* mask) const;
-    void AddLassoInteraction(const Image* mask) const;
+    void AddScribbleInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const;
+    void AddLassoInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const;
     void AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const;
     void ResetInteractions() const;
 
@@ -385,14 +387,26 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       }
       case InteractionType::Scribble:
       {
-        auto mask = static_cast<const ScribbleInteractor*>(interactor)->GetLastScribbleMask();
-        m_Impl->AddScribbleInteraction(mask);
+        auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
+        auto mask = scribbleInteractor->GetLastScribbleMask();
+        if (mask == nullptr)
+        {
+          MITK_WARN << "Skipping scribble preview update: no mask available.";
+          return;
+        }
+        m_Impl->AddScribbleInteraction(mask, scribbleInteractor->GetLastScribbleBoundingBox());
         break;
       }
       case InteractionType::Lasso:
       {
-        auto mask = static_cast<const LassoInteractor*>(interactor)->GetLastLassoMask();
-        m_Impl->AddLassoInteraction(mask);
+        auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
+        auto mask = lassoInteractor->GetLastLassoMask();
+        if (mask == nullptr)
+        {
+          MITK_WARN << "Skipping lasso preview update: no mask available.";
+          return;
+        }
+        m_Impl->AddLassoInteraction(mask, lassoInteractor->GetLastLassoBoundingBox());
         break;
       }
       default:
@@ -648,10 +662,10 @@ void mitk::nnInteractiveTool::StartSession()
     : Backend::CPU);
 
   auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
-  
+
   const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
   const auto timeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-  
+
   auto imageAtTimeStep = this->GetImageByTimeStep(image, timeStep);
 
   const auto maskPixelType = MultiLabelSegmentation::GetPixelType();
@@ -661,15 +675,13 @@ void mitk::nnInteractiveTool::StartSession()
   pythonContext->BindImage(imageAtTimeStep, "mitk_image");
   pythonContext->BindImage(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
-  {
-    pythonContext->Execute(
-      "image = mitk_image.as_numpy(writeable=True)\n"
-      "spacing = list(reversed(mitk_image.spacing))\n"
-      "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
-      "torch_target_buffer = torch.from_numpy(target_buffer)\n"
-      "session.set_image(image[None], {'spacing': spacing})\n"
-      "session.set_target_buffer(torch_target_buffer)\n");
-  }
+  pythonContext->Execute(
+    "image = mitk_image.as_numpy(writeable=True)\n"
+    "spacing = list(reversed(mitk_image.spacing))\n"
+    "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
+    "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+    "session.set_image(image[None], {'spacing': spacing})\n"
+    "session.set_target_buffer(torch_target_buffer)\n");
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -752,30 +764,52 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
   m_PythonContext->Execute(pyCommands.str());
 }
 
-void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask) const
+void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const
 {
   m_PythonContext->BindImage(const_cast<Image*>(mask), "mitk_scribble_mask");
 
   std::ostringstream pyCommands; pyCommands
     << "scribble_mask = mitk_scribble_mask.as_numpy()\n"
     << "session.add_scribble_interaction(\n"
-    << "    scribble_mask.astype(np.uint8),\n"
-    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << "    scribble_mask,\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False");
+
+  if (boundingBox != nullptr)
+  {
+    pyCommands
+      << ",\n    interaction_bbox=["
+      << '[' << (*boundingBox)[0][0] << ',' << (*boundingBox)[0][1] << "],"
+      << '[' << (*boundingBox)[1][0] << ',' << (*boundingBox)[1][1] << "],"
+      << '[' << (*boundingBox)[2][0] << ',' << (*boundingBox)[2][1] << "]]";
+  }
+
+  pyCommands << '\n'
     << ")\n"
     << "del scribble_mask\n";
 
   m_PythonContext->Execute(pyCommands.str());
 }
 
-void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask) const
+void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const
 {
   m_PythonContext->BindImage(const_cast<Image*>(mask), "mitk_lasso_mask");
 
   std::ostringstream pyCommands; pyCommands
     << "lasso_mask = mitk_lasso_mask.as_numpy()\n"
     << "session.add_lasso_interaction(\n"
-    << "    lasso_mask.astype(np.uint8),\n"
-    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
+    << "    lasso_mask,\n"
+    << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False");
+
+  if (boundingBox != nullptr)
+  {
+    pyCommands
+      << ",\n    interaction_bbox=["
+      << '[' << (*boundingBox)[0][0] << ',' << (*boundingBox)[0][1] << "],"
+      << '[' << (*boundingBox)[1][0] << ',' << (*boundingBox)[1][1] << "],"
+      << '[' << (*boundingBox)[2][0] << ',' << (*boundingBox)[2][1] << "]]";
+  }
+
+  pyCommands << '\n'
     << ")\n"
     << "del lasso_mask\n";
 

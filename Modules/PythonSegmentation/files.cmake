@@ -2,6 +2,7 @@ set(CPP_FILES
   mitknnInteractiveEnums.cpp
   mitknnInteractiveInteractor.cpp
   mitknnInteractiveTool.cpp
+  mitknnInteractiveBoundingBox.cpp
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

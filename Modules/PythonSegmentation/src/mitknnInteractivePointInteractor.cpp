@@ -74,7 +74,8 @@ namespace mitk::nnInteractive
       node->SetColor(GetColor(promptType, ColorIntensity::Vibrant), nullptr, "selectedcolor");
       node->SetProperty("Pointset.2D.shape", PointSetShapeProperty::New(PointSetShapeProperty::CIRCLE));
       node->SetIntProperty("Pointset.2D.resolution", 64);
-      node->SetFloatProperty("point 2D size", 5.0f);
+      node->SetFloatProperty("point 2D size", 10.0f);
+      node->SetBoolProperty("Pointset.2D.fixed size on screen", true);
       node->SetFloatProperty("Pointset.2D.distance to plane", 0.1f);
       node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
       node->SetBoolProperty("Pointset.2D.fill shape", true);

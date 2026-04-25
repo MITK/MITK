@@ -76,7 +76,7 @@
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -156,7 +156,7 @@
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -233,7 +233,7 @@
           "Nodes"
         ],
         "summary": "List nodes",
-        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n",
+        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n\nIn addition to the declared parameters, any query parameter of the form `filter.{property}=value` is interpreted as a property-value filter on the node. The `{property}` part is the MITK property name. Supported operators on the value: exact match (`filter.visible=true`), inequality (`filter.visible!=true`), wildcard `*` (zero or more characters, e.g. `filter.name=CT*`), and wildcard `?` (exactly one character, e.g. `filter.name=Node_0?`). The optional `context` and `property_scope` parameters control how the property is looked up. See the user manual §5.3 \"Query Parameters\" for the full filter contract — the OpenAPI schema cannot model the dynamic `filter.{property}` family directly.\n",
         "operationId": "listNodes",
         "parameters": [
           {
@@ -698,7 +698,7 @@
           "Children"
         ],
         "summary": "List child nodes",
-        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /nodes.",
+        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /datastorage/nodes, including the dynamic `filter.{property}=value` family with `*`/`?` wildcards and `!=` negation. See GET /datastorage/nodes (and user manual §5.3) for the full filter contract.",
         "operationId": "listChildren",
         "parameters": [
           {
@@ -1379,7 +1379,27 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "description": "Result of the replace operation"
+                      "description": "Result of the replace operation.",
+                      "required": [
+                        "replaced",
+                        "removed"
+                      ],
+                      "properties": {
+                        "replaced": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Names of properties whose values were written by this request."
+                        },
+                        "removed": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Names of properties that existed in the previous state but were absent from the request body and have been removed."
+                        }
+                      }
                     },
                     "meta": {
                       "type": "object",
@@ -3323,7 +3343,8 @@
                 "code": "INVALID_REQUEST",
                 "title": "Invalid Request",
                 "message": "Invalid JSON: parse error at line 1",
-                "status": 400
+                "status": 400,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -3342,7 +3363,8 @@
                 "code": "UNSUPPORTED_FORMAT",
                 "title": "Unsupported Format",
                 "message": "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.",
-                "status": 415
+                "status": 415,
+                "instance": "/api/v1/datastorage/nodes/node_1/data"
               }
             }
           }
@@ -3382,6 +3404,7 @@
                 "title": "Transfer Mode Not Available",
                 "message": "Requested transfer mode 'invalid' is not supported",
                 "status": 406,
+                "instance": "/api/v1/datastorage/nodes/node_1/data",
                 "available_modes": [
                   "file-reference",
                   "direct"
@@ -3423,7 +3446,8 @@
                 "code": "INTERNAL_ERROR",
                 "title": "Internal Server Error",
                 "message": "An unexpected error occurred",
-                "status": 500
+                "status": 500,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -3442,7 +3466,8 @@
                 "code": "TIME_NAVIGATION_NOT_AVAILABLE",
                 "title": "Time Navigation Not Available",
                 "message": "Time navigation controller is not available.",
-                "status": 503
+                "status": 503,
+                "instance": "/api/v1/rendering/selected-time"
               }
             }
           }
@@ -3461,7 +3486,8 @@
                 "code": "TIME_STEPPER_NOT_AVAILABLE",
                 "title": "Time Stepper Not Available",
                 "message": "Time stepper is not available.",
-                "status": 500
+                "status": 500,
+                "instance": "/api/v1/rendering/selected-time"
               }
             }
           }
@@ -3480,7 +3506,8 @@
                 "code": "DATASTORAGE_NOT_AVAILABLE",
                 "title": "DataStorage Not Available",
                 "message": "No DataStorage is currently connected to the REST API server",
-                "status": 503
+                "status": 503,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -3578,7 +3605,8 @@
                 "code": "RENDER_WINDOW_NOT_AVAILABLE",
                 "title": "Render Window Not Available",
                 "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                "status": 503
+                "status": 503,
+                "instance": "/api/v1/rendering/screenshot"
               }
             }
           }
@@ -3598,7 +3626,8 @@
                     "code": "RENDER_WINDOW_NOT_AVAILABLE",
                     "title": "Render Window Not Available",
                     "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                    "status": 503
+                    "status": 503,
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
                   }
                 }
               },
@@ -3610,7 +3639,8 @@
                     "code": "EDITOR_NOT_ACTIVE",
                     "title": "Editor Not Active",
                     "message": "StdMultiWidgetEditor is not open",
-                    "status": 503
+                    "status": 503,
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
                   }
                 }
               }
@@ -3657,7 +3687,8 @@
                     "code": "RENDER_WINDOW_NOT_FOUND",
                     "title": "Render Window Not Found",
                     "message": "No render window named 'bogus' in the addressed editor",
-                    "status": 404
+                    "status": 404,
+                    "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus/camera"
                   }
                 }
               },
@@ -3669,7 +3700,8 @@
                     "code": "UNSUPPORTED_OPERATION",
                     "title": "Unsupported Operation",
                     "message": "selected-slice is not applicable to the 3D window.",
-                    "status": 404
+                    "status": 404,
+                    "instance": "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice"
                   }
                 }
               }

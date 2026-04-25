@@ -83,11 +83,14 @@ namespace mitk
      *         MITK_ERROR log output; GetFailedNodes() / GetFailedProperties()
      *         reflect save-side failures only and are not populated here.
      *
-     * \note This method does not throw. Exceptions raised by underlying
-     *       readers (including JSON parse errors, missing data files, and
-     *       property-map resolution errors from SceneJsonReader) are caught
-     *       and logged as MITK_ERROR; the returned DataStorage may in that
-     *       case be empty or partially populated.
+     * \note For the JSON path, this method does not throw: exceptions
+     *       raised by SceneJsonReader (JSON parse errors, missing data
+     *       files, property-map resolution errors) are caught and logged
+     *       as MITK_ERROR, and the returned DataStorage may be empty or
+     *       partially populated. The legacy XML path retains its existing
+     *       behavior and may propagate exceptions from the underlying
+     *       reader; callers that need to handle both formats uniformly
+     *       should wrap the call in their own try/catch.
      *
      * \post The temporary directory is deleted after loading.
      */

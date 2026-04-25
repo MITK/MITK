@@ -65,18 +65,38 @@ namespace
    *
    * Absolute paths are returned as-is. Relative paths are joined to
    * \p basePath and lexically normalised, so `..` segments are allowed
-   * and collapsed against the scene directory's own path. Scene files
-   * are user documents — callers are responsible for not loading
-   * scenes from untrusted sources.
+   * and collapsed against the scene directory's own path. A warning is
+   * logged whenever the resolved path falls outside \p basePath
+   * (absolute paths or `..` traversal that escapes the scene
+   * directory), so an operator loading a scene from an untrusted
+   * source notices references that reach outside the scene's own tree.
+   * The `.mitk` ZIP scene format is structurally confined to its
+   * unpacked directory; this warning brings the JSON format closer to
+   * that asymmetry without breaking legitimate cross-tree references.
+   * Scene files are user documents — callers remain responsible for
+   * not loading scenes from untrusted sources.
    */
   fs::path ResolvePath(const fs::path &basePath, const std::string &relativeOrAbsolute)
   {
     const fs::path p(relativeOrAbsolute);
     if (p.is_absolute())
     {
+      MITK_WARN << "Scene references absolute path '" << p.string()
+                << "' which is outside the scene directory '" << basePath.string()
+                << "'. Loading anyway - only load scene files from trusted sources.";
       return p;
     }
-    return (basePath / p).lexically_normal();
+    const fs::path resolved = (basePath / p).lexically_normal();
+    const fs::path normalizedBase = basePath.lexically_normal();
+    const fs::path relative = resolved.lexically_relative(normalizedBase);
+    if (!relative.empty() && relative.begin() != relative.end() && *relative.begin() == fs::path(".."))
+    {
+      MITK_WARN << "Scene path '" << relativeOrAbsolute
+                << "' resolves outside the scene directory '" << normalizedBase.string()
+                << "' (resolved: '" << resolved.string()
+                << "'). Loading anyway - only load scene files from trusted sources.";
+    }
+    return resolved;
   }
 
   void WarnUnknownKeys(const json &obj, const std::set<std::string> &known, const std::string &context)
@@ -156,7 +176,7 @@ namespace
   {
     if (!propertyMap.is_object())
       return LoadStyle::Modify;
-    auto it = propertyMap.find("_loadstyle");
+    const auto it = propertyMap.find("_loadstyle");
     if (it == propertyMap.end() || it->is_null())
       return LoadStyle::Modify;
     if (!it->is_string())
@@ -190,7 +210,7 @@ namespace
       mitkThrow() << "Property map in " << context << " must be a JSON object.";
     }
 
-    auto fileIt = mapJson.find("_file");
+    const auto fileIt = mapJson.find("_file");
     if (fileIt == mapJson.end() || fileIt->is_null())
       return mapJson;
 
@@ -278,18 +298,21 @@ namespace
         continue;
       }
 
+      mitk::BaseProperty::Pointer prop;
       try
       {
-        mitk::BaseProperty::Pointer prop = mitk::ConvertPropertyFromSelfContainedJson(it.value());
-        if (prop.IsNotNull())
-        {
-          targetList.SetProperty(key, prop);
-        }
+        prop = mitk::ConvertPropertyFromSelfContainedJson(it.value());
       }
       catch (const mitk::Exception &e)
       {
-        MITK_ERROR << "Failed to deserialize property '" << key << "' in " << context << ": " << e.what();
+        mitkThrow() << "Failed to deserialize property '" << key << "' in " << context << ": " << e.what();
       }
+      if (prop.IsNull())
+      {
+        mitkThrow() << "Property '" << key << "' in " << context
+                    << ": unknown property type or value cannot be deserialized.";
+      }
+      targetList.SetProperty(key, prop);
     }
   }
 
@@ -327,7 +350,7 @@ namespace
    */
   int ExtractLayer(const json &nodeJson)
   {
-    auto propsIt = nodeJson.find("properties");
+    const auto propsIt = nodeJson.find("properties");
     if (propsIt == nodeJson.end() || !propsIt->is_object())
       return 0;
     auto layerIt = propsIt->find("layer");
@@ -382,14 +405,14 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     mitkThrow() << "Scene file '" << sceneSourcePath << "' root must be a JSON object.";
   }
 
-  auto typeIt = document.find("type");
+  const auto typeIt = document.find("type");
   if (typeIt == document.end() || !typeIt->is_string() || typeIt->get<std::string>() != kSceneType)
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' has missing or wrong 'type' field (expected '"
                 << kSceneType << "').";
   }
 
-  auto versionIt = document.find("version");
+  const auto versionIt = document.find("version");
   if (versionIt == document.end() || !versionIt->is_number_integer())
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' has missing or non-integer 'version' field.";
@@ -403,13 +426,13 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
 
   WarnUnknownKeys(document, kRootKnownKeys, "root");
 
-  auto metadataIt = document.find("metadata");
+  const auto metadataIt = document.find("metadata");
   if (metadataIt != document.end() && metadataIt->is_object())
   {
     WarnUnknownKeys(*metadataIt, kMetadataKnownKeys, "metadata");
   }
 
-  auto nodesIt = document.find("nodes");
+  const auto nodesIt = document.find("nodes");
   if (nodesIt == document.end() || !nodesIt->is_array())
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' is missing required 'nodes' array.";
@@ -452,7 +475,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     SceneNodeEntry entry;
     entry.nodeJson = &nodeJson;
 
-    auto uidIt = nodeJson.find("uid");
+    const auto uidIt = nodeJson.find("uid");
     if (uidIt != nodeJson.end() && !uidIt->is_null())
     {
       if (!uidIt->is_string())
@@ -470,7 +493,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       entry.uid = autoUidGen.GetUID();
     }
 
-    auto parentIt = nodeJson.find("parent_uid");
+    const auto parentIt = nodeJson.find("parent_uid");
     if (parentIt != nodeJson.end() && !parentIt->is_null())
     {
       if (!parentIt->is_string())
@@ -519,7 +542,12 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     while (true)
     {
       visited.insert(cur);
-      const SceneNodeEntry &cursorEntry = entries[uidIndex.find(cur)->second];
+      const auto cursorIt = uidIndex.find(cur);
+      if (cursorIt == uidIndex.end())
+      {
+        mitkThrow() << "Internal error: uid '" << cur << "' missing from uidIndex during cycle check.";
+      }
+      const SceneNodeEntry &cursorEntry = entries[cursorIt->second];
       if (!cursorEntry.hasExplicitParent)
         break;
       const std::string &next = cursorEntry.parentUid;
@@ -590,6 +618,13 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
 
   bool nonFatalError = false;
 
+  // Track data_uid values restored in this load so we can warn about
+  // collisions between BaseData objects loaded from the scene file. Note
+  // that BaseData uniqueness is not currently enforced across a
+  // DataStorage as a whole (e.g. loading the same file twice produces two
+  // BaseData with the same UID), so a collision here is logged only.
+  std::set<std::string> seenDataUids;
+
   // ---- 4. Pass 1: create nodes, load data, apply data-level properties.
   //
   // Data-level properties are applied here because they live on the loaded
@@ -611,18 +646,18 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     entry.dataNode = DataNode::New();
 
     // Validate the optional informative data_type field.
-    auto dataTypeIt = nodeJson.find("data_type");
+    const auto dataTypeIt = nodeJson.find("data_type");
     if (dataTypeIt != nodeJson.end() && !dataTypeIt->is_null() && !dataTypeIt->is_string())
     {
       mitkThrow() << "Node '" << entry.uid << "': 'data_type' must be a string or null.";
     }
     const bool hasDataType = dataTypeIt != nodeJson.end() && !dataTypeIt->is_null();
 
-    auto transferIt = nodeJson.find("transfer");
+    const auto transferIt = nodeJson.find("transfer");
     const bool hasTransfer = transferIt != nodeJson.end() && !transferIt->is_null();
-    auto dataUidIt = nodeJson.find("data_uid");
+    const auto dataUidIt = nodeJson.find("data_uid");
     const bool hasDataUid = dataUidIt != nodeJson.end() && !dataUidIt->is_null();
-    auto dataPropsIt = nodeJson.find("data_properties");
+    const auto dataPropsIt = nodeJson.find("data_properties");
     const bool hasDataProps = dataPropsIt != nodeJson.end() && !dataPropsIt->is_null();
 
     if (!hasTransfer)
@@ -654,7 +689,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     const json &transferJson = *transferIt;
     WarnUnknownKeys(transferJson, kTransferKnownKeys, "node '" + entry.uid + "'.transfer");
 
-    auto modeIt = transferJson.find("mode");
+    const auto modeIt = transferJson.find("mode");
     if (modeIt != transferJson.end() && !modeIt->is_null())
     {
       if (!modeIt->is_string())
@@ -669,7 +704,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       }
     }
 
-    auto filePathIt = transferJson.find("file_path");
+    const auto filePathIt = transferJson.find("file_path");
     if (filePathIt == transferJson.end() || !filePathIt->is_string() || filePathIt->get<std::string>().empty())
     {
       mitkThrow() << "Node '" << entry.uid
@@ -744,8 +779,14 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       {
         mitkThrow() << "Node '" << entry.uid << "': 'data_uid' must be a string.";
       }
+      const std::string dataUidValue = dataUidIt->get<std::string>();
+      if (!seenDataUids.insert(dataUidValue).second)
+      {
+        MITK_WARN << "Node '" << entry.uid << "': 'data_uid' value '" << dataUidValue
+                  << "' has already been assigned to another BaseData in this scene.";
+      }
       UIDManipulator manip(entry.dataNode->GetData());
-      manip.SetUID(dataUidIt->get<std::string>());
+      manip.SetUID(dataUidValue);
     }
 
     // Transfer the pre-parsed data-level properties onto the loaded
@@ -833,7 +874,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       // invalid `_loadstyle`). We downgrade these to non-fatal per-node
       // errors so that storage is never left partially populated after a
       // node has already been added.
-      auto propsIt = nodeJson.find("properties");
+      const auto propsIt = nodeJson.find("properties");
       if (propsIt != nodeJson.end() && !propsIt->is_null())
       {
         const std::string ctx = "node '" + entry.uid + "'.properties";
@@ -849,7 +890,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
         }
       }
 
-      auto ctxIt = nodeJson.find("context_properties");
+      const auto ctxIt = nodeJson.find("context_properties");
       if (ctxIt != nodeJson.end() && !ctxIt->is_null())
       {
         // Structural shape of `context_properties` was validated in step 3b

@@ -74,7 +74,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetScreenshotWithNonPositiveWidthReturns400);
   MITK_TEST(GetScreenshotWithExcessiveDimensionsReturns400);
 
-  // WP2 editor discovery tests
+  // Editor discovery tests
   MITK_TEST(GetEditorsWithoutProviderReturns503);
   MITK_TEST(GetEditorsReturns200WithAliases);
   MITK_TEST(GetStdmultiInfoWithEditorActiveReturns200);
@@ -86,7 +86,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetStdmultiWindowForAxialReturns200With2d);
   MITK_TEST(GetStdmultiWindowFor3dReturns200NoSelectedSlice);
 
-  // WP2 camera tests
+  // Camera tests
   MITK_TEST(GetCameraUnknownWindowReturns404);
   MITK_TEST(GetCameraWithoutGetterReturns503);
   MITK_TEST(GetCameraForAxialReturns200With2dFields);
@@ -107,7 +107,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutCameraOn3dReturns204);
   MITK_TEST(PutCameraStandardViewAppliedFirst);
 
-  // WP2 selected-slice tests
+  // Selected-slice tests
   MITK_TEST(GetSliceUnknownWindowReturns404);
   MITK_TEST(GetSliceOn3dReturns404UnsupportedOperation);
   MITK_TEST(GetSliceWithoutGetterReturns503);
@@ -125,7 +125,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutSliceWithoutSetterReturns503);
   MITK_TEST(PutSliceOnAxialReturns204);
 
-  // WP2 screenshot tests
+  // Window/editor screenshot tests
   MITK_TEST(GetEditorScreenshotWithoutProviderReturns503);
   MITK_TEST(GetEditorScreenshotEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(GetEditorScreenshotReturns200Png);
@@ -736,7 +736,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
   }
 
-  // ===== WP2: editor discovery =====
+  // ===== Editor discovery =====
 
   static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive)
   {
@@ -946,7 +946,7 @@ public:
     CPPUNIT_ASSERT(json["has_camera"].get<bool>());
     CPPUNIT_ASSERT(!json["has_selected_slice"].get<bool>());
   }
-  // ===== WP2: camera =====
+  // ===== Camera =====
 
   static mitk::CameraState MakeFakeCameraState(bool is3d)
   {
@@ -1234,7 +1234,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("anterior"), *captured.standardView);
     CPPUNIT_ASSERT(captured.parallelScale.has_value());
   }
-  // ===== WP2: selected-slice =====
+  // ===== Selected-slice =====
 
   static mitk::SliceState MakeFakeSliceState(bool withBounds)
   {
@@ -1468,7 +1468,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
     CPPUNIT_ASSERT_EQUAL(42u, capturedStep);
   }
-  // ===== WP2: screenshots =====
+  // ===== Window/editor screenshots =====
 
   void GetEditorScreenshotWithoutProviderReturns503()
   {

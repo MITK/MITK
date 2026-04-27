@@ -9,5 +9,5 @@ set(MODULE_TESTS
   mitkSecurityMiddlewareTest.cpp
   mitkInputValidationTest.cpp
   mitkRenderingControllerTest.cpp
-  mitkRenderWindowBridgeWP2Test.cpp
+  mitkRenderWindowBridgeTest.cpp
 )

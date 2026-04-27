@@ -19,25 +19,26 @@ found in the LICENSE file.
 #include <string>
 
 /**
- * @brief Unit tests for the WP2 additions to RenderWindowBridge.
+ * @brief Unit tests for RenderWindowBridge.
  *
- * Covers Has...() set/clear round-trips, exception transport for the three
- * typed bridge exceptions, ResetCallbacks() clearing every WP2 entry, and
- * inline invocation when no dispatcher is set.
+ * Covers Has...() set/clear round-trips for the std-multi callback set,
+ * exception transport for the three typed bridge exceptions, ResetCallbacks()
+ * clearing every registered callback, and inline invocation when no
+ * dispatcher is set.
  */
-class mitkRenderWindowBridgeWP2TestSuite : public mitk::TestFixture
+class mitkRenderWindowBridgeTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkRenderWindowBridgeWP2TestSuite);
+  CPPUNIT_TEST_SUITE(mitkRenderWindowBridgeTestSuite);
 
-  MITK_TEST(HasFlagsReflectSetAndClearForAllWP2Callbacks);
-  MITK_TEST(ResetCallbacksClearsAllWP2Callbacks);
+  MITK_TEST(HasFlagsReflectSetAndClearForAllStdMultiCallbacks);
+  MITK_TEST(ResetCallbacksClearsAllCallbacks);
   MITK_TEST(EditorListInvokerReturnsProviderResult);
   MITK_TEST(WindowListInvokerReturnsProviderResult);
   MITK_TEST(CameraGetterTransportsNoEditorException);
   MITK_TEST(CameraSetterTransportsUnknownWindowException);
   MITK_TEST(SelectedSliceGetterTransportsUnsupportedOperationException);
   MITK_TEST(InvokersThrowWhenNoCallbackSet);
-  MITK_TEST(PostResetInvocationThrowsCleanlyForEveryWP2Invoker);
+  MITK_TEST(PostResetInvocationThrowsCleanlyForEveryStdMultiInvoker);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -55,7 +56,7 @@ public:
     m_Bridge.reset();
   }
 
-  void HasFlagsReflectSetAndClearForAllWP2Callbacks()
+  void HasFlagsReflectSetAndClearForAllStdMultiCallbacks()
   {
     CPPUNIT_ASSERT(!m_Bridge->HasEditorListProvider());
     CPPUNIT_ASSERT(!m_Bridge->HasStdMultiWindowListProvider());
@@ -94,7 +95,7 @@ public:
     CPPUNIT_ASSERT(!m_Bridge->HasEditorListProvider());
   }
 
-  void ResetCallbacksClearsAllWP2Callbacks()
+  void ResetCallbacksClearsAllCallbacks()
   {
     m_Bridge->SetScreenshotProvider(
       [](std::optional<std::pair<int,int>>, mitk::ScreenshotFormat) {
@@ -231,15 +232,15 @@ public:
   }
 
   /**
-   * Shutdown-race regression (plan §6.4): after ResetCallbacks() clears every
-   * WP2 callback, a concurrent invocation attempt on any WP2 invoker must
+   * Shutdown-race regression: after ResetCallbacks() clears every std-multi
+   * callback, a concurrent invocation attempt on any std-multi invoker must
    * terminate with a std::runtime_error instead of crashing on a null
    * std::function. The throw path, not the call path, is the contract during
    * service UNREGISTERING.
    */
-  void PostResetInvocationThrowsCleanlyForEveryWP2Invoker()
+  void PostResetInvocationThrowsCleanlyForEveryStdMultiInvoker()
   {
-    // Install every WP2 callback, then reset.
+    // Install every std-multi callback, then reset.
     m_Bridge->SetEditorListProvider([]() { return std::vector<mitk::EditorInfo>{}; });
     m_Bridge->SetStdMultiWindowListProvider([]() { return std::vector<mitk::WindowInfo>{}; });
     m_Bridge->SetStdMultiEditorScreenshotProvider(
@@ -257,9 +258,9 @@ public:
 
     m_Bridge->ResetCallbacks();
 
-    // Every WP2 invoker must now throw a plain std::runtime_error — not any of
-    // the typed bridge exceptions (which are callback-generated signals), and
-    // not an access violation.
+    // Every std-multi invoker must now throw a plain std::runtime_error — not
+    // any of the typed bridge exceptions (which are callback-generated
+    // signals), and not an access violation.
     CPPUNIT_ASSERT_THROW(m_Bridge->ListEditors(), std::runtime_error);
     CPPUNIT_ASSERT_THROW(m_Bridge->ListStdMultiWindows(), std::runtime_error);
     CPPUNIT_ASSERT_THROW(
@@ -291,4 +292,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkRenderWindowBridgeWP2)
+MITK_TEST_SUITE_REGISTRATION(mitkRenderWindowBridge)

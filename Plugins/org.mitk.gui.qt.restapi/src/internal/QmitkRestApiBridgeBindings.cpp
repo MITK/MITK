@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkBaseGeometry.h>
 #include <QmitkAbstractMultiWidget.h>
+#include <QmitkAbstractMultiWidgetEditor.h>
 #include <QmitkRenderWindow.h>
 
 #include <vtkCamera.h>
@@ -219,18 +220,15 @@ namespace mitk
           throw mitk::RenderWindowBridgeNoEditorException(
             "StdMultiWidgetEditor is not open — cannot capture editor screenshot");
 
-        // Grab the multi-widget container (the editor's canvas area). The
-        // active QmitkRenderWindow's parent widget is expected to be the
-        // QmitkAbstractMultiWidget that hosts all four windows — grabbing it
-        // includes the full editor area without side panels. The qobject_cast
-        // guards against future layout changes that insert intermediate widgets.
-        auto* const active = rwp->GetActiveQmitkRenderWindow();
-        auto* const canvas = (active != nullptr)
-          ? qobject_cast<QmitkAbstractMultiWidget*>(active->parentWidget())
-          : nullptr;
+        // Ask the editor for its multi-widget directly. Walking up the parent
+        // chain of an active QmitkRenderWindow is unreliable: the render window
+        // is hosted by an intermediate QmitkRenderWindowWidget, not by the
+        // QmitkAbstractMultiWidget itself.
+        auto* const editor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(rwp);
+        auto* const canvas = (editor != nullptr) ? editor->GetMultiWidget() : nullptr;
         if (canvas == nullptr)
           throw std::runtime_error(
-            "Unexpected widget hierarchy — cannot locate QmitkAbstractMultiWidget canvas");
+            "Unexpected editor type — cannot locate QmitkAbstractMultiWidget canvas");
 
         return EncodePixmap(canvas->grab(), size, format);
       });

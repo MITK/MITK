@@ -74,7 +74,7 @@ them at a glance:
   `_`-prefixed keys never become MITK properties. They configure how the map
   is loaded (`_loadstyle`) or where the map comes from (`_file`). All other
   keys are property names whose values are self-contained JSON property
-  values (see @ref MITKSceneJsonFormatPropertyValues below).
+  values (see @ref MITKSceneJsonFormatPropertyValues).
 - **Inside schema objects** (the root, a node object, the `transfer` object),
   every key is part of a fixed schema. These objects use bare `snake_case`
   throughout and do not carry `_`-meta keys. This mirrors the REST API's
@@ -108,7 +108,7 @@ of `parent_uid` / `properties` rather than being wrapped in a `data` object.
 | `data_type`          | string / null | no       | `null`         | **Informative only.** MITK class name the author expects (e.g. `"mitk::Image"`). Never drives loader dispatch. A mismatch with the class produced by the IO layer yields a warning. |
 | `data_uid`           | string        | no       | auto-generated | Optional UID to assign to the loaded BaseData (applied via mitk::UIDManipulator). Ignored when the node has no `transfer`. |
 | `transfer`           | object / null | no       | `null`         | Data source descriptor (see @ref MITKSceneJsonFormatTransfer). Absent / `null` means the node carries no data. |
-| `data_properties`    | object        | no       | `{}`           | Property map applied to the loaded BaseData's mitk::PropertyList. Ignored when the node has no `transfer`. Same schema as node `properties`. |
+| `data_properties`    | object        | no       | `{}`           | Property map applied to the loaded BaseData's mitk::PropertyList. Ignored when the node has no `transfer`. Same schema as node `properties` (see also @ref MITKSceneJsonFormatPropertyMaps). |
 | `properties`         | object        | no       | `{}`           | Default-context property map (see @ref MITKSceneJsonFormatPropertyMaps).                 |
 | `context_properties` | object        | no       | `{}`           | Map from renderer context name to property map.                                          |
 
@@ -143,9 +143,6 @@ without edits.
 Additional unknown keys inside `transfer` produce a warning and are ignored
 (forward compatibility — e.g. for a future `checksum` key).
 
-`file-reference` is currently the only supported `mode`. Alternative modes
-(inline base64, URI, content-hash, shared-memory) are deliberately deferred;
-see the implementation plan (section 9.4).
 
 ### `data_type` is informative
 

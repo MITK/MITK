@@ -132,11 +132,14 @@ namespace
       CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
     }
 
-    // mitk::Tool overrides FilterEvents to skip the DataNode visibility
-    // check; we do the same so events flow without us being node-bound.
-    bool FilterEvents(mitk::InteractionEvent*, mitk::DataNode*) override
+    // Restrict to 2D render windows (drawing requires a slicing plane) and
+    // bypass the base-class DataNode visibility check, since this interactor
+    // owns its own lazily-created feedback node.
+    bool FilterEvents(mitk::InteractionEvent* event, mitk::DataNode*) override
     {
-      return true;
+      return event != nullptr &&
+             event->GetSender() != nullptr &&
+             event->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard2D;
     }
 
     void ConfigurationChanged() override {}

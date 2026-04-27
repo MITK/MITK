@@ -135,12 +135,14 @@ namespace
       CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
     }
 
-    // Mirrors mitk::Tool::FilterEvents: dispatch regardless of the DataNode
-    // passed to HandleEvent, since this interactor paints into its own
-    // lazily-created overlay node rather than an externally-bound one.
-    bool FilterEvents(mitk::InteractionEvent*, mitk::DataNode*) override
+    // Restrict to 2D render windows (drawing requires a slicing plane) and
+    // bypass the base-class DataNode visibility check, since this interactor
+    // paints into its own lazily-created overlay node.
+    bool FilterEvents(mitk::InteractionEvent* event, mitk::DataNode*) override
     {
-      return true;
+      return event != nullptr &&
+             event->GetSender() != nullptr &&
+             event->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard2D;
     }
 
     void ConfigurationChanged() override {}

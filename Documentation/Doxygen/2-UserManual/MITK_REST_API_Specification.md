@@ -1581,7 +1581,7 @@ Rendering endpoints control how MITK Workbench render windows refresh and orient
 
 All rendering calls are dispatched to the main/UI thread by the server — callers do not need to account for threading.
 
-The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). A symmetric MxN hierarchy is reserved for a future work package and is not documented here.
+The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). The `mxn` editor alias is also exposed by `GET /rendering/editors` for forward compatibility — its `active` flag is currently always `false`, and a symmetric `/rendering/editors/mxn/...` hierarchy is reserved but not yet implemented.
 
 #### POST /api/v1/rendering/update
 
@@ -2125,7 +2125,7 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/editors/stdmulti/windows/{name}/screenshot
 
-Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact (concept D17).
+Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact.
 
 **Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
 
@@ -2404,6 +2404,7 @@ requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uids": [ui
 | Shared memory transfer | v1.2 | Zero-copy data transfer |
 | Batch operations | v1.3 | `/datastorage/nodes/batch` endpoint |
 | Async operations | v1.3 | Long-running operations with task tracking |
+| MxN multi-widget editor | TBD | Activate the `mxn` editor alias and add the `/rendering/editors/mxn/...` hierarchy |
 
 ### 11.2 Extension Points
 

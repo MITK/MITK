@@ -33,15 +33,6 @@ namespace mitk
    * All RenderingManager calls are dispatched to the main/UI thread via
    * the StorageThreadDispatcherBase. In headless/test mode (no dispatcher),
    * tasks execute directly on the calling thread.
-   *
-   * Endpoints:
-   * - POST /rendering/update              -> HandlePOST_update()
-   * - POST /rendering/reinit              -> HandlePOST_reinit()
-   * - GET  /rendering/selected-position   -> HandleGET_selectedPosition()
-   * - PUT  /rendering/selected-position   -> HandlePUT_selectedPosition()
-   * - GET  /rendering/selected-time       -> HandleGET_selectedTime()
-   * - PUT  /rendering/selected-time       -> HandlePUT_selectedTime()
-   * - GET  /rendering/screenshot          -> HandleGET_screenshot()
    */
   class MITKRESTAPI_EXPORT RenderingController
   {
@@ -169,42 +160,42 @@ namespace mitk
      * \brief Handle GET /rendering/editors request.
      *
      * Returns the full list of known editor aliases with their current
-     * activity state. Concept §3 / WP2 E1.
+     * activity state.
      *
      * Response 200: [{"alias":..., "plugin_id":..., "active":...}, ...]
      */
     void HandleGET_editors(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti request (WP2 E2).
+     * \brief Handle GET /rendering/editors/stdmulti request.
      *
      * Returns metadata about the StdMultiWidgetEditor.
      */
     void HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows request (WP2 E4).
+     * \brief Handle GET /rendering/editors/stdmulti/windows request.
      *
      * Returns the list of render windows of the StdMultiWidget editor.
      */
     void HandleGET_stdmultiWindows(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name} request (WP2 E5).
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name} request.
      *
      * Per-window summary. Controller-side validates {name} before bridge dispatch.
      */
     void HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/camera (WP2 E7).
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/camera.
      *
      * 2D windows return `parallel_scale`, the 3D window returns `perspective_angle`.
      */
     void HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/camera (WP2 E8).
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/camera.
      *
      * Partial update. Rejects: unknown fields, 2D-only field on 3D and vice
      * versa, unknown `standard_view` values, non-positive `parallel_scale`,
@@ -213,14 +204,14 @@ namespace mitk
     void HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/selected-slice (WP2 E9).
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/selected-slice.
      *
      * Returns {step, position, bounds}. Returns 404 UNSUPPORTED_OPERATION for the 3D window.
      */
     void HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/selected-slice (WP2 E10).
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/selected-slice.
      *
      * Body accepts only `{"step": N}`. A `position` field triggers 400 with a
      * hint pointing at /rendering/selected-position (StdMulti slices are coupled).
@@ -229,14 +220,14 @@ namespace mitk
     void HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/screenshot (WP2 E3).
+     * \brief Handle GET /rendering/editors/stdmulti/screenshot.
      *
      * Editor-canvas grab. Query contract identical to /rendering/screenshot.
      */
     void HandleGET_stdmultiScreenshot(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/screenshot (WP2 E6).
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/screenshot.
      *
      * Single-window offscreen grab. Query contract identical to /rendering/screenshot.
      */

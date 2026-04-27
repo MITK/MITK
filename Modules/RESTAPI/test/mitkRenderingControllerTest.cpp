@@ -875,7 +875,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::string("2d"), json[0]["kind"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["name"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["kind"].get<std::string>());
-    // RF3: no `plane` field on window list items.
+    // No `plane` field on window list items — orientation is read from the camera.
     CPPUNIT_ASSERT(!json[0].contains("plane"));
   }
 
@@ -1311,7 +1311,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(90, json["bounds"]["steps"].get<int>());
     CPPUNIT_ASSERT(json["bounds"]["min_position"].is_array());
     CPPUNIT_ASSERT(json["bounds"]["max_position"].is_array());
-    // RF4: no `plane` field on slice response.
+    // No `plane` field on slice response — orientation is read from the camera.
     CPPUNIT_ASSERT(!json.contains("plane"));
   }
 

@@ -137,8 +137,7 @@ namespace
    * @brief Encode a QPixmap to PNG/JPEG bytes, optionally scaling first.
    *
    * Shared by the editor and per-window screenshot providers. Scaling is done
-   * on the captured image rather than by resizing the live render surface
-   * (concept D17: never resize the live window).
+   * on the captured image rather than by resizing the live render surface.
    */
   std::vector<unsigned char> EncodePixmap(
     QPixmap px,
@@ -249,8 +248,8 @@ namespace mitk
 
         // QmitkRenderWindow is a QVTKOpenGLNativeWidget (QOpenGLWidget). Capturing
         // via grabFramebuffer() reads the current OpenGL framebuffer without
-        // resizing the live render window (concept D17); we scale the resulting
-        // image afterwards if a different size was requested.
+        // resizing the live render window; we scale the resulting image
+        // afterwards if a different size was requested.
         QImage img = qrw->grabFramebuffer();
         return EncodePixmap(QPixmap::fromImage(std::move(img)), size, format);
       });
@@ -259,8 +258,8 @@ namespace mitk
       []() -> std::vector<mitk::EditorInfo>
       {
         // Two editor aliases are known up front. The MxN entry appears in the
-        // list regardless of state so clients can discover it, but stays inactive
-        // until WP3.
+        // list regardless of state so clients can discover it, but its
+        // activation is not yet implemented (always inactive).
         mitk::EditorInfo stdmulti;
         stdmulti.alias = "stdmulti";
         stdmulti.pluginId = "org.mitk.editors.stdmultiwidget";
@@ -277,7 +276,7 @@ namespace mitk
         mitk::EditorInfo mxn;
         mxn.alias = "mxn";
         mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
-        // mxn.active stays false until WP3.
+        // mxn.active stays false; activation is not yet implemented.
 
         return {stdmulti, mxn};
       });
@@ -327,7 +326,7 @@ namespace mitk
           throw std::runtime_error("vtkCamera unavailable for window " + windowName);
 
         // Apply standard_view first so explicit position/focal/view_up/etc.
-        // overrides win over it (concept §8).
+        // overrides win over it.
         if (patch.standardView)
           cc->SetStandardView(StandardViewFromName(*patch.standardView));
 

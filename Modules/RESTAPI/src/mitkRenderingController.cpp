@@ -752,7 +752,7 @@ namespace
    *
    * Shared between /rendering/screenshot, /rendering/editors/stdmulti/screenshot,
    * and /rendering/editors/stdmulti/windows/{name}/screenshot — the contract
-   * is intentionally identical (concept D17 / plan section 14 RF2).
+   * is intentionally identical.
    */
   struct ScreenshotQueryParams
   {

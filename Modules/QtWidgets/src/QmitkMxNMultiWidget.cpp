@@ -370,15 +370,39 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
-  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage(), m_SynchronizedWidgetConnectors.size());
+  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
-  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  // 'SyncGroupChanged' is wired through a lambda that catches 'mitk::Exception',
+  // because Qt slots must not let exceptions escape into the event dispatcher.
+  // The direct method 'SetSynchronizationGroup' keeps its throwing contract for
+  // direct callers; only the slot path is defensive.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this,
+    [this](QmitkSynchronizedNodeSelectionWidget* widget, const GroupSyncIndexType index)
+    {
+      try
+      {
+        this->SetSynchronizationGroup(widget, index);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Ignoring 'SyncGroupChanged(" << index
+                  << ")': " << e.GetDescription();
+      }
+    });
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested,
     this, &QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested);
   connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
+
+  // Replay existing groups so the freshly-created utility widget's combobox
+  // reflects the current set of registered groups (rather than relying on a
+  // contiguous 1..N seed inside the utility widget's constructor).
+  for (const auto& entry : m_SynchronizedWidgetConnectors)
+  {
+    utilityWidget->OnSyncGroupAdded(entry.first);
+  }
 
   // initialize the node selection widget with all nodes to set required properties, then synchronize with default group
   utilityWidget->GetNodeSelectionWidget()->SelectAll();
@@ -639,8 +663,9 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       window->show();
     }
 
-    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelectionMode(false);
-    m_SynchronizedWidgetConnectors[rowCounter]->ChangeSelection(QList({ node }));
+    auto* const rowConnector = this->GetSyncGroupConnector(rowCounter);
+    rowConnector->ChangeSelectionMode(false);
+    rowConnector->ChangeSelection(QList({ node }));
 
     auto sizes = QList<int>({1, 1, 1});
     hSplit->setSizes(sizes);
@@ -740,13 +765,13 @@ void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelection
   m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
 }
 
-QmitkSynchronizedWidgetConnector* QmitkMxNMultiWidget::GetSynchronizationGroupConnectorForTesting(const GroupSyncIndexType index) const
+QmitkSynchronizedWidgetConnector* QmitkMxNMultiWidget::GetSyncGroupConnector(const GroupSyncIndexType index) const
 {
   const auto it = m_SynchronizedWidgetConnectors.find(index);
   return (it == m_SynchronizedWidgetConnectors.end()) ? nullptr : it->second.get();
 }
 
-std::size_t QmitkMxNMultiWidget::GetSynchronizationGroupCountForTesting() const
+std::size_t QmitkMxNMultiWidget::GetSyncGroupCount() const
 {
   return m_SynchronizedWidgetConnectors.size();
 }
@@ -779,7 +804,8 @@ void QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSel
     return;
   }
 
+  // 'SetSynchronizationGroup' auto-creates the group via 'AddSynchronizationGroup'
+  // on first reference, so a separate Add call here would be redundant.
   const auto next = this->NextFreeSyncGroupIndex();
-  this->AddSynchronizationGroup(next);
   this->SetSynchronizationGroup(synchronizedWidget, next);
 }

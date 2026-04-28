@@ -73,6 +73,9 @@ public:
     //       QmitkRenderWindowDataNodeTableModel::UpdateModelData's comparator
     //       is fixed to be strict-weak-ordered (return false when neither
     //       node has the property).
+    //       NOTE: the same workaround is duplicated in
+    //       'QmitkMxNSyncGroupApiTest.cpp' -- keep both in sync
+    //       and remove together.
     m_Node1 = mitk::DataNode::New();
     m_Node1->SetName("node1");
     m_Node1->SetIntProperty("layer", 0);
@@ -101,9 +104,10 @@ public:
   }
 
   static bool ListContains(const QmitkSynchronizedWidgetConnector::NodeList& list,
-                           const mitk::DataNode::Pointer& node)
+                           const mitk::DataNode* node)
   {
-    return std::find(list.begin(), list.end(), node) != list.end();
+    return std::any_of(list.begin(), list.end(),
+                       [node](const mitk::DataNode::Pointer& entry) { return entry.GetPointer() == node; });
   }
 
   // ---------- Initial state ----------

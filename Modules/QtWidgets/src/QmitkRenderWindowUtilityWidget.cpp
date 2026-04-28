@@ -31,8 +31,7 @@ found in the LICENSE file.
 QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidget* parent/* = nullptr */,
   QmitkRenderWindow* renderWindow/* = nullptr */,
-  mitk::DataStorage* dataStorage/* = nullptr */,
-  const int nSyncGroups/* = 1 */)
+  mitk::DataStorage* dataStorage/* = nullptr */)
   : m_NodeSelectionWidget(nullptr)
   , m_SyncGroupSelector(nullptr)
   , m_NewSyncGroupButton(nullptr)
@@ -66,14 +65,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   layout->addWidget(menuBar);
 
   m_SyncGroupSelector = new QComboBox(this);
-  // Each combobox row carries its group index as userData (QVariant), so that
-  // sparse / non-monotonic group indices map correctly. Row position is
-  // never used as a proxy for the group number.
-  for (int i = 0; i < nSyncGroups; ++i)
-  {
-    const GroupSyncIndexType groupIndex = i + 1;
-    m_SyncGroupSelector->insertItem(i, QString("Group %1").arg(groupIndex), QVariant(groupIndex));
-  }
+  // The combobox starts empty and is populated reactively via 'OnSyncGroupAdded'.
+  // Each row carries its group index as userData (QVariant) so sparse /
+  // non-monotonic group indices map correctly. Row position is never used as
+  // a proxy for the group number.
   m_SyncGroupSelector->setMinimumContentsLength(8);
   connect(m_SyncGroupSelector, &QComboBox::currentIndexChanged,
     this, &QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged);
@@ -124,11 +119,18 @@ void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index
     mitkThrow() << "Invalid synchronization group index '" << index
                 << "'. Group index must be >= 1.";
   }
-  // Locate the combobox row that carries this group index in its userData and
-  // select it. setCurrentIndex(-1) (no match) is a deliberate no-op: the group
-  // exists in the model but not yet in this combobox's view, in which case
-  // OnSyncGroupAdded will add it later and the caller can reissue.
+  // Locate the combobox row that carries this group index in its userData.
+  // The group must already be registered with this widget (via a prior
+  // 'OnSyncGroupAdded'); silently de-selecting on a missing index would mask
+  // a contract violation by the caller.
   const int row = m_SyncGroupSelector->findData(QVariant(index));
+  if (row < 0)
+  {
+    mitkThrow() << "Synchronization group '" << index
+                << "' is not registered with this widget. Ensure the owning "
+                   "multi widget has emitted 'SyncGroupAdded(" << index
+                << ")' before calling 'SetSyncGroup'.";
+  }
   m_SyncGroupSelector->setCurrentIndex(row);
 }
 

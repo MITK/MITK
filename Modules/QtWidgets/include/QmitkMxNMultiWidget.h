@@ -135,8 +135,10 @@ public:
   * \param synchronizedWidget    The widget to move. Must not be null.
   * \param index                 The 1-based target group index. Must be >= 1.
   *
-  * \pre  synchronizedWidget != nullptr    (otherwise mitk::Exception)
-  * \pre  index >= 1                       (otherwise mitk::Exception, propagated from Add)
+  * \pre  synchronizedWidget != nullptr           (otherwise mitk::Exception)
+  * \pre  index >= 1                              (otherwise mitk::Exception, propagated from Add)
+  * \pre  GetDataStorage() != nullptr             (otherwise mitk::Exception, propagated from Add
+  *                                                 when the auto-create path triggers)
   *
   * \throws mitk::Exception on precondition violation.
   */
@@ -151,21 +153,6 @@ public:
   *   utility widget, or external automation).
   */
   GroupSyncIndexType NextFreeSyncGroupIndex() const;
-
-  /**
-  * \brief Look up the connector backing the synchronization group with the
-  *        given index. Intended for white-box tests that assert connector
-  *        identity / state preservation invariants. Returns nullptr if no
-  *        group with that index exists.
-  *
-  *   Not part of the supported public API surface; production code should
-  *   not depend on this. Kept narrowly scoped to avoid the broader leak that
-  *   a 'friend class' on the test suite would impose.
-  */
-  QmitkSynchronizedWidgetConnector* GetSynchronizationGroupConnectorForTesting(const GroupSyncIndexType index) const;
-
-  /** \brief Number of currently registered synchronization groups. Test-only. */
-  std::size_t GetSynchronizationGroupCountForTesting() const;
 
 public Q_SLOTS:
 
@@ -191,6 +178,24 @@ Q_SIGNALS:
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
   void SyncGroupAdded(const GroupSyncIndexType index);
+
+protected:
+
+  /**
+  * \brief Look up the connector backing the synchronization group with the
+  *        given index. Returns nullptr if no group with that index exists.
+  *
+  *   Internal accessor that all in-class code goes through (rather than
+  *   reaching into 'm_SynchronizedWidgetConnectors' directly), keeping the
+  *   map encapsulated. Exposed as 'protected' so a test-only subclass can
+  *   surface it for white-box assertions on connector identity / state
+  *   preservation; production code outside the class hierarchy must not
+  *   depend on this.
+  */
+  QmitkSynchronizedWidgetConnector* GetSyncGroupConnector(const GroupSyncIndexType index) const;
+
+  /** \brief Number of currently registered synchronization groups. */
+  std::size_t GetSyncGroupCount() const;
 
 private:
 

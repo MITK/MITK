@@ -32,11 +32,20 @@ extern std::vector<std::string> globalCmdLineArgs;
  *     edge-idempotent on the same group
  *   - NextFreeSyncGroupIndex / OnCreateNewSyncGroupRequested pick gaps
  *
- * The test uses the narrow public 'GetSynchronizationGroupConnectorForTesting'
- * accessor to inspect connector identity, and observable connector state
- * (m_SelectAll auto-reset when the connection counter drops to zero) to detect
- * double-Connect regressions without needing to probe the counter directly.
+ * The test surfaces the protected 'GetSyncGroupConnector' / 'GetSyncGroupCount'
+ * accessors via a thin subclass to inspect connector identity and registered
+ * group count without leaking these into the production public API. Connector
+ * state (m_SelectAll auto-reset when the connection counter drops to zero) is
+ * used to detect double-Connect regressions without probing the counter.
  */
+class TestableQmitkMxNMultiWidget : public QmitkMxNMultiWidget
+{
+public:
+  using QmitkMxNMultiWidget::QmitkMxNMultiWidget;
+  using QmitkMxNMultiWidget::GetSyncGroupConnector;
+  using QmitkMxNMultiWidget::GetSyncGroupCount;
+};
+
 class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkMxNSyncGroupApiTestSuite);
@@ -75,6 +84,9 @@ public:
     //       QmitkRenderWindowDataNodeTableModel::UpdateModelData's comparator
     //       is fixed to be strict-weak-ordered (return false when neither
     //       node has the property).
+    //       NOTE: the same workaround is duplicated in
+    //       'QmitkSynchronizedWidgetConnectorTest.cpp' -- keep both in sync
+    //       and remove together.
     m_Node1 = mitk::DataNode::New();
     m_Node1->SetName("node1");
     m_Node1->SetIntProperty("layer", 0);
@@ -116,22 +128,22 @@ public:
   };
 
   /** Returns the connector for `index` or nullptr if no group exists. */
-  static QmitkSynchronizedWidgetConnector* ConnectorOf(const QmitkMxNMultiWidget& w,
+  static QmitkSynchronizedWidgetConnector* ConnectorOf(const TestableQmitkMxNMultiWidget& w,
                                                        int index)
   {
-    return w.GetSynchronizationGroupConnectorForTesting(index);
+    return w.GetSyncGroupConnector(index);
   }
 
-  static std::size_t ConnectorCount(const QmitkMxNMultiWidget& w)
+  static std::size_t ConnectorCount(const TestableQmitkMxNMultiWidget& w)
   {
-    return w.GetSynchronizationGroupCountForTesting();
+    return w.GetSyncGroupCount();
   }
 
   // ---------- Add ----------
 
   void Add_RejectsZero()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     AddedRecorder rec(widget);
 
@@ -142,7 +154,7 @@ public:
 
   void Add_RejectsNegative()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     AddedRecorder rec(widget);
 
@@ -153,7 +165,7 @@ public:
 
   void Add_ThrowsWithoutDataStorage()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     // Deliberately do not set a data storage.
     CPPUNIT_ASSERT_THROW(widget.AddSynchronizationGroup(1), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, ConnectorCount(widget));
@@ -161,7 +173,7 @@ public:
 
   void Add_EmitsSignalOnFirstCall()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     AddedRecorder rec(widget);
 
@@ -174,7 +186,7 @@ public:
 
   void Add_IsIdempotent()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     AddedRecorder rec(widget);
 
@@ -202,7 +214,7 @@ public:
 
   void Set_RejectsNullWidget()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     CPPUNIT_ASSERT_THROW(widget.SetSynchronizationGroup(nullptr, 1), mitk::Exception);
@@ -210,7 +222,7 @@ public:
 
   void Set_AutoCreatesMissingGroup()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
     AddedRecorder rec(widget);
 
@@ -226,7 +238,7 @@ public:
 
   void Set_AssignsWidgetToTargetGroup()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     QmitkSynchronizedNodeSelectionWidget nodeWidget(nullptr);
@@ -239,7 +251,7 @@ public:
 
   void Set_MovesWidgetBetweenGroups()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     QmitkSynchronizedNodeSelectionWidget nodeWidget(nullptr);
@@ -270,7 +282,7 @@ public:
 
   void Set_IsIdempotentOnSameGroup()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     QmitkSynchronizedNodeSelectionWidget nodeWidget(nullptr);
@@ -303,7 +315,7 @@ public:
 
   void NextFreeSyncGroupIndex_PicksLowestUnused()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     CPPUNIT_ASSERT_EQUAL(1, widget.NextFreeSyncGroupIndex());
@@ -321,7 +333,7 @@ public:
 
   void OnCreateNewSyncGroupRequested_AssignsNextFree()
   {
-    QmitkMxNMultiWidget widget;
+    TestableQmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     widget.AddSynchronizationGroup(1);

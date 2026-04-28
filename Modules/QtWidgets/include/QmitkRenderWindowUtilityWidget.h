@@ -27,7 +27,6 @@ found in the LICENSE file.
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QComboBox>
-#include <QPushButton>
 
 namespace mitk
 {
@@ -55,17 +54,38 @@ public:
   QmitkRenderWindowUtilityWidget(
     QWidget* parent = nullptr,
     QmitkRenderWindow* renderWindow = nullptr,
-    mitk::DataStorage* dataStorage = nullptr,
-    const int nSyncGroups = 1
+    mitk::DataStorage* dataStorage = nullptr
   );
 
   ~QmitkRenderWindowUtilityWidget() override;
 
   using GroupSyncIndexType = int;
 
+  /**
+  * \brief Select the combobox row for the given synchronization group index.
+  *
+  * \param index  The 1-based group index. Must be >= 1 and must already be
+  *               registered with this widget (i.e. 'OnSyncGroupAdded' has run
+  *               for this index, or it was added by a prior 'SetSyncGroup').
+  *
+  * \pre  index >= 1                                          (otherwise mitk::Exception)
+  * \pre  the group is present in this widget's combobox      (otherwise mitk::Exception)
+  *
+  * \throws mitk::Exception on precondition violation.
+  */
   void SetSyncGroup(const GroupSyncIndexType index);
+
+  /**
+  * \brief Returns the currently selected group index, or '-1' when the combobox
+  *        holds no selection.
+  *
+  *   '-1' is returned only when no group has yet been registered with this
+  *   widget (the combobox is empty -- happens during initial construction
+  *   before the first 'OnSyncGroupAdded' or 'SetSyncGroup'). After at least
+  *   one group has been registered, the return value is always a valid group
+  *   index >= 1.
+  */
   GroupSyncIndexType GetSyncGroup() const;
-  void OnSyncGroupSelectionChanged(int index);
 
   void SetGeometry(const itk::EventObject& event);
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
@@ -85,11 +105,14 @@ Q_SIGNALS:
   void CreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
+private Q_SLOTS:
+
+  void OnSyncGroupSelectionChanged(int index);
+
 private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
-  QPushButton* m_SynchPushButton;
   QComboBox* m_SyncGroupSelector;
   QToolButton* m_NewSyncGroupButton;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;

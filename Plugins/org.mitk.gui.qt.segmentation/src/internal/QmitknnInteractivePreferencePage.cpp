@@ -64,7 +64,7 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
                    [this] { this->OnUninstallButtonClicked(); });
 
 #if !MITK_HAS_PYTHON
-  m_Ui->installationGroupBox->setVisible(false);
+  m_Ui->uninstallButton->setVisible(false);
 #endif
 
   this->Update();

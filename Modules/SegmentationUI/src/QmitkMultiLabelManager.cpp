@@ -62,7 +62,8 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   m_Controls->btnRemoveInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete_instance.svg")));
   m_Controls->btnRemoveGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
 
-  connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
+  connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector,
+    [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });
   connect(m_Controls->btnRemoveLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabel);
   connect(m_Controls->btnAddInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
   connect(m_Controls->btnRemoveInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabelInstance);
@@ -81,7 +82,8 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkMultiLabelManager::OnRenameLabelShortcutActivated);
 
   auto* addLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_A), this);
-  connect(addLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
+  connect(addLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector,
+    [inspector = this->m_Controls->labelInspector]() { inspector->AddNewLabel(); });
 
   m_AddLabelInstanceShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), this);
   connect(m_AddLabelInstanceShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);

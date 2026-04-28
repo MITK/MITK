@@ -44,6 +44,13 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
+
+  auto syncSkipNamingPromptEnabled = [this](bool enabled) {
+    m_Ui->skipNamingPromptCheckBox->setEnabled(enabled);
+    m_Ui->skipNamingPromptDescriptionLabel->setEnabled(enabled);
+  };
+  QObject::connect(m_Ui->autoCreateNextLabelCheckBox, &QCheckBox::toggled, m_Control, syncSkipNamingPromptEnabled);
+
   this->Update();
 }
 
@@ -57,6 +64,7 @@ bool QmitknnInteractivePreferencePage::PerformOk()
   auto prefs = GetPreferences();
 
   prefs->PutBool("nnInteractive/autoCreateNextLabel", m_Ui->autoCreateNextLabelCheckBox->isChecked());
+  prefs->PutBool("nnInteractive/autoCreateNextLabelSkipNamingPrompt", m_Ui->skipNamingPromptCheckBox->isChecked());
   prefs->PutBool("nnInteractive/autoConfirm", m_Ui->autoConfirmCheckBox->isChecked());
   prefs->PutBool("nnInteractive/showShortcutsInLabels", m_Ui->showShortcutsInLabelsCheckBox->isChecked());
 
@@ -98,6 +106,7 @@ void QmitknnInteractivePreferencePage::Update()
 {
   const auto prefs = GetPreferences();
   const auto autoCreateNextLabel = prefs->GetBool("nnInteractive/autoCreateNextLabel", true);
+  const auto skipNamingPrompt = prefs->GetBool("nnInteractive/autoCreateNextLabelSkipNamingPrompt", true);
   const auto autoConfirm = prefs->GetBool("nnInteractive/autoConfirm", false);
   const auto showShortcutsInLabels = prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
   const auto backend = prefs->Get("nnInteractive/backend", "auto");
@@ -105,6 +114,9 @@ void QmitknnInteractivePreferencePage::Update()
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
 
   m_Ui->autoCreateNextLabelCheckBox->setChecked(autoCreateNextLabel);
+  m_Ui->skipNamingPromptCheckBox->setChecked(skipNamingPrompt);
+  m_Ui->skipNamingPromptCheckBox->setEnabled(autoCreateNextLabel);
+  m_Ui->skipNamingPromptDescriptionLabel->setEnabled(autoCreateNextLabel);
   m_Ui->autoConfirmCheckBox->setChecked(autoConfirm);
   m_Ui->showShortcutsInLabelsCheckBox->setChecked(showShortcutsInLabels);
 

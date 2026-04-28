@@ -209,8 +209,14 @@ public Q_SLOTS:
   * the label will be either default generated or the rename delegate will be used. The label
   * will be added to the same group as the first currently selected label.
   *
+  * \param skipNamingPrompt If true, the rename/suggestion dialog is suppressed
+  * regardless of the "default label naming" and "enforce suggestions" preferences.
+  * Intended for programmatic, streamlined-workflow callers (e.g. nnInteractive's
+  * auto-create-next-label flow) that need to opt out of the dialog without
+  * changing the global preferences.
+  *
   * \pre AllowLabeModification must be set to true.*/
-  mitk::Label* AddNewLabel();
+  mitk::Label* AddNewLabel(bool skipNamingPrompt = false);
 
   /** \brief Removes the first currently selected label instance of the segmentation.
   * If no label is selected
@@ -273,7 +279,8 @@ protected:
   */
   mitk::Label* GetFirstSelectedLabelObject() const;
 
-  mitk::Label* AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup);
+  mitk::Label* AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup,
+    bool skipNamingPrompt = false);
 
   /**\brief Adds an instance of the same label/class like the passed label value
   */

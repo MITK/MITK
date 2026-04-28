@@ -781,6 +781,11 @@ bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const
   return m_Preferences->GetBool("nnInteractive/autoConfirm", false);
 }
 
+bool QmitknnInteractiveToolGUI::IsNamingPromptSkippedOnAutoCreate() const
+{
+  return m_Preferences->GetBool("nnInteractive/autoCreateNextLabelSkipNamingPrompt", true);
+}
+
 void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
 {
   // Delegate to the host's QmitkMultiLabelInspector so the "default label
@@ -812,7 +817,7 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
   // Align the inspector's selection with the active label so that
   // AddNewLabel() derives the correct group for the new label.
   inspector->SetSelectedLabel(previousActiveValue);
-  auto* addedLabel = inspector->AddNewLabel();
+  auto* addedLabel = inspector->AddNewLabel(this->IsNamingPromptSkippedOnAutoCreate());
 
   // Dialog canceled or creation failed; keep the previous label active.
   if (addedLabel == nullptr)

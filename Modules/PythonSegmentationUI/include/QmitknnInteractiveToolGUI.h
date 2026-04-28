@@ -205,6 +205,13 @@ private:
   /** \brief Reads the "auto-confirm after single interaction" preference. Not cached. */
   bool IsAutoConfirmEnabled() const;
 
+  /** \brief Reads the "skip naming prompt on auto-create" sub-preference. Not cached.
+   *
+   * When true, AutoCreateAndSelectNewLabel() bypasses the global "default
+   * label naming" and "enforce suggestions" preferences for this flow only.
+   */
+  bool IsNamingPromptSkippedOnAutoCreate() const;
+
   /** \brief Reads the "show shortcuts in button labels" preference. Not cached. */
   bool AreShortcutsShownInLabels() const;
 

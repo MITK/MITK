@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
-#include <mitkLabelSetImageHelper.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
@@ -652,6 +651,7 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
   auto segmentationPtr = m_AutoCreatedLabelSegmentation.Lock();
   const auto value = *m_AutoCreatedLabelValue;
   const auto previousActive = m_PreviousActiveLabelValue;
+  auto* inspector = this->GetMultiLabelInspector();
   this->InvalidateAutoCreatedLabel();
 
   if (segmentationPtr.IsNull())
@@ -669,7 +669,7 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
   //   the Qt event loop, pending single-shot timers are discarded, so our
   //   lambda never fires and RemoveLabel is never called. Harmless: the
   //   unused label vanishes with the application anyway.
-  QTimer::singleShot(0, qApp, [segmentationPtr, value, previousActive]() {
+  QTimer::singleShot(0, qApp, [segmentationPtr, value, previousActive, inspector]() {
     if (QCoreApplication::closingDown())
       return;
 
@@ -709,12 +709,8 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
       {
         segmentation->SetActiveLabel(fallback);
 
-        for (QWidget* topWidget : QApplication::topLevelWidgets())
-        {
-          const auto inspectors = topWidget->findChildren<QmitkMultiLabelInspector*>();
-          for (auto* inspector : inspectors)
-            inspector->SetSelectedLabel(fallback);
-        }
+        if (inspector != nullptr)
+          inspector->SetSelectedLabel(fallback);
       }
     }
 
@@ -787,6 +783,14 @@ bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const
 
 void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
 {
+  // Delegate to the host's QmitkMultiLabelInspector so the "default label
+  // naming" and "enforce suggestions" preferences are honored (including the
+  // naming/color dialog), matching the behavior of the "New label" button in
+  // the Segmentation plugin.
+  auto* inspector = this->GetMultiLabelInspector();
+  if (inspector == nullptr)
+    return;
+
   auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   if (toolManager == nullptr)
     return;
@@ -805,45 +809,10 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
 
   const auto previousActiveValue = activeLabel->GetValue();
 
-  // Delegate to the Segmentation view's QmitkMultiLabelInspector so the
-  // "default label naming" and "enforce suggestions" preferences are honored
-  // (including the naming/color dialog), matching the behavior of the
-  // "New label" button in the Segmentation plugin.
-  QmitkMultiLabelInspector* inspector = nullptr;
-  for (QWidget* topWidget : QApplication::topLevelWidgets())
-  {
-    inspector = topWidget->findChild<QmitkMultiLabelInspector*>();
-    if (inspector != nullptr)
-      break;
-  }
-
-  mitk::Label* addedLabel = nullptr;
-
-  if (inspector != nullptr)
-  {
-    // Align the inspector's selection with the active label so that
-    // AddNewLabel() derives the correct group for the new label.
-    inspector->SetSelectedLabel(previousActiveValue);
-    addedLabel = inspector->AddNewLabel();
-  }
-  else
-  {
-    // Fallback for contexts where no inspector is reachable (e.g., the
-    // Segmentation view was closed while the tool is still alive). Create
-    // the label directly without consulting the naming preferences.
-    const auto groupID = segmentation->GetGroupIndexOfLabel(previousActiveValue);
-
-    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(segmentation);
-    if (newLabel.IsNull())
-      return;
-
-    addedLabel = segmentation->AddLabel(newLabel, groupID, false);
-    if (addedLabel == nullptr)
-      return;
-
-    segmentation->SetActiveLabel(addedLabel->GetValue());
-    workingNode->Modified();
-  }
+  // Align the inspector's selection with the active label so that
+  // AddNewLabel() derives the correct group for the new label.
+  inspector->SetSelectedLabel(previousActiveValue);
+  auto* addedLabel = inspector->AddNewLabel();
 
   // Dialog canceled or creation failed; keep the previous label active.
   if (addedLabel == nullptr)

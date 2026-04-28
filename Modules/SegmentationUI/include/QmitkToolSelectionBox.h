@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <map>
 
+class QmitkMultiLabelInspector;
 class QmitkToolGUI;
 
 /**
@@ -112,6 +113,15 @@ public slots:
   /** \brief Sets the parent widget where tool-specific GUIs will be displayed. */
   virtual void SetToolGUIArea(QWidget *parentWidget);
 
+  /** \brief Sets the label inspector forwarded to each created tool GUI.
+   *
+   * The inspector is propagated to every QmitkToolGUI right after SetTool(),
+   * giving tool GUIs a deterministic handle to the host's label-management
+   * widget. Pointer ownership stays with the caller; lifetime must outlive
+   * any tool GUI that consults it. May be null.
+   */
+  void SetMultiLabelInspector(QmitkMultiLabelInspector *inspector);
+
 protected slots:
 
   void toolButtonClicked(int id);
@@ -138,6 +148,7 @@ protected:
 
   QWidget *m_ToolGUIWidget;
   QmitkToolGUI *m_LastToolGUI;
+  QmitkMultiLabelInspector *m_MultiLabelInspector = nullptr;
 
   // store buttons in this group
   QButtonGroup *m_ToolButtonGroup;

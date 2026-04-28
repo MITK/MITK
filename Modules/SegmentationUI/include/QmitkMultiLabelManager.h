@@ -37,6 +37,8 @@ namespace mitk
   class DataStorage;
 }
 
+class QmitkMultiLabelInspector;
+
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelManager : public QWidget
 {
   Q_OBJECT
@@ -55,6 +57,9 @@ public:
 
   mitk::MultiLabelSegmentation* GetMultiLabelSegmentation() const;
   mitk::DataNode* GetMultiLabelNode() const;
+
+  /** \brief Returns the inspector this manager wraps. Never null after construction. */
+  QmitkMultiLabelInspector* GetMultiLabelInspector() const;
 
   const mitk::LabelSuggestionHelper* GetLabelSuggestionHelper() const;
 

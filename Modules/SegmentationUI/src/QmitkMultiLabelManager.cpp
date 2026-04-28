@@ -188,6 +188,11 @@ mitk::DataNode* QmitkMultiLabelManager::GetMultiLabelNode() const
   return this->m_Controls->labelInspector->GetMultiLabelNode();
 }
 
+QmitkMultiLabelInspector* QmitkMultiLabelManager::GetMultiLabelInspector() const
+{
+  return this->m_Controls->labelInspector;
+}
+
 void QmitkMultiLabelManager::SetDataStorage(mitk::DataStorage *storage)
 {
   m_DataStorage = storage;

@@ -635,11 +635,15 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      }
    }
 
+   // Forward the label inspector so tool GUIs can interact with the host's label-management widget.
+   auto* multiLabelInspector = m_Controls->multiLabelWidget->GetMultiLabelInspector();
+
    // setup 2D tools
    m_Controls->toolSelectionBox2D->SetToolManager(*m_ToolManager);
    m_Controls->toolSelectionBox2D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
+   m_Controls->toolSelectionBox2D->SetMultiLabelInspector(multiLabelInspector);
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &Self::OnManualTool2DSelected);
 
@@ -648,6 +652,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
+   m_Controls->toolSelectionBox3D->SetMultiLabelInspector(multiLabelInspector);
 
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 

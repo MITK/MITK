@@ -376,6 +376,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SyncGroupChanged, this, &QmitkMxNMultiWidget::SetSynchronizationGroup);
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested,
+    this, &QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested);
   connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
 
   // initialize the node selection widget with all nodes to set required properties, then synchronize with default group
@@ -439,9 +441,22 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
     hBoxLayout->addWidget(content);
     emit UpdateUtilityWidgetViewPlanes();
   }
-  catch (nlohmann::json::out_of_range& e)
+  catch (const nlohmann::json::out_of_range& e)
   {
     MITK_ERROR << "Error in loading window layout from JSON: " << e.what();
+    QMessageBox::warning(this, "Load layout", QString("Invalid layout document: ") + e.what());
+    return;
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "Error in loading window layout: " << e.what();
+    QMessageBox::warning(this, "Load layout", QString("Invalid layout document: ") + e.what());
+    return;
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Unexpected error while loading window layout: " << e.what();
+    QMessageBox::warning(this, "Load layout", QString("Could not load layout: ") + e.what());
     return;
   }
 
@@ -561,6 +576,9 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         window = CreateRenderWindowWidget();
       }
 
+      // Pre-create the group via the canonical API so the cell's combobox has
+      // the entry before SetSyncGroup() lands. Idempotent if already present.
+      this->AddSynchronizationGroup(syncGroup);
       window->GetUtilityWidget()->SetSyncGroup(syncGroup);
 
       bool selectAll = true;
@@ -595,6 +613,11 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   for (auto node : nodes)
   {
     rowCounter++;
+    // Pre-create the row's synchronization group via the canonical API so that
+    // every utility widget's combobox has the entry before SetSyncGroup() runs.
+    // Idempotent if the group already exists.
+    this->AddSynchronizationGroup(rowCounter);
+
     auto hSplit = new QSplitter(Qt::Horizontal);
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
@@ -641,50 +664,111 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
 
 void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index)
 {
-  if (index == 0)
+  if (index < 1)
   {
-    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
+    mitkThrow() << "Invalid synchronization group index '" << index
+                << "'. Group index must be >= 1.";
+  }
+
+  // Idempotent: an existing group is preserved (no replacement, no extra signal).
+  if (m_SynchronizedWidgetConnectors.find(index) != m_SynchronizedWidgetConnectors.end())
+  {
     return;
   }
 
-  auto dataStorage = this->GetDataStorage();
+  const auto dataStorage = this->GetDataStorage();
   if (nullptr == dataStorage)
   {
-    return;
+    mitkThrow() << "Cannot create synchronization group '" << index
+                << "': no data storage set on the multi widget.";
   }
 
-  mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
+  const auto noHelperObjects = mitk::NodePredicateAnd::New();
   noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-  auto allNodes = dataStorage->GetSubset(noHelperObjects);
+  const auto allNodes = dataStorage->GetSubset(noHelperObjects);
+
   QmitkSynchronizedNodeSelectionWidget::NodeList currentSelection;
-  for (auto& node : *allNodes)
+  for (const auto& node : *allNodes)
   {
     currentSelection.append(node);
   }
 
-  m_SynchronizedWidgetConnectors[index] = std::make_unique<QmitkSynchronizedWidgetConnector>();
-  m_SynchronizedWidgetConnectors[index]->ChangeSelection(currentSelection);
+  auto connector = std::make_unique<QmitkSynchronizedWidgetConnector>();
+  connector->ChangeSelection(currentSelection);
+  m_SynchronizedWidgetConnectors[index] = std::move(connector);
 
   emit SyncGroupAdded(index);
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
 {
+  if (nullptr == synchronizedWidget)
+  {
+    mitkThrow() << "SetSynchronizationGroup: synchronizedWidget must not be null.";
+  }
+
+  // Auto-create on first reference. Add() validates index >= 1 and storage presence.
   if (m_SynchronizedWidgetConnectors.find(index) == m_SynchronizedWidgetConnectors.end())
   {
     this->AddSynchronizationGroup(index);
   }
 
-  auto old_index = synchronizedWidget->GetSyncGroup();
+  const auto old_index = synchronizedWidget->GetSyncGroup();
+
   if (old_index == index)
+  {
+    // Already on this group. Connector edge stays (no double-Connect that would
+    // double-bump the connection counter); just refresh state from the connector
+    // so the freshly attached widget sees the cached selection / select-all mode.
+    m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
     return;
-  synchronizedWidget->SetSyncGroup(index);
+  }
 
-  // For the initial setting of the synchronization, nothing old is there to disconnect
+  // For the initial setting of the synchronization, nothing old is there to disconnect.
   if (old_index != -1)
-    m_SynchronizedWidgetConnectors[old_index]->DisconnectWidget(synchronizedWidget);
+  {
+    const auto oldIt = m_SynchronizedWidgetConnectors.find(old_index);
+    if (oldIt != m_SynchronizedWidgetConnectors.end())
+    {
+      oldIt->second->DisconnectWidget(synchronizedWidget);
+    }
+  }
 
+  synchronizedWidget->SetSyncGroup(index);
   m_SynchronizedWidgetConnectors[index]->ConnectWidget(synchronizedWidget);
   m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
+}
+
+QmitkMxNMultiWidget::GroupSyncIndexType QmitkMxNMultiWidget::NextFreeSyncGroupIndex() const
+{
+  // m_SynchronizedWidgetConnectors is a std::map with int keys, so iteration is
+  // in ascending key order. Walk from 1 and return the first gap.
+  GroupSyncIndexType candidate = 1;
+  for (const auto& entry : m_SynchronizedWidgetConnectors)
+  {
+    if (entry.first != candidate)
+    {
+      break;
+    }
+    ++candidate;
+  }
+  return candidate;
+}
+
+void QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+{
+  // Guard against the slot firing before the editor has a data storage attached
+  // (e.g. during teardown, or if SetDataStorage(nullptr) was called after init).
+  // AddSynchronizationGroup would otherwise throw, and Qt slots must not let
+  // exceptions escape into the event dispatcher.
+  if (nullptr == this->GetDataStorage())
+  {
+    MITK_WARN << "Ignoring 'create new synchronization group' request: no data storage set on the multi widget.";
+    return;
+  }
+
+  const auto next = this->NextFreeSyncGroupIndex();
+  this->AddSynchronizationGroup(next);
+  this->SetSynchronizationGroup(synchronizedWidget, next);
 }

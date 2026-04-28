@@ -35,6 +35,7 @@ namespace mitk
 }
 
 class QmitkRenderWindow;
+class QToolButton;
 
 /**
 * \brief Utility widget that extends a QmitkRenderWindowWidget with window-specific controls.
@@ -77,6 +78,11 @@ Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SyncGroupChanged(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, GroupSyncIndexType index);
+  /**
+  * \brief Emitted when the user requests a new synchronization group via the '+' button.
+  *        The owning multi widget allocates a free index and assigns this cell to it.
+  */
+  void CreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
 
 private:
@@ -85,6 +91,7 @@ private:
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QPushButton* m_SynchPushButton;
   QComboBox* m_SyncGroupSelector;
+  QToolButton* m_NewSyncGroupButton;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

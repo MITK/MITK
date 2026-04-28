@@ -152,6 +152,21 @@ public:
   */
   GroupSyncIndexType NextFreeSyncGroupIndex() const;
 
+  /**
+  * \brief Look up the connector backing the synchronization group with the
+  *        given index. Intended for white-box tests that assert connector
+  *        identity / state preservation invariants. Returns nullptr if no
+  *        group with that index exists.
+  *
+  *   Not part of the supported public API surface; production code should
+  *   not depend on this. Kept narrowly scoped to avoid the broader leak that
+  *   a 'friend class' on the test suite would impose.
+  */
+  QmitkSynchronizedWidgetConnector* GetSynchronizationGroupConnectorForTesting(const GroupSyncIndexType index) const;
+
+  /** \brief Number of currently registered synchronization groups. Test-only. */
+  std::size_t GetSynchronizationGroupCountForTesting() const;
+
 public Q_SLOTS:
 
   // mouse events

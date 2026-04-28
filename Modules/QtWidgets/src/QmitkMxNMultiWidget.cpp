@@ -740,6 +740,17 @@ void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelection
   m_SynchronizedWidgetConnectors[index]->SynchronizeWidget(synchronizedWidget);
 }
 
+QmitkSynchronizedWidgetConnector* QmitkMxNMultiWidget::GetSynchronizationGroupConnectorForTesting(const GroupSyncIndexType index) const
+{
+  const auto it = m_SynchronizedWidgetConnectors.find(index);
+  return (it == m_SynchronizedWidgetConnectors.end()) ? nullptr : it->second.get();
+}
+
+std::size_t QmitkMxNMultiWidget::GetSynchronizationGroupCountForTesting() const
+{
+  return m_SynchronizedWidgetConnectors.size();
+}
+
 QmitkMxNMultiWidget::GroupSyncIndexType QmitkMxNMultiWidget::NextFreeSyncGroupIndex() const
 {
   // m_SynchronizedWidgetConnectors is a std::map with int keys, so iteration is

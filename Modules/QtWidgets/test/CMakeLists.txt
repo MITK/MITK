@@ -3,3 +3,11 @@ MITK_CREATE_MODULE_TESTS()
 mitkAddCustomModuleTest(QmitkAbstractNodeSelectionWidgetTest QmitkAbstractNodeSelectionWidgetTest
   -platform minimal
 )
+
+mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWidgetConnectorTest
+  -platform minimal
+)

@@ -46,10 +46,20 @@ namespace
   {
     auto appPath = mitk::IOUtil::GetAppBundlePath(mitk::IOUtil::AppBundlePath::Self);
 
-    if (!appPath.empty())
-      return std::hash<std::string>{}(appPath.string());
+    if (appPath.empty())
+      return {};
 
-    return {};
+    // Canonicalize before hashing so the hash is invariant to how the
+    // executable was launched. On Windows in particular, GetModuleFileName
+    // returns the path with whatever case and short/long form was used at
+    // load time; weakly_canonical resolves both to the form stored on disk.
+    std::error_code ec;
+    auto canonicalAppPath = fs::weakly_canonical(appPath, ec);
+
+    if (ec)
+      canonicalAppPath = appPath;
+
+    return std::hash<std::string>{}(canonicalAppPath.string());
   }
 
   std::string GetHashAsString(size_t hash)

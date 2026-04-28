@@ -108,6 +108,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 
   void OnSyncGroupSelectionChanged(int index);
+  void OnNodeSelectionWidgetSyncGroupChanged(int index);
 
 private:
 

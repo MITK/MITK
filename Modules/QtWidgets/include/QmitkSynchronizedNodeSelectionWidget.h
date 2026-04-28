@@ -89,6 +89,15 @@ Q_SIGNALS:
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
   void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  /**
+   * \brief Emitted when the synchronization group index actually changes.
+   *
+   * Listeners (typically the owning utility widget) use this to keep view-side
+   * state -- e.g. a group-selector combobox -- in sync with the widget's
+   * authoritative 'm_SyncGroupIndex'. Not emitted when 'SetSyncGroup' is called
+   * with the value the widget already holds.
+   */
+  void SyncGroupIndexChanged(GroupSyncIndexType index);
 
 public Q_SLOTS:
   void SetSelection(const NodeList& newSelection);

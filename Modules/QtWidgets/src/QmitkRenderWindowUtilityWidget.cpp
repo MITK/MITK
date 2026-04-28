@@ -54,6 +54,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   m_NodeSelectionWidget->SetDataStorage(dataStorage);
   m_NodeSelectionWidget->SetNodePredicate(noHelperObjects);
   connect(this, &QmitkRenderWindowUtilityWidget::SetDataSelection, m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SetSelection);
+  // Mirror authoritative group changes (e.g. via 'MxN::SetSynchronizationGroup'
+  // from the '+' button or layout load) back into the combobox.
+  connect(m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SyncGroupIndexChanged,
+    this, &QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged);
 
   auto menuBar = new QMenuBar(this);
   menuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
@@ -157,6 +161,26 @@ void QmitkRenderWindowUtilityWidget::OnSyncGroupSelectionChanged(int index)
     return;
   }
   emit SyncGroupChanged(m_NodeSelectionWidget, data.toInt());
+}
+
+void QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged(int index)
+{
+  // The node selection widget is the authoritative source of the cell's group
+  // assignment; mirror it into the combobox. The signals emitted by the
+  // combobox change are blocked to terminate the round-trip
+  // (combobox -> SyncGroupChanged -> MxN -> SetSyncGroup -> here -> combobox).
+  // We do not throw on a missing row: this slot is a notification follower and
+  // must not raise into the Qt event loop. A missing row only happens when
+  // 'SyncGroupAdded' has not been delivered yet; the corresponding
+  // 'OnSyncGroupAdded' will land shortly and the next 'SetSyncGroup' will
+  // settle the combobox.
+  const int row = m_SyncGroupSelector->findData(QVariant(index));
+  if (row < 0)
+  {
+    return;
+  }
+  const QSignalBlocker blocker(m_SyncGroupSelector);
+  m_SyncGroupSelector->setCurrentIndex(row);
 }
 
 void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)

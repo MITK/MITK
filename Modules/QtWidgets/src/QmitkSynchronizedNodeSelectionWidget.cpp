@@ -543,10 +543,21 @@ void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType
                 << "'. Group index must be >= 1.";
   }
 
+  // No-op when the value is unchanged. Suppressing the signal emission here is
+  // load-bearing: it terminates the model->view feedback loop in which the
+  // owning utility widget mirrors this index back into its combobox via
+  // 'SetSyncGroup'.
+  if (m_SyncGroupIndex == index)
+  {
+    return;
+  }
+
   // The logical group index is widget bookkeeping and must always be stored;
   // it does not depend on a renderer being attached. The renderer is only
   // required for the optional render-update side effect below.
   m_SyncGroupIndex = index;
+
+  emit SyncGroupIndexChanged(index);
 
   // Since the synchronization might lead to a different node order depending on the layer properties, the render window
   // needs to be updated.

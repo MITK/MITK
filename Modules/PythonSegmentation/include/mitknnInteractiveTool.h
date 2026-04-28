@@ -96,7 +96,11 @@ namespace mitk
     /** \brief Called when the tool is deactivated.
      *
      * Disables any active interactor, resets all interactions, and ends the
-     * Python session.
+     * Python session. Emits DeactivatedEvent at the end so observers can
+     * run cleanup that must not happen from the destructor path (e.g.
+     * removing unused auto-created labels in the GUI).
+     *
+     * \sa DeactivatedEvent
      */
     void Deactivated() override;
 

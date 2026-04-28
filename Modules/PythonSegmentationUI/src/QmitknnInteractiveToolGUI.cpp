@@ -845,8 +845,11 @@ void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()
 
 void QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted()
 {
-  m_AutoCreatedLabelValue.reset();
-  m_PreviousActiveLabelValue.reset();
+  // Delegate to keep a single canonical clearing path. Reassigning the
+  // WeakPointer to nullptr inside its own delete callback is safe: the
+  // raw pointer was already cleared before this callback was invoked,
+  // so RemoveDeleteEventObserver early-outs.
+  this->InvalidateAutoCreatedLabel();
 }
 
 void QmitknnInteractiveToolGUI::ReEnableLastInteractor()

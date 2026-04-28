@@ -45,6 +45,10 @@ namespace Ui
  * - Interactor mode buttons (point, box, scribble, lasso)
  * - Auto-zoom and auto-refine options
  * - Mask-based session initialization
+ * - Automation modes (auto-confirm after a single interaction;
+ *   auto-create-next-label on confirm, with an optional bypass of the
+ *   global label-naming preferences)
+ * - Optional shortcut hints in button labels
  * - Keyboard shortcuts for common actions (R: reset, C: confirm,
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
@@ -112,6 +116,10 @@ protected:
   void OnSettingsButtonClicked();
 
   /** \brief Resets all interactions and switches to positive prompt type.
+   *
+   * Also clears the auto-created-label tracking via
+   * InvalidateAutoCreatedLabel() so the next deactivation does not try to
+   * remove a label the user has effectively re-claimed by resetting.
    */
   void OnResetInteractionsButtonClicked();
 

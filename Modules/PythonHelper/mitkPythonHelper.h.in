@@ -36,6 +36,19 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);
   MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const fs::path& path);
+
+  // String-literal overloads. Without these, calls like ActivateVirtualEnv("foo")
+  // are ambiguous because const char* converts equally well to both std::string
+  // and fs::path; an exact-match const char* overload disambiguates.
+  inline bool ActivateVirtualEnv(const char* name)
+  {
+    return ActivateVirtualEnv(std::string(name));
+  }
+
+  inline bool RemoveVirtualEnv(const char* name)
+  {
+    return RemoveVirtualEnv(std::string(name));
+  }
 }
 
 #endif

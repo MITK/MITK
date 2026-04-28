@@ -233,8 +233,12 @@ private:
    * The new label is placed into the group of the previously-active label.
    * Tracks the new label value and segmentation so it can be removed on
    * tool deactivation if it remains unused.
+   *
+   * \return \c true if a new label was created, \c false otherwise (a
+   *         precondition was not met, or the user canceled the rename
+   *         dialog when "Ignore label naming preferences" is off).
    */
-  void AutoCreateAndSelectNewLabel();
+  bool AutoCreateAndSelectNewLabel();
 
   /** \brief Stops tracking the auto-created label without removing it. */
   void InvalidateAutoCreatedLabel();

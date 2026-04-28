@@ -632,12 +632,16 @@ void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
 
   this->OnResetInteractionsButtonClicked();
 
+  bool createdNewLabel = false;
   if (autoCreate)
-    this->AutoCreateAndSelectNewLabel();
+    createdNewLabel = this->AutoCreateAndSelectNewLabel();
 
   // Re-enable the last interactor so either automation can continue without
   // the user having to re-select Point/Box/Scribble/Lasso after every Confirm.
-  if (autoCreate || autoConfirm)
+  // Skip this if auto-create was attempted but failed (e.g. user canceled the
+  // rename dialog), so the next interaction doesn't extend the just-confirmed
+  // label instead of starting a fresh one.
+  if (autoConfirm || createdNewLabel)
     this->ReEnableLastInteractor();
 }
 
@@ -786,7 +790,7 @@ bool QmitknnInteractiveToolGUI::IsNamingPromptSkippedOnAutoCreate() const
   return m_Preferences->GetBool("nnInteractive/autoCreateNextLabelSkipNamingPrompt", true);
 }
 
-void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
+bool QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
 {
   // Delegate to the host's QmitkMultiLabelInspector so the "default label
   // naming" and "enforce suggestions" preferences are honored (including the
@@ -794,23 +798,23 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
   // the Segmentation plugin.
   auto* inspector = this->GetMultiLabelInspector();
   if (inspector == nullptr)
-    return;
+    return false;
 
   auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   if (toolManager == nullptr)
-    return;
+    return false;
 
   auto workingNode = toolManager->GetWorkingData(0);
   if (workingNode == nullptr)
-    return;
+    return false;
 
   auto segmentation = workingNode->GetDataAs<mitk::MultiLabelSegmentation>();
   if (segmentation == nullptr)
-    return;
+    return false;
 
   const auto* activeLabel = segmentation->GetActiveLabel();
   if (activeLabel == nullptr)
-    return;
+    return false;
 
   const auto previousActiveValue = activeLabel->GetValue();
 
@@ -821,13 +825,15 @@ void QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
 
   // Dialog canceled or creation failed; keep the previous label active.
   if (addedLabel == nullptr)
-    return;
+    return false;
 
   m_AutoCreatedLabelValue = addedLabel->GetValue();
   m_PreviousActiveLabelValue = previousActiveValue;
   m_AutoCreatedLabelSegmentation = segmentation;
   m_AutoCreatedLabelSegmentation.SetDeleteEventCallback(
     [this] { this->OnAutoCreatedSegmentationDeleted(); });
+
+  return true;
 }
 
 void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()

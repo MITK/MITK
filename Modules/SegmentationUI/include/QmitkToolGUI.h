@@ -20,6 +20,8 @@ found in the LICENSE file.
 
 #include <QWidget>
 
+class QmitkMultiLabelInspector;
+
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
 
@@ -38,6 +40,19 @@ public:
   /** \brief Associates the given tool with this GUI, emitting NewToolAssociated. */
   void SetTool(mitk::Tool *tool);
 
+  /** \brief Provides the segmentation view's label inspector to this GUI.
+   *
+   * Set by QmitkToolSelectionBox right after SetTool(). Tool GUIs that need
+   * to interact with the host's label-management UI (e.g. to create labels
+   * honoring the user's naming preferences) can read it via
+   * GetMultiLabelInspector(). May be null if the GUI is hosted outside a
+   * segmentation view; callers must handle that case.
+   */
+  void SetMultiLabelInspector(QmitkMultiLabelInspector *inspector);
+
+  /** \brief Returns the inspector associated with this GUI, or null if none. */
+  QmitkMultiLabelInspector *GetMultiLabelInspector() const;
+
   /** \brief Intentional no-op; prevents ITK reference counting from interfering with Qt ownership. */
   void Register() const override;
   /** \brief Intentional no-op; prevents ITK reference counting from interfering with Qt ownership. */
@@ -55,6 +70,7 @@ protected:
   QmitkToolGUI() = default;
 
   mitk::Tool::Pointer m_Tool;
+  QmitkMultiLabelInspector *m_MultiLabelInspector = nullptr;
 
   /** \brief Called when the tool's busy state changes. Override to enable/disable UI elements. */
   virtual void BusyStateChanged(bool){};

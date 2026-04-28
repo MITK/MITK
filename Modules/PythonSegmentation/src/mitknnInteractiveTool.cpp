@@ -203,6 +203,8 @@ void mitk::nnInteractiveTool::Deactivated()
   this->EndSession();
 
   Superclass::Deactivated();
+
+  this->DeactivatedEvent.Send();
 }
 
 const mitk::nnInteractiveTool::InteractorMap& mitk::nnInteractiveTool::GetInteractors() const
@@ -401,6 +403,8 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
     }
 
     previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
+
+    this->PreviewUpdatedEvent.Send();
   }
   else if (m_Impl->InitialSeg.IsNotNull())
   {

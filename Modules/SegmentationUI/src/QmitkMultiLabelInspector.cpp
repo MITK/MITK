@@ -581,14 +581,18 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
   return result;
 }
 
-mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup)
+mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabelSegmentation::GroupIndexType& containingGroup,
+  bool skipNamingPrompt)
 {
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
-  auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
 
   bool canceled = false;
-  if (!m_DefaultLabelNaming || suggestionPref.enforceSuggestions)
-    emit LabelRenameRequested(newLabel, false, canceled);
+  if (!skipNamingPrompt)
+  {
+    auto suggestionPref = mitk::LabelSuggestionHelper::GetSuggestionPreferences();
+    if (!m_DefaultLabelNaming || suggestionPref.enforceSuggestions)
+      emit LabelRenameRequested(newLabel, false, canceled);
+  }
 
   if (canceled) return nullptr;
 
@@ -617,7 +621,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::MultiLabe
   return newLabel;
 }
 
-mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
+mitk::Label* QmitkMultiLabelInspector::AddNewLabel(bool skipNamingPrompt)
 {
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of AddNewLabel.";
@@ -632,7 +636,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
     ? m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue())
     : 0;
 
-  auto result = AddNewLabelInternal(groupID);
+  auto result = AddNewLabelInternal(groupID, skipNamingPrompt);
 
   // this is needed as workaround for (T27307). It circumvents the fact that modifications
   // of data (here the segmentation) does not directly trigger the modification of the

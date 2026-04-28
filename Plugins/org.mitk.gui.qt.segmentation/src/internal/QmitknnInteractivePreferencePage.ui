@@ -15,6 +15,119 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
+    <widget class="QGroupBox" name="automationGroupBox">
+     <property name="title">
+      <string>Automation</string>
+     </property>
+     <layout class="QVBoxLayout" name="automationLayout">
+      <item>
+       <widget class="QCheckBox" name="autoCreateNextLabelCheckBox">
+        <property name="text">
+         <string>Auto-create next label</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="autoCreateNextLabelDescriptionLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Once you confirm a label, a new empty label is ready so you can keep segmenting right away. Unused auto-created labels are removed when you leave the tool.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="skipNamingPromptLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <spacer name="skipNamingPromptIndentSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="skipNamingPromptCheckBox">
+          <property name="text">
+           <string>Ignore label naming preferences</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="skipNamingPromptDescriptionLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Skip the &quot;default label naming&quot; dialog and the &quot;enforce suggestions&quot; picker for this auto-create flow only. Other label-creation paths still honor those preferences.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>40</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="autoConfirmCheckBox">
+        <property name="text">
+         <string>Auto-confirm after single interaction</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="autoConfirmDescriptionLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Confirm automatically after the first successful interaction. Best when a single interaction is enough per label.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="modelGroupBox">
      <property name="title">
       <string>Model</string>
@@ -43,6 +156,24 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="modelRestartNoteLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -94,6 +225,43 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QLabel" name="backendRestartNoteLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="interactionGroupBox">
+     <property name="title">
+      <string>Interaction</string>
+     </property>
+     <layout class="QVBoxLayout" name="interactionLayout">
+      <item>
+       <widget class="QCheckBox" name="showShortcutsInLabelsCheckBox">
+        <property name="text">
+         <string>Show keyboard shortcuts</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -113,6 +281,10 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>autoCreateNextLabelCheckBox</tabstop>
+  <tabstop>skipNamingPromptCheckBox</tabstop>
+  <tabstop>autoConfirmCheckBox</tabstop>
+  <tabstop>showShortcutsInLabelsCheckBox</tabstop>
   <tabstop>autoBackendRadioButton</tabstop>
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>

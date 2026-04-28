@@ -40,3 +40,13 @@ void QmitkToolGUI::SetTool(mitk::Tool *tool)
 
   emit(NewToolAssociated(tool));
 }
+
+void QmitkToolGUI::SetMultiLabelInspector(QmitkMultiLabelInspector *inspector)
+{
+  m_MultiLabelInspector = inspector;
+}
+
+QmitkMultiLabelInspector *QmitkToolGUI::GetMultiLabelInspector() const
+{
+  return m_MultiLabelInspector;
+}

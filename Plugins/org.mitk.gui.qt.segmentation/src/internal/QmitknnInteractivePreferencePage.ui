@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>702</width>
-    <height>474</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -266,6 +266,39 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="installationGroupBox">
+     <property name="title">
+      <string>Installation</string>
+     </property>
+     <layout class="QVBoxLayout" name="installationLayout">
+      <item>
+       <layout class="QHBoxLayout" name="uninstallLayout">
+        <item>
+         <widget class="QPushButton" name="uninstallButton">
+          <property name="text">
+           <string>Uninstall nnInteractive</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="uninstallSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -290,6 +323,7 @@
   <tabstop>gpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendLineEdit</tabstop>
   <tabstop>checkpointLineEdit</tabstop>
+  <tabstop>uninstallButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

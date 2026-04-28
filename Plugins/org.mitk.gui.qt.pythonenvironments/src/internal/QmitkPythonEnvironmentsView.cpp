@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkPythonSettingsView.h"
-#include <ui_QmitkPythonSettingsView.h>
+#include "QmitkPythonEnvironmentsView.h"
+#include <ui_QmitkPythonEnvironmentsView.h>
 
 #include <mitkPythonHelper.h>
 
@@ -209,25 +209,25 @@ namespace
   }
 }
 
-const std::string QmitkPythonSettingsView::VIEW_ID = "org.mitk.views.pythonsettings";
+const std::string QmitkPythonEnvironmentsView::VIEW_ID = "org.mitk.views.pythonenvironments";
 
-QmitkPythonSettingsView::QmitkPythonSettingsView(QObject*)
-  : m_Ui(std::make_unique<Ui::QmitkPythonSettingsView>())
+QmitkPythonEnvironmentsView::QmitkPythonEnvironmentsView(QObject*)
+  : m_Ui(std::make_unique<Ui::QmitkPythonEnvironmentsView>())
 {
 }
 
-QmitkPythonSettingsView::~QmitkPythonSettingsView()
+QmitkPythonEnvironmentsView::~QmitkPythonEnvironmentsView()
 {
 }
 
-void QmitkPythonSettingsView::CreateQtPartControl(QWidget* parent)
+void QmitkPythonEnvironmentsView::CreateQtPartControl(QWidget* parent)
 {
-  using Self = QmitkPythonSettingsView;
+  using Self = QmitkPythonEnvironmentsView;
 
   m_Ui->setupUi(parent);
 
-  m_Ui->deleteVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonSettingsView/trash.svg")));
-  m_Ui->refreshVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonSettingsView/arrow-rotate-right.svg")));
+  m_Ui->deleteVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/trash.svg")));
+  m_Ui->refreshVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/arrow-rotate-right.svg")));
 
   connect(m_Ui->venvsTreeWidget, &QTreeWidget::itemDoubleClicked, [](QTreeWidgetItem* item, int) {
     if (auto venvItem = dynamic_cast<const QmitkVenvTreeWidgetItem*>(item); venvItem != nullptr)
@@ -244,7 +244,7 @@ void QmitkPythonSettingsView::CreateQtPartControl(QWidget* parent)
   this->RefreshVenvsTreeWidget();
 }
 
-void QmitkPythonSettingsView::DeleteSelectedVenvs()
+void QmitkPythonEnvironmentsView::DeleteSelectedVenvs()
 {
   const auto selectedItems = GetSelectedVenvItems(m_Ui->venvsTreeWidget);
 
@@ -276,13 +276,13 @@ void QmitkPythonSettingsView::DeleteSelectedVenvs()
   this->RefreshVenvsTreeWidget();
 }
 
-void QmitkPythonSettingsView::RefreshVenvsTreeWidget()
+void QmitkPythonEnvironmentsView::RefreshVenvsTreeWidget()
 {
   this->PopulateVenvsTreeWidget();
   this->CalculateAllVenvSizes();
 }
 
-void QmitkPythonSettingsView::PopulateVenvsTreeWidget()
+void QmitkPythonEnvironmentsView::PopulateVenvsTreeWidget()
 {
   m_Ui->venvsTreeWidget->clearSelection();
   m_Ui->venvsTreeWidget->clear();
@@ -313,7 +313,7 @@ void QmitkPythonSettingsView::PopulateVenvsTreeWidget()
   m_Ui->venvsTreeWidget->sortByColumn(2, Qt::AscendingOrder);
 }
 
-void QmitkPythonSettingsView::CalculateAllVenvSizes()
+void QmitkPythonEnvironmentsView::CalculateAllVenvSizes()
 {
   const int venvCount = m_Ui->venvsTreeWidget->topLevelItemCount();
 
@@ -334,7 +334,7 @@ void QmitkPythonSettingsView::CalculateAllVenvSizes()
   }
 }
 
-void QmitkPythonSettingsView::SetFocus()
+void QmitkPythonEnvironmentsView::SetFocus()
 {
   m_Ui->venvsTreeWidget->setFocus();
 }

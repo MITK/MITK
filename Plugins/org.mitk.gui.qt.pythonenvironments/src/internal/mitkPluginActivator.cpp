@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPluginActivator.h"
-#include "QmitkPythonSettingsView.h"
+#include "QmitkPythonEnvironmentsView.h"
 
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonSettingsView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonEnvironmentsView, context)
 }
 
 void mitk::mitkPluginActivator::stop(ctkPluginContext*)

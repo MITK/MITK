@@ -10,26 +10,26 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPythonSettingsView_h
-#define QmitkPythonSettingsView_h
+#ifndef QmitkPythonEnvironmentsView_h
+#define QmitkPythonEnvironmentsView_h
 
 #include <QmitkAbstractView.h>
 #include <memory>
 
 namespace Ui
 {
-  class QmitkPythonSettingsView;
+  class QmitkPythonEnvironmentsView;
 }
 
-class QmitkPythonSettingsView : public QmitkAbstractView
+class QmitkPythonEnvironmentsView : public QmitkAbstractView
 {
   Q_OBJECT
 
 public:
   static const std::string VIEW_ID;
 
-  QmitkPythonSettingsView(QObject* parent = nullptr);
-  ~QmitkPythonSettingsView() override;
+  QmitkPythonEnvironmentsView(QObject* parent = nullptr);
+  ~QmitkPythonEnvironmentsView() override;
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
@@ -40,7 +40,7 @@ private:
   void PopulateVenvsTreeWidget();
   void CalculateAllVenvSizes();
 
-  std::unique_ptr<Ui::QmitkPythonSettingsView> m_Ui;
+  std::unique_ptr<Ui::QmitkPythonEnvironmentsView> m_Ui;
 };
 
 #endif

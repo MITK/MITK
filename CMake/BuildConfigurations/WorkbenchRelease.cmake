@@ -6,5 +6,5 @@ set(MITK_CONFIG_PACKAGES ${MITK_CONFIG_PACKAGES}
 )
 
 set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
-  org.mitk.gui.qt.pythonsettings
+  org.mitk.gui.qt.pythonenvironments
 )

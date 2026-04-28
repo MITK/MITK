@@ -119,10 +119,10 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 
 void QmitkRenderWindowUtilityWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  if (index == 0)
+  if (index < 1)
   {
-    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
-    return;
+    mitkThrow() << "Invalid synchronization group index '" << index
+                << "'. Group index must be >= 1.";
   }
   // Locate the combobox row that carries this group index in its userData and
   // select it. setCurrentIndex(-1) (no match) is a deliberate no-op: the group

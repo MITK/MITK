@@ -537,10 +537,10 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
 
 void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  if (index == 0)
+  if (index < 1)
   {
-    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
-    return;
+    mitkThrow() << "Invalid synchronization group index '" << index
+                << "'. Group index must be >= 1.";
   }
 
   // The logical group index is widget bookkeeping and must always be stored;

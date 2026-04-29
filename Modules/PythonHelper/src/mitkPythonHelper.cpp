@@ -14,6 +14,19 @@ found in the LICENSE file.
 #include <mitkEnvironment.h>
 #include <mitkIOUtil.h>
 
+#include <algorithm>
+#include <cctype>
+#include <functional>
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <psapi.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#else
+#include <link.h>
+#endif
+
 namespace
 {
   fs::path Up(fs::path path, int levels)
@@ -67,6 +80,114 @@ namespace
     std::stringstream stream;
     stream << std::hex << std::uppercase << std::setw(16) << std::setfill('0') << hash;
     return stream.str();
+  }
+
+  bool IsPathUnder(const fs::path& child, const fs::path& parent)
+  {
+    std::error_code ec;
+    auto canChild = fs::weakly_canonical(child, ec);
+
+    if (ec || canChild.empty())
+      return false;
+
+    auto canParent = fs::weakly_canonical(parent, ec);
+
+    if (ec || canParent.empty())
+      return false;
+
+    auto childStr = canChild.string();
+    auto parentStr = canParent.string();
+
+#if defined(_WIN32)
+    auto toLower = [](unsigned char c) { return static_cast<char>(std::tolower(c)); };
+    std::transform(childStr.begin(), childStr.end(), childStr.begin(), toLower);
+    std::transform(parentStr.begin(), parentStr.end(), parentStr.begin(), toLower);
+#endif
+
+    return childStr.size() > parentStr.size() &&
+           childStr.compare(0, parentStr.size(), parentStr) == 0;
+  }
+
+  bool ForEachLoadedModule(const std::function<bool(const fs::path&)>& pred)
+  {
+#if defined(_WIN32)
+    HANDLE process = GetCurrentProcess();
+    std::vector<HMODULE> modules(1024);
+    DWORD bytesNeeded = 0;
+
+    if (!EnumProcessModules(process, modules.data(),
+                            static_cast<DWORD>(modules.size() * sizeof(HMODULE)),
+                            &bytesNeeded))
+    {
+      return false;
+    }
+
+    if (bytesNeeded > modules.size() * sizeof(HMODULE))
+    {
+      modules.resize(bytesNeeded / sizeof(HMODULE));
+
+      if (!EnumProcessModules(process, modules.data(),
+                              static_cast<DWORD>(modules.size() * sizeof(HMODULE)),
+                              &bytesNeeded))
+      {
+        return false;
+      }
+    }
+
+    const size_t count = bytesNeeded / sizeof(HMODULE);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+      wchar_t buffer[MAX_PATH];
+
+      if (GetModuleFileNameExW(process, modules[i], buffer, MAX_PATH) &&
+          pred(fs::path(buffer)))
+      {
+        return true;
+      }
+    }
+
+    return false;
+#elif defined(__APPLE__)
+    const uint32_t count = _dyld_image_count();
+
+    for (uint32_t i = 0; i < count; ++i)
+    {
+      if (const char* name = _dyld_get_image_name(i); name != nullptr && *name != '\0')
+      {
+        if (pred(fs::path(name)))
+          return true;
+      }
+    }
+
+    return false;
+#else
+    struct Ctx
+    {
+      const std::function<bool(const fs::path&)>* pred;
+      bool found;
+    };
+
+    Ctx ctx{&pred, false};
+
+    dl_iterate_phdr(
+      [](struct dl_phdr_info* info, size_t, void* data) -> int
+      {
+        auto* c = static_cast<Ctx*>(data);
+
+        if (info->dlpi_name != nullptr && info->dlpi_name[0] != '\0' &&
+            (*c->pred)(fs::path(info->dlpi_name)))
+        {
+          c->found = true;
+          return 1;
+        }
+
+        return 0;
+      },
+      &ctx);
+
+    return ctx.found;
+#endif
   }
 }
 
@@ -306,4 +427,15 @@ bool mitk::PythonHelper::RemoveVirtualEnv(const fs::path& path)
   fs::remove_all(path, error);
 
   return !error && !fs::exists(path);
+}
+
+bool mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(const std::string& name)
+{
+  const auto venvPath = GetVirtualEnvPath(name);
+
+  if (venvPath.empty() || !fs::exists(venvPath))
+    return false;
+
+  return ForEachLoadedModule(
+    [&venvPath](const fs::path& modulePath) { return IsPathUnder(modulePath, venvPath); });
 }

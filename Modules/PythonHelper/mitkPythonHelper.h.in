@@ -39,6 +39,12 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const fs::path& path);
 
+  // Returns true if any shared library (.dll/.so/.dylib/.pyd) currently
+  // loaded into this process originates from the named virtual environment
+  // directory. RemoveVirtualEnv on such a venv would partial-fail on Windows
+  // (locked files) and on POSIX would unlink files still in use.
+  MITKPYTHONHELPER_EXPORT bool IsAnyVirtualEnvModuleLoaded(const std::string& name);
+
   // String-literal overloads. Without these, calls like ActivateVirtualEnv("foo")
   // are ambiguous because const char* converts equally well to both std::string
   // and fs::path; an exact-match const char* overload disambiguates.

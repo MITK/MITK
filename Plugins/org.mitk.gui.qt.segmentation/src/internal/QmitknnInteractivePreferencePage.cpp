@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <QmitkRun.h>
 
+#include <QCoreApplication>
 #include <QMessageBox>
 
 namespace
@@ -159,6 +160,23 @@ void QmitknnInteractivePreferencePage::Update()
 void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()
 {
 #if MITK_HAS_PYTHON
+  if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive"))
+  {
+    const auto appName = QCoreApplication::applicationName();
+    const auto restartTarget = appName.isEmpty()
+      ? QStringLiteral("this application")
+      : appName;
+
+    QMessageBox::information(
+      m_Control,
+      "Uninstall nnInteractive",
+      QStringLiteral(
+        "<p>nnInteractive cannot be uninstalled right now because Python "
+        "modules from its virtual environment are still loaded.</p>"
+        "<p>Restart %1 and try again.</p>").arg(restartTarget));
+    return;
+  }
+
   const auto answer = QMessageBox::warning(
     m_Control,
     "Uninstall nnInteractive",

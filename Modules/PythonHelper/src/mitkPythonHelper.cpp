@@ -56,7 +56,7 @@ namespace
     std::error_code ec;
     auto canonicalAppPath = fs::weakly_canonical(appPath, ec);
 
-    if (ec)
+    if (ec || canonicalAppPath.empty())
       canonicalAppPath = appPath;
 
     return std::hash<std::string>{}(canonicalAppPath.string());

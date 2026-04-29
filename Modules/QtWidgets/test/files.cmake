@@ -8,6 +8,8 @@ endif()
 set(MODULE_CUSTOM_TESTS
   QmitkDataStorageListModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
+  QmitkMxNExplicitNameTest.cpp
+  QmitkMxNLayoutV2Test.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
 )

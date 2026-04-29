@@ -21,15 +21,20 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 
 // mitk qt widget
+#include <QmitkMultiWidgetLayoutManager.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 // qt
+#include <QBoxLayout>
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QSplitter>
 
+#include <algorithm>
+#include <functional>
 #include <fstream>
+#include <vector>
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
@@ -360,13 +365,48 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
+QString QmitkMxNMultiWidget::MakeQualifiedName(const QString& bareName) const
+{
+  return this->GetMultiWidgetName() + "." + bareName;
+}
+
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
+  // Pick the smallest non-negative 'i' such that 'widget<i>' is not already
+  // used as a bare name in this editor. Replaces the old 'widget<count>'
+  // form, which silently collided when custom-named cells already used the
+  // same index (e.g. existing {widget0, widget3} + adding a 4th cell would
+  // have produced 'widget3' again, which std::map::insert silently rejects).
+  std::size_t i = 0;
+  while (this->GetRenderWindowWidget(this->MakeQualifiedName(QStringLiteral("widget") + QString::number(i))) != nullptr)
+  {
+    ++i;
+  }
+  return this->CreateRenderWindowWidget(QStringLiteral("widget") + QString::number(i));
+}
+
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& bareName)
+{
+  if (bareName.isEmpty())
+  {
+    mitkThrow() << "CreateRenderWindowWidget: bare name must not be empty.";
+  }
+
+  const auto qualifiedName = this->MakeQualifiedName(bareName);
+
+  // Use the public lookup rather than reaching into m_RenderWindowWidgets so
+  // the canonical accessor stays the single source of truth for what is
+  // registered.
+  if (this->GetRenderWindowWidget(qualifiedName) != nullptr)
+  {
+    mitkThrow() << "CreateRenderWindowWidget: a render window with name '"
+                << qualifiedName.toStdString() << "' already exists in this editor.";
+  }
+
   // create the render window widget and connect signal / slot
-  QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
-  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
-  AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, qualifiedName, GetDataStorage());
+  renderWindowWidget->SetCornerAnnotationText(qualifiedName.toStdString());
+  AddRenderWindowWidget(qualifiedName, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
@@ -439,59 +479,9 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::GetWind
   }
 }
 
-void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
-{
-  if ((*jsonData).is_null())
-  {
-    QMessageBox::warning(this, "Load layout", "Could not read window layout");
-    return;
-  }
-
-  unsigned int windowCounter = 0;
-
-  try
-  {
-    auto version = jsonData->at("version").get<std::string>();
-    if (version.at(0) != '1')
-    {
-      QMessageBox::warning(this, "Load layout", "Unknown/Outdated layout version, could not load");
-      return;
-    }
-
-    delete this->layout();
-    auto content = BuildLayoutFromJSON(jsonData, &windowCounter);
-    auto hBoxLayout = new QHBoxLayout(this);
-    this->setLayout(hBoxLayout);
-    hBoxLayout->addWidget(content);
-    emit UpdateUtilityWidgetViewPlanes();
-  }
-  catch (const nlohmann::json::out_of_range& e)
-  {
-    MITK_ERROR << "Error in loading window layout from JSON: " << e.what();
-    QMessageBox::warning(this, "Load layout", QString("Invalid layout document: ") + e.what());
-    return;
-  }
-  catch (const mitk::Exception& e)
-  {
-    MITK_ERROR << "Error in loading window layout: " << e.what();
-    QMessageBox::warning(this, "Load layout", QString("Invalid layout document: ") + e.what());
-    return;
-  }
-  catch (const std::exception& e)
-  {
-    MITK_ERROR << "Unexpected error while loading window layout: " << e.what();
-    QMessageBox::warning(this, "Load layout", QString("Could not load layout: ") + e.what());
-    return;
-  }
-
-  while (GetNumberOfRenderWindowWidgets() > windowCounter)
-  {
-    RemoveRenderWindowWidget();
-  }
-
-  EnableCrosshair();
-  emit LayoutChanged();
-}
+//////////////////////////////////////////////////////////////////////////
+// V2 LAYOUT FORMAT — Serialize / Apply (see mxn-layout-v2.schema.json)
+//////////////////////////////////////////////////////////////////////////
 
 void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
 {
@@ -499,133 +489,469 @@ void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
   {
     return;
   }
-
-  auto layout = this->layout();
-  if (layout == nullptr)
-    return;
-
-  // There should only ever be one item: a splitter
-  auto widget = layout->itemAt(0)->widget();
-  auto splitter = dynamic_cast<QSplitter*>(widget);
-  if (!splitter)
-  {
-    MITK_ERROR << "Tried to save unexpected layout format. Make sure the layout of this instance contains a single QSplitter.";
-    return;
-  }
-
-  auto layoutJSON = BuildJSONFromLayout(splitter);
-  layoutJSON["version"] = "1.1";
-  layoutJSON["name"] = "Custom Layout";
-
-  *outStream << std::setw(4) << layoutJSON << std::endl;
-
+  *outStream << this->SerializeLayout().dump(4) << std::endl;
 }
 
-nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitter)
+void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
 {
-  nlohmann::json resultJSON;
-  resultJSON["isWindow"] = false;
-  resultJSON["vertical"] = (splitter->orientation() == Qt::Vertical) ? true : false;
-  auto sizes = splitter->sizes();
-
-  auto content = nlohmann::json::array();
-
-  auto countSplitter = splitter->count();
-  for (int i = 0; i < countSplitter; ++i)
+  if (jsonData == nullptr || jsonData->is_null())
   {
-    auto widget = splitter->widget(i);
-    nlohmann::json widgetJSON;
-    if (auto widgetSplitter = dynamic_cast<QSplitter*>(widget); widgetSplitter)
-    {
-      widgetJSON = BuildJSONFromLayout(widgetSplitter);
-    }
-    else if (auto widgetWindow = dynamic_cast<QmitkRenderWindowWidget*>(widget); widgetWindow)
-    {
-      widgetJSON["isWindow"] = true;
-      widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
-      widgetJSON["syncGroup"] = widgetWindow->GetUtilityWidget()->GetSyncGroup();
-      widgetJSON["selectAll"] = widgetWindow->GetUtilityWidget()->GetNodeSelectionWidget()->GetSelectAll();
-    }
-    widgetJSON["size"] = sizes[i];
-    content.push_back(widgetJSON);
+    mitkThrow() << "LoadLayout: jsonData must not be null.";
   }
-  resultJSON["content"] = content;
-  return resultJSON;
+  this->ApplyLayout(*jsonData);
 }
 
-QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter)
+mitk::AnatomicalPlane QmitkMxNMultiWidget::ParseViewDirection(const std::string& s)
 {
+  if (s == "axial")    return mitk::AnatomicalPlane::Axial;
+  if (s == "sagittal") return mitk::AnatomicalPlane::Sagittal;
+  if (s == "coronal")  return mitk::AnatomicalPlane::Coronal;
+  if (s == "original") return mitk::AnatomicalPlane::Original;
+  mitkThrow() << "Unknown view_direction '" << s
+              << "' (expected 'axial', 'sagittal', 'coronal', or 'original').";
+}
 
-  bool vertical = jsonData->at("vertical").get<bool>();
-  auto orientation = vertical ? Qt::Vertical : Qt::Horizontal;
-
-  auto split = new QSplitter(orientation, parentSplitter);
-  QList<int> sizes;
-
-  for (auto object : jsonData->at("content"))
+std::string QmitkMxNMultiWidget::ViewDirectionToV2String(mitk::AnatomicalPlane plane)
+{
+  switch (plane)
   {
-    bool isWindow = object["isWindow"].get<bool>();
-    int size = object["size"].get<int>();
-    sizes.append(size);
+    case mitk::AnatomicalPlane::Axial:    return "axial";
+    case mitk::AnatomicalPlane::Sagittal: return "sagittal";
+    case mitk::AnatomicalPlane::Coronal:  return "coronal";
+    case mitk::AnatomicalPlane::Original: return "original";
+  }
+  mitkThrow() << "ViewDirectionToV2String: unsupported AnatomicalPlane enum value.";
+}
 
-    if (isWindow)
+QString QmitkMxNMultiWidget::StripEditorPrefix(const QString& qualifiedName) const
+{
+  const auto prefix = this->GetMultiWidgetName() + ".";
+  if (!qualifiedName.startsWith(prefix))
+  {
+    mitkThrow() << "StripEditorPrefix: '" << qualifiedName.toStdString()
+                << "' does not start with editor prefix '" << prefix.toStdString() << "'.";
+  }
+  return qualifiedName.mid(prefix.size());
+}
+
+nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
+{
+  // Validate layout shape: top-level layout must contain exactly one QSplitter
+  // (the canonical post-load shape).
+  auto* topLayout = this->layout();
+  if (nullptr == topLayout || topLayout->count() == 0)
+  {
+    mitkThrow() << "SerializeLayout: editor has no top-level layout to serialize.";
+  }
+  auto* item = topLayout->itemAt(0);
+  auto* widget = (item == nullptr) ? nullptr : item->widget();
+  auto* rootSplitter = dynamic_cast<QSplitter*>(widget);
+  if (nullptr == rootSplitter)
+  {
+    mitkThrow() << "SerializeLayout: top-level widget is not a QSplitter.";
+  }
+
+  // Pre-walk: collect engine-internal sync-group indices in pre-order encounter
+  // order and assign deterministic bare names. Engine-internal index 1 maps to
+  // "main"; other indices map to "g_<i>" where <i> is a counter assigned by
+  // pre-order encounter order over the cell list (see schema description).
+  std::map<GroupSyncIndexType, std::string> groupNames;
+  int counter = 1;
+  std::function<void(const QSplitter*)> walk = [&](const QSplitter* split)
+  {
+    for (int i = 0; i < split->count(); ++i)
     {
-      auto viewDirection = object["viewDirection"].get<std::string>();
-      mitk::AnatomicalPlane viewPlane = mitk::AnatomicalPlane::Sagittal;
-      if (viewDirection == "Axial")
+      auto* child = split->widget(i);
+      if (auto* sub = dynamic_cast<QSplitter*>(child))
       {
-        viewPlane = mitk::AnatomicalPlane::Axial;
+        walk(sub);
       }
-      else if (viewDirection == "Coronal")
+      else if (auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(child))
       {
-        viewPlane = mitk::AnatomicalPlane::Coronal;
+        const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
+        if (groupNames.find(idx) == groupNames.end())
+        {
+          groupNames[idx] = (idx == 1) ? std::string("main")
+                                       : ("g_" + std::to_string(counter++));
+        }
       }
-      else if (viewDirection == "Original")
+    }
+  };
+  walk(rootSplitter);
+
+  // Emit the strict-mode 'groups' dict for every group referenced by a cell.
+  nlohmann::json groupsJson = nlohmann::json::object();
+  for (const auto& [idx, name] : groupNames)
+  {
+    bool selectAll = true;
+    if (auto* connector = this->GetSyncGroupConnector(idx))
+    {
+      selectAll = connector->GetSelectionMode();
+    }
+    groupsJson[name] = nlohmann::json{ { "select_all", selectAll } };
+  }
+
+  nlohmann::json doc;
+  doc["version"] = "2.0";
+  doc["name"] = "Custom Layout";
+  doc["groups"] = groupsJson;
+  doc["root"] = this->SerializeSplitter(rootSplitter, groupNames, /*isRoot=*/true);
+  return doc;
+}
+
+nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
+  const QSplitter* splitter,
+  const std::map<GroupSyncIndexType, std::string>& groupNames,
+  bool isRoot) const
+{
+  nlohmann::json node;
+  node["type"] = "split";
+  node["orientation"] = (splitter->orientation() == Qt::Vertical) ? "vertical" : "horizontal";
+
+  const auto sizes = splitter->sizes();
+  auto children = nlohmann::json::array();
+  for (int i = 0; i < splitter->count(); ++i)
+  {
+    auto* child = splitter->widget(i);
+    nlohmann::json childJson;
+    if (auto* sub = dynamic_cast<QSplitter*>(child))
+    {
+      childJson = this->SerializeSplitter(sub, groupNames, /*isRoot=*/false);
+    }
+    else if (auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(child))
+    {
+      const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
+      const auto groupIt = groupNames.find(idx);
+      if (groupIt == groupNames.end())
       {
-        viewPlane = mitk::AnatomicalPlane::Original;
+        // Unreachable: the pre-walk must have visited every cell. Throwing
+        // here surfaces the engine corruption rather than silently emitting
+        // a phantom group reference.
+        mitkThrow() << "SerializeLayout: cell sync group " << idx
+                    << " was not seen during the pre-walk pass.";
       }
-      else if (viewDirection == "Sagittal")
-      {
-        viewPlane = mitk::AnatomicalPlane::Sagittal;
-      }
-
-      GroupSyncIndexType syncGroup = 1;
-      if (object.contains("syncGroup"))
-        syncGroup = object["syncGroup"].get<GroupSyncIndexType>();
-
-      // repurpose existing render windows as far as they already exist
-      auto window = GetWindowFromIndex(*windowCounter);
-      if (window == nullptr)
-      {
-        window = CreateRenderWindowWidget();
-      }
-
-      // Pre-create the group via the canonical API so the cell's combobox has
-      // the entry before SetSyncGroup() lands. Idempotent if already present.
-      this->AddSynchronizationGroup(syncGroup);
-      window->GetUtilityWidget()->SetSyncGroup(syncGroup);
-
-      bool selectAll = true;
-      if (object.contains("selectAll"))
-        selectAll = object["selectAll"].get<bool>();
-      window->GetUtilityWidget()->GetNodeSelectionWidget()->SetSelectAll(selectAll);
-
-      window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
-      window->GetSliceNavigationController()->Update();
-      split->addWidget(window.get());
-      window->show();
-      (*windowCounter)++;
+      childJson["type"] = "window";
+      childJson["name"] = this->StripEditorPrefix(cell->GetWidgetName()).toStdString();
+      childJson["view_direction"] = ViewDirectionToV2String(
+        cell->GetSliceNavigationController()->GetDefaultViewDirection());
+      childJson["links"] = nlohmann::json{ { "selection", groupIt->second } };
     }
     else
     {
-      auto subSplitter = BuildLayoutFromJSON(&object, windowCounter, split);
-      split->addWidget(subSplitter);
+      mitkThrow() << "SerializeLayout: unknown child widget type at splitter index " << i << ".";
+    }
+    childJson["size"] = sizes[i];
+    children.push_back(childJson);
+  }
+  node["children"] = children;
+
+  // Schema: root has no 'size' (no parent splitter to weight against). Child
+  // splits get their 'size' set by the parent's loop above.
+  (void)isRoot;
+  return node;
+}
+
+void QmitkMxNMultiWidget::PrewalkValidate(const nlohmann::json& node,
+                                          std::set<std::string>& seenNames,
+                                          std::set<std::string>& referencedGroups)
+{
+  if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
+  {
+    mitkThrow() << "Layout node is missing the 'type' string field.";
+  }
+  const auto type = node["type"].get<std::string>();
+
+  if (type == "split")
+  {
+    if (!node.contains("orientation") || !node["orientation"].is_string())
+    {
+      mitkThrow() << "Layout split node is missing the 'orientation' field.";
+    }
+    const auto orientation = node["orientation"].get<std::string>();
+    if (orientation != "horizontal" && orientation != "vertical")
+    {
+      mitkThrow() << "Layout split node has invalid orientation '" << orientation
+                  << "' (expected 'horizontal' or 'vertical').";
+    }
+    if (!node.contains("children") || !node["children"].is_array() || node["children"].empty())
+    {
+      mitkThrow() << "Layout split node is missing a non-empty 'children' array.";
+    }
+    for (const auto& child : node["children"])
+    {
+      PrewalkValidate(child, seenNames, referencedGroups);
     }
   }
+  else if (type == "window")
+  {
+    if (!node.contains("name") || !node["name"].is_string())
+    {
+      mitkThrow() << "Layout window node is missing the 'name' string field.";
+    }
+    const auto name = node["name"].get<std::string>();
+    if (name.empty())
+    {
+      mitkThrow() << "Layout window node has an empty 'name'.";
+    }
+    if (!seenNames.insert(name).second)
+    {
+      mitkThrow() << "Layout document contains duplicate window name '" << name << "'.";
+    }
+    if (!node.contains("view_direction") || !node["view_direction"].is_string())
+    {
+      mitkThrow() << "Layout window '" << name
+                  << "' is missing the 'view_direction' string field.";
+    }
+    if (!node.contains("links") || !node["links"].is_object())
+    {
+      mitkThrow() << "Layout window '" << name << "' is missing the 'links' object.";
+    }
+    const auto& links = node["links"];
+    if (!links.contains("selection") || !links["selection"].is_string())
+    {
+      mitkThrow() << "Layout window '" << name
+                  << "' is missing the required 'links.selection' string.";
+    }
+    referencedGroups.insert(links["selection"].get<std::string>());
+  }
+  else
+  {
+    mitkThrow() << "Unknown layout node type '" << type
+                << "' (expected 'split' or 'window').";
+  }
+}
+
+QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
+  const nlohmann::json& splitNode,
+  const std::map<std::string, GroupSyncIndexType>& nameToInt,
+  QSplitter* parentSplitter)
+{
+  const auto orientationStr = splitNode["orientation"].get<std::string>();
+  const auto orientation = (orientationStr == "vertical") ? Qt::Vertical : Qt::Horizontal;
+
+  auto* split = new QSplitter(orientation, parentSplitter);
+  QList<int> sizes;
+
+  for (const auto& child : splitNode["children"])
+  {
+    const auto type = child["type"].get<std::string>();
+    const int childSize = child.value("size", 1000);
+    sizes.append(childSize);
+
+    if (type == "split")
+    {
+      auto* sub = this->BuildSplitterFromJsonV2(child, nameToInt, split);
+      split->addWidget(sub);
+    }
+    else  // "window"
+    {
+      const auto bareName = QString::fromStdString(child["name"].get<std::string>());
+      const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
+      const auto groupName = child["links"]["selection"].get<std::string>();
+      const auto targetIdx = nameToInt.at(groupName);
+
+      auto window = this->CreateRenderWindowWidget(bareName);
+      // CreateRenderWindowWidget seeds the cell into the engine's default
+      // group (1). Move it to its document-declared target group; idempotent
+      // if the target happens to be 1.
+      this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
+      window->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
+      window->GetSliceNavigationController()->Update();
+      split->addWidget(window.get());
+      window->show();
+    }
+  }
+
   split->setSizes(sizes);
-
   return split;
+}
 
+void QmitkMxNMultiWidget::TearDownAllCells()
+{
+  // ORDER MATTERS — every shared_ptr<QmitkRenderWindowWidget> that outlives
+  // the splitter delete causes a double-delete: Qt's deleteChildren on the
+  // splitter frees the QObject memory while the dangling shared_ptr later
+  // calls 'delete' again. Drop every strong ref we hold BEFORE deleting the
+  // splitter:
+  //   1. Drop the active-widget pointer (also a shared_ptr).
+  //   2. Snapshot only the *keys* of the cell map (a value-copy of the map
+  //      itself would copy the shared_ptrs along with it and keep cells
+  //      alive past the loop).
+  //   3. Remove cells one-by-one through the public name-keyed path. Each
+  //      removal disconnects signals and drops the map's shared_ptr; with
+  //      no other strong refs left, the cell self-destructs (Qt removes it
+  //      from its parent splitter's child list during ~QObject).
+  // Only then is the splitter empty and safe to delete.
+  this->SetActiveRenderWindowWidget(nullptr);
+
+  std::vector<QString> names;
+  for (const auto& [name, _] : this->GetRenderWindowWidgets())
+  {
+    (void)_;
+    names.push_back(name);
+  }
+  for (const auto& name : names)
+  {
+    this->RemoveRenderWindowWidget(name);
+  }
+
+  // Drop sync-group connectors. Per E12 (v2 concept doc) selection state is
+  // not preserved across loads. The next ApplyLayout pass re-allocates the
+  // groups it needs from JSON.
+  m_SynchronizedWidgetConnectors.clear();
+
+  // Delete the splitter and the layout that held it. The render-window widgets
+  // are already gone; the splitter (and any sub-splitters) have no
+  // QmitkRenderWindowWidget children left.
+  if (auto* oldLayout = this->layout())
+  {
+    if (oldLayout->count() > 0)
+    {
+      auto* item = oldLayout->itemAt(0);
+      auto* w = (item == nullptr) ? nullptr : item->widget();
+      delete w;
+    }
+    delete oldLayout;
+  }
+}
+
+void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()
+{
+  this->TearDownAllCells();
+  // SetLayout(1, 1) walks SetLayoutImpl, which auto-creates one cell via the
+  // positional CreateRenderWindowWidget path (bare name 'widget0'). The
+  // cell's CreateRenderWindowWidget call seeds the default sync group 1.
+  this->SetLayout(1, 1);
+}
+
+void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
+{
+  try
+  {
+    // ----- Validation pass (no engine mutation) -----
+    if (!doc.is_object())
+    {
+      mitkThrow() << "Layout document must be a JSON object.";
+    }
+    if (!doc.contains("version") || !doc["version"].is_string())
+    {
+      mitkThrow() << "Layout document is missing the 'version' string field; only '2.0' is supported.";
+    }
+    const auto version = doc["version"].get<std::string>();
+    if (version != "2.0")
+    {
+      // T5 will refine the message for v1.x to point at the migration script.
+      mitkThrow() << "Layout document version is '" << version
+                  << "'; only '2.0' is supported.";
+    }
+    if (!doc.contains("root"))
+    {
+      mitkThrow() << "Layout document is missing the 'root' field.";
+    }
+
+    // Pre-walk: validate structural shape, collect window names + referenced
+    // group labels.
+    std::set<std::string> seenNames;
+    std::set<std::string> referencedGroups;
+    PrewalkValidate(doc.at("root"), seenNames, referencedGroups);
+
+    // Group resolution. Strict mode = top-level 'groups' present; lazy mode
+    // (no 'groups' block) defaults every referenced label to select_all=true.
+    const bool strictMode = doc.contains("groups");
+    std::map<std::string, bool> groupSelectAll;
+    if (strictMode)
+    {
+      const auto& groupsDict = doc.at("groups");
+      if (!groupsDict.is_object())
+      {
+        mitkThrow() << "Layout 'groups' field must be a JSON object.";
+      }
+      for (const auto& g : referencedGroups)
+      {
+        if (!groupsDict.contains(g))
+        {
+          mitkThrow() << "Layout references group '" << g
+                      << "' which is not declared in the 'groups' dict.";
+        }
+        const auto& entry = groupsDict.at(g);
+        if (!entry.is_object())
+        {
+          mitkThrow() << "Layout 'groups." << g << "' entry must be a JSON object.";
+        }
+        groupSelectAll[g] = entry.value("select_all", true);
+      }
+    }
+    else
+    {
+      for (const auto& g : referencedGroups)
+      {
+        groupSelectAll[g] = true;
+      }
+    }
+
+    // ----- Tear down existing state -----
+    this->TearDownAllCells();
+
+    // ----- Allocate engine-internal sync groups -----
+    // 'main' (if referenced) pins to engine index 1 to preserve the editor's
+    // default-group convention; other names get the next free index in
+    // ascending allocation order. Group properties (select_all) are written
+    // to each connector before any cell is wired up.
+    std::map<std::string, GroupSyncIndexType> nameToInt;
+    if (groupSelectAll.find("main") != groupSelectAll.end())
+    {
+      this->AddSynchronizationGroup(1);
+      this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at("main"));
+      nameToInt["main"] = 1;
+    }
+    for (const auto& [groupName, selectAll] : groupSelectAll)
+    {
+      if (groupName == "main")
+      {
+        continue;
+      }
+      const auto idx = this->NextFreeSyncGroupIndex();
+      this->AddSynchronizationGroup(idx);
+      this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
+      nameToInt[groupName] = idx;
+    }
+
+    // ----- Construct the new cell tree -----
+    auto* rootSplitter = this->BuildSplitterFromJsonV2(doc.at("root"), nameToInt, /*parent=*/nullptr);
+    auto* hBoxLayout = new QHBoxLayout(this);
+    this->setLayout(hBoxLayout);
+    hBoxLayout->addWidget(rootSplitter);
+
+    // T6 will set the active-widget reset deterministically; for now point at
+    // the first cell so downstream code that dereferences GetActive... works.
+    auto firstCell = this->GetFirstRenderWindowWidget();
+    if (nullptr != firstCell)
+    {
+      this->SetActiveRenderWindowWidget(firstCell);
+    }
+
+    emit UpdateUtilityWidgetViewPlanes();
+    EnableCrosshair();
+    emit LayoutChanged();
+  }
+  catch (const mitk::Exception&)
+  {
+    this->RollBackToSingleDefaultCell();
+    throw;
+  }
+  catch (const nlohmann::json::exception& e)
+  {
+    // Catches the entire 'parse_error / type_error / out_of_range /
+    // invalid_iterator / other_error' family — the base class is exactly
+    // 'nlohmann::json::exception'.
+    this->RollBackToSingleDefaultCell();
+    mitkThrow() << "Layout document JSON error: " << e.what();
+  }
+  catch (const std::exception& e)
+  {
+    this->RollBackToSingleDefaultCell();
+    mitkThrow() << "Layout document load failed: " << e.what();
+  }
 }
 
 void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes)

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitkMultiWidgetLayoutSelectionWidget.h>
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -145,9 +146,21 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
 
   ui->selectDefaultLayoutComboBox->setCurrentIndex(0);
 
-  std::ifstream f(filename.toStdString());
-  auto jsonData = nlohmann::json::parse(f);
-  emit LoadLayout(&jsonData);
+  // Wrap parse + apply in a single catch frame so any failure (file I/O,
+  // JSON parse error, schema-shape violation, missing group reference,
+  // unknown view_direction, ...) surfaces as a user-facing message rather
+  // than letting the exception escape into the Qt event dispatcher.
+  try
+  {
+    std::ifstream f(filename.toStdString());
+    auto jsonData = nlohmann::json::parse(f);
+    emit LoadLayout(&jsonData);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout load failed"),
+                         QString::fromUtf8(e.what()));
+  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
@@ -160,5 +173,13 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
 
   auto jsonData = m_PresetMap[index];
   close();
-  emit LoadLayout(&jsonData);
+  try
+  {
+    emit LoadLayout(&jsonData);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout load failed"),
+                         QString::fromUtf8(e.what()));
+  }
 }

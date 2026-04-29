@@ -87,6 +87,10 @@ class mitkSceneJsonReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferRejectsUnknownMode);
   MITK_TEST(TestOrphanDataPropertiesWarnedNonFatal);
   MITK_TEST(TestLayerAcceptsPrimitiveAndTaggedForms);
+  MITK_TEST(TestResolvePathEscapeIsNonFatal);
+  MITK_TEST(TestMalformedPropertyValueDowngraded);
+  MITK_TEST(TestEmptyNodesArrayLoadsCleanly);
+  MITK_TEST(TestUnicodeUidPropertyKeyAndValue);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -403,6 +407,119 @@ public:
     CPPUNIT_ASSERT(!ok);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), storage->GetAll()->Size());
     CPPUNIT_ASSERT_EQUAL(std::string("orphan"), storage->GetAll()->GetElement(0)->GetName());
+  }
+
+  void TestResolvePathEscapeIsNonFatal()
+  {
+    // A property-map `_file` that escapes the scene directory via `..` exercises
+    // the ResolvePath escape branch (warning emitted, load proceeds). The
+    // missing target file is then a non-fatal per-node error: the node is added,
+    // the overall load returns false. The warning itself is not asserted (no
+    // log capture facility); this test only asserts the observable side
+    // effects of routing through ResolvePath's escape branch.
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"uid":"escapes","properties":{"_file":"../no-such-external-map.json"}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    const bool ok = reader->LoadScene(file.Path(), storage);
+    CPPUNIT_ASSERT_MESSAGE("load reports non-fatal errors (missing _file target)", !ok);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), storage->GetAll()->Size());
+  }
+
+  void TestMalformedPropertyValueDowngraded()
+  {
+    // A malformed property value (here: a ColorProperty whose 'value' array is
+    // truncated) is not catchable by structural pre-validation; it surfaces
+    // inside ConvertPropertyFromSelfContainedJson during Pass 2. The reader
+    // must downgrade this to a per-node non-fatal error so storage is never
+    // left partially populated after storage->Add.
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"uid":"bad-color",
+       "properties":{
+         "color":{"type":"ColorProperty","value":[1.0,0.0]}
+       }}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    const bool ok = reader->LoadScene(file.Path(), storage);
+    CPPUNIT_ASSERT_MESSAGE("malformed property value downgrades to non-fatal", !ok);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), storage->GetAll()->Size());
+    // Note: no assertion on which sibling properties were applied. The bad key
+    // aborts the property-map iteration; whether a co-listed property is
+    // applied depends on iteration order and is not part of the contract.
+  }
+
+  void TestEmptyNodesArrayLoadsCleanly()
+  {
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT(reader->LoadScene(file.Path(), storage));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), storage->GetAll()->Size());
+  }
+
+  void TestUnicodeUidPropertyKeyAndValue()
+  {
+    // UTF-8 must round-trip through node uids, parent_uid references, property
+    // keys and string-property values. Bytes are written as explicit hex
+    // escapes in plain (non-raw) string literals so the test compiles
+    // identically under both C++17 (where u8"" is char[]) and C++20 (where
+    // u8"" is char8_t[] and no longer converts to std::string), and is
+    // independent of the compiler's source/execution charset.
+    //
+    //   ä = 0xC3 0xA4  ö = 0xC3 0xB6  ü = 0xC3 0xBC  ß = 0xC3 0x9F
+    //
+    // Note on hex escapes: in C++, \xHH... consumes every following hex digit,
+    // so "\xC3\xBCber" would be read as \xC3 + \xBCbe + r (and \xBCbe is out of
+    // range for char). Wherever a [0-9a-fA-F] character follows a 2-digit \xHH
+    // sequence, the literal is split with `" "` to terminate the escape.
+    const std::string sceneJson =
+      "{\"type\":\"org.mitk.scene\",\"version\":1,\"nodes\":["
+        "{\"uid\":\"node-\xC3\xA4hnlich\","
+         "\"properties\":{"
+           "\"name\":\"Patient \xC3\xA4 \xC3\xB6 \xC3\xBC\","
+           "\"\xC3\xBC" "ber\":\"Wert \xC3\x9F\""
+         "}},"
+        "{\"uid\":\"child\",\"parent_uid\":\"node-\xC3\xA4hnlich\","
+         "\"properties\":{\"name\":\"Kind\"}}"
+      "]}";
+
+    TempFile file(".mitkscene.json");
+    file.Write(sceneJson);
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT(reader->LoadScene(file.Path(), storage));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), storage->GetAll()->Size());
+
+    auto parent = storage->GetNamedNode(std::string("Patient \xC3\xA4 \xC3\xB6 \xC3\xBC"));
+    CPPUNIT_ASSERT_MESSAGE("parent located by Unicode name", parent != nullptr);
+
+    std::string ueber;
+    CPPUNIT_ASSERT_MESSAGE("Unicode property key holds Unicode value",
+                           parent->GetStringProperty("\xC3\xBC" "ber", ueber));
+    CPPUNIT_ASSERT_EQUAL(std::string("Wert \xC3\x9F"), ueber);
+
+    auto child = storage->GetNamedNode("Kind");
+    CPPUNIT_ASSERT(child != nullptr);
+    auto sources = storage->GetSources(child);
+    bool foundParent = false;
+    for (auto it = sources->Begin(); it != sources->End(); ++it)
+    {
+      if (it->Value() == parent)
+      {
+        foundParent = true;
+        break;
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE("parent_uid resolved across the Unicode UID", foundParent);
   }
 };
 

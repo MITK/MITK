@@ -27,6 +27,9 @@ external tools (Python scripts, REST clients) only need one mental model:
   mitk::SceneJsonReader. The JSON reader is **not** registered as a regular
   mitk::IFileReader, so `mitk::IOUtil::Load` does not load scenes; scenes go
   through `SceneIO` only, the same entry point as `.mitk` archives.
+- **Index precedence inside `.mitk` archives:** if an archive contains both
+  `index.xml` and `index.json` (e.g. mixed-tooling round-trip during a
+  migration phase), the reader uses `index.json` and ignores `index.xml`.
 
 ## Quick start
 
@@ -116,6 +119,28 @@ All data-related fields are independently optional. A node with none of them
 is a valid data-less node (for example a grouping node used only for
 hierarchy and properties).
 
+### Auto-generated `uid`
+
+When a node omits `uid`, the reader assigns an implementation-defined UID
+with the prefix `scene_autoUID_`. The exact suffix is generated from the
+running session's UID generator and is **not portable** across readers,
+runs, or rewrites of the same scene. Authors who need a stable identity
+(e.g. because another node references it via `parent_uid`, or because a
+downstream tool expects a known UID) should set `uid` explicitly. Auto-UIDs
+are intended only for one-shot loads of small hand-authored scenes whose
+nodes are never referenced.
+
+### Sibling add ordering and `layer`
+
+When several siblings (children of the same parent, or top-level nodes) are
+ready to be added to the DataStorage in the same wave, the reader adds them
+in ascending order of their integer `layer` property. Nodes without a
+`layer` property are treated as `layer = 0`. Authors who care about
+deterministic stacking under DataStorage observers (Data Manager, rendering)
+should set `layer` explicitly on each sibling. The property itself is
+forwarded to the node like any other property; this section only describes
+its effect on add order.
+
 ### Single-parent rationale
 
 The format permits **one** parent per node. mitk::DataStorage supports
@@ -143,6 +168,27 @@ without edits.
 Additional unknown keys inside `transfer` produce a warning and are ignored
 (forward compatibility — e.g. for a future `checksum` key).
 
+In v1, `file-reference` is the only supported `mode`. Other modes are
+reserved for future versions.
+
+### Time geometry
+
+v1 does not encode `TimeGeometry` as a first-class scene field. When the
+data file referenced by `transfer.file_path` cannot persist
+`ProportionalTimeGeometry` (notably Surface formats), MITK's runtime
+stamps `ProportionalTimeGeometry.FirstTimePoint` and
+`ProportionalTimeGeometry.StepDuration` onto the BaseData's property list
+at export time so the values can ride along. On load, if those keys are
+present on the BaseData (whether populated by the file reader or by
+`data_properties`), the scene reader applies them back to the
+`ProportionalTimeGeometry`.
+
+This is a pragmatic compatibility mechanism shared with the legacy XML
+reader. A first-class `time_geometry` block under each node is reserved
+for a future format version; until then, authors who need to override
+time geometry pass the two `ProportionalTimeGeometry.*` keys via
+`data_properties` on a node whose underlying data carries a
+`ProportionalTimeGeometry`.
 
 ### `data_type` is informative
 
@@ -254,6 +300,27 @@ Two forms are accepted:
 Use the explicit form whenever the inferred type would be wrong (e.g. to
 disambiguate between mitk::IntProperty and mitk::FloatProperty for an integer
 literal, or for composite property types).
+
+Further tagged-form examples that external implementers commonly need:
+
+```json
+{"type": "DoubleProperty", "value": 3.14159265358979}
+```
+
+`DoubleProperty` always uses the tagged form. A bare numeric literal would
+deserialize as `FloatProperty` (single-precision) and silently lose
+precision, which is why the converter requires the tag for double values.
+
+```json
+{"type": "LevelWindowProperty",
+ "value": {"level": 40.0, "window": 400.0}}
+```
+
+`LevelWindowProperty` is a composite whose `value` is itself a JSON object.
+Other composite property classes follow the same pattern: the `type` is the
+MITK class name as returned by `GetNameOfClass()`, and `value` is whatever
+self-contained shape that class' converter accepts (see
+`mitk::ConvertPropertyFromSelfContainedJson` for the authoritative list).
 
 ### Context property maps
 

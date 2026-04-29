@@ -40,23 +40,68 @@ namespace
 {
   using json = nlohmann::json;
 
-  constexpr const char *kSceneType = "org.mitk.scene";
-  constexpr int kSupportedVersion = 1;
+  constexpr const char *SCENE_TYPE = "org.mitk.scene";
+  constexpr int SUPPORTED_VERSION = 1;
+  constexpr const char *SUPPORTED_TRANSFER_MODE = "file-reference";
 
-  const std::set<std::string> kRootKnownKeys = {"type", "version", "metadata", "nodes"};
-  const std::set<std::string> kMetadataKnownKeys = {"description"};
-  const std::set<std::string> kNodeKnownKeys = {
-    "uid", "parent_uid", "data_type", "data_uid", "transfer", "data_properties", "properties", "context_properties"};
-  const std::set<std::string> kTransferKnownKeys = {"mode", "file_path", "size_bytes", "directory_path"};
-  const std::set<std::string> kKnownPropertyMapMetaKeys = {"_loadstyle", "_file"};
-  constexpr const char *kSupportedTransferMode = "file-reference";
+  // Root-object field names.
+  constexpr const char *FIELD_TYPE = "type";
+  constexpr const char *FIELD_VERSION = "version";
+  constexpr const char *FIELD_METADATA = "metadata";
+  constexpr const char *FIELD_NODES = "nodes";
+
+  // Node-object field names.
+  constexpr const char *FIELD_UID = "uid";
+  constexpr const char *FIELD_PARENT_UID = "parent_uid";
+  constexpr const char *FIELD_DATA_TYPE = "data_type";
+  constexpr const char *FIELD_DATA_UID = "data_uid";
+  constexpr const char *FIELD_TRANSFER = "transfer";
+  constexpr const char *FIELD_DATA_PROPERTIES = "data_properties";
+  constexpr const char *FIELD_PROPERTIES = "properties";
+  constexpr const char *FIELD_CONTEXT_PROPERTIES = "context_properties";
+
+  // Transfer-object field names.
+  constexpr const char *FIELD_MODE = "mode";
+  constexpr const char *FIELD_FILE_PATH = "file_path";
+  constexpr const char *FIELD_SIZE_BYTES = "size_bytes";
+  constexpr const char *FIELD_DIRECTORY_PATH = "directory_path";
+
+  // Property-map meta keys and their accepted values.
+  constexpr const char *META_LOADSTYLE = "_loadstyle";
+  constexpr const char *META_FILE = "_file";
+  constexpr const char *LOADSTYLE_MODIFY = "modify";
+  constexpr const char *LOADSTYLE_REPLACE = "replace";
+
+  // Property-name keys read directly by the reader (not just forwarded).
+  constexpr const char *PROPERTY_LAYER = "layer";
+
+  // Metadata sub-keys.
+  constexpr const char *METADATA_DESCRIPTION = "description";
+
+  const std::set<std::string> ROOT_KNOWN_KEYS = {FIELD_TYPE, FIELD_VERSION, FIELD_METADATA, FIELD_NODES};
+  const std::set<std::string> METADATA_KNOWN_KEYS = {METADATA_DESCRIPTION};
+  const std::set<std::string> NODE_KNOWN_KEYS = {FIELD_UID,
+                                                FIELD_PARENT_UID,
+                                                FIELD_DATA_TYPE,
+                                                FIELD_DATA_UID,
+                                                FIELD_TRANSFER,
+                                                FIELD_DATA_PROPERTIES,
+                                                FIELD_PROPERTIES,
+                                                FIELD_CONTEXT_PROPERTIES};
+  const std::set<std::string> TRANSFER_KNOWN_KEYS = {FIELD_MODE, FIELD_FILE_PATH, FIELD_SIZE_BYTES, FIELD_DIRECTORY_PATH};
+  const std::set<std::string> KNOWN_PROPERTY_MAP_META_KEYS = {META_LOADSTYLE, META_FILE};
 
   struct SceneNodeEntry
   {
     std::string uid;                    // always filled (auto-generated if absent)
     std::string parentUid;              // empty if top-level
     bool hasExplicitParent = false;     // parent_uid was explicitly given (and non-null)
-    const json *nodeJson = nullptr;     // source JSON object
+    /**
+     * Non-owning pointer into the JSON document parsed in `LoadScene`;
+     * valid for the duration of that call. Must not outlive the
+     * `document` local variable in `LoadScene`.
+     */
+    const json *nodeJson = nullptr;
     mitk::DataNode::Pointer dataNode;   // created in pass 1
   };
 
@@ -138,7 +183,7 @@ namespace
       mitkThrow() << "Property map in " << context << " must be a JSON object.";
     }
 
-    const auto loadstyleIt = mapJson.find("_loadstyle");
+    const auto loadstyleIt = mapJson.find(META_LOADSTYLE);
     if (loadstyleIt != mapJson.end() && !loadstyleIt->is_null())
     {
       if (!loadstyleIt->is_string())
@@ -146,14 +191,14 @@ namespace
         mitkThrow() << "Invalid '_loadstyle' in " << context << ": expected string ('modify' or 'replace').";
       }
       const std::string value = loadstyleIt->get<std::string>();
-      if (value != "modify" && value != "replace")
+      if (value != LOADSTYLE_MODIFY && value != LOADSTYLE_REPLACE)
       {
         mitkThrow() << "Invalid '_loadstyle' value '" << value << "' in " << context
                     << ". Expected 'modify' or 'replace'.";
       }
     }
 
-    const auto fileIt = mapJson.find("_file");
+    const auto fileIt = mapJson.find(META_FILE);
     if (fileIt != mapJson.end() && !fileIt->is_null())
     {
       if (!fileIt->is_string())
@@ -176,7 +221,7 @@ namespace
   {
     if (!propertyMap.is_object())
       return LoadStyle::Modify;
-    const auto it = propertyMap.find("_loadstyle");
+    const auto it = propertyMap.find(META_LOADSTYLE);
     if (it == propertyMap.end() || it->is_null())
       return LoadStyle::Modify;
     if (!it->is_string())
@@ -184,9 +229,9 @@ namespace
       mitkThrow() << "Invalid '_loadstyle' in " << context << ": expected string ('modify' or 'replace').";
     }
     const std::string value = it->get<std::string>();
-    if (value == "modify")
+    if (value == LOADSTYLE_MODIFY)
       return LoadStyle::Modify;
-    if (value == "replace")
+    if (value == LOADSTYLE_REPLACE)
       return LoadStyle::Replace;
     mitkThrow() << "Invalid '_loadstyle' value '" << value << "' in " << context
                 << ". Expected 'modify' or 'replace'.";
@@ -210,7 +255,7 @@ namespace
       mitkThrow() << "Property map in " << context << " must be a JSON object.";
     }
 
-    const auto fileIt = mapJson.find("_file");
+    const auto fileIt = mapJson.find(META_FILE);
     if (fileIt == mapJson.end() || fileIt->is_null())
       return mapJson;
 
@@ -258,13 +303,13 @@ namespace
     // Inline meta keys override external ones.
     for (auto it = mapJson.begin(); it != mapJson.end(); ++it)
     {
-      if (it.key() == "_file")
+      if (it.key() == META_FILE)
         continue;
       external[it.key()] = it.value();
     }
 
     // Prevent infinite recursion in case the external file itself sets _file.
-    if (external.contains("_file"))
+    if (external.contains(META_FILE))
     {
       mitkThrow() << "Nested '_file' references are not supported (in " << path.string() << ").";
     }
@@ -290,7 +335,7 @@ namespace
         continue;
       if (key.front() == '_')
       {
-        if (kKnownPropertyMapMetaKeys.find(key) == kKnownPropertyMapMetaKeys.end())
+        if (KNOWN_PROPERTY_MAP_META_KEYS.find(key) == KNOWN_PROPERTY_MAP_META_KEYS.end())
         {
           MITK_WARN << "Unknown meta key '" << key << "' in property map (" << context
                     << "). Ignoring (forward compatibility).";
@@ -305,6 +350,15 @@ namespace
       }
       catch (const mitk::Exception &e)
       {
+        mitkThrow() << "Failed to deserialize property '" << key << "' in " << context << ": " << e.what();
+      }
+      catch (const std::exception &e)
+      {
+        // ConvertPropertyFromSelfContainedJson can also propagate non-mitk
+        // exceptions (e.g. nlohmann::json::out_of_range when a tagged value
+        // has the wrong shape). Wrap as mitk::Exception so the Pass-2 catch
+        // around ApplyPropertyMap can downgrade this to a non-fatal per-node
+        // error rather than aborting the load.
         mitkThrow() << "Failed to deserialize property '" << key << "' in " << context << ": " << e.what();
       }
       if (prop.IsNull())
@@ -350,10 +404,10 @@ namespace
    */
   int ExtractLayer(const json &nodeJson)
   {
-    const auto propsIt = nodeJson.find("properties");
+    const auto propsIt = nodeJson.find(FIELD_PROPERTIES);
     if (propsIt == nodeJson.end() || !propsIt->is_object())
       return 0;
-    auto layerIt = propsIt->find("layer");
+    auto layerIt = propsIt->find(PROPERTY_LAYER);
     if (layerIt == propsIt->end() || layerIt->is_null())
       return 0;
     try
@@ -365,6 +419,12 @@ namespace
     catch (const mitk::Exception &)
     {
       // Ignore — sort falls back to layer 0 for this node.
+    }
+    catch (const std::exception &)
+    {
+      // ConvertPropertyFromSelfContainedJson can also propagate non-mitk
+      // exceptions (e.g. nlohmann::json::out_of_range on a malformed tagged
+      // value). Treat the same as a missing/unusable layer: fall back to 0.
     }
     return 0;
   }
@@ -405,34 +465,34 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     mitkThrow() << "Scene file '" << sceneSourcePath << "' root must be a JSON object.";
   }
 
-  const auto typeIt = document.find("type");
-  if (typeIt == document.end() || !typeIt->is_string() || typeIt->get<std::string>() != kSceneType)
+  const auto typeIt = document.find(FIELD_TYPE);
+  if (typeIt == document.end() || !typeIt->is_string() || typeIt->get<std::string>() != SCENE_TYPE)
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' has missing or wrong 'type' field (expected '"
-                << kSceneType << "').";
+                << SCENE_TYPE << "').";
   }
 
-  const auto versionIt = document.find("version");
+  const auto versionIt = document.find(FIELD_VERSION);
   if (versionIt == document.end() || !versionIt->is_number_integer())
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' has missing or non-integer 'version' field.";
   }
   const int version = versionIt->get<int>();
-  if (version != kSupportedVersion)
+  if (version != SUPPORTED_VERSION)
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' has unsupported version " << version
-                << " (supported: " << kSupportedVersion << ").";
+                << " (supported: " << SUPPORTED_VERSION << ").";
   }
 
-  WarnUnknownKeys(document, kRootKnownKeys, "root");
+  WarnUnknownKeys(document, ROOT_KNOWN_KEYS, "root");
 
-  const auto metadataIt = document.find("metadata");
+  const auto metadataIt = document.find(FIELD_METADATA);
   if (metadataIt != document.end() && metadataIt->is_object())
   {
-    WarnUnknownKeys(*metadataIt, kMetadataKnownKeys, "metadata");
+    WarnUnknownKeys(*metadataIt, METADATA_KNOWN_KEYS, "metadata");
   }
 
-  const auto nodesIt = document.find("nodes");
+  const auto nodesIt = document.find(FIELD_NODES);
   if (nodesIt == document.end() || !nodesIt->is_array())
   {
     mitkThrow() << "Scene file '" << sceneSourcePath << "' is missing required 'nodes' array.";
@@ -470,12 +530,12 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       mitkThrow() << "nodes[" << i << "] must be a JSON object.";
     }
 
-    WarnUnknownKeys(nodeJson, kNodeKnownKeys, "nodes[" + std::to_string(i) + "]");
+    WarnUnknownKeys(nodeJson, NODE_KNOWN_KEYS, "nodes[" + std::to_string(i) + "]");
 
     SceneNodeEntry entry;
     entry.nodeJson = &nodeJson;
 
-    const auto uidIt = nodeJson.find("uid");
+    const auto uidIt = nodeJson.find(FIELD_UID);
     if (uidIt != nodeJson.end() && !uidIt->is_null())
     {
       if (!uidIt->is_string())
@@ -493,7 +553,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       entry.uid = autoUidGen.GetUID();
     }
 
-    const auto parentIt = nodeJson.find("parent_uid");
+    const auto parentIt = nodeJson.find(FIELD_PARENT_UID);
     if (parentIt != nodeJson.end() && !parentIt->is_null())
     {
       if (!parentIt->is_string())
@@ -570,7 +630,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
   {
     const json &nodeJson = *entry.nodeJson;
 
-    const auto dataPropsIt = nodeJson.find("data_properties");
+    const auto dataPropsIt = nodeJson.find(FIELD_DATA_PROPERTIES);
     if (dataPropsIt != nodeJson.end() && !dataPropsIt->is_null())
     {
       if (!dataPropsIt->is_object())
@@ -580,7 +640,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       ValidatePropertyMapShape(*dataPropsIt, "node '" + entry.uid + "'.data_properties");
     }
 
-    const auto propsIt = nodeJson.find("properties");
+    const auto propsIt = nodeJson.find(FIELD_PROPERTIES);
     if (propsIt != nodeJson.end() && !propsIt->is_null())
     {
       if (!propsIt->is_object())
@@ -590,7 +650,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       ValidatePropertyMapShape(*propsIt, "node '" + entry.uid + "'.properties");
     }
 
-    const auto ctxIt = nodeJson.find("context_properties");
+    const auto ctxIt = nodeJson.find(FIELD_CONTEXT_PROPERTIES);
     if (ctxIt != nodeJson.end() && !ctxIt->is_null())
     {
       if (!ctxIt->is_object())
@@ -646,18 +706,18 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     entry.dataNode = DataNode::New();
 
     // Validate the optional informative data_type field.
-    const auto dataTypeIt = nodeJson.find("data_type");
+    const auto dataTypeIt = nodeJson.find(FIELD_DATA_TYPE);
     if (dataTypeIt != nodeJson.end() && !dataTypeIt->is_null() && !dataTypeIt->is_string())
     {
       mitkThrow() << "Node '" << entry.uid << "': 'data_type' must be a string or null.";
     }
     const bool hasDataType = dataTypeIt != nodeJson.end() && !dataTypeIt->is_null();
 
-    const auto transferIt = nodeJson.find("transfer");
+    const auto transferIt = nodeJson.find(FIELD_TRANSFER);
     const bool hasTransfer = transferIt != nodeJson.end() && !transferIt->is_null();
-    const auto dataUidIt = nodeJson.find("data_uid");
+    const auto dataUidIt = nodeJson.find(FIELD_DATA_UID);
     const bool hasDataUid = dataUidIt != nodeJson.end() && !dataUidIt->is_null();
-    const auto dataPropsIt = nodeJson.find("data_properties");
+    const auto dataPropsIt = nodeJson.find(FIELD_DATA_PROPERTIES);
     const bool hasDataProps = dataPropsIt != nodeJson.end() && !dataPropsIt->is_null();
 
     if (!hasTransfer)
@@ -687,9 +747,9 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       mitkThrow() << "Node '" << entry.uid << "': 'transfer' must be a JSON object.";
     }
     const json &transferJson = *transferIt;
-    WarnUnknownKeys(transferJson, kTransferKnownKeys, "node '" + entry.uid + "'.transfer");
+    WarnUnknownKeys(transferJson, TRANSFER_KNOWN_KEYS, "node '" + entry.uid + "'.transfer");
 
-    const auto modeIt = transferJson.find("mode");
+    const auto modeIt = transferJson.find(FIELD_MODE);
     if (modeIt != transferJson.end() && !modeIt->is_null())
     {
       if (!modeIt->is_string())
@@ -697,14 +757,14 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
         mitkThrow() << "Node '" << entry.uid << "': 'transfer.mode' must be a string.";
       }
       const std::string mode = modeIt->get<std::string>();
-      if (mode != kSupportedTransferMode)
+      if (mode != SUPPORTED_TRANSFER_MODE)
       {
         mitkThrow() << "Node '" << entry.uid << "': unsupported 'transfer.mode' value '" << mode
-                    << "' (v1 supports only '" << kSupportedTransferMode << "').";
+                    << "' (v1 supports only '" << SUPPORTED_TRANSFER_MODE << "').";
       }
     }
 
-    const auto filePathIt = transferJson.find("file_path");
+    const auto filePathIt = transferJson.find(FIELD_FILE_PATH);
     if (filePathIt == transferJson.end() || !filePathIt->is_string() || filePathIt->get<std::string>().empty())
     {
       mitkThrow() << "Node '" << entry.uid
@@ -736,6 +796,15 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
     {
       auto baseData = IOUtil::Load(dataPath.string(), preloadedDataProps.GetPointer());
       entry.dataNode->SetData(baseData);
+    }
+    catch (const mitk::Exception &e)
+    {
+      // Catch mitk::Exception before std::exception so that any future
+      // type-aware handling (e.g. preserving GetTypeName/Description) has a
+      // hook point. Rethrows wrap with node-level context; the message is
+      // intentionally identical in shape to the std::exception arm below.
+      mitkThrow() << "Node '" << entry.uid << "': failed to read data file '" << dataPath.string()
+                  << "': " << e.what();
     }
     catch (const std::exception &e)
     {
@@ -874,12 +943,15 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
       // invalid `_loadstyle`). We downgrade these to non-fatal per-node
       // errors so that storage is never left partially populated after a
       // node has already been added.
-      const auto propsIt = nodeJson.find("properties");
+      const auto propsIt = nodeJson.find(FIELD_PROPERTIES);
       if (propsIt != nodeJson.end() && !propsIt->is_null())
       {
         const std::string ctx = "node '" + entry.uid + "'.properties";
         try
         {
+          // GetPropertyList() returns the always-present default list constructed
+          // by DataNode; null check intentionally omitted (the named-context call
+          // below may legitimately be null and is checked there).
           PropertyList *defaultList = entry.dataNode->GetPropertyList();
           ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
         }
@@ -890,7 +962,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
         }
       }
 
-      const auto ctxIt = nodeJson.find("context_properties");
+      const auto ctxIt = nodeJson.find(FIELD_CONTEXT_PROPERTIES);
       if (ctxIt != nodeJson.end() && !ctxIt->is_null())
       {
         // Structural shape of `context_properties` was validated in step 3b

@@ -67,11 +67,40 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_Node1;
   mitk::DataNode::Pointer m_Node2;
 
-  QApplication* m_TestApp = nullptr;
+  /**
+   * Returns the process-wide QApplication, creating it on first use.
+   *
+   * A single, never-destroyed QApplication is required because:
+   *   1. NSApplication on macOS is a process singleton; tearing down
+   *      QApplication and recreating it across tests has been observed to
+   *      SegFault on macOS Tahoe (Qt 6.10).
+   *   2. QmitkMxNMultiWidget's ctor registers an observer on the
+   *      mitk::RenderingManager singleton and triggers state-machine
+   *      loading. That state outlives any single QApplication, so a
+   *      second-cycle QApplication would inherit dangling Qt-bound state.
+   *   3. QApplication stores `argc` by reference and `argv` as a pointer;
+   *      both must outlive the QApplication, so their backing storage is
+   *      held in function-local statics here rather than in setUp().
+   */
+  static QApplication& EnsureQApplication()
+  {
+    if (auto* const existing = QApplication::instance())
+    {
+      return *static_cast<QApplication*>(existing);
+    }
+
+    static mitk::RenderingTestHelper::ArgcHelperClass s_CmdLineArgs(globalCmdLineArgs);
+    static int s_Argc = s_CmdLineArgs.GetArgc();
+    static char** s_Argv = s_CmdLineArgs.GetArgv();
+    static auto* const s_App = new QApplication(s_Argc, s_Argv);
+    return *s_App;
+  }
 
 public:
   void setUp() override
   {
+    EnsureQApplication();
+
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
     // QmitkRenderWindowDataNodeTableModel sorts its node list by the int
@@ -96,17 +125,13 @@ public:
     m_Node2->SetName("node2");
     m_Node2->SetIntProperty("layer", 1);
     m_DataStorage->Add(m_Node2);
-
-    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
-    auto argc = cmdLineArgs.GetArgc();
-    auto argv = cmdLineArgs.GetArgv();
-    m_TestApp = new QApplication(argc, argv);
   }
 
   void tearDown() override
   {
-    delete m_TestApp;
-    m_TestApp = nullptr;
+    m_Node1 = nullptr;
+    m_Node2 = nullptr;
+    m_DataStorage = nullptr;
   }
 
   /**

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPythonHelper_h
 #define mitkPythonHelper_h
 
+#include <cassert>
+
 #include <mitkFileSystem.h>
 #include <MitkPythonHelperExports.h>
 
@@ -40,13 +42,17 @@ namespace mitk::PythonHelper
   // String-literal overloads. Without these, calls like ActivateVirtualEnv("foo")
   // are ambiguous because const char* converts equally well to both std::string
   // and fs::path; an exact-match const char* overload disambiguates.
+  //
+  // \pre name != nullptr.
   inline bool ActivateVirtualEnv(const char* name)
   {
+    assert(name != nullptr);
     return ActivateVirtualEnv(std::string(name));
   }
 
   inline bool RemoveVirtualEnv(const char* name)
   {
+    assert(name != nullptr);
     return RemoveVirtualEnv(std::string(name));
   }
 }

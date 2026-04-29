@@ -305,5 +305,5 @@ bool mitk::PythonHelper::RemoveVirtualEnv(const fs::path& path)
   std::error_code error;
   fs::remove_all(path, error);
 
-  return !error;
+  return !error && !fs::exists(path);
 }

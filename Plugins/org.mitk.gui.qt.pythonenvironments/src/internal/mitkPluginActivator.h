@@ -20,7 +20,7 @@ namespace mitk
   class mitkPluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_pythonsettings")
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_pythonenvironments")
     Q_INTERFACES(ctkPluginActivator)
 
   public:

@@ -1,4 +1,4 @@
-set(Plugin-Name "MITK Python Settings")
+set(Plugin-Name "MITK Python Environments")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "German Cancer Research Center (DKFZ)")
 set(Plugin-ContactAddress "https://www.mitk.org")

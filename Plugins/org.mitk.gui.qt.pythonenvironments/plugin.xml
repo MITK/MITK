@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <plugin>
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.pythonsettings"
-          name="Python Settings"
+    <view id="org.mitk.views.pythonenvironments"
+          name="Python Environments"
           category="General"
           icon="resources/python-gear.svg"
-          class="QmitkPythonSettingsView" />
+          class="QmitkPythonEnvironmentsView" />
   </extension>
 </plugin>

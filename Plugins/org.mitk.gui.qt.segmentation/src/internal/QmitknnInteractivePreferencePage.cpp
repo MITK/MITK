@@ -16,6 +16,16 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkSegmentationPluginConfig.h>
+
+#if MITK_HAS_PYTHON
+#include <mitkPythonHelper.h>
+#endif
+
+#include <QmitkRun.h>
+
+#include <QCoreApplication>
+#include <QMessageBox>
 
 namespace
 {
@@ -50,6 +60,13 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
     m_Ui->skipNamingPromptDescriptionLabel->setEnabled(enabled);
   };
   QObject::connect(m_Ui->autoCreateNextLabelCheckBox, &QCheckBox::toggled, m_Control, syncSkipNamingPromptEnabled);
+
+  QObject::connect(m_Ui->uninstallButton, &QPushButton::clicked, m_Control,
+                   [this] { this->OnUninstallButtonClicked(); });
+
+#if !MITK_HAS_PYTHON
+  m_Ui->uninstallButton->setVisible(false);
+#endif
 
   this->Update();
 }
@@ -136,4 +153,73 @@ void QmitknnInteractivePreferencePage::Update()
   m_Ui->gpuBackendLineEdit->setText(QString::fromStdString(gpuBackend));
 
   m_Ui->checkpointLineEdit->setText(QString::fromStdString(modelCheckpoint));
+
+  this->UpdateUninstallButton();
+}
+
+void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()
+{
+#if MITK_HAS_PYTHON
+  if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive"))
+  {
+    const auto appName = QCoreApplication::applicationName();
+    const auto restartTarget = appName.isEmpty()
+      ? QStringLiteral("this application")
+      : appName;
+
+    QMessageBox::information(
+      m_Control,
+      "Uninstall nnInteractive",
+      QStringLiteral(
+        "<p>nnInteractive cannot be uninstalled right now because Python "
+        "modules from its virtual environment are still loaded.</p>"
+        "<p>Restart %1 and try again.</p>").arg(restartTarget));
+    return;
+  }
+
+  const auto answer = QMessageBox::warning(
+    m_Control,
+    "Uninstall nnInteractive",
+    "<p>Are you sure you want to uninstall nnInteractive?</p>"
+    "<p><b>Important:</b> This can only be safely done if nnInteractive has not "
+    "been initialized since application start. If it has, restart "
+    "the application before uninstalling.</p>",
+    QMessageBox::Yes | QMessageBox::No,
+    QMessageBox::No);
+
+  if (answer != QMessageBox::Yes)
+    return;
+
+  const bool removed = QmitkRunAsyncBlocking<bool>(
+    "Uninstall nnInteractive",
+    "Removing the nnInteractive virtual environment...",
+    [] { return mitk::PythonHelper::RemoveVirtualEnv("nnInteractive"); });
+
+  if (removed)
+  {
+    QMessageBox::information(
+      m_Control,
+      "Uninstall nnInteractive",
+      "nnInteractive was uninstalled successfully.");
+  }
+  else
+  {
+    QMessageBox::critical(
+      m_Control,
+      "Uninstall nnInteractive",
+      "Failed to remove the nnInteractive virtual environment. "
+      "Make sure no process is using it and try again.");
+  }
+
+  this->UpdateUninstallButton();
+#endif
+}
+
+void QmitknnInteractivePreferencePage::UpdateUninstallButton()
+{
+#if MITK_HAS_PYTHON
+  m_Ui->uninstallButton->setEnabled(mitk::PythonHelper::VirtualEnvExists("nnInteractive"));
+#else
+  m_Ui->uninstallButton->setEnabled(false);
+#endif
 }

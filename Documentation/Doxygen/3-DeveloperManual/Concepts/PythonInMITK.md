@@ -168,7 +168,7 @@ These virtual environments are stored in the `mitk_venvs` folder within a dedica
 
 To avoid interference between multiple MITK versions built or installed on the same machine, we use a hash of the application path of the currently running MITK application as the top-level folder name inside `mitk_venvs`.
 
-Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Settings** plugin in MITK.
+Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Environments** plugin in MITK.
 
 The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
 

@@ -38,6 +38,9 @@ public:
   void Update() override;
 
 private:
+  void OnUninstallButtonClicked();
+  void UpdateUninstallButton();
+
   std::unique_ptr<Ui::QmitknnInteractivePreferencePage> m_Ui;
   QWidget* m_Control;
 };

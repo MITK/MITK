@@ -32,10 +32,10 @@ namespace mitk::nnInteractive
    * and reset. Derived classes must respond to these events by overriding
    * the corresponding methods: OnEnable(), OnDisable(), and OnReset().
    *
-   * %nnInteractive interactors are typically implemented by reusing either
-   * existing MITK interactors or manual segmentation tools. For the latter,
-   * methods like OnSetToolManager() and OnHandleEvent() can be overridden
-   * to properly configure tools and forward relevant events to them.
+   * %nnInteractive interactors are typically implemented by reusing an
+   * existing MITK interactor or by driving a custom EventStateMachine. In
+   * the latter case, OnHandleEvent() can be overridden to forward relevant
+   * events to the state machine.
    *
    * Utility methods such as GetToolManager(), GetDataStorage(), and
    * GetCurrentPromptType() provide essential functionality for derived classes.
@@ -45,10 +45,10 @@ namespace mitk::nnInteractive
    * This simplifies handling collections of interactors, such as using
    * InteractionType as a key in maps (see GetType()).
    *
-   * This base class optionally blocks global crosshair navigation via left
-   * clicks while an %nnInteractive interactor is enabled. This allows derived
+   * This base class blocks global crosshair navigation via left clicks
+   * while an %nnInteractive interactor is enabled. This allows derived
    * classes to use plain left clicks in MITK interactor event configurations,
-   * which would otherwise require modifier keys (see InteractionMode).
+   * which would otherwise require modifier keys.
    *
    * %nnInteractive interactors are mutually exclusive, and the client is
    * responsible for ensuring that no more than one interactor is enabled
@@ -110,9 +110,8 @@ namespace mitk::nnInteractive
      * method again and it will automatically call Disable() before re-enabling
      * the interactor for the other prompt type.
      *
-     * If a derived class uses InteractionMode::BlockLMBDisplayInteraction,
-     * the crosshair navigation via left click will be blocked while the
-     * interactor is enabled.
+     * Crosshair navigation via left click is blocked while the interactor is
+     * enabled and restored on Disable().
      *
      * \param[in] promptType The prompt type (positive or negative) to enable
      *                       this interactor for.
@@ -125,8 +124,8 @@ namespace mitk::nnInteractive
      *
      * Derived classes must implement OnDisable() to define specific behavior.
      *
-     * If crosshair navigation via left click was previously blocked, it will be
-     * unblocked after this method is called.
+     * Restores left mouse button crosshair navigation that was blocked while
+     * the interactor was enabled.
      *
      * \see OnDisable()
      */
@@ -195,20 +194,15 @@ namespace mitk::nnInteractive
     Message1<bool> UpdatePreviewEvent;
 
   protected:
-    /** \brief Constructs an interactor with a given type and mode.
-     *
-     * If a derived class uses InteractionMode::BlockLMBDisplayInteraction,
-     * the crosshair navigation via left click will be blocked while the
-     * interactor is enabled.
+    /** \brief Constructs an interactor with a given type.
      *
      * \note Enumerators of InteractionType must not be reused across different
      * derived classes. Each interactor must be associated with a unique
      * interaction type.
      *
      * \param type The interaction type associated with this interactor.
-     * \param mode The interaction mode, defaulting to InteractionMode::Default.
      */
-    explicit Interactor(InteractionType type, InteractionMode mode = InteractionMode::Default);
+    explicit Interactor(InteractionType type);
 
     /** \brief Called when a ToolManager is assigned.
      *
@@ -219,16 +213,16 @@ namespace mitk::nnInteractive
      */
     virtual void OnSetToolManager();
 
-    /** \brief Called when an interaction event for a tool is received.
+    /** \brief Called when an interaction event is received.
      *
      * Invoked only when the interactor is enabled.
      *
-     * Derived classes can override this method to forward the event to their
-     * tool.
+     * Derived classes can override this method to forward the event to an
+     * internal state machine.
      *
      * \param[in] event The interaction event to handle.
      *
-     * \see HandleEvent(), Tool::HandleEvent()
+     * \see HandleEvent()
      */
     virtual void OnHandleEvent(InteractionEvent* event);
 

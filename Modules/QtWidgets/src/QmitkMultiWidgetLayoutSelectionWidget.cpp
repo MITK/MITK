@@ -134,8 +134,20 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
   if (!filename.endsWith(fileExt))
     filename += fileExt;
 
-  auto outStream = std::ofstream(filename.toStdString());
-  emit SaveLayout(&outStream);
+  // Wrap the save emit so any failure (engine layout invariant violation,
+  // serializer pre-walk inconsistency, ...) surfaces as a user-facing
+  // message rather than escaping into the Qt event dispatcher. Symmetric
+  // with the load path below.
+  try
+  {
+    auto outStream = std::ofstream(filename.toStdString());
+    emit SaveLayout(&outStream);
+  }
+  catch (const std::exception& e)
+  {
+    QMessageBox::warning(this, tr("Layout save failed"),
+                         QString::fromUtf8(e.what()));
+  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
@@ -172,7 +184,9 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
   }
 
   auto jsonData = m_PresetMap[index];
-  close();
+  // Keep 'this' alive across the emit + potential error dialog; closing
+  // before emit could leave the catch block using a dangling parent if the
+  // widget ever gains 'Qt::WA_DeleteOnClose'. Close after the dialog path.
   try
   {
     emit LoadLayout(&jsonData);
@@ -182,4 +196,5 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
     QMessageBox::warning(this, tr("Layout load failed"),
                          QString::fromUtf8(e.what()));
   }
+  close();
 }

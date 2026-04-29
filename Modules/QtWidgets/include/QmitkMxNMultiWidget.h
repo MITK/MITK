@@ -230,8 +230,37 @@ public Q_SLOTS:
   void wheelEvent(QWheelEvent* e) override;
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
+
+  /**
+  * \brief Slot wrapper around 'ApplyLayout'. Loads a v2.0 layout document
+  *        (replaces the current cell tree).
+  *
+  * \param jsonData  Pointer to a parsed layout document. Must not be null.
+  *
+  * \pre   jsonData != nullptr                            (otherwise mitk::Exception)
+  *
+  * \throws mitk::Exception (rethrown from 'ApplyLayout') on null input,
+  *         version != "2.0", structural shape violation, duplicate window
+  *         names, unknown view_direction, missing group reference in strict
+  *         mode, or wrapped 'nlohmann::json::exception' subtypes.
+  */
   void LoadLayout(const nlohmann::json* jsonData);
+
+  /**
+  * \brief Slot wrapper around 'SerializeLayout'. Writes the current layout
+  *        as a v2.0 JSON document (pretty-printed) to 'outStream'.
+  *
+  *   No-op if 'outStream' is null. Otherwise emits the JSON returned by
+  *   'SerializeLayout' followed by a newline.
+  *
+  * \param outStream  Output stream. May be null (no-op).
+  *
+  * \throws mitk::Exception (rethrown from 'SerializeLayout') if the layout
+  *         tree is in an invariant-violating state (e.g. no top-level
+  *         splitter).
+  */
   void SaveLayout(std::ostream* outStream);
+
   void SetDataBasedLayout(const QmitkAbstractNodeSelectionWidget::NodeList& nodes);
 
   /**
@@ -297,35 +326,24 @@ private:
   /**
   * \brief Recursive serializer for a 'split' subtree. Emits a v2 JSON node.
   *
-  *   'isRoot' suppresses the 'size' field on the document root (which has
-  *   no parent splitter to weight against).
+  *   The root's 'size' field is omitted not by a flag but structurally:
+  *   the parent loop attaches 'size' to each child before pushing into
+  *   the children array; the root, having no parent loop, never gets one.
   *
   *   The 'groupNames' map provides the bare group name for each engine-
   *   internal sync-group index encountered in the cell tree. It must be
   *   pre-populated by the caller before recursing.
   */
   nlohmann::json SerializeSplitter(const QSplitter* splitter,
-                                   const std::map<GroupSyncIndexType, std::string>& groupNames,
-                                   bool isRoot) const;
-
-  /**
-  * \brief Pre-walks a v2 'root' subtree to validate structural shape and
-  *        collect per-window names + referenced group labels.
-  *
-  *   Throws on: missing required field; type mismatch on a known field;
-  *   duplicate window name. Does not mutate engine state.
-  */
-  static void PrewalkValidate(const nlohmann::json& node,
-                              std::set<std::string>& seenNames,
-                              std::set<std::string>& referencedGroups);
+                                   const std::map<GroupSyncIndexType, std::string>& groupNames) const;
 
   /**
   * \brief Recursive constructor for a v2 'split' subtree. Returns a freshly
   *        allocated QSplitter with the cell tree below.
   *
-  *   Window leaves are created via 'CreateRenderWindowWidget(bareName)' (the
-  *   T2 explicit-name overload), then re-parented to the new splitter and
-  *   moved into their target sync group via 'SetSynchronizationGroup'.
+  *   Window leaves are created via 'CreateRenderWindowWidget(bareName)',
+  *   then re-parented to the new splitter and moved into their target sync
+  *   group via 'SetSynchronizationGroup'.
   */
   QSplitter* BuildSplitterFromJsonV2(const nlohmann::json& splitNode,
                                      const std::map<std::string, GroupSyncIndexType>& nameToInt,
@@ -346,19 +364,6 @@ private:
   *        single-cell initialisation so the editor stays in a usable state.
   */
   void RollBackToSingleDefaultCell();
-
-  /**
-  * \brief Maps the v2 'view_direction' enum to mitk::AnatomicalPlane.
-  *        Throws on any other string. The v2 schema enum is closed
-  *        (axial/sagittal/coronal/original); no silent fallback.
-  */
-  static mitk::AnatomicalPlane ParseViewDirection(const std::string& s);
-
-  /**
-  * \brief Lowercase string form of a view direction for v2 output (the
-  *        v2 schema enum is lowercase).
-  */
-  static std::string ViewDirectionToV2String(mitk::AnatomicalPlane plane);
 
   /**
   * \brief Strip the editor's '<multiWidgetName>.' prefix from a qualified

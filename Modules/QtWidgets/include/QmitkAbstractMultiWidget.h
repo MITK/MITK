@@ -200,22 +200,26 @@ public:
   /**
    * \brief Returns the qualified widget name for the given linear index.
    *
-   *   Look-ahead semantics: if 'index' equals the current cell count, the
-   *   returned name is the one a cell at that position would have been given
-   *   under the legacy 'widget<count>' positional naming convention — the
-   *   call does not register or create anything.
+   *   For 'index' < current cell count: returns the i-th registered qualified
+   *   name in map (sorted-by-key) order. Works under any naming scheme,
+   *   including v2 layouts with custom names.
+   *
+   *   For 'index' == current cell count: returns the legacy positional name
+   *   '<multiWidgetName>.widget<index>'. The call does not register or create
+   *   anything. This look-ahead is what the configuration toolbar uses to
+   *   predict the next cell's name.
+   *
+   *   For 'index' > current cell count: returns an empty QString.
    *
    *   Superseded for new code: the MxN editor's v2 layout pipeline registers
    *   render windows by the explicit 'name' field carried in the layout
    *   document (see 'QmitkMxNMultiWidget::CreateRenderWindowWidget(const
    *   QString&)'). New consumers should look up windows by the registered
    *   qualified name (via 'GetRenderWindowWidget(const QString&)') rather than
-   *   reconstructing it from a positional index. This method is retained so
-   *   external callers (e.g. 'QmitkAbstractMultiWidgetEditor::GetQmitkRender
-   *   WindowByIndex') keep working unchanged.
+   *   reconstructing it from a positional index.
    *
    * \param[in] index The linear index.
-   * \return The qualified widget name string ('<multiWidgetName>.widget<index>').
+   * \return The qualified widget name string, or an empty string if out of range.
    */
   virtual QString GetNameFromIndex(size_t index) const;
 

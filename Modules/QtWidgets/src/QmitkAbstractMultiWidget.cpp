@@ -55,6 +55,16 @@ struct QmitkAbstractMultiWidget::Impl final
 
   QString m_MultiWidgetName;
 
+  // INVARIANT: cells stored here are owned by these shared_ptrs and MUST be
+  // destroyed by dropping the shared_ptr (via 'RemoveRenderWindowWidget' or
+  // 'TearDownAllCells'). They MUST NOT be cascade-deleted via Qt's parent /
+  // child mechanics: cells are created with 'std::make_shared', so the
+  // QObject lives inside the shared_ptr's combined control block and
+  // calling 'operator delete' on it - which Qt's 'deleteChildren' does -
+  // is undefined behaviour. Any path that destroys a layout/splitter that
+  // contains cells must drop the shared_ptrs first; see 'TearDownAllCells'
+  // for the canonical sequence. (Architectural debt: dual ownership model
+  // is brittle; tracked in 'plan_mxn_post_rest.md' B19.)
   RenderWindowWidgetMap m_RenderWindowWidgets;
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
 
@@ -311,9 +321,23 @@ QString QmitkAbstractMultiWidget::GetNameFromIndex(int row, int column) const
 
 QString QmitkAbstractMultiWidget::GetNameFromIndex(size_t index) const
 {
-  if (index <= m_Impl->m_RenderWindowWidgets.size())
+  // Look-ahead: if 'index' equals the current cell count, return the legacy
+  // positional name a hypothetical next cell would have received. This keeps
+  // the slot prediction the toolbar uses working unchanged.
+  if (index == m_Impl->m_RenderWindowWidgets.size())
   {
     return m_Impl->m_MultiWidgetName + ".widget" + QString::number(index);
+  }
+
+  // Indexed lookup: walk the registered map (sorted by qualified name) and
+  // return the i-th key. This keeps the positional accessor functional under
+  // any naming scheme, including v2 layouts with custom names that no longer
+  // match 'widget<index>'.
+  if (index < m_Impl->m_RenderWindowWidgets.size())
+  {
+    auto iterator = m_Impl->m_RenderWindowWidgets.begin();
+    std::advance(iterator, index);
+    return iterator->first;
   }
 
   return QString();

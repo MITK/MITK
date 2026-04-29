@@ -58,6 +58,8 @@ namespace mitk
      *
      * Half-pixel corner correction is applied so that even and odd sizes
      * stamp symmetrically around the index where the brush is rendered.
+     *
+     * \pre size > 0 (a non-positive size yields a degenerate contour).
      */
     static ContourModel::Pointer CreateBrushContour(int size);
 
@@ -67,6 +69,9 @@ namespace mitk
      *
      * Used to avoid holes when the mouse moves more than one brush radius
      * between successive samples.
+     *
+     * \pre from != to (a zero-length vector causes the internal
+     *      direction.normalize() to produce NaNs).
      */
     static ContourModel::Pointer CreateGapContour(const Point3D& from,
                                                   const Point3D& to,
@@ -91,10 +96,6 @@ namespace mitk
 
     virtual int GetFillValue() const;
 
-    /**
-     * \todo This is a possible place where to introduce
-     *       different types of pens
-     */
     void UpdateContour(const InteractionPositionEvent *);
 
     /**

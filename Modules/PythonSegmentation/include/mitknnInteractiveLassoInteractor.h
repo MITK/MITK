@@ -13,13 +13,9 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveLassoInteractor_h
 #define mitknnInteractiveLassoInteractor_h
 
+#include <mitkImage.h>
 #include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
-
-namespace mitk
-{
-  class Image;
-}
 
 namespace mitk::nnInteractive
 {
@@ -65,11 +61,14 @@ namespace mitk::nnInteractive
      *
      * The mask is a uint8 image whose extent matches the corresponding
      * interaction bounding box (one voxel thick along the slicing axis).
+     * Returning a smart pointer makes the lifetime explicit so callers do
+     * not need to know that the underlying member is replaced on the next
+     * stroke.
      *
-     * \return Pointer to the mask Image, or \c nullptr if no contour has been
-     *         drawn yet.
+     * \return The mask Image, or a null smart pointer if no contour has
+     *         been drawn yet.
      */
-    const Image* GetLastLassoMask() const;
+    Image::ConstPointer GetLastLassoMask() const;
 
     /** \brief Returns the interaction bounding box for the most recently
      *         drawn contour.

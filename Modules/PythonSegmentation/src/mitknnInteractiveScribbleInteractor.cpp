@@ -220,8 +220,8 @@ namespace
       const bool haveBoundingBox = mitk::nnInteractive::ComputeStrokeBoundingBox(
         m_PaintingSlice, m_ReferenceImage, boundingBox);
 
-      auto handoffSlice = m_PaintingSlice;
-      auto handoffPlane = m_CurrentPlane;
+      const auto handoffSlice = m_PaintingSlice;
+      const auto handoffPlane = m_CurrentPlane;
       m_PaintingSlice = nullptr;
 
       if (m_PaintingNode.IsNotNull())
@@ -269,7 +269,9 @@ namespace
       m_PaintingSlice->Initialize(uint8Type, *(refSlice->GetTimeGeometry()));
       m_PaintingSlice->AllocateZeroedVolume();
 
-      m_CurrentPlane = planeGeometry;
+      // Clone the renderer-owned plane so a later renderer-side mutation
+      // cannot desync the plane we hand to WriteSliceToVolume on release.
+      m_CurrentPlane = planeGeometry->Clone();
 
       this->EnsurePaintingNode();
       m_PaintingNode->SetData(m_PaintingSlice);
@@ -486,9 +488,9 @@ bool mitk::nnInteractive::ScribbleInteractor::HasInteractions() const
   return m_Impl->HasInteractions();
 }
 
-const mitk::Image* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleMask() const
+mitk::Image::ConstPointer mitk::nnInteractive::ScribbleInteractor::GetLastScribbleMask() const
 {
-  return m_Impl->m_LastStrokeMask;
+  return m_Impl->m_LastStrokeMask.GetPointer();
 }
 
 const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleBoundingBox() const

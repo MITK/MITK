@@ -155,7 +155,11 @@ namespace
       if (planeGeometry == nullptr)
         return;
 
-      m_CurrentPlane = planeGeometry;
+      // Clone the renderer-owned plane so a mid-stroke mutation by the
+      // renderer cannot desync the plane we hand to WriteSliceToVolume on
+      // release. The 2D-only restriction on the state machine already makes
+      // mid-stroke navigation unlikely; this is cheap defence in depth.
+      m_CurrentPlane = planeGeometry->Clone();
       m_LiveContour = mitk::ContourModel::New();
       m_LiveContour->SetClosed(true);
       m_LiveContour->AddVertex(positionEvent->GetPositionInWorld());
@@ -249,8 +253,8 @@ namespace
       const bool haveBoundingBox = mitk::nnInteractive::ComputeStrokeBoundingBox(
         paintingSlice, m_ReferenceImage, boundingBox);
 
-      auto contourCopy = m_LiveContour;
-      auto handoffPlane = m_CurrentPlane;
+      const auto contourCopy = m_LiveContour;
+      const auto handoffPlane = m_CurrentPlane;
       m_LiveContour = nullptr;
       m_CurrentPlane = nullptr;
 
@@ -432,9 +436,9 @@ bool mitk::nnInteractive::LassoInteractor::HasInteractions() const
   return m_Impl->HasInteractions();
 }
 
-const mitk::Image* mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
+mitk::Image::ConstPointer mitk::nnInteractive::LassoInteractor::GetLastLassoMask() const
 {
-  return m_Impl->m_LastLassoMask;
+  return m_Impl->m_LastLassoMask.GetPointer();
 }
 
 const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const

@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkLog.h>
 #include <mitkPixelType.h>
 #include <mitkSegTool2D.h>
+#include <mitkSlicedGeometry3D.h>
 
 #include <algorithm>
 #include <array>
@@ -30,8 +31,8 @@ bool mitk::nnInteractive::ComputeStrokeBoundingBox(const Image* paintingSlice2D,
   if (paintingSlice2D == nullptr || referenceImage == nullptr)
     return false;
 
-  auto sliceGeom = paintingSlice2D->GetGeometry();
-  auto refGeom = referenceImage->GetGeometry();
+  const auto sliceGeom = paintingSlice2D->GetGeometry();
+  const auto refGeom = referenceImage->GetGeometry();
   if (sliceGeom == nullptr || refGeom == nullptr)
     return false;
 
@@ -120,16 +121,22 @@ bool mitk::nnInteractive::ComputeStrokeBoundingBox(const Image* paintingSlice2D,
   // Pad by 2 voxels per side on axes where the stroke spans a non-trivial
   // range so VTK reslicing's nearest-neighbour-ish sampling at the
   // staircase boundary still has somewhere to write. On axes where every
-  // mapped corner lands at the same integer reference index (axis-aligned
+  // mapped corner lands within the same reference voxel (axis-aligned
   // slicing axis), pick that integer voxel directly; floor/ceil would be
   // sensitive to floating-point precision and could snap to the wrong
   // neighbour when the reference image has rotated direction cosines.
+  // The 0.5-voxel threshold (in reference index units) is the largest span
+  // that still rounds to a single voxel along that axis, which is what an
+  // axis-aligned plane should produce up to FP noise from the
+  // IndexToWorld/WorldToIndex round-trip; using a per-voxel threshold
+  // rather than an absolute one avoids regressing into the padded branch
+  // on reference volumes with very fine spacing.
   // Final ranges are clamped to the reference's extent.
-  constexpr double axisAlignedEpsilon = 1e-3;
+  constexpr double axisAlignedThreshold = 0.5;
   std::array<std::array<int, 2>, 3> rangeMitk{};
   for (int a = 0; a < 3; ++a)
   {
-    const bool axisAligned = (idxMaxD[a] - idxMinD[a]) < axisAlignedEpsilon;
+    const bool axisAligned = (idxMaxD[a] - idxMinD[a]) < axisAlignedThreshold;
     int lo;
     int hi;
     if (axisAligned)
@@ -165,7 +172,7 @@ mitk::Image::Pointer mitk::nnInteractive::BuildBoundingBoxMaskImage(const Image*
   if (paintingSlice2D == nullptr || slicingPlane == nullptr || referenceImage == nullptr)
     return nullptr;
 
-  auto refGeom = referenceImage->GetGeometry();
+  const auto refGeom = referenceImage->GetGeometry();
   if (refGeom == nullptr)
     return nullptr;
 
@@ -184,14 +191,18 @@ mitk::Image::Pointer mitk::nnInteractive::BuildBoundingBoxMaskImage(const Image*
   out->Initialize(uint8Type, 3, dims);
   out->AllocateZeroedVolume();
 
-  // Copy the reference's orientation and spacing, then shift the origin so
+  // Configure the first slice's PlaneGeometry with the reference's cloned
+  // IndexToWorldTransform (which already encodes spacing in its column
+  // magnitudes -- no separate SetSpacing needed) and shift its origin so
   // the small volume's (0,0,0) voxel coincides with the bounding box's
-  // first voxel in world space. SetIndexToWorldTransform on a clone
-  // preserves rotation and per-axis scaling; SetOrigin afterwards
-  // overwrites just the translation component.
-  auto outGeom = out->GetGeometry();
-  outGeom->SetIndexToWorldTransform(refGeom->GetIndexToWorldTransform()->Clone());
-  outGeom->SetSpacing(refGeom->GetSpacing());
+  // first voxel in world space. Then call InitializeEvenlySpaced on the
+  // sliced geometry so the parent transform and the per-slice plane
+  // geometries are derived consistently from the configured first slice
+  // (otherwise GetPlaneGeometry(z) would return planes with a default
+  // origin, lazily generated from a stale first slice).
+  auto* slicedGeom = out->GetSlicedGeometry(0);
+  auto* planeGeom = slicedGeom->GetPlaneGeometry(0);
+  planeGeom->SetIndexToWorldTransform(refGeom->GetIndexToWorldTransform()->Clone());
 
   Point3D originIndex;
   originIndex[0] = boundingBox[2][0];
@@ -199,7 +210,9 @@ mitk::Image::Pointer mitk::nnInteractive::BuildBoundingBoxMaskImage(const Image*
   originIndex[2] = boundingBox[0][0];
   Point3D originWorld;
   refGeom->IndexToWorld(originIndex, originWorld);
-  outGeom->SetOrigin(originWorld);
+  planeGeom->SetOrigin(originWorld);
+
+  slicedGeom->InitializeEvenlySpaced(planeGeom, dims[2]);
 
   // WriteSliceToVolume uses VTK reslicing to place the 2D painting slice
   // at its plane's world position into the volume. With our small volume

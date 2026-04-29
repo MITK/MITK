@@ -13,13 +13,9 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveScribbleInteractor_h
 #define mitknnInteractiveScribbleInteractor_h
 
+#include <mitkImage.h>
 #include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
-
-namespace mitk
-{
-  class Image;
-}
 
 namespace mitk::nnInteractive
 {
@@ -55,8 +51,8 @@ namespace mitk::nnInteractive
 
     /** \brief Checks whether any scribbles have been drawn.
      *
-     * \return \c true if any label in the scribble segmentation node contains
-     *         non-empty pixel data, \c false otherwise.
+     * \return \c true if at least one completed brushstroke node exists for
+     *         any prompt type, \c false otherwise.
      */
     bool HasInteractions() const override;
 
@@ -65,12 +61,14 @@ namespace mitk::nnInteractive
      * The mask is a uint8 image whose extent matches the corresponding
      * interaction bounding box (one voxel thick along the slicing axis).
      * Intended to be passed alongside GetLastScribbleBoundingBox() to
-     * session.add_scribble_interaction via nnInteractiveTool.
+     * session.add_scribble_interaction via nnInteractiveTool. Returning a
+     * smart pointer makes the lifetime explicit so callers do not need to
+     * know that the underlying member is replaced on the next stroke.
      *
-     * \return Pointer to the mask Image, or \c nullptr if no brushstroke has
+     * \return The mask Image, or a null smart pointer if no brushstroke has
      *         been drawn yet.
      */
-    const Image* GetLastScribbleMask() const;
+    Image::ConstPointer GetLastScribbleMask() const;
 
     /** \brief Returns the interaction bounding box for the most recent
      *         brushstroke.

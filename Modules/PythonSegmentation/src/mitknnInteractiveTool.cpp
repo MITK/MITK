@@ -218,7 +218,9 @@ const Interactor* mitk::nnInteractiveTool::GetInteractor(InteractionType interac
 
 void mitk::nnInteractiveTool::EnableInteractor(InteractionType nextInteractionType, PromptType promptType)
 {
-  // Disable any other interactor if enabled.
+  // Disable any other interactor if enabled. DisableInteractor clears the
+  // inner ToolManager's reference data as a side effect, which is why the
+  // SetReferenceData below must come after this loop -- not before.
   for (const auto& [interactionType, interactor] : m_Impl->Interactors)
   {
     if (interactionType != nextInteractionType && interactor->IsEnabled())
@@ -388,24 +390,24 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
       {
         auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
         auto mask = scribbleInteractor->GetLastScribbleMask();
-        if (mask == nullptr)
+        if (mask.IsNull())
         {
           MITK_WARN << "Skipping scribble preview update: no mask available.";
           return;
         }
-        m_Impl->AddScribbleInteraction(mask, scribbleInteractor->GetLastScribbleBoundingBox());
+        m_Impl->AddScribbleInteraction(mask.GetPointer(), scribbleInteractor->GetLastScribbleBoundingBox());
         break;
       }
       case InteractionType::Lasso:
       {
         auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
         auto mask = lassoInteractor->GetLastLassoMask();
-        if (mask == nullptr)
+        if (mask.IsNull())
         {
           MITK_WARN << "Skipping lasso preview update: no mask available.";
           return;
         }
-        m_Impl->AddLassoInteraction(mask, lassoInteractor->GetLastLassoBoundingBox());
+        m_Impl->AddLassoInteraction(mask.GetPointer(), lassoInteractor->GetLastLassoBoundingBox());
         break;
       }
       default:

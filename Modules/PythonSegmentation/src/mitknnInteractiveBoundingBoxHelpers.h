@@ -28,6 +28,12 @@ namespace mitk::nnInteractive
   //
   // Returns false if the slice has no non-zero pixels or no usable geometry.
   // On success, outBoundingBox is in nnInteractive's (Z, Y, X) order.
+  //
+  // \pre paintingSlice2D must be a 2D uint8 slice extracted from
+  //      referenceImage (i.e. its geometry is related to the reference's
+  //      via SegTool2D::GetAffectedImageSliceAs2DImage or equivalent), so
+  //      that mapping its 2D index corners through its own IndexToWorld
+  //      and back through the reference's WorldToIndex is meaningful.
   bool ComputeStrokeBoundingBox(const Image* paintingSlice2D,
                                 const Image* referenceImage,
                                 InteractionBoundingBox& outBoundingBox);
@@ -42,6 +48,11 @@ namespace mitk::nnInteractive
   //
   // The source's non-zero pixels become 1; zero pixels stay 0. Designed for
   // forwarding to nnInteractive's add_*_interaction(..., interaction_bbox=).
+  //
+  // \pre paintingSlice2D must be a 2D uint8 slice taken at slicingPlane
+  //      from referenceImage (typically via SegTool2D), and boundingBox
+  //      must be the result of ComputeStrokeBoundingBox on the same
+  //      slice/reference pair.
   Image::Pointer BuildBoundingBoxMaskImage(const Image* paintingSlice2D,
                                            const PlaneGeometry* slicingPlane,
                                            const Image* referenceImage,

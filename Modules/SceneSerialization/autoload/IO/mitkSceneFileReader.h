@@ -13,21 +13,20 @@ found in the LICENSE file.
 #ifndef mitkSceneFileReader_h
 #define mitkSceneFileReader_h
 
-// MITK
 #include <mitkAbstractFileReader.h>
 
 namespace mitk
 {
   /**
-   * \brief Reader service for MITK scene files (.mitk).
+   * \brief Reader service for legacy MITK scene files (.mitk, ZIP archive).
    *
    * Loads a scene archive and populates the DataStorage with the contained
-   * data nodes and their properties.
+   * data nodes and their properties. Internally delegates to SceneIO.
    */
   class SceneFileReader : public mitk::AbstractFileReader
   {
   public:
-    /** \brief Default constructor. Registers reader for the MITK scene MIME type. */
+    /** \brief Default constructor. Registers the reader for the MITK scene MIME type. */
     SceneFileReader();
 
     using AbstractFileReader::Read;
@@ -49,7 +48,6 @@ namespace mitk
   private:
     SceneFileReader *Clone() const override;
   };
-
-} // namespace mitk
+}
 
 #endif

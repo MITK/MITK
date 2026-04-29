@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkBaseDataSerializer.h>
 #include <mitkPropertyListSerializer.h>
 #include <mitkSceneIO.h>
+#include <mitkSceneJsonReader.h>
 #include <mitkSceneReader.h>
 
 #include <mitkBaseRenderer.h>
@@ -102,6 +103,36 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
     return storage;
   }
 
+  // Standalone JSON scene (not a ZIP archive): route directly to the
+  // JSON reader without unpacking.
+  {
+    const std::string lower = itksys::SystemTools::LowerCase(filename);
+    if (lower.size() >= std::string(".mitkscene.json").size() &&
+        lower.compare(lower.size() - std::string(".mitkscene.json").size(),
+                      std::string(".mitkscene.json").size(),
+                      ".mitkscene.json") == 0)
+    {
+      // Clearing is delegated to the reader so it can be deferred until
+      // after the scene descriptor has been validated (a malformed JSON
+      // file must not wipe the caller's session).
+      try
+      {
+        SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+        if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
+        {
+          MITK_ERROR << "There were errors while loading scene file " << filename
+                     << ". Your data may be corrupted";
+        }
+      }
+      catch (const std::exception &e)
+      {
+        MITK_ERROR << "Failed to load JSON scene file '" << filename << "': " << e.what();
+      }
+
+      return storage;
+    }
+  }
+
   // test if filename can be read
   std::ifstream file(filename.c_str(), std::ios::binary);
   if (!file.good())
@@ -140,7 +171,10 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
   // transcode locale-dependent string
   m_WorkingDirectory = Poco::Path::transcode (m_WorkingDirectory);
 
-  auto indexFile = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml";
+  // Prefer index.json over index.xml when both exist.
+  auto indexJson = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.json";
+  auto indexXml = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml";
+  auto indexFile = itksys::SystemTools::FileExists(indexJson.c_str()) ? indexJson : indexXml;
   storage = LoadSceneUnzipped(indexFile, storage, clearStorageFirst);
 
   // delete temp directory
@@ -171,18 +205,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
     storage = StandaloneDataStorage::New().GetPointer();
   }
 
-  if (clearStorageFirst)
-  {
-    try
-    {
-      storage->Remove(storage->GetAll());
-    }
-    catch (...)
-    {
-      MITK_ERROR << "DataStorage cannot be cleared properly.";
-    }
-  }
-
   // test input filename
   if (indexfilename.empty())
   {
@@ -195,13 +217,47 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   std::string workingDir;
   itksys::SystemTools::SplitProgramPath(indexfilename, workingDir, tempfilename);
 
-  // test if index.xml exists
-  // parse index.xml with TinyXML
+  // Route JSON index files to the JSON reader. Clearing is delegated so it
+  // can be deferred until the descriptor is validated; a malformed scene
+  // file must not wipe the caller's session.
+  const std::string lowerIndex = itksys::SystemTools::LowerCase(indexfilename);
+  if (lowerIndex.size() >= 5 && lowerIndex.compare(lowerIndex.size() - 5, 5, ".json") == 0)
+  {
+    try
+    {
+      SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      if (!jsonReader->LoadScene(indexfilename, storage, clearStorageFirst))
+      {
+        MITK_ERROR << "There were errors while loading scene file " << indexfilename
+                   << ". Your data may be corrupted";
+      }
+    }
+    catch (const std::exception &e)
+    {
+      MITK_ERROR << "Failed to load JSON scene index '" << indexfilename << "': " << e.what();
+    }
+    return storage;
+  }
+
+  // XML path: clear now (legacy SceneReader has no clearStorageFirst plumbing),
+  // then parse the scene descriptor.
+  if (clearStorageFirst)
+  {
+    try
+    {
+      storage->Remove(storage->GetAll());
+    }
+    catch (...)
+    {
+      MITK_ERROR << "DataStorage cannot be cleared properly.";
+    }
+  }
+
   tinyxml2::XMLDocument document;
   if (tinyxml2::XML_SUCCESS != document.LoadFile(indexfilename.c_str()))
   {
     MITK_ERROR << "Could not open/read/parse " << workingDir << mitk::IOUtil::GetDirectorySeparator()
-      << "index.xml\nTinyXML reports: " << document.ErrorStr() << std::endl;
+      << tempfilename << "\nTinyXML reports: " << document.ErrorStr() << std::endl;
     return storage;
   }
 

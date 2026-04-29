@@ -14,6 +14,10 @@ found in the LICENSE file.
 #define QmitkPythonEnvironmentsView_h
 
 #include <QmitkAbstractView.h>
+
+#include <QString>
+#include <QThreadPool>
+
 #include <memory>
 
 namespace Ui
@@ -35,12 +39,15 @@ public:
   void SetFocus() override;
 
 private:
-  void DeleteSelectedVenvs();
-  void RefreshVenvsTreeWidget();
-  void PopulateVenvsTreeWidget();
-  void CalculateAllVenvSizes();
+  void DeleteSelectedVirtualEnvs();
+  void RefreshVirtualEnvsTreeWidget();
+  void PopulateVirtualEnvsTreeWidget();
+  void CalculateAllVirtualEnvSizes();
+  void SetVirtualEnvSize(const QString& virtualEnvPath, quint64 totalSize, int generation);
 
   std::unique_ptr<Ui::QmitkPythonEnvironmentsView> m_Ui;
+  QThreadPool m_SizeThreadPool;
+  int m_RefreshGeneration = 0;
 };
 
 #endif

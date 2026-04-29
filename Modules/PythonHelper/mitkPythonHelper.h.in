@@ -40,10 +40,14 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const fs::path& path);
 
   // Returns true if any shared library (.dll/.so/.dylib/.pyd) currently
-  // loaded into this process originates from the named virtual environment
+  // loaded into this process originates from the given virtual environment
   // directory. RemoveVirtualEnv on such a venv would partial-fail on Windows
   // (locked files) and on POSIX would unlink files still in use.
+  //
+  // Note: only modules loaded into THIS process are considered. A virtual
+  // environment in use by another running MITK instance cannot be detected.
   MITKPYTHONHELPER_EXPORT bool IsAnyVirtualEnvModuleLoaded(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool IsAnyVirtualEnvModuleLoaded(const fs::path& path);
 
   // String-literal overloads. Without these, calls like ActivateVirtualEnv("foo")
   // are ambiguous because const char* converts equally well to both std::string
@@ -60,6 +64,12 @@ namespace mitk::PythonHelper
   {
     assert(name != nullptr);
     return RemoveVirtualEnv(std::string(name));
+  }
+
+  inline bool IsAnyVirtualEnvModuleLoaded(const char* name)
+  {
+    assert(name != nullptr);
+    return IsAnyVirtualEnvModuleLoaded(std::string(name));
   }
 }
 

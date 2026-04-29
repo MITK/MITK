@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTreeWidget" name="venvsTreeWidget">
+    <widget class="QTreeWidget" name="virtualEnvsTreeWidget">
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
@@ -42,6 +42,11 @@
      </property>
      <column>
       <property name="text">
+       <string>Own</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Name</string>
       </property>
      </column>
@@ -60,7 +65,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="deleteVenvsButton">
+      <widget class="QPushButton" name="deleteVirtualEnvsButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -83,7 +88,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="refreshVenvsButton">
+      <widget class="QPushButton" name="refreshVirtualEnvsButton">
        <property name="text">
         <string>Refresh</string>
        </property>

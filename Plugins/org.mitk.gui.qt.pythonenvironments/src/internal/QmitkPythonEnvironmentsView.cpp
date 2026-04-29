@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 #include <array>
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDirIterator>
@@ -33,7 +34,7 @@ found in the LICENSE file.
 #include <QTreeWidgetItem>
 #include <QUrl>
 
-#include <QtConcurrent>
+#include <QThreadPool>
 
 namespace
 {
@@ -58,10 +59,13 @@ namespace
       if (line.isEmpty() || line.startsWith('#'))
         continue;
 
-      auto tokens = line.split('=');
+      const auto separatorIndex = line.indexOf('=');
 
-      if (tokens.size() == 2 && tokens[0].trimmed() == key)
-        return tokens[1].trimmed();
+      if (separatorIndex < 0)
+        continue;
+
+      if (line.left(separatorIndex).trimmed() == key)
+        return line.mid(separatorIndex + 1).trimmed();
     }
 
     MITK_WARN << "Key \"" << key.toStdString() << "\" not found in file: " << fileName.toStdString();
@@ -99,68 +103,82 @@ namespace
     return QString::number(num, 'f', 2) + " " + sizes[sizeIndex];
   }
 
-  void OpenVenvPath(const QString& venvPath)
+  void OpenVirtualEnvPath(const QString& virtualEnvPath)
   {
-    if (QDir(venvPath).exists())
-      QDesktopServices::openUrl(QUrl::fromLocalFile(venvPath));
+    if (QDir(virtualEnvPath).exists())
+      QDesktopServices::openUrl(QUrl::fromLocalFile(virtualEnvPath));
   }
 }
 
-class QmitkVenvTreeWidgetItem : public QTreeWidgetItem
+class QmitkVirtualEnvTreeWidgetItem : public QTreeWidgetItem
 {
 public:
-  QmitkVenvTreeWidgetItem(const QDir& venvDir, const QString& homePath)
+  QmitkVirtualEnvTreeWidgetItem(const QDir& virtualEnvDir, const QString& homePath, bool isOwn)
+    : m_IsOwn(isOwn),
+      m_Name(virtualEnvDir.dirName())
   {
-    this->setVenvPath(venvDir.path());
+    if (m_IsOwn)
+    {
+      this->setText(0, QStringLiteral("✓"));
+      this->setTextAlignment(0, Qt::AlignCenter);
+    }
+
+    this->setVirtualEnvPath(virtualEnvDir.path());
+    this->setText(1, m_Name);
     this->setCalculating();
     this->setHomePath(homePath);
   }
 
   QString name() const
   {
-    return this->text(0);
+    return m_Name;
   }
 
-  QString venvPath() const
+  QString virtualEnvPath() const
   {
-    return this->data(0, Qt::UserRole).toString();
+    return this->data(1, Qt::UserRole).toString();
   }
 
   QString humanReadableSize() const
   {
-    if (this->data(1, Qt::UserRole).isNull())
+    if (this->data(2, Qt::UserRole).isNull())
       return {};
 
-    return this->text(1);
+    return this->text(2);
   }
 
   quint64 totalSize() const
   {
-    return this->data(1, Qt::UserRole).value<quint64>();
+    return this->data(2, Qt::UserRole).value<quint64>();
   }
 
   QString homePath() const
   {
-    return this->text(2);
+    return this->text(3);
+  }
+
+  bool isOwn() const
+  {
+    return m_IsOwn;
   }
 
   void setTotalSize(quint64 totalSize)
   {
-    QFont normalFont = this->font(1);
-    normalFont.setItalic(false);
+    QFont font = this->font(2);
+    font.setItalic(false);
 
-    this->setData(1, Qt::UserRole, QVariant::fromValue(totalSize));
-    this->setText(1, GetHumanReadableSize(totalSize));
-    this->setFont(1, normalFont);
+    this->setData(2, Qt::UserRole, QVariant::fromValue(totalSize));
+    this->setText(2, GetHumanReadableSize(totalSize));
+    this->setFont(2, font);
   }
 
   bool operator<(const QTreeWidgetItem& other) const override
   {
-    auto otherItem = dynamic_cast<const QmitkVenvTreeWidgetItem*>(&other);
+    auto otherItem = dynamic_cast<const QmitkVirtualEnvTreeWidgetItem*>(&other);
 
     if (otherItem != nullptr && this->treeWidget() != nullptr)
     {
-      if (this->treeWidget()->sortColumn() == 1)
+      if (this->treeWidget()->sortColumn() == 2)
         return this->totalSize() < otherItem->totalSize();
     }
 
@@ -168,44 +186,61 @@ public:
   }
 
 private:
-  void setVenvPath(const QString& venvPath)
+  void setVirtualEnvPath(const QString& virtualEnvPath)
   {
-    const auto nativeVenvPath = QDir::toNativeSeparators(venvPath);
+    const auto nativeVirtualEnvPath = QDir::toNativeSeparators(virtualEnvPath);
 
-    this->setData(0, Qt::UserRole, nativeVenvPath);
-    this->setText(0, QDir(venvPath).dirName());
-    this->setToolTip(0, nativeVenvPath);
+    this->setData(1, Qt::UserRole, nativeVirtualEnvPath);
+    this->setToolTip(1, nativeVirtualEnvPath);
   }
 
   void setCalculating()
   {
-    QFont italicFont;
-    italicFont.setItalic(true);
+    QFont font = this->font(2);
+    font.setItalic(true);
 
-    this->setText(1, "Calculating...");
-    this->setFont(1, italicFont);
+    this->setText(2, "Calculating...");
+    this->setFont(2, font);
   }
 
   void setHomePath(const QString& homePath)
   {
-    this->setText(2, QDir::toNativeSeparators(homePath));
+    this->setText(3, QDir::toNativeSeparators(homePath));
   }
+
+  bool m_IsOwn;
+  QString m_Name;
 };
 
 namespace
 {
-  QList<QmitkVenvTreeWidgetItem*> GetSelectedVenvItems(const QTreeWidget* treeWidget)
+  QList<QmitkVirtualEnvTreeWidgetItem*> GetSelectedVirtualEnvItems(const QTreeWidget* treeWidget)
   {
     const auto items = treeWidget->selectedItems();
-    QList<QmitkVenvTreeWidgetItem*> venvItems;
+    QList<QmitkVirtualEnvTreeWidgetItem*> virtualEnvItems;
 
     for (auto item : items)
     {
-      if (auto venvItem = dynamic_cast<QmitkVenvTreeWidgetItem*>(item); venvItem != nullptr)
-        venvItems.push_back(venvItem);
+      if (auto virtualEnvItem = dynamic_cast<QmitkVirtualEnvTreeWidgetItem*>(item); virtualEnvItem != nullptr)
+        virtualEnvItems.push_back(virtualEnvItem);
     }
 
-    return venvItems;
+    return virtualEnvItems;
+  }
+
+  QmitkVirtualEnvTreeWidgetItem* FindVirtualEnvItem(const QTreeWidget* treeWidget, const QString& virtualEnvPath)
+  {
+    const int virtualEnvCount = treeWidget->topLevelItemCount();
+
+    for (int itemIndex = 0; itemIndex < virtualEnvCount; ++itemIndex)
+    {
+      auto item = dynamic_cast<QmitkVirtualEnvTreeWidgetItem*>(treeWidget->topLevelItem(itemIndex));
+
+      if (item != nullptr && item->virtualEnvPath() == virtualEnvPath)
+        return item;
+    }
+
+    return nullptr;
   }
 }
 
@@ -218,6 +253,11 @@ QmitkPythonEnvironmentsView::QmitkPythonEnvironmentsView(QObject*)
 
 QmitkPythonEnvironmentsView::~QmitkPythonEnvironmentsView()
 {
+  // Make in-flight size workers finish before m_Ui is destroyed and before
+  // ~QObject removes our pending queued events. clear() drops not-yet-started
+  // runnables; waitForDone() blocks on those already running.
+  m_SizeThreadPool.clear();
+  m_SizeThreadPool.waitForDone();
 }
 
 void QmitkPythonEnvironmentsView::CreateQtPartControl(QWidget* parent)
@@ -226,115 +266,214 @@ void QmitkPythonEnvironmentsView::CreateQtPartControl(QWidget* parent)
 
   m_Ui->setupUi(parent);
 
-  m_Ui->deleteVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/trash.svg")));
-  m_Ui->refreshVenvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/arrow-rotate-right.svg")));
+  m_Ui->deleteVirtualEnvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/trash.svg")));
+  m_Ui->refreshVirtualEnvsButton->setIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/QmitkPythonEnvironmentsView/arrow-rotate-right.svg")));
 
-  connect(m_Ui->venvsTreeWidget, &QTreeWidget::itemDoubleClicked, [](QTreeWidgetItem* item, int) {
-    if (auto venvItem = dynamic_cast<const QmitkVenvTreeWidgetItem*>(item); venvItem != nullptr)
-      OpenVenvPath(venvItem->venvPath());
+  m_Ui->virtualEnvsTreeWidget->setColumnWidth(0, 40);
+  m_Ui->virtualEnvsTreeWidget->setColumnWidth(1, 250);
+
+  connect(m_Ui->virtualEnvsTreeWidget, &QTreeWidget::itemDoubleClicked, [](QTreeWidgetItem* item, int) {
+    if (auto virtualEnvItem = dynamic_cast<const QmitkVirtualEnvTreeWidgetItem*>(item); virtualEnvItem != nullptr)
+      OpenVirtualEnvPath(virtualEnvItem->virtualEnvPath());
   });
 
-  connect(m_Ui->venvsTreeWidget, &QTreeWidget::itemSelectionChanged, [this]() {
-    m_Ui->deleteVenvsButton->setEnabled(!m_Ui->venvsTreeWidget->selectedItems().empty());
+  connect(m_Ui->virtualEnvsTreeWidget, &QTreeWidget::itemSelectionChanged, [this]() {
+    m_Ui->deleteVirtualEnvsButton->setEnabled(!m_Ui->virtualEnvsTreeWidget->selectedItems().empty());
   });
 
-  connect(m_Ui->deleteVenvsButton, &QPushButton::clicked, this, &Self::DeleteSelectedVenvs);
-  connect(m_Ui->refreshVenvsButton, &QPushButton::clicked, this, &Self::RefreshVenvsTreeWidget);
+  connect(m_Ui->deleteVirtualEnvsButton, &QPushButton::clicked, this, &Self::DeleteSelectedVirtualEnvs);
+  connect(m_Ui->refreshVirtualEnvsButton, &QPushButton::clicked, this, &Self::RefreshVirtualEnvsTreeWidget);
 
-  this->RefreshVenvsTreeWidget();
+  this->RefreshVirtualEnvsTreeWidget();
 }
 
-void QmitkPythonEnvironmentsView::DeleteSelectedVenvs()
+void QmitkPythonEnvironmentsView::DeleteSelectedVirtualEnvs()
 {
-  const auto selectedItems = GetSelectedVenvItems(m_Ui->venvsTreeWidget);
+  const auto selectedItems = GetSelectedVirtualEnvItems(m_Ui->virtualEnvsTreeWidget);
 
   if (selectedItems.empty())
     return;
+
+  // IsAnyVirtualEnvModuleLoaded only sees modules loaded into THIS process,
+  // so we can only gate venvs that belong to the running MITK instance. Venvs
+  // owned by other instances are covered by the warning text below instead.
+  QStringList loadedNames;
+
+  for (const auto* item : selectedItems)
+  {
+    if (!item->isOwn())
+      continue;
+
+    const fs::path path(item->virtualEnvPath().toStdString());
+
+    if (mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(path))
+      loadedNames.append(item->name());
+  }
+
+  if (!loadedNames.isEmpty())
+  {
+    const auto appName = QCoreApplication::applicationName();
+    const auto restartTarget = appName.isEmpty()
+      ? QStringLiteral("this application")
+      : appName;
+
+    QMessageBox::information(
+      nullptr,
+      "Delete selected virtual environments",
+      QString(
+        "<h3 %1>Cannot delete in-use virtual environments</h3>"
+        "<p %1>The following virtual environments cannot be deleted because "
+        "Python modules from them are still loaded:</p>"
+        "<ul %1><li>%2</li></ul>"
+        "<p %1>Restart %3 and try again.</p>")
+        .arg(LINE_HEIGHT_STYLE, loadedNames.join("</li><li>"), restartTarget));
+    return;
+  }
 
   const auto answer = QMessageBox::question(
     nullptr,
     "Delete selected virtual environments",
     QString(
       "<h3 %1>Delete selected virtual environments?</h3>"
-      "<p %1><em>Warning:</em> This action cannot be undone. Deleting active "
-      "environments may cause the application to crash.</p>").arg(LINE_HEIGHT_STYLE),
+      "<p %1><em>Warning:</em> This action cannot be undone. If a selected "
+      "virtual environment is in use by another running MITK instance, "
+      "deleting it may cause that instance to crash.</p>").arg(LINE_HEIGHT_STYLE),
     QMessageBox::Yes | QMessageBox::No,
     QMessageBox::No);
 
   if (answer != QMessageBox::Yes)
     return;
 
-  for (const auto* item : selectedItems)
-  {
-    const auto venvPath = item->venvPath();
+  // Snapshot paths on the GUI thread; QTreeWidgetItem is not safe to touch
+  // from the worker thread.
+  QStringList virtualEnvPaths;
+  virtualEnvPaths.reserve(selectedItems.size());
 
-    QmitkRunAsyncBlocking("Delete selected virtual environments", QString("Deleting \"%1\"...").arg(venvPath), [&venvPath]() {
-      QDir(venvPath).removeRecursively();
+  for (const auto* item : selectedItems)
+    virtualEnvPaths.append(item->virtualEnvPath());
+
+  QStringList failedPaths;
+
+  QmitkRunAsyncBlocking(
+    "Delete selected virtual environments",
+    "Deleting virtual environments...",
+    [&virtualEnvPaths, &failedPaths]() {
+      for (const auto& pathString : virtualEnvPaths)
+      {
+        const fs::path path(pathString.toStdString());
+
+        if (!mitk::PythonHelper::RemoveVirtualEnv(path))
+          failedPaths.append(pathString);
+      }
     });
+
+  if (!failedPaths.isEmpty())
+  {
+    QMessageBox::warning(
+      nullptr,
+      "Delete selected virtual environments",
+      QString(
+        "<h3 %1>Some virtual environments could not be deleted</h3>"
+        "<p %1>The following could not be removed. They may be in use by "
+        "another running MITK instance, or may not be writable:</p>"
+        "<ul %1><li>%2</li></ul>")
+        .arg(LINE_HEIGHT_STYLE, failedPaths.join("</li><li>")));
   }
 
-  this->RefreshVenvsTreeWidget();
+  this->RefreshVirtualEnvsTreeWidget();
 }
 
-void QmitkPythonEnvironmentsView::RefreshVenvsTreeWidget()
+void QmitkPythonEnvironmentsView::RefreshVirtualEnvsTreeWidget()
 {
-  this->PopulateVenvsTreeWidget();
-  this->CalculateAllVenvSizes();
+  this->PopulateVirtualEnvsTreeWidget();
+  this->CalculateAllVirtualEnvSizes();
 }
 
-void QmitkPythonEnvironmentsView::PopulateVenvsTreeWidget()
+void QmitkPythonEnvironmentsView::PopulateVirtualEnvsTreeWidget()
 {
-  m_Ui->venvsTreeWidget->clearSelection();
-  m_Ui->venvsTreeWidget->clear();
+  m_Ui->virtualEnvsTreeWidget->clearSelection();
+  m_Ui->virtualEnvsTreeWidget->clear();
 
-  const QDir rootDir(mitk::PythonHelper::GetVirtualEnvBasePath().parent_path());
-  QDirIterator baseDirIt(rootDir.path(), QDir::Dirs);
+  const auto ownBasePath = mitk::PythonHelper::GetVirtualEnvBasePath();
 
-  while (baseDirIt.hasNext())
+  if (ownBasePath.empty())
+    return;
+
+  const QDir rootDir(QString::fromStdString(ownBasePath.parent_path().string()));
+
+  if (!rootDir.exists())
+    return;
+
+  const auto ownInstanceDir = QDir(QString::fromStdString(ownBasePath.string())).canonicalPath();
+
+  QDirIterator instanceDirIt(rootDir.path(), QDir::Dirs | QDir::NoDotAndDotDot);
+
+  while (instanceDirIt.hasNext())
   {
-    QDirIterator venvDirIt(baseDirIt.next(), QDir::Dirs);
+    const auto instanceDirPath = instanceDirIt.next();
+    const auto canonicalInstanceDir = QDir(instanceDirPath).canonicalPath();
+    const bool isOwn = !canonicalInstanceDir.isEmpty() && canonicalInstanceDir == ownInstanceDir;
 
-    while (venvDirIt.hasNext())
+    QDirIterator virtualEnvDirIt(instanceDirPath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while (virtualEnvDirIt.hasNext())
     {
-      const auto venvDir = QDir(venvDirIt.next());
-      const auto venvConfigPath = venvDir.filePath("pyvenv.cfg");
+      const auto virtualEnvDir = QDir(virtualEnvDirIt.next());
+      const auto virtualEnvConfigPath = virtualEnvDir.filePath("pyvenv.cfg");
 
-      if (QFile::exists(venvConfigPath))
+      if (QFile::exists(virtualEnvConfigPath))
       {
-        if (const auto homePath = ReadConfigValue(venvConfigPath, "home"); !homePath.isEmpty())
+        if (const auto homePath = ReadConfigValue(virtualEnvConfigPath, "home"); !homePath.isEmpty())
         {
-          auto item = new QmitkVenvTreeWidgetItem(venvDir, homePath);
-          m_Ui->venvsTreeWidget->addTopLevelItem(item);
+          auto item = new QmitkVirtualEnvTreeWidgetItem(virtualEnvDir, homePath, isOwn);
+          m_Ui->virtualEnvsTreeWidget->addTopLevelItem(item);
         }
       }
     }
   }
 
-  m_Ui->venvsTreeWidget->sortByColumn(2, Qt::AscendingOrder);
+  m_Ui->virtualEnvsTreeWidget->sortByColumn(3, Qt::AscendingOrder);
 }
 
-void QmitkPythonEnvironmentsView::CalculateAllVenvSizes()
+void QmitkPythonEnvironmentsView::CalculateAllVirtualEnvSizes()
 {
-  const int venvCount = m_Ui->venvsTreeWidget->topLevelItemCount();
+  // Each refresh starts a new generation. Workers from older generations
+  // still post their results, but SetVirtualEnvSize ignores them so they
+  // cannot touch tree items that were rebuilt in the meantime.
+  const int currentGeneration = ++m_RefreshGeneration;
+  const int virtualEnvCount = m_Ui->virtualEnvsTreeWidget->topLevelItemCount();
 
-  for (int itemIndex = 0; itemIndex < venvCount; ++itemIndex)
+  for (int itemIndex = 0; itemIndex < virtualEnvCount; ++itemIndex)
   {
-    auto item = dynamic_cast<QmitkVenvTreeWidgetItem*>(m_Ui->venvsTreeWidget->topLevelItem(itemIndex));
+    auto item = dynamic_cast<QmitkVirtualEnvTreeWidgetItem*>(m_Ui->virtualEnvsTreeWidget->topLevelItem(itemIndex));
 
     if (item == nullptr)
       continue;
 
-    auto future = QtConcurrent::run([item]() {
-      const auto totalSize = CalculateTotalDirectorySize(item->venvPath());
+    const auto virtualEnvPath = item->virtualEnvPath();
 
-      QMetaObject::invokeMethod(item->treeWidget(), [item, totalSize]() {
-        item->setTotalSize(totalSize);
+    m_SizeThreadPool.start([this, virtualEnvPath, currentGeneration]() {
+      const auto totalSize = CalculateTotalDirectorySize(virtualEnvPath);
+
+      // Posting back via invokeMethod with `this` as receiver is safe: if
+      // the view is destroyed before this fires, Qt drops the queued event.
+      QMetaObject::invokeMethod(this, [this, virtualEnvPath, totalSize, currentGeneration]() {
+        this->SetVirtualEnvSize(virtualEnvPath, totalSize, currentGeneration);
       });
     });
   }
 }
 
+void QmitkPythonEnvironmentsView::SetVirtualEnvSize(const QString& virtualEnvPath, quint64 totalSize, int generation)
+{
+  if (generation != m_RefreshGeneration)
+    return;
+
+  if (auto* item = FindVirtualEnvItem(m_Ui->virtualEnvsTreeWidget, virtualEnvPath))
+    item->setTotalSize(totalSize);
+}
+
 void QmitkPythonEnvironmentsView::SetFocus()
 {
-  m_Ui->venvsTreeWidget->setFocus();
+  m_Ui->virtualEnvsTreeWidget->setFocus();
 }

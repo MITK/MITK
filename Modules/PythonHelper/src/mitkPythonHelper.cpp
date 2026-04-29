@@ -431,11 +431,14 @@ bool mitk::PythonHelper::RemoveVirtualEnv(const fs::path& path)
 
 bool mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(const std::string& name)
 {
-  const auto venvPath = GetVirtualEnvPath(name);
+  return IsAnyVirtualEnvModuleLoaded(GetVirtualEnvPath(name));
+}
 
-  if (venvPath.empty() || !fs::exists(venvPath))
+bool mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(const fs::path& path)
+{
+  if (path.empty() || !fs::exists(path))
     return false;
 
   return ForEachLoadedModule(
-    [&venvPath](const fs::path& modulePath) { return IsPathUnder(modulePath, venvPath); });
+    [&path](const fs::path& modulePath) { return IsPathUnder(modulePath, path); });
 }

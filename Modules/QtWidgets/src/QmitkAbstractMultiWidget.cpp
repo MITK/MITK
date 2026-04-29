@@ -405,16 +405,30 @@ void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, 
 
 void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
 {
-  auto iterator = m_Impl->m_RenderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
+  // Walk the map in reverse and remove the lexicographically last entry.
+  // Using the map directly (rather than 'GetNameFromIndex(count-1)') keeps
+  // this safe for layouts whose cell names are not the legacy positional
+  // 'widget<i>' form, e.g. v2 layouts with custom names.
+  if (m_Impl->m_RenderWindowWidgets.empty())
+  {
+    return;
+  }
+
+  auto last = std::prev(m_Impl->m_RenderWindowWidgets.end());
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = last->second;
+  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
+  m_Impl->m_RenderWindowWidgets.erase(last);
+}
+
+void QmitkAbstractMultiWidget::RemoveRenderWindowWidget(const QString& widgetName)
+{
+  auto iterator = m_Impl->m_RenderWindowWidgets.find(widgetName);
   if (iterator == m_Impl->m_RenderWindowWidgets.end())
   {
     return;
   }
 
-  // disconnect each signal of this render window widget
   RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
   disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
-
-  // erase the render window from the map
   m_Impl->m_RenderWindowWidgets.erase(iterator);
 }

@@ -16,9 +16,9 @@ found in the LICENSE file.
 #include <vtkCornerAnnotation.h>
 #include <vtkTextProperty.h>
 
-QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
-                                                 const QString& widgetName/* = ""*/,
-                                                 mitk::DataStorage* dataStorage/* = nullptr*/)
+QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent,
+                                                 const QString& widgetName,
+                                                 mitk::DataStorage* dataStorage)
   : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)

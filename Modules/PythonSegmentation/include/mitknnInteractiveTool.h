@@ -80,19 +80,6 @@ namespace mitk
      */
     us::ModuleResource GetIconResource() const override;
 
-    /** \brief Checks whether this tool can handle the given data.
-     *
-     * The tool requires valid reference and working data (as checked by the
-     * superclass) and additionally requires the reference image to have at
-     * most 3 dimensions.
-     *
-     * \param[in] referenceData The reference image data.
-     * \param[in] workingData The working segmentation data.
-     *
-     * \return \c true if the tool can handle the data, \c false otherwise.
-     */
-    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
-
     /** \brief Called when the tool is deactivated.
      *
      * Disables any active interactor, resets all interactions, and ends the
@@ -354,6 +341,17 @@ namespace mitk
      */
     Message<> DeactivatedEvent;
 
+    /** \brief Event triggered when the Python session has ended.
+     *
+     * Emitted from EndSession() after the Python session has been torn down.
+     * Fires both on a normal Deactivated() (in which case DeactivatedEvent
+     * follows) and when the session is auto-ended because the current image
+     * or segmentation time step changed during a 4D session. GUI code can
+     * subscribe to revert session-dependent UI controls to their pre-init
+     * state.
+     */
+    Message<> SessionEndedEvent;
+
   protected:
     /** \brief Default constructor. Initializes interactors and connects events.
      */
@@ -363,14 +361,10 @@ namespace mitk
      */
     ~nnInteractiveTool() override;
 
-    /** \brief Sets the ToolManager and creates an internal ToolManager for interactors.
-     *
-     * Creates a dedicated internal ToolManager that shares the DataStorage
-     * with the provided ToolManager. All interactors are configured to use
-     * the internal ToolManager.
+    /** \brief Sets the ToolManager and forwards it to all interactors.
      *
      * \param[in] toolManager Pointer to the ToolManager to associate with
-     *                        this tool.
+     *                        this tool and its interactors.
      */
     void SetToolManager(ToolManager* toolManager) override;
 
@@ -387,6 +381,20 @@ namespace mitk
      * \param[in] timeStep The current time step.
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, MultiLabelSegmentation* previewImage, TimeStepType timeStep) override;
+
+    /** \brief Tears the running session down when the current time step no
+     *         longer matches the time step the session was bound to.
+     *
+     * The Python inference model is intrinsically 3D, so each session is
+     * bound to a single 3D slice extracted at the time step that was active
+     * when StartSession() ran. If the current image or segmentation time
+     * step diverges from that bound time step, all unconfirmed interactions
+     * are discarded, the preview is cleared, and the session is ended. This
+     * override deliberately does not chain to the base implementation, whose
+     * lazy-preview UpdatePreview() call would invoke DoUpdatePreview()
+     * against a stale Python binding.
+     */
+    void OnTimePointChanged() override;
 
     /** \brief Forwards unhandled interaction events to the enabled interactor.
      *

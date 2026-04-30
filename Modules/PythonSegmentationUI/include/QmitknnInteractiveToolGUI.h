@@ -184,6 +184,16 @@ protected:
    */
   void OnToolDeactivated();
 
+  /** \brief Handles the tool's SessionEndedEvent.
+   *
+   * Reverts the session-dependent UI controls (interactor toggles, prompt
+   * type, reset, settings) back to their pre-init state and re-enables the
+   * Initialize button. Fires when the user changes the time step during a
+   * 4D session, and also as part of a normal tool deactivation (where the
+   * extra UI revert is harmless because the GUI is being torn down).
+   */
+  void OnSessionEnded();
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.

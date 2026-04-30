@@ -46,10 +46,23 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 
 public:
 
+  /**
+  * \brief Construct a render-window widget.
+  *
+  * \param parent       Owning Qt parent. Must not be null.
+  * \param widgetName   Qualified name registered with the rendering manager
+  *                     (typically '<editorName>.<bareName>'). Must not be empty.
+  * \param dataStorage  Data storage backing the render window. Must not be null;
+  *                     the widget unconditionally talks to it during 'InitializeGUI'.
+  *
+  *   Defaults intentionally not provided: the widget is unusable without a
+  *   non-null data storage and a non-empty name. Earlier versions defaulted
+  *   all three parameters; that hid construction errors at the call site.
+  */
   QmitkRenderWindowWidget(
-    QWidget* parent = nullptr,
-    const QString& widgetName = "",
-    mitk::DataStorage* dataStorage = nullptr);
+    QWidget* parent,
+    const QString& widgetName,
+    mitk::DataStorage* dataStorage);
 
   ~QmitkRenderWindowWidget() override;
 

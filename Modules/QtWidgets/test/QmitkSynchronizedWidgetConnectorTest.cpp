@@ -10,19 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestQApplication.h"
+
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 
-#include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <QApplication>
-
 #include <algorithm>
-
-extern std::vector<std::string> globalCmdLineArgs;
 
 /**
  * Direct unit test for QmitkSynchronizedWidgetConnector. The connector hub
@@ -56,11 +53,11 @@ class QmitkSynchronizedWidgetConnectorTestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_Node2;
   mitk::DataNode::Pointer m_Node3;
 
-  QApplication* m_TestApp = nullptr;
-
 public:
   void setUp() override
   {
+    EnsureQApplication();
+
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
     // QmitkRenderWindowDataNodeTableModel sorts its node list by the int
@@ -90,17 +87,14 @@ public:
     m_Node3->SetName("node3");
     m_Node3->SetIntProperty("layer", 2);
     m_DataStorage->Add(m_Node3);
-
-    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
-    auto argc = cmdLineArgs.GetArgc();
-    auto argv = cmdLineArgs.GetArgv();
-    m_TestApp = new QApplication(argc, argv);
   }
 
   void tearDown() override
   {
-    delete m_TestApp;
-    m_TestApp = nullptr;
+    m_Node1 = nullptr;
+    m_Node2 = nullptr;
+    m_Node3 = nullptr;
+    m_DataStorage = nullptr;
   }
 
   static bool ListContains(const QmitkSynchronizedWidgetConnector::NodeList& list,

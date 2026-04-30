@@ -167,7 +167,7 @@ private:
   /**Weight in kg*/
   double m_bodyweight;
 
-  /** Time between injection and image acquesition in sec. Used when defined by user and not autodetected.*/
+  /** Time between injection and image acquisition in sec. Used when defined by user and not autodetected.*/
   bool m_validAutoTime;
   mitk::DecayTimeMapType m_autoDecayTime;
   /** DICOM decay-correction strategy detected on the selected node. Reset on each new selection. */

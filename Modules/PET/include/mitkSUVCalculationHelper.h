@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSUVCalculationHelper_h
 #define mitkSUVCalculationHelper_h
 
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
@@ -142,58 +143,49 @@ namespace mitk
   };
 
   /**
-   * \brief Get the radionuclide half-life values from DICOM properties.
+   * \brief Per-item radiopharmaceutical metadata pulled from the
+   *        Radiopharmaceutical Information Sequence (0054,0016).
    *
-   * Extracts the radionuclide half-life from the Radiopharmaceutical Information
-   * Sequence stored in the DICOM properties of the passed provider. Reads from
-   * DICOM path (0054,0016)[*](0018,1075).
+   * One instance corresponds to one item in the sequence. Fields not present
+   * in the source DICOM are left at their default (NaN for numeric fields,
+   * empty string for the name); callers should check for this rather than
+   * assume completeness.
+   */
+  struct MITKPET_EXPORT RadiopharmaceuticalInfo
+  {
+    /** Radionuclide half-life in [s]. NaN if (0018,1075) was not present. */
+    double      halfLifeSeconds = std::numeric_limits<double>::quiet_NaN();
+    /** Radionuclide total (injected) dose in [Bq]. NaN if (0018,1074) was not present. */
+    double      totalDoseBq     = std::numeric_limits<double>::quiet_NaN();
+    /** Radionuclide name (code meaning). Empty if (0054,0300)/(0008,0104) was not present. */
+    std::string name;
+  };
+
+  /**
+   * \brief Read the Radiopharmaceutical Information Sequence as paired-by-item info.
    *
-   * If the Radiopharmaceutical Information Sequence contains more than one item,
-   * the half-life of all sequence items is returned. The order of results matches
-   * the order of the sequence items.
+   * Enumerates the items of the Radiopharmaceutical Information Sequence
+   * (0054,0016) by their concrete sequence-item index, and assembles one
+   * RadiopharmaceuticalInfo per item. Within each item, the half-life
+   * (0018,1075), total dose (0018,1074), and radionuclide code meaning
+   * (0054,0300)[*](0008,0104) are read and bundled into the same struct.
+   *
+   * Index pairing is enforced: the i-th element of the returned vector
+   * corresponds to the i-th item of the source sequence; fields missing from
+   * an item come back as NaN / empty without affecting other items.
    *
    * \param[in] provider Source of DICOM properties; typically the BaseData of a
    *            PET image.
-   * \return A vector of half-life values in seconds. Empty if no appropriate
-   *         DICOM element was found or if \p provider is \c nullptr.
+   * \return A vector of RadiopharmaceuticalInfo, ordered by sequence-item
+   *         index. Empty if no Radiopharmaceutical Information Sequence is
+   *         present or if \p provider is \c nullptr.
    *
-   * \sa GetRadionuclideTotalDose, GetRadionuclideNames
+   * \remark Multi-tracer datasets are surfaced honestly (more than one entry).
+   *         Callers that only support one tracer should check
+   *         \c result.size() and react accordingly.
    */
-  std::vector<double> MITKPET_EXPORT GetRadionuclideHalfLife(const mitk::IPropertyProvider* provider);
-
-  /**
-   * \brief Get the radionuclide names from DICOM properties.
-   *
-   * Extracts the radionuclide code meaning from the Radiopharmaceutical Information
-   * Sequence stored in the DICOM properties of the passed provider. Reads from
-   * DICOM path (0054,0016)[*](0054,0300)[*](0008,0104).
-   *
-   * \param[in] provider Source of DICOM properties.
-   * \return A space-separated string of radionuclide names. Empty if no appropriate
-   *         DICOM element was found or if \p provider is \c nullptr.
-   *
-   * \sa GetRadionuclideHalfLife
-   */
-  std::string MITKPET_EXPORT GetRadionuclideNames(const mitk::IPropertyProvider* provider);
-
-  /**
-   * \brief Get the radionuclide total dose (injected dose) from DICOM properties.
-   *
-   * Extracts the radionuclide total dose in [Bq] from the Radiopharmaceutical
-   * Information Sequence stored in the DICOM properties of the passed provider.
-   * Reads from DICOM path (0054,0016)[*](0018,1074).
-   *
-   * If the Radiopharmaceutical Information Sequence contains more than one item,
-   * the total dose of all sequence items is returned. The order of results matches
-   * the order of the sequence items.
-   *
-   * \param[in] provider Source of DICOM properties.
-   * \return A vector of total dose values in [Bq]. Empty if no appropriate
-   *         DICOM element was found or if \p provider is \c nullptr.
-   *
-   * \sa GetRadionuclideHalfLife
-   */
-  std::vector<double> MITKPET_EXPORT GetRadionuclideTotalDose(const mitk::IPropertyProvider* provider);
+  std::vector<RadiopharmaceuticalInfo> MITKPET_EXPORT
+  GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Get the patient's weight from DICOM properties.

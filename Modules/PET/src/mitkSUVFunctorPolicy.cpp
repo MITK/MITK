@@ -17,54 +17,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSUVFunctorPolicy.h>
 
+#include <cmath>
+
 #include <mitkSUVCalculation.h>
 
 
-    mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy()
-    {};
+mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy() = default;
 
-    mitk::SUVbwFunctorPolicy::~SUVbwFunctorPolicy() {};
+mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy(double injectedActivity, double bodyweight, double halfLife)
+  : m_InjectedActivity(injectedActivity),
+    m_bodyweight(bodyweight),
+    m_halfLife(halfLife)
+{}
 
-    unsigned int mitk::SUVbwFunctorPolicy::GetNumberOfOutputs() const
-    {
-      return 1;
-    }
+mitk::SUVbwFunctorPolicy::~SUVbwFunctorPolicy() = default;
 
-    void mitk::SUVbwFunctorPolicy::SetDecayTimeFunctor(const DecayTimeFunctionType& functor)
-    {
-      m_Functor = functor;
-    }
+unsigned int mitk::SUVbwFunctorPolicy::GetNumberOfOutputs() const
+{
+  return 1;
+}
 
-    void mitk::SUVbwFunctorPolicy::SetInjectedActivity(double a)
-    {
-      m_InjectedActivity = a;
-    }
+void mitk::SUVbwFunctorPolicy::SetDecayTimeFunctor(const DecayTimeFunctionType& functor)
+{
+  m_Functor = functor;
+}
 
-    void mitk::SUVbwFunctorPolicy::SetBodyWeight(double w)
-    {
-      m_bodyweight = w;
-    }
+void mitk::SUVbwFunctorPolicy::SetInjectedActivity(double a)
+{
+  m_InjectedActivity = a;
+}
 
-    void mitk::SUVbwFunctorPolicy::SetHalfLife(double tau)
-    {
-      m_halfLife = tau;
-    }
+void mitk::SUVbwFunctorPolicy::SetBodyWeight(double w)
+{
+  m_bodyweight = w;
+}
 
-    bool mitk::SUVbwFunctorPolicy::operator!=(const SUVbwFunctorPolicy& other) const
-    {
-      return !(*this == other);
-    }
+void mitk::SUVbwFunctorPolicy::SetHalfLife(double tau)
+{
+  m_halfLife = tau;
+}
 
-    bool mitk::SUVbwFunctorPolicy::operator==(const SUVbwFunctorPolicy& other) const
-    {
-      return (this->m_InjectedActivity == other.m_InjectedActivity) &&
-        (this->m_bodyweight == other.m_bodyweight) &&
-        (this->m_halfLife == other.m_halfLife);
-    }
+bool mitk::SUVbwFunctorPolicy::IsConfigured() const
+{
+  return std::isfinite(m_InjectedActivity)
+      && std::isfinite(m_bodyweight)
+      && std::isfinite(m_halfLife)
+      && static_cast<bool>(m_Functor);
+}
 
-    mitk::SUVbwFunctorPolicy::SUVPixelType
-      mitk::SUVbwFunctorPolicy::operator()(const SUVPixelType& value,
-                                           const IndexType& currentIndex) const
-    {
-      return value *computeSUVbwScaleFactor(m_InjectedActivity, m_bodyweight, m_Functor(currentIndex), m_halfLife);
-    }
+bool mitk::SUVbwFunctorPolicy::operator!=(const SUVbwFunctorPolicy& other) const
+{
+  return !(*this == other);
+}
+
+bool mitk::SUVbwFunctorPolicy::operator==(const SUVbwFunctorPolicy& other) const
+{
+  return (this->m_InjectedActivity == other.m_InjectedActivity) &&
+    (this->m_bodyweight == other.m_bodyweight) &&
+    (this->m_halfLife == other.m_halfLife);
+}
+
+mitk::SUVbwFunctorPolicy::SUVPixelType
+mitk::SUVbwFunctorPolicy::operator()(const SUVPixelType& value,
+                                     const IndexType& currentIndex) const
+{
+  return value * computeSUVbwScaleFactor(m_InjectedActivity, m_bodyweight, m_Functor(currentIndex), m_halfLife);
+}

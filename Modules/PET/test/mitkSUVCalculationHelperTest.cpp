@@ -102,11 +102,13 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Strategy_Missing_Throws_MissingDICOMPropertyException);
   MITK_TEST(Strategy_UnknownValue_Throws_InvalidDICOMPropertyValueException);
 
-  // Single-tag helpers
-  MITK_TEST(RadionuclideHalfLife_Found);
-  MITK_TEST(RadionuclideHalfLife_Empty);
-  MITK_TEST(RadionuclideTotalDose_Found);
-  MITK_TEST(RadionuclideTotalDose_Empty);
+  // Radiopharmaceutical info helper
+  MITK_TEST(Radiopharm_Empty_ReturnsEmpty);
+  MITK_TEST(Radiopharm_SingleItem_FullyPopulated);
+  MITK_TEST(Radiopharm_TwoItems_PreserveIndexPairing);
+  MITK_TEST(Radiopharm_PartiallyPopulatedItem_NaNFields);
+
+  // Patient weight
   MITK_TEST(PatientWeight_Found);
   MITK_TEST(PatientWeight_Missing_Throws_MissingDICOMPropertyException);
 
@@ -197,38 +199,105 @@ public:
                          mitk::InvalidDICOMPropertyValueException);
   }
 
-  // ---- Single-tag helpers ----
+  // ---- Radiopharmaceutical info helper ----
 
-  void RadionuclideHalfLife_Found()
+  void Radiopharm_Empty_ReturnsEmpty()
   {
     auto image = MakeSyntheticImage(1, 1);
+    CPPUNIT_ASSERT(mitk::GetRadiopharmaceuticalInfos(image).empty());
+  }
+
+  void Radiopharm_SingleItem_FullyPopulated()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    // (0054,0016).[0].(0018,1075) Half-Life
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075), "6586.26");
+    // (0054,0016).[0].(0018,1074) Total Dose
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "1.85e8");
+    // (0054,0016).[0].(0054,0300).[0].(0008,0104) Code Meaning
+    {
+      mitk::DICOMTagPath path;
+      path.AddSelection(0x0054, 0x0016, 0).AddSelection(0x0054, 0x0300, 0).AddElement(0x0008, 0x0104);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "^18F^");
+    }
 
-    const auto values = mitk::GetRadionuclideHalfLife(image);
-    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), values.size());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, values[0], 1e-9);
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, infos[0].halfLifeSeconds, 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8,  infos[0].totalDoseBq,     1.0);
+    CPPUNIT_ASSERT_EQUAL(std::string("18F"), infos[0].name);
   }
 
-  void RadionuclideHalfLife_Empty()
+  void Radiopharm_TwoItems_PreserveIndexPairing()
   {
     auto image = MakeSyntheticImage(1, 1);
-    CPPUNIT_ASSERT(mitk::GetRadionuclideHalfLife(image).empty());
+
+    // Item [0]: 18F-style values.
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1075), "6586.26");
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "1.85e8");
+    {
+      mitk::DICOMTagPath path;
+      path.AddSelection(0x0054, 0x0016, 0).AddSelection(0x0054, 0x0300, 0).AddElement(0x0008, 0x0104);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "^18F^");
+    }
+
+    // Item [1]: 68Ga-style values, deliberately *different* so a pairing bug
+    // would surface as a swap.
+    {
+      mitk::DICOMTagPath path1;
+      path1.AddSelection(0x0054, 0x0016, 1).AddElement(0x0018, 0x1075);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path1), "4062.6");
+    }
+    {
+      mitk::DICOMTagPath path2;
+      path2.AddSelection(0x0054, 0x0016, 1).AddElement(0x0018, 0x1074);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path2), "5.0e7");
+    }
+    {
+      mitk::DICOMTagPath path3;
+      path3.AddSelection(0x0054, 0x0016, 1).AddSelection(0x0054, 0x0300, 0).AddElement(0x0008, 0x0104);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path3), "^68Ga^");
+    }
+
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), infos.size());
+
+    // Pairing: each index must hold values from the same source item.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, infos[0].halfLifeSeconds, 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8,  infos[0].totalDoseBq,     1.0);
+    CPPUNIT_ASSERT_EQUAL(std::string("18F"), infos[0].name);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4062.6,  infos[1].halfLifeSeconds, 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(5.0e7,   infos[1].totalDoseBq,     1.0);
+    CPPUNIT_ASSERT_EQUAL(std::string("68Ga"), infos[1].name);
   }
 
-  void RadionuclideTotalDose_Found()
+  void Radiopharm_PartiallyPopulatedItem_NaNFields()
   {
     auto image = MakeSyntheticImage(1, 1);
+
+    // Item [0]: only dose populated.
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "1.85e8");
 
-    const auto values = mitk::GetRadionuclideTotalDose(image);
-    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), values.size());
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8, values[0], 1.0);
-  }
+    // Item [1]: only half-life populated.
+    {
+      mitk::DICOMTagPath path;
+      path.AddSelection(0x0054, 0x0016, 1).AddElement(0x0018, 0x1075);
+      SetDicomProperty(image, mitk::DICOMTagPathToPropertyName(path), "6586.26");
+    }
 
-  void RadionuclideTotalDose_Empty()
-  {
-    auto image = MakeSyntheticImage(1, 1);
-    CPPUNIT_ASSERT(mitk::GetRadionuclideTotalDose(image).empty());
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), infos.size());
+
+    // Item [0]: dose set, half-life NaN, name empty.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.85e8, infos[0].totalDoseBq, 1.0);
+    CPPUNIT_ASSERT(std::isnan(infos[0].halfLifeSeconds));
+    CPPUNIT_ASSERT(infos[0].name.empty());
+
+    // Item [1]: half-life set, dose NaN, name empty.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, infos[1].halfLifeSeconds, 1e-9);
+    CPPUNIT_ASSERT(std::isnan(infos[1].totalDoseBq));
+    CPPUNIT_ASSERT(infos[1].name.empty());
   }
 
   void PatientWeight_Found()

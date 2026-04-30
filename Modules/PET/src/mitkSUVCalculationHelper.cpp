@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 #include <cctype>
+#include <functional>
 
 #include <dcmtk/dcmdata/dcvrdt.h>
 
@@ -257,53 +258,95 @@ namespace
 }
 
 
-std::vector<double> mitk::GetRadionuclideHalfLife(const mitk::IPropertyProvider* provider)
+namespace
 {
-  std::vector<double> result;
-
-  DICOMTagPath dcmPath;
-  dcmPath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1075);
-
-  const auto props = CollectPropertiesByDICOMTagPath(provider, dcmPath);
-  for (const auto& finding : props)
+  // Extract the outer (i.e. first) SequenceSelection index from a DICOMTagPath.
+  // For a path like (0054,0016).[N].(0018,1075) returns N. For nested
+  // sequences like (0054,0016).[N].(0054,0300).[M].(0008,0104) it still
+  // returns the outermost index N (the (0054,0016) item index), which is the
+  // identity used to pair half-life / dose / name.
+  // Returns -1 if the path has no SequenceSelection node.
+  mitk::DICOMTagPath::ItemSelectionIndex
+  OuterSequenceIndex(const mitk::DICOMTagPath& path)
   {
-    result.push_back(ConvertDICOMStrToValue<double>(finding.second->GetValueAsString()));
+    for (const auto& node : path.GetNodes())
+    {
+      if (node.type == mitk::DICOMTagPath::NodeInfo::NodeType::SequenceSelection)
+      {
+        return node.selection;
+      }
+    }
+    return -1;
   }
-
-  return result;
 }
 
-std::string mitk::GetRadionuclideNames(const mitk::IPropertyProvider* provider)
+std::vector<mitk::RadiopharmaceuticalInfo>
+mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider)
 {
-  std::string result;
+  using IndexedMap = std::map<DICOMTagPath::ItemSelectionIndex, RadiopharmaceuticalInfo>;
+  IndexedMap byIndex;
 
-  DICOMTagPath dcmPath;
-  dcmPath.AddAnySelection(0x0054, 0x0016).AddAnySelection(0x0054, 0x0300).AddElement(0x0008, 0x0104);
-
-  const auto props = CollectPropertiesByDICOMTagPath(provider, dcmPath);
-  for (const auto& finding : props)
+  // Helper: enumerate properties matching a query path, group the values by
+  // the outer-sequence (RPI) item index, and apply the assigner to the
+  // per-item RadiopharmaceuticalInfo.
+  auto enumerate = [&](const DICOMTagPath& queryPath,
+                       const std::function<void(RadiopharmaceuticalInfo&,
+                                                const std::string&)>& assigner)
   {
-    std::string value = finding.second->GetValueAsString();
-    value.erase(std::remove(value.begin(), value.end(), '^'), value.end());
-    result += value + " ";
-  }
+    const auto matches = CollectPropertiesByDICOMTagPath(provider, queryPath);
+    for (const auto& finding : matches)
+    {
+      const DICOMTagPath storedPath = PropertyNameToDICOMTagPath(finding.first);
+      const auto idx = OuterSequenceIndex(storedPath);
+      if (idx < 0)
+      {
+        continue;
+      }
+      assigner(byIndex[idx], finding.second->GetValueAsString());
+    }
+  };
 
-  return result;
-}
-
-std::vector<double> mitk::GetRadionuclideTotalDose(const mitk::IPropertyProvider* provider)
-{
-  std::vector<double> result;
-
-  DICOMTagPath dcmPath;
-  dcmPath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
-
-  const auto props = CollectPropertiesByDICOMTagPath(provider, dcmPath);
-  for (const auto& finding : props)
+  // Half-life (0018,1075).
+  DICOMTagPath halfLifePath;
+  halfLifePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1075);
+  enumerate(halfLifePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
   {
-    result.push_back(ConvertDICOMStrToValue<double>(finding.second->GetValueAsString()));
-  }
+    info.halfLifeSeconds = ConvertDICOMStrToValue<double>(v);
+  });
 
+  // Total dose (0018,1074).
+  DICOMTagPath dosePath;
+  dosePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
+  enumerate(dosePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
+  {
+    info.totalDoseBq = ConvertDICOMStrToValue<double>(v);
+  });
+
+  // Radionuclide code meaning, nested in (0054,0300). The outer index we
+  // care about is the (0054,0016) item index; multiple inner radionuclide
+  // entries within one outer item are concatenated with spaces (matches the
+  // historical GetRadionuclideNames behaviour, scoped per outer item).
+  DICOMTagPath namePath;
+  namePath.AddAnySelection(0x0054, 0x0016).AddAnySelection(0x0054, 0x0300).AddElement(0x0008, 0x0104);
+  enumerate(namePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
+  {
+    std::string cleaned = v;
+    cleaned.erase(std::remove(cleaned.begin(), cleaned.end(), '^'), cleaned.end());
+    if (!info.name.empty())
+    {
+      info.name += " ";
+    }
+    info.name += cleaned;
+  });
+
+  // std::map iterates in key order, so the resulting vector is ordered by
+  // the outer-sequence item index.
+  std::vector<RadiopharmaceuticalInfo> result;
+  result.reserve(byIndex.size());
+  for (const auto& entry : byIndex)
+  {
+    result.push_back(entry.second);
+  }
   return result;
 }
 

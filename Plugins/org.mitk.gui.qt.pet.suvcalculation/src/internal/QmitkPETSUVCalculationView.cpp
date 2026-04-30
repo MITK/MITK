@@ -339,10 +339,7 @@ mitk::Image::Pointer QmitkPETSUVCalculationView::CalcSUV(mitk::Image *inputImage
 
     typedef itk::IndexedUnaryFunctorImageFilter<ImageType, SUVImageType, mitk::SUVbwFunctorPolicy> SUVFilterType;
     SUVFilterType::Pointer suvFilter = SUVFilterType::New();
-    mitk::SUVbwFunctorPolicy functor;
-    functor.SetBodyWeight(m_bodyweight);
-    functor.SetHalfLife(m_halfLife);
-    functor.SetInjectedActivity(m_injectedActivity);
+    mitk::SUVbwFunctorPolicy functor(m_injectedActivity, m_bodyweight, m_halfLife);
 
     if (this->m_Controls->radioTimeAuto->isChecked())
     {
@@ -377,6 +374,13 @@ mitk::Image::Pointer QmitkPETSUVCalculationView::CalcSUV(mitk::Image *inputImage
         [this](const mitk::SUVbwFunctorPolicy::IndexType& /*sliceIndex*/) { throw 0;
       return 0; };
       functor.SetDecayTimeFunctor(decayFunction);
+    }
+
+    if (!functor.IsConfigured())
+    {
+      mitkThrow() << "Cannot compute SUV: the functor policy is not fully configured "
+                     "(injected activity, body weight, half-life, or decay-time function "
+                     "is missing). Aborting at time step " << i << ".";
     }
 
     suvFilter->SetFunctor(functor);
@@ -459,19 +463,26 @@ void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Poi
 
   if (newNode.IsNotNull() && this->m_Controls->checkAuto->isChecked())
   {
-    auto activities = mitk::GetRadionuclideTotalDose(newNode->GetData());
-    if (activities.empty())
+    const auto radiopharmInfos = mitk::GetRadiopharmaceuticalInfos(newNode->GetData());
+
+    if (radiopharmInfos.empty())
     {
-      MITK_ERROR << "Error reading injected activity.";
-    }
-    else if (activities.size() > 1)
-    {
-      MITK_WARN << "There are more then one radonuclide total doses stored for the node. First one will be used: "
-        << activities[0];
+      MITK_ERROR << "Error reading radiopharmaceutical information from DICOM properties. "
+                    "Cannot deduce injected activity, half-life, or nuclide name.";
     }
     else
     {
-      this->m_injectedActivity = activities[0];
+      if (radiopharmInfos.size() > 1)
+      {
+        MITK_WARN << "Multi-tracer dataset detected (" << radiopharmInfos.size()
+                  << " radiopharmaceutical sequence items). Multi-tracer SUV is not yet "
+                     "supported; the first item will be used.";
+      }
+
+      const auto& info = radiopharmInfos.front();
+      this->m_injectedActivity = info.totalDoseBq;
+      this->m_halfLife         = info.halfLifeSeconds;
+      this->m_DefinedNuclide   = info.name;
     }
 
     try
@@ -481,23 +492,6 @@ void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Poi
     catch (const mitk::Exception& e)
     {
       MITK_ERROR << "Error reading patient body weight. Error details:" << e;
-    }
-
-    m_DefinedNuclide = mitk::GetRadionuclideNames(newNode->GetData());
-
-    auto halflifes = mitk::GetRadionuclideHalfLife(newNode->GetData());
-    if (halflifes.empty())
-    {
-      MITK_ERROR << "Error reading radio nuclide half life.";
-    }
-    else if (halflifes.size() > 1)
-    {
-      MITK_WARN << "There are more then one radonuclide half life stored for the node. First one will be used: "
-        << halflifes[0];
-    }
-    else
-    {
-      this->m_halfLife = halflifes[0];
     }
 
     if (this->m_Controls->radioTimeAuto->isChecked())

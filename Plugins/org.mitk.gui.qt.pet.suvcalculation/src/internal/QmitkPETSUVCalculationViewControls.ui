@@ -63,7 +63,7 @@ Uncheck, if you want to use this view with any kind of image.</string>
      <item row="2" column="3">
       <widget class="QDoubleSpinBox" name="halflifeSpinBox">
        <property name="specialValueText">
-        <string>unkown</string>
+        <string>unknown</string>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -99,7 +99,7 @@ Uncheck, if you want to use this view with any kind of image.</string>
         <enum>QAbstractSpinBox::UpDownArrows</enum>
        </property>
        <property name="specialValueText">
-        <string>unkown</string>
+        <string>unknown</string>
        </property>
        <property name="decimals">
         <number>3</number>
@@ -115,7 +115,7 @@ Uncheck, if you want to use this view with any kind of image.</string>
      <item row="1" column="3">
       <widget class="QDoubleSpinBox" name="activitySpinBox">
        <property name="specialValueText">
-        <string>unkown</string>
+        <string>unknown</string>
        </property>
        <property name="maximum">
         <double>1000000.000000000000000</double>
@@ -173,7 +173,7 @@ Uncheck, if you want to use this view with any kind of image.</string>
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Time to measurment</string>
+      <string>Time to measurement</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="2">
@@ -181,7 +181,7 @@ Uncheck, if you want to use this view with any kind of image.</string>
         <item>
          <widget class="QSpinBox" name="timeSpinBox">
           <property name="specialValueText">
-           <string>unkown</string>
+           <string>unknown</string>
           </property>
           <property name="maximum">
            <number>180</number>

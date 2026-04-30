@@ -385,7 +385,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
     if (std::regex_search(key, instance_matches, regEx))
     {
       auto idProp = source->GetConstProperty(key);
-      if (idProp->GetValueAsString() == relationUID)
+      if (idProp != nullptr && idProp->GetValueAsString() == relationUID)
       {
         if (instance_matches.size()>1)
         {

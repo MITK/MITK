@@ -14,12 +14,21 @@ found in the LICENSE file.
 
 namespace py = pybind11;
 
+void InitCppMicroServices(py::module_&);
 void InitException(py::module_&);
 void InitPoints(py::module_&);
 void InitVectors(py::module_&);
 void InitGeometries(py::module_&);
+void InitColor(py::module_&);
 void InitPixelType(py::module_&);
 void InitImage(py::module_&);
+void InitIOUtil(py::module_&);
+void InitProperty(py::module_&);
+void InitPropertyList(py::module_&);
+void InitTemporoSpatialStringProperty(py::module_&);
+void InitPropertyKeyPath(py::module_&);
+void InitDICOMTagPath(py::module_&);
+void InitMultiLabelSegmentation(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -28,10 +37,19 @@ PYBIND11_MODULE(mitk, m)
   py::module_ os = py::module_::import("os");
   os.attr("environ")["PYMITK"] = "1";
 
+  InitCppMicroServices(m);
   InitException(m);
   InitPoints(m);
   InitVectors(m);
   InitGeometries(m);
+  InitColor(m);
   InitPixelType(m);
   InitImage(m);
+  InitIOUtil(m);
+  InitProperty(m);
+  InitPropertyList(m);
+  InitTemporoSpatialStringProperty(m);
+  InitPropertyKeyPath(m);
+  InitDICOMTagPath(m);
+  InitMultiLabelSegmentation(m);
 }

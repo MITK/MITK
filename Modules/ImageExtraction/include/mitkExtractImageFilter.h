@@ -22,10 +22,9 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \deprecated This class is deprecated. Use mitk::ExtractSliceFilter instead.
-    \sa ExtractSliceFilter
-
     \brief Extracts a 2D slice from a 3D image.
+
+    \sa ExtractSliceFilter
 
     \sa SegTool2D
 
@@ -51,35 +50,52 @@ namespace mitk
     itkCloneMacro(Self);
 
       /**
-        \brief Which slice to extract (first one has index 0).
+        \brief Set/Get the index of the slice to extract (zero-based).
+        \param[in] _arg The zero-based index of the slice along the slice dimension.
       */
       itkSetMacro(SliceIndex, unsigned int);
     itkGetConstMacro(SliceIndex, unsigned int);
 
     /**
-      \brief The orientation of the slice to be extracted.
+      \brief Set/Get the dimension along which to extract the slice.
 
-      \a Parameter SliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 2
-      for axial)
+      This is the dimension that remains constant for all pixels in the
+      extracted 2D slice: 0 = Sagittal, 1 = Coronal, 2 = Axial.
+
+      \param[in] _arg The dimension index (0, 1, or 2).
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);
 
     /**
-      \brief Time step of the image to be extracted.
+      \brief Set/Get the time step to extract from a 4D image.
+
+      For 3D images this value is ignored. Default is 0.
+      \param[in] _arg The zero-based time step index.
      */
     itkSetMacro(TimeStep, unsigned int);
     itkGetConstMacro(TimeStep, unsigned int);
 
+    /**
+     * \brief Enumeration of direction collapse strategies for the ITK
+     *        ExtractImageFilter used internally.
+     *
+     * Controls how the direction cosine matrix is handled when reducing
+     * dimensionality from 3D to 2D.
+     */
     typedef enum DirectionCollapseStrategyEnum {
-      DIRECTIONCOLLAPSETOUNKOWN = 0,
-      DIRECTIONCOLLAPSETOIDENTITY = 1,
-      DIRECTIONCOLLAPSETOSUBMATRIX = 2,
-      DIRECTIONCOLLAPSETOGUESS = 3
+      DIRECTIONCOLLAPSETOUNKOWN = 0,     ///< Unknown strategy (may cause errors).
+      DIRECTIONCOLLAPSETOIDENTITY = 1,   ///< Set direction to identity matrix.
+      DIRECTIONCOLLAPSETOSUBMATRIX = 2,  ///< Extract the sub-matrix from the direction.
+      DIRECTIONCOLLAPSETOGUESS = 3       ///< Let ITK guess the best strategy (default).
     } DIRECTIONCOLLAPSESTRATEGY;
 
     /**
-      \brief Collapse strategy to be used.
+      \brief Set/Get the direction collapse strategy.
+
+      Controls how the 3D direction matrix is collapsed to 2D when extracting
+      a slice. Default is DIRECTIONCOLLAPSETOGUESS.
+      \param[in] _arg One of the DIRECTIONCOLLAPSESTRATEGY enum values.
      */
     itkSetMacro(DirectionCollapseToStrategy, DIRECTIONCOLLAPSESTRATEGY);
     itkGetConstMacro(DirectionCollapseToStrategy, DIRECTIONCOLLAPSESTRATEGY);

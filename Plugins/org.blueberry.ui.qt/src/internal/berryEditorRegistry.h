@@ -258,13 +258,6 @@ public: IEditorDescriptor::Pointer FindEditor(const QString& id) override;
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
-   *
-   * @deprecated
-   */
-public: IEditorDescriptor::Pointer GetDefaultEditor() override;
-
-  /*
-   * (non-Javadoc) Method declared on IEditorRegistry.
    */
 public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& filename) override;
 

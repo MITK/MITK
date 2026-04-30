@@ -54,25 +54,66 @@ namespace mitk
 
     typedef ::itk::Index<3> IndexType;
 
+    /**
+     * \brief Returns the global static parameters that are the same for all positions.
+     * \return A map of global static parameter names to their values.
+     */
     virtual StaticParameterMapType GetGlobalStaticParameters() const = 0;
+
+    /**
+     * \brief Returns the local static parameters specific to the given image position.
+     * \param[in] currentPosition The 3D index position in image space.
+     * \return A map of local static parameter names to their values.
+     */
     virtual StaticParameterMapType GetLocalStaticParameters(const IndexType& currentPosition) const = 0;
 
-    /** Returns the parameterization (e.g. initial parametrization for fitting) that should be used.
-     If no ParameterizationDelegate is set (see SetInitialParameterizationDelegate()) it will just return
-     the result of GetInitialParameterization().*/
+    /**
+     * \brief Returns the initial parameterization for fitting.
+     *
+     * If an InitialParameterizationDelegate has been set, it will be used.
+     * Otherwise, GetDefaultInitialParameterization() is returned.
+     *
+     * \return The initial parameter values.
+     */
     ParametersType GetInitialParameterization() const;
+
+    /**
+     * \brief Returns the initial parameterization for a specific image position.
+     * \param[in] currentPosition The 3D index position in image space.
+     * \return The initial parameter values for the given position.
+     */
     ParametersType GetInitialParameterization(const IndexType& currentPosition) const;
 
-    /** This function returns the default parameterization (e.g. initial parametrization for fitting)
-     defined by the model developer for  for the given model.*/
+    /**
+     * \brief Returns the default initial parameterization defined by the model developer.
+     * \return The default initial parameter values for fitting.
+     */
     virtual ParametersType GetDefaultInitialParameterization() const = 0;
 
-    /** Possibility to set a custom strategy for defining the initial parameterization via a delegate.*/
+    /**
+     * \brief Sets a custom strategy for defining the initial parameterization.
+     * \param[in] delegate Pointer to the delegate that provides custom initial values.
+     */
     void SetInitialParameterizationDelegate(const InitialParameterizationDelegateBase* delegate);
 
+    /**
+     * \brief Generates a fully parameterized model instance for the given position.
+     *
+     * The model is configured with both global and local static parameters,
+     * and the default time grid.
+     *
+     * \param[in] currentPosition The 3D index position in image space.
+     * \return Smart pointer to the fully parameterized model.
+     */
     virtual ModelBasePointer GenerateParameterizedModel(const IndexType& currentPosition) const = 0;
-    /** Generate model instance, only with global static parametrization.
-     * Any local static parameter stay default.*/
+
+    /**
+     * \brief Generates a model instance with only global static parameterization.
+     *
+     * Local static parameters remain at their default values.
+     *
+     * \return Smart pointer to the globally parameterized model.
+     */
     virtual ModelBasePointer GenerateParameterizedModel() const = 0;
 
     itkSetMacro(DefaultTimeGrid, TimeGridType);

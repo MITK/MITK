@@ -32,48 +32,54 @@ namespace mitk
   class DataStorage;
 }
 
-/*!
-  \brief QmitkImageMaskingWidget
-
-  Tool masks an image with a binary image or a surface. The Method requires
-  an image and a binary image mask or a surface. The input image and the binary
-  image mask must be of the same size. Masking with a surface creates first a
-  binary image of the surface and then use this for the masking of the input image.
-*/
+/**
+ * \brief Widget for masking an image with a binary image or surface mask.
+ *
+ * Applies a mask to an image using either a binary image mask or a surface. The input image
+ * and binary image mask must be of the same size. When masking with a surface, a binary image
+ * is first generated from the surface and then used for masking. The user can select the masking
+ * value (minimum of image, custom value, etc.) for pixels outside the mask region.
+ *
+ * \sa QmitkBooleanOperationsWidget
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkImageMaskingWidget : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
+  /**
+   * \brief Constructs the widget with GUI elements and signal/slot connections.
+   * \param[in] dataStorage Pointer to the data storage for node selection.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
 
-  /** @brief Default destructor. */
+  /** \brief Destructor. */
   ~QmitkImageMaskingWidget() override;
 
 private:
 
-  /** @brief This slot is called if the image selection changed.*/
+  /** \brief Called when the image selection changes. */
   void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
-  /** @brief This slot is called if the segmentation selection changed.*/
+  /** \brief Called when the segmentation selection changes. */
   void OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/);
 
-  /** @brief This slot is called if user activates the button to mask an image. */
+  /** \brief Called when the user clicks the mask image button. */
   void OnMaskImagePressed();
 
-  /** @brief This slot is called if the user toggles the "Custom" radio button. */
+  /** \brief Called when the user toggles the "Custom" radio button. */
   void OnCustomValueButtonToggled(bool checked);
 
-  /** @brief Configure the widgets according to the internal state. */
+  /** \brief Configures the widgets according to the internal state. */
   void ConfigureWidgets();
   void EnableButtons(bool enable);
 
-  /** @brief Mask an image with a given binary mask. Note that the input image and the mask image must be of the same size. */
+  /** \brief Masks an image with a given binary mask. The input image and the mask image must be of the same size. */
   itk::SmartPointer<mitk::Image> MaskImage(itk::SmartPointer<mitk::Image> referenceImage, itk::SmartPointer<mitk::Image> maskImage );
 
-  /** @brief Adds a new data object to the DataStorage.*/
+  /** \brief Adds a new data object to the DataStorage. */
   void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 

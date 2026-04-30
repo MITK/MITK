@@ -414,8 +414,13 @@ void mitk::SegWithPreviewTool::TransferSegmentationsAtTimeStep(const MultiLabelS
 
         for (const auto& [destGroupID, relevantLabelMapping] : destGroupLabelMapping)
         {
-          auto resultSlice =
-            SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationSeg->GetGroupImage(destGroupID), timeStep)->Clone();
+          auto destSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), destinationSeg->GetGroupImage(destGroupID), timeStep);
+          if (destSlice.IsNull())
+          {
+            MITK_ERROR << "Unable to extract destination slice.";
+            continue;
+          }
+          auto resultSlice = destSlice->Clone();
 
           //We need to transfer explicitly to a copy of the current working image to ensure that labelMapping is done and things
           //like merge style, overwrite style and locks are regarded.

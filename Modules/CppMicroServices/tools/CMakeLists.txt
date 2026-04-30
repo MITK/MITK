@@ -1,30 +1,23 @@
+add_executable(usResourceCompiler usResourceCompiler.c)
 
-enable_language(C)
+target_include_directories(usResourceCompiler PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
-include_directories(${US_INCLUDE_DIRS})
+target_compile_definitions(usResourceCompiler PRIVATE
+  US_MINIZ_NO_ARCHIVE_READING_API
+  US_MINIZ_NO_ZLIB_COMPATIBLE_NAMES)
 
-add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_NAME}\")
+# Vendored miniz relies on C99 non-constant aggregate initializers. MSVC
+# treats those as a MSVC-C89 extension (C4204) under /TC default; request
+# C11 so the construct is standard and the per-function pragma in
+# us_miniz.c can stay dropped.
+set_target_properties(usResourceCompiler PROPERTIES
+  C_STANDARD 11
+  C_STANDARD_REQUIRED ON)
 
-set(srcs usResourceCompiler.c)
-
-add_executable(${US_RCC_EXECUTABLE_NAME} ${srcs})
 if(WIN32)
-  target_link_libraries(${US_RCC_EXECUTABLE_NAME} Shlwapi)
+  target_link_libraries(usResourceCompiler PRIVATE Shlwapi)
 endif()
 
-set_property(
-  TARGET ${US_RCC_EXECUTABLE_NAME} APPEND PROPERTY
-  COMPILE_DEFINITIONS "US_MINIZ_NO_ARCHIVE_READING_API;US_MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
-  )
-
-set_property(
-  TARGET ${US_RCC_EXECUTABLE_NAME} PROPERTY
-  FOLDER "${MITK_ROOT_FOLDER}/CppMicroServices/Snippets"
-  )
-
-if(NOT US_NO_INSTALL)
-  install(TARGETS ${US_RCC_EXECUTABLE_NAME}
-          EXPORT ${PROJECT_NAME}Targets
-          FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
-          RUNTIME DESTINATION bin ${US_SDK_INSTALL_COMPONENT})
-endif()
+set_property(TARGET usResourceCompiler PROPERTY
+  FOLDER "${MITK_ROOT_FOLDER}/Modules/CppMicroServices")

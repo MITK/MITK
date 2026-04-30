@@ -19,31 +19,34 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Writes a MultiLabelSegmentation to a file.
-  * mitk::Identifiable UID is supported and will be serialized.
-  * @ingroup Process
-  */
-  // The export macro should be removed. Currently, the unit
-  // tests directly instantiate this class.
+   * \brief Reader for legacy LabelSetImage files (older NRRD-based format).
+   *
+   * Reads a MultiLabelSegmentation from a legacy format file.
+   * mitk::Identifiable UID is supported and will be deserialized.
+   *
+   * \ingroup Process
+   */
   class LegacyLabelSetImageIO : public mitk::AbstractFileReader
   {
   public:
     typedef mitk::MultiLabelSegmentation InputType;
 
+    /** \brief Default constructor. Registers reader for the legacy LabelSetImage MIME type. */
     LegacyLabelSetImageIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
+    /** \brief Return the confidence level for reading the given file as a legacy LabelSetImage. */
     ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
     /**
-    * @brief Reads a number of mitk::LabelSetImages from the file system
-    * @return a vector of mitk::LabelSetImages
-    * @throws throws an mitk::Exception if an error occurs during parsing the nrrd header
-    */
+     * \brief Read legacy LabelSetImage data from the file system.
+     * \return A vector of mitk::LabelSetImages.
+     * \throw mitk::Exception if an error occurs during NRRD header parsing.
+     */
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     // Fills the m_DefaultMetaDataKeys vector with default values

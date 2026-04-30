@@ -45,8 +45,18 @@ namespace mitk
     mitkClassMacro(OtsuSegmentationFilter, ImageToImageFilter);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
+
+    /** \brief Returns the number of thresholds to compute. */
     itkGetMacro(NumberOfThresholds, unsigned int);
 
+    /**
+     * \brief Sets the number of thresholds for Otsu's method.
+     *
+     * The number of resulting classes will be NumberOfThresholds + 1.
+     *
+     * \param[in] number Number of thresholds, must be >= 1.
+     * \note Values less than 1 are ignored with a warning.
+     */
     void SetNumberOfThresholds(unsigned int number)
     {
       if (number < 1)
@@ -57,7 +67,18 @@ namespace mitk
       m_NumberOfThresholds = number;
     }
 
+    /**
+     * \brief Enables or disables valley emphasis in the Otsu threshold computation.
+     * \param[in] useValley If true, valley emphasis is used for better threshold selection
+     *            in images with unequal class variances.
+     */
     void SetValleyEmphasis(bool useValley) { m_ValleyEmphasis = useValley; }
+
+    /**
+     * \brief Sets the number of histogram bins for Otsu's threshold computation.
+     * \param[in] number Number of bins, must be >= 1.
+     * \note Values less than 1 are ignored with a warning.
+     */
     void SetNumberOfBins(unsigned int number)
     {
       if (number < 1)

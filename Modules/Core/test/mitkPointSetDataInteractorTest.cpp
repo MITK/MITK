@@ -99,7 +99,7 @@ public:
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
-    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
+    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(*referencePointSet, *m_TestPointSet, .001, true, false));
   }
 
   void RotatedPlanesInteraction()
@@ -132,7 +132,7 @@ public:
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
-    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
+    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(*referencePointSet, *m_TestPointSet, .001, true, false));
   }
 
   void PlayInteraction(std::string &xmlFile, mitk::DataNode *node)
@@ -191,7 +191,7 @@ public:
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
-    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
+    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(*referencePointSet, *m_TestPointSet, .001, true, false));
   }
 
   // this is only for the OpenGL check

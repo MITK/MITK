@@ -366,7 +366,7 @@ void mitk::ExtractSliceFilter::GenerateData()
 
   // ResliceAxesOrigin is the anchor point of the plane
   double originInVtk[3];
-  itk2vtk(origin, originInVtk);
+  mitk::ToArray(originInVtk, origin);
   m_Reslicer->SetResliceAxesOrigin(originInVtk);
 
   // the cosines define the plane: x and y are the direction vectors, n is the planes normal
@@ -376,11 +376,12 @@ void mitk::ExtractSliceFilter::GenerateData()
   //  x3 y3 n3
   double cosines[9];
 
-  vnl2vtk(m_Right.GetVnlVector(), cosines); // x
-
-  vnl2vtk(m_Bottom.GetVnlVector(), cosines + 3); // y
-
-  vnl2vtk(normal.GetVnlVector(), cosines + 6); // n
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    cosines[i]     = m_Right[i];  // x
+    cosines[i + 3] = m_Bottom[i]; // y
+    cosines[i + 6] = normal[i];   // n
+  }
 
   m_Reslicer->SetResliceAxesDirectionCosines(cosines);
 

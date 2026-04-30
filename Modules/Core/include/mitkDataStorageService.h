@@ -52,25 +52,54 @@ namespace mitk
 class MITKCORE_EXPORT DataStorageService : public IDataStorageService
 {
 public:
+  /** \brief The label used for the default DataStorage. */
   static const std::string DEFAULT_LABEL;
 
+  /**
+   * \brief Constructor. Creates a default StandaloneDataStorage.
+   */
   DataStorageService();
+
+  /** \brief Destructor. */
   ~DataStorageService() override;
 
+  /** \brief \sa IDataStorageService::GetDefaultDataStorage() */
   DataStorage::Pointer GetDefaultDataStorage() const override;
+
+  /** \brief \sa IDataStorageService::GetActiveDataStorage() */
   DataStorage::Pointer GetActiveDataStorage() const override;
+
+  /** \brief \sa IDataStorageService::GetActiveDataStorageReference() */
   DataStorageReference GetActiveDataStorageReference() const override;
+
+  /** \brief \sa IDataStorageService::SetActiveDataStorage() */
   bool SetActiveDataStorage(const std::string& label) override;
 
+  /** \brief \sa IDataStorageService::AddDataStorage() */
   bool AddDataStorage(const std::string& label, DataStorage::Pointer storage) override;
+
+  /** \brief \sa IDataStorageService::CreateDataStorage() */
   std::optional<DataStorageReference> CreateDataStorage(const std::string& label) override;
+
+  /** \brief \sa IDataStorageService::GetDataStorageReference() */
   std::optional<DataStorageReference> GetDataStorageReference(const std::string& label) const override;
+
+  /** \brief \sa IDataStorageService::GetLabel() */
   std::optional<std::string> GetLabel(const DataStorage* storage) const override;
+
+  /** \brief \sa IDataStorageService::GetAllLabels() */
   std::vector<std::string> GetAllLabels() const override;
+
+  /** \brief \sa IDataStorageService::GetAllDataStorages() */
   std::vector<DataStorageReference> GetAllDataStorages() const override;
+
+  /** \brief \sa IDataStorageService::HasDataStorage() */
   bool HasDataStorage(const std::string& label) const override;
+
+  /** \brief \sa IDataStorageService::RemoveDataStorage() */
   bool RemoveDataStorage(const std::string& label) override;
 
+  /** \brief \sa IDataStorageService::GetDispatcher() */
   StorageThreadDispatcherBase* GetDispatcher() const override;
 
   /**

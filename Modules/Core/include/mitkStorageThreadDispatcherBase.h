@@ -21,7 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Abstract base class for dispatching tasks to the thread that owns DataStorage.
+   * \brief Abstract base class for dispatching tasks to the thread that owns DataStorage.
    *
    * Implementations provide thread-marshaling to ensure DataStorage operations
    * (which trigger synchronous observer events) execute on the correct thread.
@@ -35,11 +35,13 @@ namespace mitk
     mitkClassMacroItkParent(StorageThreadDispatcherBase, itk::Object);
 
     /**
-     * @brief Execute a task on the storage-owning thread. Blocks until completion.
-     * Execute() does check thread affinity automatically to avoid deadlocks
+     * \brief Execute a task on the storage-owning thread, blocking until completion.
+     *
+     * Checks thread affinity automatically to avoid deadlocks
      * (e.g., Qt::BlockingQueuedConnection deadlocks if called
-     * from the target thread). If true, execute the task directly instead of dispatching.
-     * @pre task must not be empty.
+     * from the target thread). If on the dispatch thread, executes the task directly.
+     *
+     * \pre task must not be empty.
      */
     void Execute(std::function<void()> task)
     {
@@ -54,17 +56,22 @@ namespace mitk
     }
 
     /**
-     * @brief Check if the current thread IS the dispatch target thread.
+     * \brief Check if the current thread is the dispatch target thread.
      *
      * Callers can check this before Execute(), but Execute() does it automatically
      * to avoid deadlocks (e.g., Qt::BlockingQueuedConnection deadlocks if called
      * from the target thread).
+     *
+     * \return True if the current thread is the dispatch target thread.
      */
     virtual bool IsDispatchThread() const = 0;
 
     /**
-     * @brief Convenience template for tasks that return a value.
+     * \brief Convenience template for tasks that return a value.
+     *
      * Blocks until the task completes and returns the result.
+     *
+     * \return The result of the executed task.
      */
     template <typename R>
     R ExecuteWithResult(std::function<R()> task)
@@ -77,9 +84,12 @@ namespace mitk
   protected:
 
     /**
-     * @brief Execute a task on the storage-owning thread. Blocks until completion.
-     * Needs to be implemented in derived classes.
-     * @pre task must not be empty.
+     * \brief Execute a task on the storage-owning thread, blocking until completion.
+     *
+     * Must be implemented in derived classes.
+     *
+     * \param[in] task the task to execute on the dispatch thread.
+     * \pre task must not be empty.
      */
     virtual void ExecuteDispatched(std::function<void()> task) = 0;
 

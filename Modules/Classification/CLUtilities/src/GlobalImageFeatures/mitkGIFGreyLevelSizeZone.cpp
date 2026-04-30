@@ -369,7 +369,10 @@ CalculateGreyLevelSizeZoneFeatures(const itk::Image<TPixel, VImageDimension>* it
     offsetVector.clear();
     offset[0] = 0;
     offset[1] = 0;
-    offset[2] = 1;
+    if constexpr (VImageDimension >= 3)
+    {
+      offset[2] = 1;
+    }
     offsetVector.push_back(offset);
   }
 

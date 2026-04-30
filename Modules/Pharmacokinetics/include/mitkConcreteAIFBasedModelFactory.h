@@ -18,6 +18,17 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \class ConcreteAIFBasedModelFactory
+   * \brief Template factory class for AIF-based pharmacokinetic models.
+   *
+   * This factory creates model parameterizer instances for AIF-based models, restoring
+   * the AIF values and AIF time grid from a persisted ModelFitInfo object. It serves
+   * as the concrete factory for any model whose parameterizer derives from
+   * AIFBasedModelParameterizerBase.
+   *
+   * \tparam TModelParameterizer The concrete parameterizer type for the AIF-based model.
+   * \sa ConcreteModelFactoryBase, AIFBasedModelParameterizerBase
+   */
   template <class TModelParameterizer>
   class ConcreteAIFBasedModelFactory : public
     mitk::ConcreteModelFactoryBase<typename TModelParameterizer::ModelType>

@@ -23,14 +23,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
-  //##Documentation
-  //## @brief Property containing a smart-pointer
-  //## @ingroup DataManagement
+  /**
+   * \brief Property containing a smart pointer to an itk::Object.
+   *
+   * Stores a reference-counted smart pointer to an arbitrary itk::Object.
+   * Internally tracks reference counts and UIDs for all pointed-to objects
+   * to support XML serialization and deserialization workflows.
+   *
+   * \note This property does not support JSON serialization. ToJSON() and
+   * FromJSON() return \c false.
+   *
+   * \ingroup DataManagement
+   *
+   * \sa BaseProperty
+   * \sa WeakPointerProperty
+   */
   class MITKCORE_EXPORT SmartPointerProperty : public BaseProperty
   {
   public:
@@ -39,25 +46,90 @@ namespace mitk
     itkCloneMacro(Self);
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
 
+    /** \brief The type of the value stored by this property. */
     typedef itk::Object::Pointer ValueType;
 
+    /**
+     * \brief Get the stored smart pointer.
+     * \return The itk::Object smart pointer.
+     */
     itk::Object::Pointer GetSmartPointer() const;
+
+    /**
+     * \brief Get the stored smart pointer (alias for GetSmartPointer()).
+     * \return The itk::Object smart pointer.
+     */
     ValueType GetValue() const;
 
+    /**
+     * \brief Set the stored smart pointer.
+     *
+     * Updates internal reference counting and UID tracking. Marks the property
+     * as modified if the pointer changes.
+     *
+     * Takes the new itk::Object to point to, or \c nullptr.
+     */
     void SetSmartPointer(itk::Object *);
+
+    /**
+     * \brief Set the stored smart pointer (alias for SetSmartPointer()).
+     *
+     * Takes the new itk::Object smart pointer.
+     */
     void SetValue(const ValueType &);
 
-    /// mainly for XML output
+    /**
+     * \brief Return the UID of the pointed-to object as a string.
+     *
+     * Returns "nullptr" if the pointer is null.
+     *
+     * \return The UID string of the referenced object.
+     */
     std::string GetValueAsString() const override;
 
+    /**
+     * \brief Resolve all smart pointer references after XML deserialization.
+     *
+     * Iterates over all SmartPointerProperty instances that were read from XML
+     * and resolves their pointer targets from the registered target map.
+     */
     static void PostProcessXMLReading();
 
-    /// Return the number of SmartPointerProperties that reference the object given as parameter
+    /**
+     * \brief Get the number of SmartPointerProperties referencing the given object.
+     *
+     * \return The reference count (0 if not referenced by any SmartPointerProperty).
+     */
     static unsigned int GetReferenceCountFor(itk::Object *);
+
+    /**
+     * \brief Get the reference UID for the given object.
+     *
+     * \return The UID string, or "invalid" if the object is not tracked.
+     */
     static std::string GetReferenceUIDFor(itk::Object *);
+
+    /**
+     * \brief Register an object as a potential target for XML deserialization.
+     *
+     * Takes the target object and the UID string to associate with it.
+     */
     static void RegisterPointerTarget(itk::Object *, const std::string uid);
 
+    /**
+     * \brief JSON serialization is not supported for SmartPointerProperty.
+     *
+     * \param[out] j Unused.
+     * \return Always \c false.
+     */
     bool ToJSON(nlohmann::json& j) const override;
+
+    /**
+     * \brief JSON deserialization is not supported for SmartPointerProperty.
+     *
+     * \param[in] j Unused.
+     * \return Always \c false.
+     */
     bool FromJSON(const nlohmann::json& j) override;
 
     using BaseProperty::operator=;
@@ -92,9 +164,6 @@ namespace mitk
     static UIDGenerator m_UIDGenerator;
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // namespace mitk
 

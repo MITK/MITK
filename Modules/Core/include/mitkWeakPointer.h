@@ -19,29 +19,68 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief A weak pointer that observes an itk::Object without preventing its deletion.
+   *
+   * WeakPointer holds a non-owning reference to an itk::Object-derived instance.
+   * It automatically detects when the observed object is deleted by registering
+   * an itk::DeleteEvent observer. After the object is deleted, the weak pointer
+   * expires (IsExpired() returns true and Lock() returns nullptr).
+   *
+   * An optional delete-event callback can be registered via SetDeleteEventCallback()
+   * to receive notification when the observed object is destroyed.
+   *
+   * Unlike itk::WeakPointer, this implementation supports const pointers.
+   *
+   * All comparison operators (==, !=, <, >, <=, >=) are supported via C++20
+   * operator== and operator<=> generation.
+   *
+   * \tparam T  The type of the observed object. Must derive from itk::Object.
+   *
+   * \ingroup Core
+   */
   template <class T>
   class WeakPointer final
   {
   public:
+    /** \brief Callback type invoked when the observed object is deleted. */
     using DeleteEventCallbackType = std::function<void ()>;
 
+    /** \brief Default constructor. Creates an expired weak pointer (null). */
     WeakPointer() noexcept
       : m_RawPointer(nullptr)
     {
     }
 
+    /**
+     * \brief Construct a weak pointer observing the given raw pointer.
+     *
+     * \param[in] rawPointer  The object to observe. May be nullptr.
+     */
     WeakPointer(T *rawPointer)
       : m_RawPointer(rawPointer)
     {
       this->AddDeleteEventObserver();
     }
 
+    /**
+     * \brief Copy constructor. Observes the same object as \p other.
+     *
+     * \param[in] other  The weak pointer to copy from.
+     */
     WeakPointer(const WeakPointer &other)
       : m_RawPointer(other.m_RawPointer)
     {
       this->AddDeleteEventObserver();
     }
 
+    /**
+     * \brief Move constructor. Takes over the observed object from \p other.
+     *
+     * After the move, \p other is in an expired state (null).
+     *
+     * \param[in] other  The weak pointer to move from.
+     */
     WeakPointer(WeakPointer &&other)
       : m_RawPointer(other.m_RawPointer)
     {
@@ -50,6 +89,7 @@ namespace mitk
       this->AddDeleteEventObserver();
     }
 
+    /** \brief Destructor. Removes the delete-event observer from the observed object. */
     ~WeakPointer() noexcept
     {
       try
@@ -63,9 +103,15 @@ namespace mitk
       }
     }
 
-    // Prefer classic implementation to copy-and-swap idiom. Swapping is
-    // non-trivial for this class as the observed object is keeping references
-    // to its observers.
+    /**
+     * \brief Copy assignment operator.
+     *
+     * Uses classic implementation rather than copy-and-swap, because swapping
+     * is non-trivial when the observed object keeps references to its observers.
+     *
+     * \param[in] other  The weak pointer to copy from.
+     * \return Reference to this weak pointer.
+     */
     WeakPointer & operator =(const WeakPointer &other)
     {
       if (this != &other)
@@ -78,6 +124,14 @@ namespace mitk
       return *this;
     }
 
+    /**
+     * \brief Move assignment operator.
+     *
+     * After the move, \p other is in an expired state (null).
+     *
+     * \param[in] other  The weak pointer to move from.
+     * \return Reference to this weak pointer.
+     */
     WeakPointer & operator =(WeakPointer &&other)
     {
       // No check for self-assignment as it is allowed to assume that the
@@ -91,6 +145,11 @@ namespace mitk
       return *this;
     }
 
+    /**
+     * \brief Assign nullptr to reset this weak pointer to an expired state.
+     *
+     * \return Reference to this weak pointer.
+     */
     WeakPointer & operator =(std::nullptr_t)
     {
       this->RemoveDeleteEventObserver();
@@ -99,6 +158,12 @@ namespace mitk
       return *this;
     }
 
+    /**
+     * \brief Assign a raw pointer to observe.
+     *
+     * \param[in] other  The raw pointer to observe. May be nullptr.
+     * \return Reference to this weak pointer.
+     */
     WeakPointer & operator =(T *other)
     {
       if (m_RawPointer != other)
@@ -111,21 +176,44 @@ namespace mitk
       return *this;
     }
 
+    /**
+     * \brief Bool conversion operator.
+     *
+     * \return True if the observed object is still alive, false if expired.
+     */
     explicit operator bool() const noexcept
     {
       return nullptr != m_RawPointer;
     }
 
+    /**
+     * \brief Check whether the observed object has been deleted.
+     *
+     * \return True if the weak pointer is expired (null), false otherwise.
+     */
     bool IsExpired() const noexcept
     {
       return !*this;
     }
 
+    /**
+     * \brief Obtain a smart pointer to the observed object.
+     *
+     * If the observed object is still alive, a valid itk::SmartPointer is
+     * returned. If it has been deleted, a null SmartPointer is returned.
+     *
+     * \return An itk::SmartPointer to the observed object, or nullptr.
+     */
     itk::SmartPointer<T> Lock() const
     {
       return m_RawPointer;
     }
 
+    /**
+     * \brief Set a callback to be invoked when the observed object is deleted.
+     *
+     * \param[in] callback  The callback function. May be empty to clear.
+     */
     void SetDeleteEventCallback(const DeleteEventCallbackType &callback)
     {
       m_DeleteEventCallback = callback;

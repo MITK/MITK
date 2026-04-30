@@ -20,6 +20,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ExponentialDecayModelParameterizer
+   * \brief Parameterizer for the ExponentialDecayModel providing default initial values.
+   *
+   * \sa ExponentialDecayModel, ExponentialDecayModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT ExponentialDecayModelParameterizer : public
     mitk::ConcreteModelParameterizerBase<mitk::ExponentialDecayModel>
   {

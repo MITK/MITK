@@ -56,52 +56,82 @@ class MITKQTOVERLAYS_EXPORT QmitkOverlayController : public QObject
 
 public:
   /**
-  * \brief constructor with mandatory QmitkRenderWindow and optional mitk::PropertyList
-  */
+   * \brief Constructor.
+   *
+   * Initializes overlay container widgets for all eight display positions and
+   * connects to the render window's moved() signal for automatic repositioning.
+   *
+   * \param[in] rw The QmitkRenderWindow that overlays will be displayed on. Must not be nullptr.
+   * \param[in] pl Optional PropertyList with render-window-specific properties.
+   */
   QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkOverlayController() override;
 
   /**
-  * \brief adds an instance of QmitkOverlay to the RenderWindow
-  *
-  * This method adds the given QmitkOverlay as a sub-widget to the registered RenderWindow.
-  * It will be added to the correct position in the RenderWindow as it's defined by the overlays
-  * position-variable. The layer-property will only be considered if necessary.
-  */
-  void AddOverlay(QmitkOverlay *);
+   * \brief Adds an overlay to the managed render window.
+   *
+   * The overlay is placed in the container widget corresponding to its
+   * display position. Its GenerateData() method is called with the
+   * concatenated property list, and the layout is restacked and repositioned.
+   *
+   * \param[in] overlay The overlay to add. Ignored if nullptr.
+   */
+  void AddOverlay(QmitkOverlay* overlay);
 
-  void RemoveOverlay(QmitkOverlay *);
+  /**
+   * \brief Removes a specific overlay from the render window.
+   *
+   * The overlay's widget is unparented and hidden, and the overlay is
+   * scheduled for deletion.
+   *
+   * \param[in] overlay The overlay to remove. Ignored if nullptr.
+   */
+  void RemoveOverlay(QmitkOverlay* overlay);
 
+  /**
+   * \brief Removes all overlays from the render window.
+   *
+   * All overlay widgets are unparented, hidden, and scheduled for deletion.
+   */
   void RemoveAllOverlays();
 
   /**
-  * \brief setting the visibility of all overlays
-  */
+   * \brief Sets the visibility of all overlay container widgets and their contents.
+   * \param[in] visible If true, all overlays are shown; if false, all are hidden.
+   */
   void SetOverlayVisibility(bool visible);
 
   /**
-  * \brief getter for the RenderWindow-specific PropertyList
-  */
-  mitk::PropertyList *GetPropertyList();
-
-  /**
-  * \brief setter for the RenderWindow-specific PropertyList
-  */
-  void SetPropertyList(mitk::PropertyList *);
+   * \brief Sets the render-window-specific PropertyList.
+   * \param[in] pl The new PropertyList.
+   */
+  void SetPropertyList(mitk::PropertyList* pl);
 
 public slots:
   /**
-  * \brief adjusts the position of all overlays to the position of the RenderWindow
-  *
-  * This method updates the position of all Widgets according to the position of the RenderWindow
-  * and the extend of the overlays.
-  */
+   * \brief Repositions all overlay container widgets to match the current render window geometry.
+   *
+   * Called automatically when the render window is moved.
+   */
   void AdjustAllOverlayPosition();
 
+  /**
+   * \brief Repositions the overlay container widget at the specified display position.
+   * \param[in] displayPosition The display position whose container widget should be repositioned.
+   */
   void AdjustOverlayPosition(QmitkOverlay::DisplayPosition displayPosition);
 
+  /**
+   * \brief Updates the data of all managed overlays by calling their GenerateData() methods.
+   */
   void UpdateAllOverlays();
 
+  /**
+   * \brief Updates the data of a single overlay and readjusts its position.
+   * \param[in] overlay The overlay to update. Ignored if nullptr.
+   */
   void UpdateOverlayData(QmitkOverlay *overlay);
 
 protected:

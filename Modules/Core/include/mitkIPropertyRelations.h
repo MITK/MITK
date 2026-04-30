@@ -28,6 +28,7 @@ namespace mitk
   class MITKCORE_EXPORT IPropertyRelations
   {
   public:
+    /** \brief Virtual destructor. */
     virtual ~IPropertyRelations();
 
     using RuleResultVectorType = std::list<PropertyRelationRuleBase::ConstPointer>;

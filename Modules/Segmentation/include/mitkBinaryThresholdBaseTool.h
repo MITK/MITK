@@ -26,20 +26,35 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief Base class for binary threshold tools.
-
-  \ingroup ToolManagerEtAl
-  \sa mitk::Tool
-  \sa QmitkInteractiveSegmentation
-  */
+   * \brief Base class for binary threshold segmentation tools.
+   *
+   * Provides the common logic for single-threshold and upper/lower-threshold
+   * segmentation tools. The tool computes a preview segmentation by applying
+   * an ITK binary threshold filter to the reference image.
+   *
+   * Subclasses should set m_LockedUpperThreshold to control single vs. range mode.
+   *
+   * \ingroup ToolManagerEtAl
+   * \sa BinaryThresholdTool, BinaryThresholdULTool, SegWithPreviewTool
+   */
   class MITKSEGMENTATION_EXPORT BinaryThresholdBaseTool : public SegWithPreviewTool
   {
   public:
+    /** \brief Emitted when the sensible threshold interval borders change.
+     * Parameters: lower border, upper border, whether upper threshold is locked. */
     Message3<double, double, bool> IntervalBordersChanged;
+
+    /** \brief Emitted when the current thresholding values change.
+     * Parameters: lower threshold, upper threshold. */
     Message2<ScalarType, ScalarType> ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdBaseTool, SegWithPreviewTool);
 
+    /**
+     * \brief Sets the lower and upper threshold values for the segmentation.
+     * \param[in] lower The lower threshold value.
+     * \param[in] upper The upper threshold value.
+     */
     virtual void SetThresholdValues(double lower, double upper);
 
   protected:

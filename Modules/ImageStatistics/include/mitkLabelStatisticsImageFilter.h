@@ -29,6 +29,22 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Computes per-label image statistics including histogram, moments, and entropy.
+   *
+   * This filter is a MITK-specific replacement for ITK's itkLabelStatisticsImageFilter.
+   * It computes, for each label in a label image, a comprehensive set of statistics:
+   * count, min, max, mean, sigma, variance, sum, sum of squares/cubes/quadruples,
+   * skewness, kurtosis, MPP, median, uniformity, UPP, entropy, and a histogram.
+   *
+   * The filter is streaming-capable via itk::ImageSink and supports multi-threaded
+   * processing.
+   *
+   * \tparam TInputImage The type of the input intensity image.
+   *
+   * \sa StatisticsImageFilter
+   * \sa ImageStatisticsCalculator
+   */
   template <typename TInputImage>
   class LabelStatisticsImageFilter : public itk::ImageSink<TInputImage>
   {
@@ -96,8 +112,22 @@ namespace mitk
     using MapConstIterator = typename MapType::const_iterator;
 
     using ValidLabelValuesContainerType = std::vector<LabelPixelType>;
+    /**
+     * \brief Get the list of label values that were found during processing.
+     * \return Const reference to a vector of valid label pixel values.
+     */
     const ValidLabelValuesContainerType& GetValidLabelValues() const;
 
+    /**
+     * \brief Set per-label histogram parameters.
+     *
+     * Configures the number of bins, lower bound, and upper bound for the
+     * histogram of each label individually. Must be called before Update().
+     *
+     * \param[in] sizes Map from label value to number of histogram bins.
+     * \param[in] lowerBounds Map from label value to histogram lower bound.
+     * \param[in] upperBounds Map from label value to histogram upper bound.
+     */
     void SetHistogramParameters(
       const std::unordered_map<LabelPixelType, unsigned int>& sizes,
       const std::unordered_map<LabelPixelType, RealType>& lowerBounds,

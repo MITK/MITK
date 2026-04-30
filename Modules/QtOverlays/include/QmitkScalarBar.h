@@ -19,34 +19,71 @@ found in the LICENSE file.
 #include <QPen>
 #include <QWidget>
 
+/**
+ * \class QmitkScalarBar
+ * \brief A widget that draws a scale bar with subdivision lines for spatial reference.
+ *
+ * The scalar bar can be oriented either vertically or horizontally. It automatically
+ * adapts its number of subdivisions and size based on the parent widget dimensions and
+ * the given scale factor (mm-per-pixel). The bar is drawn using a configurable QPen.
+ *
+ * \sa QmitkScalarBarOverlay
+ * \ingroup Qmitk
+ */
 class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
 {
   Q_OBJECT
 public:
+  /**
+   * \brief Orientation of the scalar bar.
+   */
   enum alignment
   {
-    vertical = 0,
-    horizontal = 1
+    vertical = 0,   ///< Vertical orientation (default)
+    horizontal = 1  ///< Horizontal orientation
   };
 
   /**
-  * @brief Default Constructor
-  **/
+   * \brief Constructor.
+   * \param[in] parent Optional parent widget.
+   */
   QmitkScalarBar(QWidget *parent = nullptr);
 
-  /**
-  * @brief Default Destructor
-  **/
+  /** \brief Destructor. */
   ~QmitkScalarBar() override;
 
+  /**
+   * \brief Sets the scale factor (mm per pixel) and resizes the bar accordingly.
+   *
+   * The method dynamically adjusts the number of subdivisions and the widget size
+   * to fit within a reasonable proportion of the parent widget.
+   *
+   * \param[in] scale The scale factor in mm per pixel.
+   */
   virtual void SetScaleFactor(double scale);
 
+  /**
+   * \brief Sets the orientation of the scalar bar.
+   * \param[in] align The desired alignment (vertical or horizontal).
+   */
   virtual void SetAlignment(alignment align);
 
+  /**
+   * \brief Sets the pen used to draw the scalar bar lines.
+   * \param[in] pen The QPen to use for rendering.
+   */
   void SetPen(const QPen &pen);
 
+  /**
+   * \brief Sets the number of subdivision tick marks.
+   * \param[in] subs The number of subdivisions.
+   */
   void SetNumberOfSubdivisions(unsigned int subs);
 
+  /**
+   * \brief Returns the current number of subdivision tick marks.
+   * \return The number of subdivisions.
+   */
   unsigned int GetNumberOfSubdivisions();
 
 protected:

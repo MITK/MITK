@@ -19,6 +19,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+/**
+ * \class TwoStepLinearModelParameterizer
+ * \brief Parameterizer for the TwoStepLinearModel providing default initial values.
+ *
+ * \sa TwoStepLinearModel, TwoStepLinearModelFactory, ConcreteModelParameterizerBase
+ */
 class MITKMODELFIT_EXPORT TwoStepLinearModelParameterizer : public
   mitk::ConcreteModelParameterizerBase<mitk::TwoStepLinearModel>
 {
@@ -45,7 +51,7 @@ public:
 
   /** This function returns the default parameterization (e.g. initial parametrization for fitting)
    defined by the model developer for  for the given model.*/
-  virtual ParametersType GetDefaultInitialParameterization() const;
+  ParametersType GetDefaultInitialParameterization() const override;
 
 protected:
   TwoStepLinearModelParameterizer(){};

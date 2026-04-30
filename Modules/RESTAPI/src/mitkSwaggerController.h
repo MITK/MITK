@@ -23,7 +23,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Serves Swagger UI and OpenAPI specification for API documentation.
+   * \brief Serves Swagger UI and OpenAPI specification for API documentation.
    *
    * Endpoints:
    * - GET /api/v1/docs             -> Swagger UI HTML page
@@ -39,33 +39,34 @@ namespace mitk
   public:
     SwaggerController();
 
-    /** @brief Handle GET /docs - serves Swagger UI HTML page. */
+    /** \brief Handle GET /docs - serves Swagger UI HTML page. */
     void HandleGET_docs(const httplib::Request& req, httplib::Response& res);
 
-    /** @brief Handle GET /docs/swagger-ui.css - serves Swagger UI stylesheet. */
+    /** \brief Handle GET /docs/swagger-ui.css - serves Swagger UI stylesheet. */
     void HandleGET_docs_css(const httplib::Request& req, httplib::Response& res);
 
-    /** @brief Handle GET /docs/swagger-ui-bundle.js - serves Swagger UI JavaScript. */
+    /** \brief Handle GET /docs/swagger-ui-bundle.js - serves Swagger UI JavaScript. */
     void HandleGET_docs_js(const httplib::Request& req, httplib::Response& res);
 
-    /** @brief Handle GET /openapi.json - serves the OpenAPI specification. */
+    /** \brief Handle GET /openapi.json - serves the OpenAPI specification. */
     void HandleGET_openapi(const httplib::Request& req, httplib::Response& res);
 
   private:
     /**
-     * @brief Load a CppMicroServices bundled resource as a string.
+     * \brief Load a CppMicroServices bundled resource as a string.
      *
      * All resources are pre-loaded into m_ResourceCache in the constructor,
      * so this method is read-only after construction and safe to call from
      * concurrent handler threads without additional locking.
      *
-     * @pre Resource must exist in the module bundle.
-     * @param resourcePath Path within the resource bundle.
-     * @return Resource content, or empty string if not found.
+     * \pre Resource must exist in the module bundle.
+     * \param resourcePath Path within the resource bundle.
+     * 
+eturn Resource content, or empty string if not found.
      */
     std::string LoadResource(const std::string& resourcePath) const;
 
-    /** @brief Read-only after construction; safe for concurrent handler thread access. */
+    /** \brief Read-only after construction; safe for concurrent handler thread access. */
     std::unordered_map<std::string, std::string> m_ResourceCache;
   };
 }

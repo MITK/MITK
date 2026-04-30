@@ -37,27 +37,41 @@ namespace mitk
   class Mapper;
   class BaseLocalStorageHandler;
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
   itkEventMacroDeclaration(RendererResetEvent, itk::AnyEvent);
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
-  /*
-   * \brief Organizes the rendering process
+  /**
+   * \brief Organizes the rendering process.
    *
    * A BaseRenderer contains a reference to a given vtkRenderWindow
-   * and a corresponding vtkRenderer.
-   * The BaseRenderer defines which mapper should be used (2D / 3D)
-   * and which view direction should be rendered.
+   * and a corresponding vtkRenderer. It manages geometry extraction
+   * (world time geometry, current world geometry, current world plane geometry),
+   * coordinate conversions between display and world space,
+   * and the mapper type (2D / 3D) used for rendering.
    *
-   * All existing BaseRenderer are stored in a static variable
+   * All existing BaseRenderer instances are stored in a static map
    * that can be accessed / modified via the static functions.
-   * VtkPropRenderer is a concrete implementation of a BaseRenderer.
+   * VtkPropRenderer is the concrete implementation of a BaseRenderer.
+   *
+   * \sa VtkPropRenderer
+   * \sa RenderingManager
+   * \sa SliceNavigationController
+   * \sa Mapper
+   * \ingroup Rendering
    */
   class MITKCORE_EXPORT BaseRenderer : public itk::Object
   {
   public:
 
+    /** \brief Map type associating vtkRenderWindow pointers with BaseRenderer pointers. */
     typedef std::map<vtkRenderWindow*, BaseRenderer*> BaseRendererMapType;
+
+    /** \brief Static map holding all registered BaseRenderer instances, keyed by their vtkRenderWindow. */
     static BaseRendererMapType baseRendererMap;
 
     /**
@@ -65,52 +79,124 @@ namespace mitk
      */
     enum StandardMapperSlot
     {
-      Standard2D = 1,
-      Standard3D = 2
+      Standard2D = 1, ///< Use 2D mappers for rendering.
+      Standard3D = 2  ///< Use 3D mappers for rendering.
     };
 
+    /**
+     * \brief Get the BaseRenderer instance associated with the given vtkRenderWindow.
+     * \param[in] renderWindow The vtkRenderWindow to look up.
+     * \return Pointer to the associated BaseRenderer, or nullptr if not found.
+     */
     static BaseRenderer* GetInstance(vtkRenderWindow* renderWindow);
+
+    /**
+     * \brief Register a BaseRenderer instance for the given vtkRenderWindow.
+     *
+     * If a BaseRenderer is already registered for this render window, it is removed first.
+     *
+     * \param[in] renderWindow The vtkRenderWindow to associate with the renderer.
+     * \param[in] baseRenderer The BaseRenderer instance to register.
+     */
     static void AddInstance(vtkRenderWindow* renderWindow, BaseRenderer* baseRenderer);
+
+    /**
+     * \brief Remove the BaseRenderer registration for the given vtkRenderWindow.
+     * \param[in] renderWindow The vtkRenderWindow whose registration should be removed.
+     */
     static void RemoveInstance(vtkRenderWindow* renderWindow);
 
+    /**
+     * \brief Find a BaseRenderer by its name.
+     * \param[in] name The name of the renderer to search for.
+     * \return Pointer to the matching BaseRenderer, or nullptr if not found.
+     */
     static BaseRenderer* GetByName(const std::string& name);
+
+    /**
+     * \brief Find a vtkRenderWindow by the name of its associated BaseRenderer.
+     * \param[in] name The name of the renderer whose render window is requested.
+     * \return Pointer to the matching vtkRenderWindow, or nullptr if not found.
+     */
     static vtkRenderWindow* GetRenderWindowByName(const std::string& name);
 
     /**
-     * \brief Get a map of specific RenderWindows
+     * \brief Get a map of all BaseRenderers that use the specified mapper type.
+     * \param[in] mapper The MapperSlotId (Standard2D or Standard3D) to filter by.
+     * \return A map of matching vtkRenderWindow-to-BaseRenderer pairs.
      */
     static BaseRendererMapType GetSpecificRenderWindows(MapperSlotId mapper);
 
     /**
-     * \brief Convenience function: Get a map of all 2D RenderWindows
+     * \brief Convenience function: Get a map of all 2D RenderWindows.
+     * \return A map of all BaseRenderers using Standard2D mappers.
      */
     static BaseRendererMapType GetAll2DRenderWindows();
 
     /**
-     * \brief Convenience function: Get a map of all 3D RenderWindows
+     * \brief Convenience function: Get a map of all 3D RenderWindows.
+     * \return A map of all BaseRenderers using Standard3D mappers.
      */
     static BaseRendererMapType GetAll3DRenderWindows();
 
     mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
+    /**
+     * \brief Construct a BaseRenderer with an optional name and vtkRenderWindow.
+     * \param[in] name The name of the renderer. If nullptr, an unnamed renderer is created.
+     * \param[in] renderWindow The vtkRenderWindow to associate with this renderer. Can be nullptr.
+     */
     BaseRenderer(const char* name = nullptr, vtkRenderWindow* renderWindow = nullptr);
 
+    /**
+     * \brief Remove all registered local storages and notify observers via RendererResetEvent.
+     */
     void RemoveAllLocalStorages();
+
+    /**
+     * \brief Register a local storage handler with this renderer.
+     * \param[in] lsh The local storage handler to register.
+     */
     void RegisterLocalStorageHandler(BaseLocalStorageHandler* lsh);
+
+    /**
+     * \brief Unregister a previously registered local storage handler.
+     * \param[in] lsh The local storage handler to unregister.
+     */
     void UnregisterLocalStorageHandler(BaseLocalStorageHandler* lsh);
 
+    /**
+     * \brief Set the DataStorage used by this renderer.
+     *
+     * The DataStorage provides the data nodes whose contents are rendered.
+     * Also updates the dispatcher's data storage reference.
+     *
+     * \param[in] storage The DataStorage to use. If nullptr, no change is made.
+     */
     virtual void SetDataStorage(DataStorage* storage);
 
+    /**
+     * \brief Get the DataStorage used by this renderer.
+     * \return Pointer to the current DataStorage.
+     */
     virtual DataStorage::Pointer GetDataStorage() const
     {
       return m_DataStorage.GetPointer();
     }
 
+    /**
+     * \brief Get the vtkRenderWindow associated with this renderer.
+     * \return Pointer to the vtkRenderWindow.
+     */
     vtkRenderWindow* GetRenderWindow() const
     {
       return m_RenderWindow;
     }
 
+    /**
+     * \brief Get the underlying vtkRenderer used for VTK rendering.
+     * \return Pointer to the vtkRenderer.
+     */
     vtkRenderer* GetVtkRenderer() const
     {
       return m_VtkRenderer;
@@ -123,20 +209,33 @@ namespace mitk
 
     /**
      * \brief Set a new size for the render window.
+     * \param[in] w Width in pixels.
+     * \param[in] h Height in pixels.
      */
     virtual void Resize(int w, int h);
 
     /**
      * \brief Initialize the base renderer with a vtk render window.
-     *        Set the new renderer for the camera controller.
+     *
+     * Replaces the current render window, removes all local storages,
+     * and re-initializes the camera controller.
+     *
+     * \param[in] renderwindow The new vtkRenderWindow to use.
      */
     virtual void InitRenderer(vtkRenderWindow* renderwindow);
 
     /**
      * \brief Set the initial size for the render window.
+     * \param[in] w Width in pixels.
+     * \param[in] h Height in pixels.
      */
     virtual void InitSize(int w, int h);
 
+    /**
+     * \brief Draw an overlay mouse cursor at the given position.
+     *
+     * \note This is a stub; the actual implementation must be provided in concrete subclasses.
+     */
     virtual void DrawOverlayMouse(Point2D&)
     {
       MITK_INFO << "BaseRenderer::DrawOverlayMouse() should be in concret implementation OpenGLRenderer." << std::endl;
@@ -187,6 +286,11 @@ namespace mitk
      */
     itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry);
 
+    /**
+     * \brief Set the world geometry so that it encompasses all objects in the DataStorage.
+     * \return true if the geometry was successfully updated, false otherwise.
+     * \note Default implementation returns false; subclasses may override.
+     */
     virtual bool SetWorldGeometryToDataStorageBounds()
     {
       return false;
@@ -304,13 +408,39 @@ namespace mitk
      */
     virtual void SetMapperID(MapperSlotId id);
 
+    /**
+     * \brief Get the size of the render window in pixels.
+     * \return Pointer to an array of two integers [width, height].
+     */
     virtual int* GetSize() const;
+
+    /**
+     * \brief Get the size of the VTK viewport in pixels.
+     * \return Pointer to an array of two integers [width, height].
+     * \note This may differ from GetSize() when multiple viewports share a render window.
+     */
     virtual int* GetViewportSize() const;
 
+    /**
+     * \brief Replace the current SliceNavigationController.
+     *
+     * Copies the world geometry from the new controller, connects geometry events,
+     * and sets the renderer reference on the new controller.
+     *
+     * \param[in] SlicenavigationController The new SliceNavigationController. Ignored if nullptr.
+     */
     void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
+
+    /** \brief Get the CameraController for this renderer. */
     itkGetObjectMacro(CameraController, CameraController);
+
+    /** \brief Get the SliceNavigationController for this renderer. */
     itkGetObjectMacro(SliceNavigationController, SliceNavigationController);
+
+    /** \brief Get the CameraRotationController for this renderer. */
     itkGetObjectMacro(CameraRotationController, CameraRotationController);
+
+    /** \brief Return whether the current world geometry is empty (has zero extent). */
     itkGetMacro(EmptyWorldGeometry, bool);
 
     /**
@@ -352,7 +482,16 @@ namespace mitk
      */
     const double* GetBounds() const;
 
+    /**
+     * \brief Request an asynchronous rendering update for this render window via the RenderingManager.
+     *
+     * Also constrains zooming and panning before requesting the update.
+     */
     void RequestUpdate();
+
+    /**
+     * \brief Force an immediate synchronous rendering update for this render window.
+     */
     void ForceImmediateUpdate();
 
     /**
@@ -362,49 +501,95 @@ namespace mitk
     unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
     /**
-     * \brief Convert a display point to the 3D world index
-     *        using the geometry of the renderWindow.
+     * \brief Convert a display point to a 3D world coordinate.
+     *
+     * For 2D renderers, the z-depth is obtained from the camera focal point.
+     * For 3D renderers, PickWorldPoint() is used.
+     *
+     * \param[in] displayPoint 2D display coordinate in pixels.
+     * \param[out] worldIndex The resulting 3D world coordinate.
      */
     void DisplayToWorld(const Point2D& displayPoint, Point3D& worldIndex) const;
 
     /**
-     * \brief Convert a display point to the 2D world index, mapped onto the display plane
-     *        using the geometry of the renderWindow.
+     * \brief Convert a display point to a 2D plane coordinate in millimeters.
+     *
+     * Only meaningful for 2D renderers. Logs a warning for 3D renderers.
+     *
+     * \param[in] displayPoint 2D display coordinate in pixels.
+     * \param[out] planePointInMM The resulting 2D coordinate on the current world plane in mm.
      */
     void DisplayToPlane(const Point2D& displayPoint, Point2D& planePointInMM) const;
 
     /**
-     * \brief Convert a 3D world index to the display point
-     *        using the geometry of the renderWindow.
+     * \brief Convert a 3D world coordinate to a 2D display point.
+     * \param[in] worldIndex 3D world coordinate.
+     * \param[out] displayPoint The resulting 2D display coordinate in pixels.
      */
     void WorldToDisplay(const Point3D& worldIndex, Point2D& displayPoint) const;
 
     /**
-     * \brief Convert a 3D world index to the point on the viewport
-     *        using the geometry of the renderWindow.
+     * \brief Convert a 3D world coordinate to a 2D viewport point.
+     *
+     * The viewport point is in pixels relative to the VTK viewport origin.
+     *
+     * \param[in] worldIndex 3D world coordinate.
+     * \param[out] viewPoint The resulting 2D viewport coordinate in pixels.
      */
     void WorldToView(const Point3D& worldIndex, Point2D& viewPoint) const;
 
     /**
-     * \brief Convert a 2D plane coordinate to the display point
-     *        using the geometry of the renderWindow.
+     * \brief Convert a 2D plane coordinate in millimeters to a 2D display point.
+     * \param[in] planePointInMM 2D coordinate on the current world plane in mm.
+     * \param[out] displayPoint The resulting 2D display coordinate in pixels.
      */
     void PlaneToDisplay(const Point2D& planePointInMM, Point2D& displayPoint) const;
 
     /**
-     * \brief Convert a 2D plane coordinate to the point on the viewport
-     *        using the geometry of the renderWindow.
+     * \brief Convert a 2D plane coordinate in millimeters to a 2D viewport point.
+     * \param[in] planePointInMM 2D coordinate on the current world plane in mm.
+     * \param[out] viewPoint The resulting 2D viewport coordinate in pixels.
      */
     void PlaneToView(const Point2D& planePointInMM, Point2D& viewPoint) const;
 
+    /**
+     * \brief Get the scale factor relating millimeters to display pixels.
+     *
+     * For 2D renderers this is computed from the camera's parallel scale and
+     * the viewport height. For 3D renderers, returns 1.0.
+     *
+     * \return The number of millimeters per display pixel.
+     */
     double GetScaleFactorMMPerDisplayUnit() const;
 
+    /**
+     * \brief Get the size of the render window in millimeters.
+     * \return A Point2D with (width_mm, height_mm).
+     */
     Point2D GetDisplaySizeInMM() const;
+
+    /**
+     * \brief Get the size of the VTK viewport in millimeters.
+     * \return A Point2D with (width_mm, height_mm).
+     */
     Point2D GetViewportSizeInMM() const;
 
+    /**
+     * \brief Get the origin of the viewport in plane coordinates (millimeters).
+     * \return A Point2D representing the top-left corner of the render window in plane mm.
+     */
     Point2D GetOriginInMM() const;
 
+    /** \brief Get whether zooming and panning are constrained to the displayed geometry. */
     itkGetConstMacro(ConstrainZoomingAndPanning, bool)
+
+    /**
+     * \brief Enable or disable constraining of zooming and panning.
+     *
+     * When enabled, the camera controller is adjusted to fit the plane.
+     *
+     * \param[in] constrain True to constrain zooming and panning, false to allow free navigation.
+     */
     virtual void SetConstrainZoomingAndPanning(bool constrain);
 
   protected:

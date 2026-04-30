@@ -16,6 +16,10 @@ found in the LICENSE file.
 
 #include <pybind11/embed.h>
 
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+
 namespace py = pybind11;
 
 namespace
@@ -37,6 +41,36 @@ namespace
 
     MITK_INFO << "Using virtual environment: " << venvName;
   }
+
+  // Inserts a key into a dict on construction and removes it on
+  // destruction. GIL must be held by the caller for both. Used to scope
+  // __file__/__name__ during ExecuteFile so they never leak into the
+  // shared dictionary, even if py::exec or dict assignment throws.
+  class ScopedDictKey
+  {
+  public:
+    ScopedDictKey(py::dict& dict, const char* key, py::object value)
+      : m_Dict(dict), m_Key(key)
+    {
+      m_Dict[py::str(m_Key)] = std::move(value);
+    }
+
+    ~ScopedDictKey() noexcept
+    {
+      if (m_Dict.contains(m_Key))
+        PyDict_DelItemString(m_Dict.ptr(), m_Key);
+
+      if (PyErr_Occurred())
+        PyErr_Clear();
+    }
+
+    ScopedDictKey(const ScopedDictKey&) = delete;
+    ScopedDictKey& operator=(const ScopedDictKey&) = delete;
+
+  private:
+    py::dict& m_Dict;
+    const char* m_Key;
+  };
 }
 
 struct mitk::PythonContext::Impl
@@ -45,11 +79,8 @@ struct mitk::PythonContext::Impl
   {
     py::gil_scoped_acquire gil;
 
-    if (this->LocalDictionary.contains(varName))
-      return this->LocalDictionary[py::str(varName)];
-
-    if (this->GlobalDictionary.contains(varName))
-      return this->GlobalDictionary[py::str(varName)];
+    if (this->Dictionary.contains(varName))
+      return this->Dictionary[py::str(varName)];
 
     return py::none();
   }
@@ -72,8 +103,7 @@ struct mitk::PythonContext::Impl
     }
   }
 
-  py::dict GlobalDictionary;
-  py::dict LocalDictionary;
+  py::dict Dictionary;
 };
 
 mitk::PythonContext::PythonContext(const std::string& venvName)
@@ -98,7 +128,6 @@ void mitk::PythonContext::Activate()
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
     << "def add_site_packages(base_path):\n"
-    << "    import os, site, sys\n"
     << "    if os.name == 'nt':\n"
     << "        site_packages = os.path.join(base_path, 'Lib', 'site-packages')\n"
     << "    else:\n"
@@ -121,8 +150,17 @@ void mitk::PythonContext::Activate()
 
 mitk::PythonContext::~PythonContext()
 {
-  m_Impl->LocalDictionary.clear();
-  m_Impl->GlobalDictionary.clear();
+  if (!Py_IsInitialized())
+  {
+    // The interpreter is already finalized. Destroying the py::dict in
+    // m_Impl would Py_DECREF objects backed by a dead interpreter (UB).
+    // Leak instead; this only happens during abnormal shutdown.
+    (void)m_Impl.release();
+    return;
+  }
+
+  py::gil_scoped_acquire gil;
+  m_Impl.reset();
 }
 
 void mitk::PythonContext::Execute(const std::string &expression)
@@ -131,11 +169,46 @@ void mitk::PythonContext::Execute(const std::string &expression)
 
   try
   {
-    py::exec(expression, m_Impl->GlobalDictionary, m_Impl->LocalDictionary);
+    py::exec(expression, m_Impl->Dictionary);
   }
   catch (py::error_already_set& e)
   {
     mitkThrow() << "An error occurred while executing Python code: " << e.what();
+  }
+}
+
+void mitk::PythonContext::ExecuteFile(const fs::path& filePath)
+{
+  const auto normalizedPath = fs::absolute(filePath).lexically_normal();
+
+  std::ifstream stream(normalizedPath, std::ios::binary);
+
+  if (!stream.is_open())
+    mitkThrow() << "Could not open Python file: " << normalizedPath.string();
+
+  std::ostringstream buffer;
+  buffer << stream.rdbuf();
+
+  py::gil_scoped_acquire gil;
+
+  // __file__ and __name__ are script-scoped: the guards below insert them
+  // for the duration of execution so scripts can use Path(__file__) and
+  // `if __name__ == "__main__"`, then remove them on destruction so
+  // subsequent Execute() calls don't see stale values. User-defined
+  // globals intentionally persist in the shared dictionary.
+  ScopedDictKey fileKey(m_Impl->Dictionary, "__file__",
+                        py::str(normalizedPath.generic_string()));
+  ScopedDictKey nameKey(m_Impl->Dictionary, "__name__",
+                        py::str("__main__"));
+
+  try
+  {
+    py::exec(buffer.str(), m_Impl->Dictionary);
+  }
+  catch (py::error_already_set& e)
+  {
+    mitkThrow() << "An error occurred while executing Python file \""
+                << normalizedPath.string() << "\": " << e.what();
   }
 }
 
@@ -145,13 +218,13 @@ void mitk::PythonContext::BindImage(Image* image, const std::string& varName)
 
   if (image == nullptr)
   {
-    m_Impl->GlobalDictionary[py::str(varName)] = py::none();
+    m_Impl->Dictionary[py::str(varName)] = py::none();
     return;
   }
 
   try
   {
-    m_Impl->GlobalDictionary[py::str(varName)] = py::cast(image, py::return_value_policy::reference);
+    m_Impl->Dictionary[py::str(varName)] = py::cast(image, py::return_value_policy::reference);
   }
   catch (const py::error_already_set& e)
   {
@@ -163,8 +236,7 @@ bool mitk::PythonContext::HasVariable(const std::string &varName)
 {
   py::gil_scoped_acquire gil;
 
-  return m_Impl->LocalDictionary.contains(varName) ||
-         m_Impl->GlobalDictionary.contains(varName);
+  return m_Impl->Dictionary.contains(varName);
 }
 
 std::optional<bool> mitk::PythonContext::GetVariableAsBool(const std::string& varName)
@@ -175,6 +247,11 @@ std::optional<bool> mitk::PythonContext::GetVariableAsBool(const std::string& va
 std::optional<int> mitk::PythonContext::GetVariableAsInt(const std::string& varName)
 {
   return m_Impl->GetVariableAs<int>(varName);
+}
+
+std::optional<double> mitk::PythonContext::GetVariableAsDouble(const std::string& varName)
+{
+  return m_Impl->GetVariableAs<double>(varName);
 }
 
 std::optional<std::string> mitk::PythonContext::GetVariableAsString(const std::string& varName)

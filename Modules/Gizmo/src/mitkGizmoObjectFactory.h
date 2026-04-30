@@ -21,15 +21,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /*
-      \brief Registers mappers and assigns default properties for mitk::Gizmo.
-
-      This class is still required by MITK to register custom mappers.
-      The base class interface requires also methods that describe file
-      reader/writer extensions, but this is already deprecated. We do
-      not implement those methods but use the new micro-service registration
-      via GizmoActivator.
-  */
+  /**
+   * \brief Registers mappers and assigns default properties for mitk::Gizmo.
+   *
+   * This class is still required by MITK to register custom mappers. Micro-service
+   * registration for IO happens in GizmoActivator.
+   */
   class MITKGIZMO_EXPORT GizmoObjectFactory : public mitk::CoreObjectFactoryBase
   {
   public:
@@ -37,27 +34,19 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    // Create a mapper for given node
+    /**
+     * \brief Create a mapper for the given node if it contains a Gizmo.
+     * \param node The data node to create a mapper for.
+     * \param slotId The mapper slot (2D or 3D).
+     * \return A mapper instance, or nullptr if not applicable.
+     */
     mitk::Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
 
-    // Assign default properties to given node
+    /**
+     * \brief Assign default rendering properties for Gizmo nodes.
+     * \param node The data node to set default properties on.
+     */
     void SetDefaultProperties(mitk::DataNode *node) override;
-
-    // Deprecated but required!
-    std::string GetFileExtensions() override { return ""; }
-    // Deprecated but required!
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
-    {
-      return CoreObjectFactoryBase::MultimapType();
-    }
-
-    // Deprecated but required!
-    std::string GetSaveFileExtensions() override { return ""; }
-    // Deprecated but required!
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
-    {
-      return CoreObjectFactoryBase::MultimapType();
-    }
   };
 }
 

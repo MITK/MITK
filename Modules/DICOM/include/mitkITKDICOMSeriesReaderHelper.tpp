@@ -55,7 +55,14 @@ mitk::ITKDICOMSeriesReaderHelper
   // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position
   if (correctTilt)
   {
-    readVolume = FixUpTiltedGeometry( reader->GetOutput(), tiltInfo );
+    if constexpr (TDim >= 3)
+    {
+      readVolume = FixUpTiltedGeometry(reader->GetOutput(), tiltInfo);
+    }
+    else
+    {
+      mitkThrow() << "Gantry tilt correction requires a 3D image series.";
+    }
   }
 
   image->InitializeByItk(readVolume.GetPointer());

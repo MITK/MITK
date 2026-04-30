@@ -13,34 +13,75 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveScribbleInteractor_h
 #define mitknnInteractiveScribbleInteractor_h
 
+#include <mitkImage.h>
+#include <mitknnInteractiveBoundingBox.h>
 #include <mitknnInteractiveInteractor.h>
-
-namespace mitk
-{
-  class Image;
-}
 
 namespace mitk::nnInteractive
 {
   /** \brief %nnInteractive interactor for freehand brushstrokes.
    *
-   * Scribbles are managed as labels of a common MultiLabelSegmentation, organized
-   * by PromptType.
+   * Each completed brushstroke is stored as a small 2D uint8 mitk::Image
+   * positioned at the stroke's slicing plane and wrapped in a DataNode that
+   * gets added to the data storage for persistent cross-slice
+   * visualization. Strokes are organized by PromptType (each completed node
+   * keeps the color of the prompt type active when it was drawn). The most
+   * recent brushstroke is also exposed as a pointer to the 2D mask plus an
+   * axis-aligned interaction bounding box in nnInteractive coordinates so
+   * the Python call can skip the full 3D volume round-trip.
    *
-   * Interaction is handled through the DrawPaintbrushTool.
+   * Interaction is handled through an internal brush state machine that
+   * paints directly into a 2D uint8 Image -- no 3D working segmentation is
+   * involved. Left mouse button display interaction (crosshair navigation)
+   * is blocked while the interactor is enabled so that brush strokes do
+   * not move the crosshair.
+   *
+   * \sa Interactor, nnInteractiveTool
    */
   class MITKPYTHONSEGMENTATION_EXPORT ScribbleInteractor : public Interactor
   {
   public:
+    /** \brief Constructs a ScribbleInteractor with InteractionType::Scribble.
+     */
     ScribbleInteractor();
+
+    /** \brief Destructor. Calls OnReset() to clean up data nodes.
+     */
     ~ScribbleInteractor() override;
 
+    /** \brief Checks whether any scribbles have been drawn.
+     *
+     * \return \c true if at least one completed brushstroke node exists for
+     *         any prompt type, \c false otherwise.
+     */
     bool HasInteractions() const override;
 
-    const Image* GetLastScribbleMask() const;
+    /** \brief Returns the binary mask slice of the most recent brushstroke.
+     *
+     * The mask is a uint8 image whose extent matches the corresponding
+     * interaction bounding box (one voxel thick along the slicing axis).
+     * Intended to be passed alongside GetLastScribbleBoundingBox() to
+     * session.add_scribble_interaction via nnInteractiveTool. Returning a
+     * smart pointer makes the lifetime explicit so callers do not need to
+     * know that the underlying member is replaced on the next stroke.
+     *
+     * \return The mask Image, or a null smart pointer if no brushstroke has
+     *         been drawn yet.
+     */
+    Image::ConstPointer GetLastScribbleMask() const;
+
+    /** \brief Returns the interaction bounding box for the most recent
+     *         brushstroke.
+     *
+     * The box is in nnInteractive's coordinate order (reverse of MITK index
+     * order): \c {{z_min,z_max}, {y_min,y_max}, {x_min,x_max}}.
+     *
+     * \return Pointer to the bounding box, or \c nullptr if no brushstroke
+     *         has been drawn yet.
+     */
+    const InteractionBoundingBox* GetLastScribbleBoundingBox() const;
 
   private:
-    void OnSetToolManager() override;
     void OnHandleEvent(InteractionEvent* event) override;
     void OnEnable() override;
     void OnDisable() override;

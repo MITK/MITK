@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkContourModel.h>
 #include <mitkImage.h>
-#include <mitkLabelSetImage.h>
 
 #include <vtkSmartPointer.h>
 
@@ -23,48 +22,44 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**
-   * \brief Helpful methods for working with contours and images
+  /** \brief Static utility methods for working with contour models and images.
    *
+   * Provides projection, back-projection, and fill operations for contour models
+   * in relation to 2D image slices. These utilities support the segmentation
+   * workflow by converting between world and index coordinate contour representations
+   * and by filling contour regions into images.
    *
+   * \sa ContourModel, Image, LabelSetImage
+   * \ingroup MitkContourModelModule
    */
   class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
   {
   public:
     mitkClassMacroItkParent(ContourModelUtils, itk::Object);
 
-    /**
-      \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
-
-      \param slice
-      \param contourIn3D
-    */
+    /** \brief Project a 3D contour onto a 2D image slice.
+     *
+     * Converts each vertex of the contour from world coordinates to index
+     * coordinates of the given slice.
+     *
+     * \param[in] slice The 2D image slice providing the geometry for projection.
+     * \param[in] contourIn3D The contour in world (3D) coordinates.
+     * \return A new ContourModel with vertices in slice index coordinates.
+     */
     static ContourModel::Pointer ProjectContourTo2DSlice(const Image *slice,
                                                          const ContourModel *contourIn3D);
 
-    /**
-      \brief Projects a slice index coordinates of a contour back into world coordinates.
-
-      \param sliceGeometry
-      \param contourIn2D
-    */
+    /** \brief Back-project a 2D slice contour into 3D world coordinates.
+     *
+     * Converts each vertex of the contour from slice index coordinates back to
+     * world coordinates using the provided geometry.
+     *
+     * \param[in] sliceGeometry The geometry of the 2D slice.
+     * \param[in] contourIn2D The contour in slice index coordinates.
+     * \return A new ContourModel with vertices in world (3D) coordinates.
+     */
     static ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
                                                                const ContourModel *contourIn2D);
-
-    /**
-    \brief Fill a contour in a 2D slice with a specified pixel value.
-    This overloaded version uses the contour at the passed contourTimeStep
-    to fill the passed image slice.
-    \deprecated This function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContentAtTimeStep()) instead.
-    \pre sliceImage points to a valid instance
-    \pre projectedContour points to a valid instance
-    */
-    //[[deprecated]]
-    DEPRECATED(static void FillContourInSlice(const ContourModel* projectedContour,
-      TimeStepType contourTimeStep,
-      Image* sliceImage,
-      int paintingPixelValue = 1));
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -97,28 +92,11 @@ namespace mitk
       Image* sliceImage,
       int paintingPixelValue = 1);
 
-    /**
-    \brief Fills the paintingPixelValue into every pixel of resultImage as indicated by filledImage.
-    If a LableSet image is specified it also by incorporating the rules of LabelSet images when filling the content.
-    \param filledImage Pointer to the image content that should be checked to decide if a pixel in resultImage should
-    be filled with paintingPixelValue or not.
-    \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
-    If an LabelSet instance is passed its states (e.g. locked labels etc...) will be used. If nullptr or an normal image
-    is passed, then simply any pixel position indicated by filledImage will be overwritten.
-    \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
-    \param fillForegroundThreshold The threshold value that decides if a pixel in the filled image counts
-    as foreground (>=fillForegroundThreshold) or not.
-    \deprecated This function is deprecated. Use TransferLabelContent() instead.
-    */
-    [[deprecated]]
-    static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
-                                 vtkSmartPointer<vtkImageData> resultImage,
-                                 int paintingPixelValue,
-                                 double fillForegroundThreshold = 1.0);
-
-    /**
-    \brief Move the contour in time step 0 to to a new contour model at the given time step.
-    */
+    /** \brief Create a new contour model with the contour from time step 0 placed at the specified time step.
+     * \param[in] contour The source contour model whose time step 0 data is used.
+     * \param[in] timeStep The destination time step in the new contour model.
+     * \return A new ContourModel containing the contour at the specified time step.
+     */
     static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType timeStep);
 
   protected:

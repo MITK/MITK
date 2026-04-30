@@ -21,6 +21,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /** \brief Parameterizer for the TwoCompartmentExchangeModel.
+   * \sa TwoCompartmentExchangeModel, TwoCompartmentExchangeModelFactory
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoCompartmentExchangeModelParameterizer : public
     mitk::AIFBasedModelParameterizerBase<mitk::TwoCompartmentExchangeModel>
   {

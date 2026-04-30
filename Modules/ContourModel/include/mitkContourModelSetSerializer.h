@@ -18,6 +18,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Serializer for mitk::ContourModelSet objects.
+   *
+   * Writes a ContourModelSet to a .cnt_set file using ContourModelSetWriter.
+   * Used by the scene serialization framework to persist contour set data.
+   *
+   * \sa ContourModelSet, BaseDataSerializer, ContourModelSerializer
+   * \ingroup MitkContourModelModule
+   */
   class MITKCONTOURMODEL_EXPORT ContourModelSetSerializer : public BaseDataSerializer
   {
   public:
@@ -25,6 +33,9 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief Serialize the associated ContourModelSet to a .cnt_set file.
+       * \return The filename of the serialized file, or an empty string on failure.
+       */
       std::string Serialize() override;
 
   protected:

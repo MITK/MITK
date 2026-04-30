@@ -17,6 +17,15 @@ found in the LICENSE file.
 
 namespace itk
 {
+  /**
+   * \brief Computes a multi-bin local histogram for each voxel.
+   *
+   * For each voxel, a local histogram is computed within a neighbourhood of configurable
+   * size. The histogram bin counts are output as separate images, one per bin.
+   *
+   * \tparam TInputImageType The input image type.
+   * \tparam TOuputImageType The output image type.
+   */
   template<typename TInputImageType, typename TOuputImageType >
   class MultiHistogramFilter : public ImageToImageFilter< TInputImageType, TOuputImageType>
   {

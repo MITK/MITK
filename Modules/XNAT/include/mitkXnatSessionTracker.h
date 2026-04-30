@@ -21,16 +21,44 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Tracks ctkXnatSession services in the CppMicroServices registry and emits
+   *        signals when sessions are opened or about to be closed.
+   *
+   * XnatSessionTracker monitors the CppMicroServices service registry for ctkXnatSession
+   * instances. When a session service is registered, the tracker connects to its opened and
+   * aboutToBeClosed signals and re-emits corresponding Qt signals. This allows plugins and
+   * modules to react to XNAT session lifecycle events without directly depending on the
+   * service registry.
+   *
+   * \sa mitk::XnatSession, ctkXnatSession, us::ServiceTracker
+   */
   class MITKXNAT_EXPORT XnatSessionTracker : public QObject, public us::ServiceTracker<ctkXnatSession>
   {
     Q_OBJECT
 
   public:
+    /**
+     * \brief Construct a session tracker for the given module context.
+     *
+     * \param[in] context The CppMicroServices module context used to track ctkXnatSession services.
+     */
     XnatSessionTracker(us::ModuleContext *context);
 
   signals:
-    void Opened(ctkXnatSession *);
-    void AboutToBeClosed(ctkXnatSession *);
+    /**
+     * \brief Emitted when a tracked XNAT session has been opened.
+     *
+     * \param[in] session Pointer to the ctkXnatSession that was opened.
+     */
+    void Opened(ctkXnatSession * session);
+
+    /**
+     * \brief Emitted when a tracked XNAT session is about to be closed.
+     *
+     * \param[in] session Pointer to the ctkXnatSession that is about to close.
+     */
+    void AboutToBeClosed(ctkXnatSession * session);
 
   private:
     typedef us::ServiceTracker<ctkXnatSession> Superclass;

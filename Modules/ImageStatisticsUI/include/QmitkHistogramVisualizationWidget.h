@@ -26,7 +26,15 @@ namespace Ui
 }
 
 /**
- * \brief Widget for displaying Histograms.
+ * \brief Widget for displaying and interacting with histogram visualizations.
+ *
+ * Provides a chart-based histogram display with controls for adjusting the number of bins,
+ * toggling a subchart view, setting custom min/max value ranges, and copying histogram data
+ * to the clipboard. Multiple histograms can be displayed simultaneously, each identified by
+ * a data label.
+ *
+ * \sa QmitkChartWidget
+ * \sa QmitkImageStatisticsWidget
  */
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkHistogramVisualizationWidget : public QWidget
@@ -34,24 +42,59 @@ class MITKIMAGESTATISTICSUI_EXPORT QmitkHistogramVisualizationWidget : public QW
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the histogram visualization widget.
+   * \param[in] parent Optional parent widget.
+   */
   QmitkHistogramVisualizationWidget(QWidget *parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkHistogramVisualizationWidget() override;
 
-  /** \brief Draws the histogram and enables the GUI elements. */
+  /**
+   * \brief Displays a histogram in the chart and enables the GUI controls.
+   *
+   * If a histogram with the given label already exists, it is updated. Otherwise, a new
+   * histogram series is added to the chart.
+   *
+   * \param[in] histogram The ITK histogram to display. If nullptr, the call is ignored.
+   * \param[in] dataLabel A unique label identifying this histogram series.
+   */
   void SetHistogram(itk::Statistics::Histogram<double>::ConstPointer histogram, const std::string &dataLabel);
-  /** \brief Clears the histogram and disables all GUI elements. */
+
+  /**
+   * \brief Clears all histogram data and disables all GUI elements.
+   */
   void Reset();
-  /** \brief Sets the theme (either dark or light) */
+
+  /**
+   * \brief Sets the color theme for the chart widget.
+   * \param[in] style The color theme to apply (dark or light).
+   */
   void SetTheme(QmitkChartWidget::ColorTheme style);
-  /** \brief Resets the default settings */
+
+  /**
+   * \brief Resets all controls to their default settings.
+   *
+   * Enables the default number of bins checkbox, sets bins to 100, and disables the subchart.
+   */
   void ResetDefault();
 
-  /** \brief Gets the number of bins to calculate */
+  /**
+   * \brief Returns the current number of histogram bins configured in the spin box.
+   * \return The number of bins.
+   */
   int GetBins();
 
  signals:
-   /** \brief Signal to be emitted when the number of bins is changed by the user. The HistogramCalculator should
- connect to this signal and recalculate the data accordingly. */
+  /**
+   * \brief Emitted when the user changes the number of bins.
+   *
+   * Listeners (e.g., a statistics calculator) should connect to this signal and
+   * recalculate histogram data with the updated bin count.
+   *
+   * \param[in] nBins The new number of bins requested by the user.
+   */
   void RequestHistogramUpdate(unsigned int nBins);
 
 private:

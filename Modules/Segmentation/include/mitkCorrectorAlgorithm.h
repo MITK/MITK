@@ -24,16 +24,16 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * This class encapsulates an algorithm, which takes a 2D binary image and a contour.
-  * The algorithm tests if the line begins and ends inside or outside a segmentation
-  * and whether areas should be added to or subtracted from the segmentation shape.
-  *
-  * This class has two outputs:
-  *   \li the modified input image from GetOutput()
-  *
-  * The output image is a combination of the original input with the generated difference image.
-  *
-  * \sa CorrectorTool2D
+    \brief Contour-based correction algorithm for 2D binary segmentation images.
+
+    This class takes a 2D binary image and a user-drawn contour. The algorithm tests
+    whether the line begins and ends inside or outside the segmentation and determines
+    whether areas should be added to or subtracted from the segmentation shape.
+
+    The output is the modified input image, combining the original input with the
+    generated difference.
+
+    \sa CorrectorTool2D
   */
   class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
   {
@@ -45,7 +45,7 @@ namespace mitk
       typedef mitk::Label::PixelType DefaultSegmentationDataType;
 
     /**
-    * \brief User drawn contour
+      \brief Set the user-drawn contour that defines the correction region.
     */
     void SetContour(ContourModel *contour) { this->m_Contour = contour; }
     itkSetMacro(FillColor, int);
@@ -53,10 +53,6 @@ namespace mitk
 
     itkSetMacro(EraseColor, int);
     itkGetConstMacro(EraseColor, int);
-    /**
-    * \brief Calculated difference image.
-    */
-    // itkGetObjectMacro(DifferenceImage, Image);
 
     // used by TobiasHeimannCorrectionAlgorithm
     typedef struct
@@ -72,10 +68,17 @@ namespace mitk
     CorrectorAlgorithm();
     ~CorrectorAlgorithm() override;
 
-    // does the actual processing
+    /** \brief Perform the actual contour correction processing. */
     void GenerateData() override;
 
+    /** \brief Apply the improved Heilmann correction algorithm on the given 2D image.
+      \return True if the correction was applied successfully.
+    */
     bool ImprovedHeimannCorrectionAlgorithm(itk::Image<DefaultSegmentationDataType, 2>::Pointer pic);
+
+    /** \brief Modify a single segment in the image according to the correction contour.
+      \return True if the segment was modified successfully.
+    */
     bool ModifySegment(const TSegData &segment, itk::Image<DefaultSegmentationDataType, 2>::Pointer pic);
 
     Image::Pointer m_WorkingImage;

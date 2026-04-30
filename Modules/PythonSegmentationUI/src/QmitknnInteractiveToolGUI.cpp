@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <ui_QmitknnInteractiveToolGUI.h>
 
 #include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
@@ -21,21 +22,53 @@ found in the LICENSE file.
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
-#include <QmitknnInteractiveInstallDialog.h>
-#include <QmitkRun.h>
+#include <QmitkMultiLabelInspector.h>
+#include <QmitkPipInstallDialog.h>
+#include <mitkPipPackageInfo.h>
 #include <QmitkStyleManager.h>
 
+#include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QTimer>
+#include <QWidget>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
 namespace
 {
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
+
+  // Qt::Key_A..Qt::Key_Z are 0x41..0x5a and coincide with the ASCII codes
+  // of the uppercase letters, so the same constant drives the QShortcut,
+  // the tooltip hint, and the label suffix.
+  constexpr Qt::Key RESET_KEY       = Qt::Key_R;
+  constexpr Qt::Key CONFIRM_KEY     = Qt::Key_C;
+  constexpr Qt::Key PROMPT_TYPE_KEY = Qt::Key_T;
+  constexpr Qt::Key POINT_KEY       = Qt::Key_P;
+  constexpr Qt::Key BOX_KEY         = Qt::Key_B;
+  constexpr Qt::Key SCRIBBLE_KEY    = Qt::Key_S;
+  constexpr Qt::Key LASSO_KEY       = Qt::Key_L;
+
+  QChar KeyChar(Qt::Key key)
+  {
+    return QChar(static_cast<int>(key));
+  }
+
+  QString LabelWithShortcut(const QString& baseText, Qt::Key key)
+  {
+    return QString("%1 (%2)").arg(baseText, KeyChar(key));
+  }
+
+  void BindShortcut(QWidget* parent, Qt::Key key, QPushButton* button,
+                    const QString& tooltipTemplate)
+  {
+    button->setToolTip(tooltipTemplate.arg(KeyChar(key)));
+    auto shortcut = new QShortcut(QKeySequence(key), parent);
+    QObject::connect(shortcut, &QShortcut::activated, button, &QPushButton::click);
+  }
 
   void SetIcon(QAbstractButton* button, const char* icon)
   {
@@ -128,9 +161,30 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
 {
   this->UncheckOtherInteractorButtons(nullptr); // Ensure override cursor restoration.
 
-  this->GetTool()->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
-    this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+  // Note: unused-auto-label cleanup is handled on the tool's DeactivatedEvent
+  // (deferred via QTimer::singleShot), not here. Running RemoveLabel in the
+  // destructor is unsafe because Qt widgets and itk::Object observers may be
+  // in a partially-destructed state during application shutdown, which
+  // causes crashes when segmentation events fan out to dead observers.
 
+  if (auto* tool = this->GetTool())
+  {
+    tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+    tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+    tool->ConfirmCleanUpEvent -= mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
+      this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
+  }
+
+  if (m_Preferences != nullptr)
+  {
+    m_Preferences->OnPropertyChanged -=
+      mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::IPreferences::ChangeEvent&>(
+        this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
+  }
 }
 
 void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -160,21 +214,44 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->GetTool()->ConfirmCleanUpEvent += mitk::MessageDelegate1<QmitknnInteractiveToolGUI, bool>(
     this, &QmitknnInteractiveToolGUI::OnConfirmCleanUp);
 
+  this->GetTool()->PreviewUpdatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
+
+  this->GetTool()->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
   Superclass::InitializeUI(mainLayout);
 
-  // Set shortcut to reset all interactions.
-
-  m_Ui->resetButton->setToolTip("Press R to reset all interactions");
-  auto reset = new QShortcut(QKeySequence(Qt::Key_R), this);
-  connect(reset, &QShortcut::activated, m_Ui->resetButton, &QPushButton::click);
-
-  // Set shortcut to confirm a segmentation.
-  // TODO: Once we agree on a common shortcut concept, this should be moved to the base class.
+  // TODO: Once we agree on a common shortcut concept, the confirm binding
+  // should be moved to the base class.
 
   auto confirmButton = this->GetConfirmSegmentationButton();
-  confirmButton->setToolTip("Press C to confirm a segmentation");
-  auto confirmSegmentation = new QShortcut(QKeySequence(Qt::Key_C), this);
-  connect(confirmSegmentation, &QShortcut::activated, confirmButton, &QPushButton::click);
+
+  BindShortcut(this, RESET_KEY, m_Ui->resetButton, "Press %1 to reset all interactions");
+  BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
+
+  // Cache the base label of each shortcut-bound widget as seen from the
+  // .ui file (and, for the confirm button, from the base class). The cache
+  // is the single source of truth for ApplyShortcutLabels, so repeated
+  // invocations never accumulate suffixes.
+
+  m_ShortcutLabels = {
+    { m_Ui->resetButton,    RESET_KEY,    m_Ui->resetButton->text() },
+    { m_Ui->pointButton,    POINT_KEY,    m_Ui->pointButton->text() },
+    { m_Ui->boxButton,      BOX_KEY,      m_Ui->boxButton->text() },
+    { m_Ui->scribbleButton, SCRIBBLE_KEY, m_Ui->scribbleButton->text() },
+    { m_Ui->lassoButton,    LASSO_KEY,    m_Ui->lassoButton->text() },
+    { confirmButton,        CONFIRM_KEY,  confirmButton->text() },
+  };
+  m_PromptTypeBaseTitle = m_Ui->promptTypeGroupBox->title();
+
+  auto prefService = mitk::CoreServices::GetPreferencesService();
+  m_Preferences = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  m_Preferences->OnPropertyChanged +=
+    mitk::MessageDelegate1<QmitknnInteractiveToolGUI, const mitk::IPreferences::ChangeEvent&>(
+      this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
+
+  this->ApplyShortcutLabels();
 }
 
 void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
@@ -215,11 +292,11 @@ void QmitknnInteractiveToolGUI::InitializePromptType()
 
   // Set shortcut to toggle the prompt type.
 
-  const QString toolTip("Press T to switch the prompt types");
+  const QString toolTip = QString("Press %1 to switch the prompt types").arg(KeyChar(PROMPT_TYPE_KEY));
   m_Ui->positiveButton->setToolTip(toolTip);
   m_Ui->negativeButton->setToolTip(toolTip);
 
-  auto togglePromptType = new QShortcut(QKeySequence(Qt::Key_T), this);
+  auto togglePromptType = new QShortcut(QKeySequence(PROMPT_TYPE_KEY), this);
 
   connect(togglePromptType, &QShortcut::activated, this, [this]() {
     if (m_Ui->positiveButton->isChecked())
@@ -237,21 +314,10 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
 {
   // Set shortcuts to toggle interactor buttons.
 
-  m_Ui->pointButton->setToolTip("Press P to toggle the point interaction");
-  auto togglePointInteractor = new QShortcut(QKeySequence(Qt::Key_P), this);
-  connect(togglePointInteractor, &QShortcut::activated, m_Ui->pointButton, &QPushButton::click);
-
-  m_Ui->boxButton->setToolTip("Press B to toggle the box interaction");
-  auto toggleBoxInteractor = new QShortcut(QKeySequence(Qt::Key_B), this);
-  connect(toggleBoxInteractor, &QShortcut::activated, m_Ui->boxButton, &QPushButton::click);
-
-  m_Ui->scribbleButton->setToolTip("Press S to toggle the scribble interaction");
-  auto toggleScribbleInteractor = new QShortcut(QKeySequence(Qt::Key_S), this);
-  connect(toggleScribbleInteractor, &QShortcut::activated, m_Ui->scribbleButton, &QPushButton::click);
-
-  m_Ui->lassoButton->setToolTip("Press L to toggle the lasso interaction");
-  auto toggleLassoInteractor = new QShortcut(QKeySequence(Qt::Key_L), this);
-  connect(toggleLassoInteractor, &QShortcut::activated, m_Ui->lassoButton, &QPushButton::click);
+  BindShortcut(this, POINT_KEY,    m_Ui->pointButton,    "Press %1 to toggle the point interaction");
+  BindShortcut(this, BOX_KEY,      m_Ui->boxButton,      "Press %1 to toggle the box interaction");
+  BindShortcut(this, SCRIBBLE_KEY, m_Ui->scribbleButton, "Press %1 to toggle the scribble interaction");
+  BindShortcut(this, LASSO_KEY,    m_Ui->lassoButton,    "Press %1 to toggle the lasso interaction");
 
   m_InteractorButtons[InteractionType::Point] = m_Ui->pointButton;
   m_InteractorButtons[InteractionType::Box] = m_Ui->boxButton;
@@ -274,27 +340,79 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
   connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
-bool QmitknnInteractiveToolGUI::CreateVirtualEnv()
+bool QmitknnInteractiveToolGUI::Install()
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
 
+  // If the venv already exists, check if packages are installed.
+  // This avoids showing the install dialog when everything is up to date.
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
-    return true;
+  {
+    if (!this->GetTool()->CreatePythonContext())
+      return false;
 
-  const auto venvPath = QmitkRunAsyncBlocking<fs::path>("nnInteractive", "Creating virtual environment...", [&]() {
-    return mitk::PythonHelper::CreateVirtualEnv(venvName);
-  });
+    if (this->GetTool()->IsInstalled())
+      return true;
+  }
 
-  return !venvPath.empty();
-}
+  // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
+  // pip uses the default PyPI index.
+#if defined(_WIN32)
+  // Starting with CUDA v12.9 we get the following error on our lowest
+  // supported GPU architecture (e.g. GeForce 10 Series):
+  //   torch.AcceleratorError: CUDA error: no kernel image is available
+  //   for exec
+  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
+#else
+  const std::string cudaIndexUrl;
+#endif
 
-bool QmitknnInteractiveToolGUI::Install()
-{
-  if (this->GetTool()->IsInstalled())
-    return true;
+  // Pre-fetch the model weights so the first StartSession() doesn't surprise
+  // the user with a silent multi-minute download. The checkpoint name mirrors
+  // the preference mitknnInteractiveTool::StartSession() reads. Guard each
+  // link in the preferences chain so a missing preferences service doesn't
+  // crash the installer before it even starts.
+  std::string checkpoint = "nnInteractive_v1.0";
+  if (auto* prefsService = mitk::CoreServices::GetPreferencesService())
+  {
+    if (auto* system = prefsService->GetSystemPreferences())
+    {
+      if (auto* prefs = system->Node("org.mitk.views.segmentation"))
+        checkpoint = prefs->Get("nnInteractive/modelCheckpoint", checkpoint);
+    }
+  }
 
-  QmitknnInteractiveInstallDialog installDialog;
-  return installDialog.exec() == QDialog::Accepted;
+  mitk::PipInstallSpec spec;
+  spec.name = "nnInteractive";
+  spec.venvName = venvName;
+  spec.upgradePipFirst = true;
+
+  mitk::PipInstallGroup torchGroup;
+  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+  torchGroup.indexUrl = cudaIndexUrl;
+  spec.groups.push_back(std::move(torchGroup));
+
+  mitk::PipInstallGroup nnInteractiveGroup;
+  nnInteractiveGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
+  spec.groups.push_back(std::move(nnInteractiveGroup));
+
+  mitk::HuggingFaceDownload modelDownload;
+  modelDownload.repoId = "nnInteractive/nnInteractive";
+  modelDownload.allowPatterns = { checkpoint + "/*" };
+  modelDownload.displayName = "model checkpoint " + checkpoint;
+  modelDownload.optional = true;
+  spec.huggingFaceDownloads.push_back(std::move(modelDownload));
+
+  QmitkPipInstallDialog dialog(spec, this);
+
+  if (dialog.exec() != QDialog::Accepted)
+    return false;
+
+  // The dialog populated the venv (and possibly created it). Create a fresh
+  // context so the embedded interpreter picks up the newly installed packages.
+  // PythonContext checks Py_IsInitialized internally, so calling this a second
+  // time after the early-return path above is safe.
+  return this->GetTool()->CreatePythonContext();
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
@@ -312,9 +430,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 #else
   this->EnableInitializeButtons(false);
 
-  if (!CreateVirtualEnv() ||
-      !this->GetTool()->CreatePythonContext() ||
-      !Install())
+  if (!Install())
   {
     this->EnableInitializeButtons(true);
     return;
@@ -322,9 +438,7 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
   const auto initMessage = QString(
     "<h3 %1>Initializing nnInteractive</h3>"
-    "<p %1>Please wait a few seconds...</p>"
-    "<p %1><small><em>Note:</em> The first initialization after downloading MITK may take a minute "
-    "instead. Please be patient.</small></p>").arg(LINE_HEIGHT_STYLE);
+    "<p %1>Please wait a few seconds until nnInteractive is fully initialized...</p>").arg(LINE_HEIGHT_STYLE);
  
   auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
   messageBox->setStandardButtons(QMessageBox::NoButton);
@@ -358,6 +472,12 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     }
 
     messageBox->accept();
+
+    // Re-enable the settings button so the user can adjust preferences that
+    // apply mid-session (e.g., interaction mode). The initialize button
+    // stays disabled because re-initialization within the same session is
+    // not supported.
+    m_Ui->settingsButton->setEnabled(true);
 
     m_Ui->resetButton->setEnabled(true);
     m_Ui->promptTypeGroupBox->setEnabled(true);
@@ -402,6 +522,10 @@ void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
 {
+  // An explicit reset invalidates any pending auto-created-label tracking
+  // so the empty label survives (the user chose to reset, not confirm).
+  this->InvalidateAutoCreatedLabel();
+
   // Uncheck any interactor button.
   for (const auto& [interactor, button] : m_InteractorButtons)
     button->setChecked(false);
@@ -437,6 +561,9 @@ void QmitknnInteractiveToolGUI::OnInteractorToggled(InteractionType interactionT
     // Ensure that only a single interactor is enabled at any time.
     this->UncheckOtherInteractorButtons(m_InteractorButtons[interactionType]);
     this->GetTool()->EnableInteractor(interactionType, m_PromptType);
+
+    // Remember this button so automation can re-enable it after an auto-confirm.
+    m_LastInteractorButton = m_InteractorButtons[interactionType];
 
     // Set the cursor to the interactor's cursor.
     auto svg = this->GetTool()->GetInteractor(interactionType)->GetCursor(m_PromptType);
@@ -495,6 +622,238 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
 
 void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
 {
-  if (isConfirmed)
-    this->OnResetInteractionsButtonClicked();
+  if (!isConfirmed)
+    return;
+
+  // Read flags fresh so a mid-session preference change takes effect
+  // on the next Confirm without requiring tool reactivation.
+  const bool autoCreate = this->IsAutoCreateNextLabelEnabled();
+  const bool autoConfirm = this->IsAutoConfirmEnabled();
+
+  this->OnResetInteractionsButtonClicked();
+
+  bool createdNewLabel = false;
+  if (autoCreate)
+    createdNewLabel = this->AutoCreateAndSelectNewLabel();
+
+  // Re-enable the last interactor so either automation can continue without
+  // the user having to re-select Point/Box/Scribble/Lasso after every Confirm.
+  // Skip this if auto-create was attempted but failed (e.g. user canceled the
+  // rename dialog), so the next interaction doesn't extend the just-confirmed
+  // label instead of starting a fresh one.
+  if (autoConfirm || createdNewLabel)
+    this->ReEnableLastInteractor();
+}
+
+void QmitknnInteractiveToolGUI::OnToolDeactivated()
+{
+  if (!m_AutoCreatedLabelValue.has_value())
+    return;
+
+  // Capture state locally and clear our tracking. Lock() returns a
+  // SmartPointer that keeps the segmentation alive for the deferred call.
+  auto segmentationPtr = m_AutoCreatedLabelSegmentation.Lock();
+  const auto value = *m_AutoCreatedLabelValue;
+  const auto previousActive = m_PreviousActiveLabelValue;
+  auto* inspector = this->GetMultiLabelInspector();
+  this->InvalidateAutoCreatedLabel();
+
+  if (segmentationPtr.IsNull())
+    return;
+
+  // Defer the destructive part to the next event-loop tick.
+  //
+  // - Normal user-initiated tool switch: the Qt event loop is alive, so the
+  //   lambda fires a tick later, after any synchronous BlueBerry chatter
+  //   from the tool-switch path has settled.
+  //
+  // - Workbench close: BlueBerry's Workbench::Close() runs synchronously and
+  //   tears down views/widgets in a sequence that leaves some segmentation
+  //   observers (renderer mappers, etc.) dangling. When it eventually quits
+  //   the Qt event loop, pending single-shot timers are discarded, so our
+  //   lambda never fires and RemoveLabel is never called. Harmless: the
+  //   unused label vanishes with the application anyway.
+  QTimer::singleShot(0, qApp, [segmentationPtr, value, previousActive, inspector]() {
+    if (QCoreApplication::closingDown())
+      return;
+
+    auto* segmentation = segmentationPtr.GetPointer();
+
+    if (segmentation == nullptr || !segmentation->ExistLabel(value))
+      return;
+
+    if (!segmentation->IsEmpty(value, 0))
+      return;
+
+    const auto* activeLabel = segmentation->GetActiveLabel();
+    if (activeLabel != nullptr && activeLabel->GetValue() == value)
+    {
+      mitk::MultiLabelSegmentation::LabelValueType fallback = 0;
+      bool haveFallback = false;
+
+      if (previousActive.has_value() && *previousActive != value && segmentation->ExistLabel(*previousActive))
+      {
+        fallback = *previousActive;
+        haveFallback = true;
+      }
+      else
+      {
+        for (const auto& label : segmentation->GetLabels())
+        {
+          if (label.IsNotNull() && label->GetValue() != value)
+          {
+            fallback = label->GetValue();
+            haveFallback = true;
+            break;
+          }
+        }
+      }
+
+      if (haveFallback)
+      {
+        segmentation->SetActiveLabel(fallback);
+
+        if (inspector != nullptr)
+          inspector->SetSelectedLabel(fallback);
+      }
+    }
+
+    segmentation->RemoveLabel(value);
+  });
+}
+
+void QmitknnInteractiveToolGUI::OnPreviewUpdated()
+{
+  if (m_AutoConfirmInProgress)
+    return;
+
+  if (!this->IsAutoConfirmEnabled())
+    return;
+
+  auto tool = this->GetTool();
+  if (tool == nullptr || !tool->HasInteractions())
+    return;
+
+  auto confirmButton = this->GetConfirmSegmentationButton();
+  if (confirmButton == nullptr)
+    return;
+
+  m_AutoConfirmInProgress = true;
+
+  // Defer the click to the next event-loop tick so the current
+  // DoUpdatePreview call can fully unwind before Confirm fires.
+  QTimer::singleShot(0, this, [this, confirmButton]() {
+    confirmButton->click();
+    m_AutoConfirmInProgress = false;
+  });
+}
+
+bool QmitknnInteractiveToolGUI::IsAutoCreateNextLabelEnabled() const
+{
+  return m_Preferences->GetBool("nnInteractive/autoCreateNextLabel", true);
+}
+
+bool QmitknnInteractiveToolGUI::AreShortcutsShownInLabels() const
+{
+  return m_Preferences->GetBool("nnInteractive/showShortcutsInLabels", true);
+}
+
+void QmitknnInteractiveToolGUI::ApplyShortcutLabels()
+{
+  const bool show = this->AreShortcutsShownInLabels();
+
+  for (const auto& entry : m_ShortcutLabels)
+  {
+    entry.button->setText(show
+      ? LabelWithShortcut(entry.baseText, entry.key)
+      : entry.baseText);
+  }
+
+  m_Ui->promptTypeGroupBox->setTitle(show
+    ? LabelWithShortcut(m_PromptTypeBaseTitle, PROMPT_TYPE_KEY)
+    : m_PromptTypeBaseTitle);
+}
+
+void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)
+{
+  if (event.GetProperty() == "nnInteractive/showShortcutsInLabels")
+    this->ApplyShortcutLabels();
+}
+
+bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const
+{
+  return m_Preferences->GetBool("nnInteractive/autoConfirm", false);
+}
+
+bool QmitknnInteractiveToolGUI::IsNamingPromptSkippedOnAutoCreate() const
+{
+  return m_Preferences->GetBool("nnInteractive/autoCreateNextLabelSkipNamingPrompt", true);
+}
+
+bool QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
+{
+  // Delegate to the host's QmitkMultiLabelInspector so the "default label
+  // naming" and "enforce suggestions" preferences are honored (including the
+  // naming/color dialog), matching the behavior of the "New label" button in
+  // the Segmentation plugin.
+  auto* inspector = this->GetMultiLabelInspector();
+  if (inspector == nullptr)
+    return false;
+
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  if (toolManager == nullptr)
+    return false;
+
+  auto workingNode = toolManager->GetWorkingData(0);
+  if (workingNode == nullptr)
+    return false;
+
+  auto segmentation = workingNode->GetDataAs<mitk::MultiLabelSegmentation>();
+  if (segmentation == nullptr)
+    return false;
+
+  const auto* activeLabel = segmentation->GetActiveLabel();
+  if (activeLabel == nullptr)
+    return false;
+
+  const auto previousActiveValue = activeLabel->GetValue();
+
+  // Align the inspector's selection with the active label so that
+  // AddNewLabel() derives the correct group for the new label.
+  inspector->SetSelectedLabel(previousActiveValue);
+  auto* addedLabel = inspector->AddNewLabel(this->IsNamingPromptSkippedOnAutoCreate());
+
+  // Dialog canceled or creation failed; keep the previous label active.
+  if (addedLabel == nullptr)
+    return false;
+
+  m_AutoCreatedLabelValue = addedLabel->GetValue();
+  m_PreviousActiveLabelValue = previousActiveValue;
+  m_AutoCreatedLabelSegmentation = segmentation;
+  m_AutoCreatedLabelSegmentation.SetDeleteEventCallback(
+    [this] { this->OnAutoCreatedSegmentationDeleted(); });
+
+  return true;
+}
+
+void QmitknnInteractiveToolGUI::InvalidateAutoCreatedLabel()
+{
+  m_AutoCreatedLabelValue.reset();
+  m_PreviousActiveLabelValue.reset();
+  m_AutoCreatedLabelSegmentation = nullptr;
+}
+
+void QmitknnInteractiveToolGUI::OnAutoCreatedSegmentationDeleted()
+{
+  // Delegate to keep a single canonical clearing path. Reassigning the
+  // WeakPointer to nullptr inside its own delete callback is safe: the
+  // raw pointer was already cleared before this callback was invoked,
+  // so RemoveDeleteEventObserver early-outs.
+  this->InvalidateAutoCreatedLabel();
+}
+
+void QmitknnInteractiveToolGUI::ReEnableLastInteractor()
+{
+  if (m_LastInteractorButton != nullptr)
+    m_LastInteractorButton->setChecked(true);
 }

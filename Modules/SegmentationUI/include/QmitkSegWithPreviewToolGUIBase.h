@@ -25,7 +25,14 @@ class QBoxLayout;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI base clase for tools derived from mitk::SegWithPreviewTool.
+  \brief GUI base class for tools derived from mitk::SegWithPreviewTool.
+
+  Provides the common UI elements shared by all preview-based segmentation tools,
+  including the "Confirm Segmentation" button, merge/overwrite checkboxes, and
+  busy-state handling.
+
+  \sa mitk::SegWithPreviewTool
+  \sa QmitkMultiLabelSegWithPreviewToolGUIBase
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSegWithPreviewToolGUIBase : public QmitkToolGUI
 {

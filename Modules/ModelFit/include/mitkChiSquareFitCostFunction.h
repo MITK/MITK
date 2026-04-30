@@ -20,8 +20,18 @@ found in the LICENSE file.
 
 namespace mitk
 {
-/** Multi valued model fit cost function that computes the Chi square. NOTE: This is only for Data from Radioactive Decays (e.g. PET, SPECT)
-*/
+/**
+ * \class ChiSquareFitCostFunction
+ * \brief Single-valued cost function that computes the chi-square statistic.
+ *
+ * This cost function computes the chi-square goodness-of-fit measure, which is
+ * appropriate for data from radioactive decay processes (e.g. PET, SPECT) where
+ * the variance of each measurement equals its expected value.
+ *
+ * \note This cost function assumes Poisson-distributed data (radioactive decays).
+ *
+ * \sa SVModelFitCostFunction, ReducedChiSquareFitCostFunction
+ */
 class MITKMODELFIT_EXPORT ChiSquareFitCostFunction : public mitk::SVModelFitCostFunction
 {
 public:

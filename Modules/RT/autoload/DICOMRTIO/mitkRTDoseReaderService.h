@@ -23,12 +23,19 @@ found in the LICENSE file.
 namespace mitk
 {
     /**
-    * \brief RTDoseReaderService reads DICOM files of modality RTDOSE.
-    */
+     * \brief Reader service for DICOM files of modality RTDOSE.
+     *
+     * Reads PixelData from a DicomRT dose file, scales with the grid
+     * scaling factor to produce Gray values, and stores the result as
+     * an mitk::Image with a vtkColorTransferFunction.
+     */
     class MITKDICOMRTIO_EXPORT RTDoseReaderService : public mitk::AbstractFileReader
     {
         public:
+            /** \brief Copy constructor. */
             RTDoseReaderService(const RTDoseReaderService& other);
+
+            /** \brief Default constructor. Registers reader for the RTDOSE MIME type. */
             RTDoseReaderService();
 
             ~RTDoseReaderService() override;
@@ -37,14 +44,17 @@ namespace mitk
 
     protected:
       /**
-      * @brief Reads a dicom dataset from a RTDOSE file
-      * The method reads the PixelData from the DicomRT dose file and scales
-      * them with a factor for getting Gray-values instead of pixel-values.
-      * The Gray-values are stored in a mitkImage with a vtkColorTransferFunc.
-      * Relative values are used for coloring the image. The relative values are
-      * relative to a PrescriptionDose defined in the RT-Plan. If there is no
-      * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
-      */
+       * \brief Read a DICOM dataset from an RTDOSE file.
+       *
+       * Reads the PixelData from the DicomRT dose file and scales
+       * them with a factor for getting Gray values instead of pixel values.
+       * The Gray values are stored in an mitk::Image with a vtkColorTransferFunction.
+       * Relative values are used for coloring the image. The relative values are
+       * relative to a PrescriptionDose defined in the RT-Plan. If there is no
+       * RT-Plan file, PrescriptionDose is set to 80% of the maximum dose.
+       *
+       * \return A vector of loaded BaseData objects (dose images).
+       */
       std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
     private:

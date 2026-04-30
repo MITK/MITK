@@ -496,13 +496,13 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* editMenu = menuBar->addMenu("&Edit");
   undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
     "&Undo",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
-    QKeySequence("CTRL+Z"));
+    QKeySequence("CTRL+Z"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onUndo);
   undoAction->setToolTip("Undo the last action (not supported by all modules)");
   redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
     "&Redo",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
-    QKeySequence("CTRL+Y"));
+    QKeySequence("CTRL+Y"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onRedo);
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
   // ==== Window Menu ==========================
@@ -516,8 +516,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
   windowMenu->addSeparator();
   windowMenu->addAction("&Preferences...",
-    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-    QKeySequence("CTRL+P"));
+    QKeySequence("CTRL+P"),
+    QmitkFlowApplicationWorkbenchWindowAdvisorHack::undohack, &QmitkFlowApplicationWorkbenchWindowAdvisorHack::onEditPreferences);
 
   // fill perspective menu
   berry::IPerspectiveRegistry* perspRegistry =
@@ -558,7 +558,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* helpMenu = menuBar->addMenu("&Help");
   helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
   helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-  helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+  helpMenu->addAction("&Context Help", QKeySequence("F1"), this, &QmitkFlowApplicationWorkbenchWindowAdvisor::onHelp);
   helpMenu->addAction("&About",this, SLOT(onAbout()));
   // =====================================================
 
@@ -677,8 +677,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
             {
               if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
               {
-                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0, 0.0), QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                 QApplication::sendEvent(widget, &pressEvent);
                 QApplication::sendEvent(widget, &releaseEvent);
               }
@@ -1121,8 +1121,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisorHack::onIntro()
 
     std::cout << title.toStdString() << std::endl;
 
-    QMessageBox::information(nullptr, title,
-      text, "Close");
+    QMessageBox::information(nullptr, title, text, QMessageBox::Close);
   }
   else
   {

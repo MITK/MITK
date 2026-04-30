@@ -49,6 +49,20 @@ namespace mitk
   public:
     mitkClassMacroItkParent(SegmentationInterpolationAlgorithm, itk::Object);
 
+    /**
+     * \brief Interpolates a binary segmentation slice between two given slices.
+     *
+     * \param[in] lowerSlice The segmented slice below the requested position.
+     * \param[in] lowerSliceIndex The index of the lower slice.
+     * \param[in] upperSlice The segmented slice above the requested position.
+     * \param[in] upperSliceIndex The index of the upper slice.
+     * \param[in] requestedIndex The index of the slice to interpolate (between lower and upper).
+     * \param[in] sliceDimension The dimension along which slicing is performed (e.g. 2 for axial).
+     * \param[in] resultImage Optional pre-allocated image to store the result.
+     * \param[in] timeStep The time step for accessing the reference image data.
+     * \param[in] referenceImage Optional original patient image for intensity-based interpolation.
+     * \return The interpolated binary segmentation slice.
+     */
     virtual Image::Pointer Interpolate(Image::ConstPointer lowerSlice,
                                        unsigned int lowerSliceIndex,
                                        Image::ConstPointer upperSlice,

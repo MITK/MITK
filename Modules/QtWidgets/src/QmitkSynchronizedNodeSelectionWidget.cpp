@@ -537,25 +537,36 @@ void QmitkSynchronizedNodeSelectionWidget::SelectAll()
 
 void QmitkSynchronizedNodeSelectionWidget::SetSyncGroup(const GroupSyncIndexType index)
 {
-  auto baseRenderer = m_BaseRenderer.Lock();
-  if (baseRenderer.IsNull())
+  if (index < 1)
+  {
+    mitkThrow() << "Invalid synchronization group index '" << index
+                << "'. Group index must be >= 1.";
+  }
+
+  // No-op when the value is unchanged. Suppressing the signal emission here is
+  // load-bearing: it terminates the model->view feedback loop in which the
+  // owning utility widget mirrors this index back into its combobox via
+  // 'SetSyncGroup'.
+  if (m_SyncGroupIndex == index)
   {
     return;
   }
 
-  if (index == 0)
-  {
-    MITK_ERROR << "Invalid call to SetSyncGroup. Group index can't be 0.";
-    return;
-  }
-
+  // The logical group index is widget bookkeeping and must always be stored;
+  // it does not depend on a renderer being attached. The renderer is only
+  // required for the optional render-update side effect below.
   m_SyncGroupIndex = index;
+
+  emit SyncGroupIndexChanged(index);
 
   // Since the synchronization might lead to a different node order depending on the layer properties, the render window
   // needs to be updated.
   // Explicitly request an update since a renderer-specific property change does not mark the node as modified.
   // see https://phabricator.mitk.org/T22322
-  mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  if (auto baseRenderer = m_BaseRenderer.Lock())
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }
 
 QmitkSynchronizedNodeSelectionWidget::GroupSyncIndexType QmitkSynchronizedNodeSelectionWidget::GetSyncGroup() const

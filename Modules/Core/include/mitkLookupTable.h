@@ -27,23 +27,26 @@ class vtkPiecewiseFunction;
 namespace mitk
 {
   /**
-   * @brief The LookupTable class mitk wrapper for a vtkLookupTable
-   * @ingroup DataManagement
+   * \brief MITK wrapper for a vtkLookupTable.
    *
-   * This class can be used to color images with a LookupTable, such as the
-   * vtkLookupTable.
-   * @note If you want to use this as a property for an mitk::Image, make sure
-   * to use the mitk::LookupTableProperty and set the mitk::RenderingModeProperty
-   * to a mode which supports lookup tables (e.g. LOOKUPTABLE_COLOR). Make
-   * sure to check the documentation of the mitk::RenderingModeProperty. For a
-   * code example how to use the mitk::LookupTable check the
-   * mitkImageVtkMapper2DLookupTableTest.cpp in Core/Code/Testing.
+   * Wraps a vtkLookupTable and provides convenience methods for creating
+   * predefined color lookup tables (grayscale, hot iron, jet, PET, etc.),
+   * modifying opacity values, and querying color mappings.
+   *
+   * \note To use this as an image property, wrap it in a
+   *       mitk::LookupTableProperty and set the mitk::RenderingModeProperty
+   *       to a mode that supports lookup tables (e.g. LOOKUPTABLE_COLOR).
+   *       See the documentation of mitk::RenderingModeProperty and the test
+   *       mitkImageVtkMapper2DLookupTableTest.cpp for examples.
+   *
+   * \sa LookupTableProperty, RenderingModeProperty, TransferFunction
+   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT LookupTable : public itk::DataObject
   {
   public:
     /**
-     * @brief RawLookupTableType raw lookuptable typedef for convenience.
+     * \brief Convenience typedef for the raw lookup table element type.
      */
     typedef unsigned char RawLookupTableType;
 
@@ -54,54 +57,63 @@ namespace mitk
     itkCloneMacro(Self);
 
     /**
-     * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
+     * \brief Get the internally wrapped vtkLookupTable.
+     * \return Smart pointer to the vtkLookupTable.
      */
     virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
     /**
-     * @brief GetRawLookupTable Getter for the raw lookuptable array.
+     * \brief Get the raw lookup table array from the wrapped vtkLookupTable.
+     * \return Pointer to the raw RGBA byte array, or nullptr if not built.
      */
     virtual RawLookupTableType *GetRawLookupTable() const;
 
     /**
-     * @brief SetVtkLookupTable Setter for the internal lookuptable.
-     * @param lut The lookuptable.
+     * \brief Set the internal vtkLookupTable.
+     * \param[in] lut The vtkLookupTable to wrap.
      */
     virtual void SetVtkLookupTable(vtkSmartPointer<vtkLookupTable> lut);
 
     /**
-     * @brief ChangeOpacityForAll Set the opacity for all table values.
-     * @param opacity Opacity between 0.0 and 1.0.
+     * \brief Set the opacity (alpha) for all entries in the table.
+     * \param[in] opacity Opacity value between 0.0 (transparent) and 1.0 (opaque).
      */
     virtual void ChangeOpacityForAll(float opacity);
 
     /**
-     * @brief ChangeOpacity Set the opacity for a specific table index.
-     * @param index The lookuptable index.
-     * @param opacity Opacity between 0.0 and 1.0.
+     * \brief Set the opacity (alpha) for a specific table entry.
+     * \param[in] index   Zero-based index into the lookup table.
+     * \param[in] opacity Opacity value between 0.0 (transparent) and 1.0 (opaque).
      */
     virtual void ChangeOpacity(int index, float opacity);
 
     /**
-     * @brief GetColor convenience method wrapping the vtkLookupTable::GetColor() method.
+     * \brief Map a scalar value to an RGB color via the lookup table.
      *
-     * Map one value through the lookup table and return the color as an RGB array of doubles between 0 and 1.
-     * @param value The value you want to map.
-     * @param rgb RGB values between 0 and 1.
+     * Wraps vtkLookupTable::GetColor().
+     *
+     * \param[in]  value The scalar value to map.
+     * \param[out] rgb   Array of 3 doubles filled with RGB values in [0, 1].
      */
     virtual void GetColor(double value, double rgb[3]);
 
     /**
-     * @brief GetTableValue convenience method wrapping the vtkLookupTable::GetTableValue() method.
-     * @param index The index you want to get.
-     * @param rgba RGB values between 0 and 1.
+     * \brief Get the RGBA tuple at a specific table index.
+     *
+     * Wraps vtkLookupTable::GetTableValue().
+     *
+     * \param[in]  index Zero-based index into the table.
+     * \param[out] rgba  Array of 4 doubles filled with RGBA values in [0, 1].
      */
     virtual void GetTableValue(int index, double rgba[4]);
 
     /**
-     * @brief SetTableValue convenience method wrapping the vtkLookupTable::SetTableValue() method.
-     * @param index The index you want to set.
-     * @param rgba RGB values between 0 and 1.
+     * \brief Set the RGBA tuple at a specific table index.
+     *
+     * Wraps vtkLookupTable::SetTableValue().
+     *
+     * \param[in] index Zero-based index into the table.
+     * \param[in] rgba  Array of 4 doubles with RGBA values in [0, 1].
      */
     virtual void SetTableValue(int index, double rgba[4]);
 
@@ -110,71 +122,87 @@ namespace mitk
     itkSetMacro(Opacity, float);
 
     /**
-     * @brief equality operator implementation
+     * \brief Compare two LookupTable objects for equality.
+     * \param[in] LookupTable The LookupTable to compare against.
+     * \return True if both tables contain the same entries.
      */
     virtual bool operator==(const mitk::LookupTable &LookupTable) const;
 
     /**
-     * @brief non equality operator implementation
+     * \brief Compare two LookupTable objects for inequality.
+     * \param[in] LookupTable The LookupTable to compare against.
+     * \return True if the tables differ.
      */
     virtual bool operator!=(const LookupTable &LookupTable) const;
 
     /**
-     * @brief implementation necessary because operator made
-     * private in itk::Object
+     * \brief Copy assignment operator.
+     *
+     * Necessary because itk::Object makes operator= private.
+     *
+     * \param[in] LookupTable The LookupTable to copy from.
+     * \return Reference to this object.
      */
     virtual LookupTable &operator=(const LookupTable &LookupTable);
 
     /**
-     * @brief Updates the output information of the current object by calling
-     * updateOutputInformation of the data objects source object.
+     * \brief Update output information by querying the source object.
      */
     void UpdateOutputInformation() override;
 
     /**
-     * @brief Sets the requested Region to the largest possible region.
-     * This method is not implemented, since this is the default
-     * behavior of the itk pipeline and we do not support the
-     * requested-region mechanism for lookup-tables
+     * \brief Set the requested region to the largest possible region.
+     *
+     * No-op for lookup tables since the requested-region mechanism
+     * is not supported.
      */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
-     * @brief Checks, if the requested region lies outside of the buffered region by
-     * calling verifyRequestedRegion().
+     * \brief Check whether the requested region is outside the buffered region.
+     * \return The result of VerifyRequestedRegion() negated.
      */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
-     * @brief Checks if the requested region is completely contained in
-     * the buffered region. Since we always want to process the lookup
-     * table as a whole, this method always returns true
+     * \brief Check whether the requested region is valid.
+     *
+     * Always returns true because lookup tables are always processed as a whole.
+     *
+     * \return True.
      */
     bool VerifyRequestedRegion() override;
 
     /**
-     * @brief This method has no effect for lookup tables, since we do
-     * not support the region-mechanism
+     * \brief Set the requested region from another data object.
+     *
+     * No-op for lookup tables since the region mechanism is not supported.
+     *
+     * \param[in] data The data object whose region would be copied (ignored).
      */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
+    /** \brief Default constructor. Builds a GRAYSCALE table by default. */
     LookupTable();
+    /** \brief Destructor. */
     ~LookupTable() override;
-    /**
-     * \deprecatedSince{2014_03} Please use CreateColorTransferFunction() instead
-     */
-    DEPRECATED(void CreateColorTransferFunction(vtkColorTransferFunction *&colorFunction));
-    /**
-    * \deprecatedSince{2014_03} Please use CreateOpacityTransferFunction() instead
-    */
-    DEPRECATED(void CreateOpacityTransferFunction(vtkPiecewiseFunction *&opacityFunction));
-    /**
-     * \deprecatedSince{2014_03} Please use CreateGradientTransferFunction() instead
-     */
-    DEPRECATED(void CreateGradientTransferFunction(vtkPiecewiseFunction *&gradientFunction));
 
+    /**
+     * \brief Create a vtkColorTransferFunction from this lookup table.
+     * \return Smart pointer to the new color transfer function.
+     */
     vtkSmartPointer<vtkColorTransferFunction> CreateColorTransferFunction();
+
+    /**
+     * \brief Create a vtkPiecewiseFunction for opacity from this lookup table.
+     * \return Smart pointer to the new opacity transfer function.
+     */
     vtkSmartPointer<vtkPiecewiseFunction> CreateOpacityTransferFunction();
+
+    /**
+     * \brief Create a vtkPiecewiseFunction for gradient opacity from this lookup table.
+     * \return Smart pointer to the new gradient transfer function.
+     */
     vtkSmartPointer<vtkPiecewiseFunction> CreateGradientTransferFunction();
 
     /**
@@ -217,29 +245,38 @@ namespace mitk
       TURBO
     };
 
+    /** \brief List of all predefined lookup table type names. */
     static std::vector<std::string> typenameList;
 
     /**
-     *  @brief Set the look-up table type by enum (or integer).
-     *  @details Returns if the given type doesn't exist. Only changes the type if it is different
-     *           from the current one.
+     * \brief Set the lookup table type by enum value.
+     *
+     * Rebuilds the internal vtkLookupTable for the given type. Does nothing
+     * if the type is already active or if the type is not recognized.
+     *
+     * \param[in] type The desired LookupTableType enum value.
      */
     virtual void SetType(const LookupTableType type);
 
     /**
-     *  @brief Set the look-up table type by string.
-     *  @details Returns if the given type doesn't exist. Only changes the type if it is different
-     *           from the current one.
+     * \brief Set the lookup table type by name string.
+     *
+     * Looks up \p typeName in typenameList and delegates to SetType(LookupTableType).
+     * Does nothing if the name is not found.
+     *
+     * \param[in] typeName Case-sensitive name of the lookup table type.
      */
     virtual void SetType(const std::string &typeName);
 
     /**
-     *  @brief Return the current look-up table type.
+     * \brief Get the currently active lookup table type.
+     * \return The active LookupTableType enum value.
      */
     virtual LookupTableType GetActiveType() const;
 
     /**
-     *  @brief Return the current look-up table type as a string.
+     * \brief Get the currently active lookup table type as a string.
+     * \return The name of the active type.
      */
     virtual std::string GetActiveTypeAsString() const;
 

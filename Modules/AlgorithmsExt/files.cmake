@@ -12,7 +12,6 @@ set(CPP_FILES
   mitkGeometryClipImageFilter.cpp
   mitkGeometryDataSource.cpp
   mitkHeightFieldSurfaceClipImageFilter.cpp
-  mitkImageToUnstructuredGridFilter.cpp
   mitkLabeledImageToSurfaceFilter.cpp
   mitkMaskAndCutRoiImageFilter.cpp
   mitkMaskImageFilter.cpp
@@ -24,13 +23,10 @@ set(CPP_FILES
   mitkPointLocator.cpp
   mitkSegmentationSink.cpp
   mitkSimpleHistogram.cpp
-  mitkSimpleUnstructuredGridHistogram.cpp
   mitkCovarianceMatrixCalculator.cpp
   mitkAnisotropicIterativeClosestPointRegistration.cpp
   mitkWeightedPointTransform.cpp
   mitkAnisotropicRegistrationCommon.cpp
-  mitkUnstructuredGridClusteringFilter.cpp
-  mitkUnstructuredGridToUnstructuredGridFilter.cpp
   mitkSurfaceToPointSetFilter.cpp
   mitkCropTimestepsImageFilter.cpp
 )

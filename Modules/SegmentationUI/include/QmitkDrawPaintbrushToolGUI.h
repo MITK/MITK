@@ -18,11 +18,15 @@ found in the LICENSE file.
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::PaintbrushTool.
+  \brief GUI for the drawing mode of mitk::PaintbrushTool.
 
-  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
+  Specialization of QmitkPaintbrushToolGUI that provides the user interface for
+  drawing (adding) segmentation pixels with the paintbrush tool. Shows a slider
+  to change the brush size.
 
-  Last contributor: $Author$
+  \sa mitk::PaintbrushTool
+  \sa QmitkPaintbrushToolGUI
+  \sa QmitkErasePaintbrushToolGUI
 */
 
 class MITKSEGMENTATIONUI_EXPORT QmitkDrawPaintbrushToolGUI : public QmitkPaintbrushToolGUI

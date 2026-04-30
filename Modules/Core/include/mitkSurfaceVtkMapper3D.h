@@ -80,16 +80,46 @@ namespace mitk
 
     itkCloneMacro(Self);
 
+    /** \brief Enable or disable automatic surface normal generation.
+     * \param[in] _arg True to generate normals, false otherwise.
+     */
     itkSetMacro(GenerateNormals, bool);
 
+    /** \brief Get whether automatic surface normal generation is enabled.
+     * \return True if normal generation is enabled.
+     */
     itkGetMacro(GenerateNormals, bool);
 
+    /**
+     * \brief Get the input Surface from the associated DataNode.
+     * \return Const pointer to the input mitk::Surface.
+     */
     virtual const mitk::Surface *GetInput();
 
+    /**
+     * \brief Get the VTK prop (actor) for the given renderer.
+     * \param[in] renderer The renderer for which the prop is requested.
+     * \return Pointer to the vtkProp (vtkActor) used for 3D rendering.
+     */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
+    /**
+     * \brief Apply all material, color, opacity, and scalar visibility properties to the given actor.
+     * \param[in] renderer The renderer whose property list is queried.
+     * \param[in] actor The vtkActor to apply properties to.
+     */
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
 
+    /**
+     * \brief Set default properties for 3D surface rendering on the given DataNode.
+     *
+     * Initializes material properties (ambient, diffuse, specular), color, opacity,
+     * scalar visibility, and related rendering options.
+     *
+     * \param[in] node The DataNode on which to set the properties.
+     * \param[in] renderer The renderer context (nullptr for default property list).
+     * \param[in] overwrite If true, overwrite existing properties.
+     */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:
@@ -108,14 +138,23 @@ namespace mitk
     bool m_GenerateNormals;
 
   public:
+    /**
+     * \brief Per-renderer storage holding VTK objects for 3D surface rendering.
+     */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
+      /** \brief The VTK actor representing the surface in 3D. */
       vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief The VTK poly data mapper. */
       vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+      /** \brief Filter for computing surface normals. */
       vtkSmartPointer<vtkPolyDataNormals> m_VtkPolyDataNormals;
+      /** \brief Collection of clipping planes applied to the surface. */
       vtkSmartPointer<vtkPlaneCollection> m_ClippingPlaneCollection;
+      /** \brief Filter for depth-sorting translucent polygons. */
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
+      /** \brief Timestamp tracking the last shader update. */
       itk::TimeStamp m_ShaderTimestampUpdate;
 
       LocalStorage()
@@ -133,11 +172,29 @@ namespace mitk
       ~LocalStorage() override {}
     };
 
+    /** \brief Handler managing per-renderer LocalStorage instances. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
+    /**
+     * \brief Apply MITK material properties from a DataNode to a vtkProperty.
+     *
+     * Reads color, ambient, diffuse, specular, interpolation, representation,
+     * and other properties from the DataNode and applies them to the given vtkProperty.
+     *
+     * \param[in] node The DataNode providing the properties.
+     * \param[in] property The vtkProperty to configure.
+     * \param[in] renderer The renderer context for renderer-specific properties.
+     */
     static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node,
                                                  vtkProperty *property,
                                                  mitk::BaseRenderer *renderer);
+
+    /**
+     * \brief Set default material properties for vtkProperty-based rendering.
+     * \param[in] node The DataNode on which to set the properties.
+     * \param[in] renderer The renderer context.
+     * \param[in] overwrite If true, overwrite existing properties.
+     */
     static void SetDefaultPropertiesForVtkProperty(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite);
   };
 } // namespace mitk

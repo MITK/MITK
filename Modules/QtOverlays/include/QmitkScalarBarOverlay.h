@@ -21,11 +21,23 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <QmitkScalarBar.h>
 
-/** \class  QmitkScalarBarOverlay
-* \brief object representing a text that is drawn as an overlay
-*
-* \ingroup Qmitk
-*/
+/**
+ * \class  QmitkScalarBarOverlay
+ * \brief Overlay displaying a scale bar in a render window.
+ *
+ * This overlay wraps a QmitkScalarBar widget and configures it based on
+ * properties from a mitk::PropertyList. The scale factor is read from the
+ * property identified by the overlay's ID (as a float property), and the
+ * color is read from the "overlay.color" property.
+ *
+ * The overlay registers an observer on the scale property so that the bar
+ * updates automatically when the property value changes.
+ *
+ * \sa QmitkScalarBar
+ * \sa QmitkOverlay
+ * \sa QmitkTextOverlay
+ * \ingroup Qmitk
+ */
 
 class MITKQTOVERLAYS_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
 {
@@ -33,48 +45,65 @@ class MITKQTOVERLAYS_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
 
 public:
   /**
-  * @brief Default Constructor
-  **/
+   * \brief Constructor. Creates the internal QmitkScalarBar widget.
+   * \param[in] id String identifier used to look up the scale factor property.
+   */
   QmitkScalarBarOverlay(const char *id);
 
-  /**
-  * @brief Default Destructor
-  **/
+  /** \brief Destructor. Removes the property observer. */
   ~QmitkScalarBarOverlay() override;
 
   /**
-  * \brief Setup the QLabel with overlay specific information
-  *
-  * First, this method sets text-overlay specific properties as described in the class docu above.
-  * Secondly, the actual text of the label is set.
-  *
-  * \warning No error will be issued if the property containing the text is not found, the TextOverlay
-  * will show an empty string!
-  */
-  void GenerateData(mitk::PropertyList::Pointer) override;
+   * \brief Configures the scalar bar overlay from the given PropertyList.
+   *
+   * Reads overlay-specific properties (color, scale factor) and sets up
+   * an observer for automatic updates when the scale property changes.
+   *
+   * \param[in] pl The PropertyList containing the configuration properties.
+   */
+  void GenerateData(mitk::PropertyList::Pointer pl) override;
 
+  /**
+   * \brief Returns the current size of the scalar bar widget.
+   * \return The QSize of the internal widget.
+   */
   QSize GetNeededSize() override;
 
 protected:
   /**
-  * \brief internal helper class to determine text-properties
-  *
-  * This method is only used internally to apply the text specific properties that can be set
-  * using a mitk::PropertyList. If a property cannot be found, a default value is used.
-  *
-  * The values of these properties are then attributed to the label using QFont and QPalette.
-  */
-  void GetProperties(mitk::PropertyList::Pointer);
+   * \brief Reads visual properties (color) from the PropertyList and applies them.
+   *
+   * Reads the "overlay.color" property and configures the pen of the internal
+   * QmitkScalarBar accordingly. Falls back to a default color if the property is missing.
+   *
+   * \param[in] pl The PropertyList to read properties from.
+   */
+  void GetProperties(mitk::PropertyList::Pointer pl);
 
+  /**
+   * \brief Sets up an ITK observer on the given property to auto-update the scale factor.
+   * \param[in] prop The property to observe for modifications.
+   */
   void SetupCallback(mitk::BaseProperty::Pointer prop);
 
+  /**
+   * \brief Reads the scale factor property and applies it to the scalar bar.
+   *
+   * The scale factor is read from the property identified by m_Id. Falls back
+   * to a default value of 2 if the property is not found.
+   */
   void SetScaleFactor();
-  /** \brief QWidget internally representing the TextOverlay */
+
+  /** \brief The internal QmitkScalarBar widget. */
   QmitkScalarBar *m_ScalarBar;
 
+  /** \brief The observed property for automatic updates. */
   mitk::BaseProperty::Pointer m_ObservedProperty;
 
+  /** \brief Cached PropertyList for property lookups. */
   mitk::PropertyList::Pointer m_PropertyList;
+
+  /** \brief ITK observer tag for the property modification callback. */
   unsigned long m_ObserverTag;
 };
 

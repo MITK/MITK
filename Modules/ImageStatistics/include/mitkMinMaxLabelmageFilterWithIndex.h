@@ -23,6 +23,19 @@ found in the LICENSE file.
 
 namespace itk
 {
+/**
+ * \brief Computes per-label and global minimum/maximum pixel values with their indices.
+ *
+ * This ITK filter computes the minimum and maximum pixel values (and their
+ * indices) for each label in a label image, as well as the global extrema
+ * across all labels. It uses multi-threaded processing for performance.
+ *
+ * \tparam TInputImage The type of the input intensity image.
+ * \tparam TLabelImage The type of the label image.
+ *
+ * \sa MinMaxImageFilterWithIndex
+ * \sa LabelStatisticsImageFilter
+ */
 template <typename TInputImage, typename TLabelImage>
 class MinMaxLabelImageFilterWithIndex: public itk::ImageToImageFilter<TInputImage, TInputImage>
 {
@@ -51,7 +64,7 @@ public:
     typedef typename TLabelImage::PixelType  LabelPixelType;
 
     /**
-     * @brief The LabelExtrema class is just a container for global min/max values and their indices as well as all min and max values (+indices) of the mask labels
+     * \brief Container holding minimum/maximum values and their indices for a single label.
      */
     class LabelExtrema
     {
@@ -70,6 +83,11 @@ public:
     typedef typename ExtremaMapType::const_iterator                   ExtremaMapTypeConstIterator;
     typedef typename ExtremaMapType::value_type                       MapValueType;
 
+    /**
+     * \brief Get the minimum pixel value for the given label.
+     * \param[in] label The label value to query.
+     * \return The minimum pixel value for that label.
+     */
     PixelType GetMin(LabelPixelType label) const
     {
         ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
@@ -81,6 +99,11 @@ public:
         return (*it).second.m_Min;
     }
 
+    /**
+     * \brief Get the maximum pixel value for the given label.
+     * \param[in] label The label value to query.
+     * \return The maximum pixel value for that label.
+     */
     PixelType GetMax(LabelPixelType label) const
     {
         ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
@@ -93,7 +116,8 @@ public:
     }
 
     /**
-     * @brief Returns a std::vector containing all labels for which min and max values (and indices) have been computed
+     * \brief Get all labels for which extrema have been computed.
+     * \return A vector containing all label pixel values with computed min/max.
      */
     std::vector<LabelPixelType> GetRelevantLabels() const
     {
@@ -105,6 +129,11 @@ public:
         return labels;
     }
 
+    /**
+     * \brief Get the index of the minimum pixel value for the given label.
+     * \param[in] label The label value to query.
+     * \return The image index of the minimum pixel for that label.
+     */
     IndexType GetMinIndex(LabelPixelType label) const
     {
         ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
@@ -117,6 +146,11 @@ public:
 
     }
 
+    /**
+     * \brief Get the index of the maximum pixel value for the given label.
+     * \param[in] label The label value to query.
+     * \return The image index of the maximum pixel for that label.
+     */
     IndexType GetMaxIndex(LabelPixelType label) const
     {
         ExtremaMapTypeConstIterator it = m_LabelExtrema.find(label);
@@ -129,34 +163,56 @@ public:
 
     }
 
+    /**
+     * \brief Get the global minimum pixel value across all labels.
+     * \return The global minimum pixel value.
+     */
     PixelType GetGlobalMin() const
     {
         return m_GlobalMin;
     }
 
+    /**
+     * \brief Get the global maximum pixel value across all labels.
+     * \return The global maximum pixel value.
+     */
     PixelType GetGlobalMax() const
     {
         return m_GlobalMax;
     }
 
+    /**
+     * \brief Get the index of the global minimum pixel value.
+     * \return The image index of the global minimum pixel.
+     */
     IndexType GetGlobalMinIndex() const
     {
         return m_GlobalMinIndex;
     }
 
+    /**
+     * \brief Get the index of the global maximum pixel value.
+     * \return The image index of the global maximum pixel.
+     */
     IndexType GetGlobalMaxIndex() const
     {
         return m_GlobalMaxIndex;
     }
 
-    /** Set the label image */
+    /**
+     * \brief Set the label image defining label regions.
+     * \param[in] input Pointer to the label image.
+     */
     void SetLabelInput(const TLabelImage *input)
     {
       // Process object is not const-correct so the const casting is required.
       this->SetNthInput( 1, const_cast< TLabelImage * >( input ) );
     }
 
-    /** Get the label image */
+    /**
+     * \brief Get the label image.
+     * \return Const pointer to the label image.
+     */
     const TLabelImage * GetLabelInput() const
     {
       return itkDynamicCastInDebugMode< TLabelImage * >( const_cast< DataObject * >( this->ProcessObject::GetInput(1) ) );

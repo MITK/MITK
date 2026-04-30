@@ -24,15 +24,7 @@ found in the LICENSE file.
 
 mitk::MultilabelObjectFactory::MultilabelObjectFactory() : CoreObjectFactoryBase()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    MITK_DEBUG << "MultilabelObjectFactory c'tor" << std::endl;
-
-    CreateFileExtensionsMap();
-
-    alreadyDone = true;
-  }
+  MITK_DEBUG << "MultilabelObjectFactory c'tor" << std::endl;
 }
 
 mitk::MultilabelObjectFactory::~MultilabelObjectFactory()
@@ -90,34 +82,6 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
       propertyFilters->AddFilter(labelSetImageFilter, "MultiLabelSegmentation");
     }
   }
-}
-
-std::string mitk::MultilabelObjectFactory::GetFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions({}, fileExtension);
-  return fileExtension.c_str();
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::MultilabelObjectFactory::GetFileExtensionsMap()
-{
-  return {};
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::MultilabelObjectFactory::GetSaveFileExtensionsMap()
-{
-  return {};
-}
-
-void mitk::MultilabelObjectFactory::CreateFileExtensionsMap()
-{
-}
-
-std::string mitk::MultilabelObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions({}, fileExtension);
-  return fileExtension.c_str();
 }
 
 struct RegisterMultilabelObjectFactory

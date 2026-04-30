@@ -17,25 +17,33 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /*!
-    \brief Interface for creating a sequence of nice/matching/appropriate/... colors.
-
-    See derived classes for implemented sequences.
-  */
+  /**
+   * \brief Abstract interface for generating a sequence of distinguishable colors.
+   *
+   * Subclasses implement specific color sequences (e.g., cycling through hue
+   * values or using a predefined rainbow palette).
+   *
+   * \sa ColorSequenceCycleH, ColorSequenceRainbow
+   */
   class MITKDATATYPESEXT_EXPORT ColorSequence
   {
   public:
+    /** \brief Default constructor. */
     ColorSequence();
+
+    /** \brief Virtual destructor. */
     virtual ~ColorSequence();
 
-    /*!
-    \brief Return another color
-    */
+    /**
+     * \brief Return the next color in the sequence.
+     *
+     * \return The next mitk::Color value.
+     */
     virtual Color GetNextColor() = 0;
 
-    /*!
-    \brief Set the color-index to begin again
-    */
+    /**
+     * \brief Reset the sequence to the beginning.
+     */
     virtual void GoToBegin() = 0;
   };
 }

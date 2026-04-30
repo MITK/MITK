@@ -32,43 +32,92 @@ found in the LICENSE file.
 
 namespace mitk
 {
-/*!
-  \brief MITKRegistrationHelper
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-*/
+/**
+ * \brief Static utility class providing helper methods for working with MatchPoint registrations in MITK.
+ *
+ * MITKRegistrationHelper offers convenience functions for extracting affine matrices from
+ * registrations, checking registration dimensionality, identifying registration nodes in the
+ * data storage, and obtaining node predicates for common data types.
+ *
+ * \sa mitk::MAPRegistrationWrapper, mitk::ImageMappingHelper, mitk::PointSetMappingHelper
+ */
 class MITKMATCHPOINTREGISTRATION_EXPORT MITKRegistrationHelper
 {
 public:
 
+  /** \brief 3D scalable affine transform type used for matrix extraction. */
   typedef ::itk::ScalableAffineTransform< ::mitk::ScalarType,3 > Affine3DTransformType;
+  /** \brief 3D-to-3D MatchPoint registration type. */
   typedef ::map::core::Registration<3,3> Registration3DType;
+  /** \brief Base type of all MatchPoint registrations. */
   typedef ::map::core::RegistrationBase RegistrationBaseType;
 
-  /** Extracts the affine transformation, if possible, of the selected kernel.
-   @param wrapper Pointer to the registration that is target of the extraction
-   @param inverseKernel Indicates from which kernel the matrix should be extract. True: inverse kernel, False: direct kernel.
-   @return Pointer to the extracted transform. If it is not possible to convert the kernel into an affine transform a null pointer is returned.
-   @pre wrapper must point to a valid instance.
-   @pre wrapper must be a 3D-3D registration.*/
+  /**
+   * \brief Extracts the affine transformation matrix from a registration wrapper's kernel.
+   *
+   * \param[in] wrapper Pointer to the registration wrapper.
+   * \param[in] inverseKernel If true, extract from the inverse kernel; if false, from the direct kernel.
+   * \return Pointer to the extracted affine transform, or nullptr if extraction is not possible
+   *         (e.g. the kernel is not affine-decomposable).
+   * \pre \p wrapper must point to a valid instance.
+   * \pre \p wrapper must wrap a 3D-3D registration.
+   */
   static Affine3DTransformType::Pointer getAffineMatrix(const mitk::MAPRegistrationWrapper* wrapper, bool inverseKernel);
+
+  /**
+   * \brief Extracts the affine transformation matrix from a MatchPoint registration's kernel.
+   *
+   * \param[in] registration Pointer to the MatchPoint registration base.
+   * \param[in] inverseKernel If true, extract from the inverse kernel; if false, from the direct kernel.
+   * \return Pointer to the extracted affine transform, or nullptr if extraction is not possible.
+   * \pre \p registration must point to a valid 3D-3D registration instance.
+   */
   static Affine3DTransformType::Pointer getAffineMatrix(const RegistrationBaseType* registration, bool inverseKernel);
 
+  /**
+   * \brief Checks whether the given registration wrapper represents a 3D-to-3D registration.
+   *
+   * \param[in] wrapper Pointer to the registration wrapper.
+   * \return True if both moving and target dimensions are 3, false otherwise or if wrapper is nullptr.
+   */
   static bool is3D(const mitk::MAPRegistrationWrapper* wrapper);
+
+  /**
+   * \brief Checks whether the given MatchPoint registration is a 3D-to-3D registration.
+   *
+   * \param[in] regBase Pointer to the MatchPoint registration base.
+   * \return True if both moving and target dimensions are 3, false otherwise or if regBase is nullptr.
+   */
   static bool is3D(const RegistrationBaseType* regBase);
 
-  /** Checks if the passed Node contains a MatchPoint registration
-   @param node Pointer to the node to be checked.*
-   @return true: node contains a MAPRegistrationWrapper. false: "node" does not point to a valid instance or does not contain
-    a registration wrapper.*/;
+  /**
+   * \brief Checks whether the given DataNode contains a MatchPoint registration.
+   *
+   * \param[in] node Pointer to the node to be checked.
+   * \return True if the node contains a MAPRegistrationWrapper. False if \p node is nullptr
+   *         or does not contain a registration wrapper.
+   */
   static bool IsRegNode(const mitk::DataNode* node);
 
-  /** Returns a node predicate that identifies registration nodes.*/
+  /**
+   * \brief Returns a node predicate that identifies nodes containing MatchPoint registrations.
+   *
+   * \return A constant pointer to a NodePredicateBase matching MAPRegistrationWrapper data.
+   */
   static NodePredicateBase::ConstPointer RegNodePredicate();
 
-  /** Returns a node predicate that identifies image nodes.*/
+  /**
+   * \brief Returns a node predicate that identifies nodes containing images.
+   *
+   * \return A constant pointer to a NodePredicateBase matching mitk::Image data.
+   */
   static NodePredicateBase::ConstPointer ImageNodePredicate();
 
-  /** Returns a node predicate that identifies point set nodes.*/
+  /**
+   * \brief Returns a node predicate that identifies nodes containing point sets.
+   *
+   * \return A constant pointer to a NodePredicateBase matching mitk::PointSet data.
+   */
   static NodePredicateBase::ConstPointer PointSetNodePredicate();
 
 private:

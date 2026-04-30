@@ -21,8 +21,18 @@ found in the LICENSE file.
 namespace mitk
 {
 /**
- * @brief Utility class for mask operations. It checks whether an image and a mask are compatible (spacing, orientation, etc...)
- * and it can also crop an image to the LargestPossibleRegion of the Mask
+ * \brief Utility class for validating and adapting masks for use with images.
+ *
+ * MaskUtilities provides functionality to check whether an ITK image and a
+ * mask image are geometrically compatible (same spacing, direction, and
+ * alignment) and to crop the image region to match the mask's
+ * LargestPossibleRegion.
+ *
+ * \tparam TPixel The pixel type of the image.
+ * \tparam VImageDimension The dimensionality of the image and mask.
+ *
+ * \sa ImageStatisticsCalculator
+ * \sa ImageMaskGenerator
  */
 template <class TPixel, unsigned int VImageDimension>
 class MaskUtilities: public itk::Object
@@ -38,27 +48,41 @@ class MaskUtilities: public itk::Object
         itkNewMacro(Self); /** Runtime information support. */
         itkTypeMacro(MaskUtilities, itk::Object);
 
+        /** \brief ITK image type with the given pixel type and dimension. */
         typedef itk::Image<TPixel, VImageDimension> ImageType;
+        /** \brief Mask image type (unsigned short) with the given dimension. */
         typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
         /**
-         * @brief Set image
+         * \brief Set the image to validate against the mask.
+         * \param[in] image Const pointer to the ITK image.
          */
         void SetImage(const ImageType* image);
 
         /**
-         * @brief Set mask
+         * \brief Set the mask image.
+         * \param[in] mask Const pointer to the ITK mask image.
          */
         void SetMask(const MaskType* mask);
 
         /**
-         * @brief Checks whether mask and image are compatible for joint access (as via iterators).
-         * Spacing and direction must be the same between the two and they must be aligned. Also, the mask must be completely inside the image
+         * \brief Check whether the mask and image are geometrically compatible.
+         *
+         * Validates that spacing and direction are the same between image and
+         * mask (within tolerance), that the two are grid-aligned, and that the
+         * mask region is completely inside the image region.
+         *
+         * \return True if mask and image are compatible for joint pixel access.
+         *
+         * \sa MASK_SUITABILITY_TOLERANCE_COORDINATE
+         * \sa MASK_SUITABILITY_TOLERANCE_DIRECTION
          */
         bool CheckMaskSanity();
 
         /**
-         * @brief Crops the image to the LargestPossibleRegion of the mask
+         * \brief Crop the image to the LargestPossibleRegion of the mask.
+         *
+         * \return Const pointer to the cropped image region matching the mask extent.
          */
         typename ImageType::ConstPointer ExtractMaskImageRegion();
 

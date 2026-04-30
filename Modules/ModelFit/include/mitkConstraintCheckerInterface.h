@@ -19,10 +19,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Interface class that is implemented by all constraint checkers that are used in the context of model fitting.
-   * @remark All functions of the interface must be implemented thread save because it will be used in a multi threaded
-   * environment.
-  */
+  /**
+   * \class ConstraintCheckerInterface
+   * \brief Interface for all constraint checkers used in model fitting.
+   *
+   * Constraint checkers evaluate parameter vectors and return penalty values
+   * for constraint violations. They are used by cost function decorators to
+   * enforce parameter bounds during optimization.
+   *
+   * \note All functions must be implemented thread-safe as they are used in a
+   * multi-threaded environment.
+   *
+   * \sa ConstraintCheckerBase, SimpleBarrierConstraintChecker
+   */
   class MITKMODELFIT_EXPORT ConstraintCheckerInterface
   {
   public:
@@ -35,13 +44,13 @@ namespace mitk
     typedef ModelBase::ParametersType ParametersType;
 
     /** Returns the penalties for all defined constraints.
-    * @pre defined constraints must address valid parameters in the passed parameters set.
-    * @post the result vector has the size given by GetNumberOfConstraints().
+    * \pre defined constraints must address valid parameters in the passed parameters set.
+    * \post the result vector has the size given by GetNumberOfConstraints().
     */
     virtual PenaltyArrayType GetPenalties(const ParametersType &parameters) const = 0;
 
     /** Returns the sum of all penalties.
-    * @pre defined constraints must address valid parameters in the passed parameters set.
+    * \pre defined constraints must address valid parameters in the passed parameters set.
     */
     virtual PenaltyValueType GetPenaltySum(const ParametersType &parameters) const = 0;
 

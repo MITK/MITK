@@ -24,13 +24,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Encapsulates 3D visualization properties which are forwarded to vtk for
-   * color mapping. This includes color, specular coefficient and power, opacity
+   * \brief Encapsulates 3D visualization properties which are forwarded to VTK for color mapping.
+   *
+   * This includes color, specular coefficient and power, opacity,
    * interpolation type (flat, gouraud, phong) and representation (points,
    * wireframe or surface).
    *
-   * @see vtkProperty
-  */
+   * \sa vtkProperty
+   */
   class MITKCORE_EXPORT Material : public itk::Object
   {
   public:
@@ -53,10 +54,14 @@ namespace mitk
     };
 
     /**
-     * Constructor. Materials are set to the following default values:
-     * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
+     * \brief Create a new Material with default values.
+     *
+     * Materials are set to the following default values:
+     * Color (0.5, 0.5, 0.5), color coefficient 1.0, specular color (1.0, 1.0, 1.0),
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
+     *
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New()
     {
@@ -66,12 +71,16 @@ namespace mitk
     }
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param color the material color in RGB. Each RGB value should be in the
-     *              range [0..1]
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *              and 1.0 means solid.
+     * \brief Create a new Material with the given color and opacity.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] color the material color in RGB. Each RGB value should be in the
+     *            range [0..1].
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New(Color color, double opacity = 1.0f)
     {
@@ -81,13 +90,17 @@ namespace mitk
     }
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param red the red component of the materials color (range [0..1])
-     * @param green the green component of the materials color (range [0..1])
-     * @param blue the blue component of the materials color (range [0..1])
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * \brief Create a new Material with the given RGB color components and opacity.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New(double red, double green, double blue, double opacity = 1.0f)
     {
@@ -97,19 +110,23 @@ namespace mitk
     }
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param red the red component of the materials color (range [0..1])
-     * @param green the green component of the materials color (range [0..1])
-     * @param blue the blue component of the materials color (range [0..1])
-     * @param colorCoefficient a scaling factor for the color coefficient which
-     *        will be multiplied with each color component (range [0..1]).
-     * @param specularCoefficient controls in combination with the specular power
-     *        how shiny the material will appear (range [0..1]).
-     * @param specularPower controls in combination with the specular coefficient
-     *        how shiny the material will appear (range [0..inf]).
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * \brief Create a new Material with full control over color and lighting properties.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
+     * \param[in] colorCoefficient a scaling factor for the color coefficient which
+     *            will be multiplied with each color component (range [0..1]).
+     * \param[in] specularCoefficient controls in combination with the specular power
+     *            how shiny the material will appear (range [0..1]).
+     * \param[in] specularPower controls in combination with the specular coefficient
+     *            how shiny the material will appear (range [0..inf]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New(double red,
                        double green,
@@ -125,19 +142,22 @@ namespace mitk
     }
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
+     * \brief Create a new Material with the given color and lighting properties.
      *
-     * @param color the material color in RGB. Each RGB value should be in the
-     *        range [0..1]
-     * @param colorCoefficient a scaling factor for the color coefficient which
-     *        will be multiplied with each color component (range [0..1]).
-     * @param specularCoefficient controls in combination with the specular power
-     *        how shiny the material will appear (range [0..1]).
-     * @param specularPower controls in combination with the specular coefficient
-     *        how shiny the material will appear (range [0..inf]).
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] color the material color in RGB. Each RGB value should be in the
+     *            range [0..1].
+     * \param[in] colorCoefficient a scaling factor for the color coefficient which
+     *            will be multiplied with each color component (range [0..1]).
+     * \param[in] specularCoefficient controls in combination with the specular power
+     *            how shiny the material will appear (range [0..1]).
+     * \param[in] specularPower controls in combination with the specular coefficient
+     *            how shiny the material will appear (range [0..inf]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New(
       Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity)
@@ -147,14 +167,23 @@ namespace mitk
       return smartPtr;
     }
 
-    /**
-     * Copy constructor
-     */
+    /** \brief Copy constructor. */
     mitkNewMacro1Param(Material, const Material &);
 
     /**
-     * Copy constructor, provided for convenience. The values are copied from property
-     * and afterwards the values provided for red green blue and opacity are written into the object.
+     * \brief Copy constructor with color and opacity override.
+     *
+     * The values are copied from the given property and afterwards the values
+     * provided for red, green, blue, and opacity are written into the object.
+     *
+     * \param[in] property the source Material to copy from.
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
+     * \param[in] name an optional name to associate with this material.
+     * \return Smart pointer to the newly created Material.
      */
     static Pointer New(
       const Material &property, double red, double green, double blue, double opacity = 1.0, std::string name = "")
@@ -164,226 +193,282 @@ namespace mitk
       return smartPtr;
     }
 
+    /**
+     * \brief Check whether the given material can be assigned to this one.
+     *
+     * \param[in] other the Material to check for assignability.
+     * \return True if the other material is of compatible type.
+     */
     virtual bool Assignable(const Material &other) const;
+
+    /**
+     * \brief Assignment operator. Copies all properties from the other material.
+     *
+     * \param[in] other the Material to copy from.
+     * \return Reference to this material.
+     */
     virtual Material &operator=(const Material &other);
 
-    /* Sets the materials color in RGB space. The rgb components have to be
-    * in the range [0..1]
-    * @param color the new color of the material
-    */
+    /**
+     * \brief Set the material color in RGB space.
+     *
+     * The RGB components have to be in the range [0..1].
+     *
+     * \param[in] color the new color of the material.
+     */
     virtual void SetColor(Color color);
 
     /**
-     * Sets the materials color in RGB space. The rgb components have to be
-     * in the range [0..1]
-     * @param red the red component of the materials color (range [0..1])
-     * @param green the green component of the materials color (range [0..1])
-     * @param blue the blue component of the materials color (range [0..1])
+     * \brief Set the material color in RGB space.
+     *
+     * The RGB components have to be in the range [0..1].
+     *
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
      */
     virtual void SetColor(double red, double green, double blue);
 
     /**
-     * Sets a attenuation coefficient for the color. A value of 0 results in
-     * a black object. VAlid range is [0..1]
-     * @param coefficient the color attenuation coefficient
+     * \brief Set an attenuation coefficient for the color.
+     *
+     * A value of 0 results in a black object. Valid range is [0..1].
+     *
+     * \param[in] coefficient the color attenuation coefficient.
      */
     virtual void SetColorCoefficient(double coefficient);
 
     /**
-     * Sets the specular color
-     * @param color the specular color in RGB. Each RGB value should be in the
-     *        range [0..1]
+     * \brief Set the specular color.
+     *
+     * \param[in] color the specular color in RGB. Each RGB value should be in the
+     *            range [0..1].
      */
     virtual void SetSpecularColor(Color color);
 
     /**
-     * Sets the specular color
-     * @param red the red component of the specular color (range [0..1])
-     * @param green the green component of the specular color (range [0..1])
-     * @param blue the blue component of the specular color (range [0..1])
+     * \brief Set the specular color using RGB components.
+     *
+     * \param[in] red the red component of the specular color (range [0..1]).
+     * \param[in] green the green component of the specular color (range [0..1]).
+     * \param[in] blue the blue component of the specular color (range [0..1]).
      */
     virtual void SetSpecularColor(double red, double green, double blue);
 
     /**
-     * Sets the specular coefficient which controls the shininess of the object
-     * together with the specular power
-     * @param specularCoefficient the new specular coefficient. Valid range
-     *        is [0..1]
+     * \brief Set the specular coefficient which controls the shininess of the object
+     * together with the specular power.
+     *
+     * \param[in] specularCoefficient the new specular coefficient. Valid range
+     *            is [0..1].
      */
     virtual void SetSpecularCoefficient(double specularCoefficient);
 
     /**
-     * Sets the specular power which controls the shininess of the object
-     * together with the specular coefficient
-     * @param specularPower the new specular coefficient. Valid range
-     *        is [0..inf]
+     * \brief Set the specular power which controls the shininess of the object
+     * together with the specular coefficient.
+     *
+     * \param[in] specularPower the new specular power. Valid range
+     *            is [0..inf].
      */
     virtual void SetSpecularPower(double specularPower);
 
     /**
-     * Sets the opacity of the material, which controls how transparent the
-     * object appears. Valid range is [0..1], where 0 means fully transparent
-     * and 1 means a solid surface.
-     * @param opacity the new opacity of the material
+     * \brief Set the opacity of the material.
+     *
+     * Controls how transparent the object appears. Valid range is [0..1],
+     * where 0 means fully transparent and 1 means a solid surface.
+     *
+     * \param[in] opacity the new opacity of the material.
      */
     virtual void SetOpacity(double opacity);
 
     /**
-     * Sets the surface interpolation method of the object rendered using the
-     * given materials. Valid Interopation types are Flat, Gouraud and Phong.
-     * See any computer graphics book for their meaning
-     * @param interpolation the interpolation method used for rendering of
-     *        surfaces.
+     * \brief Set the surface interpolation method of the object.
+     *
+     * Valid interpolation types are Flat, Gouraud and Phong.
+     *
+     * \param[in] interpolation the interpolation method used for rendering of
+     *            surfaces.
      */
     virtual void SetInterpolation(InterpolationType interpolation);
 
     /**
-     * Sets the surface representation method of the object rendered using the
-     * given materials. Valid Interopation types are Points, Wireframe and
-     * Surface.
-     * @param representation the representation method used for rendering of
-     *        surfaces.
+     * \brief Set the surface representation method of the object.
+     *
+     * Valid representation types are Points, Wireframe and Surface.
+     *
+     * \param[in] representation the representation method used for rendering of
+     *            surfaces.
      */
     virtual void SetRepresentation(RepresentationType representation);
 
     /**
-     * Set/Get the width of a Line. The width is expressed in screen units. The default is 1.0.
+     * \brief Set the width of a Line.
+     *
+     * The width is expressed in screen units. The default is 1.0.
+     *
+     * \param[in] lineWidth the new line width in screen units.
      */
     virtual void SetLineWidth(float lineWidth);
 
     /**
-     * @returns the color of the material
+     * \brief Get the color of the material.
+     * \return The material color as an RGB pixel.
      */
     virtual Color GetColor() const;
 
     /**
-     * @returns the color coefficient of the material. Range is [0..1]
+     * \brief Get the color coefficient of the material.
+     * \return The color coefficient in the range [0..1].
      */
     virtual double GetColorCoefficient() const;
 
     /**
-     * @returns the specular color of the material in rgb values, which
-     * range from 0 .. 1
+     * \brief Get the specular color of the material.
+     * \return The specular color in RGB values, each in the range [0..1].
      */
     virtual Color GetSpecularColor() const;
 
     /**
-     * @returns the specular coefficient used for rendering. Range is [0..1]
+     * \brief Get the specular coefficient used for rendering.
+     * \return The specular coefficient in the range [0..1].
      */
     virtual double GetSpecularCoefficient() const;
 
     /**
-     * @returns the specular power. Ranges from 0 to infinity
+     * \brief Get the specular power.
+     * \return The specular power, ranging from 0 to infinity.
      */
     virtual double GetSpecularPower() const;
 
     /**
-     * @returns the opacity of the material. Ranges from 0 to 1
+     * \brief Get the opacity of the material.
+     * \return The opacity in the range [0..1].
      */
     virtual double GetOpacity() const;
 
     /**
-     * @returns the interpolation method used for rendering.
+     * \brief Get the interpolation method used for rendering.
+     * \return The interpolation type (Flat, Gouraud, or Phong).
      */
     virtual InterpolationType GetInterpolation() const;
 
     /**
-     * @returns the representation type used for rendering.
+     * \brief Get the representation type used for rendering.
+     * \return The representation type (Points, Wireframe, or Surface).
      */
     virtual RepresentationType GetRepresentation() const;
 
     /**
-     * @returns the interpolation method used for rendering using the predefined
-     * vtk constants.
+     * \brief Get the interpolation method as a VTK constant.
+     * \return The VTK interpolation constant (VTK_FLAT, VTK_GOURAUD, or VTK_PHONG).
      */
     virtual int GetVtkInterpolation() const;
 
     /**
-     * @returns the representation type used for rendering using the predefined
-     * vtk constants.
+     * \brief Get the representation type as a VTK constant.
+     * \return The VTK representation constant (VTK_POINTS, VTK_WIREFRAME, or VTK_SURFACE).
      */
     virtual int GetVtkRepresentation() const;
 
     /**
-     * @returns the line width used for wireframe rendering as a fraction of screen units
+     * \brief Get the line width used for wireframe rendering.
+     * \return The line width in screen units.
      */
     virtual float GetLineWidth() const;
 
     /**
-     * Fills the current materials with the properties of the
-     * given material.
-     * @param property the materials which should be copied in the
-     *        current materials
+     * \brief Fill the current material with the properties of the given material.
+     *
+     * \param[in] property the Material whose properties should be copied
+     *            into this material.
      */
     virtual void Initialize(const Material &property);
 
     /**
-     * comparison operator which uses the member variables for
-     * comparison
+     * \brief Comparison operator which uses the member variables for comparison.
+     *
+     * \param[in] property the Material to compare with.
+     * \return True if all properties are equal.
      */
     virtual bool operator==(const Material &property) const;
 
     /**
-     * Dumps the properties to the out stream out
+     * \brief Print the material properties to the given output stream.
+     *
+     * \param[in] os the output stream.
      */
     void PrintSelf(std::ostream &os, itk::Indent) const override;
 
     /**
-     * Sets an optional name which may be associated with the material property
-     * Please note, that this name is NOT forwarded to the data tree node
-     * as the node name
+     * \brief Set an optional name which may be associated with the material property.
+     *
+     * Please note that this name is NOT forwarded to the data tree node
+     * as the node name.
      */
     itkSetMacro(Name, std::string);
 
     /**
-     * returns the name associated with the material property
+     * \brief Get the name associated with the material property.
      */
     itkGetConstMacro(Name, std::string);
 
   protected:
     /**
-     * Constructor. Materials are set to the following default values:
-     * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
+     * \brief Default constructor.
+     *
+     * Materials are set to the following default values:
+     * Color (0.5, 0.5, 0.5), color coefficient 1.0, specular color (1.0, 1.0, 1.0),
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
      */
     Material();
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param color the material color in RGB. Each RGB value should be in the
-     *              range [0..1]
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *              and 1.0 means solid.
+     * \brief Constructor with color and opacity.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] color the material color in RGB. Each RGB value should be in the
+     *            range [0..1].
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
      */
     Material(Color color, double opacity = 1.0f);
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param red the red component of the materials color (range [0..1])
-     * @param green the green component of the materials color (range [0..1])
-     * @param blue the blue component of the materials color (range [0..1])
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * \brief Constructor with RGB components and opacity.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
      */
     Material(double red, double green, double blue, double opacity = 1.0f);
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
-     * @param red the red component of the materials color (range [0..1])
-     * @param green the green component of the materials color (range [0..1])
-     * @param blue the blue component of the materials color (range [0..1])
-     * @param colorCoefficient a scaling factor for the color coefficient which
-     *        will be multiplied with each color component (range [0..1]).
-     * @param specularCoefficient controls in combination with the specular power
-     *        how shiny the material will appear (range [0..1]).
-     * @param specularPower controls in combination with the specular coefficient
-     *        how shiny the material will appear (range [0..inf]).
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * \brief Constructor with full control over color and lighting properties.
+     *
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] red the red component of the material color (range [0..1]).
+     * \param[in] green the green component of the material color (range [0..1]).
+     * \param[in] blue the blue component of the material color (range [0..1]).
+     * \param[in] colorCoefficient a scaling factor for the color coefficient which
+     *            will be multiplied with each color component (range [0..1]).
+     * \param[in] specularCoefficient controls in combination with the specular power
+     *            how shiny the material will appear (range [0..1]).
+     * \param[in] specularPower controls in combination with the specular coefficient
+     *            how shiny the material will appear (range [0..inf]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
      */
     Material(double red,
              double green,
@@ -394,36 +479,40 @@ namespace mitk
              double opacity);
 
     /**
-     * Constructor. All values besides the given ones are set to defaults as
-     * described in the default constructor
+     * \brief Constructor with color and lighting properties.
      *
-     * @param color the material color in RGB. Each RGB value should be in the
-     *        range [0..1]
-     * @param colorCoefficient a scaling factor for the color coefficient which
-     *        will be multiplied with each color component (range [0..1]).
-     * @param specularCoefficient controls in combination with the specular power
-     *        how shiny the material will appear (range [0..1]).
-     * @param specularPower controls in combination with the specular coefficient
-     *        how shiny the material will appear (range [0..inf]).
-     * @param opacity the opacity of the material. 0.0 means fully transparent
-     *        and 1.0 means solid.
+     * All values besides the given ones are set to defaults as
+     * described in the default constructor.
+     *
+     * \param[in] color the material color in RGB. Each RGB value should be in the
+     *            range [0..1].
+     * \param[in] colorCoefficient a scaling factor for the color coefficient which
+     *            will be multiplied with each color component (range [0..1]).
+     * \param[in] specularCoefficient controls in combination with the specular power
+     *            how shiny the material will appear (range [0..1]).
+     * \param[in] specularPower controls in combination with the specular coefficient
+     *            how shiny the material will appear (range [0..inf]).
+     * \param[in] opacity the opacity of the material. 0.0 means fully transparent
+     *            and 1.0 means solid.
      */
     Material(Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity);
 
-    /**
-     * Copy constructor
-     */
+    /** \brief Copy constructor. */
     Material(const Material &property);
 
     /**
-     * Copy constructor, provided for convenience. The values are copied from property
-     * and afterwards the values provided for red green blue and opacity are written into the object.
+     * \brief Copy constructor with color and opacity override.
+     *
+     * The values are copied from the given property and afterwards the values
+     * provided for red, green, blue, and opacity are written into the object.
      */
     Material(
       const Material &property, double red, double green, double blue, double opacity = 1.0, std::string name = "");
 
+    /** \brief Initialize all member variables to standard default values. */
     virtual void InitializeStandardValues();
 
+    /** \brief Re-apply all current property values, triggering Modified(). */
     virtual void Update();
 
     std::string m_Name;

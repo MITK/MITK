@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Superclass of all classes generating Images (instances of class
+   * \brief Superclass of all classes generating Images (instances of class
    * Image) as output.
    *
    * In itk and vtk the generated result of a ProcessObject is only guaranteed
@@ -31,25 +31,28 @@ namespace mitk
    * that guarantee an up-to-date result (by first calling Update and then
    * returning the result of GetOutput()): GetData(), GetPic() and
    * GetVtkImageData().
-   * @ingroup Process
+   *
+   * \ingroup Process
+   * \sa BaseDataSource
+   * \sa ImageToImageFilter
    */
   class MITKCORE_EXPORT ImageSource : public BaseDataSource
   {
   public:
     mitkClassMacro(ImageSource, BaseDataSource);
 
-      /** @brief Method for creation through the object factory. */
+      /** \brief Method for creation through the object factory. */
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
 
-      /** @brief Some convenient typedefs. */
+      /** \brief Some convenient typedefs. */
       typedef mitk::Image OutputImageType;
     typedef OutputImageType OutputType;
     typedef OutputImageType::Pointer OutputImagePointer;
     typedef SlicedData::RegionType OutputImageRegionType;
 
     /**
-     * @brief Get the output data of this image source object.
+     * \brief Get the output data of this image source object.
      *
      * The output of this
      * function is not valid until an appropriate Update() method has
@@ -100,7 +103,7 @@ namespace mitk
      */
     mitkBaseDataSourceGetOutputDeclarations
 
-      /** @brief Make a DataObject of the correct type to used as the specified
+      /** \brief Make a DataObject of the correct type to be used as the specified
        * output.
        *
        * Every ProcessObject subclass must be able to create a
@@ -126,13 +129,15 @@ namespace mitk
      */
     itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
+    /** \brief Get the output as VTK image data (non-const version). */
     virtual vtkImageData *GetVtkImageData();
+    /** \brief Get the output as VTK image data (const version). */
     virtual const vtkImageData *GetVtkImageData() const;
 
   protected:
     ImageSource();
     ~ImageSource() override {}
-    /** @brief A version of GenerateData() specific for image processing
+    /** \brief A version of GenerateData() specific for image processing
      * filters.
      *
      * This implementation will split the processing across
@@ -144,14 +149,14 @@ namespace mitk
      * provided). If an image processing filter cannot be threaded, the
      * filter should provide an implementation of GenerateData(). That
      * implementation is responsible for allocating the output buffer.
-     * If a filter an be threaded, it should NOT provide a
+     * If a filter can be threaded, it should NOT provide a
      * GenerateData() method but should provide a ThreadedGenerateData()
      * instead.
      *
      * \sa ThreadedGenerateData() */
     void GenerateData() override;
 
-    /** @brief If an imaging filter can be implemented as a multithreaded
+    /** \brief If an imaging filter can be implemented as a multithreaded
      * algorithm, the filter will provide an implementation of
      * ThreadedGenerateData().
      *
@@ -167,7 +172,7 @@ namespace mitk
      * method as its implementation, then the filter is responsible for
      * allocating the output data.  If a filter provides a
      * ThreadedGenerateData() method as its implementation, then the
-     * output memory will allocated automatically by this superclass.
+     * output memory will be allocated automatically by this superclass.
      * The ThreadedGenerateData() method should only produce the output
      * specified by "outputThreadRegion"
      * parameter. ThreadedGenerateData() cannot write to any other
@@ -177,7 +182,7 @@ namespace mitk
      * \sa GenerateData(), SplitRequestedRegion() */
     virtual void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, itk::ThreadIdType threadId);
 
-    /** @brief This method is intentionally left blank.
+    /** \brief This method is intentionally left blank.
      *
      * ImageSource's need not
      * Initialize their containers. The Image::Allocate() method (called
@@ -186,18 +191,18 @@ namespace mitk
      */
     void PrepareOutputs() override;
 
-    /** @brief The GenerateData method normally allocates the buffers for all of the
+    /** \brief The GenerateData method normally allocates the buffers for all of the
      * outputs of a filter.
      *
      * Some filters may want to override this default
      * behavior. For example, a filter may have multiple outputs with
      * varying resolution. Or a filter may want to process data in place by
-     * grafting its input to its output.*/
+     * grafting its input to its output. */
     virtual void AllocateOutputs();
 
-    /** @brief If an imaging filter needs to perform processing after the buffer
+    /** \brief If an imaging filter needs to perform processing after the buffer
      * has been allocated but before threads are spawned, the filter can
-     * can provide an implementation for BeforeThreadedGenerateData().
+     * provide an implementation for BeforeThreadedGenerateData().
      *
      * The execution flow in the default GenerateData() method will be:
      *      1) Allocate the output buffer
@@ -207,8 +212,8 @@ namespace mitk
      * Note that this flow of control is only available if a filter provides
      * a ThreadedGenerateData() method and NOT a GenerateData() method. */
     virtual void BeforeThreadedGenerateData() {}
-    /** @brief If an imaging filter needs to perform processing after all
-     * processing threads have completed, the filter can can provide an
+    /** \brief If an imaging filter needs to perform processing after all
+     * processing threads have completed, the filter can provide an
      * implementation for AfterThreadedGenerateData().
      *
      * The execution
@@ -220,7 +225,7 @@ namespace mitk
      * Note that this flow of control is only available if a filter provides
      * a ThreadedGenerateData() method and NOT a GenerateData() method. */
     virtual void AfterThreadedGenerateData() {}
-    /** @brief Split the output's RequestedRegion into "num" pieces, returning
+    /** \brief Split the output's RequestedRegion into "num" pieces, returning
      * region "i" as "splitRegion".
      *
      * This method is called "num" times. The
@@ -229,13 +234,13 @@ namespace mitk
      * i.e. return value is less than or equal to "num". */
     virtual unsigned int SplitRequestedRegion(unsigned int i, unsigned int num, OutputImageRegionType &splitRegion);
 
-    /** @brief Static function used as a "callback" by the MultiThreader.
+    /** \brief Static function used as a "callback" by the MultiThreader.
      *
      * The threading library will call this routine for each thread, which will delegate the
      * control to ThreadedGenerateData(). */
     static itk::ITK_THREAD_RETURN_TYPE ThreaderCallback(void *arg);
 
-    /** @brief Internal structure used for passing image data into the threading library */
+    /** \brief Internal structure used for passing image data into the threading library. */
     struct ThreadStruct
     {
       Pointer Filter;

@@ -130,7 +130,8 @@ bool mitk::SlicedGeometry3D::SetPlaneGeometry(mitk::PlaneGeometry *geometry2D, i
   if (this->IsValidSlice(s))
   {
     m_PlaneGeometries[s] = geometry2D;
-    m_PlaneGeometries[s]->SetReferenceGeometry(m_ReferenceGeometry);
+    if (geometry2D != nullptr)
+      m_PlaneGeometries[s]->SetReferenceGeometry(m_ReferenceGeometry);
     return true;
   }
   return false;

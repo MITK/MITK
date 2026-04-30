@@ -33,9 +33,6 @@ class vtkContourTriangulator;
 namespace mitk
 {
   class PlaneGeometryData;
-  class PlaneGeometryDataToSurfaceFilter;
-  /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataToSurfaceFilter instead. */
-  DEPRECATED(typedef PlaneGeometryDataToSurfaceFilter Geometry2DDataToSurfaceFilter);
   /** \brief Superclass of all classes having a PlaneGeometryData as input and
   *  generating Images as output
   *
@@ -61,15 +58,33 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      void GenerateOutputInformation() override;
+    /** \brief Generate information about the output (size, spacing, etc.). */
+    void GenerateOutputInformation() override;
 
+    /** \brief Generate the Surface output from the PlaneGeometryData input. */
     void GenerateData() override;
 
+    /** \brief Get the first PlaneGeometryData input. */
     const PlaneGeometryData *GetInput(void);
+
+    /**
+     * \brief Get the PlaneGeometryData input at the given index.
+     * \param idx The input index.
+     */
     const PlaneGeometryData *GetInput(unsigned int idx);
 
+    /**
+     * \brief Set the PlaneGeometryData input (at index 0).
+     * \param image The PlaneGeometryData to use as input.
+     */
     virtual void SetInput(const PlaneGeometryData *image);
     using itk::ProcessObject::SetInput;
+
+    /**
+     * \brief Set the PlaneGeometryData input at the given index.
+     * \param index The input index.
+     * \param image The PlaneGeometryData to use as input.
+     */
     virtual void SetInput(unsigned int index, const PlaneGeometryData *image);
 
     /** \brief If \a true (default), use Geometry3D::GetParametricBounds() to define the resolution in parameter space,
@@ -143,11 +158,23 @@ namespace mitk
     itkSetMacro(PlaceByGeometry, bool);
     itkBooleanMacro(PlaceByGeometry);
 
+    /** \brief Get whether a bounding box is used to clip the generated surface. */
     itkGetConstMacro(UseBoundingBox, bool);
+    /** \brief Set whether a bounding box should be used to clip the generated surface. */
     itkSetMacro(UseBoundingBox, bool);
+    /** \brief Toggle use of bounding box for clipping. */
     itkBooleanMacro(UseBoundingBox);
 
+    /**
+     * \brief Set the bounding box used to clip the generated surface.
+     * \param boundingBox The bounding box. Only used when UseBoundingBox is true.
+     */
     void SetBoundingBox(const BoundingBox *boundingBox);
+
+    /**
+     * \brief Get the bounding box used to clip the generated surface.
+     * \return The current bounding box, or nullptr if none is set.
+     */
     const BoundingBox *GetBoundingBox() const;
 
   protected:

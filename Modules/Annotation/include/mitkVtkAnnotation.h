@@ -22,33 +22,68 @@ class vtkProp;
 namespace mitk
 {
   /**
-   * @brief The VtkAnnotation class is the base for all Annotation which are using the VTK framework to render
-   *the elements.
+   * \brief Base class for all annotations that use the VTK framework for rendering.
+   *
+   * Subclasses must implement GetVtkProp() to provide a vtkProp element and
+   * UpdateVtkAnnotation() to synchronize properties before rendering.
+   *
+   * \sa Annotation, VtkAnnotation2D, VtkAnnotation3D
+   * \ingroup Annotation
    */
   class MITKANNOTATION_EXPORT VtkAnnotation : public Annotation
   {
   public:
     mitkClassMacro(VtkAnnotation, Annotation);
+
+    /**
+     * \brief Update the annotation for the given renderer.
+     * \param[in] renderer The renderer to update for.
+     */
     void Update(BaseRenderer *renderer) override;
+
+    /**
+     * \brief Add this annotation's vtkProp to the given BaseRenderer.
+     * \param[in] renderer The renderer to add to.
+     */
     void AddToBaseRenderer(BaseRenderer *renderer) override;
+
+    /**
+     * \brief Add this annotation's vtkProp to a specific vtkRenderer.
+     * \param[in] renderer The MITK renderer.
+     * \param[in] vtkrenderer The VTK renderer.
+     */
     void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+
+    /**
+     * \brief Remove this annotation's vtkProp from a specific vtkRenderer.
+     * \param[in] renderer The MITK renderer.
+     * \param[in] vtkrenderer The VTK renderer.
+     */
     void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+
+    /**
+     * \brief Remove this annotation's vtkProp from the given BaseRenderer.
+     * \param[in] renderer The renderer to remove from.
+     */
     void RemoveFromBaseRenderer(BaseRenderer *renderer) override;
 
     /**
-    * \brief Paints the Annotation.
-    *
-    * This method forces a paint of the Annotation as it is configured at the moment.
-    * \warning Should only be used as alternative to the AnnotationManager mechanism
-    * in GL-Mappers.
-    */
+     * \brief Force an immediate paint of this annotation.
+     *
+     * \warning Should only be used as alternative to the AnnotationManager
+     * mechanism in GL-Mappers.
+     *
+     * \param[in] renderer The renderer to paint into.
+     */
     void Paint(BaseRenderer *renderer);
 
   protected:
     /**
-     * @brief This method is implemented by the specific VTKAnnotation in order to create the element as a vtkProp
-     * @param renderer
-     * @return The element that was created by the subclasses as a vtkProp.
+     * \brief Create the VTK prop representing this annotation.
+     *
+     * Must be implemented by subclasses.
+     *
+     * \return The vtkProp element created by the subclass.
      */
     virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const = 0;
     virtual void UpdateVtkAnnotation(BaseRenderer *renderer) = 0;

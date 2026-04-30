@@ -20,6 +20,17 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class TwoStepLinearModel
+   * \brief Piecewise linear model with two segments joined at a transition point.
+   *
+   * The model defines two linear segments: y = y0 + b0*x for x <= x0, and
+   * y = y0 + b0*x0 + b1*(x - x0) for x > x0. Parameters are the initial value (y0),
+   * the transition point (x0), and the slopes of both segments (b0, b1).
+   * Derived parameters include AUC, y_fin, y_max, and y1.
+   *
+   * \sa TwoStepLinearModelFactory, TwoStepLinearModelParameterizer, ModelBase
+   */
   class MITKMODELFIT_EXPORT TwoStepLinearModel : public mitk::ModelBase
   {
 
@@ -128,13 +139,13 @@ namespace mitk
 
     mitkCloneMacro(TwoStepLinearModel);
 
-    virtual ModelResultType ComputeModelfunction(const ParametersType& parameters) const;
-    virtual DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
-        parameters) const;
+    ModelResultType ComputeModelfunction(const ParametersType& parameters) const override;
+    DerivedParameterMapType ComputeDerivedParameters(const mitk::ModelBase::ParametersType&
+        parameters) const override;
 
-    virtual void SetStaticParameter(const ParameterNameType& name,
-                                    const StaticParameterValuesType& values);
-    virtual StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const;
+    void SetStaticParameter(const ParameterNameType& name,
+                            const StaticParameterValuesType& values) override;
+    StaticParameterValuesType GetStaticParameterValue(const ParameterNameType& name) const override;
 
     static double ComputeSignalFromParameters(double x, double t, double a1, double a2, double b1, double b2);
 

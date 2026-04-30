@@ -20,32 +20,87 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Abstract base class for recording movies from OpenGL render windows.
+   *
+   * MovieGenerator provides the infrastructure for capturing frames from a
+   * BaseRenderer and assembling them into a movie file. It supports two modes:
+   * - Stepper-driven: Iterates through all steps of a Stepper and captures each frame.
+   * - Frame-by-frame: Each call to WriteCurrentFrameToMovie() captures a single frame.
+   *
+   * Platform-specific subclasses (e.g., MovieGeneratorWin32) implement the
+   * actual video encoding via platform APIs.
+   *
+   * \sa MovieGeneratorWin32
+   * \sa Stepper
+   * \sa BaseRenderer
+   * \ingroup Process
+   */
   class MITKALGORITHMSEXT_EXPORT MovieGenerator : public itk::LightObject
   {
   public:
     mitkClassMacroItkParent(MovieGenerator, itk::LightObject);
 
-    // delivers Win32 or Linux-versions of MovieGenerator
+    /**
+     * \brief Factory method returning a platform-specific MovieGenerator.
+     * \return Smart pointer to a MovieGenerator instance (Win32 or Linux).
+     */
     static Pointer New(void);
 
-    //!  stepper  used to  control  movie  generation
+    /**
+     * \brief Set the stepper used to control movie generation.
+     * \param[in] stepper The Stepper that drives frame iteration.
+     */
     virtual void SetStepper(Stepper *stepper) { m_stepper = stepper; }
-    //!  renderer to record
+
+    /**
+     * \brief Set the renderer whose render window will be captured.
+     * \param[in] renderer The BaseRenderer to record from.
+     */
     virtual void SetRenderer(BaseRenderer *renderer) { m_renderer = renderer; }
-    //!  filename under which movie is  saved
+
+    /**
+     * \brief Set the output filename for the movie.
+     * \param[in] fileName Path to the output movie file.
+     */
     virtual void SetFileName(const char *fileName) { strcpy(m_fileName, fileName); }
-    //!  uses given stepper and filename  to create a movie from the active OpenGL context
+
+    /**
+     * \brief Generate a movie by iterating through all stepper steps.
+     *
+     * Uses the configured Stepper and Renderer to capture frames from the
+     * active OpenGL context and assemble them into a movie file.
+     *
+     * \pre Stepper and Renderer must be set.
+     * \return True if the movie was successfully written.
+     */
     virtual bool WriteMovie();
 
-    //!  alternative way, which does not use a stepper;
-    //   it adds a single frame to a movie each time the function is called
-    //   Initialization is done with first function call; Renderer and Filename have to be set up properly before.
+    /**
+     * \brief Capture a single frame and add it to the movie.
+     *
+     * This method does not use a Stepper. Initialization occurs on the
+     * first call. Renderer and FileName must be set before calling this method.
+     *
+     * \return True if the frame was successfully added.
+     */
     virtual bool WriteCurrentFrameToMovie();
-    //!  releases a movie writer after usage of WriteCurrentFrameToMovie()
+
+    /**
+     * \brief Release the movie writer resources after using WriteCurrentFrameToMovie().
+     */
     virtual void ReleaseMovieWriter();
 
+    /**
+     * \brief Set the frame rate of the output movie.
+     * \param[in] rate Frames per second (default: 20).
+     */
     virtual void SetFrameRate(unsigned int rate);
 
+    /**
+     * \brief Get the frame rate of the output movie.
+     * \return The frame rate in frames per second.
+     */
     unsigned int GetFrameRate();
 
   protected:

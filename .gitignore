@@ -84,6 +84,7 @@ Icon
 ## Python
 *.pyc
 __pycache__/
+.pytest_cache/
 
 ## Claude Code
 .claude/

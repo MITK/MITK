@@ -262,7 +262,7 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
 
 mitk::PlanarFigure::PolyLineType& mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
-  if (index > m_PolyLines.size() || !m_PolyLineUpToDate)
+  if (index >= m_PolyLines.size() || !m_PolyLineUpToDate)
   {
     this->GeneratePolyLine();
     m_PolyLineUpToDate = true;
@@ -595,7 +595,7 @@ bool mitk::PlanarFigure::ResetOnPointSelectNeeded() const
 
 void mitk::PlanarFigure::RemoveControlPoint(unsigned int index)
 {
-  if (index > m_ControlPoints.size())
+  if (index >= m_ControlPoints.size())
     return;
 
   if ((m_ControlPoints.size() - 1) < this->GetMinimumNumberOfControlPoints())
@@ -742,7 +742,7 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure &other) const
 
     while (itThis != itEnd)
     {
-      if ((itThis->Quantity - itOther->Quantity) > .001)
+      if (fabs(itThis->Quantity - itOther->Quantity) > .001)
       {
         MITK_ERROR << "Quantity is Different" << itThis->Quantity << "/" << itOther->Quantity;
         return false;

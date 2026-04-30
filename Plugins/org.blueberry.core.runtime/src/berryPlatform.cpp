@@ -66,16 +66,6 @@ const QString Platform::PROP_IGNOREAPP = "BlueBerry.ignoreApp";
 const QString Platform::PROP_XARGS = "xargs";
 
 
-QDir Platform::GetConfigurationPath()
-{
-  ctkLocation* location = GetConfigurationLocation();
-  if (location)
-  {
-    return location->getUrl().toLocalFile();
-  }
-  return QDir();
-}
-
 ctkLocation* Platform::GetConfigurationLocation()
 {
   return InternalPlatform::GetInstance()->GetConfigurationLocation();
@@ -101,30 +91,9 @@ mitk::IPreferencesService *Platform::GetPreferencesService()
 //  return InternalPlatform::GetInstance()->GetEvents();
 //}
 
-QDir Platform::GetInstallPath()
-{
-  ctkLocation* location = GetInstallLocation();
-  if (location)
-  {
-    return location->getUrl().toLocalFile();
-  }
-  return QDir();
-}
-
 ctkLocation* Platform::GetInstallLocation()
 {
   return InternalPlatform::GetInstance()->GetInstallLocation();
-}
-
-QDir Platform::GetInstancePath()
-{
-  ctkLocation* location = GetInstanceLocation();
-  if (location)
-  {
-    return location->getUrl().toLocalFile();
-  }
-  return QDir();
-
 }
 
 ctkLocation* Platform::GetInstanceLocation()
@@ -187,26 +156,9 @@ bool Platform::IsVMS()
 #endif
 }
 
-bool Platform::GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool /*create*/)
-{
-  statePath = GetStateLocation(plugin);
-  return true;
-}
-
 QDir Platform::GetStateLocation(const QSharedPointer<ctkPlugin>& plugin)
 {
   return InternalPlatform::GetInstance()->GetStateLocation(plugin);
-}
-
-QDir Platform::GetUserPath()
-{
-  ctkLocation* location = GetUserLocation();
-  if (location)
-  {
-    return location->getUrl().toLocalFile();
-  }
-  return QDir();
-
 }
 
 ctkLocation* Platform::GetUserLocation()

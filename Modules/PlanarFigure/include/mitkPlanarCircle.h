@@ -21,47 +21,91 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-   * \brief Implementation of PlanarFigure representing a circle
-   * either through two control points or by one control point (fixed radius mode)
-   * The mode is defined by the chosen constructor.
+   * \brief Implementation of PlanarFigure representing a circle.
+   *
+   * The circle is defined either by two control points (center and a point
+   * on the circumference) in normal mode, or by a single control point
+   * (center) with a fixed radius. The mode is selected by the constructor used.
+   *
+   * Provides three features:
+   * - FEATURE_ID_RADIUS: the circle radius
+   * - FEATURE_ID_DIAMETER: the circle diameter
+   * - FEATURE_ID_AREA: the circle area
+   *
+   * Optional minimum/maximum radius constraints can be activated.
+   *
+   * \sa PlanarFigure, PlanarEllipse, PlanarFigureMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarCircle, PlanarFigure);
+    /** \brief Creates a PlanarCircle with a fixed radius. */
     mitkNewMacro1Param(PlanarCircle, double);
     itkFactorylessNewMacro(Self);
 
     itkCloneMacro(Self);
 
-      /** \brief Place figure in its minimal configuration (a point at least)
-       * onto the given 2D geometry.
+      /**
+       * \brief Sets a control point position with optional radius constraints.
        *
-       * Must be implemented in sub-classes.
+       * \param[in] index               Zero-based index of the control point.
+       * \param[in] point               New 2D coordinates.
+       * \param[in] createIfDoesNotExist If true, creates the point if it does not exist.
+       * \return True if the control point was set successfully.
        */
-      // virtual void Initialize();
-
       bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
 
-    /** \brief Circle has 2 control points per definition. */
+    /**
+     * \brief Returns 1 in fixed-radius mode, 2 otherwise.
+     * \return The minimum number of control points.
+     */
     unsigned int GetMinimumNumberOfControlPoints() const override { return (m_RadiusFixed) ? 1 : 2; }
-    /** \brief Circle has 2 control points per definition. */
+    /**
+     * \brief Returns 1 in fixed-radius mode, 2 otherwise.
+     * \return The maximum number of control points.
+     */
     unsigned int GetMaximumNumberOfControlPoints() const override { return (m_RadiusFixed) ? 1 : 2; }
-    /** \brief Sets the minimum radius
-    */
+
+    /**
+     * \brief Sets the minimum allowed radius.
+     * \param[in] radius The minimum radius value.
+     */
     void SetMinimumRadius(double radius) { m_MinRadius = radius; }
-    /** \brief Gets the minimum radius
-    */
+    /**
+     * \brief Returns the minimum allowed radius.
+     * \return The minimum radius value.
+     */
     double GetMinimumRadius() { return m_MinRadius; }
-    /** \brief Sets the maximum radius
-    */
+    /**
+     * \brief Sets the maximum allowed radius.
+     * \param[in] radius The maximum radius value.
+     */
     void SetMaximumRadius(double radius) { m_MaxRadius = radius; }
-    /** \brief Gets the minimum radius
-    */
+    /**
+     * \brief Returns the maximum allowed radius.
+     * \return The maximum radius value.
+     */
     double GetMaximumRadius() { return m_MaxRadius; }
+
+    /**
+     * \brief Activates or deactivates minimum/maximum radius constraints.
+     * \param[in] active If true, radius constraints are enforced.
+     */
     void ActivateMinMaxRadiusContstraints(bool active) { m_MinMaxRadiusContraintsActive = active; }
+
+    /**
+     * \brief Sets the currently selected control point, applying radius constraints if active.
+     * \param[in] point New 2D coordinates.
+     * \return True if the point was set successfully.
+     */
     bool SetCurrentControlPoint(const Point2D &point) override;
 
+    /**
+     * \brief Compares this PlanarCircle with another PlanarFigure for equality.
+     * \param[in] other The PlanarFigure to compare with.
+     * \return True if both figures are considered equal.
+     */
     bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:

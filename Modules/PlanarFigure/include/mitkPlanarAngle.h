@@ -21,8 +21,15 @@ namespace mitk
   class PlaneGeometry;
 
   /**
-   * \brief Implementation of PlanarFigure to display an angle
-   * through three control points
+   * \brief Implementation of PlanarFigure representing an angle measurement.
+   *
+   * Displays an angle defined by three control points: two endpoints and a
+   * vertex point in between. The angle is measured at the vertex (second
+   * control point) between the two line segments.
+   *
+   * Provides one feature: the angle value in degrees (FEATURE_ID_ANGLE).
+   *
+   * \sa PlanarFigure, PlanarFourPointAngle, PlanarFigureMapper2D
    */
   class MITKPLANARFIGURE_EXPORT PlanarAngle : public PlanarFigure
   {
@@ -32,20 +39,19 @@ namespace mitk
     itkFactorylessNewMacro(Self);
 
     itkCloneMacro(Self) public :
-      // Feature identifiers
+      /** \brief Feature identifier for the angle measurement (in degrees). */
       const unsigned int FEATURE_ID_ANGLE;
 
-    /** \brief Place figure in its minimal configuration (a point at least)
-     * onto the given 2D geometry.
-     *
-     * Must be implemented in sub-classes.
-     */
-    // virtual void Initialize();
-
-    /** \brief Angle has 3 control points per definition. */
+    /** \brief Returns 3 -- an angle requires exactly three control points. */
     unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
-    /** \brief Angle has 3 control points per definition. */
+    /** \brief Returns 3 -- an angle requires exactly three control points. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return 3; }
+
+    /**
+     * \brief Compares this PlanarAngle with another PlanarFigure for equality.
+     * \param[in] other The PlanarFigure to compare with.
+     * \return True if both figures are considered equal.
+     */
     bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:

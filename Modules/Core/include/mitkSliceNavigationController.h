@@ -21,9 +21,13 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkTimeGeometry.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <itkCommand.h>
 
@@ -173,8 +177,16 @@ namespace mitk
     itkSetEnumMacro(DefaultViewDirection, AnatomicalPlane);
     itkGetEnumMacro(DefaultViewDirection, AnatomicalPlane);
 
+    /**
+     * \brief Get the current view direction as a human-readable string.
+     * \return A string such as "Axial", "Sagittal", "Coronal", or "Original".
+     */
     const char *GetViewDirectionAsString() const;
 
+    /**
+     * \brief Reset the view direction to the default view direction.
+     * \sa SetDefaultViewDirection
+     */
     virtual void SetViewDirectionToDefault();
 
     /**
@@ -188,6 +200,10 @@ namespace mitk
      * \brief Extended version of Update, additionally allowing to
      * specify the direction/orientation of the created geometry.
      *
+     * \param[in] viewDirection The anatomical plane direction for slicing.
+     * \param[in] top If true, the geometry is oriented from the top.
+     * \param[in] frontside If true, the geometry faces the front side.
+     * \param[in] rotated If true, the geometry is rotated.
      */
     virtual void Update(AnatomicalPlane viewDirection, bool top = true, bool frontside = true, bool rotated = false);
 
@@ -281,9 +297,17 @@ namespace mitk
       m_ReceiverToObserverTagsMap.erase(i);
     }
 
+    /** \brief Signal emitted when the crosshair position changes. The parameter is the new position in world coordinates. */
     Message1<const Point3D&> SetCrosshairEvent;
 
-    /** \brief Positions the SNC according to the specified point */
+    /**
+     * \brief Select the slice closest to the given 3D point.
+     *
+     * Updates the stepper position, sends a geometry update event, and
+     * fires the SetCrosshairEvent.
+     *
+     * \param[in] point The 3D world coordinate to select the closest slice for.
+     */
     void SelectSliceByPoint(const Point3D& point);
 
     /** \brief Returns the BaseGeometry of the currently selected time step. */
@@ -301,18 +325,36 @@ namespace mitk
     itkSetObjectMacro(Renderer, BaseRenderer);
     itkGetMacro(Renderer, BaseRenderer*);
 
-    /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
-         The given point (world coordinates) defines the selected slice.
-         Careful: The resulting axis vectors are not clearly defined this way. If you want to define them clearly, use
-         ReorientSlices (const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1).
+    /**
+     * \brief Re-orient the slice stack using a normal vector.
+     *
+     * All slices will be oriented perpendicular to the given normal vector.
+     * The given point (world coordinates) defines which slice is selected.
+     *
+     * \param[in] point A 3D world coordinate defining the selected slice.
+     * \param[in] normal The desired normal vector of the slice planes.
+     *
+     * \note The resulting in-plane axis vectors are not clearly defined.
+     *       Use the two-axis overload for full control.
      */
     void ReorientSlices(const Point3D& point, const Vector3D& normal);
 
-    /** \brief Re-orients the slice stack so that all planes are oriented according to the
-     * given axis vectors. The given Point eventually defines selected slice.
+    /**
+     * \brief Re-orient the slice stack using two explicit axis vectors.
+     *
+     * All planes are oriented according to the given axis vectors.
+     * The given point defines which slice is selected.
+     *
+     * \param[in] point A 3D world coordinate defining the selected slice.
+     * \param[in] axisVec0 The first in-plane axis vector.
+     * \param[in] axisVec1 The second in-plane axis vector.
      */
     void ReorientSlices(const Point3D& point, const Vector3D& axisVec0, const Vector3D& axisVec1);
 
+    /**
+     * \brief Execute an operation (e.g. OpMOVE, OpRESTOREPLANEPOSITION, OpAPPLYTRANSFORMMATRIX).
+     * \param[in] operation The operation to execute. Nullptr is safely ignored.
+     */
     void ExecuteOperation(Operation* operation) override;
 
     /**

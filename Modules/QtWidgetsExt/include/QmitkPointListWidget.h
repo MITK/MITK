@@ -53,57 +53,94 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListWidget : public QWidget
   Q_OBJECT
 
 public:
+  /**
+   * \brief Construct the point list widget.
+   * \param[in] parent The parent widget.
+   * \param[in] orientation Layout orientation: 0 = vertical (default), 1 or 2 = horizontal variants.
+   */
   QmitkPointListWidget(QWidget *parent = nullptr, int orientation = 0);
+
+  /** \brief Destructor. */
   ~QmitkPointListWidget() override;
 
+  /** \brief Connect internal widget signals and slots. Called during construction. */
   void SetupConnections();
 
   /**
-   * @brief Add a mitk::SliceNavigationController instance.
-   * @param snc The mitk::SliceNavigationController instance.
-   *
-   * This method adds \c snc to the set of slice navigation controllers which are
-   * used to navigate to the selected point.
+   * \brief Add a mitk::SliceNavigationController for point-based crosshair navigation.
+   * \param[in] snc The mitk::SliceNavigationController instance to add.
    */
   void AddSliceNavigationController(mitk::SliceNavigationController *snc);
 
   /**
-   * @brief Remove a mitk::SliceNavigationController instance.
-   * @param snc The mitk::SliceNavigationController instance.
-   *
-   * This method removes \c snc from the set of slice navigation controllers which are
-   * used to navigate to the selected point.
+   * \brief Remove a mitk::SliceNavigationController.
+   * \param[in] snc The mitk::SliceNavigationController instance to remove.
    */
   void RemoveSliceNavigationController(mitk::SliceNavigationController *snc);
 
-  /** @brief assign a point set (contained in a node of DataStorage) for observation */
+  /**
+   * \brief Set the point set data on the existing data node.
+   * \param[in] newPs The point set to assign.
+   */
   void SetPointSet(mitk::PointSet *newPs);
+
+  /**
+   * \brief Get the currently managed point set.
+   * \return Pointer to the mitk::PointSet, or nullptr.
+   */
   mitk::PointSet *GetPointSet();
 
-  /** @brief assign a point set (contained in a node of DataStorage) for observation */
+  /**
+   * \brief Set the data node containing the point set.
+   * \param[in] newNode The data node with a mitk::PointSet.
+   */
   void SetPointSetNode(mitk::DataNode *newNode);
+
+  /**
+   * \brief Get the current point set data node.
+   * \return Pointer to the mitk::DataNode.
+   */
   mitk::DataNode *GetPointSetNode();
 
-  /** @brief assign a QmitkAbstractMultiWidget for updating render window crosshair */
+  /**
+   * \brief Set a multi widget for automatic crosshair navigation to selected points.
+   * \param[in] multiWidget The QmitkAbstractMultiWidget, or nullptr to clear.
+   */
   void SetMultiWidget(QmitkAbstractMultiWidget*multiWidget);
 
-  /** @brief itk observer for node "delete" events */
+  /**
+   * \brief ITK observer callback for data node deletion events.
+   * \param[in] e The ITK event object.
+   */
   void OnNodeDeleted(const itk::EventObject &e);
 
-  /** @brief Unselects the edit button if it is selected. */
+  /** \brief Programmatically uncheck the "add point" toggle button. */
   void UnselectEditButton();
 
 public slots:
+  /**
+   * \brief Deactivate the point set interactor.
+   * \param[in] deactivate True to deactivate (currently unused).
+   */
   void DeactivateInteractor(bool deactivate);
+
+  /**
+   * \brief Enable or disable the "add point" toggle button.
+   * \param[in] enabled True to enable the button.
+   */
   void EnableEditButton(bool enabled);
 
 signals:
-  /** @brief signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is
-   * active or not */
+  /**
+   * \brief Emitted when the point editing interactor is activated or deactivated.
+   * \param[in] active True if point editing is now active.
+   */
   void EditPointSets(bool active);
-  /// signal to inform that the selection of a point in the pointset has changed
+
+  /** \brief Emitted when the point selection changes in the point set. */
   void PointSelectionChanged();
-  /// signal to inform about cleared or loaded point sets
+
+  /** \brief Emitted when points are loaded, cleared, added, or removed. */
   void PointListChanged();
 
 protected slots:

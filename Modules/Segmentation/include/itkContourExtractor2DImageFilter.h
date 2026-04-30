@@ -138,10 +138,13 @@ namespace itk
     itkGetConstReferenceMacro(VertexConnectHighPixels, bool);
     itkBooleanMacro(VertexConnectHighPixels);
 
-    /** Control whether the largest possible input region is used, or if a
-      * custom requested region is to be used. */
+    /** \brief Set a custom requested region for processing.
+      \param region The input region to process.
+    */
     void SetRequestedRegion(const InputRegionType region);
     itkGetConstReferenceMacro(RequestedRegion, InputRegionType);
+
+    /** \brief Clear the custom requested region and revert to the largest possible region. */
     void ClearRequestedRegion();
 
     /** Set/Get the image intensity value that the contours should follow.

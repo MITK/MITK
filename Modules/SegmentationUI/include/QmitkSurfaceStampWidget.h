@@ -39,9 +39,11 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceStampWidget : public QWidget
   Q_OBJECT
 
 public:
+  /** \brief Constructs the surface stamp widget. */
   QmitkSurfaceStampWidget(QWidget *parent = nullptr, const char *name = nullptr);
   ~QmitkSurfaceStampWidget() override;
 
+  /** \brief Sets the data storage used for node selection. */
   void SetDataStorage(mitk::DataStorage *storage);
 
 protected slots:

@@ -18,27 +18,24 @@ found in the LICENSE file.
 #include <map>
 #include <string>
 
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable: 4522) // "multiple assignment operators specified"
-#endif
-
 namespace mitk
 {
   /**
-   * This class may be used to store properties similar to enumeration values.
-   * Each enumeration value is identified by an id and a name. Note that both
-   * name and id must be unique. Add enumeration values before you use the
-   * Get/SetValue methods.
+   * \brief Property for storing enumeration-like values identified by id and name.
+   *
+   * This class may be used to store properties similar to C++ enumeration values.
+   * Each enumeration value is identified by a unique id and a unique name. You must
+   * add enumeration values before using the Get/SetValue methods.
    *
    * To use this class, create a subclass that adds the possible enumeration
    * values in its constructor. You should override AddEnum() as protected so
-   * that the user isn't able to add invalid enumeration values.
+   * that users cannot add invalid enumeration values.
    *
-   * As example see mitk::VtkRepresentationProperty or
-   * mitk::VtkInterpolationProperty.
+   * \ingroup DataManagement
    *
-   * @ingroup DataManagement
+   * \sa VtkRepresentationProperty
+   * \sa VtkInterpolationProperty
+   * \sa BaseProperty
    */
   class MITKCORE_EXPORT EnumerationProperty : public BaseProperty
   {
@@ -47,134 +44,175 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    /**
-     * Represents the unique id which is assigned to each enumeration name.
-     */
+    /** \brief Unsigned integer type used as unique enumeration value identifier. */
     typedef unsigned int IdType;
 
-    /**
-     * Type used to store a mapping from enumeration id to enumeration name.
-     */
+    /** \brief Map type storing id-to-name mappings. */
     typedef std::map<IdType, std::string> EnumIdsContainerType;
 
-    /**
-     * Type used to store a mapping from enumeration name to enumeration id.
-     */
+    /** \brief Map type storing name-to-id mappings. */
     typedef std::map<std::string, IdType> EnumStringsContainerType;
 
-    /**
-     * Type used for iterators over all defined enumeration values.
-     */
+    /** \brief Const iterator type for iterating over enumeration values. */
     typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
     /**
-     * Adds an enumeration value into the enumeration. The name and id provided
-     * must be unique. This is checked while adding the new enumeration value.
-     * If it is not unique, false is returned. If addition was successful, true
-     * is returned.
-     * @param name The unique name of the enumeration value
-     * @param id The unique id of the enumeration value
-     * @returns True, if the name/id combination was successfully added to the
-     * enumeration values. Otherwise false.
+     * \brief Add an enumeration value.
+     *
+     * The name and id provided must both be unique. If either already exists,
+     * the value is not added and \c false is returned.
+     *
+     * \param[in] name The unique name of the enumeration value.
+     * \param[in] id The unique id of the enumeration value.
+     * \return \c true if the name/id combination was successfully added,
+     *         \c false if either name or id already exists.
      */
     virtual bool AddEnum(const std::string &name, const IdType &id);
 
     /**
-     * Sets the current value of the enumeration.
-     * @param name The name of the enumeration value to set
-     * @returns True if the value was successfully set. Otherwise false.
+     * \brief Set the current value of the enumeration by name.
+     *
+     * \param[in] name The name of the enumeration value to set.
+     * \return \c true if the value was successfully set (name is valid),
+     *         \c false otherwise.
      */
     virtual bool SetValue(const std::string &name);
 
     /**
-     * Sets the current value of the enumeration.
-     * @param id The id of the enumeration value to set
-     * @returns True, if the value was successfully set. Otherwise false.
+     * \brief Set the current value of the enumeration by id.
+     *
+     * \param[in] id The id of the enumeration value to set.
+     * \return \c true if the value was successfully set (id is valid),
+     *         \c false otherwise.
      */
     virtual bool SetValue(const IdType &id);
 
     /**
-     * Returns the id of the current enumeration value. If it was not set so far,
-     * the return value is unspecified.
+     * \brief Get the id of the currently selected enumeration value.
+     *
+     * \return The id of the current value. If no value has been set, the
+     *         return value is unspecified.
      */
     virtual IdType GetValueAsId() const;
 
     /**
-     * Returns the name of the current enumeration value. If it was not set so far,
-     * the return value is unspecified.
+     * \brief Get the name of the currently selected enumeration value.
+     *
+     * \return The name string of the current value. If no value has been set,
+     *         the return value is unspecified.
      */
     std::string GetValueAsString() const override;
 
     /**
-     * Clears all enumerations including the current one.
+     * \brief Remove all enumeration values and reset the current selection.
      */
     virtual void Clear();
 
     /**
-     * Determines the number of enumeration values.
+     * \brief Get the number of defined enumeration values.
+     *
+     * \return The count of registered enumeration values.
      */
     virtual EnumIdsContainerType::size_type Size() const;
 
     /**
-     * Provides access to the set of enumeration values. The name can be
-     * accessed with iterator->second, the id via iterator->first.
-     * @returns An iterator over all enumeration values.
+     * \brief Get an iterator to the first enumeration value.
+     *
+     * Iterator dereferences to a pair where \c first is the id and \c second is the name.
+     *
+     * \return A const iterator to the beginning of the enumeration values.
      */
     virtual EnumConstIterator Begin() const;
 
     /**
-     * Specifies the end of the range of enumeration values.
-     * @returns An iterator pointing past the last enumeration values.
+     * \brief Get an iterator past the last enumeration value.
+     *
+     * \return A const iterator pointing past the end of the enumeration values.
      */
     virtual EnumConstIterator End() const;
 
     /**
-     * Returns the name for the given id.
-     * @param id The id for which the name should be determined.
-     *        If the id is invalid, the return value is unspecified.
-     * @returns The name of the determined enumeration value.
+     * \brief Get the name string for a given enumeration id.
+     *
+     * \param[in] id The id for which to retrieve the name.
+     * \return The name of the enumeration value. If the id is invalid, the
+     *         return value is the string "invalid enum id or enums empty".
      */
     virtual std::string GetEnumString(const IdType &id) const;
 
     /**
-     * Returns the id for the given name.
-     * @param name The enumeration name for which the id should be determined.
-     *        If the name is invalid, the return value is unspecified.
-     * @returns The id of the determined enumeration value.
+     * \brief Get the id for a given enumeration name.
+     *
+     * \param[in] name The enumeration name for which to retrieve the id.
+     * \return The id of the enumeration value. If the name is invalid,
+     *         the return value is 0.
      */
     virtual IdType GetEnumId(const std::string &name) const;
 
     /**
-     * Determines if a given id is valid.
-     * @param id The id to check
-     * @returns True if the given id is valid. Otherwise false.
+     * \brief Check whether a given id corresponds to a valid enumeration value.
+     *
+     * \param[in] id The id to check.
+     * \return \c true if the id is valid, \c false otherwise.
      */
     virtual bool IsValidEnumerationValue(const IdType &id) const;
 
     /**
-     * Determines if a given name is valid.
-     * @param name The name to check
-     * @returns True if the given name is valid. Otherwise false.
+     * \brief Check whether a given name corresponds to a valid enumeration value.
+     *
+     * \param[in] name The name to check.
+     * \return \c true if the name is valid, \c false otherwise.
      */
     virtual bool IsValidEnumerationValue(const std::string &name) const;
 
+    /**
+     * \brief Get a const reference to the id-to-name map.
+     * \return The map of enumeration ids to names.
+     */
     const EnumIdsContainerType &GetEnumIds() const;
+
+    /**
+     * \brief Get a const reference to the name-to-id map.
+     * \return The map of enumeration names to ids.
+     */
     const EnumStringsContainerType &GetEnumStrings() const;
 
+    /**
+     * \brief Get a mutable reference to the id-to-name map.
+     * \return The map of enumeration ids to names.
+     */
     EnumIdsContainerType &GetEnumIds();
+
+    /**
+     * \brief Get a mutable reference to the name-to-id map.
+     * \return The map of enumeration names to ids.
+     */
     EnumStringsContainerType &GetEnumStrings();
 
     /**
-     * Serializes the property to JSON.
-     * @note Classes deriving from EnumerationProperty are covered by this implementation and do not
-     * need to override this method again.
+     * \brief Serialize the current enumeration value to JSON.
+     *
+     * Writes the current enumeration value name as a JSON string.
+     *
+     * \note Classes deriving from EnumerationProperty are covered by this
+     * implementation and do not need to override this method again.
+     *
+     * \param[out] j The JSON value to write into.
+     * \return Always \c true.
      */
     bool ToJSON(nlohmann::json& j) const override;
 
     /**
-     * Deserializes the property to JSON.
-     * @note Classes deriving from EnumerationProperty are covered by this implementation and do not
-     * need to override this method again.
+     * \brief Deserialize the enumeration value from JSON.
+     *
+     * Reads a string from JSON and sets the enumeration value by name.
+     *
+     * \note Classes deriving from EnumerationProperty are covered by this
+     * implementation and do not need to override this method again.
+     *
+     * \param[in] j The JSON string value to read from.
+     * \return Always \c true.
+     * \throw mitk::Exception if the JSON string is not a valid enumeration value.
      */
     bool FromJSON(const nlohmann::json& j) override;
 
@@ -201,8 +239,5 @@ namespace mitk
   };
 }
 
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif

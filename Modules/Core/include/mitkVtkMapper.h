@@ -36,52 +36,79 @@ class vtkActor;
 
 namespace mitk
 {
-  /** \brief Base class of all Vtk Mappers in order to display primitives
-  * by exploiting Vtk functionality.
-  *
-  * Rendering of opaque, translucent or volumetric geometry and overlays
-  * is done in consecutive render passes.
-  *
-  * \ingroup Mapper
-  */
+  /**
+   * \brief Base class of all VTK-based Mappers for displaying primitives using VTK functionality.
+   *
+   * Rendering of opaque, translucent or volumetric geometry and overlays
+   * is done in consecutive render passes. Subclasses must implement GetVtkProp()
+   * to provide the VTK prop (actor, assembly, etc.) for each BaseRenderer.
+   *
+   * \sa Mapper
+   * \sa ImageVtkMapper2D
+   * \sa SurfaceVtkMapper2D
+   * \sa SurfaceVtkMapper3D
+   * \ingroup Mapper
+   */
   class MITKCORE_EXPORT VtkMapper : public Mapper
   {
   public:
     mitkClassMacro(VtkMapper, Mapper);
 
+    /**
+     * \brief Return the VTK prop (actor, assembly, etc.) for the given renderer.
+     *
+     * Each subclass must implement this to provide its rendering representation.
+     *
+     * \param[in] renderer The renderer for which the prop is requested.
+     * \return Pointer to the vtkProp used for rendering.
+     */
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
 
     /**
-    * \brief Returns whether this is an vtk-based mapper
-    * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
-    */
-    DEPRECATED(virtual bool IsVtkBased() const override);
-
-    /** \brief Determines which geometry should be rendered
-    * (opaque, translucent, volumetric, overlay)
-    * and calls the appropriate function.
-    *
-    * Called by mitk::VtkPropRenderer::Render
-    */
+     * \brief Determine the render pass type and call the appropriate render method.
+     *
+     * Dispatches to MitkRenderOpaqueGeometry(), MitkRenderTranslucentGeometry(),
+     * MitkRenderOverlay(), or MitkRenderVolumetricGeometry() based on the type.
+     * Called by mitk::VtkPropRenderer::Render.
+     *
+     * \param[in] renderer The renderer to render into.
+     * \param[in] type The render pass type (Opaque, Translucent, Overlay, Volumetric).
+     */
     void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
-    /** \brief Checks visibility and renders the overlay */
+    /**
+     * \brief Check visibility and render the overlay pass.
+     * \param[in] renderer The renderer to render into.
+     */
     virtual void MitkRenderOverlay(BaseRenderer *renderer);
 
-    /** \brief Checks visibility and renders untransparent geometry */
+    /**
+     * \brief Check visibility and render opaque (untransparent) geometry.
+     * \param[in] renderer The renderer to render into.
+     */
     virtual void MitkRenderOpaqueGeometry(BaseRenderer *renderer);
 
-    /** \brief Checks visibility and renders transparent geometry */
+    /**
+     * \brief Check visibility and render translucent (transparent) geometry.
+     * \param[in] renderer The renderer to render into.
+     */
     virtual void MitkRenderTranslucentGeometry(BaseRenderer *renderer);
 
-    /** \brief Checks visibility and renders volumes */
+    /**
+     * \brief Check visibility and render volumetric geometry.
+     * \param[in] renderer The renderer to render into.
+     */
     virtual void MitkRenderVolumetricGeometry(BaseRenderer *renderer);
 
-    /** \brief Returns true if this mapper owns the specified vtkProp for
-    * the given BaseRenderer.
-    *
-    * Note: returns false by default; should be implemented for VTK-based
-    * Mapper subclasses. */
+    /**
+     * \brief Check whether this mapper owns the specified vtkProp for the given renderer.
+     *
+     * Default implementation compares the given prop pointer with the result of GetVtkProp().
+     *
+     * \param[in] prop The vtkProp to check ownership of.
+     * \param[in] renderer The renderer context.
+     * \return true if this mapper owns the given prop, false otherwise.
+     */
     virtual bool HasVtkProp(const vtkProp *prop, BaseRenderer *renderer);
 
     /** \brief Set the vtkTransform of the m_Prop3D for
@@ -99,35 +126,26 @@ namespace mitk
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
     /**
-    * \brief Apply color and opacity properties read from the PropertyList
-    * \deprecatedSince{2013_03} Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor)
-    * instead
-    */
-    DEPRECATED(inline virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer))
-    {
-      ApplyColorAndOpacityProperties(renderer, actor);
-    }
-
-    /**
-    * \deprecatedSince{2018_04}
-    */
-    DEPRECATED(void ApplyShaderProperties(mitk::BaseRenderer *)){}
-
-    /**
-    * \brief Apply color and opacity properties read from the PropertyList.
-    * Called by mapper subclasses.
-    */
+     * \brief Apply color and opacity properties read from the PropertyList to the given vtkActor.
+     *
+     * Reads the "color" and "opacity" properties from the DataNode and applies them
+     * to the actor's vtkProperty.
+     *
+     * \param[in] renderer The renderer whose property list is queried.
+     * \param[in] actor The vtkActor to apply color and opacity to.
+     */
     void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     /**
-    * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
-    *
-    * Method called by mitk::VtkPropRenderer. The parameter renderer could be used to
-    * determine which graphic resources to release.  The local storage is accessible
-    * by the parameter renderer. Should be overwritten in subclasses.
-    */
+     * \brief Release VTK-based graphics resources consumed by this mapper.
+     *
+     * Called by mitk::VtkPropRenderer. Subclasses should override this to release
+     * renderer-specific VTK resources (textures, framebuffers, etc.).
+     *
+     */
     virtual void ReleaseGraphicsResources(mitk::BaseRenderer * /*renderer*/) {}
 
+    /** \brief Empty LocalStorage subclass for VtkMapper. */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     };

@@ -21,10 +21,15 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief Batch processing of all selected segmentations/data
-
-    This class is undocumented. Ask the creator ($Author$) to supply useful comments.
-  */
+   * \brief Abstract base class for tools that batch-process all selected segmentations.
+   *
+   * When activated, this tool iterates over all working data items from the ToolManager
+   * and calls ProcessOneWorkingData() on each. Subclasses implement the actual processing
+   * logic by overriding ProcessOneWorkingData() and related methods.
+   *
+   * \ingroup ToolManagerEtAl
+   * \sa Tool, AutoCropTool
+   */
   class MITKSEGMENTATION_EXPORT SegmentationsProcessingTool : public Tool
   {
   public:

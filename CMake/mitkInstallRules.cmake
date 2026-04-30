@@ -5,21 +5,6 @@ if(WIN32)
     DESTINATION bin)
 endif()
 
-# Install CppMicroServices - it uses usMacroCreateModule() (not mitk_create_module())
-# so it is not tracked in MITK_MODULE_TARGETS, and US_NO_INSTALL disables its own
-# install rules.
-
-if(TARGET CppMicroServices)
-  foreach(_bindir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_RUNTIME_DEPENDENCY_SETS)
-    install(TARGETS CppMicroServices
-      RUNTIME_DEPENDENCY_SET ${_depset}
-      RUNTIME DESTINATION ${_bindir}
-      LIBRARY DESTINATION ${_bindir}
-      PUBLIC_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL
-      PRIVATE_HEADER DESTINATION include/CppMicroServices EXCLUDE_FROM_ALL)
-  endforeach()
-endif()
-
 # Install Python3 with MITK Python module
 
 if(MITK_USE_Python3)
@@ -104,5 +89,39 @@ if(MITK_USE_Qt6 AND _mitk_executable_targets)
     if(_deploy_qt)
       mitkFunctionDeployQt(${_mitk_executable_target})
     endif()
+  endforeach()
+endif()
+
+#-----------------------------------------------------------------------------
+# Reset RUNPATH of bundled CTK core libraries on Linux.
+#
+# CTK has INSTALL_COMMAND "" in CMakeExternals/CTK.cmake, so CTK_DIR points
+# directly at the build tree. install(RUNTIME_DEPENDENCY_SET) copies libCTK*.so*
+# in as a transitive dependency of MITK plug-ins but does not rewrite RPATHs,
+# so the bundled CTK libraries retain absolute build-host paths in their
+# RUNPATH (e.g. the Qt install prefix, and the CTK build dir itself as the
+# first entry — which shadows $ORIGIN). That makes the bundle non-relocatable:
+# on a machine that happens to have a different CTK build tree or Qt install
+# at the baked-in paths, the loader follows them into foreign libraries and
+# triggers ABI mismatches.
+#
+# Reset RUNPATH to "$ORIGIN" so these libraries resolve peers (Qt, ITK, DCMTK,
+# etc.) from the same bin/ directory. Skip symlinks — only the real .so files
+# carry RPATH, and file(RPATH_SET) on a symlink is meaningless.
+#
+# Windows: PE has no RPATH. macOS: macdeployqt rewrites library references
+# during Qt deployment, so Mach-O references are already flattened.
+#-----------------------------------------------------------------------------
+
+if(LINUX)
+  foreach(_bindir IN LISTS MITK_INSTALL_BINDIR)
+    install(CODE "
+      file(GLOB _mitk_ctk_libs \"\${CMAKE_INSTALL_PREFIX}/${_bindir}/libCTK*.so*\")
+      foreach(_lib IN LISTS _mitk_ctk_libs)
+        if(NOT IS_SYMLINK \"\${_lib}\")
+          file(RPATH_SET FILE \"\${_lib}\" NEW_RPATH \"\$ORIGIN\")
+        endif()
+      endforeach()
+    ")
   endforeach()
 endif()

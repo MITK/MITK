@@ -17,13 +17,19 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
-   * Encapsulates the thick slices method enumeration
+   * \brief Encapsulates the thick slices reslice method as an enumeration property.
+   *
+   * Valid enumeration values are:
+   * - "disabled" (0)
+   * - "mip" (1) -- Maximum Intensity Projection
+   * - "sum" (2)
+   * - "weighted" (3)
+   * - "minip" (4) -- Minimum Intensity Projection
+   * - "mean" (5)
+   *
+   * \sa EnumerationProperty
+   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT ResliceMethodProperty : public EnumerationProperty
   {
@@ -37,11 +43,25 @@ namespace mitk
     using BaseProperty::operator=;
 
   protected:
+    /** \brief Default constructor. Sets reslice method to "disabled". */
     ResliceMethodProperty();
+
+    /** \brief Copy constructor. */
     ResliceMethodProperty(const ResliceMethodProperty &other);
+
+    /** \brief Constructor. Sets reslice method to the given enumeration value.
+     *
+     * \param value the enumeration ID of the reslice method.
+     */
     ResliceMethodProperty(const IdType &value);
+
+    /** \brief Constructor. Sets reslice method to the given string value.
+     *
+     * \param value the string name of the reslice method.
+     */
     ResliceMethodProperty(const std::string &value);
 
+    /** \brief Adds the available thick slices reslice method types to the enumeration. */
     void AddThickSlicesTypes();
 
     mitkCloneMacro(ResliceMethodProperty);
@@ -51,9 +71,6 @@ namespace mitk
     ResliceMethodProperty &operator=(const ResliceMethodProperty &);
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

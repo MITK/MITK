@@ -21,25 +21,29 @@ found in the LICENSE file.
 
 namespace mitk
 {
-    /**Method generates a proper result node for the given registration wrapper.
-    @param nodeName Name of the result node
-    @param resultReg Pointer to the registration wrapper that should be data of the node.
-    @param algorithmUID UID string of the algorithm used to generate the result.
-    @param movingDataUID UID string of the data used as moving input for the registration algorithm.
-    @param targetDataUID UID string of the data used as moving input for the registration algorithm.
-    @pre registration must point to a valid instance
-    @result Pointer to a data node with all properties properly set.*/
+    /**
+     * \brief Generate a result data node for a registration wrapper.
+     *
+     * \param[in] nodeName Name of the result node.
+     * \param[in] resultReg Pointer to the registration wrapper (must not be nullptr).
+     * \param[in] algorithmUID UID string of the algorithm used to generate the result.
+     * \param[in] movingDataUID UID string of the data used as moving input.
+     * \param[in] targetDataUID UID string of the data used as target input.
+     * \return Pointer to a data node with all properties properly set.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT mitk::DataNode::Pointer generateRegistrationResultNode(const std::string& nodeName, mitk::MAPRegistrationWrapper::Pointer resultReg, const std::string& algorithmUID, const std::string& movingDataUID, const std::string& targetDataUID);
 
-    /**Method generates a proper result node for the given registration wrapper.
-    @param nodeName Name of the result node
-    @param mappedData Pointer to the mapped data that should be data of the node.
-    @param regUID UID string of the registration used to map the data.
-    @param inputDataUID UID string of the data used as input for the mapping.
-    @param refinedGeometry Indicates if the data was really mapped or the geometry was refined.
-    @param interpolator Name of the used interpolation strategy.
-    @pre mappedData must point to a valid instance
-    @result Pointer to a data node with all properties properly set.*/
+    /**
+     * \brief Generate a result data node for mapped data.
+     *
+     * \param[in] nodeName Name of the result node.
+     * \param[in] mappedData Pointer to the mapped data (must not be nullptr).
+     * \param[in] regUID UID string of the registration used to map the data.
+     * \param[in] inputDataUID UID string of the data used as input for the mapping.
+     * \param[in] refinedGeometry True if the geometry was refined rather than fully mapped.
+     * \param[in] interpolator Name of the interpolation strategy used.
+     * \return Pointer to a data node with all properties properly set.
+     */
     MITKMATCHPOINTREGISTRATION_EXPORT mitk::DataNode::Pointer generateMappedResultNode(const std::string& nodeName, mitk::BaseData::Pointer mappedData, const std::string& regUID, const std::string& inputDataUID, const bool refinedGeometry, const std::string& interpolator = "Unkown");
 
 }

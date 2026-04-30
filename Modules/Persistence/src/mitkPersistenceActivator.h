@@ -19,15 +19,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  ///
-  /// installs the PersistenceService
-  /// runs all initial commands (setting env paths etc)
-  ///
+  /**
+   * \brief Module activator that installs the PersistenceService.
+   *
+   * Creates and registers the PersistenceService as a micro-service
+   * when the module is loaded.
+   */
   class PersistenceActivator : public us::ModuleActivator
   {
   public:
     PersistenceActivator();
+
+    /** \brief Create and register the PersistenceService. */
     void Load(us::ModuleContext *context) override;
+
+    /** \brief Unregister the PersistenceService. */
     void Unload(us::ModuleContext *context) override;
     ~PersistenceActivator() override;
 

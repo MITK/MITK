@@ -44,97 +44,140 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    /**
+     * \brief Confirms the current preview segmentation and transfers it to the working image.
+     *
+     * The transfer behavior is controlled by LabelTransferScope, LabelTransferMode,
+     * MergeStyle, and OverwriteStyle.
+     */
     void ConfirmSegmentation();
 
+    /** \brief If true, the preview is computed for all time steps at once. */
     itkSetMacro(CreateAllTimeSteps, bool);
     itkGetMacro(CreateAllTimeSteps, bool);
     itkBooleanMacro(CreateAllTimeSteps);
 
+    /** \brief If true, the tool stays active after the segmentation is accepted. */
     itkSetMacro(KeepActiveAfterAccept, bool);
     itkGetMacro(KeepActiveAfterAccept, bool);
     itkBooleanMacro(KeepActiveAfterAccept);
 
+    /** \brief If true, the tool reacts to time point changes and updates the preview. */
     itkSetMacro(IsTimePointChangeAware, bool);
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
 
+    /** \brief If true, the preview is reset to empty on activation. */
     itkSetMacro(ResetsToEmptyPreview, bool);
     itkGetMacro(ResetsToEmptyPreview, bool);
     itkBooleanMacro(ResetsToEmptyPreview);
 
+    /** \brief If true, a special color is used for the preview rendering. */
     itkSetMacro(UseSpecialPreviewColor, bool);
     itkGetMacro(UseSpecialPreviewColor, bool);
     itkBooleanMacro(UseSpecialPreviewColor);
 
+    /** \brief If true, a confirmation dialog is shown before deactivating the tool. */
     itkSetMacro(RequestDeactivationConfirmation, bool);
     itkGetMacro(RequestDeactivationConfirmation, bool);
     itkBooleanMacro(RequestDeactivationConfirmation);
 
+    /**
+     * \brief Returns the special preview color.
+     * \return The RGB color used for preview rendering.
+     */
     Color GetSpecialPreviewColor() const;
 
-    /*itk macro was not used on purpose, to avoid the change of mtime.*/
+    /**
+     * \brief Sets how the preview content is merged into the working image upon confirmation.
+     * \param[in] mergeStyle The merge style (Replace or Merge).
+     * \note Does not modify MTime to avoid unnecessary preview updates.
+     */
     void SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle);
     itkGetMacro(MergeStyle, MultiLabelSegmentation::MergeStyle);
 
-    /*itk macro was not used on purpose, to avoid the change of mtime.*/
+    /**
+     * \brief Sets whether locked labels should be overwritten during transfer.
+     * \param[in] overwriteStyle The overwrite style (RegardLocks or IgnoreLocks).
+     * \note Does not modify MTime to avoid unnecessary preview updates.
+     */
     void SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle);
     itkGetMacro(OverwriteStyle, MultiLabelSegmentation::OverwriteStyle);
 
+    /**
+     * \brief Defines which labels from the preview are transferred on confirmation.
+     */
     enum class LabelTransferScope
     {
-      ActiveLabel, //Only the selected label will be transferred from the preview segmentation
-                   //to the result segmentation.
-                   //If this mode is selected the class expects that GetSelectedLabels indicate
-                   //the label in the preview.
-      SelectedLabels, //The labels defined as selected labels will be transferred.
-      AllLabels //Transfer all labels of the preview
+      ActiveLabel,    /**< Only the currently active/selected label is transferred. */
+      SelectedLabels, /**< Only the labels in the SelectedLabels list are transferred. */
+      AllLabels       /**< All labels of the preview segmentation are transferred. */
     };
-    /*itk macro was not used on purpose, to avoid the change of mtime.*/
+
+    /**
+     * \brief Sets which labels from the preview are transferred on confirmation.
+     * \param[in] labelTransferScope The scope of labels to transfer.
+     * \note Does not modify MTime to avoid unnecessary preview updates.
+     */
     void SetLabelTransferScope(LabelTransferScope labelTransferScope);
     itkGetMacro(LabelTransferScope, LabelTransferScope);
 
+    /** \brief Type for the vector of selected label values. */
     using SelectedLabelVectorType = std::vector<Label::PixelType>;
-    /** Specifies the labels that should be transferred form preview to the working image,
-      if the segmentation is confirmed. The setting will be used, if LabelTransferScope is set to "ActiveLabel"
-      or "SelectedLabels".
-      @remark If the LabelTransferScope=="ActiveLabel", the class expects only one label to be selected.
-      @remark The selected label IDs correspond to the labels of the preview image.*/
+
+    /**
+     * \brief Sets the labels to transfer from preview to working image on confirmation.
+     *
+     * Used when LabelTransferScope is ActiveLabel or SelectedLabels.
+     *
+     * \param[in] labelsToTransfer Vector of label values from the preview image.
+     * \pre If LabelTransferScope is ActiveLabel, exactly one label must be provided.
+     */
     void SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer);
     itkGetMacro(SelectedLabels, SelectedLabelVectorType);
 
+    /**
+     * \brief Defines how labels are transferred from preview to the working image.
+     */
     enum class LabelTransferMode
     {
-      MapLabel, //Only the active label will be transferred from preview to segmentation.
-      AddLabel //The labels defined as selected labels will be transferred.
+      MapLabel, /**< Preview labels are mapped to the active label in the working image. */
+      AddLabel  /**< Preview labels are added as new labels to the working image. */
     };
-    /*itk macro was not used on purpose, to avoid the change of mtime.*/
+
+    /**
+     * \brief Sets how labels are transferred from preview to the working image.
+     * \param[in] labelTransferMode The label transfer mode.
+     * \note Does not modify MTime to avoid unnecessary preview updates.
+     */
     void SetLabelTransferMode(LabelTransferMode labelTransferMode);
     itkGetMacro(LabelTransferMode, LabelTransferMode);
 
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
-    /** Triggers the actualization of the preview
-     * @param ignoreLazyPreviewSetting If set true UpdatePreview will always
-     * generate the preview for all time steps. If set to false, UpdatePreview
-     * will regard the setting specified by the constructor.
-     * To define the update generation for time steps implement DoUpdatePreview.
-     * To alter what should be done directly before or after the update of the preview,
-     * reimplement UpdatePrepare() or UpdateCleanUp().*/
+    /**
+     * \brief Triggers the update of the preview segmentation.
+     *
+     * \param[in] ignoreLazyPreviewSetting If true, the preview is generated for all time steps.
+     *            If false, the lazy preview setting from the constructor is respected.
+     *
+     * To define the update generation for time steps, implement DoUpdatePreview().
+     * To alter behavior before/after the preview update, reimplement UpdatePrepare() or UpdateCleanUp().
+     */
     void UpdatePreview(bool ignoreLazyPreviewSetting = false);
 
     /** Indicate if currently UpdatePreview is triggered (true) or not (false).*/
     bool IsUpdating() const;
 
     /**
-   * @brief Gets the name of the currently selected segmentation node
-   * @return the name of the segmentation node or an empty string if
-   *         none is selected
-   */
+     * \brief Returns the name of the currently selected segmentation node.
+     * \return The name of the segmentation node or an empty string if none is selected.
+     */
     std::string GetCurrentSegmentationName();
 
     /**
-     * @brief Returns the currently selected segmentation node
-     * @return a mitk::DataNode which contains a segmentation image
+     * \brief Returns the currently selected segmentation node.
+     * \return A mitk::DataNode which contains a segmentation image.
      */
     virtual DataNode* GetTargetSegmentationNode() const;
     MultiLabelSegmentation* GetTargetSegmentation() const;
@@ -188,21 +231,23 @@ namespace mitk
 
     using LabelMappingType = std::vector<std::pair<Label::PixelType, Label::PixelType> >;
 
-    /** This member function offers derived classes the possibility to alter what should
-    happen directly before the content of the preview is transferred to the segmentation,
-    when the segmentation is confirmed. It is called by CreateResultSegmentationFromPreview.
-    Default implementation ensure that all labels that will be transferred, exist in the
-    segmentation. If they are not existing before the transfer, the will be added by
-    cloning the label information of the preview.
-    @param labelMapping the mapping that should be used for transferring the labels.
-    */
+    /**
+     * \brief Called before the preview content is transferred to the segmentation on confirmation.
+     *
+     * Default implementation ensures that all labels to be transferred exist in the segmentation.
+     * Missing labels are added by cloning label information from the preview.
+     *
+     * \param[in] labelMapping The mapping used for transferring labels from preview to result.
+     */
     virtual void PreparePreviewToResultTransfer(const LabelMappingType& labelMapping);
 
-    /**Helper function that can be used to copy the label information (not the pixel content) from one segmentation to another.
-     @param labelMapping indicates the labels which information should be copied from source. In the mapping one can also define of the
-     label should get a new label value in the target segmentation.
-     @param source
-     @param target*/
+    /**
+     * \brief Copies label information (not pixel content) from one segmentation to another.
+     *
+     * \param[in] labelMapping Indicates which labels to copy and optional label value remapping.
+     * \param[in] source The source segmentation containing the label information.
+     * \param[in,out] target The target segmentation that receives the label information.
+     */
     static void TransferLabelInformation(const LabelMappingType& labelMapping,
       const mitk::MultiLabelSegmentation* source, mitk::MultiLabelSegmentation* target);
 

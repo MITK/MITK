@@ -38,7 +38,16 @@ class MITKFORMSUI_EXPORT QmitkQuestionWidget : public QFrame
   Q_OBJECT
 
 public:
+  /** \brief Construct the question widget with common GUI elements.
+   *
+   * Sets up the question text label and the requirement reminder label (hidden by default).
+   *
+   * \param[in] parent The parent widget.
+   */
   explicit QmitkQuestionWidget(QWidget* parent = nullptr);
+
+  /** \brief Destructor.
+   */
   ~QmitkQuestionWidget() override;
 
   /** \name Pure virtual functions
@@ -65,6 +74,9 @@ public:
    *   return new RhetoricalQuestionWidget(parent);
    * }
    * \endcode
+   *
+   * \param[in] parent The parent widget for the new instance.
+   * \return A pointer to the new widget. The caller takes ownership.
    */
   virtual QmitkQuestionWidget* CreateAnother(QWidget* parent = nullptr) const = 0;
 
@@ -77,6 +89,8 @@ public:
    *   return m_Question;
    * }
    * \endcode
+   *
+   * \return A pointer to the associated Question, or \c nullptr if none is set.
    *
    * \sa SetQuestion()
    */
@@ -106,6 +120,10 @@ public:
    *   m_Question = rhetoricalQuestion;
    * }
    * \endcode
+   *
+   * \param[in] question The question to associate with this widget. Must not be \c nullptr.
+   *
+   * \throw mitk::Exception If \p question is \c nullptr or of an incompatible type.
    */
   virtual void SetQuestion(mitk::Forms::Question* question) = 0;
 
@@ -125,8 +143,18 @@ public:
 
   /**\}*/
 
+  /** \brief Show or hide the requirement reminder.
+   *
+   * \param[in] visible If \c true, show the requirement indicator; if \c false, hide it.
+   */
   void SetRequirementVisible(bool visible);
+
+  /** \brief Show the requirement reminder label and highlight the widget border in red.
+   */
   void ShowRequirement();
+
+  /** \brief Hide the requirement reminder label and reset the widget border style.
+   */
   void HideRequirement();
 
 protected:
@@ -148,6 +176,8 @@ protected:
    *   this->InsertLayout(m_Layout);
    * }
    * \endcode
+   *
+   * \param[in] layout The layout to insert between the question label and the requirement label.
    */
   void InsertLayout(QLayout* layout);
 

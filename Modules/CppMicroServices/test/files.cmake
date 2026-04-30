@@ -1,0 +1,34 @@
+set(MODULE_TESTS
+  usAnyTest.cpp
+  usHookReentranceTest.cpp
+  usLDAPFilterTest.cpp
+  usModuleAutoLoadTest.cpp
+  usModuleHooksTest.cpp
+  usModuleManifestTest.cpp
+  usModuleTest.cpp
+  usModuleResourceContainerTest.cpp
+  usModuleResourceTest.cpp
+  usModuleVersionTest.cpp
+  usNullEventTest.cpp
+  usServiceFactoryTest.cpp
+  usServiceHooksTest.cpp
+  usServiceListenerTest.cpp
+  usServiceRegistryPerformanceTest.cpp
+  usServiceRegistryTest.cpp
+  usServiceTemplateTest.cpp
+  usServiceTrackerTest.cpp
+  usSharedLibraryTest.cpp
+  usStaticModuleResourceTest.cpp
+  usStaticModuleTest.cpp
+)
+
+set(CPP_FILES
+  usTestDriverActivator.cpp
+  usTestManager.cpp
+  usTestUtilModuleListener.cpp
+)
+
+set(MODULE_RESOURCE_FILES
+  usTestResource.txt
+  manifest.json
+)

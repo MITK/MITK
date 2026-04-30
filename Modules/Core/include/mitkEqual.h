@@ -22,11 +22,11 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Helper method to check if the difference is bigger or equal to a given epsilon
+   * \brief Check if the absolute difference is bigger than or equal to a given epsilon.
    *
-   * @param diff the difference to be checked against the epsilon
-   * @param epsilon The absolute difference needs to be smaller than this.
-   * @return true if abs(diff) >= eps
+   * \param[in] diff The difference to be checked against epsilon.
+   * \param[in] epsilon The absolute difference needs to be smaller than this.
+   * \return True if abs(diff) >= epsilon.
    */
   template <typename DifferenceType>
   inline bool DifferenceBiggerOrEqualEps(DifferenceType diff, mitk::ScalarType epsilon = mitk::eps)
@@ -35,14 +35,16 @@ namespace mitk
   }
 
   /**
-   * outputs elem1, elem2 and eps in case verbose and !isEqual.
-   * Elem can e.g. be a mitk::Vector or an mitk::Point.
+   * \brief Conditionally output the difference between two elements to the log.
    *
-   * @param elem1 first element to be output
-   * @param elem2 second
-   * @param eps the epsilon which their difference was bigger than
-   * @param verbose tells the function if something shall be output
-   * @param isEqual function will only output something if the two elements are not equal
+   * Outputs elem1, elem2, and eps when verbose is true and the elements are not equal.
+   * Elements can e.g. be a mitk::Vector or a mitk::Point.
+   *
+   * \param[in] elem1 First element to be output.
+   * \param[in] elem2 Second element to be output.
+   * \param[in] eps The epsilon which their difference was bigger than.
+   * \param[in] verbose Whether output should be generated.
+   * \param[in] isEqual Only output something if the two elements are not equal.
    */
   template <typename ElementToOutput1, typename ElementToOutput2>
   inline void ConditionalOutputOfDifference(
@@ -57,13 +59,14 @@ namespace mitk
   }
 
   /**
-   * @ingroup MITKTestingAPI
+   * \ingroup MITKTestingAPI
+   * \brief Compare two scalar values for equality within a tolerance.
    *
-   * @param scalar1 Scalar value to compare.
-   * @param scalar2 Scalar value to compare.
-   * @param eps Tolerance for floating point comparison.
-   * @param verbose Flag indicating detailed console output.
-   * @return True if scalars are equal.
+   * \param[in] scalar1 Scalar value to compare.
+   * \param[in] scalar2 Scalar value to compare.
+   * \param[in] eps Tolerance for floating point comparison.
+   * \param[in] verbose Flag indicating detailed console output.
+   * \return True if scalars are equal within the given tolerance.
    */
   inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps = mitk::eps, bool verbose = false)
   {

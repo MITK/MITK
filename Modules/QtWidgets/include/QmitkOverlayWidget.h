@@ -17,9 +17,15 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-/** Simple widget that can be used to achieve overlays. The overlay will lie above its parent.
+/**
+ * \brief Simple widget that can be used to achieve overlays above a parent widget.
+ *
  * This implementation just renders a semi transparent black background. To add content to the
- * overlay derive from this class.*/
+ * overlay derive from this class.
+ *
+ * \sa QmitkSimpleTextOverlayWidget
+ * \sa QmitkButtonOverlayWidget
+ */
 class MITKQTWIDGETS_EXPORT QmitkOverlayWidget : public QWidget
 {
   Q_OBJECT
@@ -29,12 +35,22 @@ public:
   explicit QmitkOverlayWidget(QWidget* parent = nullptr);
   ~QmitkOverlayWidget() override;
 
+  /** \brief Returns whether mouse events pass through the overlay to the parent. */
   bool isTransparentForMouseEvents() const;
+  /**
+   * \brief Sets whether mouse events pass through the overlay.
+   * \param[in] transparent If true, mouse events are forwarded to the parent widget.
+   */
   void setTransparentForMouseEvents(bool transparent = true);
 
+  /** \brief Returns the current opacity value (0-255). */
   int getOpacity() const;
 
 public slots:
+  /**
+   * \brief Sets the overlay opacity.
+   * \param[in] opacity The opacity value (0 = fully transparent, 255 = fully opaque).
+   */
   void setOpacity(int opacity);
 
 protected:

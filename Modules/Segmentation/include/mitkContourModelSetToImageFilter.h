@@ -22,9 +22,14 @@ namespace mitk
   class ContourModel;
 
   /**
-    * @brief Fills a given mitk::ContourModelSet into a given mitk::Image
-    * @ingroup Process
-    */
+   * \brief Fills a given mitk::ContourModelSet into a given mitk::Image.
+   *
+   * Rasterizes contour model sets into image volumes by filling each contour
+   * on the appropriate slice of the output image.
+   *
+   * \ingroup Process
+   * \sa ContourModelSet, ContourModel
+   */
   class MITKSEGMENTATION_EXPORT ContourModelSetToImageFilter : public ImageSource
   {
   public:
@@ -45,11 +50,13 @@ namespace mitk
     itkBooleanMacro(MakeOutputLabelPixelType);
 
     /**
-       * Allocates a new output object and returns it. Currently the
-       * index idx is not evaluated.
-       * @param idx the index of the output for which an object should be created
-       * @returns the new object
-       */
+     * \brief Allocates a new output object and returns it.
+     *
+     * Currently the index is not evaluated.
+     *
+     * \param[in] idx The index of the output for which an object should be created.
+     * \return The new output data object.
+     */
     itk::DataObject::Pointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
@@ -72,9 +79,9 @@ namespace mitk
     virtual void SetInput(const mitk::ContourModelSet *input);
 
     /**
-       * @brief Set the image which will be used to initialize the output of this filter.
-       * @param refImage the image used to initialize the output image
-       */
+     * \brief Sets the image which will be used to initialize the output of this filter.
+     * \param[in] refImage The image used to initialize the output image geometry and properties.
+     */
     void SetImage(const mitk::Image *refImage);
 
     const mitk::Image *GetImage(void);
@@ -85,8 +92,8 @@ namespace mitk
     ~ContourModelSetToImageFilter() override;
 
     /**
-       * @brief Initializes the volume of the output image with zeros
-       */
+     * \brief Initializes the volume of the output image with zeros.
+     */
     void InitializeOutputEmpty();
 
     bool m_MakeOutputBinary;
@@ -98,16 +105,22 @@ namespace mitk
     const mitk::Image *m_ReferenceImage;
   };
 
-  /** Helper function for conveniently convert a passed contour model set into a image containing the content of the
-   * set as a binary mask that can be used as a label content of a segmentation.
-   * @param refImage Pointer to a image that serves as template for the image that should be generated.
-   * @param contourSet Pointer to the contour set that should be converted into an image.*/
+  /**
+   * \brief Converts a contour model set into a binary label mask image.
+   *
+   * \param[in] refImage Image that serves as geometry template for the output.
+   * \param[in] contourSet The contour set to convert.
+   * \return A binary image suitable for use as label content in a segmentation.
+   */
   MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelSetToLabelMask(const mitk::Image* refImage, mitk::ContourModelSet* contourSet);
 
-  /** Helper function for conveniently convert a passed contour model into a image containing the content of the
-   * model as a binary mask that can be used as a label content of a segmentation.
-   * @param refImage Pointer to a image that serves as template for the image that should be generated.
-   * @param contourModel Pointer to the contour model that should be converted into an image.*/
+  /**
+   * \brief Converts a contour model into a binary label mask image.
+   *
+   * \param[in] refImage Image that serves as geometry template for the output.
+   * \param[in] contourModel The contour model to convert.
+   * \return A binary image suitable for use as label content in a segmentation.
+   */
   MITKSEGMENTATION_EXPORT Image::Pointer ConvertContourModelToLabelMask(const mitk::Image* refImage, mitk::ContourModel* contourModel);
 }
 #endif

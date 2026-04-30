@@ -17,16 +17,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
-   * Encapsulates the enumeration vtkRepresentation. Valid values are
-   * (VTK constant/Id/string representation):
-   * VTK_POINTS/0/Points, VTK_WIREFRAME/1/Wireframe, VTK_SURFACE/2/Surface
-   * Default is the Surface representation
+   * \brief Encapsulates the VTK representation enumeration as an EnumerationProperty.
+   *
+   * Valid values are (VTK constant / Id / string representation):
+   * VTK_POINTS/0/Points, VTK_WIREFRAME/1/Wireframe, VTK_SURFACE/2/Surface.
+   * Default is the Surface representation.
    */
   class MITKCORE_EXPORT VtkRepresentationProperty : public EnumerationProperty
   {
@@ -42,59 +38,53 @@ namespace mitk
     mitkNewMacro1Param(VtkRepresentationProperty, const std::string &);
 
     /**
-     * Returns the current representation value as defined by VTK constants.
-     * @returns the current representation as VTK constant.
+     * \brief Return the current representation value as defined by VTK constants.
+     * \return The current representation as a VTK constant.
      */
     virtual int GetVtkRepresentation();
 
-    /**
-     * Sets the representation type to VTK_POINTS.
-     */
+    /** \brief Set the representation type to VTK_POINTS. */
     virtual void SetRepresentationToPoints();
 
-    /**
-     * Sets the representation type to VTK_WIREFRAME.
-     */
+    /** \brief Set the representation type to VTK_WIREFRAME. */
     virtual void SetRepresentationToWireframe();
 
-    /**
-     * Sets the representation type to VTK_SURFACE.
-     */
+    /** \brief Set the representation type to VTK_SURFACE. */
     virtual void SetRepresentationToSurface();
 
     using BaseProperty::operator=;
 
   protected:
-    /**
-     * Constructor. Sets the representation to a default value of Surface(2)
-     */
+    /** \brief Constructor. Sets the representation to a default value of Surface(2). */
     VtkRepresentationProperty();
 
     /**
-     * Constructor. Sets the representation to the given value. If it is not
-     * valid, the representation is set to Surface(2)
-     * @param value the integer representation of the representation
+     * \brief Constructor. Sets the representation to the given value.
+     *
+     * If the value is not valid, the representation is set to Surface(2).
+     *
+     * \param[in] value The integer representation of the representation type.
      */
     VtkRepresentationProperty(const IdType &value);
 
     /**
-     * Constructor. Sets the representation to the given value. If it is not
-     * valid, the representation is set to Surface(2)
-     * @param value the string representation of the representation
+     * \brief Constructor. Sets the representation to the given value.
+     *
+     * If the value is not valid, the representation is set to Surface(2).
+     *
+     * \param[in] value The string representation of the representation type.
      */
     VtkRepresentationProperty(const std::string &value);
 
     VtkRepresentationProperty(const VtkRepresentationProperty &other);
 
     /**
-     * this function is overridden as protected, so that the user may not add
-     * additional invalid representation types.
+     * \brief Overridden as protected to prevent adding invalid representation types.
      */
     bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
-     * Adds the enumeration types as defined by vtk to the list of known
-     * enumeration values.
+     * \brief Add the VTK-defined representation types to the enumeration.
      */
     virtual void AddRepresentationTypes();
 
@@ -105,9 +95,6 @@ namespace mitk
     VtkRepresentationProperty &operator=(const VtkRepresentationProperty &);
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 #endif

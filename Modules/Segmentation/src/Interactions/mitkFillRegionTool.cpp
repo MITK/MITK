@@ -48,7 +48,10 @@ void mitk::FillRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D
 
   if (nullptr == labelSetImage) mitkThrow() << "Invalid state of FillRegionTool. Working image is not of correct type.";
 
-  m_FillLabelValue = labelSetImage->GetActiveLabel()->GetValue();
+  auto activeLabel = labelSetImage->GetActiveLabel();
+  if (nullptr == activeLabel) mitkThrow() << "Invalid state of FillRegionTool. No active label set.";
+
+  m_FillLabelValue = activeLabel->GetValue();
   m_MergeStyle = MultiLabelSegmentation::MergeStyle::Merge;
 };
 

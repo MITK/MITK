@@ -13,9 +13,41 @@ found in the LICENSE file.
 #ifndef mitkSerializerMacros_h
 #define mitkSerializerMacros_h
 
+/**
+ * \file mitkSerializerMacros.h
+ * \brief Provides the MITK_REGISTER_SERIALIZER macro for automatic registration of serializer classes.
+ *
+ * This header defines a macro that generates an ITK object factory and a static
+ * registration helper for a given serializer class. The generated factory allows
+ * the serializer to be discovered and instantiated at runtime through the ITK
+ * object factory mechanism.
+ *
+ * \sa mitk::BaseDataSerializer, mitk::BasePropertySerializer
+ */
+
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>
 
+/**
+ * \brief Registers a serializer class with the ITK object factory system.
+ *
+ * This macro generates two helper classes for the given serializer class name:
+ * - A factory class (classnameFactory) derived from itk::ObjectFactoryBase
+ *   that creates instances of the serializer.
+ * - A registration class (classnameRegistrationMethod) whose static instance
+ *   registers the factory at program startup and unregisters it on shutdown.
+ *
+ * Usage: Place this macro in the global scope (outside any namespace) after
+ * including the serializer header, typically in the serializer's .cpp file.
+ *
+ * \param classname The unqualified name of the serializer class to register.
+ *                  The class must reside in the mitk namespace.
+ *
+ * \code
+ * // In mitkMyPropertySerializer.cpp:
+ * MITK_REGISTER_SERIALIZER(MyPropertySerializer);
+ * \endcode
+ */
 #define MITK_REGISTER_SERIALIZER(classname)                                                                            \
   \
 \

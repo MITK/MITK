@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <vector>
 
 /**
- * Adds a Message<> variable and methods to add/remove message delegates to/from
+ * \brief Adds a Message<> variable and methods to add/remove message delegates to/from
  * this variable.
-*/
+ */
 #define mitkNewMessageMacro(msgHandleObject)                                                                           \
 private:                                                                                                               \
   ::mitk::Message<> m_##msgHandleObject##Message;                                                                      \
@@ -79,6 +79,9 @@ public:                                                                         
 
 namespace mitk
 {
+  /** \brief Abstract base class for message delegates with no parameters.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <typename A = void>
   class MessageAbstractDelegate
   {
@@ -89,6 +92,10 @@ namespace mitk
     virtual MessageAbstractDelegate *Clone() const = 0;
   };
 
+  /** \brief Abstract base class for message delegates with one parameter.
+   * \tparam T Type of the first parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <typename T, typename A = void>
   class MessageAbstractDelegate1
   {
@@ -99,6 +106,11 @@ namespace mitk
     virtual MessageAbstractDelegate1 *Clone() const = 0;
   };
 
+  /** \brief Abstract base class for message delegates with two parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <typename T, typename U, typename A = void>
   class MessageAbstractDelegate2
   {
@@ -109,6 +121,12 @@ namespace mitk
     virtual MessageAbstractDelegate2 *Clone() const = 0;
   };
 
+  /** \brief Abstract base class for message delegates with three parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <typename T, typename U, typename V, typename A = void>
   class MessageAbstractDelegate3
   {
@@ -119,6 +137,13 @@ namespace mitk
     virtual MessageAbstractDelegate3 *Clone() const = 0;
   };
 
+  /** \brief Abstract base class for message delegates with four parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam W Type of the fourth parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <typename T, typename U, typename V, typename W, typename A = void>
   class MessageAbstractDelegate4
   {
@@ -130,12 +155,14 @@ namespace mitk
   };
 
   /**
-   * This class essentially wraps a function pointer with signature
-   * A(R::*function)(). A is the return type of your callback function
-   * and R the type of the class implementing the function.
+   * \brief Wraps a member function pointer with signature A(R::*function)().
    *
-   * Use this class to add a callback function to
+   * A is the return type of your callback function and R the type of the class
+   * implementing the function. Use this class to add a callback function to
    * messages without parameters.
+   *
+   * \tparam R The class type that contains the member function.
+   * \tparam A Return type of the callback function (default: void).
    */
   template <class R, typename A = void>
   class MessageDelegate : public MessageAbstractDelegate<A>
@@ -175,15 +202,17 @@ namespace mitk
   };
 
   /**
-   * This class essentially wraps a function pointer with signature
-   * A(R::*function)(T). A is the return type of your callback function,
-   * R the type of the class implementing the function and T the type
-   * of the argument.
+   * \brief Wraps a member function pointer with signature A(R::*function)(T).
    *
-   * Use this class to add a callback function to
-   * messages with one parameter.
+   * A is the return type of your callback function, R the type of the class
+   * implementing the function, and T the type of the argument. Use this class
+   * to add a callback function to messages with one parameter.
    *
-   * If you need more parameters, use MessageDelegate2 etc.
+   * If you need more parameters, use MessageDelegate2, MessageDelegate3, etc.
+   *
+   * \tparam R The class type that contains the member function.
+   * \tparam T Type of the parameter.
+   * \tparam A Return type of the callback function (default: void).
    */
   template <class R, typename T, typename A = void>
   class MessageDelegate1 : public MessageAbstractDelegate1<T, A>
@@ -222,6 +251,12 @@ namespace mitk
     A (R::*m_MemberFunctionPointer)(T); // pointer to member function
   };
 
+  /** \brief Wraps a member function pointer with signature A(R::*function)(T, U).
+   * \tparam R The class type that contains the member function.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <class R, typename T, typename U, typename A = void>
   class MessageDelegate2 : public MessageAbstractDelegate2<T, U, A>
   {
@@ -259,6 +294,13 @@ namespace mitk
     A (R::*m_MemberFunctionPointer)(T, U); // pointer to member function
   };
 
+  /** \brief Wraps a member function pointer with signature A(R::*function)(T, U, V).
+   * \tparam R The class type that contains the member function.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <class R, typename T, typename U, typename V, typename A = void>
   class MessageDelegate3 : public MessageAbstractDelegate3<T, U, V, A>
   {
@@ -300,6 +342,14 @@ namespace mitk
     A (R::*m_MemberFunctionPointer)(T, U, V); // pointer to member function
   };
 
+  /** \brief Wraps a member function pointer with signature A(R::*function)(T, U, V, W).
+   * \tparam R The class type that contains the member function.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam W Type of the fourth parameter.
+   * \tparam A Return type of the callback function (default: void).
+   */
   template <class R, typename T, typename U, typename V, typename W, typename A = void>
   class MessageDelegate4 : public MessageAbstractDelegate4<T, U, V, W, A>
   {
@@ -341,6 +391,13 @@ namespace mitk
     A (R::*m_MemberFunctionPointer)(T, U, V, W); // pointer to member function
   };
 
+  /** \brief Base class for message/event objects that manage a list of delegate listeners.
+   *
+   * Provides thread-safe add/remove listener functionality. Listeners are stored
+   * as cloned delegates to ensure ownership.
+   *
+   * \tparam AbstractDelegate The abstract delegate type this message manages.
+   */
   template <typename AbstractDelegate>
   class MessageBase
   {
@@ -371,6 +428,7 @@ namespace mitk
       return *this;
     }
 
+    /** \brief Add a listener delegate. Duplicates are silently ignored. */
     void AddListener(const AbstractDelegate &delegate) const
     {
       AbstractDelegate *msgCmd = delegate.Clone();
@@ -389,7 +447,10 @@ namespace mitk
       m_Mutex.unlock();
     }
 
+    /** \brief Shorthand for AddListener(). */
     void operator+=(const AbstractDelegate &delegate) const { this->AddListener(delegate); }
+
+    /** \brief Remove a listener delegate. If not found, nothing happens. */
     void RemoveListener(const AbstractDelegate &delegate) const
     {
       m_Mutex.lock();
@@ -406,9 +467,16 @@ namespace mitk
       m_Mutex.unlock();
     }
 
+    /** \brief Shorthand for RemoveListener(). */
     void operator-=(const AbstractDelegate &delegate) const { this->RemoveListener(delegate); }
+
+    /** \brief Get the list of currently registered listeners. */
     const ListenerList &GetListeners() const { return m_Listeners; }
+
+    /** \brief Check whether any listeners are registered. */
     bool HasListeners() const { return !m_Listeners.empty(); }
+
+    /** \brief Check whether the listener list is empty. */
     bool IsEmpty() const { return m_Listeners.empty(); }
   protected:
     /**
@@ -475,7 +543,10 @@ namespace mitk
     void operator()() const { this->Send(); }
   };
 
-  // message with 1 parameter and return type
+  /** \brief Event/message class with one parameter.
+   * \tparam T Type of the parameter.
+   * \tparam A Return type (default: void).
+   */
   template <typename T, typename A = void>
   class Message1 : public MessageBase<MessageAbstractDelegate1<T, A>>
   {
@@ -503,7 +574,11 @@ namespace mitk
     void operator() (T t) const { this->Send(t); }
   };
 
-  // message with 2 parameters and return type
+  /** \brief Event/message class with two parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam A Return type (default: void).
+   */
   template <typename T, typename U, typename A = void>
   class Message2 : public MessageBase<MessageAbstractDelegate2<T, U, A>>
   {
@@ -531,7 +606,12 @@ namespace mitk
     void operator()(T t, U u) const { this->Send(t, u); }
   };
 
-  // message with 3 parameters and return type
+  /** \brief Event/message class with three parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam A Return type (default: void).
+   */
   template <typename T, typename U, typename V, typename A = void>
   class Message3 : public MessageBase<MessageAbstractDelegate3<T, U, V, A>>
   {
@@ -559,7 +639,13 @@ namespace mitk
     void operator()(T t, U u, V v) const { this->Send(t, u, v); }
   };
 
-  // message with 4 parameters and return type
+  /** \brief Event/message class with four parameters.
+   * \tparam T Type of the first parameter.
+   * \tparam U Type of the second parameter.
+   * \tparam V Type of the third parameter.
+   * \tparam W Type of the fourth parameter.
+   * \tparam A Return type (default: void).
+   */
   template <typename T, typename U, typename V, typename W, typename A = void>
   class Message4 : public MessageBase<MessageAbstractDelegate4<T, U, V, W>>
   {

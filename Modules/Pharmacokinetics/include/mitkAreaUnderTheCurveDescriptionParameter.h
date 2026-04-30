@@ -18,7 +18,14 @@ found in the LICENSE file.
 namespace  mitk
 {
 
-  /** Description parameter that computes the area under the curve */
+  /** \class AreaUnderTheCurveDescriptionParameter
+   * \brief Curve description parameter that computes the Area Under the Curve (AUC).
+   *
+   * The AUC is computed by numerical integration using the trapezoidal rule over
+   * the absolute values of the curve, i.e. AUC = integral( |C(t)| dt ).
+   *
+   * \sa AreaUnderFirstMomentDescriptionParameter, MeanResidenceTimeDescriptionParameter, CurveDescriptionParameterBase
+   */
     class MITKPHARMACOKINETICS_EXPORT AreaUnderTheCurveDescriptionParameter : public mitk::CurveDescriptionParameterBase
     {
     public:
@@ -29,6 +36,9 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
+
+        /** \brief Returns the name of the computed description parameter ("AreaUnderCurve").
+         *  \return Vector containing the single parameter name. */
         DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:

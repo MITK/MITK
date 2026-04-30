@@ -43,9 +43,8 @@ namespace mitk::nnInteractive
   class Interactor::Impl
   {
   public:
-    Impl(InteractionType type, InteractionMode mode)
+    explicit Impl(InteractionType type)
       : Type(type),
-        Mode(mode),
         CurrentPromptType(PromptType::Positive),
         IsEnabled(false)
     {
@@ -96,7 +95,6 @@ namespace mitk::nnInteractive
     }
 
     InteractionType Type;
-    InteractionMode Mode;
     PromptType CurrentPromptType;
     bool IsEnabled;
 
@@ -106,8 +104,8 @@ namespace mitk::nnInteractive
   };
 }
 
-mitk::nnInteractive::Interactor::Interactor(InteractionType type, InteractionMode mode)
-  : m_Impl(std::make_unique<Impl>(type, mode))
+mitk::nnInteractive::Interactor::Interactor(InteractionType type)
+  : m_Impl(std::make_unique<Impl>(type))
 {
 }
 
@@ -141,8 +139,7 @@ void mitk::nnInteractive::Interactor::Enable(PromptType promptType)
     this->Disable();
   }
 
-  if (m_Impl->Mode == InteractionMode::BlockLMBDisplayInteraction)
-    m_Impl->BlockLMBDisplayInteraction();
+  m_Impl->BlockLMBDisplayInteraction();
 
   m_Impl->CurrentPromptType = promptType;
 
@@ -160,8 +157,7 @@ void mitk::nnInteractive::Interactor::Disable()
 
   m_Impl->IsEnabled = false;
 
-  if (m_Impl->Mode == InteractionMode::BlockLMBDisplayInteraction)
-    m_Impl->UnblockLMBDisplayInteraction();
+  m_Impl->UnblockLMBDisplayInteraction();
 }
 
 bool mitk::nnInteractive::Interactor::IsEnabled() const
@@ -172,6 +168,14 @@ bool mitk::nnInteractive::Interactor::IsEnabled() const
 void mitk::nnInteractive::Interactor::Reset()
 {
   this->OnReset();
+}
+
+void mitk::nnInteractive::Interactor::OnSetToolManager()
+{
+}
+
+void mitk::nnInteractive::Interactor::OnHandleEvent(InteractionEvent*)
+{
 }
 
 std::string mitk::nnInteractive::Interactor::GetIcon() const

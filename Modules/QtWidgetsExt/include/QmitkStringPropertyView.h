@@ -17,13 +17,28 @@ found in the LICENSE file.
 #include <mitkPropertyObserver.h>
 #include <mitkStringProperty.h>
 
-/// @ingroup Widgets
+/**
+ * \brief Read-only QLabel that displays a mitk::StringProperty value as text.
+ * \ingroup Widgets
+ *
+ * Observes a mitk::StringProperty and updates the label text whenever the
+ * property value changes. If the property is removed, "n/a" is displayed.
+ *
+ * \sa QmitkStringPropertyEditor, QmitkStringPropertyOnDemandEdit, QmitkPropertyViewFactory
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 
 public:
-  QmitkStringPropertyView(const mitk::StringProperty *, QWidget *parent);
+  /**
+   * \brief Construct a view for the given string property.
+   * \param[in] property The mitk::StringProperty to observe.
+   * \param[in] parent The parent widget.
+   */
+  QmitkStringPropertyView(const mitk::StringProperty *property, QWidget *parent);
+
+  /** \brief Destructor. */
   ~QmitkStringPropertyView() override;
 
 protected:

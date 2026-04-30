@@ -21,8 +21,8 @@ found in the LICENSE file.
 #include <QPixmap>
 
 /**
-* @class QmitkNodeSelectionButton
-* @brief Button class that can be used to display information about a given node.
+* \class QmitkNodeSelectionButton
+* \brief Button class that can be used to display information about a given node.
 *        If the given node is a nullptr the node info text will be shown.
 *        The node info can be formatted text (e.g. HTML code; like the tooltip text).
 */
@@ -34,11 +34,21 @@ public:
   explicit QmitkNodeSelectionButton(QWidget *parent = nullptr);
   ~QmitkNodeSelectionButton() override;
 
+  /** \brief Returns the currently selected data node, or nullptr if none is selected. */
   const mitk::DataNode* GetSelectedNode() const;
+  /** \brief Returns whether the selection is optional. */
   bool GetSelectionIsOptional() const;
 
 public Q_SLOTS:
+  /**
+   * \brief Sets the node to display.
+   * \param[in] node The data node to display. May be nullptr.
+   */
   virtual void SetSelectedNode(const mitk::DataNode* node);
+  /**
+   * \brief Sets the info text that is shown when no node is selected.
+   * \param[in] info The info text, which may contain HTML.
+   */
   virtual void SetNodeInfo(QString info);
 
   /** Set the widget into an optional mode. Optional means that the selection of no valid

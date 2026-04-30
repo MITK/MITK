@@ -20,6 +20,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+/**
+ * \brief String constants for RT dose visualization UI preferences.
+ *
+ * This struct defines preference node IDs and property keys used to persist
+ * dose visualization settings (reference dose, iso presets, display modes)
+ * in the MITK preference system.
+ *
+ * \sa mitk::RTConstants
+ * \sa mitk::RTCTKEventConstants
+ * \ingroup MitkRTUIModule
+ */
 struct MITKRTUI_EXPORT RTUIConstants
 {
   /** ID/Path of main preference node for RT UI.  */
@@ -65,13 +76,26 @@ struct MITKRTUI_EXPORT RTUIConstants
   static const DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE;
 };
 
+/**
+ * \brief CTK event topic constants for RT dose visualization change notifications.
+ *
+ * These topic strings are used with the CTK event framework to publish and subscribe
+ * to changes in reference dose, iso dose level presets, and global visibility settings.
+ *
+ * \sa mitk::RTUIConstants
+ * \ingroup MitkRTUIModule
+ */
 struct MITKRTUI_EXPORT RTCTKEventConstants
 {
-  /** ID/Path of main preference node for RT UI.  */
+  /** \brief Event topic for reference dose queries. */
   static const std::string TOPIC_REFERENCE_DOSE;
+  /** \brief Event topic emitted when the reference dose has changed. */
   static const std::string TOPIC_REFERENCE_DOSE_CHANGED;
+  /** \brief Event topic for iso dose level preset queries. */
   static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS;
+  /** \brief Event topic emitted when iso dose level presets have changed. */
   static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED;
+  /** \brief Event topic emitted when global visibility settings have changed. */
   static const std::string TOPIC_GLOBAL_VISIBILITY_CHANGED;
 };
 

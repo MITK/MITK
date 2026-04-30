@@ -22,18 +22,32 @@ namespace mitk
 {
   // Class is adapted from MatchPoint ProcessExecutor
 
+  /**
+   * \brief Event carrying output text from an external process.
+   *
+   * Base class for stdout/stderr events emitted during external process execution.
+   * Register an observer for this event type to capture all process output.
+   *
+   * \sa ProcessExecutor, ExternalProcessStdOutEvent, ExternalProcessStdErrEvent
+   */
   class ExternalProcessOutputEvent : public itk::AnyEvent
   {
   public:
     typedef ExternalProcessOutputEvent Self;
     typedef itk::AnyEvent Superclass;
 
+    /**
+     * \brief Constructor.
+     * \param[in] output The output text from the external process.
+     */
     explicit ExternalProcessOutputEvent(const std::string &output = "") : m_Output(output) {}
     ~ExternalProcessOutputEvent() override {}
 
     const char *GetEventName() const override { return "ExternalProcessOutputEvent"; }
     bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
     itk::EventObject *MakeObject() const override { return new Self(m_Output); }
+
+    /** \brief Returns the output text from the external process. */
     std::string GetOutput() const { return m_Output; }
 
   private:
@@ -78,21 +92,53 @@ namespace mitk
     itkSetMacro(SharedOutputPipes, bool);
     itkGetConstMacro(SharedOutputPipes, bool);
 
+    /** \brief Type for the list of command-line arguments. */
     using ArgumentListType = std::vector<std::string>;
 
+    /**
+     * \brief Executes an external process.
+     * \param[in] executionPath Working directory for the process.
+     * \param[in] executableName Name of the executable to run.
+     * \param[in,out] argumentList Command-line arguments for the process.
+     * \return true if the process executed successfully, false otherwise.
+     */
     bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType &argumentList);
 
     /**
-     * @brief Executes the process. This version assumes that the executable name is the first argument in the argument
-     * list and has already been converted to its OS dependent name via the static convert function of this class.
+     * \brief Executes an external process.
+     *
+     * This version assumes that the executable name is the first argument in the argument
+     * list and has already been converted to its OS-dependent name.
+     *
+     * \param[in] executionPath Working directory for the process.
+     * \param[in] argumentList Command-line arguments; first element is the executable.
+     * \return true if the process executed successfully, false otherwise.
      */
     virtual bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
 
+    /**
+     * \brief Returns the exit value of the last executed process.
+     * \return The process exit code.
+     */
     int GetExitValue();
-    static std::string EnsureCorrectOSPathSeparator(const std::string &);
 
+    /**
+     * \brief Converts path separators to the OS-correct form.
+     * \param[in] path The path string to convert.
+     * \return The path with correct OS-specific separators.
+     */
+    static std::string EnsureCorrectOSPathSeparator(const std::string & path);
+
+    /**
+     * \brief Returns the OS-dependent executable name (e.g. adds ".exe" on Windows).
+     * \param[in] name The platform-independent executable name.
+     * \return The OS-dependent executable name.
+     */
     static std::string GetOSDependendExecutableName(const std::string &name);
 
+    /**
+     * \brief Kills the currently running process.
+     */
     void KillProcess();
 
   protected:

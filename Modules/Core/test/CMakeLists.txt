@@ -1,15 +1,5 @@
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
-  # The core tests need relaxed compiler flags...
-  # TODO fix core tests to compile without these additional no-error flags
-  if(MSVC_VERSION)
-    target_compile_options(${TESTDRIVER} PRIVATE /wd4996)
-  else()
-    target_compile_options(${TESTDRIVER} PRIVATE
-      -Wno-error=deprecated
-      -Wno-error=deprecated-declarations)
-  endif()
-
   mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|IONRRD VTK|TestingRendering tinyxml2)
 
   mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest

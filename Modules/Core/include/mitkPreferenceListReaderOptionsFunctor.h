@@ -45,11 +45,36 @@ namespace mitk
   {
     using ListType = std::vector<std::string>;
 
+    /** \brief Applies the preference/black list strategy to select and configure a reader.
+     *
+     * \param loadInfo The load info containing reader selector and options.
+     * \return True if a reader was successfully selected.
+     */
     bool operator()(IOUtil::LoadInfo &loadInfo) const override;
 
+    /** \brief Default constructor with empty preference and black lists. */
     PreferenceListReaderOptionsFunctor();
+
+    /** \brief Constructor with preference and black lists.
+     *
+     * \param preference List of preferred reader descriptions (first match wins).
+     * \param black List of blacklisted reader descriptions (always excluded).
+     */
     PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black);
+
+    /** \brief Constructor with preference list and reader options.
+     *
+     * \param preference List of preferred reader descriptions.
+     * \param options Options to apply to the selected reader.
+     */
     PreferenceListReaderOptionsFunctor(const ListType& preference, const IFileReader::Options& options);
+
+    /** \brief Constructor with preference list, black list, and reader options.
+     *
+     * \param preference List of preferred reader descriptions.
+     * \param black List of blacklisted reader descriptions.
+     * \param options Options to apply to the selected reader.
+     */
     PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black, const IFileReader::Options& options);
 
   protected:

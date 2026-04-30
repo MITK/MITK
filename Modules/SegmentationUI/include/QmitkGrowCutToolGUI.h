@@ -25,12 +25,13 @@ namespace Ui
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::GrowCutTool.
-  \sa mitk::
+  \brief GUI for the GrowCut segmentation tool.
 
-  This GUI shows ...
+  Provides controls for the GrowCut algorithm including a preview button, advanced settings
+  for the distance penalty parameter, and label selection for multi-label preview.
 
-  Last contributor: $Author$
+  \sa mitk::GrowCutTool
+  \sa QmitkMultiLabelSegWithPreviewToolGUIBase
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkGrowCutToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {

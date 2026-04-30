@@ -25,14 +25,14 @@ namespace us
 namespace mitk
 {
   /**
-  \brief Calculates the segmented volumes for binary images.
-
-  \ingroup ToolManagerEtAl
-  \sa mitk::Tool
-  \sa QmitkInteractiveSegmentation
-
-  Last contributor: $Author$
-  */
+   * \brief Upper/lower dual-threshold segmentation tool for interactive segmentation.
+   *
+   * Segments an image by applying both a lower and an upper threshold. Only pixels
+   * within the [lower, upper] range are included in the segmentation result.
+   *
+   * \ingroup ToolManagerEtAl
+   * \sa BinaryThresholdBaseTool, BinaryThresholdTool
+   */
   class MITKSEGMENTATION_EXPORT BinaryThresholdULTool : public BinaryThresholdBaseTool
   {
   public:
@@ -40,7 +40,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Returns the icon resource for this tool's button. */
     us::ModuleResource GetIconResource() const override;
+
+    /** \brief Returns the display name of this tool ("UL Threshold"). */
     const char *GetName() const override;
 
   protected:

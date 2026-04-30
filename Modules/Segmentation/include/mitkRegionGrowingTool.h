@@ -68,29 +68,31 @@ namespace mitk
     void Deactivated() override;
 
     /**
-     * @brief OnMousePressed is called when the user clicks.
-     * Grows a region by calling 'GetNeighborhoodAverage' and 'StartRegionGrowing'.
+     * \brief Called when the user clicks. Initiates region growing.
+     *
+     * Grows a region by calling GetNeighborhoodAverage() and StartRegionGrowing().
      */
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
-     * @brief OnMouseMoved is called when the user moves the mouse with the left mouse button pressed.
-     * Adjusts the thresholds.
-     * Up: Increase upper threshold, decrease lower threshold.
-     * Down: Decrease upper threshold, increase lower threshold.
-     * Right: Increase both thresholds.
-     * Left: Decrease both thresholds.
+     * \brief Called when the user moves the mouse with the left button pressed. Adjusts thresholds.
+     *
+     * - Up: Increase upper threshold, decrease lower threshold.
+     * - Down: Decrease upper threshold, increase lower threshold.
+     * - Right: Increase both thresholds.
+     * - Left: Decrease both thresholds.
      */
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
-     * @brief OnMouseReleased converts the feedback contour to a segmentation.
+     * \brief Called when the mouse button is released. Converts the feedback contour to a segmentation.
      */
     virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
-     * @brief Template to calculate average pixel value around index using a square/cube with radius neighborhood.
-     * Example: 1 = 3x3 pixels, 2 = 5x5 pixels, etc.
+     * \brief Calculates average pixel value around index using a square/cube neighborhood.
+     *
+     * Example: neighborhood=1 yields a 3x3 region, neighborhood=2 yields 5x5, etc.
      */
     template <typename TPixel, unsigned int imageDimension>
     void GetNeighborhoodAverage(const itk::Image<TPixel, imageDimension> *itkImage,
@@ -99,7 +101,7 @@ namespace mitk
                                 unsigned int neighborhood = 1);
 
     /**
-     * @brief Template that calls an ITK filter to do the region growing.
+     * \brief Calls an ITK filter to perform the region growing.
      */
     template <typename TPixel, unsigned int imageDimension>
     void StartRegionGrowing(const itk::Image<TPixel, imageDimension> *itkImage,
@@ -108,7 +110,7 @@ namespace mitk
                             mitk::Image::Pointer &outputImage);
 
     /**
-     * @brief Template to calculate the initial thresholds for region growing.
+     * \brief Calculates the initial thresholds for region growing based on the seed point.
      */
     template <typename TPixel, unsigned int imageDimension>
     void CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>* itkImage);

@@ -91,39 +91,6 @@ void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Po
   pt3d_mm = m_ItkVtkAbstractTransform->TransformPoint(pt3d_mm);
 }
 
-bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &atPt3d_mm,
-                                              const mitk::Vector3D &vec3d_mm,
-                                              mitk::Vector3D &projectedVec3d_mm) const
-{
-  itkExceptionMacro("not implemented yet - replace GetIndexToWorldTransform by "
-                    "m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()");
-  assert(this->IsBoundingBoxNull() == false);
-
-  auto inverse = mitk::AffineTransform3D::New();
-  GetIndexToWorldTransform()->GetInverse(inverse);
-
-  Vector3D vec3d_units = inverse->GetMatrix() * vec3d_mm;
-  vec3d_units[2] = 0;
-  projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
-
-  Point3D pt3d_units;
-  mitk::ScalarType temp[3];
-  unsigned int i, j;
-
-  for (j = 0; j < 3; ++j)
-    temp[j] = atPt3d_mm[j] - GetIndexToWorldTransform()->GetOffset()[j];
-
-  for (i = 0; i < 3; ++i)
-  {
-    pt3d_units[i] = 0.0;
-
-    for (j = 0; j < 3; ++j)
-      pt3d_units[i] += inverse->GetMatrix()[i][j] * temp[j];
-  }
-
-  return this->GetBoundingBox()->IsInside(pt3d_units);
-}
-
 bool mitk::AbstractTransformGeometry::Project(const mitk::Vector3D & /*vec3d_mm*/,
                                               mitk::Vector3D & /*projectedVec3d_mm*/) const
 {
@@ -142,11 +109,11 @@ bool mitk::AbstractTransformGeometry::Map(const mitk::Point3D &atPt3d_mm,
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
 
   ScalarType vtkpt[3], vtkvec[3];
-  itk2vtk(atPt3d_mm, vtkpt);
-  itk2vtk(vec3d_mm, vtkvec);
+  mitk::ToArray(vtkpt, atPt3d_mm);
+  mitk::ToArray(vtkvec, vec3d_mm);
   m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::Vector3D vec3d_units;
-  vtk2itk(vtkvec, vec3d_units);
+  mitk::FillArray(vec3d_units, vtkvec);
   return m_Plane->Map(atPt3d_mm, vec3d_units, vec2d_mm);
 }
 
@@ -158,10 +125,10 @@ void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &atPt2d_mm,
   Point3D atPt3d_mm;
   Map(atPt2d_mm, atPt3d_mm);
   float vtkpt[3], vtkvec[3];
-  itk2vtk(atPt3d_mm, vtkpt);
-  itk2vtk(vec3d_mm, vtkvec);
+  mitk::ToArray(vtkpt, atPt3d_mm);
+  mitk::ToArray(vtkvec, vec3d_mm);
   m_ItkVtkAbstractTransform->GetVtkAbstractTransform()->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
-  vtk2itk(vtkvec, vec3d_mm);
+  mitk::FillArray(vec3d_mm, vtkvec);
 }
 
 void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
@@ -174,27 +141,9 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &pt_mm, m
   m_Plane->WorldToIndex(pt_mm, pt_units);
 }
 
-void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Point2D & /*atPt2d_units*/,
-                                                   const mitk::Vector2D &vec_units,
-                                                   mitk::Vector2D &vec_mm) const
-{
-  MITK_WARN << "Warning! Call of the deprecated function AbstractTransformGeometry::IndexToWorld(point, vec, vec). Use "
-               "AbstractTransformGeometry::IndexToWorld(vec, vec) instead!";
-  this->IndexToWorld(vec_units, vec_mm);
-}
-
 void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
   m_Plane->IndexToWorld(vec_units, vec_mm);
-}
-
-void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D & /*atPt2d_mm*/,
-                                                   const mitk::Vector2D &vec_mm,
-                                                   mitk::Vector2D &vec_units) const
-{
-  MITK_WARN << "Warning! Call of the deprecated function AbstractTransformGeometry::WorldToIndex(point, vec, vec). Use "
-               "AbstractTransformGeometry::WorldToIndex(vec, vec) instead!";
-  this->WorldToIndex(vec_mm, vec_units);
 }
 
 void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const

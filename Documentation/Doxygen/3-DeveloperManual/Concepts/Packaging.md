@@ -161,6 +161,8 @@ Third-party (imported) CTK plugins are installed via `install(FILES ...)` since 
 
 Plugins get `INSTALL_RPATH "$ORIGIN/.."` on Linux and `INSTALL_RPATH "@loader_path/.."` on macOS to resolve libraries in the parent directory (`bin/` or `Contents/MacOS/`).
 
+The CTK *core* libraries (`libCTKCore`, `libCTKWidgets`, `libCTKPluginFramework`, `libCTKDICOMCore`, `libCTKDICOMWidgets`, `libCTKXNATCore`) are not installed by any of the CTK-aware helpers above. They are pulled into the package as transitive dependencies of MITK plugins by `install(RUNTIME_DEPENDENCY_SET)`. Because CTK has `INSTALL_COMMAND ""` (see `CMakeExternals/CTK.cmake`), `CTK_DIR` points directly at the CTK build tree, and those libraries retain their build-tree RPATH — which on Linux contains absolute paths from the build host (Qt install prefix and the CTK build directory itself). `install(RUNTIME_DEPENDENCY_SET)` does not rewrite RPATHs on copied files, so without further action the packaged bundle is non-relocatable: on another machine, the loader may follow the baked-in paths into unrelated library trees and trigger ABI mismatches. To prevent this, `mitkInstallRules.cmake` runs a post-install `install(CODE ...)` step on Linux that globs `libCTK*.so*` in each bundle's `bin/` and resets their RUNPATH to `$ORIGIN` using `file(RPATH_SET)`. macOS does not need the equivalent because `macdeployqt` rewrites library references during Qt deployment, and Windows has no RPATH.
+
 ### Executables
 
 Created by `mitk_create_executable()` (in `mitkMacroCreateExecutable.cmake`), which wraps `mitk_create_module()` with the `EXECUTABLE` option. Executables are installed to each bundle's binary directory with a wrapper script (Linux/Windows only — macOS executables are inside the bundle):
@@ -358,10 +360,10 @@ Wrapper scripts launch MITK executables from the install root. They exist becaus
 
 | Script | Used by | Behavior |
 |---|---|---|
-| `RunInstalledApp.sh` | Regular executables and BlueBerry apps | Sets `LD_LIBRARY_PATH` to include `python/lib`, then launches `bin/<name>` |
+| `RunInstalledApp.sh` | Regular executables and BlueBerry apps | Sets `LD_LIBRARY_PATH` to include `bin/` and `python/lib`, then launches `bin/<name>` |
 | `RunInstalledCmdLineApp.sh` | Command-line apps | Same but resolves paths from `apps/` subdirectory |
 
-On Linux, the wrapper scripts also prepend `python/lib` to `LD_LIBRARY_PATH`, which is necessary for the Python shared library to be found at runtime.
+On Linux, the wrapper scripts prepend `bin/` and `python/lib` to `LD_LIBRARY_PATH`. `python/lib` is required for the Python shared library to be found at runtime. `bin/` is a defensive layer: `LD_LIBRARY_PATH` takes precedence over a library's RUNPATH, so even if a bundled external `.so` carries a stale build-tree RPATH entry that happens to match a real directory on the user's machine, the bundled libraries in `bin/` are loaded first. The CTK RUNPATH fixup in `mitkInstallRules.cmake` addresses the root cause for CTK specifically; this wrapper-script layer protects against the same class of failure for other externals and for the case of running the raw executable directly through the wrapper.
 
 ## CPack Configuration
 

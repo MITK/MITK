@@ -55,14 +55,19 @@ public:
   vtkTypeMacro(mitkVtkImageOverwrite, vtkImageReslice);
 
   /** \brief Set the mode either to reslice (false) or to overwrite (true).
-      Default: false
-   */
+      Default: false.
+  */
   void SetOverwriteMode(bool b);
+
+  /** \brief Query whether the filter is in overwrite mode.
+    \return True if in overwrite mode, false if in reslice mode.
+  */
   bool IsOverwriteMode() { return m_Overwrite_Mode; }
+
   /** \brief Set the slice for overwrite mode.
-    Note:
-    It is recommend not to use this in reslice mode because otherwise the slice will be modified!
-    */
+    \param slice The 2D image data to write into the volume.
+    \note It is recommended not to use this in reslice mode because the slice will be modified.
+  */
   void SetInputSlice(vtkImageData *slice);
 
 protected:

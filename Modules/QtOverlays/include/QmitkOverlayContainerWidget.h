@@ -19,29 +19,36 @@ found in the LICENSE file.
 #include <MitkQtOverlaysExports.h>
 
 /**
-* \class  QmitkOverlayContainerWidget
-* \brief Widget that overrides the paintEvent method to correctly display
-* the Qt based overlays when using the system-environment variable
-* QT_DEVICE_PIXEL_RATIO.
-*/
+ * \class  QmitkOverlayContainerWidget
+ * \brief Container widget for overlay positioning that correctly clears its background.
+ *
+ * This widget overrides the paintEvent method to use CompositionMode_Clear
+ * before painting, ensuring a fully transparent background. This is necessary
+ * for proper overlay rendering when using high-DPI scaling (QT_DEVICE_PIXEL_RATIO).
+ *
+ * \sa QmitkOverlayController
+ * \sa QmitkOverlay
+ * \ingroup Qmitk
+ */
 
 class MITKQTOVERLAYS_EXPORT QmitkOverlayContainerWidget : public QWidget
 {
 public:
   /**
-  * @brief Default Constructor
-  **/
+   * \brief Constructor.
+   * \param[in] parent Optional parent widget.
+   * \param[in] f Optional window flags.
+   */
   QmitkOverlayContainerWidget(QWidget *parent = nullptr, Qt::WindowFlags f = {});
 
-  /**
-  * @brief Default Destructor
-  **/
+  /** \brief Destructor. */
   ~QmitkOverlayContainerWidget() override;
 
 protected:
   /**
-  * @brief overridden version of paintEvent that correctly clears its canvas before painting.
-  **/
+   * \brief Clears the widget background with transparency before painting.
+   * \param[in] event The paint event (unused).
+   */
   void paintEvent(QPaintEvent *event) override;
 };
 

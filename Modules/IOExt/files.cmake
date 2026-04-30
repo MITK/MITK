@@ -4,14 +4,4 @@ set(CPP_FILES
   mitkObjFileReaderService.cpp
   mitkPlyFileWriterService.cpp
   mitkPlyFileReaderService.cpp
-  mitkParRecFileIOFactory.cpp
-  mitkParRecFileReader.cpp
-  mitkSceneFileReader.cpp
-  mitkStlVolumeTimeSeriesIOFactory.cpp
-  mitkStlVolumeTimeSeriesReader.cpp
-  mitkUnstructuredGridVtkWriter.cpp
-  mitkUnstructuredGridVtkWriterFactory.cpp
-  mitkVtkUnstructuredGridReader.cpp
-  mitkVtkVolumeTimeSeriesIOFactory.cpp
-  mitkVtkVolumeTimeSeriesReader.cpp
 )

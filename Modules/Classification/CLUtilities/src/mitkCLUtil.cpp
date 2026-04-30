@@ -133,7 +133,7 @@ void mitk::CLUtil::LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::I
 
 void mitk::CLUtil::HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma)
 {
-  AccessByItk_2(image, mitk::CLUtil::itkHessianOfGaussianFilter, sigma, out);
+  AccessFixedDimensionByItk_2(image, mitk::CLUtil::itkHessianOfGaussianFilter, 3, sigma, out);
 }
 
 void mitk::CLUtil::LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize)

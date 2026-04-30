@@ -39,11 +39,6 @@ void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRend
   }
 }
 
-bool mitk::VtkMapper::IsVtkBased() const
-{
-  return true;
-}
-
 void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer *renderer)
 {
   bool visible = true;

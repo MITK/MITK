@@ -19,13 +19,14 @@ found in the LICENSE file.
 #include <vtkGlyph2D.h>
 
 class vtkMaskPoints;
-/**
- * This class masked points of the input data set and glyphs
- * only the selected points. Points may be selected either by
- * random or by ratio.
- * Additionally, this class allows to set the InputScalars,
- * InputVectors and InputNormals by their field name in the
- * input dataset.
+/** \brief VTK filter that masks input points and generates 2D glyphs only for selected points.
+ *
+ * Extends vtkGlyph2D by adding point masking functionality. Points may be
+ * selected by random sampling or by ratio to limit the number of glyphs
+ * rendered, which is useful for large datasets where rendering all glyphs
+ * would be too slow.
+ *
+ * \sa vtkMaskedGlyph3D, vtkGlyph2D
  */
 class MITKMAPPEREXT_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
@@ -33,32 +34,43 @@ public:
   vtkTypeMacro(vtkMaskedGlyph2D, vtkGlyph2D);
   void PrintSelf(ostream &os, vtkIndent indent) override;
 
-  /**
-   * Constructor
+  /** \brief Create a new instance of vtkMaskedGlyph2D.
+   * \return A new vtkMaskedGlyph2D instance.
    */
   static vtkMaskedGlyph2D *New();
 
-  /**
-   * Limit the number of points to glyph
+  /** \brief Set the maximum number of points to glyph.
+   *
+   * Points exceeding this limit are masked out. Default: all points.
    */
   vtkSetMacro(MaximumNumberOfPoints, int);
+
+  /** \brief Get the maximum number of points to glyph.
+   * \return The current maximum point count.
+   */
   vtkGetMacro(MaximumNumberOfPoints, int);
 
-  /**
-   * Set the input to this filter.
+  /** \brief Set the input dataset to this filter.
+   * \param[in] input The input dataset containing points to glyph.
    */
   virtual void SetInput(vtkDataSet *input);
 
-  /**
-   * Set/get whether to mask points
-   */
+  /** \brief Set whether to enable point masking. Non-zero to enable, 0 to disable. */
   vtkSetMacro(UseMaskPoints, int);
+
+  /** \brief Get whether point masking is enabled.
+   * \return Non-zero if masking is enabled.
+   */
   vtkGetMacro(UseMaskPoints, int);
 
-  /**
-   * Set/get flag to cause randomization of which points to mask.
+  /** \brief Set whether to randomly select which points to mask.
+   * \param[in] mode Non-zero for random masking, 0 for uniform masking.
    */
   void SetRandomMode(int mode);
+
+  /** \brief Get the current random masking mode.
+   * \return Non-zero if random mode is active.
+   */
   int GetRandomMode();
 
   ///**

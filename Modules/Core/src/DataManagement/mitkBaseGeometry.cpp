@@ -479,15 +479,6 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector
   vec_units = inverse * vec_mm;
 }
 
-void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/,
-                                      const mitk::Vector3D &vec_mm,
-                                      mitk::Vector3D &vec_units) const
-{
-  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::WorldToIndex(point, vec, vec). Use "
-               "BaseGeometry::WorldToIndex(vec, vec) instead!";
-  this->WorldToIndex(vec_mm, vec_units);
-}
-
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
   return GetOrigin().GetVnlVector();
@@ -695,16 +686,6 @@ void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4 *vtkma
 void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4 *vtkmatrix)
 {
   m_GeometryTransform->SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkmatrix);
-}
-
-void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D & /*atPt3d_units*/,
-                                      const mitk::Vector3D &vec_units,
-                                      mitk::Vector3D &vec_mm) const
-{
-  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::IndexToWorld(point, vec, vec). Use "
-               "BaseGeometry::IndexToWorld(vec, vec) instead!";
-  // vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
-  this->IndexToWorld(vec_units, vec_mm);
 }
 
 vtkMatrix4x4 *mitk::BaseGeometry::GetVtkMatrix()

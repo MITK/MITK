@@ -23,6 +23,14 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \brief Factory for the DescriptivePharmacokineticBrixModel.
+   *
+   * Creates model parameterizer instances for the Brix model, restoring the injection time
+   * (tau) from a persisted ModelFitInfo object.
+   *
+   * \sa DescriptivePharmacokineticBrixModel, DescriptivePharmacokineticBrixModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT DescriptivePharmacokineticBrixModelFactory : public
     ConcreteModelFactoryBase<DescriptivePharmacokineticBrixModel>
   {

@@ -10,6 +10,26 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkImageAccessByItk.h
+ * \brief Provides the AccessByItk macro family for type-safe access to mitk::Image data through ITK image types.
+ *
+ * These macros convert a mitk::Image to a correctly typed \c itk::Image at run time by
+ * checking the image's pixel type and dimension, then calling a user-supplied templated
+ * function with the matching \c itk::Image pointer. Variants exist for:
+ * - All pixel types and dimensions (\c AccessByItk)
+ * - Fixed pixel types (\c AccessFixedPixelTypeByItk), fixed dimensions (\c AccessFixedDimensionByItk),
+ *   or both (\c AccessFixedTypeByItk)
+ * - Integral-only, floating-point-only, and vector pixel type variants
+ * - Versions accepting additional pass-through parameters (\c AccessByItk_n and friends)
+ * - Two-image access macros (\c AccessTwoImagesFixedDimensionByItk)
+ *
+ * If the image's actual type does not match any of the supported types, a
+ * mitk::AccessByItkException is thrown.
+ *
+ * \ingroup Adaptor
+ */
+
 #ifndef mitkImageAccessByItk_h
 #define mitkImageAccessByItk_h
 
@@ -249,6 +269,22 @@ namespace mitk
   AccessFixedTypeByItk(                                                                                                \
     mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
+/**
+ * \brief Access a mitk-image with a vector pixel type by an ITK image
+ *
+ * See #AccessByItk for details.
+ *
+ * \param mitkImage The MITK input image.
+ * \param itkImageTypeFunction The templated access-function to be called.
+ *
+ * \throws mitk::AccessByItkException If mitkImage is of unsupported pixel type or dimension.
+ *
+ * \sa AccessFixedPixelTypeByItk
+ * \sa AccessByItk
+ * \sa AccessVectorPixelTypeByItk_n
+ *
+ * \ingroup Adaptor
+ */
 #define AccessVectorPixelTypeByItk(mitkImage, itkImageTypeFunction)                                                    \
   AccessFixedTypeByItk(                                                                                                \
     mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
@@ -277,6 +313,26 @@ namespace mitk
 #define AccessFixedDimensionByItk(mitkImage, itkImageTypeFunction, dimension)                                          \
   AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dimension))
 
+/**
+ * \brief Access a vector mitk-image with known dimension by an ITK vector image
+ *
+ * For usage, see #AccessByItk.
+ *
+ * \param mitkImage The MITK input image.
+ * \param itkImageTypeFunction The templated access-function to be called.
+ * \param dimension Dimension of the mitk-image. If the image has a different dimension,
+ *        a mitk::AccessByItkException exception is thrown.
+ *
+ * \throws mitk::AccessByItkException If mitkImage is of unsupported pixel type or dimension.
+ *
+ * \note If you do not know the dimension for sure, use #AccessVectorPixelTypeByItk.
+ *
+ * \sa AccessByItk
+ * \sa AccessVectorPixelTypeByItk
+ * \sa AccessVectorFixedDimensionByItk_n
+ *
+ * \ingroup Adaptor
+ */
 #define AccessVectorFixedDimensionByItk(mitkImage, itkImageTypeFunction, dimension)                                    \
   AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, (dimension))
 

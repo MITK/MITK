@@ -28,7 +28,7 @@ QmitkLabelSelectionToolGUI::QmitkLabelSelectionToolGUI() : QmitkToolGUI(),
 {
   m_Controls->setupUi(this);
 
-  connect(m_Controls->m_OnlyActiveGroupCheck, &QCheckBox::stateChanged, this, &QmitkLabelSelectionToolGUI::OnCheckChanged);
+  connect(m_Controls->m_OnlyActiveGroupCheck, &QCheckBox::checkStateChanged, this, &QmitkLabelSelectionToolGUI::OnCheckChanged);
 
   connect(this, &QmitkLabelSelectionToolGUI::NewToolAssociated, this, &QmitkLabelSelectionToolGUI::OnNewToolAssociated);
 
@@ -118,7 +118,7 @@ void QmitkLabelSelectionToolGUI::OnIndicatedLabelsChanged()
   }
 }
 
-void QmitkLabelSelectionToolGUI::OnCheckChanged(int /*current*/)
+void QmitkLabelSelectionToolGUI::OnCheckChanged(Qt::CheckState /*current*/)
 {
   if (m_InternalEventCall)
     return;

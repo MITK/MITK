@@ -15,9 +15,12 @@ found in the LICENSE file.
 
 #include <QVariant>
 
-/** /brief This class holds the actual data for the chart generation with C3.
- * data can be loaded in constructor directly or with SetData
- * It is derived from QObject, because we need Q_PROPERTIES to send Data via QWebChannel to JavaScript.
+/**
+ * \brief Holds data for chart generation via C3/Plotly.
+ *
+ * Data can be loaded in the constructor directly or with SetData.
+ * This class is derived from QObject because Q_PROPERTIES are needed
+ * to send data via QWebChannel to JavaScript.
  */
 class QmitkChartxyData : public QObject
 {

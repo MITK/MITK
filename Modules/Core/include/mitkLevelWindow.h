@@ -37,7 +37,7 @@ namespace mitk
   *
   * @note If you want to apply the mitk::LevelWindow to an mitk::Image, make sure
   * to use the mitk::LevelWindowProperty and set the mitk::RenderingModeProperty
-  * to a mode which supports level window (e.g. LEVELWINDOW_COLOR).
+  * to a mode which supports level window (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR).
   * Make sure to check the documentation of the mitk::RenderingModeProperty. For a
   * code example how to use the mitk::LevelWindowProperty check the
   * mitkImageVtkMapper2DLevelWindowTest.cpp in Core/Code/Testing.
@@ -45,160 +45,221 @@ namespace mitk
   class MITKCORE_EXPORT LevelWindow
   {
   public:
+    /**
+     * \brief Construct a LevelWindow with given level (center) and window (range) values.
+     * \param[in] level The center of the grey value interval (default: 127.5).
+     * \param[in] window The width of the grey value interval (default: 255.0).
+     */
     LevelWindow(ScalarType level = 127.5, ScalarType window = 255.0);
+
+    /**
+     * \brief Copy constructor.
+     * \param[in] levWin The LevelWindow to copy.
+     */
     LevelWindow(const mitk::LevelWindow &levWin);
+
+    /** \brief Virtual destructor. */
     virtual ~LevelWindow();
 
-    /*!
-    * \brief method that returns the level value, i.e. the center of
-    * the current grey value interval
-    */
+    /**
+     * \brief Get the level value, i.e. the center of the current grey value interval.
+     * \return The level (center) value.
+     */
     ScalarType GetLevel() const;
 
-    /*!
-    * \brief returns the current window size, i.e the range size of the current grey value interval
-    */
+    /**
+     * \brief Get the current window size, i.e. the width of the current grey value interval.
+     * \return The window (range) size.
+     */
     ScalarType GetWindow() const;
 
-    /*!
-    * \brief method returns the default level value for the image
-    */
+    /**
+     * \brief Get the default level value for the image.
+     * \return The default level value.
+     */
     ScalarType GetDefaultLevel() const;
 
-    /*!
-    * \brief returns the default window size for the image
-    */
+    /**
+     * \brief Get the default window size for the image.
+     * \return The default window size.
+     */
     ScalarType GetDefaultWindow() const;
 
-    /*!
-    * \brief Resets the level and the window value to the default values
-    */
+    /**
+     * \brief Reset the level and window to their default values.
+     */
     void ResetDefaultLevelWindow();
 
-    /*!
-    * Returns the minimum Value of the window
-    */
+    /**
+     * \brief Get the lower bound of the current window.
+     * \return The lower window bound.
+     */
     ScalarType GetLowerWindowBound() const;
 
-    /*!
-    * Returns the upper window bound value of the window
-    */
+    /**
+     * \brief Get the upper bound of the current window.
+     * \return The upper window bound.
+     */
     ScalarType GetUpperWindowBound() const;
 
-    /*!
-    * To set the level and the window value
-    */
+    /**
+     * \brief Set the level and window values.
+     * \param[in] level The center of the grey value interval.
+     * \param[in] window The width of the grey value interval.
+     * \param[in] expandRangesIfNecessary If true, the range is expanded to fit the new window.
+     */
     void SetLevelWindow(ScalarType level, ScalarType window, bool expandRangesIfNecessary = true);
 
-    /*!
-    * Set the lower and upper bound of the window, restricted to the range from -10^300 to 10^300. Higher/lower values are clamped to these boundaries.
-    */
+    /**
+     * \brief Set the lower and upper window bounds directly.
+     *
+     * Values are clamped to the range [-10^300, 10^300].
+     *
+     * \param[in] lowerBound The lower window bound.
+     * \param[in] upperBound The upper window bound.
+     * \param[in] expandRangesIfNecessary If true, the range is expanded to fit the new bounds.
+     */
     void SetWindowBounds(ScalarType lowerBound, ScalarType upperBound, bool expandRangesIfNecessary = true);
 
-    /*!
-    * sets the window to its maximum Size in scaleRange
-    */
+    /**
+     * \brief Set the window to cover the entire valid range.
+     */
     void SetToMaxWindowSize();
 
-    /*!
-    * Set the range minimum and maximum value
-    */
+    /**
+     * \brief Set the minimum and maximum of the valid value range.
+     * \param[in] min The range minimum.
+     * \param[in] max The range maximum.
+     */
     void SetRangeMinMax(ScalarType min, ScalarType max);
 
-    /*!
-    * Get the range minimum value
-    */
+    /**
+     * \brief Get the minimum of the valid value range.
+     * \return The range minimum.
+     */
     ScalarType GetRangeMin() const;
 
-    /*!
-    * Get the range maximum value
-    */
+    /**
+     * \brief Get the maximum of the valid value range.
+     * \return The range maximum.
+     */
     ScalarType GetRangeMax() const;
 
-    /*!
-    * Get the default range minimum value
-    */
+    /**
+     * \brief Get the default lower bound (default range minimum).
+     * \return The default lower bound.
+     */
     ScalarType GetDefaultLowerBound() const;
 
-    /*!
-    * Get the default range maximum value
-    */
+    /**
+     * \brief Get the default upper bound (default range maximum).
+     * \return The default upper bound.
+     */
     ScalarType GetDefaultUpperBound() const;
 
-    /*!
-    * \brief the default min and max range for image will be reset
-    */
+    /**
+     * \brief Reset the range min/max to the default boundaries.
+     */
     void ResetDefaultRangeMinMax();
 
-    /**!
-    * \brief returns the size of the grey value range
-    */
+    /**
+     * \brief Get the total size of the grey value range (max - min).
+     * \return The range size.
+     */
     ScalarType GetRange() const;
 
-    /*!
-    * set the default level and window value
-    */
+    /**
+     * \brief Set the default level and window values.
+     * \param[in] level The default level (center) value.
+     * \param[in] window The default window (range) size.
+     */
     void SetDefaultLevelWindow(ScalarType level, ScalarType window);
 
-    /*!
-    * set the default Boundaries
-    */
+    /**
+     * \brief Set the default lower and upper boundaries.
+     * \param[in] low The default lower bound.
+     * \param[in] up The default upper bound.
+     */
     void SetDefaultBoundaries(ScalarType low, ScalarType up);
 
-    /**!
-    * \brief sets level/window to optimize the contrast of the given Image
-    */
+    /**
+     * \brief Automatically set level/window to optimize image contrast.
+     *
+     * Analyzes the image statistics (optionally from the central slice) to
+     * determine appropriate level/window settings that maximize contrast.
+     * Handles special cases like binary images, uniform images, and images
+     * with outlier values.
+     *
+     * \param[in] image The image to analyze.
+     * \param[in] tryPicTags Currently unused, reserved for backward compatibility.
+     * \param[in] guessByCentralSlice If true, analyze only the central slice first for performance.
+     * \param[in] selectedComponent The image component to analyze (for multi-component images).
+     */
     void SetAuto(const Image *image,
                  bool tryPicTags = true,
                  bool guessByCentralSlice = true,
                  unsigned selectedComponent = 0);
 
-    /**!
-    * \brief sets level/window to the min/max greyvalues of the given Image
-    */
+    /**
+     * \brief Set level/window to the full min/max grey value range of the given image.
+     * \param[in] image The image whose value range determines the level/window.
+     */
     void SetToImageRange(const Image *image);
 
     /**
-    * If a level window is set to fixed, the set and get methods won't accept
-    * modifications to the level window settings anymore. This behaviour can
-    * be turned of by setting fixed to false;
-    */
+     * \brief Lock or unlock the level window settings.
+     *
+     * When fixed, all Set methods will be no-ops.
+     *
+     * \param[in] fixed True to lock settings, false to allow modifications.
+     */
     void SetFixed(bool fixed);
 
     /**
-    * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
-    */
+     * \brief Return whether the level window settings are fixed.
+     * \return True if fixed, false otherwise.
+     * \sa SetFixed
+     */
     bool GetFixed() const;
 
     /**
-    * Returns whether the level window settings are fixed (@see SetFixed(bool)) or not
-    */
+     * \brief Return whether the level window settings are fixed.
+     * \return True if fixed, false otherwise.
+     * \sa SetFixed
+     */
     bool IsFixed() const;
 
-    /*!
-    * \brief equality operator implementation that allows to compare two level windows
-    */
+    /**
+     * \brief Compare two LevelWindow objects for equality.
+     * \param[in] levWin The LevelWindow to compare with.
+     * \return True if all settings match within epsilon tolerance.
+     */
     virtual bool operator==(const LevelWindow &levWin) const;
 
-    /*!
-    * \brief non equality operator implementation that allows to compare two level windows
-    */
+    /**
+     * \brief Compare two LevelWindow objects for inequality.
+     * \param[in] levWin The LevelWindow to compare with.
+     * \return True if any setting differs.
+     */
     virtual bool operator!=(const LevelWindow &levWin) const;
 
-    /*!
-    * \brief implementation necessary because operator made
-    *  private in itk::Object
-    */
+    /**
+     * \brief Assignment operator.
+     * \param[in] levWin The LevelWindow to copy from.
+     * \return Reference to this LevelWindow.
+     */
     virtual LevelWindow &operator=(const LevelWindow &levWin);
 
-    /*!
-    * \brief Shows if floating values are accepted
-    */
+    /**
+     * \brief Check whether the image uses floating-point values.
+     * \return True if the image has float or double pixel type.
+     */
     bool IsFloatingValues() const;
 
-    /*!
-    * \brief Sets the floating image value
-    */
+    /**
+     * \brief Set whether the image uses floating-point values.
+     * \param[in] value True for floating-point images, false otherwise.
+     */
     void SetFloatingValues(bool value);
 
   protected:

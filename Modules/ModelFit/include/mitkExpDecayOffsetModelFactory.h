@@ -23,10 +23,16 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ExpDecayOffsetModelFactory
+   * \brief Factory for creating ExpDecayOffsetModel instances and their parameterizers.
+   *
+   * \sa ExpDecayOffsetModel, ExpDecayOffsetModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ExpDecayOffsetModelFactory : public ConcreteModelFactoryBase<ExpDecayOffsetModel>
   {
   public:
-    mitkClassMacroItkParent(ExpDecayOffsetModelFactory, ConcreteModelFactoryBase<ExpDecayOffsetModel>);
+    mitkClassMacro(ExpDecayOffsetModelFactory, ConcreteModelFactoryBase<ExpDecayOffsetModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

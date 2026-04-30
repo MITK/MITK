@@ -19,6 +19,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Implementation of the irreversible two-tissue compartment model for FDG PET pharmacokinetics.
+   *
+   * Models the irreversible uptake of FDG with parameters K1 (plasma-to-tissue influx),
+   * k2 (tissue-to-plasma efflux), k3 (phosphorylation rate), and vb (blood volume fraction).
+   * Unlike the full two-tissue compartment model, k4 is assumed to be zero (irreversible trapping).
+   *
+   * \sa TwoTissueCompartmentModel, OneTissueCompartmentModel, AIFBasedModelBase
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentFDGModel : public AIFBasedModelBase
   {
 

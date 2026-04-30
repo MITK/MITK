@@ -21,9 +21,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Utility functions for plane clipping calculations. */
   namespace PlaneClipping
   {
-    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
+    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds().
+     *
+     * Tests whether the line segment between two points crosses the z=0 plane,
+     * and if so, updates the bounds with the intersection coordinates.
+     *
+     * \param[in] points VTK point set containing the coordinates.
+     * \param[in] p1 Index of the first point in the point set.
+     * \param[in] p2 Index of the second point in the point set.
+     * \param[in,out] bounds Array of 6 doubles [xmin, xmax, ymin, ymax, zmin, zmax]
+     *                       updated with the intersection point if found.
+     * \return True if an intersection with z=0 was found.
+     */
     static bool LineIntersectZero(vtkPoints *points, int p1, int p2, double *bounds)
     {
       double point1[3];
@@ -59,9 +71,19 @@ namespace mitk
       return false;
     }
 
-    /** \brief Calculate the bounding box of the resliced image. This is necessary for
-        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
-        will have a new bounding box, which needs to be calculated. */
+    /** \brief Calculate the bounding box of the resliced image.
+     *
+     * This is necessary for arbitrarily rotated planes in an image volume.
+     * A rotated plane (e.g. in swivel mode) will have a new bounding box,
+     * which needs to be calculated by clipping the bounding geometry edges
+     * against the plane.
+     *
+     * \param[in] boundingGeometry The geometry defining the volume bounding box.
+     * \param[in] planeGeometry The plane geometry to clip against.
+     * \param[out] bounds Array of 6 doubles receiving [xmin, xmax, ymin, ymax, zmin, zmax]
+     *                    in physical coordinates (mm), adjusted by plane spacing.
+     * \return True if valid bounds were computed, false if the plane does not intersect the volume.
+     */
     static bool CalculateClippedPlaneBounds(const BaseGeometry *boundingGeometry,
                                             const PlaneGeometry *planeGeometry,
                                             double *bounds)

@@ -24,6 +24,16 @@ namespace mitk
 {
   class Image;
 
+  /**
+   * \brief Otsu multi-threshold 3D segmentation tool with preview.
+   *
+   * Uses the Otsu method to automatically determine multiple thresholds
+   * for segmenting the reference image into distinct regions. The number
+   * of regions, histogram bins, and valley emphasis can be configured.
+   *
+   * \ingroup ToolManagerEtAl
+   * \sa OtsuSegmentationFilter, SegWithPreviewTool
+   */
   class MITKSEGMENTATION_EXPORT OtsuTool3D : public SegWithPreviewTool
   {
   public:

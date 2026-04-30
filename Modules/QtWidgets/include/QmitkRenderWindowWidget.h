@@ -32,7 +32,7 @@ found in the LICENSE file.
 class vtkCornerAnnotation;
 
 /**
-* @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
+* \brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
 *        and some associates properties, e.g. decorations.
 *        Decorations are corner annotation (text and color), frame color or background color
 *        and can be set using this class.

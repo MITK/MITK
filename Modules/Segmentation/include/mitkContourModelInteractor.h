@@ -22,15 +22,16 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief
-
-    \sa Interactor
-
-    \ingroup Interaction
-    \ingroup ToolManagerEtAl
-
-
-  */
+   * \brief Interactor for editing contour model vertices by mouse interaction.
+   *
+   * Supports adding, deleting, and moving vertices of a ContourModel data node.
+   * Actions are mapped from the loaded state machine pattern.
+   *
+   * \sa DataInteractor, ContourModel
+   *
+   * \ingroup Interaction
+   * \ingroup ToolManagerEtAl
+   */
   class MITKSEGMENTATION_EXPORT ContourModelInteractor : public DataInteractor
   {
   public:
@@ -44,7 +45,11 @@ namespace mitk
        */
       void ConnectActionsAndFunctions() override;
 
-      void SetRestrictedArea(mitk::ContourModel* restrictedArea);
+    /**
+     * \brief Sets a contour that constrains the vertex editing area.
+     * \param[in] restrictedArea The contour defining the restricted area.
+     */
+    void SetRestrictedArea(mitk::ContourModel* restrictedArea);
 
   protected:
     ContourModelInteractor();

@@ -19,6 +19,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief VTK-based mapper for rendering planar figures in 3D render windows.
+   *
+   * Renders the polyline representation of a PlanarFigure as a 3D VTK actor.
+   *
+   * \sa PlanarFigure
+   * \sa PlanarFigureMapper2D
+   * \ingroup MitkPlanarFigureModule
+   */
   class MITKPLANARFIGURE_EXPORT PlanarFigureVtkMapper3D : public VtkMapper
   {
     class LocalStorage

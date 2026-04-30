@@ -20,9 +20,13 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkLabelSetImage.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <vector>
 
@@ -108,6 +112,11 @@ namespace mitk
      */
     const ToolVectorTypeConst GetTools();
 
+    /**
+     * \brief Returns the ID (index) of the given tool.
+     * \param[in] tool The tool to look up.
+     * \return The tool's index, or -1 if the tool is not managed.
+     */
     int GetToolID(const Tool *tool);
 
     /**
@@ -123,6 +132,11 @@ namespace mitk
     */
     bool ActivateTool(int id);
 
+    /**
+     * \brief Returns the ID (index) of the first tool matching the given type.
+     * \tparam T The tool type to search for.
+     * \return The tool's index, or -1 if no tool of type T was found.
+     */
     template <class T>
     int GetToolIdByToolType()
     {
@@ -219,7 +233,13 @@ namespace mitk
     */
     MultiLabelSegmentation::LabelValueType GetActiveWorkingLabel();
 
+    /** \brief Returns the data storage associated with this tool manager. */
     DataStorage::Pointer GetDataStorage() const;
+
+    /**
+     * \brief Sets the data storage for this tool manager.
+     * \param[in] storage Reference to the data storage to use.
+     */
     void SetDataStorage(DataStorage &storage);
 
     /** Get the current selected time point of the RenderManager

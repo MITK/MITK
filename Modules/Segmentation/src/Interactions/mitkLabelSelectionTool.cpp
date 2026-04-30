@@ -77,7 +77,10 @@ void mitk::LabelSelectionTool::UpdateLabels()
 
   if (m_CheckOnlyActiveGroup)
   {
-    group = segmentation->GetGroupIndexOfLabel(segmentation->GetActiveLabel()->GetValue());
+    auto activeLabel = segmentation->GetActiveLabel();
+    if (nullptr == activeLabel)
+      return;
+    group = segmentation->GetGroupIndexOfLabel(activeLabel->GetValue());
   }
 
   auto newLabels = segmentation->GetLabelValuesByCoordinates(m_LastCheckedPoint,

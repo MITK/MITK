@@ -21,6 +21,29 @@ found in the LICENSE file.
 
 namespace itk
 {
+  /**
+   * \brief Cost function for Tract-Based Spatial Statistics (TBSS) path finding.
+   *
+   * This cost function is designed for finding shortest paths along white
+   * matter tracts in TBSS analysis. The cost of transitioning between two
+   * pixels combines the Euclidean distance with a penalty inversely
+   * proportional to the pixel intensity (tract weight).
+   *
+   * Pixels with intensity below the configured threshold are considered
+   * impassable (infinite cost), preventing the path from leaving the
+   * tract skeleton.
+   *
+   * The cost formula is:
+   * \code
+   * cost = sqrt(dx^2 + dy^2 + dz^2) + 1000 * (1 - weight)
+   * \endcode
+   * where \c weight is the pixel intensity at the destination pixel.
+   *
+   * \tparam TInputImageType The ITK image type (typically 3D float image).
+   *
+   * \sa ShortestPathCostFunction
+   * \sa ShortestPathImageFilter
+   */
   template <class TInputImageType>
   class ShortestPathCostFunctionTbss : public ShortestPathCostFunction<TInputImageType>
   {
@@ -42,22 +65,48 @@ namespace itk
       /** Run-time type information (and related methods). */
       itkTypeMacro(Self, Superclass);
 
-    // \brief calculates the costs for going from p1 to p2
+    /**
+     * \brief Calculate the cost of transitioning from pixel p1 to pixel p2.
+     *
+     * If the intensity at p2 is below the threshold, returns
+     * std::numeric_limits<double>::max() (impassable). Otherwise, returns
+     * the Euclidean distance plus a penalty of 1000 * (1 - weight).
+     *
+     * \param[in] p1 The source pixel index.
+     * \param[in] p2 The destination pixel index.
+     * \return The transition cost, or numeric max if below threshold.
+     */
     double GetCost(IndexType p1, IndexType p2) override;
 
-    // \brief Initialize the metric
+    /**
+     * \brief Initialize the cost function.
+     *
+     * Currently a no-op for the TBSS cost function.
+     */
     void Initialize() override;
 
-    // \brief returns the minimal costs possible (needed for A*)
+    /**
+     * \brief Return the minimal possible cost (needed for A*).
+     * \return Always returns 1.0.
+     */
     double GetMinCost() override;
 
+    /**
+     * \brief Set the intensity threshold below which pixels are impassable.
+     *
+     * Pixels with intensity below this value receive infinite cost,
+     * effectively restricting paths to the tract skeleton.
+     *
+     * \param[in] t The threshold value.
+     */
     void SetThreshold(double t) { m_Threshold = t; }
+
   protected:
     ShortestPathCostFunctionTbss();
 
     ~ShortestPathCostFunctionTbss() override{};
 
-    double m_Threshold;
+    double m_Threshold; ///< Intensity threshold below which pixels are impassable.
 
   private:
   };

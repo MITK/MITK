@@ -20,6 +20,9 @@ namespace mitk
 {
 
 
+  /** \brief Factory for the TwoTissueCompartmentModel.
+   * \sa TwoTissueCompartmentModel, TwoTissueCompartmentModelParameterizer
+   */
   class MITKPHARMACOKINETICS_EXPORT TwoTissueCompartmentModelFactory : public
     mitk::TwoTissueCompartmentModelFactoryBase<TwoTissueCompartmentModelParameterizer>
   {

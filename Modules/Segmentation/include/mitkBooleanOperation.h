@@ -18,18 +18,53 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** \brief Executes a boolean operation on two different segmentations.
-   * All parameters of the boolean operations must be specified during construction.
-   * The actual operation is executed when calling GetResult().
+  /**
+   * \brief Namespace providing boolean set operations on multi-label segmentations.
+   *
+   * Provides functions to compute the union, intersection, or difference of
+   * label regions within a MultiLabelSegmentation. Each function returns a new
+   * binary image representing the result of the operation.
+   *
+   * \sa MultiLabelSegmentation
    */
   namespace BooleanOperation
   {
 
-    Image::Pointer MITKSEGMENTATION_EXPORT GenerateUnion(const MultiLabelSegmentation*, MultiLabelSegmentation::LabelValueVectorType labelValues,
+    /**
+     * \brief Computes the union (logical OR) of the specified label regions.
+     * \param[in] segmentation Pointer to the source multi-label segmentation.
+     * \param[in] labelValues Vector of label values whose regions are combined.
+     * \param[in] progressCallback Optional callback for progress reporting (0.0 to 1.0).
+     * \return A new binary image representing the union of all specified labels.
+     * \pre segmentation must point to a valid instance.
+     */
+    Image::Pointer MITKSEGMENTATION_EXPORT GenerateUnion(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueVectorType labelValues,
       std::function<void(float progress)> progressCallback = [](float) {});
-    Image::Pointer MITKSEGMENTATION_EXPORT GenerateIntersection(const MultiLabelSegmentation*, MultiLabelSegmentation::LabelValueVectorType labelValues,
+
+    /**
+     * \brief Computes the intersection (logical AND) of the specified label regions.
+     * \param[in] segmentation Pointer to the source multi-label segmentation.
+     * \param[in] labelValues Vector of label values whose regions are intersected.
+     * \param[in] progressCallback Optional callback for progress reporting (0.0 to 1.0).
+     * \return A new binary image representing the intersection of all specified labels.
+     * \pre segmentation must point to a valid instance.
+     */
+    Image::Pointer MITKSEGMENTATION_EXPORT GenerateIntersection(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueVectorType labelValues,
       std::function<void(float progress)> progressCallback = [](float) {});
-    Image::Pointer MITKSEGMENTATION_EXPORT GenerateDifference(const MultiLabelSegmentation*, MultiLabelSegmentation::LabelValueType minuendLabelValue,
+
+    /**
+     * \brief Computes the difference (set subtraction) of label regions.
+     *
+     * Subtracts the union of the subtrahend labels from the minuend label region.
+     *
+     * \param[in] segmentation Pointer to the source multi-label segmentation.
+     * \param[in] minuendLabelValue Label value of the region to subtract from.
+     * \param[in] subtrahendLabelValues Label values of the regions to subtract.
+     * \param[in] progressCallback Optional callback for progress reporting (0.0 to 1.0).
+     * \return A new binary image representing the difference.
+     * \pre segmentation must point to a valid instance.
+     */
+    Image::Pointer MITKSEGMENTATION_EXPORT GenerateDifference(const MultiLabelSegmentation* segmentation, MultiLabelSegmentation::LabelValueType minuendLabelValue,
       const MultiLabelSegmentation::LabelValueVectorType subtrahendLabelValues, std::function<void(float progress)> progressCallback = [](float) {});
 
   };

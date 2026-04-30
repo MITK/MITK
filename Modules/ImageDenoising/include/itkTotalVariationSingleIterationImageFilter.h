@@ -19,10 +19,29 @@ found in the LICENSE file.
 namespace itk
 {
   /** \class TotalVariationSingleIterationImageFilter
-   * \brief Applies a total variation denoising filter to an image
+   * \brief Performs a single iteration of total variation denoising.
+   *
+   * This filter implements one step of the iterative total variation (TV)
+   * denoising algorithm. Given the current estimate of the denoised image
+   * (as the filter input) and the original noisy image (set via
+   * SetOriginalImage()), it computes a weighted average at each pixel
+   * that balances fidelity to the original with local smoothness.
+   *
+   * The weighting is controlled by the Lambda parameter and the local
+   * variation in the image (computed via LocalVariationImageFilter in
+   * BeforeThreadedGenerateData()). Larger Lambda values favor fidelity
+   * to the original image.
+   *
+   * This filter is typically not used directly but is called iteratively
+   * by TotalVariationDenoisingImageFilter.
    *
    * Reference: Tony F. Chan et al., The digital TV filter and nonlinear denoising
    *
+   * \tparam TInputImage The type of the input image.
+   * \tparam TOutputImage The type of the output image.
+   *
+   * \sa TotalVariationDenoisingImageFilter
+   * \sa LocalVariationImageFilter
    * \sa Image
    * \sa Neighborhood
    * \sa NeighborhoodOperator
@@ -42,6 +61,7 @@ namespace itk
     typedef TInputImage InputImageType;
     typedef TOutputImage OutputImageType;
 
+    /** Float image type used to store the local variation at each pixel. */
     typedef itk::Image<float, InputImageDimension> LocalVariationImageType;
 
     /** Standard class typedefs. */
@@ -66,18 +86,39 @@ namespace itk
 
     typedef typename InputImageType::SizeType InputSizeType;
 
-    /** A larger input requested region than
-     * the output requested region is required.
-     * Therefore, an implementation for GenerateInputRequestedRegion()
-     * is provided.
+    /**
+     * \brief Generates the input requested region, padded by a radius of 1.
      *
-     * \sa ImageToImageFilter::GenerateInputRequestedRegion() */
+     * This filter requires a larger input requested region than the output
+     * requested region because it accesses face-connected neighbors.
+     *
+     * \throw itk::InvalidRequestedRegionError if the padded region falls
+     *        outside the input's largest possible region.
+     *
+     * \sa ImageToImageFilter::GenerateInputRequestedRegion()
+     */
     void GenerateInputRequestedRegion() override;
 
+    /**
+     * \brief Set/Get the regularization parameter Lambda.
+     *
+     * Lambda controls the trade-off between fidelity to the original image
+     * and smoothness in the denoised output. Default is 1.0.
+     */
     itkSetMacro(Lambda, double);
     itkGetMacro(Lambda, double);
 
+    /**
+     * \brief Set the original (undenoised) image used as a reference
+     *        for the data fidelity term.
+     * \param[in] in Pointer to the original input image.
+     */
     void SetOriginalImage(InputImageType *in) { this->m_OriginalImage = in; }
+
+    /**
+     * \brief Get the original (undenoised) image.
+     * \return Pointer to the original image.
+     */
     typename InputImageType::Pointer GetOriginialImage() { return this->m_OriginalImage; }
   protected:
     TotalVariationSingleIterationImageFilter();

@@ -93,7 +93,7 @@ namespace mitk
 
     for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
     {
-      sprintf(keybuffer, "layer_%03u", layerIdx);
+      snprintf(keybuffer, sizeof(keybuffer), "layer_%03u", layerIdx);
       int numberOfLabels = MultiLabelIOHelper::GetIntByKey(dictionary, keybuffer);
 
       mitk::MultiLabelSegmentation::LabelVectorType labelSet;
@@ -101,7 +101,7 @@ namespace mitk
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
         tinyxml2::XMLDocument doc;
-        sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
+        snprintf(keybuffer, sizeof(keybuffer), "label_%03u_%05d", layerIdx, labelIdx);
         _xmlStr = MultiLabelIOHelper::GetStringByKey(dictionary, keybuffer);
         doc.Parse(_xmlStr.c_str(), _xmlStr.size());
 

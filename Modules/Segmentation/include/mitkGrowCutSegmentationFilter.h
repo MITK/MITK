@@ -37,8 +37,16 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /**
+     * \brief Sets the seed image that contains the initial label assignments for GrowCut.
+     * \param[in] itkSeedImage ITK image containing seed labels (foreground/background markers).
+     */
     void SetSeedImage(itk::Image<mitk::Label::PixelType, 3>::Pointer itkSeedImage) { m_itkSeedImage = itkSeedImage; }
 
+    /**
+     * \brief Sets the distance penalty factor used in the GrowCut algorithm.
+     * \param[in] distancePenalty Penalty factor. Higher values penalize growth over long distances.
+     */
     void SetDistancePenalty(double distancePenalty) { m_DistancePenalty = distancePenalty; }
 
   protected:

@@ -19,10 +19,10 @@ found in the LICENSE file.
 #include <QModelIndex>
 
 /**
- * @brief A proxy model that flattens a hierarchical content of a QmitkMultiLabelTreeModel instance into a simple list.
+ * \brief A proxy model that flattens a hierarchical QmitkMultiLabelTreeModel into a simple list.
  *
- * It only includes items that have a non-empty QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceDataRole.
- * So everything in the model tree that counts as an label instance representation.
+ * It only includes items that have a non-empty QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceDataRole,
+ * i.e., everything in the model tree that counts as a label instance representation.
  */
 class QmitkFlatLabelInstanceProxyModel : public QAbstractProxyModel
 {

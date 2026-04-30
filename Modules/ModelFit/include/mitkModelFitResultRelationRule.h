@@ -27,7 +27,7 @@ namespace mitk
   a DICOM Source Image Sequence item (0x0008,0x2112) and (2) the destination must have properties
   DICOM SOP Instance UIDs (0x0008, 0x0018) and DICOM SOP Class UID (0x0008, 0x0016). If the destination
   does not have this properties, no connection can be made on the data-layer.
-  @remark Please note that PropertyRelationRules and DICOM use the term "source" differently. The DICOM
+  \remark Please note that PropertyRelationRules and DICOM use the term "source" differently. The DICOM
   source (image) equals the PropertyRelationRule destination. This is due to
   an inverted relation direction. So in the context of the SourceImageRelationRule interface a derived data is
   the source and points to the original image, it derives from. In the context of DICOM this referenced original image would be

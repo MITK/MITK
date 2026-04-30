@@ -60,7 +60,8 @@ found in the LICENSE file.
     m_DesiredRegion = ComputeDesiredRegion();
     unsigned int dimension = input->GetDimension();
     auto dimensions = new unsigned int[dimension];
-    itk2vtk(m_DesiredRegion.GetSize(), dimensions);
+    for (unsigned int i = 0; i < 3; ++i)
+      dimensions[i] = static_cast<unsigned int>(m_DesiredRegion.GetSize(i));
     if (dimension > 3)
       memcpy(dimensions + 3, input->GetDimensions() + 3, (dimension - 3) * sizeof(unsigned int));
 

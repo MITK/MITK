@@ -21,37 +21,77 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * \brief Integrates into the VTK event mechanism to generate MITK specific events.
-  * This class is NON-QT dependent pandon to the current MITK event handling code in QmitkRenderWindow.
-  * \ingroup Renderer
-  */
+   * \brief Integrates into the VTK event mechanism to generate MITK-specific events.
+   *
+   * This class is the non-Qt-dependent counterpart to the event handling code
+   * in QmitkRenderWindow. It observes VTK interactor events and translates
+   * them into MITK interaction events via VtkEventAdapter.
+   *
+   * \ingroup Renderer
+   */
   class MITKCORE_EXPORT vtkEventProvider : public vtkInteractorObserver
   {
   public:
     static vtkEventProvider *New();
     vtkTypeMacro(vtkEventProvider, vtkInteractorObserver);
 
-    // Satisfy the superclass API. Enable/disable listening for events.
-    void SetEnabled(int) override;
+    /**
+     * \brief Enable or disable listening for VTK events.
+     *
+     * When enabling, registers observers for all interaction event types.
+     * When disabling, removes all observers from the interactor.
+     *
+     * \param[in] enabled Non-zero to enable, zero to disable.
+     */
+    void SetEnabled(int enabled) override;
+
+    /**
+     * \brief Set the VTK render window interactor.
+     *
+     * If an interactor was previously set, it is disabled first.
+     *
+     * \param[in] iren The new render window interactor.
+     */
     void SetInteractor(vtkRenderWindowInteractor *iren) override;
 
-    // Interface to MITK
+    /**
+     * \brief Set the MITK RenderWindow associated with this event provider.
+     * \param[in] renWin The MITK render window to associate.
+     */
     virtual void SetMitkRenderWindow(mitk::RenderWindow *renWin);
+
+    /**
+     * \brief Return the associated MITK RenderWindow.
+     * \return Pointer to the MITK render window.
+     */
     mitk::RenderWindow *GetRenderWindow();
 
   protected:
     vtkEventProvider();
     ~vtkEventProvider() override;
 
-    // methods for processing events - callback for the observer/command pattern of vtkCommand
+    /**
+     * \brief Callback for the VTK observer/command pattern.
+     *
+     * Translates VTK events into MITK interaction events and forwards
+     * them to the associated RenderWindow.
+     */
     static void ProcessEvents(vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
     mitk::RenderWindow *m_RenderWindow;
 
-    // adds the MITK interaction event types to the VTK observer/command pattern
+    /**
+     * \brief Add a VTK event type to the list of observed interaction events.
+     * \param[in] ievent The VTK event identifier to observe.
+     */
     void AddInteractionEvent(unsigned long ievent);
-    // removes the MITK interaction event types
+
+    /**
+     * \brief Remove a VTK event type from the list of observed interaction events.
+     * \param[in] ievent The VTK event identifier to stop observing.
+     */
     void RemoveInteractionEvent(unsigned long ievent);
+
     typedef std::vector<unsigned long> InteractionEventsVectorType;
     InteractionEventsVectorType m_InteractionEventsVector;
 

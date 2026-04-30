@@ -19,7 +19,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief A list of strings, used throughout the DICOM module to hold file paths and similar data.
+   * \sa DICOMFilePathList
+   */
   typedef std::vector<std::string> StringList;
+
+  /** \brief A list of boolean values, used e.g. for tracking per-slice loaded states. */
   typedef std::vector<bool> BoolList;
 
   /**
@@ -27,6 +32,8 @@ namespace mitk
    \brief How the mitk::Image spacing should be interpreted (see mitk::DICOMFileReader).
 
    Compare DICOM PS 3.3 10.7 (Basic Pixel Spacing Calibration Macro).
+
+   \sa DICOMImageBlockDescriptor::GetPixelSpacingInterpretation
  */
  typedef enum
   {
@@ -44,6 +51,8 @@ namespace mitk
 
     Errors to load images which are reported as Supported
     are considered bugs. For PartlySupported please check the reader documentation on specifics.
+
+    \sa DICOMFileReader, DICOMImageBlockDescriptor::GetReaderImplementationLevel
   */
   typedef enum
   {
@@ -55,9 +64,18 @@ namespace mitk
   } ReaderImplementationLevel;
 
 
-  /// Convert mitk::PixelSpacingInterpretation to a human readable string.
+  /**
+   * \brief Convert a PixelSpacingInterpretation enum value to a human readable string.
+   * \param[in] value The enum value to convert.
+   * \return A string representation such as "In Patient", "At Detector", or "Unknown".
+   */
   std::string PixelSpacingInterpretationToString(const PixelSpacingInterpretation& value);
-  /// Convert mitk::ReaderImplementationLevel to a human readable string.
+
+  /**
+   * \brief Convert a ReaderImplementationLevel enum value to a human readable string.
+   * \param[in] enumValue The enum value to convert.
+   * \return A string representation such as "Supported", "PartlySupported", "Implemented", "Unsupported", or "Unknown".
+   */
   std::string ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue );
 }
 

@@ -47,6 +47,10 @@ namespace mitk
 
     const char* GetName() const override;
 
+    /**
+     * \brief Returns the label values currently indicated (under the cursor).
+     * \return Vector of label values at the current cursor position.
+     */
     MultiLabelSegmentation::LabelValueVectorType GetIndicatedLabels() const;
 
     itkGetConstMacro(CheckOnlyActiveGroup, bool);
@@ -56,6 +60,7 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    /** \brief Refreshes the displayed label highlight based on current cursor position. */
     void UpdateLabels();
 
   protected:

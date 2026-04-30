@@ -1,8 +1,6 @@
 /**
 \page org_mitk_petSUVCalculation The PET SUV Calculation View
 
-\image html petsuv.png "Icon of PET SUV Calculation View"
-
 \li \ref PETSUV_Introduction
 \li \ref PETSUV_Contact
 \li \ref PETSUV_Usage

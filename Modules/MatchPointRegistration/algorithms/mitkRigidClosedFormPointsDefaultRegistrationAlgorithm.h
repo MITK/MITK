@@ -21,6 +21,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Default rigid closed-form point-based registration algorithm.
+   *
+   * Type alias for the MatchPoint ITK rigid 3D closed-form registration
+   * algorithm operating on point sets with a MITK-specific UID policy.
+   *
+   * \tparam TPointSetType The ITK point set type to register.
+   */
   template <typename TPointSetType>
   using RigidClosedFormPointsDefaultRegistrationAlgorithm = typename map::algorithm::boxed::ITKRigid3DClosedFormRegistrationAlgorithmTemplate<TPointSetType, ::map::algorithm::mitkRigidClosedFormPointsDefaultRegistrationAlgorithmUIDPolicy>::Type;
 }

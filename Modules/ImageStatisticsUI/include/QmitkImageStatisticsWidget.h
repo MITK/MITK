@@ -28,36 +28,85 @@ namespace Ui
   class QmitkImageStatisticsControls;
 }
 
+/**
+ * \brief Widget for displaying image statistics in a tree view with clipboard export.
+ *
+ * This widget wraps a QmitkImageStatisticsTreeModel in a sortable tree view and provides
+ * controls for ignoring zero-valued voxels and copying statistics to the clipboard.
+ * It automatically enables its controls when statistics data becomes available.
+ *
+ * \sa QmitkImageStatisticsTreeModel
+ * \sa QmitkHistogramVisualizationWidget
+ * \sa QmitkStatisticsModelToStringConverter
+ */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the image statistics widget.
+   * \param[in] parent Optional parent widget.
+   */
   QmitkImageStatisticsWidget(QWidget *parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkImageStatisticsWidget() override;
 
-  /**Documentation
-  Set the data storage the model should fetch its statistic objects from.
-  @pre data storage must be valid
-  */
+  /**
+   * \brief Sets the data storage from which the model fetches statistics objects.
+   * \param[in] newDataStorage Pointer to the data storage. Must be valid.
+   * \pre The data storage must not be nullptr.
+   */
   void SetDataStorage(mitk::DataStorage *newDataStorage);
 
+  /**
+   * \brief Sets the image nodes whose statistics should be displayed.
+   * \param[in] nodes Vector of image data nodes.
+   */
   void SetImageNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes);
+
+  /**
+   * \brief Sets the mask nodes whose statistics should be displayed.
+   * \param[in] nodes Vector of mask data nodes.
+   */
   void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes);
+
+  /**
+   * \brief Clears all data from the model and disables the widget controls.
+   */
   void Reset();
 
-  /*! /brief Set flag to ignore zero valued voxels */
+  /**
+   * \brief Sets whether zero-valued voxels should be ignored when selecting statistics.
+   * \param[in] _arg True to ignore zero-valued voxels; false to include them.
+   */
   void SetIgnoreZeroValueVoxel(bool _arg);
-  /*! /brief Get status of zero value voxel ignoring. */
+
+  /**
+   * \brief Returns whether zero-valued voxels are currently being ignored.
+   * \return True if zero-valued voxels are ignored; false otherwise.
+   */
   bool GetIgnoreZeroValueVoxel() const;
 
-  /*! /brief Set bin size for histogram resolution.*/
+  /**
+   * \brief Sets the number of histogram bins used to select matching statistics.
+   * \param[in] nbins The number of histogram bins.
+   */
   void SetHistogramNBins(unsigned int nbins);
-  /*! /brief Get bin size for histogram resolution.*/
+
+  /**
+   * \brief Returns the current number of histogram bins.
+   * \return The number of histogram bins.
+   */
   unsigned int GetHistogramNBins() const;
 
 signals:
-  void IgnoreZeroValuedVoxelStateChanged(int status);
+  /**
+   * \brief Emitted when the user toggles the "ignore zero-valued voxels" checkbox.
+   * \param[in] status The new checkbox state.
+   */
+  void IgnoreZeroValuedVoxelStateChanged(Qt::CheckState status);
 
 private:
   void CreateConnections();

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkScreenshotWidget.h"
 #include <ui_QmitkScreenshotWidget.h>
 
-#include <mitkLogMacros.h>
+#include <mitkLog.h>
 
 #include <QFileInfo>
 

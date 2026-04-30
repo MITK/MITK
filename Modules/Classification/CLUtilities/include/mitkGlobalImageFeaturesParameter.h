@@ -22,10 +22,26 @@ namespace mitk
 {
   namespace cl
   {
+    /**
+     * \brief Holds and parses command-line parameters for global image feature extraction.
+     *
+     * This class manages all parameters needed by the global image feature extraction
+     * command-line tool, including image/mask paths, output options, histogram settings,
+     * resampling options, and header configuration.
+     */
     class MITKCLUTILITIES_EXPORT GlobalImageFeaturesParameter
     {
     public:
+      /**
+       * \brief Register all supported parameters with the command-line parser.
+       * \param parser The command-line parser to add arguments to.
+       */
       void AddParameter(mitkCommandLineParser &parser);
+
+      /**
+       * \brief Parse and store parameter values from the command-line arguments.
+       * \param parsedArgs Map of parsed argument names to values.
+       */
       void ParseParameter(std::map<std::string, us::Any> parsedArgs);
 
       std::string imagePath;

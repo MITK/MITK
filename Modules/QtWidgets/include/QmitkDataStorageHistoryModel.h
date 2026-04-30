@@ -18,27 +18,45 @@ found in the LICENSE file.
 #include <QmitkDataStorageDefaultListModel.h>
 
 /**
-* @brief Internal DataStorage model to represent the history of node selections.
-*
-* The model will present all nodes in the history under the following conditions
-* - the nodes are sorted by selection time (lifo -> last is first)
-* - node must be in the storage
-* - node must be valid
-* - node will only be in the history once.
-*
-*/
-
+ * \brief DataStorage model that maintains a history of node selections.
+ *
+ * This model extends QmitkDataStorageDefaultListModel to present nodes
+ * ordered by selection time (LIFO -- most recently selected first).
+ * The history is maintained as a static list shared across all instances.
+ *
+ * Nodes appear in the history only if they satisfy all of the following:
+ * - The node is still present in the data storage.
+ * - The node pointer is valid (not expired).
+ * - Each node appears at most once (duplicates are removed).
+ *
+ * \sa QmitkDataStorageDefaultListModel
+ * \sa QmitkDataStorageSelectionHistoryInspector
+ */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageHistoryModel : public QmitkDataStorageDefaultListModel
 {
     Q_OBJECT
 
 public:
 
+    /**
+     * \brief Constructs the history model.
+     * \param[in] parent The parent QObject.
+     */
     QmitkDataStorageHistoryModel(QObject *parent);
 
-    /** Adds the passed node to the history. If the node is already in the history, old instances will be removed.
-     If the passed node is nullptr, it will be ignored.*/
+    /**
+     * \brief Adds a node to the global selection history.
+     *
+     * If the node is already present in the history, the old entry is removed
+     * before inserting the node at the front. A nullptr node is silently ignored.
+     *
+     * \param[in] node The data node to add. May be nullptr.
+     */
     static void AddNodeToHistory(mitk::DataNode* node);
+
+    /**
+     * \brief Clears the entire selection history.
+     */
     static void ResetHistory();
 
 protected:

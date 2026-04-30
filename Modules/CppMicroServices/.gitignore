@@ -1,6 +1,0 @@
-*~
-*.o
-*.so
-CMakeLists.txt.user*
-gh-pages
-core/examples/makefile/main

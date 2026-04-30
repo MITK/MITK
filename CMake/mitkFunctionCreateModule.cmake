@@ -1,3 +1,13 @@
+# CppMicroServices resource and module init helpers
+include(usFunctionCheckCompilerFlags)
+include(usFunctionCheckResourceLinking)
+include(usFunctionGenerateModuleInit)
+include(usFunctionAddResources)
+include(usFunctionEmbedResources)
+include(usFunctionGetResourceSource)
+
+usFunctionCheckResourceLinking()
+
 ##################################################################
 #
 # mitk_create_module
@@ -54,7 +64,6 @@
 #! \param VERSION Module version number, e.g. "1.2.0"
 #! \param AUTOLOAD_WITH A module target name identifying the module which will
 #!        trigger the automatic loading of this module
-#! \param DEPRECATED_SINCE Marks this modules as deprecated since <arg>
 #! \param DESCRIPTION A description for this module
 #!
 #! Multi-value Parameters (all optional):
@@ -101,7 +110,6 @@ function(mitk_create_module)
                              # automatic loading of this module
       FILES_CMAKE            # file name of a CMake file setting source list variables
                              # (defaults to files.cmake)
-      DEPRECATED_SINCE       # marks this modules as deprecated
       DESCRIPTION            # a description for this module
      )
 
@@ -334,31 +342,13 @@ function(mitk_create_module)
       else()
         mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 
-        # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
-        # versions to "static-member-init"
-        #
-        # Also, older Clang and seemingly all gcc versions do not warn if unknown
-        # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
-        # command line. This may get confusing if unrelated compiler errors happen and
-        # the error output then additionally contains errors about unknown flags (which
-        # is not the case if there were no compile errors).
-        #
-        # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
-        # the compiler and if applicable, prints the specific warning as a real warning and
-        # not as an error (although -Werror was given).
+        # We use -Wno-error=* instead of -Wno-* so the compiler rejects unknown
+        # flag names: older Clang and all GCC versions silently accept unknown
+        # -Wno-* flags, which makes typos invisible until an actual warning of
+        # that name would have fired. -Wno-error=* is properly rejected and
+        # demotes the warning from error without hiding it.
 
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=class-memaccess" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-copy" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-function-type" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-volatile" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=volatile" module_c_flags module_cxx_flags)
-        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=type-limits" module_c_flags module_cxx_flags)
       endif()
     endif()
 
@@ -369,9 +359,6 @@ function(mitk_create_module)
     endif(MODULE_FORCE_STATIC)
 
     if(NOT MODULE_HEADERS_ONLY)
-      if(NOT MODULE_NO_INIT OR RESOURCE_FILES)
-        find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
-      endif()
       if(NOT MODULE_NO_INIT)
         usFunctionGenerateModuleInit(CPP_FILES)
       endif()
@@ -565,10 +552,6 @@ function(mitk_create_module)
         endif()
       endif()
 
-      if(MODULE_DEPRECATED_SINCE)
-        set_property(TARGET ${MODULE_TARGET} PROPERTY MITK_MODULE_DEPRECATED_SINCE ${MODULE_DEPRECATED_SINCE})
-      endif()
-
       # create export macros
       if (NOT MODULE_EXECUTABLE)
         generate_export_header(${MODULE_NAME}
@@ -603,7 +586,7 @@ function(mitk_create_module)
     if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
       # Add a CppMicroServices dependency implicitly, since it is
       # needed for the generated "module initialization" code.
-      set(DEPENDS "CppMicroServices;${DEPENDS}")
+      set(DEPENDS "MitkCppMicroServices;${DEPENDS}")
     endif()
     if(DEPENDS OR MODULE_PACKAGE_DEPENDS)
       mitk_use_modules(TARGET ${MODULE_TARGET}

@@ -28,20 +28,22 @@ namespace Ui
   class QmitkSynchronizedNodeSelectionWidget;
 }
 
-/*
-* @brief The 'QmitkSynchronizedNodeSelectionWidget' implements the 'QmitkAbstractNodeSelectionWidget'
-*        by providing a table view, using a 'QmitkRenderWindowDataNodeTableModel' and extending it
-*        with base renderer-specific functionality.
-* 
-*        Given a base renderer, the selection widget is able to display and access render window specific properties
-*        of the selected nodes. It can be connected with other QmitkSynchronizedNodeSelectionWidgets to synchronize
-*        their state.
-*        The widget can be used to decide if all data nodes of the data storage should be selected or
-*        only an individually selected set of nodes, defined by a 'QmitkNodeSelectionDialog'.
-*        If individual nodes are selected / removed from the selection, the widget can inform other
-*        'QmitkSynchronizedNodeSelectionWidget' about the current selection, if desired.
-*        Additionally the widget allows to reinitialize the corresponding base renderer with a specific
-*        data node geometry.
+/**
+* \brief Node selection widget with renderer-specific functionality and synchronization support.
+*
+* The QmitkSynchronizedNodeSelectionWidget implements QmitkAbstractNodeSelectionWidget
+* by providing a table view, using a QmitkRenderWindowDataNodeTableModel and extending it
+* with base renderer-specific functionality.
+*
+* Given a base renderer, the selection widget is able to display and access render window specific properties
+* of the selected nodes. It can be connected with other QmitkSynchronizedNodeSelectionWidgets to synchronize
+* their state.
+* The widget can be used to decide if all data nodes of the data storage should be selected or
+* only an individually selected set of nodes, defined by a QmitkNodeSelectionDialog.
+* If individual nodes are selected / removed from the selection, the widget can inform other
+* QmitkSynchronizedNodeSelectionWidget instances about the current selection, if desired.
+* Additionally the widget allows to reinitialize the corresponding base renderer with a specific
+* data node geometry.
 */
 class MITKQTWIDGETS_EXPORT QmitkSynchronizedNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -54,15 +56,32 @@ public:
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
+  /**
+   * \brief Sets the base renderer that this widget controls.
+   * \param[in] baseRenderer Pointer to the base renderer.
+   */
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
 
+  /** \brief Returns the internal data node table model. */
   QmitkRenderWindowDataNodeTableModel* GetStorageModel() const;
 
+  /**
+   * \brief Sets whether all nodes should be selected.
+   * \param[in] selectAll If true, selects all nodes from the data storage.
+   */
   void SetSelectAll(bool selectAll);
+  /** \brief Returns whether the "select all" mode is active. */
   bool GetSelectAll() const;
+  /** \brief Selects all nodes from the data storage. */
   void SelectAll();
+  /** \brief Type alias for the synchronization group index. */
   using GroupSyncIndexType = int;
+  /**
+   * \brief Sets the synchronization group for this widget.
+   * \param[in] index The synchronization group index.
+   */
   void SetSyncGroup(const GroupSyncIndexType index);
+  /** \brief Returns the current synchronization group index. */
   GroupSyncIndexType GetSyncGroup() const;
 
 Q_SIGNALS:
@@ -70,6 +89,15 @@ Q_SIGNALS:
   void SelectionModeChanged(bool selectAll);
   void DeregisterSynchronization();
   void NodeVisibilityChanged(mitk::DataNode::Pointer node, const bool visibility);
+  /**
+   * \brief Emitted when the synchronization group index actually changes.
+   *
+   * Listeners (typically the owning utility widget) use this to keep view-side
+   * state -- e.g. a group-selector combobox -- in sync with the widget's
+   * authoritative 'm_SyncGroupIndex'. Not emitted when 'SetSyncGroup' is called
+   * with the value the widget already holds.
+   */
+  void SyncGroupIndexChanged(GroupSyncIndexType index);
 
 public Q_SLOTS:
   void SetSelection(const NodeList& newSelection);

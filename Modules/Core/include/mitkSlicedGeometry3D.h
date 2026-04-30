@@ -91,21 +91,22 @@ namespace mitk
       */
       virtual mitk::PlaneGeometry *GetPlaneGeometry(int s) const;
     /**
-  * \deprecatedSince{2014_10} Please use GetPlaneGeometry
-  */
-    DEPRECATED(const PlaneGeometry *GetGeometry2D(int s)) { return GetPlaneGeometry(s); }
-    /**
-    * \deprecatedSince{2014_10} Please use SetPlaneGeometry
-    */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry *geo, int s)) { SetPlaneGeometry(geo, s); }
-    //##Documentation
-    //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to
-    //change
-    // the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and
-    // changes the origin respectively.
+     * \brief Switch between image geometry and normal geometry with origin correction.
+     *
+     * Overrides BaseGeometry to also propagate the change to all
+     * contained PlaneGeometries.
+     *
+     * \param[in] isAnImageGeometry true to switch to image geometry,
+     *            false to switch to normal geometry.
+     */
     void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry) override;
 
-    // virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
+    /**
+     * \brief Get the bounding box of this sliced geometry.
+     *
+     * \return Const pointer to the bounding box.
+     * \pre The bounding box must not be null.
+     */
     const mitk::BoundingBox *GetBoundingBox() const override;
 
     /**
@@ -123,10 +124,29 @@ namespace mitk
     */
     virtual bool IsValidSlice(int s = 0) const;
 
+    /**
+     * \brief Get the reference geometry used for reslicing calculations.
+     *
+     * \return Const pointer to the reference geometry, or nullptr if not set.
+     */
     virtual const BaseGeometry* GetReferenceGeometry() const;
 
+    /**
+     * \brief Set the reference geometry for reslicing calculations.
+     *
+     * The reference geometry is typically the global geometry describing
+     * how datasets are to be resliced. It is propagated to each
+     * PlaneGeometry managed by this SlicedGeometry3D.
+     *
+     * \param[in] referenceGeometry The reference geometry (may be nullptr).
+     */
     virtual void SetReferenceGeometry(const BaseGeometry *referenceGeometry);
 
+    /**
+     * \brief Check whether a reference geometry has been set.
+     *
+     * \return true if a non-null reference geometry is available.
+     */
     bool HasReferenceGeometry() const;
 
     /**
@@ -137,6 +157,11 @@ namespace mitk
     * changes, which can occur whenthe slices are re-oriented by rotation.
     */
     virtual void SetSliceNavigationController(mitk::SliceNavigationController *snc);
+    /**
+     * \brief Get the SliceNavigationController associated with this geometry.
+     *
+     * \return Pointer to the SliceNavigationController, or nullptr if none is set.
+     */
     mitk::SliceNavigationController *GetSliceNavigationController();
 
     /**
@@ -168,8 +193,11 @@ namespace mitk
     virtual void SetDirectionVector(const mitk::Vector3D &directionVector);
     itkGetConstMacro(DirectionVector, const mitk::Vector3D &);
 
+    /** \brief Property key for the number of slices. */
     static const std::string SLICES;
+    /** \brief Property key for the direction vector between slices. */
     const static std::string DIRECTION_VECTOR;
+    /** \brief Property key for the evenly-spaced flag. */
     const static std::string EVENLY_SPACED;
 
     /**
@@ -230,10 +258,33 @@ namespace mitk
                                   bool frontside = true,
                                   bool rotated = false);
 
+    /**
+     * \brief Override to propagate the ImageGeometry flag to all slice geometries.
+     *
+     * \param[in] isAnImageGeometry true for image geometry, false otherwise.
+     */
     void SetImageGeometry(const bool isAnImageGeometry) override;
 
+    /**
+     * \brief Execute an operation on this sliced geometry.
+     *
+     * Handles rotation operations by re-initializing the plane stack
+     * after the rotation is applied.
+     *
+     * \param[in] operation The operation to execute.
+     */
     void ExecuteOperation(Operation *operation) override;
 
+    /**
+     * \brief Calculate directed spacing from regular spacing and a direction vector.
+     *
+     * Computes the effective spacing along \a d given the isotropic
+     * \a spacing, using the ellipsoid equation.
+     *
+     * \param[in] spacing The regular voxel spacing.
+     * \param[in] d The direction vector.
+     * \return The calculated spacing along \a d.
+     */
     static double CalculateSpacing(const mitk::Vector3D &spacing, const mitk::Vector3D &d);
 
   protected:

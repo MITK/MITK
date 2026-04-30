@@ -19,20 +19,39 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Constants for node selection preference keys.
+   *
+   * Defines preference node paths and value identifiers used by the node
+   * selection dialog and its inspectors to persist user preferences such as
+   * visible inspectors, preferred inspector, and visibility of special
+   * inspectors (favorites, history).
+   *
+   * \sa QmitkNodeSelectionDialog
+   * \sa QmitkNodeSelectionPreferenceHelper
+   */
   struct MITKQTWIDGETS_EXPORT NodeSelectionConstants
   {
-    /** ID/Path of main preference node for node selections.*/
+    /** \brief Preference node path for the root of all node selection preferences. */
     static const std::string ROOT_PREFERENCE_NODE_ID;
-    /** ID of main preference node where all visible inspectors are stored (e.g. ROOT_PREFERENCE_NODE_ID+"/"+VISIBLE_INSPECTORS_NODE_ID+"/[orderering #]").
-    The sub node naming encodes the ordering number of the visible inspector.*/
+
+    /** \brief Preference sub-node path storing the ordered list of visible inspectors.
+     *
+     * Each child node is named with the ordering number and stores a
+     * VISIBLE_INSPECTOR_ID value identifying the inspector.
+     */
     static const std::string VISIBLE_INSPECTORS_NODE_ID;
-    /** ID for the value that stores the preferred inspector ID in the root preference node.*/
+
+    /** \brief Key for the preferred (default) inspector ID in the root preference node. */
     static const std::string PREFERRED_INSPECTOR_ID;
-    /** ID for the value that stores the inspector ID in the preference node.*/
+
+    /** \brief Key for the inspector ID stored within each visible inspector preference node. */
     static const std::string VISIBLE_INSPECTOR_ID;
-    /** ID for the value that stores if the favorite inspector should be visible.*/
+
+    /** \brief Key controlling whether the favorite inspector is shown. */
     static const std::string SHOW_FAVORITE_INSPECTOR;
-    /** ID for the value that stores if the history inspector should be visible.*/
+
+    /** \brief Key controlling whether the history inspector is shown. */
     static const std::string SHOW_HISTORY_INSPECTOR;
   };
 }

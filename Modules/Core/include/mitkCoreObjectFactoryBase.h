@@ -19,7 +19,6 @@ found in the LICENSE file.
 // be available to all classes implementing this interface.
 #include <mitkLog.h>
 
-#include <mitkFileWriterWithInformation.h>
 #include <mitkMapper.h>
 #include <MitkCoreExports.h>
 #include <itkObjectFactoryBase.h>
@@ -29,63 +28,46 @@ namespace mitk
 {
   class DataNode;
 
-  //## @brief base-class for factories of certain mitk objects.
-  //## @ingroup Algorithms
-  //## This interface can be implemented by factories which add new mapper classes or extend the
-  //## data tree deserialization mechanism.
-
+  /**
+   * \brief Abstract base class for factories that create mappers and set default properties.
+   *
+   * This interface can be implemented by factories that add new mapper classes
+   * or extend the data tree deserialization mechanism. Module-specific factories
+   * deriving from this class can be registered with CoreObjectFactory.
+   *
+   * \ingroup Algorithms
+   * \sa CoreObjectFactory Mapper DataNode
+   */
   class MITKCORE_EXPORT CoreObjectFactoryBase : public itk::Object
   {
   public:
-    typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
-    typedef std::multimap<std::string, std::string> MultimapType;
-
     mitkClassMacroItkParent(CoreObjectFactoryBase, itk::Object);
 
-      virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) = 0;
+    /**
+     * \brief Create a mapper for the given data node and mapper slot.
+     * \param node   The data node to create a mapper for.
+     * \param slotId The mapper slot (2D or 3D).
+     * \return A new mapper, or nullptr if not supported.
+     */
+    virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) = 0;
+
+    /**
+     * \brief Set default rendering properties on the given data node.
+     * \param node The data node to configure.
+     */
     virtual void SetDefaultProperties(mitk::DataNode *node) = 0;
 
     /**
-     * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
+     * \brief Get the ITK source version string.
+     * \return The ITK source version used to build MITK.
      */
-    virtual std::string GetFileExtensions() = 0;
-
-    /**
-     * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
-     */
-    virtual MultimapType GetFileExtensionsMap() = 0;
-
-    /**
-     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    virtual std::string GetSaveFileExtensions() = 0;
-
-    /**
-     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
-     */
-    virtual MultimapType GetSaveFileExtensionsMap() = 0;
-
     virtual const char *GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+
+    /**
+     * \brief Get a human-readable description of this factory.
+     * \return The description string.
+     */
     virtual const char *GetDescription() const { return "Core Object Factory"; }
-    /**
-     * @deprecatedSince{2014_10} See mitk::FileWriterRegistry
-     */
-    FileWriterList GetFileWriters() { return m_FileWriters; }
-  protected:
-    /**
-     * @brief create a string from a map that contains the file extensions
-     * @param fileExtensionsMap input map with the file extensions, e.g. ("*.dcm", "DICOM files")("*.dc3", "DICOM
-     * files")
-     * @param fileExtensions the converted output string, suitable for the QT QFileDialog widget
-     *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;ODF Images (*.odf *qbi)"
-     *
-     * @deprecatedSince{2014_10}
-     */
-    static void CreateFileExtensions(MultimapType fileExtensionsMap, std::string &fileExtensions);
-
-    FileWriterList m_FileWriters;
-
-    friend class CoreObjectFactory;
   };
 }
 #endif

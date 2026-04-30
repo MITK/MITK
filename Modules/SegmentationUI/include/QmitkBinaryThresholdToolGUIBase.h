@@ -21,9 +21,16 @@ found in the LICENSE file.
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief Base GUI for mitk::BinaryThresholdTool.
+  \brief Base GUI class for threshold-based segmentation tools.
 
-  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
+  Provides the common UI elements for both single-threshold and upper/lower threshold
+  segmentation tools. Contains a slider or range widget for adjusting threshold values
+  and connects to the tool's threshold change events.
+
+  \sa mitk::BinaryThresholdTool
+  \sa QmitkBinaryThresholdToolGUI
+  \sa QmitkBinaryThresholdULToolGUI
+  \sa QmitkSegWithPreviewToolGUIBase
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUIBase : public QmitkSegWithPreviewToolGUIBase
 {
@@ -32,7 +39,19 @@ class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUIBase : public QmitkSe
 public:
   mitkClassMacro(QmitkBinaryThresholdToolGUIBase, QmitkSegWithPreviewToolGUIBase);
 
+  /**
+   * \brief Called when the tool's threshold interval borders change.
+   * \param[in] lower The new lower border of the valid threshold range.
+   * \param[in] upper The new upper border of the valid threshold range.
+   * \param[in] isFloat True if the image pixel type is floating-point.
+   */
   void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
+
+  /**
+   * \brief Called when the tool's current threshold values change.
+   * \param[in] lower The new lower threshold value.
+   * \param[in] upper The new upper threshold value.
+   */
   void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
 protected slots:

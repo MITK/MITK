@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkCommon.h>
 #include <mitkContourModelUtils.h>
-#include <mitkContourUtils.h> //TODO remove legacy support
 #include <mitkImage.h>
 #include <mitkSegTool2D.h>
 #include <MitkSegmentationExports.h>
@@ -52,19 +51,20 @@ namespace mitk
     /// \brief Add a control point and finish current segment.
     virtual void OnClick(StateMachineAction*, InteractionEvent* interactionEvent);
 
-    /** Function that generates the mask image that indicates which pixels should be filled.
-    * Caller of this function assumes that all pixels that should be filled have the value 1.
-    * Pixels that should stay untouched should have the value 0.
-    * The default implementation marks the connected reagion around seedPoint, that has
-    * the same pixel value/label like the seedPoint.
-    * You may reimplement this function to change the strategy to determine the fill region.
-    * @param workingSlice part of the segmentation image that should be used to determine the fill image.
-    * @param seedPoint The world coordinate position where the user has cliced.
-    * @param [out] seedLabelValue The function should return the label value that should be assumed
-    * as clicked on, given the seedPoint.
-    * @return Return the image maske that indicates which pixels should be filled. Returning
-    * a null pointer indicates that there is nothing to fill.
-    */
+    /**
+     * \brief Generates the mask image indicating which pixels should be filled.
+     *
+     * Filled pixels have value 1, untouched pixels have value 0.
+     * The default implementation marks the connected region around the seed point
+     * that has the same pixel value/label as the seed point.
+     *
+     * Reimplement this to change the fill region strategy.
+     *
+     * \param[in] workingSlice Part of the segmentation image used to determine the fill region.
+     * \param[in] seedPoint The world coordinate where the user clicked.
+     * \param[out] seedLabelValue Receives the label value at the seed point.
+     * \return The binary fill mask, or nullptr if there is nothing to fill.
+     */
     virtual Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const;
 
     /** Function that is called by OnClick before the filling is executed. If you want to do special

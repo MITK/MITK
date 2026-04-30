@@ -25,15 +25,22 @@ namespace mitk
 {
   class SlicedGeometry3D;
 
-  //##Documentation
-  //## @brief Super class of data objects consisting of slices
-  //##
-  //## Super class of data objects consisting of slices, e.g., images or a stack
-  //## of contours. (GetGeometry will return a BaseGeometry containing PlaneGeometry
-  //## objects).
-  //##
-  //## SlicedData-objects have geometries of type SlicedGeometry3D or sub-classes.
-  //## @ingroup Data
+  /**
+   * \brief Super class of data objects consisting of slices.
+   *
+   * SlicedData is the common base class for data objects that consist of slices,
+   * such as images (mitk::Image) or stacks of contours. GetGeometry() returns a
+   * BaseGeometry containing PlaneGeometry objects, and the data geometry is of
+   * type SlicedGeometry3D or a sub-class thereof.
+   *
+   * SlicedData extends BaseData with region-based pipeline support using
+   * itk::ImageRegion<5>, where the five dimensions represent x, y, slices (z),
+   * time steps, and channels.
+   *
+   * \sa mitk::Image, mitk::BaseData
+   * \sa mitk::SlicedGeometry3D, mitk::PlaneGeometry
+   * \ingroup Data
+   */
   class MITKCORE_EXPORT SlicedData : public BaseData
   {
   public:
@@ -57,140 +64,215 @@ namespace mitk
     typedef itk::Size<RegionDimension> SizeType;
     typedef SizeType::SizeValueType SizeValueType;
 
-    //##Documentation
-    //## Update the information for this DataObject so that it can be used as
-    //## an output of a ProcessObject.  This method is used in the pipeline
-    //## mechanism to propagate information and initialize the meta data
-    //## associated with a itk::DataObject.  Any implementation of this method
-    //## in a derived class of itk::DataObject is assumed to call its source's
-    //## ProcessObject::UpdateOutputInformation() which determines modified
-    //## times, LargestPossibleRegions, and any extra meta data like spacing,
-    //## origin, etc.
+    /**
+     * \brief Update the information for this DataObject so it can be used as
+     * an output of a ProcessObject.
+     *
+     * Propagates information through the pipeline and initializes metadata.
+     * Calls the source's UpdateOutputInformation() and, if there is no source,
+     * sets the use-largest-possible-region flag. Also initializes the requested
+     * region if it has not yet been set.
+     */
     void UpdateOutputInformation() override;
 
+    /**
+     * \brief Prepare the data object to receive new data.
+     *
+     * Releases existing data if the pipeline time has changed, ensuring a
+     * clean state for subsequent writes.
+     */
     void PrepareForNewData() override;
 
-    //##Documentation
-    //## Set the RequestedRegion to the LargestPossibleRegion.  This forces a
-    //## filter to produce all of the output in one execution (i.e. not
-    //## streaming) on the next call to Update().
+    /**
+     * \brief Set the RequestedRegion to the LargestPossibleRegion.
+     *
+     * Forces a filter to produce all of the output in one execution
+     * (i.e., no streaming) on the next call to Update().
+     */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
-    //##Documentation
-    //## Determine whether the RequestedRegion is outside of the
-    //## BufferedRegion. This method returns true if the RequestedRegion is
-    //## outside the BufferedRegion (true if at least one pixel is outside).
-    //## This is used by the pipeline mechanism to determine whether a filter
-    //## needs to re-execute in order to satisfy the current request.  If the
-    //## current RequestedRegion is already inside the BufferedRegion from the
-    //## previous execution (and the current filter is up to date), then a
-    //## given filter does not need to re-execute
+    /**
+     * \brief Determine whether the RequestedRegion is outside of the BufferedRegion.
+     *
+     * Returns true if at least one requested slice, volume, or channel is not
+     * currently buffered. Used by the pipeline mechanism to determine whether
+     * re-execution is needed.
+     *
+     * \return True if the requested region is not fully contained in the buffered region.
+     */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    //##Documentation
-    //## @brief Verify that the RequestedRegion is within the
-    //## LargestPossibleRegion.
-    //##
-    //## Verify that the RequestedRegion is within the LargestPossibleRegion.
-    //## If the RequestedRegion is not within the LargestPossibleRegion,
-    //## then the filter cannot possibly satisfy the request. This method
-    //## returns true if the request can be satisfied (even if it will be
-    //## necessary to process the entire LargestPossibleRegion) and
-    //## returns false otherwise.  This method is used by
-    //## PropagateRequestedRegion().  PropagateRequestedRegion() throws a
-    //## InvalidRequestedRegionError exception if the requested region is
-    //## not within the LargestPossibleRegion.
+    /**
+     * \brief Verify that the RequestedRegion is within the LargestPossibleRegion.
+     *
+     * If the RequestedRegion is not within the LargestPossibleRegion, the
+     * filter cannot satisfy the request.
+     *
+     * \return True if the request can be satisfied, false otherwise.
+     */
     bool VerifyRequestedRegion() override;
 
-    //##Documentation
-    //## Set the requested region from this data object to match the requested
-    //## region of the data object passed in as a parameter.  This method is
-    //## implemented in the concrete subclasses of DataObject.
+    /**
+     * \brief Set the requested region from another data object.
+     *
+     * \param[in] data The data object whose requested region will be matched.
+     *            Must be castable to SlicedData.
+     * \throw itk::ExceptionObject if \a data cannot be cast to SlicedData.
+     */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
-    //##Documentation
-    //## Set the requested region from this data object to match the requested
-    //## region of the data object passed in as a parameter.  This method is
-    //## implemented in the concrete subclasses of DataObject.
+    /**
+     * \brief Set the requested region from a RegionType pointer.
+     *
+     * \param[in] region Pointer to the region to use. Must not be nullptr.
+     * \throw itk::ExceptionObject if \a region is nullptr.
+     */
     virtual void SetRequestedRegion(SlicedData::RegionType *region);
 
-    /*! Documentation
-    \brief Sets the largest possible region.
-    The largest possible region is the entire region occupied by the data object.
-    Note that the largest possible region should always be bigger then the requested region
-    of a certain operation.*/
+    /**
+     * \brief Set the largest possible region.
+     *
+     * The largest possible region is the entire region occupied by the data
+     * object. The largest possible region should always be bigger than or equal
+     * to the requested region of any operation.
+     *
+     * \param[in] region Pointer to the region to set. Must not be nullptr.
+     * \throw itk::ExceptionObject if \a region is nullptr.
+     */
     void SetLargestPossibleRegion(SlicedData::RegionType *region);
 
+    /**
+     * \brief Get the largest possible region.
+     *
+     * \return Const reference to the largest possible region.
+     */
     const RegionType &GetLargestPossibleRegion() const { return m_LargestPossibleRegion; }
-    //##Documentation
-    //## Get the region object that defines the size and starting index
-    //## for the region of the image requested (i.e., the region of the
-    //## image to be operated on by a filter).
+
+    /**
+     * \brief Get the region object that defines the size and starting index
+     * for the requested region (i.e., the part of the data to be operated on).
+     *
+     * \return Const reference to the requested region.
+     */
     virtual const RegionType &GetRequestedRegion() const { return m_RequestedRegion; }
+
+    /**
+     * \brief Check whether slice \a s at time \a t in channel \a n is set.
+     *
+     * \param[in] s Slice index (default: 0).
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the slice data is available.
+     */
     virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
+
+    /**
+     * \brief Check whether volume at time \a t in channel \a n is set.
+     *
+     * \param[in] t Time step (default: 0).
+     * \param[in] n Channel number (default: 0).
+     * \return True if the volume data is available.
+     */
     virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
+
+    /**
+     * \brief Check whether channel \a n is set.
+     *
+     * \param[in] n Channel number (default: 0).
+     * \return True if the channel data is available.
+     */
     virtual bool IsChannelSet(int n = 0) const = 0;
+
+    /**
+     * \brief Copy information from the specified data set.
+     *
+     * Copies the TimeGeometry, PropertyList, and LargestPossibleRegion from
+     * the given data object. Calls the superclass version.
+     *
+     * \param[in] data The data object to copy from. Must be castable to SlicedData.
+     * \throw itk::ExceptionObject if \a data cannot be cast to SlicedData.
+     */
     void CopyInformation(const itk::DataObject *data) override;
 
-    //##Documentation
-    //## @brief Get the number of channels
+    /**
+     * \brief Get the number of channels.
+     *
+     * The number of channels is derived from the fifth dimension of the
+     * LargestPossibleRegion.
+     *
+     * \return The number of channels.
+     */
     unsigned int GetNumberOfChannels() const { return m_LargestPossibleRegion.GetSize(4); }
-    ////##Documentation
-    ////## @brief Return the PlaneGeometry of the slice (@a s, @a t).
-    ////##
-    ////## The method does not simply call GetGeometry()->GetPlaneGeometry(). Before doing this, it
-    ////## makes sure that the PlaneGeometry is up-to-date before returning it (by
-    ////## setting the update extent appropriately and calling
-    ////## UpdateOutputInformation).
-    ////##
-    ////## @warning GetPlaneGeometry not yet completely implemented.
-    ////## @todo Appropriate setting of the update extent is missing.
-    // virtual const mitk::PlaneGeometry* GetPlaneGeometry(int s, int t=0) const;
 
-    //##Documentation
-    //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
-    //##
-    //## @em No update will be called. Normally used in GenerateOutputInformation of
-    //## subclasses of BaseProcess.
+    /**
+     * \brief Convenience access method for the geometry, which is of type
+     * SlicedGeometry3D (or a sub-class of it).
+     *
+     * \warning No update will be called. Normally used in GenerateOutputInformation
+     * of subclasses of BaseProcess.
+     *
+     * \param[in] t The time step for which to retrieve the geometry (default: 0).
+     * \return Pointer to the SlicedGeometry3D, or nullptr if the TimeGeometry is not set.
+     * \sa GetUpdatedSlicedGeometry
+     */
     SlicedGeometry3D *GetSlicedGeometry(unsigned int t = 0) const;
 
-    //##Documentation
-    //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
-    //##
-    //## The method does not simply return the value of the m_Geometry3D member.
-    //## Before doing this, it makes sure that the BaseGeometry is up-to-date before
-    //## returning it (by setting the update extent appropriately and calling
-    //## UpdateOutputInformation).
-    //##
-    //## @warning GetGeometry not yet completely implemented.
-    //## @todo Appropriate setting of the update extent is missing.
+    /**
+     * \brief Convenience access method that returns an up-to-date SlicedGeometry3D.
+     *
+     * Before returning, this method ensures the geometry is up-to-date by
+     * calling SetRequestedRegionToLargestPossibleRegion() and
+     * UpdateOutputInformation().
+     *
+     * \param[in] t The time step for which to retrieve the geometry (default: 0).
+     * \return Const pointer to the up-to-date SlicedGeometry3D.
+     * \sa GetSlicedGeometry
+     * \todo Appropriate setting of the update extent is missing.
+     */
     const SlicedGeometry3D *GetUpdatedSlicedGeometry(unsigned int t = 0);
 
-    //##Documentation
-    //## @brief Set the BaseGeometry of the data, which will be referenced (not copied!). It
-    //## has to be a sub-class of SlicedGeometry3D.
-    //##
-    //## @warning This method will normally be called internally by the sub-class of SlicedData
-    //## during initialization.
+    /**
+     * \brief Set the BaseGeometry of the data, which will be referenced (not copied!).
+     *
+     * The geometry must be a SlicedGeometry3D or a PlaneGeometry that can be wrapped
+     * in a SlicedGeometry3D. If a PlaneGeometry is provided, it will be used to
+     * initialize an evenly spaced SlicedGeometry3D.
+     *
+     * \warning This method will normally be called internally by sub-classes of
+     * SlicedData during initialization.
+     *
+     * \param[in] aGeometry3D The geometry to set. May be nullptr to clear the geometry.
+     */
     void SetGeometry(BaseGeometry *aGeometry3D) override;
 
-    //##Documentation
-    //## @brief Convenience method for setting the origin of
-    //## the SlicedGeometry3D instances of all time steps
-    //##
-    //## In case the SlicedGeometry3D is evenly spaced,
-    //## the origin of the first slice is set to \a origin.
-    //## \sa mitk::BaseData::SetOrigin
+    /**
+     * \brief Convenience method for setting the origin of the SlicedGeometry3D
+     * instances of all time steps.
+     *
+     * In case the SlicedGeometry3D is evenly spaced, the origin of the first
+     * slice is set to \a origin and the sliced geometry is re-initialized.
+     *
+     * \param[in] origin The new origin in world coordinates.
+     * \sa mitk::BaseData::SetOrigin
+     */
     void SetOrigin(const Point3D &origin) override;
 
-    //##Documentation
-    //## @brief Convenience method for setting the spacing of
-    //## the SlicedGeometry3D instances of all time steps
+    /**
+     * \brief Convenience method for setting the spacing of the SlicedGeometry3D
+     * instances of all time steps.
+     *
+     * \param[in] aSpacing Array of three spacing values [x, y, z].
+     * \sa SetSpacing(mitk::Vector3D)
+     */
     virtual void SetSpacing(const ScalarType aSpacing[]);
 
-    //##Documentation
-    //## @brief Convenience method for setting the spacing of
-    //## the SlicedGeometry3D instances of all time steps
+    /**
+     * \brief Convenience method for setting the spacing of the SlicedGeometry3D
+     * instances of all time steps.
+     *
+     * \param[in] aSpacing Vector of three spacing values [x, y, z].
+     * \sa SetSpacing(const ScalarType[])
+     */
     virtual void SetSpacing(mitk::Vector3D aSpacing);
 
   protected:

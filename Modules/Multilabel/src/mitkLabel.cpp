@@ -283,7 +283,10 @@ mitk::Label::PixelType mitk::Label::GetValue() const
 const mitk::Color &mitk::Label::GetColor() const
 {
   mitk::ColorProperty *colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
-  return colorProp->GetColor();
+  if (colorProp != nullptr)
+    return colorProp->GetColor();
+  static mitk::Color defaultColor;
+  return defaultColor;
 }
 
 void mitk::Label::SetColor(const mitk::Color &_color)
@@ -351,9 +354,8 @@ mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 
 void mitk::Label::ResetCenterOfMass()
 {
-  Point3D pnt(0, 0, 0);
-  SetCenterOfMassCoordinates(pnt);
-  SetCenterOfMassIndex(pnt);
+  this->RemoveProperty("center.index");
+  this->RemoveProperty("center.coordinates");
 }
 
 itk::ModifiedTimeType mitk::Label::GetCenterOfMassMTime() const

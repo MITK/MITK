@@ -21,67 +21,119 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /*! \brief Abstract base class for properties
-
-    \ingroup DataManagement
-
-      Base class for properties. Properties are arbitrary additional information
-      (to define a new type of information you have to define a subclass of
-      BaseProperty) that can be added to a PropertyList.
-      Concrete subclasses of BaseProperty should define Set-/Get-methods to assess
-      the property value, which should be stored by value (not by reference).
-      Subclasses must implement an operator==(const BaseProperty& property), which
-      is used by PropertyList to check whether a property has been changed.
-  */
+  /**
+   * \brief Abstract base class for properties.
+   *
+   * Base class for all properties in MITK. Properties represent arbitrary additional
+   * information that can be added to a PropertyList and associated with data objects.
+   * To define a new type of property, create a subclass of BaseProperty.
+   *
+   * Concrete subclasses should define Set-/Get-methods to access the property value,
+   * which should be stored by value (not by reference). Subclasses must implement the
+   * pure virtual methods IsEqual() and Assign() for comparison and assignment support.
+   *
+   * \ingroup DataManagement
+   *
+   * \sa PropertyList
+   * \sa GenericProperty
+   * \sa StringProperty
+   */
   class MITKCORE_EXPORT BaseProperty : public itk::Object
   {
   public:
     mitkClassMacroItkParent(BaseProperty, itk::Object);
     itkCloneMacro(Self);
 
-      /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
+    /**
+     * \brief Compare two properties for equality.
+     *
+     * Checks whether this property is equal to the given property. Two properties are
+     * considered equal if they have the same type (checked via typeid) and their
+     * subclass-specific IsEqual() method returns true.
+     *
+     * \param[in] property The property to compare against.
+     * \return \c true if both properties are of the same type and have equal values,
+     *         \c false otherwise.
+     *
+     * \sa IsEqual
+     */
+    bool operator==(const BaseProperty &property) const;
 
-          operator== which is used by PropertyList to check whether a property has been changed.
-      */
-      bool
-      operator==(const BaseProperty &property) const;
-
-    /*! @brief Assigns property to this BaseProperty instance.
-
-        Subclasses must implement Assign(const BaseProperty&) and call the superclass
-        Assign method for proper handling of polymorphic assignments. The assignment
-        operator of the subclass should be disabled and the baseclass operator should
-        be made visible using "using" statements.
-    */
+    /**
+     * \brief Assign a property value to this instance.
+     *
+     * Performs a polymorphic assignment from the given property. The assignment succeeds
+     * only if the source and target properties are of the same type. The subclass-specific
+     * Assign() method is called to perform the actual value copy.
+     *
+     * Subclasses must implement Assign(const BaseProperty&) and call the superclass
+     * Assign method for proper handling. The copy assignment operator of the subclass
+     * should be disabled and the base class operator should be made visible using
+     * "using" statements.
+     *
+     * \param[in] property The property whose value should be assigned to this instance.
+     * \return A reference to this property.
+     *
+     * \sa AssignProperty
+     * \sa Assign
+     */
     BaseProperty &operator=(const BaseProperty &property);
 
-    /*! @brief Assigns property to this BaseProperty instance.
-
-        This method is identical to the assignment operator, except for the return type.
-        It allows to directly check if the assignment was successful.
-    */
+    /**
+     * \brief Assign a property value to this instance and report success.
+     *
+     * This method is identical to the assignment operator, except for the return type.
+     * It allows callers to directly check whether the assignment was successful.
+     * The assignment fails if the source and target properties have different types.
+     * On success, the property is marked as modified.
+     *
+     * \param[in] property The property whose value should be assigned to this instance.
+     * \return \c true if the assignment was successful (same type), \c false otherwise.
+     *
+     * \sa operator=
+     */
     bool AssignProperty(const BaseProperty &property);
 
+    /**
+     * \brief Return the property value as a human-readable string.
+     *
+     * The default implementation returns VALUE_CANNOT_BE_CONVERTED_TO_STRING.
+     * Subclasses should override this method to provide a meaningful string
+     * representation of their value.
+     *
+     * \return A string representation of the property value.
+     */
     virtual std::string GetValueAsString() const;
 
-    /** \brief Serialize property value(s) to JSON.
+    /**
+     * \brief Serialize property value(s) to JSON.
      *
-     * Rely on exceptions for error handling when implementing serialization.
+     * Subclasses must implement this method to serialize their value into the
+     * provided JSON object. Rely on exceptions for error handling when
+     * implementing serialization.
      *
-     * \return False if not serializable by design, true otherwise.
+     * \param[out] j The JSON object to write the serialized value into.
+     * \return \c false if the property is not serializable by design, \c true otherwise.
      */
     virtual bool ToJSON(nlohmann::json& j) const = 0;
 
-    /** \brief Deserialize property value(s) from JSON.
-    *
-    * Rely on exceptions for error handling when implementing deserialization.
-    *
-    * \return False if not deserializable by design, true otherwise.
-    */
+    /**
+     * \brief Deserialize property value(s) from JSON.
+     *
+     * Subclasses must implement this method to restore their value from the
+     * provided JSON object. Rely on exceptions for error handling when
+     * implementing deserialization.
+     *
+     * \param[in] j The JSON object containing the serialized value.
+     * \return \c false if the property is not deserializable by design, \c true otherwise.
+     */
     virtual bool FromJSON(const nlohmann::json& j) = 0;
 
     /**
-     * @brief Default return value if a property which can not be returned as string
+     * \brief Default return value for properties that cannot be converted to a string.
+     *
+     * This constant (value "n/a") is returned by GetValueAsString() in the base
+     * implementation to indicate that no string conversion is available.
      */
     static const std::string VALUE_CANNOT_BE_CONVERTED_TO_STRING;
 

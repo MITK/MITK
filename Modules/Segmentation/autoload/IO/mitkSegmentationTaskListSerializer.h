@@ -17,6 +17,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Serializer for SegmentationTaskList objects in scene serialization.
+   *
+   * Writes SegmentationTaskList instances to disk during scene saving and provides
+   * the file path of the serialized output.
+   *
+   * \sa SegmentationTaskList, BaseDataSerializer
+   */
   class SegmentationTaskListSerializer : public BaseDataSerializer
   {
   public:

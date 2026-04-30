@@ -15,8 +15,15 @@ found in the LICENSE file.
 
 #include <berryAbstractUICTKPlugin.h>
 
+#include <usModuleContext.h>
+#include <usServiceEvent.h>
+#include <usServiceReference.h>
+
 namespace mitk
 {
+  struct IRestServerService;
+  class RenderWindowBridge;
+
   class RestApiPluginActivator : public berry::AbstractUICTKPlugin
   {
     Q_OBJECT
@@ -37,8 +44,15 @@ namespace mitk
 
   private:
 
+    void OnRestServerServiceChanged(const us::ServiceEvent event);
+    void ConnectRestServer(const us::ServiceReferenceU& ref);
+    void DisconnectRestServer(const us::ServiceReferenceU& ref);
+
     static ctkPluginContext* m_context;
     static RestApiPluginActivator* m_Instance;
+
+    us::ModuleContext* m_MitkContext = nullptr;
+    RenderWindowBridge* m_RenderWindowBridge = nullptr;
   };
 }
 

@@ -330,7 +330,13 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
-    outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(m_Controls->outputSegSelector->GetSelectedNode()->GetData());
+    auto outputNode = m_Controls->outputSegSelector->GetSelectedNode();
+    if (outputNode.IsNull())
+    {
+      QApplication::restoreOverrideCursor();
+      return;
+    }
+    outputSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(outputNode->GetData());
 
     if (outputSeg->GetNumberOfGroups() > 0)
     {
@@ -506,10 +512,14 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
   if (m_Controls->radioAddToSeg->isChecked())
   {
-    mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
-    undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ m_Controls->outputSegSelector->GetSelectedNode()->GetName()+"\"");
+    auto outputNode = m_Controls->outputSegSelector->GetSelectedNode();
+    if (outputNode.IsNotNull())
+    {
+      mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(outputSeg, addedGroups);
+      undoRedoGenerator.RegisterUndoRedoOperationEvent("Insert conversion groups to segmentation node \n"+ outputNode->GetName()+"\"");
 
-    m_Controls->outputSegSelector->GetSelectedNode()->Modified();
+      outputNode->Modified();
+    }
   }
   else
   {

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef mitkPythonHelper_h
 #define mitkPythonHelper_h
 
+#include <cassert>
+
 #include <mitkFileSystem.h>
 #include <MitkPythonHelperExports.h>
 
@@ -34,6 +36,41 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT fs::path CreateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);
+  MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool RemoveVirtualEnv(const fs::path& path);
+
+  // Returns true if any shared library (.dll/.so/.dylib/.pyd) currently
+  // loaded into this process originates from the given virtual environment
+  // directory. RemoveVirtualEnv on such a venv would partial-fail on Windows
+  // (locked files) and on POSIX would unlink files still in use.
+  //
+  // Note: only modules loaded into THIS process are considered. A virtual
+  // environment in use by another running MITK instance cannot be detected.
+  MITKPYTHONHELPER_EXPORT bool IsAnyVirtualEnvModuleLoaded(const std::string& name);
+  MITKPYTHONHELPER_EXPORT bool IsAnyVirtualEnvModuleLoaded(const fs::path& path);
+
+  // String-literal overloads. Without these, calls like ActivateVirtualEnv("foo")
+  // are ambiguous because const char* converts equally well to both std::string
+  // and fs::path; an exact-match const char* overload disambiguates.
+  //
+  // \pre name != nullptr.
+  inline bool ActivateVirtualEnv(const char* name)
+  {
+    assert(name != nullptr);
+    return ActivateVirtualEnv(std::string(name));
+  }
+
+  inline bool RemoveVirtualEnv(const char* name)
+  {
+    assert(name != nullptr);
+    return RemoveVirtualEnv(std::string(name));
+  }
+
+  inline bool IsAnyVirtualEnvModuleLoaded(const char* name)
+  {
+    assert(name != nullptr);
+    return IsAnyVirtualEnvModuleLoaded(std::string(name));
+  }
 }
 
 #endif

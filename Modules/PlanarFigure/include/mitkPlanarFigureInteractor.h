@@ -19,9 +19,13 @@ found in the LICENSE file.
 #include <mitkDataInteractor.h>
 #include <mitkNumericTypes.h>
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 namespace mitk
 {
@@ -33,7 +37,9 @@ namespace mitk
   class InteractionPositionEvent;
   class StateMachineAction;
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
   // Define events for PlanarFigure interaction notifications
   itkEventMacroDeclaration(PlanarFigureEvent, itk::AnyEvent);
@@ -47,13 +53,29 @@ namespace mitk
   itkEventMacroDeclaration(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacroDeclaration(PointMovedPlanarFigureEvent, PlanarFigureEvent);
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
   /**
-    * \brief Interaction with mitk::PlanarFigure objects via control-points
-    *
-    * @ingroup MitkPlanarFigureModule
-    */
+   * \brief Interactor for creating, editing, and manipulating PlanarFigure objects.
+   *
+   * Handles mouse-based interaction with PlanarFigure objects, including:
+   * - Placement of new planar figures by clicking control points
+   * - Selection and hovering of existing figures
+   * - Moving control points to modify figure geometry
+   * - Adding and removing control points
+   * - Context menu requests
+   *
+   * Emits various events (StartPlacementPlanarFigureEvent, EndPlacementPlanarFigureEvent,
+   * SelectPlanarFigureEvent, etc.) that other components can observe.
+   *
+   * The interaction behavior is defined by a state machine configuration loaded
+   * during construction.
+   *
+   * \ingroup MitkPlanarFigureModule
+   * \sa PlanarFigure, PlanarFigureMapper2D, DataInteractor
+   */
   class MITKPLANARFIGURE_EXPORT PlanarFigureInteractor : public DataInteractor
   {
   public:
@@ -61,12 +83,31 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    /** \brief Sets the amount of precision */
+    /**
+     * \brief Sets the precision for picking control points and figure edges.
+     *
+     * Defines how close (in display coordinates) a mouse click must be
+     * to a control point or figure edge to select it.
+     *
+     * \param[in] precision The precision value in display units.
+     */
     void SetPrecision(ScalarType precision);
 
-    /** \brief Sets the minimal distance between two control points. */
+    /**
+     * \brief Sets the minimal distance between two control points.
+     *
+     * Prevents adding a new control point too close to an existing one.
+     *
+     * \param[in] minimumDistance The minimum allowed distance between control points.
+     */
     void SetMinimumPointDistance(ScalarType minimumDistance);
 
+    /**
+     * \brief Enables continuous points mode.
+     *
+     * In this mode, control points are added continuously while moving the
+     * mouse, rather than requiring individual clicks.
+     */
     void EnableContinuousPointsMode();
 
   protected:

@@ -23,10 +23,12 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief A simple struct to hold the result of the comparison filter.
+   * \brief Holds the detailed results of a CompareImageDataFilter comparison.
+   * \sa CompareImageDataFilter
    */
   struct CompareFilterResults
   {
+    /** \brief Print the comparison results to MITK_INFO. */
     void PrintSelf()
     {
       if (!m_FilterCompleted)
@@ -43,23 +45,27 @@ namespace mitk
                 << "Number of pixels with differences: " << m_PixelsWithDifference;
     }
 
-    double m_MinimumDifference;
-    double m_MaximumDifference;
+    double m_MinimumDifference;  ///< Smallest per-pixel difference found.
+    double m_MaximumDifference;  ///< Largest per-pixel difference found.
 
-    double m_TotalDifference;
-    double m_MeanDifference;
-    size_t m_PixelsWithDifference;
+    double m_TotalDifference;  ///< Sum of all per-pixel differences.
+    double m_MeanDifference;  ///< Mean per-pixel difference.
+    size_t m_PixelsWithDifference;  ///< Number of pixels that differ beyond tolerance.
 
-    bool m_FilterCompleted;
-    std::string m_ExceptionMessage;
+    bool m_FilterCompleted;  ///< Whether the comparison finished without exception.
+    std::string m_ExceptionMessage;  ///< Exception message if the filter did not complete.
   };
 
   /**
-   * @brief Filter for comparing two mitk::Image objects by pixel values
+   * \brief Filter for pixel-wise comparison of two mitk::Image objects.
    *
-   * The comparison is pixel-wise, the filter uses the itk::Testing::ComparisonImageFilter
-   * to find differences. The filter expects two images as input, provide them by using the SetInput( int, mitk::Image)
-   * method.
+   * Uses itk::Testing::ComparisonImageFilter internally to find per-pixel
+   * differences. Provide two images via SetInput(0, image1) and
+   * SetInput(1, image2). For multi-component images the
+   * MultiComponentImageDataComparisonFilter is used instead.
+   *
+   * \ingroup Algorithms
+   * \sa CompareFilterResults ImageToImageFilter
    */
   class MITKCORE_EXPORT CompareImageDataFilter : public ImageToImageFilter
   {
@@ -67,41 +73,57 @@ namespace mitk
     mitkClassMacro(CompareImageDataFilter, ImageToImageFilter);
     itkSimpleNewMacro(Self);
 
-      /**
-       * @brief Get the result of the comparison
-       *
-       * The method compares only the number of pixels with differences. It returns true if the amount
-       * is under the specified threshold. To get the complete results, use the GetCompareResults method.
-       *
-       * Returns false also if the itk ComparisonImageFilter raises an exception during update.
-       *
-       * @param threshold Allowed amount of pixels with differences
-       */
-      bool GetResult(size_t threshold = 0);
+    /**
+     * \brief Check whether the comparison passes a given threshold.
+     *
+     * Returns true if the number of pixels with differences is at or below
+     * the specified threshold. Returns false if the ITK ComparisonImageFilter
+     * raised an exception during Update().
+     *
+     * \param threshold Maximum allowed number of pixels with differences (default 0).
+     * \return \c true if the comparison passes, \c false otherwise.
+     *
+     * \sa GetCompareResults
+     */
+    bool GetResult(size_t threshold = 0);
 
     /**
-     * @brief Get the detailed results of the comparison run
-     *
-     * @sa CompareFilterResults
+     * \brief Get the detailed results of the comparison run.
+     * \return A CompareFilterResults struct with all comparison statistics.
+     * \sa CompareFilterResults
      */
     CompareFilterResults GetCompareResults() { return m_CompareDetails; }
+
+    /**
+     * \brief Set the tolerance for per-pixel difference comparison.
+     * \param eps Allowed absolute difference per pixel.
+     */
     void SetTolerance(double eps) { m_Tolerance = eps; }
+
   protected:
+    /** \brief Constructor. Sets the number of required inputs to 2. */
     CompareImageDataFilter();
+    /** \brief Destructor. */
     ~CompareImageDataFilter() override {}
+
+    /** \brief Perform the pixel-wise comparison. */
     void GenerateData() override;
 
-    /*! \brief Method resets the compare detail member struct to its initial state */
+    /** \brief Reset the comparison detail struct to its initial state. */
     void ResetCompareResultsToInitial();
 
-    /** ITK-like method which calls the ComparisonFilter on the two inputs of the filter */
+    /**
+     * \brief Run itk::Testing::ComparisonImageFilter on the two inputs.
+     * \tparam TPixel The pixel type of the input image.
+     * \tparam VImageDimension The dimension of the input image.
+     */
     template <typename TPixel, unsigned int VImageDimension>
     void EstimateValueDifference(const itk::Image<TPixel, VImageDimension> *itkImage1,
                                  const mitk::Image *referenceImage);
-    bool m_CompareResult;
 
-    CompareFilterResults m_CompareDetails;
-    double m_Tolerance;
+    bool m_CompareResult;  ///< Overall pass/fail result.
+    CompareFilterResults m_CompareDetails;  ///< Detailed comparison statistics.
+    double m_Tolerance;  ///< Per-pixel tolerance value.
   };
 } // end namespace mitk
 

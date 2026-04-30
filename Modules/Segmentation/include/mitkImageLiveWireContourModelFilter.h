@@ -61,11 +61,11 @@ namespace mitk
     typedef itk::ShortestPathCostFunctionLiveWire<InternalImageType> CostFunctionType;
     typedef std::vector<itk::Index<2>> ShortestPathType;
 
-    /** \brief start point in world coordinates*/
+    /** \brief Start point in world coordinates. */
     itkSetMacro(StartPoint, mitk::Point3D);
     itkGetMacro(StartPoint, mitk::Point3D);
 
-    /** \brief end point in woorld coordinates*/
+    /** \brief End point in world coordinates. */
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
@@ -92,22 +92,40 @@ namespace mitk
     */
     void RemoveRepulsivePoint(const itk::Index<2> &idx);
 
+    /** \brief Set the input image for the LiveWire computation.
+      \param input The image to compute the LiveWire contour on.
+    */
     virtual void SetInput(const InputType *input);
 
     using Superclass::SetInput;
+
+    /** \brief Set the input image at a specific index.
+      \param idx The input index.
+      \param input The image to set.
+    */
     virtual void SetInput(unsigned int idx, const InputType *input);
 
+    /** \brief Get the first input image. */
     const InputType *GetInput(void);
 
+    /** \brief Get the input image at a specific index. */
     const InputType *GetInput(unsigned int idx);
 
+    /** \brief Get the output contour model. */
     virtual OutputType *GetOutput();
 
+    /** \brief Debug helper that dumps the internal mask image. */
     virtual void DumpMaskImage();
 
-    /** \brief Create dynamic cost transfer map - on the fly training*/
+    /** \brief Create a dynamic cost transfer map using on-the-fly training.
+      \param path Optional contour path to use for training. If nullptr, the last computed segment is used.
+      \return True if the cost map was created successfully.
+    */
     bool CreateDynamicCostMap(mitk::ContourModel *path = nullptr);
 
+    /** \brief Enable or disable the cost function in the shortest path filter.
+      \param doUseCostFunction If true, the cost function is used; otherwise uniform cost is assumed.
+    */
     void SetUseCostFunction(bool doUseCostFunction) { m_ShortestPathFilter->SetUseCostFunction(doUseCostFunction); };
 
   protected:
@@ -121,16 +139,16 @@ namespace mitk
 
     void UpdateLiveWire();
 
-    /** \brief start point in worldcoordinates*/
+    /** \brief Start point in world coordinates. */
     mitk::Point3D m_StartPoint;
 
-    /** \brief end point in woorldcoordinates*/
+    /** \brief End point in world coordinates. */
     mitk::Point3D m_EndPoint;
 
-    /** \brief Start point in index*/
+    /** \brief Start point in image index coordinates. */
     mitk::Point3D m_StartPointInIndex;
 
-    /** \brief End point in index*/
+    /** \brief End point in image index coordinates. */
     mitk::Point3D m_EndPointInIndex;
 
     /** \brief The cost function to compute costs between two pixels*/

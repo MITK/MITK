@@ -18,24 +18,16 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 
 #include <mitkContourModel.h>
-#include <mitkContourModelGLMapper2D.h>
+#include <mitkContourModelMapper2D.h>
 #include <mitkContourModelMapper2D.h>
 #include <mitkContourModelMapper3D.h>
 #include <mitkContourModelSet.h>
-#include <mitkContourModelSetGLMapper2D.h>
+#include <mitkContourModelSetMapper2D.h>
 #include <mitkContourModelSetMapper3D.h>
-#include <mitkContourModelSetWriter.h>
-#include <mitkContourModelWriter.h>
 
 mitk::ContourObjectFactory::ContourObjectFactory() : CoreObjectFactoryBase()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
-
-    alreadyDone = true;
-  }
+  MITK_DEBUG << "ContourObjectFactory c'tor" << std::endl;
 }
 
 mitk::ContourObjectFactory::~ContourObjectFactory()
@@ -51,12 +43,12 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *n
     std::string classname("ContourModel");
     if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
     {
-      newMapper = mitk::ContourModelGLMapper2D::New();
+      newMapper = mitk::ContourModelMapper2D::New();
       newMapper->SetDataNode(node);
     }
     else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
     {
-      newMapper = mitk::ContourModelSetGLMapper2D::New();
+      newMapper = mitk::ContourModelSetMapper2D::New();
       newMapper->SetDataNode(node);
     }
   }
@@ -88,46 +80,14 @@ void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 
   if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
   {
-    mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelMapper2D::SetDefaultProperties(node);
     mitk::ContourModelMapper3D::SetDefaultProperties(node);
   }
   else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
   {
-    mitk::ContourModelSetGLMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelSetMapper2D::SetDefaultProperties(node);
     mitk::ContourModelSetMapper3D::SetDefaultProperties(node);
   }
-}
-
-std::string mitk::ContourObjectFactory::GetFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
-};
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::ContourObjectFactory::GetFileExtensionsMap()
-{
-  return m_FileExtensionsMap;
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::ContourObjectFactory::GetSaveFileExtensionsMap()
-{
-  return m_SaveFileExtensionsMap;
-}
-
-void mitk::ContourObjectFactory::CreateFileExtensionsMap()
-{
-}
-
-std::string mitk::ContourObjectFactory::GetSaveFileExtensions()
-{
-  std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
-  return fileExtension.c_str();
-}
-
-void mitk::ContourObjectFactory::RegisterIOFactories()
-{
 }
 
 struct RegisterContourObjectFactory

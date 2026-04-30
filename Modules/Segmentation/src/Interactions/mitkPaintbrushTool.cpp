@@ -106,190 +106,171 @@ mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
   return p;
 }
 
-void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positionEvent)
+mitk::ContourModel::Pointer mitk::PaintbrushTool::CreateBrushContour(int size)
 {
-  // MITK_INFO<<"Update...";
-  // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
-  // mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  // const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent)
-    return;
+  const int radius = size / 2;
+  const float fradius = static_cast<float>(size) / 2.0f;
 
-  // Get Spacing of current Slice
-  // mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
-
-  //
-  // Draw a contour in Square according to selected brush size
-  //
-  int radius = (m_Size) / 2;
-  float fradius = static_cast<float>(m_Size) / 2.0f;
-
-  ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
+  auto contourInImageIndexCoordinates = ContourModel::New();
+  contourInImageIndexCoordinates->SetClosed(true);
 
   // estimate center point of the brush ( relative to the pixel the mouse points on )
   // -- left upper corner for even sizes,
   // -- midpoint for uneven sizes
-  mitk::Point2D centerCorrection;
+  Point2D centerCorrection;
   centerCorrection.Fill(0);
 
-  // even --> correction of [+0.5, +0.5]
-  bool evenSize = ((m_Size % 2) == 0);
+  const bool evenSize = ((size % 2) == 0);
   if (evenSize)
   {
     centerCorrection[0] += 0.5;
     centerCorrection[1] += 0.5;
   }
 
-  // we will compute the control points for the upper left quarter part of a circle contour
-  std::vector<mitk::Point2D> quarterCycleUpperRight;
-  std::vector<mitk::Point2D> quarterCycleLowerRight;
-  std::vector<mitk::Point2D> quarterCycleLowerLeft;
-  std::vector<mitk::Point2D> quarterCycleUpperLeft;
+  // compute the control points for the upper right quarter of the circle contour
+  std::vector<Point2D> quarterCycleUpperRight;
+  std::vector<Point2D> quarterCycleLowerRight;
+  std::vector<Point2D> quarterCycleLowerLeft;
+  std::vector<Point2D> quarterCycleUpperLeft;
 
-  mitk::Point2D curPoint;
+  Point2D curPoint;
   bool curPointIsInside = true;
   curPoint[0] = 0;
   curPoint[1] = radius;
   quarterCycleUpperRight.push_back(upperLeft(curPoint));
 
-  // to estimate if a pixel is inside the circle, we need to compare against the 'outer radius'
-  // i.e. the distance from the midpoint [0,0] to the border of the pixel [0,radius]
-  // const float outer_radius = static_cast<float>(radius) + 0.5;
-
   while (curPoint[1] > 0)
   {
-    // Move right until pixel is outside circle
     float curPointX_squared = 0.0f;
     float curPointY_squared = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
     while (curPointIsInside)
     {
-      // increment posX and chec
       curPoint[0]++;
       curPointX_squared = (curPoint[0] - centerCorrection[0]) * (curPoint[0] - centerCorrection[0]);
       const float len = sqrt(curPointX_squared + curPointY_squared);
       if (len > fradius)
-      {
-        // found first Pixel in this horizontal line, that is outside the circle
         curPointIsInside = false;
-      }
     }
     quarterCycleUpperRight.push_back(upperLeft(curPoint));
 
-    // Move down until pixel is inside circle
     while (!curPointIsInside)
     {
-      // increment posX and chec
       curPoint[1]--;
       curPointY_squared = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
       const float len = sqrt(curPointX_squared + curPointY_squared);
       if (len <= fradius)
       {
-        // found first Pixel in this horizontal line, that is outside the circle
         curPointIsInside = true;
         quarterCycleUpperRight.push_back(upperLeft(curPoint));
       }
 
-      // Quarter cycle is full, when curPoint y position is 0
       if (curPoint[1] <= 0)
         break;
     }
   }
 
   // QuarterCycle is full! Now copy quarter cycle to other quarters.
-
   if (!evenSize)
   {
-    std::vector<mitk::Point2D>::const_iterator it = quarterCycleUpperRight.begin();
-    while (it != quarterCycleUpperRight.end())
+    for (const auto& p0 : quarterCycleUpperRight)
     {
-      mitk::Point2D p;
-      p = *it;
-
-      // the contour points in the lower right corner have same position but with negative y values
+      Point2D p = p0;
       p[1] *= -1;
       quarterCycleLowerRight.push_back(p);
-
-      // the contour points in the lower left corner have same position
-      // but with both x,y negative
       p[0] *= -1;
       quarterCycleLowerLeft.push_back(p);
-
-      // the contour points in the upper left corner have same position
-      // but with x negative
       p[1] *= -1;
       quarterCycleUpperLeft.push_back(p);
-
-      it++;
     }
   }
   else
   {
-    std::vector<mitk::Point2D>::const_iterator it = quarterCycleUpperRight.begin();
-    while (it != quarterCycleUpperRight.end())
+    for (const auto& p0 : quarterCycleUpperRight)
     {
-      mitk::Point2D p, q;
-      p = *it;
-
-      q = p;
-      // the contour points in the lower right corner have same position but with negative y values
-      q[1] *= -1;
-      // correct for moved offset if size even = the midpoint is not the midpoint of the current pixel
-      // but its upper right corner
-      q[1] += 1;
-      quarterCycleLowerRight.push_back(q);
-
-      q = p;
-      // the contour points in the lower left corner have same position
-      // but with both x,y negative
-      q[1] = -1.0f * q[1] + 1;
-      q[0] = -1.0f * q[0] + 1;
-      quarterCycleLowerLeft.push_back(q);
-
-      // the contour points in the upper left corner have same position
-      // but with x negative
-      q = p;
-      q[0] *= -1;
-      q[0] += 1;
-      quarterCycleUpperLeft.push_back(q);
-
-      it++;
+      Point2D q;
+      q = p0; q[1] = -1.0f * q[1] + 1;                          quarterCycleLowerRight.push_back(q);
+      q = p0; q[1] = -1.0f * q[1] + 1; q[0] = -1.0f * q[0] + 1; quarterCycleLowerLeft.push_back(q);
+      q = p0; q[0] = -1.0f * q[0] + 1;                          quarterCycleUpperLeft.push_back(q);
     }
   }
 
   // fill contour with points in right ordering, starting with the upperRight block
-  mitk::Point3D tempPoint;
-  for (unsigned int i = 0; i < quarterCycleUpperRight.size(); i++)
+  Point3D tempPoint;
+  tempPoint[2] = 0;
+  for (const auto& p : quarterCycleUpperRight)
   {
-    tempPoint[0] = quarterCycleUpperRight[i][0];
-    tempPoint[1] = quarterCycleUpperRight[i][1];
-    tempPoint[2] = 0;
+    tempPoint[0] = p[0]; tempPoint[1] = p[1];
     contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
-  // the lower right has to be parsed in reverse order
-  for (int i = quarterCycleLowerRight.size() - 1; i >= 0; i--)
+  for (int i = static_cast<int>(quarterCycleLowerRight.size()) - 1; i >= 0; --i)
   {
-    tempPoint[0] = quarterCycleLowerRight[i][0];
-    tempPoint[1] = quarterCycleLowerRight[i][1];
-    tempPoint[2] = 0;
+    tempPoint[0] = quarterCycleLowerRight[i][0]; tempPoint[1] = quarterCycleLowerRight[i][1];
     contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
-  for (unsigned int i = 0; i < quarterCycleLowerLeft.size(); i++)
+  for (const auto& p : quarterCycleLowerLeft)
   {
-    tempPoint[0] = quarterCycleLowerLeft[i][0];
-    tempPoint[1] = quarterCycleLowerLeft[i][1];
-    tempPoint[2] = 0;
+    tempPoint[0] = p[0]; tempPoint[1] = p[1];
     contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
-  // the upper left also has to be parsed in reverse order
-  for (int i = quarterCycleUpperLeft.size() - 1; i >= 0; i--)
+  for (int i = static_cast<int>(quarterCycleUpperLeft.size()) - 1; i >= 0; --i)
   {
-    tempPoint[0] = quarterCycleUpperLeft[i][0];
-    tempPoint[1] = quarterCycleUpperLeft[i][1];
-    tempPoint[2] = 0;
+    tempPoint[0] = quarterCycleUpperLeft[i][0]; tempPoint[1] = quarterCycleUpperLeft[i][1];
     contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
 
-  m_MasterContour = contourInImageIndexCoordinates;
+  return contourInImageIndexCoordinates;
+}
+
+mitk::ContourModel::Pointer mitk::PaintbrushTool::CreateGapContour(const Point3D& from,
+                                                                    const Point3D& to,
+                                                                    double radius)
+{
+  Point3D direction;
+  direction[0] = to[0] - from[0];
+  direction[1] = to[1] - from[1];
+  direction[2] = to[2] - from[2];
+  const auto dirVec = direction.GetVnlVector().normalize();
+  direction[0] = dirVec[0];
+  direction[1] = dirVec[1];
+  direction[2] = dirVec[2];
+
+  // 90 degrees rotation of direction in the slice plane
+  Point3D normal;
+  normal[0] = -1.0 * direction[1];
+  normal[1] = direction[0];
+  normal[2] = 0;
+
+  auto gapContour = ContourModel::New();
+  gapContour->SetClosed(true);
+
+  Point3D vertex;
+  vertex[2] = 0;
+
+  vertex[0] = from[0] + normal[0] * radius;
+  vertex[1] = from[1] + normal[1] * radius;
+  gapContour->AddVertex(vertex);
+
+  vertex[0] = to[0] + normal[0] * radius;
+  vertex[1] = to[1] + normal[1] * radius;
+  gapContour->AddVertex(vertex);
+
+  vertex[0] = to[0] - normal[0] * radius;
+  vertex[1] = to[1] - normal[1] * radius;
+  gapContour->AddVertex(vertex);
+
+  vertex[0] = from[0] - normal[0] * radius;
+  vertex[1] = from[1] - normal[1] * radius;
+  gapContour->AddVertex(vertex);
+
+  return gapContour;
+}
+
+void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positionEvent)
+{
+  if (!positionEvent)
+    return;
+
+  m_MasterContour = CreateBrushContour(m_Size);
 }
 
 void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -396,49 +377,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
     // in between the 2 points
     if (dist > radius)
     {
-      const mitk::Point3D &currentPos = indexCoordinates;
-      mitk::Point3D direction;
-      mitk::Point3D vertex;
-      mitk::Point3D normal;
-
-      direction[0] = indexCoordinates[0] - m_LastPosition[0];
-      direction[1] = indexCoordinates[1] - m_LastPosition[1];
-      direction[2] = indexCoordinates[2] - m_LastPosition[2];
-
-      direction[0] = direction.GetVnlVector().normalize()[0];
-      direction[1] = direction.GetVnlVector().normalize()[1];
-      direction[2] = direction.GetVnlVector().normalize()[2];
-
-      // 90 degrees rotation of direction
-      normal[0] = -1.0 * direction[1];
-      normal[1] = direction[0];
-
-      auto gapContour = ContourModel::New();
-
-      // upper left corner
-      vertex[0] = m_LastPosition[0] + (normal[0] * radius);
-      vertex[1] = m_LastPosition[1] + (normal[1] * radius);
-
-      gapContour->AddVertex(vertex);
-
-      // upper right corner
-      vertex[0] = currentPos[0] + (normal[0] * radius);
-      vertex[1] = currentPos[1] + (normal[1] * radius);
-
-      gapContour->AddVertex(vertex);
-
-      // lower right corner
-      vertex[0] = currentPos[0] - (normal[0] * radius);
-      vertex[1] = currentPos[1] - (normal[1] * radius);
-
-      gapContour->AddVertex(vertex);
-
-      // lower left corner
-      vertex[0] = m_LastPosition[0] - (normal[0] * radius);
-      vertex[1] = m_LastPosition[1] - (normal[1] * radius);
-
-      gapContour->AddVertex(vertex);
-
+      auto gapContour = CreateGapContour(m_LastPosition, indexCoordinates, radius);
       ContourModelUtils::FillContourInSlice2(gapContour, m_PaintingSlice, this->GetFillValue());
     }
   }
@@ -476,7 +415,10 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
     return;
 
   auto workingSeg = this->GetWorkingData();
-  Label::PixelType activePixelValue = workingSeg->GetActiveLabel()->GetValue();
+  auto activeLabel = workingSeg->GetActiveLabel();
+  if (nullptr == activeLabel)
+    return;
+  Label::PixelType activePixelValue = activeLabel->GetValue();
   if (!m_FillMode)
   {
     activePixelValue = MultiLabelSegmentation::UNLABELED_VALUE;
@@ -588,7 +530,12 @@ void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* eve
     return;
   }
 
-  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()))->Clone();
+  auto affectedSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, segmentation->GetGroupImage(segmentation->GetActiveLayer()));
+  if (affectedSlice.IsNull())
+  {
+    return;
+  }
+  m_WorkingSlice = affectedSlice->Clone();
 
   m_PaintingSlice = Image::New();
   m_PaintingSlice->Initialize(m_WorkingSlice);

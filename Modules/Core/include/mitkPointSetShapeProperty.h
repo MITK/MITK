@@ -17,12 +17,9 @@ found in the LICENSE file.
 
 namespace mitk
 {
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4522)
-#endif
-
   /**
+   * \brief Enumeration property for point set rendering shapes.
+   *
    * Encapsulates the enumeration for point set shapes. Valid values are:
    * \li NONE
    * \li VERTEX
@@ -39,6 +36,9 @@ namespace mitk
    *
    * This class provides different shapes for the point set rendering (unselected points).
    *
+   * \ingroup DataManagement
+   * \sa EnumerationProperty
+   * \sa PointSetDataInteractor
    */
 
   class MITKCORE_EXPORT PointSetShapeProperty : public EnumerationProperty
@@ -113,9 +113,6 @@ namespace mitk
     PointSetShapeProperty &operator=(const PointSetShapeProperty &);
   };
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 } // end of namespace mitk
 

@@ -36,14 +36,22 @@ namespace mitk::Forms
     {
     public:
       /** \brief Obtain a pointer to the single instance of this service.
+       *
+       * \return A pointer to the IQuestionWidgetFactory service, or \c nullptr if unavailable.
        */
       static IQuestionWidgetFactory* GetInstance();
 
+      /** \brief Virtual destructor.
+       */
       virtual ~IQuestionWidgetFactory();
 
       /** \brief Register a QmitkQuestionWidget subclass for a certain Question type string.
        *
        * The service takes over ownership of the passed QmitkQuestionWidget pointer.
+       *
+       * \param[in] questionType The type string that identifies the Question subclass (as returned
+       *            by Question::GetType()).
+       * \param[in] widgetPrototype A prototype widget instance. Ownership is transferred to the service.
        *
        * \sa Question::GetType()
        */
@@ -51,9 +59,14 @@ namespace mitk::Forms
 
       /** \brief Create an instance of a matching QmitkQuestionWidget subclass for a certain question.
        *
-       * The given question is passed to QmitkQuestionWidget::SetQuestion().
+       * The widget is created via QmitkQuestionWidget::CreateAnother() and the given question
+       * is passed to QmitkQuestionWidget::SetQuestion().
        *
-       * \sa QmitkQuestionWidget::CreateAnother()
+       * \param[in] question The question for which to create a widget. The widget does not take ownership.
+       * \param[in] parent The parent widget for the new widget.
+       * \return A pointer to the new widget. The caller takes ownership.
+       *
+       * \sa QmitkQuestionWidget::CreateAnother(), QmitkQuestionWidget::SetQuestion()
        */
       virtual QmitkQuestionWidget* Create(Question* question, QWidget* parent = nullptr) const = 0;
     };

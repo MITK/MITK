@@ -24,10 +24,16 @@ namespace mitk
 {
 
 
+  /**
+   * \class ThreeStepLinearModelFactory
+   * \brief Factory for creating ThreeStepLinearModel instances and their parameterizers.
+   *
+   * \sa ThreeStepLinearModel, ThreeStepLinearModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ThreeStepLinearModelFactory : public ConcreteModelFactoryBase<ThreeStepLinearModel>
   {
   public:
-    mitkClassMacroItkParent(ThreeStepLinearModelFactory, ConcreteModelFactoryBase<ThreeStepLinearModel>);
+    mitkClassMacro(ThreeStepLinearModelFactory, ConcreteModelFactoryBase<ThreeStepLinearModel>);
     itkFactorylessNewMacro(Self);
 
     /** This function returns the default parameterization (e.g. initial parametrization for fitting)

@@ -22,17 +22,18 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Shape-based binary image interpolation.
-   *
-   * This class uses legacy code from ipSegmentation to implement
-   * the shape-based interpolation algorithm described in
-   *
-   * G.T. Herman, J. Zheng, C.A. Bucholtz: "Shape-based interpolation"
-   * IEEE Computer Graphics & Applications, pp. 69-79,May 1992
-   *
-   *  Last contributor:
-   *  $Author:$
-   */
+    \brief Shape-based binary image interpolation.
+
+    This class implements the shape-based interpolation algorithm described in:
+
+    G.T. Herman, J. Zheng, C.A. Bucholtz: "Shape-based interpolation"
+    IEEE Computer Graphics & Applications, pp. 69-79, May 1992
+
+    It computes signed distance maps from the upper and lower slices and
+    linearly interpolates between them to produce the intermediate slice.
+    Distance maps are cached internally for performance when interpolating
+    multiple slices between the same pair.
+  */
   class MITKSEGMENTATION_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
   {
   public:
@@ -40,6 +41,18 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+      /** \brief Interpolate a 2D slice between two known segmentation slices.
+        \param lowerSlice The segmentation slice below the requested index.
+        \param lowerSliceIndex The index of the lower slice.
+        \param upperSlice The segmentation slice above the requested index.
+        \param upperSliceIndex The index of the upper slice.
+        \param requestedIndex The index of the slice to interpolate.
+        \param sliceDimension The dimension along which slicing is performed.
+        \param resultImage Optional pre-allocated image to write the result into.
+        \param timeStep The time step to interpolate for.
+        \param referenceImage A reference image providing geometry information.
+        \return The interpolated 2D binary image.
+      */
       Image::Pointer Interpolate(Image::ConstPointer lowerSlice,
                                  unsigned int lowerSliceIndex,
                                  Image::ConstPointer upperSlice,

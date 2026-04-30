@@ -10,6 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file mitkInstantiateAccessFunctions.h
+ * \brief Preprocessor macros for explicit template instantiation of image access functions
+ *        across all supported pixel types and dimensions.
+ *
+ * These macros work together with the AccessByItk macro family. After defining a templated
+ * access function and a corresponding \c InstantiateAccessFunction_* macro, use
+ * \c InstantiateAccessFunction or one of its variants to generate explicit template
+ * instantiations for the desired combinations of pixel types and image dimensions.
+ *
+ * \sa mitkImageAccessByItk.h
+ * \ingroup Adaptor
+ */
+
 #ifndef mitkInstantiateAccessFunctions_h
 #define mitkInstantiateAccessFunctions_h
 

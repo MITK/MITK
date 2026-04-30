@@ -50,16 +50,6 @@ struct BERRY_UI_QT IHandlerActivation : public virtual IEvaluationResultCache
   static const int ROOT_DEPTH; // = 1;
 
   /**
-   * Clears the cached computation of the <code>isActive</code> method, if
-   * any. This method is only intended for internal use. It provides a
-   * mechanism by which <code>ISourceProvider</code> events can invalidate
-   * state on a <code>IHandlerActivation</code> instance.
-   *
-   * @deprecated Use berry::IEvaluationResultCache::clearResult() instead.
-   */
-  virtual void ClearActive() = 0;
-
-  /**
    * Returns the identifier of the command whose handler is being activated.
    *
    * @return The command identifier; never <code>null</code>.

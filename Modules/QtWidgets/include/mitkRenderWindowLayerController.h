@@ -45,62 +45,62 @@ namespace mitk
 
     RenderWindowLayerController();
     /**
-    * @brief Set the data storage on which to work.
+    * \brief Set the data storage on which to work.
     */
     void SetDataStorage(DataStorage::Pointer dataStorage);
 
     // wrapper functions to modify the layer order / visibility of render window data
     /**
-    * @brief Insert the given data node at the specified layer for the given renderer.
+    * \brief Insert the given data node at the specified layer for the given renderer.
     *
-    * @param dataNode   The data node that should be inserted.
-    * @param layer      The layer value for the "layer" property of the data node (insertion level).
+    * \param dataNode   The data node that should be inserted.
+    * \param layer      The layer value for the "layer" property of the data node (insertion level).
                         "layer = RenderWindowLayerUtilities::TOP_LAYER_INDEX" (default) inserts the given data node at the top of the node stack (topmost layer).
-    * @param renderer   Pointer to the renderer instance for which the data node should be inserted.
+    * \param renderer   Pointer to the renderer instance for which the data node should be inserted.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     *
-    * @post After a successful call, the "visibility" property will be true and the "layer" property will be set correctly.
+    * \post After a successful call, the "visibility" property will be true and the "layer" property will be set correctly.
     */
     void InsertLayerNode(DataNode* dataNode, int layer = RenderWindowLayerUtilities::TOP_LAYER_INDEX, const BaseRenderer* renderer = nullptr);
     /**
-    * @brief Move the data node to the given layer. This will change only the "layer" property.
+    * \brief Move the data node to the given layer. This will change only the "layer" property.
     *
-    * @param dataNode   The data node that should be moved.
-    * @param layer      The layer to which the data node should be moved.
-    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    * \param dataNode   The data node that should be moved.
+    * \param layer      The layer to which the data node should be moved.
+    * \param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected and the
     *                   common property list will be modified.
     */
     bool MoveNodeToPosition(DataNode* dataNode, int layer, const BaseRenderer* renderer = nullptr);
     /**
-    * @brief Set the node in the given renderer as the topmost layer. This will change only the "layer" property.
+    * \brief Set the node in the given renderer as the topmost layer. This will change only the "layer" property.
     *
-    * @param dataNode   The data node that should be moved.
-    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    * \param dataNode   The data node that should be moved.
+    * \param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
     bool MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
-    * @brief Set the node in the given renderer as the lowermost layer. This will change only the "layer" property.
+    * \brief Set the node in the given renderer as the lowermost layer. This will change only the "layer" property.
     *
-    * @param dataNode   The data node that should be moved.
-    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    * \param dataNode   The data node that should be moved.
+    * \param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
     bool MoveNodeToBack(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
-    * @brief Move the node in the given renderer one layer down. This will change only the "layer" property.
+    * \brief Move the node in the given renderer one layer down. This will change only the "layer" property.
     *
-    * @param dataNode   The data node that should be moved.
-    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    * \param dataNode   The data node that should be moved.
+    * \param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
     bool MoveNodeUp(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
-    * @brief Move the node in the given renderer one layer up. This will change only the "layer" property.
+    * \brief Move the node in the given renderer one layer up. This will change only the "layer" property.
     *
-    * @param dataNode   The data node that should be moved.
-    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    * \param dataNode   The data node that should be moved.
+    * \param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
     bool MoveNodeDown(DataNode* dataNode, const BaseRenderer* renderer = nullptr);

@@ -24,69 +24,110 @@ class vtkRenderer;
 namespace mitk
 {
   /**
-   * Manages the VTK layer hierarchy
-   * of a vtkRenderWindow.
-   * For simple access the layers are divided into three
-   * main groups: background, scene and foreground layers.
-   * Renderers can be registered via the insert... functions and
-   * removed via the RemoveRenderer function.
+   * \brief Manages the VTK layer hierarchy of a vtkRenderWindow.
+   *
+   * For simple access the layers are divided into three main groups:
+   * background, scene, and foreground layers. Renderers can be
+   * registered via the Insert... functions and removed via RemoveRenderer().
    */
   class MITKCORE_EXPORT VtkLayerController
   {
   public:
+    /**
+     * \brief Return the VtkLayerController instance for the given render window.
+     *
+     * \param[in] renWin The VTK render window.
+     * \return The associated VtkLayerController, or nullptr if none exists.
+     */
     static VtkLayerController *GetInstance(vtkSmartPointer<vtkRenderWindow> renWin);
+
+    /**
+     * \brief Register a new VtkLayerController instance for the given render window.
+     *
+     * \param[in] renWin The VTK render window.
+     * \param[in] mitkSceneRenderer The initial scene renderer for this window.
+     */
     static void AddInstance(vtkSmartPointer<vtkRenderWindow> renWin, vtkSmartPointer<vtkRenderer> mitkSceneRenderer);
+
+    /**
+     * \brief Remove the VtkLayerController instance for the given render window.
+     *
+     * \param[in] renWin The VTK render window whose controller should be removed.
+     */
     static void RemoveInstance(vtkSmartPointer<vtkRenderWindow> renWin);
 
+    /**
+     * \brief Construct a VtkLayerController for the given render window.
+     * \param[in] renderWindow The VTK render window to manage.
+     */
     VtkLayerController(vtkSmartPointer<vtkRenderWindow> renderWindow);
     virtual ~VtkLayerController();
 
     /**
-      * Returns the current vtkRenderer of the Scene
-      */
+     * \brief Return the current scene renderer.
+     * \return The VTK renderer used for the scene layer.
+     */
     vtkSmartPointer<vtkRenderer> GetSceneRenderer();
 
     /**
-      * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the background.
-      * With forceAbsoluteBackground set true a renderer can be placed at the absolute background of the scene.
-      * Multiple calls with forceAbsoluteBackground set true will set the latest registered renderer as background.
-      */
+     * \brief Insert a renderer into the background layer.
+     *
+     * \param[in] renderer The VTK renderer to insert.
+     * \param[in] forceAbsoluteBackground If true, place the renderer at the absolute
+     *            background. Multiple calls with this set to true will make the latest
+     *            renderer the absolute background.
+     */
     void InsertBackgroundRenderer(vtkSmartPointer<vtkRenderer> renderer, bool forceAbsoluteBackground);
 
     /**
-      * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered in the foreground.
-      * With forceAbsoluteBackground set true a renderer can be placed at the absolute foreground of the scene.
-      * Multiple calls with forceAbsoluteForeground set true will set the latest registered renderer as foreground.
-      */
+     * \brief Insert a renderer into the foreground layer.
+     *
+     * \param[in] renderer The VTK renderer to insert.
+     * \param[in] forceAbsoluteForeground If true, place the renderer at the absolute
+     *            foreground. Multiple calls with this set to true will make the latest
+     *            renderer the absolute foreground.
+     */
     void InsertForegroundRenderer(vtkSmartPointer<vtkRenderer> renderer, bool forceAbsoluteForeground);
 
     /**
-      * Connects a VTK renderer with a vtk renderwindow. The renderer will be rendered between background renderers and
-      * foreground renderers.
-      */
+     * \brief Insert a renderer into the scene layer.
+     *
+     * The renderer will be rendered between background and foreground renderers.
+     *
+     * \param[in] renderer The VTK renderer to insert.
+     */
     void InsertSceneRenderer(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
-      * Connects a VtkRenderWindow with the layer controller.
-      */
+     * \brief Set the VTK render window managed by this controller.
+     * \param[in] renwin The VTK render window.
+     */
     void SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin);
 
     /**
-      * A renderer which has been inserted via a insert... function can be removed from the vtkRenderWindow with
-      * RemoveRenderer.
-      */
+     * \brief Remove a previously inserted renderer from the render window.
+     * \param[in] renderer The VTK renderer to remove.
+     */
     void RemoveRenderer(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
-      * Returns true if a renderer has been inserted
-      */
+     * \brief Check whether a renderer has been inserted.
+     *
+     * \param[in] renderer The VTK renderer to check.
+     * \return True if the renderer is currently registered.
+     */
     bool IsRendererInserted(vtkSmartPointer<vtkRenderer> renderer);
 
     /**
-      * Returns the number of renderers in the renderwindow.
-      */
+     * \brief Return the total number of renderers in the render window.
+     * \return The count of all registered renderers across all layers.
+     */
     unsigned int GetNumberOfRenderers();
 
+    /**
+     * \brief Set the erase flag for all registered renderers.
+     * \param[in] i The erase flag value (non-zero to enable erasing).
+     */
     void SetEraseForAllRenderers(int i);
 
   protected:

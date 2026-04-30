@@ -27,16 +27,17 @@ namespace mitk
   class Geometry3D;
 
   /**
-   * @internal
+   * \internal
    *
-   * @brief XML-based writer for mitk::PointSets
+   * \brief XML-based writer for mitk::PointSets.
    *
-   * XML-based writer for mitk::PointSet. Multiple PointSets can be written in
-   * a single XML file by simply setting multiple inputs to the filter.
+   * Serializes mitk::PointSet objects to an XML file format. Supports writing
+   * multi-timestep point sets. The output includes point coordinates, IDs,
+   * specifications, and geometry data for each time step.
    *
-   * @todo This class would merit a XML library for maintainability or a denser format for performance.
-   *
-   * @ingroup IO
+   * \ingroup IO
+   * \sa PointSetReaderService
+   * \sa AbstractFileWriter
    */
   class PointSetWriterService : public AbstractFileWriter
   {
@@ -45,6 +46,13 @@ namespace mitk
     ~PointSetWriterService() override;
 
     using AbstractFileWriter::Write;
+
+    /**
+     * \brief Write the input PointSet to XML format.
+     *
+     * Serializes all time steps of the PointSet into a TinyXML2 document
+     * and writes it to the output location.
+     */
     void Write() override;
 
   private:
@@ -52,9 +60,21 @@ namespace mitk
 
     mitk::PointSetWriterService *Clone() const override;
 
+    /**
+     * \brief Convert a numeric value to string.
+     * \tparam T The numeric type.
+     * \param[in] value The value to convert.
+     * \return The string representation.
+     */
     template <typename T>
     std::string ConvertToString(T value);
 
+    /**
+     * \brief Serialize a PointSet to a TinyXML2 element.
+     * \param[in,out] doc The XML document that owns the created elements.
+     * \param[in] pointSet The PointSet to serialize.
+     * \return The root XML element representing the PointSet.
+     */
     tinyxml2::XMLElement *ToXML(tinyxml2::XMLDocument &doc, const mitk::PointSet *pointSet);
 
     static const std::string XML_POINT_SET;

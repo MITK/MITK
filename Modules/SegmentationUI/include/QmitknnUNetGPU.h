@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
- * @brief Struct to store GPU info.
+ * \brief Struct to store GPU info.
  *
  */
 struct QmitkGPUSpec
@@ -29,7 +29,7 @@ struct QmitkGPUSpec
 };
 
 /**
- * @brief Class to load and save GPU information
+ * \brief Class to load and save GPU information
  * for further validation
  */
 class MITKSEGMENTATIONUI_EXPORT QmitkGPULoader
@@ -39,23 +39,23 @@ private:
 
 public:
   /**
-   * @brief Construct a new Qmitk GPU Loader object.
+   * \brief Construct a new Qmitk GPU Loader object.
    * Parses GPU info using `nvidia-smi` command and saves it as QmitkGPUSpec objects.
    */
   QmitkGPULoader();
   ~QmitkGPULoader() = default;
 
   /**
-   * @brief Returns the number of GPUs parsed and saved as QmitkGPUSpec objects.
+   * \brief Returns the number of GPUs parsed and saved as QmitkGPUSpec objects.
    *
-   * @return int
+   * \return int
    */
   int GetGPUCount() const;
 
   /**
-   * @brief Returns all the parsed GPU  information
+   * \brief Returns all the parsed GPU  information
    * 
-   * @return std::vector<QmitkGPUSpec>
+   * \return std::vector<QmitkGPUSpec>
    */
   std::vector<QmitkGPUSpec> GetAllGPUSpecs();
 };

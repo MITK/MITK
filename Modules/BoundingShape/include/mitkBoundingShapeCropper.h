@@ -25,14 +25,25 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Documentation
-  * @brief Crops or masks an Boundingbox defined by GeometryData out of an mitk Image
-  *
-  * Input Parameters are a mitk::GeometryData and an mitk::Image
-  * Masking: Pixel on the outside of the bounding box will have a pixelvalue of m_OutsideValue
-  * Cropping: Output image has the same size as the bounding box
-  */
-  //## @ingroup Process
+  /** \brief Crops or masks an image using a bounding box defined by GeometryData.
+   *
+   * This filter takes an mitk::Image and an mitk::GeometryData as inputs and produces
+   * a cropped or masked image as output.
+   *
+   * Two modes of operation are supported:
+   * - **Cropping** (UseWholeInputRegion = false): The output image is reduced to the size
+   *   of the bounding box.
+   * - **Masking** (UseWholeInputRegion = true): The output image retains the original
+   *   dimensions, but pixels outside the bounding box are set to the OutsideValue.
+   *
+   * For 4D images, optionally only a single time step can be processed via
+   * UseCropTimeStepOnly and CurrentTimeStep.
+   *
+   * \pre The input image and a valid GeometryData must be set before calling Update().
+   *
+   * \sa GeometryData, ImageToImageFilter, BoundingShapeInteractor
+   * \ingroup Process
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeCropper : public ImageToImageFilter
   {
   public:
@@ -40,35 +51,67 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /**
-      * @brief Set geometry of the bounding object
-      */
-      void SetGeometry(const mitk::GeometryData *geometry);
-    /**
-    * @brief Get geometry of the bounding object
-    */
-    // const mitk::GeometryData* GetGeometryData() const;
+    /** \brief Set the geometry of the bounding object used for cropping/masking.
+     *
+     * \param[in] geometry The GeometryData defining the bounding box region.
+     *
+     * \pre \p geometry is not null and has a valid BaseGeometry.
+     */
+    void SetGeometry(const mitk::GeometryData *geometry);
 
-    /**
-    * @brief Sets and Gets the outside value for masking
-    */
+    /** \brief Set the pixel value assigned to voxels outside the bounding box during masking.
+     *
+     * Only used when UseWholeInputRegion is \c true (masking mode). Default: 0.
+     *
+     * \param[in] _arg The scalar value for outside pixels.
+     */
     itkSetMacro(OutsideValue, ScalarType);
+
+    /** \brief Get the current outside pixel value used for masking.
+     *
+     * \return The scalar value assigned to pixels outside the bounding box.
+     */
     itkGetMacro(OutsideValue, ScalarType);
-    /**
-    * @brief Sets and Gets whether a masking or cropping needs to be performed
-    */
+
+    /** \brief Set whether the full input region is preserved (masking mode).
+     *
+     * \param[in] _arg If \c true, the output has the same dimensions as the input and
+     *                 outside pixels are set to OutsideValue (masking). If \c false,
+     *                 the output is cropped to the bounding box size.
+     */
     itkSetMacro(UseWholeInputRegion, bool);
+
+    /** \brief Get whether masking mode is active.
+     *
+     * \return \c true if masking mode is active, \c false for cropping mode.
+     */
     itkGetMacro(UseWholeInputRegion, bool);
 
-    /**
-    * @brief Sets and Gets the current timestep for images with 4 dimensions
-    */
+    /** \brief Set the time step to process for 4D images.
+     *
+     * Only relevant when UseCropTimeStepOnly is \c true.
+     *
+     * \param[in] _arg The zero-based time step index.
+     */
     itkSetMacro(CurrentTimeStep, ScalarType);
+
+    /** \brief Get the current time step index.
+     *
+     * \return The zero-based time step index.
+     */
     itkGetMacro(CurrentTimeStep, ScalarType);
-    /**
-    *@brief Sets and Gets whether only one timestep is cropped / masked
-    */
+
+    /** \brief Set whether to process only a single time step.
+     *
+     * \param[in] _arg If \c true, only the time step specified by CurrentTimeStep is
+     *                 cropped/masked. If \c false, all time steps are processed.
+     */
     itkSetMacro(UseCropTimeStepOnly, bool);
+
+    /** \brief Get whether only a single time step is processed.
+     *
+     * \return \c true if only the CurrentTimeStep is processed.
+     */
     itkGetMacro(UseCropTimeStepOnly, bool);
 
   protected:

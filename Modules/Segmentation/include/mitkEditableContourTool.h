@@ -18,12 +18,14 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * Base class for lasso like tools that allow to draw closed contours with multiple ancor points.
-  * The segments between the ancor points may be freehand contour segments or computed segments
-  * (e.g. straight lines or live wire). Derive from the class to implement the computation of the non-freehand
-  * segments.
-  * @sa LassoTool LivewWireTool2D
-  */
+   * \brief Base class for lasso-like tools that draw closed contours with multiple anchor points.
+   *
+   * The segments between anchor points may be freehand contour segments or computed segments
+   * (e.g. straight lines or LiveWire). Derive from this class to implement the computation
+   * of the non-freehand segments.
+   *
+   * \sa LassoTool, LiveWireTool2D
+   */
   class MITKSEGMENTATION_EXPORT EditableContourTool : public FeedbackContourTool
   {
   public:

@@ -20,6 +20,12 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ExponentialSaturationModelParameterizer
+   * \brief Parameterizer for the ExponentialSaturationModel providing default initial values.
+   *
+   * \sa ExponentialSaturationModel, ExponentialSaturationModelFactory, ConcreteModelParameterizerBase
+   */
   class MITKMODELFIT_EXPORT ExponentialSaturationModelParameterizer : public
     mitk::ConcreteModelParameterizerBase<mitk::ExponentialSaturationModel>
   {

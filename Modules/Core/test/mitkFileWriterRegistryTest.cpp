@@ -268,12 +268,6 @@ int mitkFileWriterRegistryTest(int /*argc*/, char * /*argv*/ [])
   // >("F://Build//MITK-Data//pointSet.mps");
   // MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
 
-  //// And now for something completely different... (Debug)
-  // mitk::LegacyFileWriterService::Pointer lfr = mitk::LegacyFileWriterService::New(".nrrd", "Nearly Raw Raster Data");
-  // returned = mitk::FileWriterRegistry::GetWriter(".nrrd");
-  // MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileWriter with Options: Low
-  // priority Writer with specific option");
-
   // mitk::BaseData::Pointer image = mitk::FileWriterRegistry::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
   // MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Testing whether BaseData is empty or not");
   // mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*> (image.GetPointer());

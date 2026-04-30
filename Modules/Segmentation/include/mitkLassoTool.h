@@ -43,15 +43,23 @@ namespace mitk
     mitkClassMacro(LassoTool, SegTool2D);
     itkFactorylessNewMacro(Self);
 
+    /** \brief Return the cursor icon resource for this tool. */
     us::ModuleResource GetCursorIconResource() const override;
+
+    /** \brief Return the toolbar icon resource for this tool. */
     us::ModuleResource GetIconResource() const override;
+
+    /** \brief Return the human-readable name of this tool ("Lasso"). */
     const char *GetName() const override;
 
   protected:
     LassoTool();
     ~LassoTool() override;
 
+    /** \brief Wire state machine actions to the corresponding member functions. */
     void ConnectActionsAndFunctions() override;
+
+    /** \brief Finalize the contour and write it back as a segmentation result. */
     void FinishTool() override;
 
   private:

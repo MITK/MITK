@@ -50,9 +50,13 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
-    /**Clears all picks and updates the preview.*/
+    /** \brief Clears all seed picks and updates the preview. */
     void ClearPicks();
 
+    /**
+     * \brief Returns whether any seed points have been placed.
+     * \return true if there are picks, false otherwise.
+     */
     bool HasPicks() const;
 
   protected:

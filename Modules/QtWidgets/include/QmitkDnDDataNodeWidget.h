@@ -25,7 +25,7 @@ class QDragEnterEvent;
 class QDropEvent;
 
 /**
-* @brief A drag 'n' drop widget (QFrame) that checks the mime data of the incoming
+* \brief A drag 'n' drop widget (QFrame) that checks the mime data of the incoming
 *        event. If the drag event is coming from another widget and the mime data
 *        is of type 'application/x-qmitk-datanode-ptrs' the node(s) will be dropped
 *        and a signal is emitted.
@@ -44,7 +44,7 @@ public:
 Q_SIGNALS:
 
   /**
-  * @brief The signal will be emitted if the drag events are accepted.
+  * \brief The signal will be emitted if the drag events are accepted.
   *        It contains the vector of nodes that have been dropped.
   */
   void NodesDropped(std::vector<mitk::DataNode*> nodes);

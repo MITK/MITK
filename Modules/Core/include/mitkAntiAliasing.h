@@ -15,10 +15,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Anti-aliasing methods for rendering.
+   * \ingroup Core
+   */
   enum class AntiAliasing : int
   {
-    None,
-    FastApproximate // FXAA
+    None,              ///< No anti-aliasing.
+    FastApproximate    ///< Fast approximate anti-aliasing (FXAA).
   };
 }
 

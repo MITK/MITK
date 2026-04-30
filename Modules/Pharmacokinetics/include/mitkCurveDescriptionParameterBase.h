@@ -23,12 +23,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /** Base class for functor that compute descriptive values for
-  a curve (e.g. like Area under the Curve, Time to peek, maximum,...)
-  @remark The derived classes must be implemented thread safe because GetCurveDescriptionParameter()
-  and GetDescriptionParameterName() of one instance may be called in
-  multi-threaded context (e.g. DescriptionParameterImageGeneratorBase
-  and derived classes). */
+  /** \class CurveDescriptionParameterBase
+   * \brief Abstract base class for functors that compute descriptive scalar values for a time-concentration curve.
+   *
+   * Derived classes implement specific curve descriptors such as Area Under the Curve (AUC),
+   * Time to Peak, Maximum, Mean Residence Time, etc. Each descriptor can produce one or more
+   * named result values.
+   *
+   * \note Derived classes must be thread-safe because GetCurveDescriptionParameter() and
+   * GetDescriptionParameterName() may be called concurrently from multi-threaded generators
+   * (e.g. PixelBasedDescriptionParameterImageGenerator).
+   *
+   * \sa AreaUnderTheCurveDescriptionParameter, AreaUnderFirstMomentDescriptionParameter,
+   *     MaximumCurveDescriptionParameter, TimeToPeakCurveDescriptionParameter,
+   *     MeanResidenceTimeDescriptionParameter, CurveParameterFunctor
+   */
 class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Object
   {
   public:
@@ -39,21 +48,31 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
 
     itkTypeMacro(CurveDescriptionParameterBase, itk::Object);
 
+    /** \brief Array type for curve values. */
     typedef itk::Array<double> CurveType;
+    /** \brief Array type for the curve time grid. */
     typedef itk::Array<double> CurveGridType;
 
+    /** \brief Scalar result type for a single description parameter value. */
     typedef double CurveDescriptionParameterResultType;
+    /** \brief String type for description parameter names. */
     typedef std::string CurveDescriptionParameterNameType;
 
+    /** \brief Vector of computed description parameter results. */
     typedef std::vector<CurveDescriptionParameterResultType> DescriptionParameterResultsType;
+    /** \brief Vector of description parameter names. */
     typedef std::vector<CurveDescriptionParameterNameType> DescriptionParameterNamesType;
 
-    /** Returns the concrete description values for a curve.
-     * @pre Curve value vector and curve grid must have the same size*/
+    /** \brief Computes and returns the description parameter values for the given curve.
+     *  \param[in] curve The curve values (e.g. concentration over time).
+     *  \param[in] grid The time grid corresponding to the curve values.
+     *  \pre \p curve and \p grid must have the same size.
+     *  \return Vector of computed description parameter values. */
     DescriptionParameterResultsType GetCurveDescriptionParameter(const CurveType& curve, const CurveGridType& grid) const;
 
-    /**Return the names of all description values that will be computed by the class.
-     * @post The order of names equales the order of the results of GetCurveDescriptionParameter().*/
+    /** \brief Returns the names of all description parameters computed by this class.
+     *  \post The order of names matches the order of results returned by GetCurveDescriptionParameter().
+     *  \return Vector of parameter name strings. */
     virtual DescriptionParameterNamesType GetDescriptionParameterName() const = 0 ;
 
   protected:

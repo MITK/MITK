@@ -212,7 +212,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="labelExternalSuggestions">
        <property name="text">
         <string>External suggestions:</string>
        </property>
@@ -343,7 +343,7 @@
     </widget>
    </item>
    <item row="4" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label3DDisplay">
      <property name="text">
       <string>3D display</string>
      </property>

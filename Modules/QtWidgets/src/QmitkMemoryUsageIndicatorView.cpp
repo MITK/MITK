@@ -67,7 +67,7 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
 
   m_Ui->label->setText(QString::fromStdString(this->GetMemoryDescription(processSize, percentage)));
 
-  for (size_t i = m_States.size() - 1; i >= 0; --i)
+  for (size_t i = m_States.size(); i-- > 0;)
   {
     if (percentage >= m_States[i].first)
     {

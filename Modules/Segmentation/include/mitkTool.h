@@ -106,16 +106,16 @@ namespace mitk
     // no New(), there should only be subclasses
 
     /**
-     * @brief Returns the cursor icon of the tool wrapped by a usModuleResource
-     * @return a valid ModuleResource or an invalid if this function
-     *         is not reimplemented
+     * \brief Returns the cursor icon of the tool wrapped by a usModuleResource.
+     * \return A valid ModuleResource or an invalid one if this function
+     *         is not reimplemented.
      */
     virtual us::ModuleResource GetCursorIconResource() const;
 
     /**
-     * @brief Returns the tool button icon of the tool wrapped by a usModuleResource
-     * @return a valid ModuleResource or an invalid if this function
-     *         is not reimplemented
+     * \brief Returns the tool button icon of the tool wrapped by a usModuleResource.
+     * \return A valid ModuleResource or an invalid one if this function
+     *         is not reimplemented.
      */
     virtual us::ModuleResource GetIconResource() const;
 
@@ -142,6 +142,7 @@ namespace mitk
     */
     virtual bool IsEligibleForAutoInit() const;
 
+    /** \brief Initializes the state machine for this tool based on the interaction type. */
     virtual void InitializeStateMachine();
 
     /**
@@ -167,20 +168,30 @@ namespace mitk
      */
     virtual itk::Object::Pointer GetGUI(const std::string &toolkitPrefix, const std::string &toolkitPostfix);
 
+    /** \brief Returns a predicate describing valid reference data for this tool. */
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
+
+    /** \brief Returns a predicate describing valid working data for this tool. */
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
 
-    /** Function used to check if a tool can handle the referenceData and (if specified) the working data.
-     @pre referenceData must be a valid pointer
-     @param referenceData Pointer to the data that should be checked as valid reference for the tool.
-     @param workingData Pointer to the data that should be checked as valid working data for this tool.
-     This parameter can be null if no working data is specified so far.*/
+    /**
+     * \brief Checks if a tool can handle the given reference data and optional working data.
+     *
+     * \param[in] referenceData Pointer to the data that should be checked as valid reference for the tool.
+     * \param[in] workingData Pointer to the data that should be checked as valid working data for this tool.
+     *            This parameter can be null if no working data is specified so far.
+     * \return true if the tool can handle the given data, false otherwise.
+     * \pre referenceData must be a valid pointer.
+     */
     virtual bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const;
 
     /**
-     * @brief Method call to invoke a dialog box just before exiting.
-     * The method can be reimplemented in the respective tool class with business logic 
+     * \brief Method call to invoke a dialog box just before exiting.
+     *
+     * The method can be reimplemented in the respective tool class with business logic
      * on when there should be a confirmation dialog from the user before the tool exits.
+     *
+     * \return true if the user must confirm before the tool is deactivated, false otherwise.
      */
     virtual bool ConfirmBeforeDeactivation();
 

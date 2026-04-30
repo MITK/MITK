@@ -18,41 +18,67 @@ found in the LICENSE file.
 
 #include <MitkRTUIExports.h>
 
-/** \class QmitkDoseValueDelegate
-\brief An item delegate for rendering and editing dose values.
-The delegate assumes that the model uses the role Qt::UserRole+1
-to indicate if the returned dose value is an absolute (data(Qt::UserRole+1) == true)
-or an relative dose (data(Qt::UserRole+1) == false).*/
+/**
+ * \class QmitkDoseValueDelegate
+ * \brief Item delegate for rendering and editing dose values in a QTableView.
+ *
+ * This delegate renders dose values right-aligned and creates a QDoubleSpinBox editor
+ * for editing. The delegate inspects Qt::UserRole+1 on the model to determine whether
+ * the dose is displayed as absolute (Gy) or relative (%). The spin box suffix and step
+ * size are adjusted accordingly.
+ *
+ * \sa QmitkIsoDoseLevelSetModel
+ * \sa QmitkDoseColorDelegate
+ * \sa QmitkDoseVisualStyleDelegate
+ * \ingroup MitkRTUIModule
+ */
 class MITKRTUI_EXPORT QmitkDoseValueDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
 public:
-  ///
-  /// Creates a new PropertyDelegate.
-  ///
+  /**
+   * \brief Constructor.
+   * \param[in] parent Optional parent QObject.
+   */
   explicit QmitkDoseValueDelegate(QObject *parent = nullptr);
 
-  ///
-  /// Renders a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Renders the dose value text right-aligned in the cell.
+   * \param[in] painter The QPainter to use for drawing.
+   * \param[in] option Style options for the item.
+   * \param[in] index The model index of the item to paint.
+   */
   void paint(QPainter *painter, const QStyleOptionViewItem &option
     , const QModelIndex &index) const override;
 
-  ///
-  /// Create an editor for a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Creates a QDoubleSpinBox editor for editing dose values.
+   *
+   * The spin box is configured with appropriate suffix ("Gy" or "%"),
+   * step size, and range [0, 9999] based on whether the dose is absolute or relative.
+   *
+   * \param[in] parent The parent widget for the editor.
+   * \param[in] option Style options for the item.
+   * \param[in] index The model index of the item to edit.
+   * \return A QDoubleSpinBox for valid data, or a QLabel for invalid data.
+   */
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option
     , const QModelIndex &index) const override;
 
-  ///
-  /// Create an editor for a specific property  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Populates the editor with the current dose value from the model.
+   * \param[in,out] editor The editor widget (QDoubleSpinBox) to populate.
+   * \param[in] index The model index to read data from.
+   */
   void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
-  ///
-  /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
-  ///
+  /**
+   * \brief Commits the edited dose value from the spin box back to the model.
+   * \param[in] editor The editor widget (QDoubleSpinBox) containing the new value.
+   * \param[in,out] model The model to write the new value to.
+   * \param[in] index The model index of the item being edited.
+   */
   void setModelData(QWidget *editor, QAbstractItemModel* model, const QModelIndex &index) const override;
 };
 

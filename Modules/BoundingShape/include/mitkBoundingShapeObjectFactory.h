@@ -18,6 +18,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Object factory that registers mappers and default properties for bounding shape data.
+   *
+   * Creates BoundingShapeVtkMapper2D and BoundingShapeVtkMapper3D instances for DataNodes
+   * containing GeometryData, and sets default rendering properties for bounding shape visualization.
+   *
+   * \sa BoundingShapeVtkMapper2D, BoundingShapeVtkMapper3D, CoreObjectFactoryBase
+   */
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeObjectFactory : public CoreObjectFactoryBase
   {
   public:
@@ -25,25 +32,35 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
+    /** \brief Create a mapper for bounding shape rendering.
+     *
+     * \param[in] node   The data node to create a mapper for.
+     * \param[in] slotId The mapper slot (2D or 3D).
+     * \return A mapper instance, or \c nullptr if the node data is not GeometryData.
+     */
+    Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
+
+    /** \brief Set default rendering properties for bounding shape visualization on the given node.
+     *
+     * \param[in] node The data node to configure.
+     */
     void SetDefaultProperties(DataNode *node) override;
-    std::string GetFileExtensions() override;
-    CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+
+    /** \brief Get a human-readable description of this factory.
+     * \return A description string.
+     */
     const char *GetDescription() const override;
 
   protected:
     BoundingShapeObjectFactory();
     ~BoundingShapeObjectFactory() override;
-
-    void CreateFileExtensionsMap();
-
-  private:
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
   };
 
+  /** \brief Register the BoundingShapeObjectFactory with the CoreObjectFactory.
+   *
+   * Call this function once during application startup to enable bounding shape
+   * rendering. Typically invoked from module activators.
+   */
   MITKBOUNDINGSHAPE_EXPORT void RegisterBoundingShapeObjectFactory();
 }
 

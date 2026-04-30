@@ -34,23 +34,43 @@ namespace mitk
   class DataStorage;
 }
 
-/** \brief GUI class for morphological segmentation tools.
+/**
+ * \brief Widget providing morphological operations on segmentation labels.
+ *
+ * Offers buttons for closing, opening, dilation, erosion, and fill-holes operations.
+ * The user can select a segmentation and label, choose the structural element type
+ * (ball or cross) and its radius, then apply the operation.
+ *
+ * \sa mitk::MorphologicalOperations
  */
 class MITKSEGMENTATIONUI_EXPORT QmitkMorphologicalOperationsWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Constructs the widget with GUI elements and signal/slot connections.
+   * \param[in] dataStorage Pointer to the data storage for node selection.
+   * \param[in] parent Optional parent widget.
+   */
   explicit QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
+  /** \brief Destructor. */
   ~QmitkMorphologicalOperationsWidget() override;
 
 public slots:
+  /** \brief Performs morphological closing on the selected label. */
   void OnClosingButtonClicked();
+  /** \brief Performs morphological opening on the selected label. */
   void OnOpeningButtonClicked();
+  /** \brief Performs morphological dilation on the selected label. */
   void OnDilatationButtonClicked();
+  /** \brief Performs morphological erosion on the selected label. */
   void OnErosionButtonClicked();
+  /** \brief Fills holes in the selected label. */
   void OnFillHolesButtonClicked();
+  /** \brief Called when the segmentation selection changes. */
   void OnSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  /** \brief Called when the structural element radio buttons are clicked. */
   void OnRadioButtonsClicked();
 
 protected:

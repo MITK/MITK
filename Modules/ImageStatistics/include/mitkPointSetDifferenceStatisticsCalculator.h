@@ -37,49 +37,71 @@ public:
 
   mitkNewMacro2Param(PointSetDifferenceStatisticsCalculator,mitk::PointSet::Pointer,mitk::PointSet::Pointer);
 
-  /*!
-  \brief set point sets to be compared
-  */
+  /**
+   * \brief Set the two point sets to be compared.
+   * \param[in] pSet1 First point set.
+   * \param[in] pSet2 Second point set. Must have the same size as pSet1.
+   */
   void SetPointSets(mitk::PointSet::Pointer pSet1, mitk::PointSet::Pointer pSet2);
-  /*!
-  \brief returns a vector holding the differences between the corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the Euclidean distances between corresponding points.
+   * \return A vector holding the distance for each pair of corresponding points.
+   */
   std::vector<double> GetDifferences();
-  /*!
-  \brief returns a vector holding the squared differences between the corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the squared Euclidean distances between corresponding points.
+   * \return A vector holding the squared distance for each pair of corresponding points.
+   */
   std::vector<double> GetSquaredDifferences();
-  /*!
-  \brief returns the mean distance of all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the mean distance of all corresponding point pairs.
+   * \return The mean Euclidean distance.
+   */
   double GetMean();
-  /*!
-  \brief returns the standard deviation of the distances between all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the standard deviation of the distances between all corresponding point pairs.
+   * \return The standard deviation of distances.
+   */
   double GetSD();
-  /*!
-  \brief returns the variance of the distances between all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the variance of the distances between all corresponding point pairs.
+   * \return The variance of distances.
+   */
   double GetVariance();
-  /*!
-  \brief returns the root mean squared distance of all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the root mean squared distance of all corresponding point pairs.
+   * \return The RMS distance.
+   */
   double GetRMS();
-  /*!
-  \brief returns the median distance of all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the median distance of all corresponding point pairs.
+   * \return The median distance.
+   */
   double GetMedian();
-  /*!
-  \brief returns the maximal distance of all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the maximum distance of all corresponding point pairs.
+   * \return The maximum distance.
+   */
   double GetMax();
-  /*!
-  \brief returns the minimal distance of all corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the minimum distance of all corresponding point pairs.
+   * \return The minimum distance.
+   */
   double GetMin();
-  /*!
-  \brief returns the total number of corresponding points of the point sets
-  */
+
+  /**
+   * \brief Get the total number of corresponding point pairs.
+   * \return The number of points.
+   */
   double GetNumberOfPoints();
 
 protected:
@@ -88,9 +110,9 @@ protected:
   PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer,mitk::PointSet::Pointer);
   ~PointSetDifferenceStatisticsCalculator() override;
 
-  /*!
-  \brief Method for computing the complete statistics of the differences between the given point sets.
-  */
+  /**
+   * \brief Compute the complete statistics of the distances between the given point sets.
+   */
   void ComputeStatistics();
 
   mitk::ImageStatisticsContainer::ImageStatisticsObject m_Statistics; ///< struct holding the statistics

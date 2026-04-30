@@ -19,25 +19,30 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  ///
-  /// a PropertyListReplacedObserver gets informed as soon as a PropertyList with a given id was replaced during a
-  /// Load()
-  /// process
-  /// \see IPersistenceService::AddPropertyListReplacedObserver()
-  ///
+  /**
+   * \brief Observer that gets informed when a PropertyList with a given id is replaced during a Load() process.
+   *
+   * \sa IPersistenceService::AddPropertyListReplacedObserver()
+   */
   class MITKCORE_EXPORT PropertyListReplacedObserver
   {
   public:
-    ///
-    /// will be called *before* the propertyList gets replaced with new contents, i.e. propertyList still contains the
-    /// old
-    /// values
-    ///
+    /** \brief Called before the property list is replaced with new contents.
+     *
+     * At this point, \p propertyList still contains the old values.
+     *
+     * \param id the identifier of the property list being replaced.
+     * \param propertyList the property list that is about to be replaced.
+     */
     virtual void BeforePropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList);
-    ///
-    /// will be called *after* the propertyList gets replaced with new contents, i.e. propertyList contains the new
-    /// values
-    ///
+
+    /** \brief Called after the property list has been replaced with new contents.
+     *
+     * At this point, \p propertyList contains the new values.
+     *
+     * \param id the identifier of the property list that was replaced.
+     * \param propertyList the property list with new values.
+     */
     virtual void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList);
   };
 } // namespace mitk

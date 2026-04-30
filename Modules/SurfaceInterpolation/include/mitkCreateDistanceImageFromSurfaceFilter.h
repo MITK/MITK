@@ -27,40 +27,29 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  /**
-  \brief This filter interpolates the 3D surface for a segmented area. The basis for the interpolation
-         are the edge-points of contours that are drawn into an image.
-
-         The interpolation itself is performed via Radial Basis Function Interpolation.
-
-         ATTENTION:
-         This filter needs beside the edge points of the delineated contours additionally the normals for each
-         edge point.
-
-         \sa mitkSurfaceInterpolationController
-
-         Based on the contour edge points and their normal this filter calculates a distance function with the following
-         properties:
-         - Putting a point into the distance function that lies inside the considered surface gives a negativ scalar
-  value
-         - Putting a point into the distance function that lies outside the considered surface gives a positive scalar
-  value
-         - Putting a point into the distance function that lies exactly on the considered surface gives the value zero
-
-         With this interpolated distance function a distance image will be created. The desired surface can then be
-  extract e.g.
-         with the marching cubes algorithm. (Within the  distance image the surface goes exactly where the pixelvalues
-  are zero)
-
-         Note that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the
-  image can be
-         adjusted by calling SetDistanceImageVolume(unsigned int volume) which specifies the number ob pixels enclosed
-  by the image.
-
-  \ingroup Process
-
-  $Author: fetzer$
-  */
+  /** \brief Filter that creates a distance image from contour surface points using Radial Basis Function interpolation.
+   *
+   * Given a set of contour edge points with associated normals (as mitk::Surface inputs),
+   * this filter computes an implicit distance function via Radial Basis Function (RBF)
+   * interpolation and samples it into a 3D distance image.
+   *
+   * The distance function has the following properties:
+   * - Points inside the surface yield negative values.
+   * - Points outside the surface yield positive values.
+   * - Points on the surface yield zero.
+   *
+   * The zero level set of the resulting distance image represents the interpolated
+   * surface, which can be extracted using e.g. marching cubes.
+   *
+   * The distance image always has isotropic spacing. Its total number of pixels can
+   * be adjusted via SetDistanceImageVolume() (default: 500000).
+   *
+   * \pre Each input surface must contain contour edge points with normals stored
+   *      in the cell data.
+   *
+   * \sa ComputeContourSetNormalsFilter, ReduceContourSetFilter, SurfaceInterpolationController
+   * \ingroup MitkSurfaceInterpolationModule
+   */
   class MITKSURFACEINTERPOLATION_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
   public:

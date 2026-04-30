@@ -10,6 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file QmitkDataStorageListModel.h
+ * \brief Declares QmitkDataStorageListModel, a QAbstractListModel backed by a mitk::DataStorage
+ *        with optional node predicate filtering.
+ *
+ * \ingroup QmitkModule
+ */
+
 #ifndef QmitkDataStorageListModel_h
 #define QmitkDataStorageListModel_h
 

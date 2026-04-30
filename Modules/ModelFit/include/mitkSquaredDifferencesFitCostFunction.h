@@ -20,9 +20,15 @@ found in the LICENSE file.
 namespace mitk
 {
 
-/** Multi valued model fit cost function that computes the squared differences between the model output and the
- * signal.
-*/
+/**
+ * \class SquaredDifferencesFitCostFunction
+ * \brief Multi-valued cost function that computes the element-wise squared differences.
+ *
+ * For each time point, the cost is computed as (model_signal - observed_signal)^2.
+ * Returns a vector of squared difference values (one per time point).
+ *
+ * \sa MVModelFitCostFunction, SumOfSquaredDifferencesFitCostFunction
+ */
 class MITKMODELFIT_EXPORT SquaredDifferencesFitCostFunction : public mitk::MVModelFitCostFunction
 {
 public:

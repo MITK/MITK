@@ -23,73 +23,111 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Base class for all interaction events in MITK.
+   *
+   * InteractionEvent is the root of the interaction event hierarchy. Every
+   * interaction event carries a reference to the BaseRenderer that generated it
+   * (the "sender"). Subclasses add position information (InteractionPositionEvent),
+   * keyboard information (InteractionKeyEvent), or mouse button/wheel details.
+   *
+   * Equality between events is checked via operator== which delegates to IsEqual().
+   * Two events match if they agree on all attributes relevant for state machine
+   * transitions (e.g. mouse button, modifiers) while ignoring attributes like
+   * the exact pointer position.
+   *
+   * \sa InteractionPositionEvent
+   * \sa InteractionKeyEvent
+   * \sa EventStateMachine
+   * \sa Dispatcher
+   * \ingroup Interaction
+   */
   class MITKCORE_EXPORT InteractionEvent : public itk::LightObject
   {
   public:
     mitkClassMacroItkParent(InteractionEvent, itk::LightObject);
     mitkNewMacro1Param(Self, BaseRenderer*);
 
+    /**
+     * \brief Set the BaseRenderer that sent this event.
+     * \param[in] sender Pointer to the sending BaseRenderer.
+     */
     void SetSender(BaseRenderer *sender);
+
+    /**
+     * \brief Get the BaseRenderer that sent this event.
+     * \return Pointer to the sending BaseRenderer.
+     */
     BaseRenderer *GetSender() const;
 
     /**
-     * This class implements an up cast to check if the provided baseClass object is derived from this class.
-     * This function is used to support polymorphism on state machine pattern (XML) level.
+     * \brief Check if the provided event is an instance of this class or a derived class.
+     *
+     * This up-cast check supports polymorphism at the state machine pattern (XML) level,
+     * allowing transitions to match on base event types.
+     *
+     * \param[in] baseClass The event to check.
+     * \return true if baseClass is an InteractionEvent or derived from it.
      */
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const;
 
     /**
-     * Mouse/keyboard state values
+     * \brief Enumeration of mouse button states.
+     *
+     * Values can be combined with bitwise OR to represent multiple pressed buttons.
      */
     enum MouseButtons
     {
-      NoButton = 0x0000,
-      LeftMouseButton = 0x0001,
-      RightMouseButton = 0x0002,
-      MiddleMouseButton = 0x0004
-    };
-
-    enum ModifierKeys
-    {
-      NoKey = 0x0000,
-      ShiftKey = 0x0100,
-      ControlKey = 0x0200,
-      AltKey = 0x0400
+      NoButton = 0x0000,         ///< No mouse button.
+      LeftMouseButton = 0x0001,  ///< Left mouse button.
+      RightMouseButton = 0x0002, ///< Right mouse button.
+      MiddleMouseButton = 0x0004 ///< Middle mouse button.
     };
 
     /**
-     * KeyConstants Constants for special keys
+     * \brief Enumeration of keyboard modifier keys.
+     *
+     * Values can be combined with bitwise OR to represent multiple held modifiers.
      */
-    // Special Keys
-    static const std::string KeyEsc;        // = "Escape";
-    static const std::string KeyEnter;      // = "Enter";
-    static const std::string KeyReturn;     // = "Return";
-    static const std::string KeyDelete;     // = "Delete";
-    static const std::string KeyArrowUp;    // = "ArrowUp";
-    static const std::string KeyArrowDown;  // = "ArrowDown";
-    static const std::string KeyArrowLeft;  // = "ArrowLeft";
-    static const std::string KeyArrowRight; // = "ArrowRight";
+    enum ModifierKeys
+    {
+      NoKey = 0x0000,      ///< No modifier key.
+      ShiftKey = 0x0100,   ///< Shift key.
+      ControlKey = 0x0200, ///< Control (Ctrl) key.
+      AltKey = 0x0400      ///< Alt key.
+    };
 
-    static const std::string KeyF1;  // = "F1";
-    static const std::string KeyF2;  // = "F2";
-    static const std::string KeyF3;  // = "F3";
-    static const std::string KeyF4;  // = "F4";
-    static const std::string KeyF5;  // = "F5";
-    static const std::string KeyF6;  // = "F6";
-    static const std::string KeyF7;  // = "F7";
-    static const std::string KeyF8;  // = "F8";
-    static const std::string KeyF9;  // = "F9";
-    static const std::string KeyF10; // = "F10";
-    static const std::string KeyF11; // = "F11";
-    static const std::string KeyF12; // = "F12";
+    /** \brief String constants for special keys used in key events and state machine patterns. */
+    ///@{
+    static const std::string KeyEsc;        ///< "Escape" key constant.
+    static const std::string KeyEnter;      ///< "Enter" key constant.
+    static const std::string KeyReturn;     ///< "Return" key constant.
+    static const std::string KeyDelete;     ///< "Delete" key constant.
+    static const std::string KeyArrowUp;    ///< "ArrowUp" key constant.
+    static const std::string KeyArrowDown;  ///< "ArrowDown" key constant.
+    static const std::string KeyArrowLeft;  ///< "ArrowLeft" key constant.
+    static const std::string KeyArrowRight; ///< "ArrowRight" key constant.
 
-    static const std::string KeyPos1;     // = "Pos1";
-    static const std::string KeyEnd;      // = "End";
-    static const std::string KeyInsert;   // = "Insert";
-    static const std::string KeyPageUp;   // = "PageUp";
-    static const std::string KeyPageDown; // = "PageDown";
-    static const std::string KeySpace;    // = "Space";
-    // End special keys
+    static const std::string KeyF1;  ///< "F1" key constant.
+    static const std::string KeyF2;  ///< "F2" key constant.
+    static const std::string KeyF3;  ///< "F3" key constant.
+    static const std::string KeyF4;  ///< "F4" key constant.
+    static const std::string KeyF5;  ///< "F5" key constant.
+    static const std::string KeyF6;  ///< "F6" key constant.
+    static const std::string KeyF7;  ///< "F7" key constant.
+    static const std::string KeyF8;  ///< "F8" key constant.
+    static const std::string KeyF9;  ///< "F9" key constant.
+    static const std::string KeyF10; ///< "F10" key constant.
+    static const std::string KeyF11; ///< "F11" key constant.
+    static const std::string KeyF12; ///< "F12" key constant.
+
+    static const std::string KeyPos1;     ///< "Pos1" (Home) key constant.
+    static const std::string KeyEnd;      ///< "End" key constant.
+    static const std::string KeyInsert;   ///< "Insert" key constant.
+    static const std::string KeyPageUp;   ///< "PageUp" key constant.
+    static const std::string KeyPageDown; ///< "PageDown" key constant.
+    static const std::string KeySpace;    ///< "Space" key constant.
+    ///@}
 
   protected:
     InteractionEvent(BaseRenderer *);

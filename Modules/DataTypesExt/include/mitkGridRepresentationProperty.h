@@ -19,25 +19,28 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * Extends the enumeration prop mitkEnumerationPropery. Adds the value
-   * (constant / Id / string representation):
-   * <ul>
-   * <li>POINTS / 0 / Points</li>
-   * <li>WIREFRAME / 1 / Wireframe</li>
-   * <li>SURFACE / 2 / Surface</li>
-   * <li>WIREFRAME_SURFACE / 3 / WireframeSurface</li>
-   * </ul>
-   * Default is the Wireframe representation
+   * \brief Enumeration property for grid representation types.
+   *
+   * Extends EnumerationProperty with the following values:
+   * - POINTS (0) -- render as points
+   * - WIREFRAME (1) -- render as wireframe (default)
+   * - SURFACE (2) -- render as surface
+   *
+   * \sa EnumerationProperty, GridVolumeMapperProperty
+   * \ingroup Data
    */
   class MITKDATATYPESEXT_EXPORT GridRepresentationProperty : public EnumerationProperty
   {
   public:
+    /**
+     * \brief Available representation types for unstructured grids.
+     */
     enum RepresentationType
     {
-      POINTS = 0,
-      WIREFRAME = 1,
-      SURFACE = 2
-    }; //, WIREFRAME_SURFACE = 3};
+      POINTS = 0,    ///< Render grid as points.
+      WIREFRAME = 1, ///< Render grid as wireframe.
+      SURFACE = 2    ///< Render grid as filled surface.
+    };
 
     mitkClassMacro(GridRepresentationProperty, EnumerationProperty);
 
@@ -49,24 +52,16 @@ namespace mitk
 
     mitkNewMacro1Param(GridRepresentationProperty, const std::string &);
 
-    /**
-     * Sets the representation type to POINTS.
-     */
+    /** \brief Set the representation type to POINTS. */
     virtual void SetRepresentationToPoints();
 
-    /**
-     * Sets the representation type to WIREFRAME.
-     */
+    /** \brief Set the representation type to WIREFRAME. */
     virtual void SetRepresentationToWireframe();
 
-    /**
-     * Sets the representation type to SURFACE.
-     */
+    /** \brief Set the representation type to SURFACE. */
     virtual void SetRepresentationToSurface();
 
-    /**
-     * Sets the representation type to WIREFRAME_SURFACE.
-     */
+    /** \brief Set the representation type to WIREFRAME_SURFACE (combined). */
     virtual void SetRepresentationToWireframeSurface();
 
   protected:

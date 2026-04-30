@@ -19,23 +19,25 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory that registers mappers and default properties for MultiLabelSegmentation.
+   */
   class MultilabelObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(MultilabelObjectFactory, CoreObjectFactoryBase);
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self) Mapper::Pointer
-      CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    itkCloneMacro(Self)
+
+    /** \brief Create a mapper for the given node and slot. */
+    Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+
+    /** \brief Set default rendering properties on the given node. */
     void SetDefaultProperties(mitk::DataNode *node) override;
-    std::string GetFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   protected:
     MultilabelObjectFactory();
     ~MultilabelObjectFactory() override;
-    void CreateFileExtensionsMap();
   };
 }
 

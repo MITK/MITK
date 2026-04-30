@@ -23,10 +23,18 @@ found in the LICENSE file.
 namespace mitk
 {
 
+  /**
+   * \class ExponentialSaturationModelFactory
+   * \brief Factory for creating ExponentialSaturationModel instances and their parameterizers.
+   *
+   * Provides default initial parameterization and default constraints (e.g. rate > 0).
+   *
+   * \sa ExponentialSaturationModel, ExponentialSaturationModelParameterizer, ConcreteModelFactoryBase
+   */
   class MITKMODELFIT_EXPORT ExponentialSaturationModelFactory : public ConcreteModelFactoryBase<ExponentialSaturationModel>
   {
   public:
-    mitkClassMacroItkParent(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
+    mitkClassMacro(ExponentialSaturationModelFactory, ConcreteModelFactoryBase<ExponentialSaturationModel>);
     itkFactorylessNewMacro(Self);
 
     ParametersType GetDefaultInitialParameterization() const override;

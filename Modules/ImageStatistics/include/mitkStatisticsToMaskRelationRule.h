@@ -18,6 +18,15 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Relation rule that connects an ImageStatisticsContainer to its mask.
+   *
+   * This rule is used to establish a data relation between computed statistics
+   * and the mask (segmentation or planar figure) used for the computation.
+   *
+   * \sa GenericIDRelationRule
+   * \sa StatisticsToImageRelationRule
+   */
   class MITKIMAGESTATISTICS_EXPORT StatisticsToMaskRelationRule : public mitk::GenericIDRelationRule
   {
   public:

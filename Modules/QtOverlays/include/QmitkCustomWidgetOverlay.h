@@ -18,37 +18,50 @@ found in the LICENSE file.
 
 #include <MitkQtOverlaysExports.h>
 
-/** \class  QmitkCustomWidgetOverlay
-* \brief object representing a custom widget that is handled and positioned
-* as an overlay.
-*
-* A QmitkCustomWidgetOverlay is a generic sub-class of QmitkOverlay. It
-* offers the possibility to set the internal m_Widget from the outside.
-*
-* This offers the possibility to position custom widgets 'on top of' other
-* widgets using the positioning mechanism of all overlays.
-*
-* \warning The custom widgets need to be configured and connected manually.
-* Properties cannot be set.
-*
-* \ingroup Overlays
-*/
+/**
+ * \class  QmitkCustomWidgetOverlay
+ * \brief Overlay that wraps an externally provided custom QWidget.
+ *
+ * A QmitkCustomWidgetOverlay is a generic sub-class of QmitkOverlay. It
+ * offers the possibility to set the internal widget from the outside.
+ *
+ * This allows positioning custom widgets 'on top of' other widgets using
+ * the positioning mechanism of the overlay framework.
+ *
+ * \warning The custom widgets need to be configured and connected manually.
+ * Properties set via GenerateData() have no effect on custom widgets.
+ *
+ * \sa QmitkOverlay
+ * \sa QmitkOverlayController
+ * \ingroup Overlays
+ */
 
 class MITKQTOVERLAYS_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
 {
 public:
   /**
-  * @brief Default Constructor
-  **/
+   * \brief Constructor.
+   * \param[in] id String identifier used to look up overlay properties.
+   */
   QmitkCustomWidgetOverlay(const char *id);
 
-  /**
-  * @brief Default Destructor
-  **/
+  /** \brief Destructor. */
   ~QmitkCustomWidgetOverlay() override;
 
+  /**
+   * \brief Sets the custom widget to be managed as an overlay.
+   *
+   * The widget replaces the internal widget pointer. Ownership is not transferred;
+   * the widget will not be deleted when this overlay is destroyed.
+   *
+   * \param[in] widget The custom QWidget to display as an overlay. Ignored if nullptr.
+   */
   void SetWidget(QWidget *widget);
 
+  /**
+   * \brief Returns the current size of the custom widget.
+   * \return The QSize of the internal widget.
+   */
   QSize GetNeededSize() override;
 };
 

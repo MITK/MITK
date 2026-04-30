@@ -21,29 +21,28 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief ContourModel is a structure of linked vertices defining a contour in 3D space.
-  The vertices are stored in a mitk::ContourElement for each timestep.
-  The contour line segments are implicitly defined by the given linked vertices.
-  By default two control points are linked by a straight line. It is possible to add
-  vertices at the front and end of the contour and to iterate in both directions.
-
-  Points are specified containing coordinates and additional (data) information,
-  see mitk::ContourElement.
-  For accessing a specific vertex either an index or a position in 3D space can be used.
-  The vertices are best accessed by using a VertexIterator.
-  Interaction with the contour is thus available without any mitk interactor class using the
-  api of ContourModel. It is possible to shift single vertices as well as shifting the whole
-  contour.
-
-  A contour can be either open like a single curved line segment or
-  closed. A closed contour can for example represent a jordan curve.
-
-  \section mitkContourModelDisplayOptions Display Options
-
-  The default mappers for this data structure are mitk::ContourModelGLMapper2D and
-  mitk::ContourModelMapper3D. See these classes for display options which can
-  can be set via properties.
-  */
+   * \brief A time-resolved contour representation consisting of linked vertices in 3D space.
+   *
+   * ContourModel stores a sequence of vertices (mitk::ContourElement) for each time step.
+   * Line segments between vertices are implicitly defined. By default, consecutive control
+   * points are connected by straight lines, but B-spline interpolation is also available.
+   *
+   * Vertices can be added at the front or end and accessed by index, 3D position, or
+   * iterator. The contour may be open (a polyline) or closed (forming a Jordan curve).
+   * Interaction operations such as shifting individual vertices or the entire contour
+   * are provided directly in the API without requiring a separate interactor class.
+   *
+   * ContourModel inherits from mitk::BaseData and therefore integrates with the MITK
+   * data management framework (DataStorage, DataNode, TimeGeometry).
+   *
+   * \section mitkContourModelDisplayOptions Display Options
+   *
+   * The default mappers are mitk::ContourModelMapper2D and mitk::ContourModelMapper3D.
+   * See those classes for display properties that can be configured via DataNode properties.
+   *
+   * \sa ContourElement, ContourModelSet, ContourModelMapper2D, ContourModelMapper3D
+   * \ingroup MitkContourModelModule
+   */
   class MITKCONTOURMODEL_EXPORT ContourModel : public BaseData
   {
   public:
@@ -61,23 +60,33 @@ namespace mitk
     typedef std::vector<ContourElement::Pointer> ContourModelSeries;
     /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
-    /** \brief Possible interpolation of the line segments between control points */
+    /** \brief Interpolation mode for line segments between control points.
+     *
+     * Determines how consecutive control points are connected visually.
+     */
     enum LineSegmentInterpolation
     {
-      LINEAR,
-      B_SPLINE
+      LINEAR,   ///< Straight line segments between control points.
+      B_SPLINE  ///< B-spline interpolated curve through control points.
     };
 
     /*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
 
-    /** \brief Get the current selected vertex.
-    */
+    /** \brief Get the currently selected vertex.
+     * \return Pointer to the selected vertex, or nullptr if no vertex is selected.
+     */
     VertexType *GetSelectedVertex() { return this->m_SelectedVertex; }
-    /** \brief Deselect vertex.
-    */
+
+    /** \brief Clear the current vertex selection.
+     * \post GetSelectedVertex() returns nullptr.
+     */
     void Deselect() { this->m_SelectedVertex = nullptr; }
-    /** \brief Set selected vertex as control point
-    */
+
+    /** \brief Set or clear the control point flag on the currently selected vertex.
+     * \param[in] isControlPoint If true, marks the selected vertex as a control point;
+     *            if false, removes the control point designation. Default is true.
+     * \note Does nothing if no vertex is currently selected.
+     */
     void SetSelectedVertexAsControlPoint(bool isControlPoint = true)
     {
       if (this->m_SelectedVertex)
@@ -87,16 +96,20 @@ namespace mitk
       }
     }
 
-    /** \brief Set the interpolation of the line segments between control points.
-    */
+    /** \brief Set the interpolation mode for line segments between control points.
+     * \param[in] interpolation The desired interpolation mode.
+     * \sa GetLineSegmentInterpolation
+     */
     void SetLineSegmentInterpolation(LineSegmentInterpolation interpolation)
     {
       this->m_lineInterpolation = interpolation;
       this->Modified();
     }
 
-    /** \brief Get the interpolation of the line segments between control points.
-    */
+    /** \brief Get the current interpolation mode for line segments between control points.
+     * \return The current LineSegmentInterpolation mode.
+     * \sa SetLineSegmentInterpolation
+     */
     LineSegmentInterpolation GetLineSegmentInterpolation() { return this->m_lineInterpolation; }
     /*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
 
@@ -254,30 +267,49 @@ namespace mitk
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 
+    /** \brief Find the nearest vertex to a given 3D position at a specific time step.
+     * \param[in] point Query position in 3D space.
+     * \param[in] eps Maximum Euclidean distance for the search.
+     * \param[in] timestep Time step to query.
+     * \return Const pointer to the nearest vertex, or nullptr if the timestep is invalid or no vertex is within eps.
+     */
     const VertexType *GetVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
 
-    /** Returns the next control vertex to the approximate nearest vertex of a given position in 3D space
-     * If the timestep is invalid a nullptr will be returned.
+    /** \brief Return the next control vertex after the nearest vertex to a given 3D position.
+     * \param[in] point Query position in 3D space.
+     * \param[in] eps Maximum Euclidean distance for the search.
+     * \param[in] timestep Time step to query.
+     * \return Const pointer to the next control vertex, or nullptr if the timestep is invalid or no vertex is found.
      */
     virtual const VertexType *GetNextControlVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
 
-    /** Returns the previous control vertex to the approximate nearest vertex of a given position in 3D space
-     * If the timestep is invalid a nullptr will be returned.
+    /** \brief Return the previous control vertex before the nearest vertex to a given 3D position.
+     * \param[in] point Query position in 3D space.
+     * \param[in] eps Maximum Euclidean distance for the search.
+     * \param[in] timestep Time step to query.
+     * \return Const pointer to the previous control vertex, or nullptr if the timestep is invalid or no vertex is found.
      */
     virtual const VertexType *GetPreviousControlVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
 
-    /** \brief Remove a vertex at given timestep within the container.
-
-    \return index of vertex. -1 if not found.
-    */
+    /** \brief Return the index of a given vertex within the contour at the specified time step.
+     * \param[in] vertex Pointer to the vertex to find.
+     * \param[in] timestep Time step to query. Default is 0.
+     * \return Index of the vertex, or -1 if not found or the timestep is invalid.
+     */
     int GetIndex(const VertexType *vertex, TimeStepType timestep = 0);
 
-    /** \brief Check if there isn't something at this timestep.
-    */
+    /** \brief Check whether the given time step has no associated contour data.
+     * \param[in] t Time step index.
+     * \return True if \p t exceeds the number of available time steps.
+     */
     bool IsEmptyTimeStep(unsigned int t) const override;
 
-    /** \brief Check if mouse cursor is near the contour.
-    */
+    /** \brief Check whether a given point lies near the contour at the specified time step.
+     * \param[in] point Query position in 3D space.
+     * \param[in] eps Maximum squared distance for the proximity test.
+     * \param[in] timestep Time step to query.
+     * \return True if the point is near the contour, false otherwise.
+     */
     bool IsNearContour(Point3D &point, float eps, TimeStepType timestep) const;
 
     /** Function that searches for the line segment of the contour that is closest to the passed point

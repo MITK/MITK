@@ -41,12 +41,41 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
   {
   public:
-    // sent when the pen size is changed or should be updated in a GUI.
+    /** \brief Emitted when the pen size changes or should be updated in a GUI. */
     Message1<int> SizeChanged;
 
     mitkClassMacro(PaintbrushTool, FeedbackContourTool);
 
+    /**
+     * \brief Sets the radius of the circular paintbrush pen.
+     * \param[in] value The pen radius in pixels.
+     */
     void SetSize(int value);
+
+    /**
+     * \brief Builds a closed circular brush contour of the given size in 2D
+     *        index coordinates, centered at the origin.
+     *
+     * Half-pixel corner correction is applied so that even and odd sizes
+     * stamp symmetrically around the index where the brush is rendered.
+     *
+     * \pre size > 0 (a non-positive size yields a degenerate contour).
+     */
+    static ContourModel::Pointer CreateBrushContour(int size);
+
+    /**
+     * \brief Builds a closed four-vertex rectangle ContourModel that fills the
+     *        gap swept between two brush positions, in 2D index coordinates.
+     *
+     * Used to avoid holes when the mouse moves more than one brush radius
+     * between successive samples.
+     *
+     * \pre from != to (a zero-length vector causes the internal
+     *      direction.normalize() to produce NaNs).
+     */
+    static ContourModel::Pointer CreateGapContour(const Point3D& from,
+                                                  const Point3D& to,
+                                                  double radius);
 
   protected:
     PaintbrushTool(bool startWithFillMode = true); // purposely hidden
@@ -67,16 +96,12 @@ namespace mitk
 
     virtual int GetFillValue() const;
 
-    /**
-     * \todo This is a possible place where to introduce
-     *       different types of pens
-     */
     void UpdateContour(const InteractionPositionEvent *);
 
     /**
     *   Little helper function. Returns the upper left corner of the given pixel.
     */
-    mitk::Point2D upperLeft(mitk::Point2D p);
+    static mitk::Point2D upperLeft(mitk::Point2D p);
 
     /**
       * Checks  if the current slice has changed and updates (if needed m_CurrentPlane).

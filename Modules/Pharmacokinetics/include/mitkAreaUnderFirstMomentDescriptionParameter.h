@@ -18,7 +18,16 @@ found in the LICENSE file.
 namespace  mitk
 {
 
-  /** Description parameter that computes the area under the curve */
+  /** \class AreaUnderFirstMomentDescriptionParameter
+   * \brief Curve description parameter that computes the Area Under the First Moment Curve (AUMC).
+   *
+   * The AUMC is calculated by numerical integration using the trapezoidal rule over
+   * the product of the curve values and their corresponding time points, i.e.
+   * AUMC = integral( |C(t) * t| dt ). This is useful for pharmacokinetic analysis
+   * to derive mean residence time (MRT = AUMC / AUC).
+   *
+   * \sa AreaUnderTheCurveDescriptionParameter, MeanResidenceTimeDescriptionParameter, CurveDescriptionParameterBase
+   */
     class MITKPHARMACOKINETICS_EXPORT AreaUnderFirstMomentDescriptionParameter : public mitk::CurveDescriptionParameterBase
     {
     public:
@@ -29,6 +38,9 @@ namespace  mitk
 
         itkFactorylessNewMacro(Self);
         itkCloneMacro(Self);
+
+        /** \brief Returns the name of the computed description parameter ("AreaUnderFirstMoment").
+         *  \return Vector containing the single parameter name. */
         DescriptionParameterNamesType GetDescriptionParameterName() const override;
 
     protected:

@@ -26,7 +26,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * @brief Base class for model fit provider.
+   * \brief Base class for model fit provider.
    */
   template<class TModelFactory>
   class ModelFitProviderBase : public mitk::IModelFitProvider
@@ -38,7 +38,7 @@ namespace mitk
     /** Returns the grid of the model variable extracted from the fit info. The default implementation
      returns a time grid extracted from the time geometry of the fitInfo->inputImage. Reimplement for
      other models/fits to generate other variable grids.
-     @pre fitInfo is a valid instance for the model fit.
+     \pre fitInfo is a valid instance for the model fit.
     */
     ModelBase::TimeGridType GetVariableGrid(const modelFit::ModelFitInfo* fitInfo) const override;
 

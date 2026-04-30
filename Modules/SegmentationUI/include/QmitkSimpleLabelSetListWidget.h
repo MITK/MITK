@@ -28,12 +28,15 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSimpleLabelSetListWidget : public QWidget
   Q_OBJECT
 
 public:
+  /** \brief Constructs the label set list widget. */
   QmitkSimpleLabelSetListWidget(QWidget* parent = nullptr);
   ~QmitkSimpleLabelSetListWidget() override;
 
   using LabelVectorType = std::vector<mitk::Label::ConstPointer>;
 
+  /** \brief Returns the currently selected labels. */
   LabelVectorType SelectedLabels() const;
+  /** \brief Returns the MultiLabelSegmentation currently displayed. */
   const mitk::MultiLabelSegmentation* GetLabelSetImage() const;
 
 signals:

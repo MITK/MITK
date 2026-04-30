@@ -17,6 +17,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Object factory for extended IO types.
+   *
+   * Registers mappers and default rendering properties for extended data types.
+   */
   class IOExtObjectFactory : public CoreObjectFactoryBase
   {
   public:
@@ -24,27 +29,15 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    /** \brief Create a mapper for the given node and slot. */
+    Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+
+    /** \brief Set default rendering properties on the given node. */
     void SetDefaultProperties(mitk::DataNode *node) override;
-    std::string GetFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    std::string GetSaveFileExtensions() override;
-    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   private:
     IOExtObjectFactory();
     ~IOExtObjectFactory() override;
-
-    void CreateFileExtensionsMap();
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
-
-    itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
-    itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
-    itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;
-
-    itk::ObjectFactoryBase::Pointer m_UnstructuredGridVtkWriterFactory;
   };
 }
 

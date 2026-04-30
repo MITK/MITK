@@ -18,38 +18,94 @@ found in the LICENSE file.
 #include <MitkImageStatisticsUIExports.h>
 
 /**
-Generates ImageStatisticContainers by using QmitkImageStatisticsCalculationRunnables for each pair if image and ROIs and ensures their
-validity.
-It also encodes the HistogramNBins and IgnoreZeroValueVoxel as properties to the results as these settings are important criteria for
-discriminating statistics results.
-For more details of how the generation is done see QmitkDataGenerationBase.
-*/
+ * \brief Generates and manages ImageStatisticsContainer results for image/ROI pairs.
+ *
+ * Uses QmitkImageStatisticsCalculationRunnable jobs to compute statistics for each image/ROI
+ * combination and ensures their validity. The generator encodes HistogramNBins and
+ * IgnoreZeroValueVoxel as properties on the result containers, since these settings are
+ * critical criteria for distinguishing statistics results.
+ *
+ * For details on the generation orchestration, see QmitkDataGeneratorBase.
+ *
+ * \sa QmitkImageAndRoiDataGeneratorBase
+ * \sa QmitkDataGeneratorBase
+ * \sa QmitkImageStatisticsCalculationRunnable
+ * \sa mitk::ImageStatisticsContainer
+ */
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsDataGenerator : public QmitkImageAndRoiDataGeneratorBase
 {
 public:
+  /**
+   * \brief Constructs the generator with a data storage.
+   * \param[in] storage The data storage for storing results and observing changes.
+   * \param[in] parent Optional parent QObject for Qt ownership.
+   */
   QmitkImageStatisticsDataGenerator(mitk::DataStorage::Pointer storage, QObject* parent = nullptr) : QmitkImageAndRoiDataGeneratorBase(storage, parent) {};
+
+  /**
+   * \brief Constructs the generator without an initial data storage.
+   * \param[in] parent Optional parent QObject for Qt ownership.
+   */
   QmitkImageStatisticsDataGenerator(QObject* parent = nullptr) : QmitkImageAndRoiDataGeneratorBase(parent) {};
 
+  /**
+   * \brief Checks whether a valid, up-to-date statistics result exists for the given image/ROI pair.
+   * \param[in] imageNode The image data node.
+   * \param[in] roiNode The ROI data node (may be nullptr).
+   * \return True if a valid final result is available; false otherwise.
+   */
   bool IsValidResultAvailable(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode) const;
 
-  /** Returns the latest result for a given image and ROI and the current settings of the generator.
-   @param imageNode
-   @param roiNode
-   @param onlyIfUpToDate Indicates if results should only be returned if the are up to date, thus not older then image and ROI.
-   @param noWIP If noWIP is true, the function only returns valid final result and not just its placeholder (WIP).
-   If noWIP equals false it might also return a WIP, thus the valid result is currently processed/ordered but might not be ready yet.*/
+  /**
+   * \brief Returns the latest statistics result node for a given image/ROI pair and current settings.
+   *
+   * \param[in] imageNode The image data node. Must not be nullptr and must contain valid data.
+   * \param[in] roiNode The ROI data node (may be nullptr).
+   * \param[in] onlyIfUpToDate If true, only returns results that are newer than the source image and ROI.
+   * \param[in] noWIP If true, only returns finalized results (not WIP placeholders).
+   *                  If false, may also return a WIP placeholder indicating computation is in progress.
+   * \return The result data node, or nullptr if no matching result is found.
+   * \throw mitk::Exception if imageNode is nullptr or contains no data.
+   */
   mitk::DataNode::Pointer GetLatestResult(const mitk::DataNode* imageNode, const mitk::DataNode* roiNode, bool onlyIfUpToDate = false, bool noWIP = true) const;
 
+  /**
+   * \brief Generates a unique node name for a statistics result based on image, ROI, and current settings.
+   * \param[in] image The source image. Must not be nullptr.
+   * \param[in] roi The source ROI data (may be nullptr).
+   * \return A string containing the generated node name incorporating bin count, zero-ignore flag, and UIDs.
+   * \throw mitk::Exception if image is nullptr.
+   */
   std::string GenerateStatisticsNodeName(const mitk::Image* image, const mitk::BaseData* roi) const;
 
-  /*! /brief Set flag to ignore zero valued voxels */
+  /**
+   * \brief Sets whether zero-valued voxels should be ignored in statistics computation.
+   *
+   * If auto-update is enabled and the value changes, regeneration is triggered.
+   *
+   * \param[in] _arg True to ignore zero-valued voxels; false to include them.
+   */
   void SetIgnoreZeroValueVoxel(bool _arg);
-  /*! /brief Get status of zero value voxel ignoring. */
+
+  /**
+   * \brief Returns whether zero-valued voxels are currently being ignored.
+   * \return True if zero-valued voxels are ignored; false otherwise.
+   */
   bool GetIgnoreZeroValueVoxel() const;
 
-  /*! /brief Set bin size for histogram resolution.*/
+  /**
+   * \brief Sets the number of bins for histogram computation.
+   *
+   * If auto-update is enabled and the value changes, regeneration is triggered.
+   *
+   * \param[in] nbins The number of histogram bins.
+   */
   void SetHistogramNBins(unsigned int nbins);
-  /*! /brief Get bin size for histogram resolution.*/
+
+  /**
+   * \brief Returns the current number of histogram bins.
+   * \return The number of histogram bins.
+   */
   unsigned int GetHistogramNBins() const;
 
 protected:

@@ -19,20 +19,33 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  @brief Gets a predicate for the ImageStatistics plugin input image
-  @details Predicate: DataType:Image && !(Property:binary) && !(Property:helper object)
-  */
+   * \brief Get a predicate for the ImageStatistics plugin input image.
+   *
+   * The predicate matches: DataType:Image && !(Property:binary) && !(Property:helper object).
+   *
+   * \return A node predicate suitable for selecting input images.
+   */
   mitk::NodePredicateBase::Pointer MITKIMAGESTATISTICS_EXPORT GetImageStatisticsImagePredicate();
+
   /**
-  @brief Gets a predicate for the ImageStatistics plugin input mask
-  @details Predicate: see GetMultiLabelSegmentationPredicate()  */
+   * \brief Get a predicate for the ImageStatistics plugin input mask.
+   *
+   * The predicate matches multi-label segmentations; see GetMultiLabelSegmentationPredicate().
+   *
+   * \return A node predicate suitable for selecting mask images.
+   */
   mitk::NodePredicateBase::Pointer MITKIMAGESTATISTICS_EXPORT GetImageStatisticsMaskPredicate();
+
   /**
-  @brief Gets a predicate for the ImageStatistics plugin planar figure
-  @details Predicate: (DataType:PlanarCircle || DataType:PlanarRectangle || DataType:PlanarEllipse
-  DataType:PlanarDoubleEllipse || DataType:PlanarPolygon || DataType:PlanarSubdivisionPolygon ||
-  DataType:PlanarBezierCurve || DataType:PlanarLine) && !(Property:helper object)
-  */
+   * \brief Get a predicate for the ImageStatistics plugin planar figure.
+   *
+   * The predicate matches: (DataType:PlanarCircle || DataType:PlanarRectangle ||
+   * DataType:PlanarEllipse || DataType:PlanarDoubleEllipse || DataType:PlanarPolygon ||
+   * DataType:PlanarSubdivisionPolygon || DataType:PlanarBezierCurve || DataType:PlanarLine)
+   * && !(Property:helper object).
+   *
+   * \return A node predicate suitable for selecting planar figures.
+   */
   mitk::NodePredicateBase::Pointer MITKIMAGESTATISTICS_EXPORT GetImageStatisticsPlanarFigurePredicate();
 }
 

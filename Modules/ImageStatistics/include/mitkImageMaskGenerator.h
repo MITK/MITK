@@ -21,6 +21,17 @@ found in the LICENSE file.
 
 namespace mitk
 {
+/**
+ * \brief Generates a mask from an existing mitk::Image for use in statistics calculations.
+ *
+ * This mask generator takes an external binary or label image (set via
+ * SetImageMask()) and provides it as a mask for the ImageStatisticsCalculator.
+ * The mask image is internally adapted (e.g., time step extraction) to match
+ * the input image geometry.
+ *
+ * \sa MaskGenerator
+ * \sa ImageStatisticsCalculator
+ */
 class MITKIMAGESTATISTICS_EXPORT ImageMaskGenerator: public MaskGenerator
 {
 public:
@@ -34,8 +45,17 @@ public:
     itkNewMacro(Self); /** Runtime information support. */
     itkTypeMacro(ImageMaskGenerator, MaskGenerator);
 
+    /**
+     * \brief Returns the number of masks this generator provides.
+     * \return Always returns 1.
+     */
     unsigned int GetNumberOfMasks() const override;
 
+    /**
+     * \brief Set the image mask to use.
+     * \param[in] _arg Const pointer to the mask image. Non-zero pixels define
+     *            the region of interest.
+     */
     itkSetConstObjectMacro(ImageMask, Image)
 
 protected:

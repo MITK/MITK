@@ -20,57 +20,61 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief represents an action, that is executed after a certain event (in statemachine-mechanism)
-  //##
-  //## @ingroup Interaction
+  /**
+   * \brief Represents an action that is executed after a certain event in the state machine mechanism.
+   *
+   * An Action encapsulates an action ID and an optional set of properties that
+   * parameterize the action's behavior. Actions are used by the interaction state
+   * machine to execute responses to user input events.
+   *
+   * \ingroup Interaction
+   * \sa PropertyList
+   */
   class MITKCORE_EXPORT Action : public itk::Object
   {
   public:
     mitkClassMacroItkParent(Action, itk::Object);
 
     /**
-    * @brief static New method to use SmartPointer
-    **/
+     * \brief Static New method for SmartPointer-based construction.
+     */
     mitkNewMacro1Param(Self, int);
 
     /**
-    * @brief Adds a property to the list of properties.
-    **/
+     * \brief Add a property to the action's property list.
+     *
+     * \param[in] propertyKey The key under which to store the property.
+     * \param[in] property The property instance to add.
+     */
     void AddProperty(const char *propertyKey, BaseProperty *property);
 
     /**
-    * @brief Returns the Id of this action.
-    **/
+     * \brief Get the ID of this action.
+     * \return The action ID.
+     */
     int GetActionId() const;
 
     /**
-    * @brief returns the specified property
-    **/
+     * \brief Get a property by its key.
+     *
+     * \param[in] propertyKey The key of the property to retrieve.
+     * \return Pointer to the property, or nullptr if not found.
+     */
     mitk::BaseProperty *GetProperty(const char *propertyKey) const;
 
   protected:
     /**
-    * @brief Default Constructor.
-    * Set the actionId.
-    **/
+     * \brief Construct an action with the given ID.
+     * \param[in] actionId The unique action identifier.
+     */
     Action(int actionId);
 
-    /**
-    * @brief Default Destructor
-    **/
+    /** \brief Destructor. */
     ~Action() override;
 
   private:
-    /**
-    * @brief The Id of this action.
-    **/
-    int m_ActionId;
-
-    /**
-    * @brief An action can also have several properties that are needed to execute a special action.
-    **/
-    PropertyList::Pointer m_PropertiesList;
+    int m_ActionId;                      ///< The unique ID of this action.
+    PropertyList::Pointer m_PropertiesList; ///< Optional properties parameterizing the action.
   };
 
 } // namespace mitk

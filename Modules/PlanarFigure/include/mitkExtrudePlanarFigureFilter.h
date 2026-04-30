@@ -23,6 +23,16 @@ namespace mitk
   class PlanarFigure;
   class Surface;
 
+  /**
+   * \brief Extrude a planar figure along its normal to produce a 3D surface.
+   *
+   * This filter takes a PlanarFigure as input and generates a Surface by
+   * extruding it along its normal direction. The extrusion supports twisting,
+   * bending, direction flipping, and normal flipping.
+   *
+   * \sa PlanarFigure
+   * \sa Surface
+   */
   class MITKPLANARFIGURE_EXPORT ExtrudePlanarFigureFilter : public itk::ProcessObject
   {
   public:
@@ -42,7 +52,7 @@ namespace mitk
     itkSetClampMacro(BendAngle, ScalarType, -360, 360);
 
     itkGetMacro(BendDirection, Vector2D);
-    mitkSetConstReferenceMacro(BendDirection, Vector2D);
+    itkSetMacro(BendDirection, Vector2D);
 
     itkGetMacro(FlipDirection, bool);
     itkSetMacro(FlipDirection, bool);

@@ -23,66 +23,85 @@ found in the LICENSE file.
 
 class QmitkAbstractMultiWidget;
 
-/*!
-* \brief GUI widget for handling mitk::PointSet
-*
-* Displays all the points in a mitk::PointSet graphically.
-* Reacts automatically to changes in the PointSet's selection status.
-* Updates PointSet's selection status when this list's selection changes.
-*
-* If a QmitkAbstractMultiWidget is assigned via SetMultiWidget(), the
-* crosshair of the QmitkAbstractMultiWidget is moved to the currently selected
-* point.
-*
-*/
+/**
+ * \brief GUI widget for displaying and interacting with a mitk::PointSet.
+ *
+ * Displays all points in a mitk::PointSet as a list view. Automatically
+ * reacts to changes in the PointSet's selection status and updates the
+ * PointSet's selection when the list selection changes. Double-clicking
+ * a point opens a QmitkEditPointDialog for coordinate editing.
+ *
+ * If a QmitkAbstractMultiWidget is assigned via SetMultiWidget(), or
+ * SliceNavigationControllers are added, the crosshair navigates to the
+ * selected point. The mouse wheel changes the displayed time step.
+ *
+ * Key bindings: F2 moves point up, F3 moves point down, Delete removes the point.
+ *
+ * \sa QmitkPointListModel, QmitkPointListWidget, QmitkEditPointDialog
+ */
 class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
 {
   Q_OBJECT
 
 public:
+  /**
+   * \brief Construct the point list view.
+   * \param[in] parent The parent widget.
+   */
   QmitkPointListView(QWidget *parent = nullptr);
+
+  /** \brief Destructor. */
   ~QmitkPointListView() override;
 
-  /// assign a point set for observation
+  /**
+   * \brief Set the data node containing the point set to display.
+   * \param[in] pointSetNode The data node with a mitk::PointSet.
+   */
   void SetPointSetNode(mitk::DataNode *pointSetNode);
 
-  /// which point set to work on
+  /**
+   * \brief Get the displayed point set.
+   * \return Const pointer to the mitk::PointSet, or nullptr.
+   */
   const mitk::PointSet *GetPointSet() const;
 
   /**
-  * \brief If Multiwidget is set, the crosshair is automatically centering to the selected point
-  * As an alternative, if you dont have a multiwidget, you can call SetSnc1, SetSnc2, SetSnc3 to set the
-  * SliceNavigationControllers directly to enable the focussing feature.
-  */
+   * \brief Set a multi widget for automatic crosshair centering on selected points.
+   *
+   * When set, all render windows of the multi widget are registered as
+   * slice navigation controllers for point-based navigation.
+   *
+   * \param[in] multiWidget The multi widget to use, or nullptr to clear.
+   */
   void SetMultiWidget(QmitkAbstractMultiWidget* multiWidget);
 
   /**
-   * \brief Return the QmitkAbstractMultiWidget that is used for updating the render window crosshair.
+   * \brief Get the currently assigned multi widget.
+   * \return Pointer to the QmitkAbstractMultiWidget, or nullptr.
    */
   QmitkAbstractMultiWidget* GetMultiWidget() const;
 
   /**
-   * @brief Add a mitk::SliceNavigationController instance.
-   * @param snc The mitk::SliceNavigationController instance.
-   *
-   * This method adds \c snc to the set of slice navigation controllers which are
-   * used to navigate to the selected point.
+   * \brief Add a slice navigation controller for point-based crosshair navigation.
+   * \param[in] snc The mitk::SliceNavigationController to add. Ignored if nullptr.
    */
   void AddSliceNavigationController(mitk::SliceNavigationController *snc);
 
   /**
-   * @brief Remove a mitk::SliceNavigationController instance.
-   * @param snc The mitk::SliceNavigationController instance.
-   *
-   * This method removes \c snc from the set of slice navigation controllers which are
-   * used to navigate to the selected point.
+   * \brief Remove a slice navigation controller.
+   * \param[in] snc The mitk::SliceNavigationController to remove. Ignored if nullptr.
    */
   void RemoveSliceNavigationController(mitk::SliceNavigationController *snc);
 
 signals:
+  /** \brief Emitted when the point selection changes in the point set. */
+  void SignalPointSelectionChanged();
 
-  void SignalPointSelectionChanged(); ///< this signal is emitted, if the selection of a point in the pointset is changed
-  void SignalTimeStepChanged(int);
+  /**
+   * \brief Emitted when the time step changes via mouse wheel.
+   * \param[in] timeStep The new time step index.
+   */
+  void SignalTimeStepChanged(int timeStep);
 
 protected slots:
 

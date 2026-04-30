@@ -21,7 +21,7 @@ Q_DECLARE_METATYPE(mitk::ProcessExecutor::Pointer);
 Q_DECLARE_METATYPE(mitk::ProcessExecutor::ArgumentListType);
 
 /**
- * @brief Class to execute some functions from the Segmentation Plugin in a separate thread
+ * \brief Class to execute some functions from the Segmentation Plugin in a separate thread
  */
 class nnUNetDownloadWorker : public QObject
 {
@@ -29,7 +29,7 @@ class nnUNetDownloadWorker : public QObject
 
 public slots:
   /**
-   * @brief Starts the download process worker thread.
+   * \brief Starts the download process worker thread.
    *
    */
   void DoWork(QString, QString, mitk::ProcessExecutor::Pointer, mitk::ProcessExecutor::ArgumentListType);
@@ -37,10 +37,10 @@ public slots:
 signals:
 
   /**
-   * @brief the signal emitted when a download process is finished; success or failed
+   * \brief the signal emitted when a download process is finished; success or failed
    *
-   * @param exitCode
-   * @param message
+   * \param exitCode
+   * \param message
    */
   void Exit(bool exitCode, const QString message);
 

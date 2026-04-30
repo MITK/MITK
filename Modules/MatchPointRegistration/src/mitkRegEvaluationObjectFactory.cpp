@@ -18,17 +18,9 @@ found in the LICENSE file.
 
 #include <mitkRegEvaluationMapper2D.h>
 
-typedef std::multimap<std::string, std::string> MultimapType;
-
 mitk::RegEvaluationObjectFactory::RegEvaluationObjectFactory()
 : CoreObjectFactoryBase()
 {
-  static bool alreadyDone = false;
-  if (!alreadyDone)
-  {
-    alreadyDone = true;
-  }
-
 }
 
 mitk::RegEvaluationObjectFactory::~RegEvaluationObjectFactory()
@@ -57,32 +49,6 @@ CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode*)
 {
 
-}
-
-std::string mitk::RegEvaluationObjectFactory::GetFileExtensions()
-{
-  //return empty (dummy) extension string
-  return m_FileExtensions.c_str();
-};
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::RegEvaluationObjectFactory::GetFileExtensionsMap()
-{
-  return mitk::CoreObjectFactoryBase::MultimapType();
-}
-
-std::string mitk::RegEvaluationObjectFactory::GetSaveFileExtensions()
-{
-  //return empty (dummy) extension string
-  return m_FileExtensions.c_str();
-}
-
-mitk::CoreObjectFactoryBase::MultimapType mitk::RegEvaluationObjectFactory::GetSaveFileExtensionsMap()
-{
-  return mitk::CoreObjectFactoryBase::MultimapType();
-}
-
-void mitk::RegEvaluationObjectFactory::RegisterIOFactories()
-{
 }
 
 struct RegisterRegEvaluationObjectFactoryHelper{

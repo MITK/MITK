@@ -80,7 +80,7 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
     const ScalarType radius =
       std::max(outerMajorRadius - innerMajorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
 
-    return centerPoint + minorDirection * radius;
+    return Superclass::ApplyControlPointConstraints(index, centerPoint + minorDirection * radius);
   }
   else if (index == 3 && !m_ConstrainThickness)
   {
@@ -94,10 +94,10 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
 
     outerMajorVector.Normalize();
 
-    return centerPoint - outerMajorVector * radius;
+    return Superclass::ApplyControlPointConstraints(index, centerPoint - outerMajorVector * radius);
   }
 
-  return point;
+  return Superclass::ApplyControlPointConstraints(index, point);
 }
 
 void mitk::PlanarDoubleEllipse::EvaluateFeaturesInternal()

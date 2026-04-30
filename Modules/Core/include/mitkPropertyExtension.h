@@ -20,7 +20,13 @@ found in the LICENSE file.
 namespace mitk
 {
   /** \brief Base class for all property extensions.
-    */
+   *
+   * Property extensions allow attaching additional metadata to properties,
+   * such as allowed value ranges or other constraints. Derive from this class
+   * to define custom property extension types.
+   *
+   * \sa IPropertyExtensions
+   */
   class MITKCORE_EXPORT PropertyExtension : public itk::LightObject
   {
   public:

@@ -108,11 +108,8 @@ void QmitkIsoSurface::CreateSurface()
                                 "CAUTION!!!",
                                 "The number of polygons is greater than 2 000 000. If you continue, the program might "
                                 "crash. How do you want to go on?",
-                                "Proceed anyway!",
-                                "Cancel immediately! (maybe you want to insert an other threshold)!",
-                                QString(),
-                                0,
-                                1) == 1)
+                                QMessageBox::Ok | QMessageBox::Cancel,
+                                QMessageBox::Cancel) == QMessageBox::Cancel)
       {
         return;
       }

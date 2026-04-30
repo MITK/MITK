@@ -19,6 +19,21 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Transfer a VTK 4x4 matrix into an ITK transform.
+   *
+   * Copies the 3x3 rotation submatrix and the translation offset from
+   * a vtkMatrix4x4 into the given ITK transform. The transform's internal
+   * matrix modification time is updated so that the inverse will be
+   * recomputed on the next request.
+   *
+   * \tparam TTransformType The ITK transform type (e.g. AffineTransform3D).
+   * \param vtkmatrix The source VTK 4x4 matrix.
+   * \param itkTransform The destination ITK transform. If nullptr, the function returns immediately.
+   *
+   * \sa TransferItkTransformToVtkMatrix
+   * \sa ItkMatrixHack
+   */
   template <class TTransformType>
   void TransferVtkMatrixToItkTransform(const vtkMatrix4x4 *vtkmatrix, TTransformType *itkTransform)
   {
@@ -43,6 +58,19 @@ namespace mitk
     itkTransform->SetOffset(offset);
   }
 
+  /**
+   * \brief Transfer an ITK transform into a VTK 4x4 matrix.
+   *
+   * Copies the 3x3 rotation submatrix and the translation offset from
+   * the given ITK transform into a vtkMatrix4x4. The bottom row is set
+   * to [0, 0, 0, 1].
+   *
+   * \tparam TTransformType The ITK transform type (e.g. AffineTransform3D).
+   * \param itkTransform The source ITK transform.
+   * \param vtkmatrix The destination VTK 4x4 matrix.
+   *
+   * \sa TransferVtkMatrixToItkTransform
+   */
   template <class TTransformType>
   void TransferItkTransformToVtkMatrix(const TTransformType *itkTransform, vtkMatrix4x4 *vtkmatrix)
   {
@@ -57,6 +85,17 @@ namespace mitk
     vtkmatrix->SetElement(3, 3, 1);
   }
 
+  /**
+   * \brief Convert between two ITK transform types by copying matrix and offset.
+   *
+   * \tparam TTransformType1 The source ITK transform type.
+   * \tparam TTransformType2 The destination ITK transform type.
+   * \param sourceTransform The source transform. If nullptr, the function returns immediately.
+   * \param destTransform The destination transform. If nullptr, the function returns immediately.
+   *
+   * \sa TransferVtkMatrixToItkTransform
+   * \sa TransferItkTransformToVtkMatrix
+   */
   template <class TTransformType1, class TTransformType2>
   void ConvertItkTransform(const TTransformType1 *sourceTransform, TTransformType2 *destTransform)
   {
@@ -67,6 +106,18 @@ namespace mitk
     destTransform->SetOffset(sourceTransform->GetOffset());
   }
 
+  /**
+   * \brief Extract the rotation matrix from a geometry, removing spacing.
+   *
+   * Divides each column of the geometry's IndexToWorld matrix by the
+   * corresponding spacing component to obtain a pure rotation matrix.
+   *
+   * \tparam TMatrixType The ITK matrix type for the output.
+   * \param geometry The source geometry from which to extract the rotation.
+   * \param itkmatrix The output matrix that receives the rotation.
+   *
+   * \sa GetWorldToItkPhysicalTransform
+   */
   template <class TMatrixType>
   void GetRotation(const mitk::BaseGeometry *geometry, TMatrixType &itkmatrix)
   {
@@ -81,6 +132,20 @@ namespace mitk
         outputVnlMatrix[i][j] = geometryVnlMatrix[i][j] / spacing[j];
   }
 
+  /**
+   * \brief Compute the world-to-ITK-physical-space transform from a geometry.
+   *
+   * Extracts the rotation from the geometry (with spacing removed), computes
+   * its inverse (transpose), and combines it with the geometry's offset to
+   * produce a transform from MITK world coordinates to ITK physical coordinates.
+   *
+   * \tparam TTransformType The ITK transform type (e.g. AffineTransform3D).
+   * \param geometry The source geometry.
+   * \param itkTransform The output transform. If nullptr, the function returns immediately.
+   *
+   * \sa GetRotation
+   * \sa TransferVtkMatrixToItkTransform
+   */
   template <class TTransformType>
   void GetWorldToItkPhysicalTransform(const mitk::BaseGeometry *geometry, TTransformType *itkTransform)
   {

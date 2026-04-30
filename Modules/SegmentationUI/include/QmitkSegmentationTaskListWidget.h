@@ -32,24 +32,41 @@ namespace Ui
   class QmitkSegmentationTaskListWidget;
 }
 
+/**
+ * \brief Widget for managing segmentation task lists.
+ *
+ * Provides navigation through a list of segmentation tasks, loading/unloading of
+ * task images and segmentations, saving results, and tracking task progress.
+ *
+ * \sa mitk::SegmentationTaskList
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkSegmentationTaskListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /** \brief Constructs the segmentation task list widget. */
   explicit QmitkSegmentationTaskListWidget(QWidget* parent = nullptr);
   ~QmitkSegmentationTaskListWidget() override;
 
+  /** \brief Sets the data storage used for loading task data nodes. */
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  /** \brief Checks data storage consistency, optionally after a node removal. */
   void CheckDataStorage(const mitk::DataNode* removedNode = nullptr);
 
+  /** \brief Returns true if the currently active task is shown in the widget. */
   bool ActiveTaskIsShown() const;
+  /** \brief Loads the next unfinished task from the task list. */
   void LoadNextUnfinishedTask();
+  /** \brief Saves the currently active task, optionally as an interim result. */
   void SaveActiveTask(bool saveAsInterimResult = false);
+  /** \brief Called during application shutdown; prompts for unsaved changes if needed. Returns false to cancel shutdown. */
   bool OnPreShutdown();
 
 signals:
+  /** \brief Emitted when the active task changes. The index is std::nullopt when no task is active. */
   void ActiveTaskChanged(const std::optional<size_t>& index);
+  /** \brief Emitted when the current (browsed) task changes. The index is std::nullopt when no task is current. */
   void CurrentTaskChanged(const std::optional<size_t>& index);
 
 private:

@@ -325,9 +325,9 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nbins)
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(int state)
+void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(Qt::CheckState state)
 {
-  auto ignoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
+  auto ignoreZeroValueVoxel = state != Qt::Unchecked;
   m_Controls->widget_statistics->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
   m_DataGenerator->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);
   this->UpdateIntensityProfile();

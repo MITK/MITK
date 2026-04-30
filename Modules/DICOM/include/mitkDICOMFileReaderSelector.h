@@ -38,7 +38,7 @@ namespace mitk
 
   Two convenience methods load "default" configurations from
   compiled-in resources: LoadBuiltIn3DConfigs() and LoadBuiltIn3DnTConfigs().
-  @remark If you use LoadBuiltIn3DConfigs() and LoadBuiltIn3DnTConfigs() you must
+  \remark If you use LoadBuiltIn3DConfigs() and LoadBuiltIn3DnTConfigs() you must
   ensure that the MitkDICOM module (and therefore its resources) is properly
   loaded. If the module is not available these methods will do nothing.
   This can especially lead to problems if these methods are used in the scope
@@ -68,7 +68,7 @@ class MITKDICOM_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     /// \brief Load 3D image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOM module.
-    /// @remark If you use this function you must ensure that the MitkDICOM module(and therefore its resources)
+    /// \remark If you use this function you must ensure that the MitkDICOM module(and therefore its resources)
     /// is properly loaded. If the module is not available this function will do nothing.
     /// This can especially lead to problem if this function is used in the scope
     /// of another module's activator.
@@ -76,7 +76,7 @@ class MITKDICOM_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
     /// \brief Load 3D+t image creating configurations from the MITK module system (see us::Module::FindResources()).
     /// For a default set of configurations, look into the directory Resources of the DICOM module.
-    /// @remark If you use this function you must ensure that the MitkDICOM module(and therefore its resources)
+    /// \remark If you use this function you must ensure that the MitkDICOM module(and therefore its resources)
     /// is properly loaded. If the module is not available this function will do nothing.
     /// This can especially lead to problem if this function is used in the scope
     /// of another module's activator.

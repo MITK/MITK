@@ -17,10 +17,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Scalar type used throughout MITK for geometric computations. */
   typedef double ScalarType;
 
+  /** \brief Epsilon value for floating point comparison (vnl_math::eps * 100). */
   MITKCORE_EXPORT extern const ScalarType eps;
+
+  /** \brief Square root of epsilon (vnl_math::sqrteps). */
   MITKCORE_EXPORT extern const ScalarType sqrteps;
+
+  /** \brief A large value (std::numeric_limits<ScalarType>::max()). */
   MITKCORE_EXPORT extern const double large;
 }
 

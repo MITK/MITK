@@ -191,7 +191,7 @@ void mitk::LookupTable::ChangeOpacityForAll(float opacity)
 void mitk::LookupTable::ChangeOpacity(int index, float opacity)
 {
   int noValues = m_LookupTable->GetNumberOfTableValues();
-  if (index > noValues)
+  if (index >= noValues)
   {
     MITK_INFO << "could not change opacity. index exceed size of lut ... " << std::endl;
     return;
@@ -346,11 +346,6 @@ vtkSmartPointer<vtkColorTransferFunction> mitk::LookupTable::CreateColorTransfer
   return colorFunction;
 }
 
-void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction *&colorFunction)
-{
-  colorFunction = this->CreateColorTransferFunction();
-}
-
 vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateOpacityTransferFunction()
 {
   vtkSmartPointer<vtkPiecewiseFunction> opacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -374,11 +369,6 @@ vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateOpacityTransferFu
   return opacityFunction;
 }
 
-void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction *&opacityFunction)
-{
-  opacityFunction = this->CreateOpacityTransferFunction();
-}
-
 vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateGradientTransferFunction()
 {
   vtkSmartPointer<vtkPiecewiseFunction> gradientFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
@@ -400,11 +390,6 @@ vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateGradientTransferF
   gradientFunction->BuildFunctionFromTable(
     m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values, alphasHead);
   return gradientFunction;
-}
-
-void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction *&gradientFunction)
-{
-  gradientFunction = this->CreateGradientTransferFunction();
 }
 
 void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const

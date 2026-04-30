@@ -20,19 +20,24 @@ found in the LICENSE file.
 // STL header
 #include <vector>
 // ITK header
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 #include <itkEventObject.h>
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 #include <deque>
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief A linear undo model with one undo and one redo stack.
-  //##
-  //## Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
-  //## GUI elements, whether each of the stacks is empty or not (to enable/disable button, ...)
+  /**
+   * \brief A linear undo model with one undo and one redo stack.
+   *
+   * Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
+   * GUI elements whether each of the stacks is empty or not (to enable/disable buttons, etc.).
+   */
   class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
   {
   public:
@@ -43,100 +48,105 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      bool SetOperationEvent(UndoStackItem *stackItem) override;
+    /** \brief Store an operation event on the undo stack.
+     *
+     * Clears the redo stack when a new operation is added. If the undo limit
+     * is reached, the oldest entry is removed.
+     *
+     * \return True if the stack item was successfully added.
+     */
+    bool SetOperationEvent(UndoStackItem *stackItem) override;
 
-    //##Documentation
-    //## @brief Undoes the last changes
-    //##
-    //##  Reads the top element of the Undo-Stack,
-    //##  executes the operation,
-    //##  swaps the OperationEvent-Undo with the Operation
-    //##  and sets it to Redo-Stack
+    /** \brief Undoes the last changes.
+     *
+     * Reads the top element of the Undo-Stack,
+     * executes the operation,
+     * swaps the OperationEvent-Undo with the Operation
+     * and sets it to the Redo-Stack.
+     */
     bool Undo() override;
+
+    /** \brief Undoes the last changes.
+     *
+     * If fine is true, undoes one object event ID; otherwise undoes
+     * one group event ID.
+     */
     bool Undo(bool) override;
 
-    //##Documentation
-    //## @brief Undoes all changes until ObjectEventID oeid
+    /** \brief Undoes all changes until ObjectEventID oeid. */
     virtual bool Undo(int oeid);
 
-    //##Documentation
-    //## @brief Undoes the last changes
-    //##
-    //## Reads the top element of the Redo-Stack,
-    //## executes the operation,
-    //## swaps the OperationEvent-Operation with the Undo-Operation
-    //## and sets it to Undo-Stack
+    /** \brief Redoes the last undone changes.
+     *
+     * Reads the top element of the Redo-Stack,
+     * executes the operation,
+     * swaps the OperationEvent-Operation with the Undo-Operation
+     * and sets it to the Undo-Stack.
+     */
     bool Redo() override;
+
+    /** \brief Redoes changes (parameter currently unused). */
     bool Redo(bool) override;
 
-    //##Documentation
-    //## @brief Redoes all changes until ObjectEventID oeid
+    /** \brief Redoes all changes until ObjectEventID oeid. */
     virtual bool Redo(int oeid);
 
-    //##Documentation
-    //## @brief Clears UndoList and RedoList
+    /** \brief Clears both the UndoList and RedoList. */
     void Clear() override;
 
-    //##Documentation
-    //## @brief Clears the RedoList
+    /** \brief Clears the RedoList. */
     void ClearRedoList() override;
 
-    //##Documentation
-    //## @brief True, if RedoList is empty
+    /** \brief Returns true if the RedoList is empty. */
     bool RedoListEmpty() override;
 
-    //##Documentation
-    //## @brief True, if UndoList is empty
+    /** \brief Returns true if the UndoList is empty. */
     bool UndoListEmpty() override;
 
-    //##Documentation
-    //## @brief Gets the limit on the size of the undo history.
-    //## The undo limit determines how many items can be stored
-    //## in the undo stack. If the value is 0 that means that
-    //## there is no limit.
+    /** \brief Gets the limit on the size of the undo history.
+     *
+     * The undo limit determines how many items can be stored
+     * in the undo stack. A value of 0 means there is no limit.
+     */
     std::size_t GetUndoLimit() const override;
 
-    //##Documentation
-    //## @brief Sets a limit on the size of the undo history.
-    //## If the limit is reached, the oldest undo items will
-    //## be dropped from the bottom of the undo stack.
-    //## The 0 value means that there is no limit.
-    //## @param limit the maximum number of items on the stack
+    /** \brief Sets a limit on the size of the undo history.
+     *
+     * If the limit is reached, the oldest undo items will
+     * be dropped from the bottom of the undo stack.
+     * A value of 0 means there is no limit.
+     */
     void SetUndoLimit(std::size_t limit) override;
 
-    //##Documentation
-    //## @brief Returns the ObjectEventId of the
-    //## top element in the OperationHistory
+    /** \brief Returns the ObjectEventId of the top element in the OperationHistory. */
     int GetLastObjectEventIdInList() override;
 
-    //##Documentation
-    //## @brief Returns the GroupEventId of the
-    //## top element in the OperationHistory
+    /** \brief Returns the GroupEventId of the top element in the OperationHistory. */
     int GetLastGroupEventIdInList() override;
 
-    //##Documentation
-    //## @brief Returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given values; if nothing found, then returns nullptr
+    /** \brief Returns the last OperationEvent in the Undo-list matching the given
+     *         destination and operation type.
+     *
+     * \return The matching OperationEvent, or nullptr if nothing was found.
+     */
     OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
 
-    /**
-     * @brief Removes invalid operations from the undo/redo stack.
+    /** \brief Removes invalid operations from the undo/redo stack.
+     *
      * Iterates through m_UndoList and m_RedoList and removes invalid OperationEvents.
-     * @return Number of invalid operations removed
+     *
+     * \return Number of invalid operations removed.
      */
     unsigned int RemoveInvalidOperations() override;
 
   protected:
-    //##Documentation
-    //## Constructor
+    /** \brief Constructor. */
     LimitedLinearUndo();
 
-    //##Documentation
-    //## Destructor
+    /** \brief Destructor. Deletes all undo and redo entries. */
     ~LimitedLinearUndo() override;
 
-    //## @brief Convenience method to free the memory of
-    //## elements in the list and to clear the list
+    /** \brief Convenience method to free the memory of elements in the list and clear it. */
     void ClearList(UndoContainer *list);
 
     UndoContainer m_UndoList;
@@ -150,20 +160,25 @@ namespace mitk
 
   };
 
+#ifdef __GNUC__
 #pragma GCC visibility push(default)
+#endif
 
-  /// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (disable undo button)
-  /// or when there are items in the stack (enable button)
+  /** \brief ITK events to notify listening GUI elements when the undo or redo stack
+   *         is empty (disable button) or when there are items in the stack (enable button).
+   */
   itkEventMacroDeclaration(UndoStackEvent, itk::ModifiedEvent);
-  itkEventMacroDeclaration(UndoEmptyEvent, UndoStackEvent);
-  itkEventMacroDeclaration(RedoEmptyEvent, UndoStackEvent);
-  itkEventMacroDeclaration(UndoNotEmptyEvent, UndoStackEvent);
-  itkEventMacroDeclaration(RedoNotEmptyEvent, UndoStackEvent);
-  /// Additional unused events, if anybody wants to put an artificial limit to the possible number of items in the stack
-  itkEventMacroDeclaration(UndoFullEvent, UndoStackEvent);
-  itkEventMacroDeclaration(RedoFullEvent, UndoStackEvent);
+  itkEventMacroDeclaration(UndoEmptyEvent, UndoStackEvent);   ///< \brief Undo stack became empty.
+  itkEventMacroDeclaration(RedoEmptyEvent, UndoStackEvent);   ///< \brief Redo stack became empty.
+  itkEventMacroDeclaration(UndoNotEmptyEvent, UndoStackEvent); ///< \brief Undo stack is no longer empty.
+  itkEventMacroDeclaration(RedoNotEmptyEvent, UndoStackEvent); ///< \brief Redo stack is no longer empty.
+  /** \brief Additional events for signaling that a stack has reached its limit. */
+  itkEventMacroDeclaration(UndoFullEvent, UndoStackEvent);    ///< \brief Undo stack is full.
+  itkEventMacroDeclaration(RedoFullEvent, UndoStackEvent);    ///< \brief Redo stack is full.
 
+#ifdef __GNUC__
 #pragma GCC visibility pop
+#endif
 
 } // namespace mitk
 

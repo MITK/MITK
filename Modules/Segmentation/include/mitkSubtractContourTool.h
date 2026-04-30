@@ -24,7 +24,7 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Fill the inside of a contour with 1
+    \brief Erase the inside of a contour by filling it with the background pixel value.
 
     \sa ContourTool
 
@@ -33,15 +33,12 @@ namespace mitk
 
     Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
     is released, SubtractContourTool tries to extract a slice from the working image and fill in
-    the (filled) contour as a binary image. All inside pixels are set to 0.
+    the (filled) contour as a binary image. All inside pixels are set to 0 (erase).
 
     While holding the CTRL key, the contour changes color and the pixels on the inside would be
-    filled with 1.
-
+    filled with 1 (add).
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
   class MITKSEGMENTATION_EXPORT SubtractContourTool : public ContourTool
   {
@@ -50,15 +47,20 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    /** \brief Return the cursor icon resource for this tool. */
     us::ModuleResource GetCursorIconResource() const override;
+
+    /** \brief Return the toolbar icon resource for this tool. */
     us::ModuleResource GetIconResource() const override;
 
+    /** \brief Return the human-readable name of this tool ("Subtract"). */
     const char *GetName() const override;
 
   protected:
     SubtractContourTool(); // purposely hidden
     ~SubtractContourTool() override;
 
+    /** \brief Toggle painting pixel value and swap cursor icon when CTRL is pressed. */
     void OnInvertLogic(StateMachineAction* action, InteractionEvent* event) override;
   };
 

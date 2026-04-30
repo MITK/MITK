@@ -28,7 +28,6 @@ found in the LICENSE file.
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
 #include <mitkToolManagerProvider.h>
@@ -636,11 +635,15 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
      }
    }
 
+   // Forward the label inspector so tool GUIs can interact with the host's label-management widget.
+   auto* multiLabelInspector = m_Controls->multiLabelWidget->GetMultiLabelInspector();
+
    // setup 2D tools
    m_Controls->toolSelectionBox2D->SetToolManager(*m_ToolManager);
    m_Controls->toolSelectionBox2D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
+   m_Controls->toolSelectionBox2D->SetMultiLabelInspector(multiLabelInspector);
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &Self::OnManualTool2DSelected);
 
@@ -649,6 +652,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetGenerateAccelerators(false); // TODO: Doesn't work for buttons with same initial letter and blocks shortcuts for tools.
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
+   m_Controls->toolSelectionBox3D->SetMultiLabelInspector(multiLabelInspector);
 
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
@@ -693,10 +697,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_RenderingManagerObserverTag =
      mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command);
 
-   m_RenderWindowPart = this->GetRenderWindowPart();
-   if (nullptr != m_RenderWindowPart)
+   // Put m_Parent into a known-enabled state. When the view is restored from a
+   // perspective before the render window editor opens (e.g., CLI startup with
+   // a data argument), GetRenderWindowPart() returns null; the coordinator will
+   // call RenderWindowPartActivated once the editor becomes visible.
+   auto* renderWindowPart = this->GetRenderWindowPart();
+   if (nullptr != renderWindowPart)
    {
-     this->RenderWindowPartActivated(m_RenderWindowPart);
+     this->RenderWindowPartActivated(renderWindowPart);
+   }
+   else if (nullptr != m_Parent)
+   {
+     m_Parent->setEnabled(true);
    }
 
    // Make sure the GUI notices if appropriate data is already present on creation.

@@ -1,3 +1,4 @@
 set(MODULE_TESTS
-  mitkPythonTest.cpp
+  mitkPythonContextTest.cpp
+  mitkPythonBindingsTest.cpp
 )

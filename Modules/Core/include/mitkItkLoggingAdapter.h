@@ -19,12 +19,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Adapter that overwrites the standard itk logging output window and sends the logging messages to the MITK
-  // logging instead.
-  //## @ingroup IO
-
-  // this class is used to send output to stdout and not the itk window
+  /**
+   * \brief Adapter that overwrites the standard ITK logging output window
+   *        and redirects logging messages to the MITK logging system.
+   *
+   * \ingroup IO
+   */
   class MITKCORE_EXPORT ItkLoggingAdapter : public itk::OutputWindow
   {
   public:
@@ -39,11 +39,14 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      /** @brief Initializes the logging adapter. Itk logging
-        *        messages are redirected to MITK logging afterwards.
-        */
-      static void Initialize();
+    /** \brief Initializes the logging adapter.
+     *
+     * After calling this method, ITK logging messages are redirected
+     * to the MITK logging system.
+     */
+    static void Initialize();
 
+    /** \brief Displays text by forwarding it to MITK_INFO. */
     void DisplayText(const char *s) override;
 
   protected:

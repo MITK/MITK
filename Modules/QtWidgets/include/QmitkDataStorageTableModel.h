@@ -10,6 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+/**
+ * \file QmitkDataStorageTableModel.h
+ * \brief Declares QmitkDataStorageTableModel, a QAbstractTableModel that presents
+ *        DataStorage nodes (filtered by a predicate) in a sortable table with
+ *        columns for name, data type, and visibility.
+ *
+ * \ingroup QmitkModule
+ */
+
 #ifndef QmitkDataStorageTableModel_h
 #define QmitkDataStorageTableModel_h
 

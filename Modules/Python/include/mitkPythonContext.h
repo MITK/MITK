@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPythonContext_h
 #define mitkPythonContext_h
 
+#include <mitkFileSystem.h>
 #include <MitkPythonExports.h>
 
 #include <memory>
@@ -27,10 +28,21 @@ namespace mitk
    * \brief Provides a Python interpreter context for executing Python code and
    *        interacting with MITK data like images.
    *
-   * This class wraps a Python interpreter and maintains separate global and
-   * local dictionaries for executing Python code. It allows binding MITK data
-   * like images to Python variables and retrieving Python variables from the
-   * context in a type-safe manner.
+   * This class wraps a Python interpreter and maintains a dictionary for
+   * executing Python code. It allows binding MITK data like images to Python
+   * variables and retrieving Python variables from the context in a
+   * type-safe manner.
+   *
+   * A typical usage pattern is:
+   * \code
+   * mitk::PythonContext ctx("myenv");
+   * ctx.Activate();
+   * ctx.BindImage(image, "input_image");
+   * ctx.Execute("result = process(input_image)");
+   * auto value = ctx.GetVariableAsInt("result");
+   * \endcode
+   *
+   * \sa mitk::nnInteractiveTool
    */
   class MITKPYTHON_EXPORT PythonContext
   {
@@ -39,13 +51,21 @@ namespace mitk
      * \brief Constructs a PythonContext and optionally creates or activates a
      *        virtual environment.
      *
-     * \param venvName Name of the Python virtual environment to create or
-                       activate. If empty, no virtual environment is used.
+     * If the Python interpreter has not been initialized yet, it will be
+     * initialized during construction.
+     *
+     * \param[in] venvName Name of the Python virtual environment to create or
+     *                     activate. If empty, no virtual environment is used.
+     *
+     * \throw mitk::Exception if the virtual environment cannot be created or
+     *        activated.
+     *
+     * \post The Python interpreter is initialized.
      */
     explicit PythonContext(const std::string& venvName = {});
 
     /**
-     * \brief Destructor. Clears internal Python dictionaries.
+     * \brief Destructor. Clears the internal Python dictionary.
      */
     ~PythonContext();
 
@@ -56,66 +76,102 @@ namespace mitk
      * Adds the application path and the active virtual environment's
      * site-packages to the Python sys.path. Also imports NumPy and MITK Python
      * modules.
+     *
+     * \pre The PythonContext has been constructed.
+     *
+     * \throw mitk::Exception if any of the Python initialization commands fail.
      */
     void Activate();
 
     /**
      * \brief Checks whether a Python variable with the given name exists.
      *
-     * \param varName Name of the Python variable to check.
+     * \param[in] varName Name of the Python variable to check.
      *
-     * \return True if the variable exists in either the local or global
-     *         dictionary.
+     * \return \c true if the variable exists in the context's dictionary,
+     *         \c false otherwise.
      */
     bool HasVariable(const std::string &varName);
 
     /**
      * \brief Retrieves a Python variable as a bool.
      *
-     * \param varName Name of the Python variable.
+     * \param[in] varName Name of the Python variable.
      *
-     * \return std::optional<bool> containing the value if it exists and can be
-     *         cast, std::nullopt otherwise.
+     * \return The variable value if it exists and can be cast to \c bool,
+     *         \c std::nullopt otherwise.
      */
     std::optional<bool> GetVariableAsBool(const std::string& varName);
 
     /**
      * \brief Retrieves a Python variable as an int.
      *
-     * \param varName Name of the Python variable.
+     * \param[in] varName Name of the Python variable.
      *
-     * \return std::optional<int> containing the value if it exists and can be
-     *         cast, std::nullopt otherwise.
+     * \return The variable value if it exists and can be cast to \c int,
+     *         \c std::nullopt otherwise.
      */
     std::optional<int> GetVariableAsInt(const std::string& varName);
 
     /**
+     * \brief Retrieves a Python variable as a double.
+     *
+     * \param[in] varName Name of the Python variable.
+     *
+     * \return The variable value if it exists and can be cast to \c double,
+     *         \c std::nullopt otherwise.
+     */
+    std::optional<double> GetVariableAsDouble(const std::string& varName);
+
+    /**
      * \brief Retrieves a Python variable as a string.
      *
-     * \param varName Name of the Python variable.
+     * \param[in] varName Name of the Python variable.
      *
-     * \return std::optional<std::string> containing the value if it exists and
-     *         can be cast, std::nullopt otherwise.
+     * \return The variable value if it exists and can be cast to \c std::string,
+     *         \c std::nullopt otherwise.
      */
     std::optional<std::string> GetVariableAsString(const std::string& varName);
 
     /**
-     * \brief Binds an MITK image to a Python variable in the global dictionary.
+     * \brief Binds an MITK image to a Python variable in the context's dictionary.
      *
-     * \param image Pointer to the Image to bind. If nullptr, the variable is
-     *              set to None.
-     * \param varName Name of the Python variable to assign the image to.
+     * The image is passed by reference to Python (no copy). If the image
+     * pointer is \c nullptr, the variable is set to Python's \c None.
+     *
+     * \param[in] image Pointer to the Image to bind. If \c nullptr, the
+     *                  variable is set to \c None.
+     * \param[in] varName Name of the Python variable to assign the image to.
+     *
+     * \throw mitk::Exception if the image cannot be bound to the variable.
      */
     void BindImage(mitk::Image* image, const std::string& varName);
 
     /**
-     * \brief Executes arbitrary Python code with the context's dictionaries.
+     * \brief Executes arbitrary Python code within this context.
      *
-     * \param expression The Python code to execute.
+     * The code is executed using the context's dictionary, so variables set
+     * in previous calls are available in subsequent ones.
      *
-     * \throws mitk::Exception if execution fails.
+     * \param[in] expression The Python code to execute. May contain multiple
+     *                       statements separated by newlines.
+     *
+     * \throw mitk::Exception if execution fails (e.g., due to a Python error).
      */
     void Execute(const std::string &expression);
+
+    /**
+     * \brief Executes a Python file within this context.
+     *
+     * The file contents are executed using the same dictionary as Execute(),
+     * so variables and imports remain available across calls. The special
+     * \c __file__ variable is set to the executed file path.
+     *
+     * \param[in] filePath Absolute or relative path to the Python file.
+     *
+     * \throw mitk::Exception if the file cannot be read or execution fails.
+     */
+    void ExecuteFile(const fs::path& filePath);
 
   private:
     struct Impl;

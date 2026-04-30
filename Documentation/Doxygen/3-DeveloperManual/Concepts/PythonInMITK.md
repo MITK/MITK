@@ -84,11 +84,75 @@ In most cases, you won't need to interact with the `MitkPreloadPython` module di
 To run the Python interpreter as a separate process, use `MitkPythonHelper`.
 To exchange data (e.g., images) between MITK and Python, use `MitkPython`.
 
+### Testing
+
+The `MitkPython` module ships two complementary test binaries, both compiled into `MitkPythonTestDriver`:
+
+1. **`mitkPythonContextTest`**: a CppUnit suite exercising the `mitk::PythonContext` class directly from C++ — interpreter initialization, variable exchange, `Execute()`, `ExecuteFile()`, image binding, and context isolation.
+2. **`mitkPythonBindingsTest`**: a thin C++ host that spins up a dedicated `mitk_pytest` virtual environment, installs `pytest` on first run, then hands control to a pytest suite under `Modules/Python/test/pytest/`. The suite covers the `mitk` Python module's binding surface (image construction, NumPy interop, I/O, geometry, pixel types, points/vectors, auto-loaded modules) as seen from idiomatic Python.
+
+Splitting the two lets each side use its native testing idiom: CppUnit for C++ API coverage, pytest for Python-side behavior. The `mitk_pytest` venv is reused across test runs, so the pytest install cost is paid only once per machine.
+
 ## Python Wrapping: The mitk Python module
 
 The Python wrapping of MITK is handled by pybind11.
+The bindings are defined in `Wrapping/Python/mitk/` and compiled into a native extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`).
 
-**Note**: Currently, only a small subset of MITK is wrapped — primarily to support data exchange, such as transferring images, between MITK and Python.
+Currently, the following types and functions are exposed:
+
+| Category | Types / Functions |
+|---|---|
+| **Image** | `Image` with constructor overloads (empty / numpy / file path), `initialize()`, classmethods `from_numpy()` and `load()`, `save()`, `as_numpy()`, `__array__`, geometry properties (`spacing`, `origin`, `direction`, `direction_cosines`, `ndim`, `shape`, `dtype`, `array`, `time_steps`, `time_geometry`), per-time-step accessors (`get_spacing()`, `set_spacing()`, `get_origin()`, `set_origin()`, `get_direction()`, `set_direction()`, `get_geometry()`) |
+| **IO** | `IOUtil.load()`, `IOUtil.save()` |
+| **Geometry** | `BaseGeometry`, `Geometry3D`, `PlaneGeometry`, `SlicedGeometry3D`, `TimeGeometry` (with `count_time_steps()`, `get_min_time_point()`, `get_max_time_point()`, `get_time_bounds()`, `time_step_to_time_point()`, `time_point_to_time_step()`, `is_valid_time_step()`, `is_valid_time_point()`, `get_geometry_for_time_step()`, `get_geometry_for_time_point()`), `ArbitraryTimeGeometry`, `ProportionalTimeGeometry` |
+| **Pixel types** | `PixelType`, `make_pixel_type()` |
+| **Points / Vectors** | `Point2D`, `Point3D`, `Vector2D`, `Vector3D` |
+| **Exceptions** | `Exception` |
+| **CppMicroServices** | `get_loaded_modules()` |
+
+`mitk.Image` is the bound C++ class. Its constructor is overloaded by argument type so the same name handles empty construction, loading from a file, and wrapping a numpy array. `isinstance(img, mitk.Image)`, type hints, IDE autocomplete, and subclassing all work normally. Named factories `mitk.Image.from_numpy()` and `mitk.Image.load()` remain available for callers who prefer to be explicit.
+
+Basic usage:
+
+```python
+import mitk
+import numpy as np
+from pathlib import Path
+
+# Empty image (call initialize() before use)
+empty = mitk.Image()
+empty.initialize("float32", [64, 64, 64])
+
+# Construct from numpy
+arr = np.zeros((64, 64, 64), dtype=np.float32)
+img = mitk.Image(arr, spacing=(1.0, 1.0, 2.5))
+
+# Construct from a file path (str or pathlib.Path)
+loaded = mitk.Image("output.nrrd")
+loaded = mitk.Image(Path("output.nrrd"))
+
+# In-place modification (default direct, unlocked path)
+img.as_numpy(writeable=True)[32, 32, 32] = 1.0
+
+# Read access via the array protocol
+print(np.asarray(img)[32, 32, 32])  # 1.0
+
+# Geometry access
+print(img.shape, img.spacing, img.origin, img.direction)
+
+# Persistence
+img.save("output.nrrd")
+```
+
+By default, `as_numpy()` returns a *direct* numpy view that pins the underlying `mitk.Image` via a smart-pointer capsule but does **not** acquire any read/write lock. This is the preferred mode for in-process work and matches the behavior expected by `numpy.asarray()` and the `__array__` protocol. For workflows that need lock-based concurrency control (e.g. multi-threaded access from C++ and Python at the same time), pass `use_accessor=True` to safeguard image access through a `ImageReadAccessor`/`ImageWriteAccessor`-backed view, which holds the MITK accessor lock until the numpy array is garbage-collected:
+
+```python
+arr = img.as_numpy(use_accessor=True, writeable=True)
+arr[5, 5, 5] = 7
+del arr  # release the write accessor before re-acquiring
+```
+
+The bindings are available both within MITK applications (via the embedded Python in `MITK-build/python`) and as a standalone installable wheel (see below).
 
 ## Virtual environments
 
@@ -98,13 +162,75 @@ This allows different MITK components — such as segmentation tools — to use 
 
 These virtual environments are stored in the `mitk_venvs` folder within a dedicated user-writable location:
 
-- `%LocalAppData%` on Windows
+- `%%LocalAppData%` on Windows
 - `$XDG_DATA_HOME` or `$HOME/.local/share` on Linux
 - `$HOME/Library/Application Support` on macOS
 
 To avoid interference between multiple MITK versions built or installed on the same machine, we use a hash of the application path of the currently running MITK application as the top-level folder name inside `mitk_venvs`.
 
-Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Settings** plugin in MITK.
+Virtual environments created by `mitk::PythonContext` (or the corresponding functions in the `MitkPythonHelper` module) can be listed and managed through the **Python Environments** plugin in MITK.
+
+The `mitkPythonBindingsTest` described above relies on this mechanism and creates a dedicated `mitk_pytest` virtual environment the first time it runs.
+
+## Python Wheel
+
+The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk-*.whl`).
+This allows users to `pip install` the MITK bindings into any compatible Python environment without building MITK from source.
+
+### What is in the wheel?
+
+The wheel bundles:
+
+- The compiled pybind11 extension module (`mitk.cpXYZ-<platform>.pyd` / `.so`)
+- All CppMicroServices auto-load modules (IO readers/writers, model fit services, etc.)
+- All native library dependencies (ITK, VTK, CppMicroServices, MITK modules, etc.), vendored via a platform-specific delocator
+
+On import, `mitk/__init__.py` sets up the environment so that CppMicroServices auto-loading works transparently — the same IO file formats are available as in a full MITK application.
+
+### Building the wheel
+
+Use the `PythonWheel` build configuration, which is a headless configuration (no Qt, BlueBerry, or plugins) locked to Release builds:
+
+```bash
+cmake -S . -B ../MITK-superbuild -DMITK_BUILD_CONFIGURATION=PythonWheel
+cmake --build ../MITK-superbuild
+cmake --build ../MITK-superbuild/MITK-build
+```
+
+The last command builds all MITK modules and then automatically produces the wheel in the `MITK-build/` directory via the `mitk_python_wheel` target, which is included in the default build.
+
+The target:
+1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
+2. Stages the bindings and auto-load modules via `cmake --install --component wheel`
+3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
+
+The platform delocators are:
+- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk.libs/`
+- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk.libs/` and patches RPATH
+- **macOS**: [delocate](https://github.com/matthew-brett/delocate) — copies dylibs into `mitk/.dylibs/` and rewrites load commands
+
+### Testing the wheel
+
+A self-contained smoke test script is provided:
+
+```bash
+python Wrapping/Python/wheel/test_wheel.py --build-dir ../MITK-superbuild/MITK-build
+```
+
+This automatically creates a temporary virtual environment, installs the wheel, runs the tests, and cleans up.
+The test scope is deliberately narrow: it covers wheel-specific concerns (import, `__version__`, CppMicroServices auto-load bundling) plus a single functional sanity check.
+Comprehensive binding coverage lives in the `mitkPythonBindingsTest` pytest suite described above — running those against the wheel would be redundant.
+
+### Standalone usage
+
+The `build_wheel.py` script can also be invoked manually outside of the CMake build:
+
+```bash
+python Wrapping/Python/wheel/build_wheel.py --build-dir <MITK-build>
+```
+
+The wheel is written to the build directory by default.
+Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocator step for debugging.
 
 ## Quirks
 

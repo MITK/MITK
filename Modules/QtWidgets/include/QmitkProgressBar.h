@@ -20,42 +20,61 @@ found in the LICENSE file.
 
 /**
  * \ingroup QmitkModule
- * \brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
+ * \brief Qt implementation of the MITK progress bar interface.
  *
- * All mitk-classes will call this class for output:
- * mitk::ProgressBar::GetInstance();
+ * This class provides a Qt QProgressBar that implements the
+ * mitk::ProgressBarImplementation interface. It registers itself with
+ * mitk::ProgressBar so that all MITK classes can report progress through
+ * mitk::ProgressBar::GetInstance().
+ *
+ * Thread safety is achieved by using signal/slot connections: the public
+ * interface methods emit signals that are dispatched to the GUI thread.
+ *
+ * \sa mitk::ProgressBar
+ * \sa mitk::ProgressBarImplementation
  */
 class MITKQTWIDGETS_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
   Q_OBJECT
 
 public:
-  //##Documentation
-  //##@brief Constructor;
-  //## holds param instance internally and connects this to the mitkProgressBar
+  /**
+   * \brief Constructs the progress bar and registers it with mitk::ProgressBar.
+   * \param[in] parent Optional parent widget.
+   * \param[in] name   Optional object name (unused, kept for compatibility).
+   */
   QmitkProgressBar(QWidget *parent = nullptr, const char *name = nullptr);
 
-  //##Documentation
-  //##@brief Destructor
   ~QmitkProgressBar() override;
 
-  //##Documentation
-  //## @brief Sets whether the current progress value is displayed.
+  /**
+   * \brief Sets whether the percentage text is displayed on the progress bar.
+   * \param[in] visible True to show percentage, false to hide it.
+   */
   void SetPercentageVisible(bool visible) override;
 
-  //##Documentation
-  //## @brief Adds steps to totalSteps.
+  /**
+   * \brief Adds the given number of steps to the total step count.
+   * \param[in] steps The number of steps to add.
+   */
   void AddStepsToDo(unsigned int steps) override;
 
-  //##Documentation
-  //## @brief Sets the current amount of progress to current progress + steps.
-  //## @param steps the number of steps done since last Progress(int steps) call.
+  /**
+   * \brief Advances the progress by the given number of steps.
+   *
+   * When the progress reaches the total, the bar is automatically reset.
+   *
+   * \param[in] steps The number of steps completed since the last call.
+   */
   void Progress(unsigned int steps) override;
 
 signals:
 
+  /** \brief Internal signal to dispatch AddStepsToDo to the GUI thread. */
   void SignalAddStepsToDo(unsigned int steps);
+  /** \brief Internal signal to dispatch Progress to the GUI thread. */
   void SignalProgress(unsigned int steps);
+  /** \brief Internal signal to dispatch SetPercentageVisible to the GUI thread. */
   void SignalSetPercentageVisible(bool visible);
 
 protected slots:
@@ -65,8 +84,7 @@ protected slots:
   virtual void SlotSetPercentageVisible(bool visible);
 
 private:
-  //##Documentation
-  //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
+  /** \brief Reset the progress bar. The progress bar "rewinds" and shows no progress. */
   void Reset() override;
 
   unsigned int m_TotalSteps;

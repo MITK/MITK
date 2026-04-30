@@ -356,12 +356,6 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_OS; // "os";
 
   /**
-   * The name of the deprecated parent attribute, which appears on scheme
-   * definitions.
-   */
-  static const QString ATT_PARENT; // "parent";
-
-  /**
    * View parent category attribute. Value <code>parentCategory</code>.
    */
   static const QString ATT_PARENT_CATEGORY; // "parentCategory";
@@ -370,12 +364,6 @@ struct WorkbenchRegistryConstants {
    * Parent id attribute. Value <code>parentId</code>.
    */
   static const QString ATT_PARENT_ID; // "parentId";
-
-  /**
-   * The name of the deprecated parent scope attribute, which appears on
-   * contexts definitions.
-   */
-  static const QString ATT_PARENT_SCOPE; // "parentScope";
 
   /**
    * Path attribute. Value <code>path</code>.
@@ -712,11 +700,6 @@ struct WorkbenchRegistryConstants {
   static const QString PL_WORKINGSETS; // "workingSets";
 
   /**
-   * The name of the deprecated accelerator configurations extension point.
-   */
-  static const QString EXTENSION_ACCELERATOR_CONFIGURATIONS;
-
-  /**
    * The name of the accelerator scopes extension point.
    */
   static const QString EXTENSION_ACCELERATOR_SCOPES;
@@ -822,18 +805,6 @@ struct WorkbenchRegistryConstants {
    * The action style for check boxes.
    */
   static const QString STYLE_TOGGLE; // "toggle";
-
-  /**
-   * The name of the deprecated accelerator configuration element. This
-   * element was used in 2.1.x and earlier to define groups of what are now
-   * called schemes.
-   */
-  static const QString TAG_ACCELERATOR_CONFIGURATION; // "acceleratorConfiguration";
-
-  /**
-   * The name of the element storing a deprecated accelerator scope.
-   */
-  static const QString TAG_ACCELERATOR_SCOPE; // "acceleratorScope";
 
   /**
    * Action tag. Value <code>action</code>.
@@ -977,13 +948,6 @@ struct WorkbenchRegistryConstants {
   static const QString TAG_EDITOR; // "editor";
 
   /**
-   * The name of the deprecated editorContribution element. This is used for
-   * contributing actions to the top-level menus and tool bars when particular
-   * editors are visible.
-   */
-  static const QString TAG_EDITOR_CONTRIBUTION; // "editorContribution";
-
-  /**
    * The name of the enabled when element, which appears on a handler
    * definition.
    */
@@ -1058,13 +1022,6 @@ struct WorkbenchRegistryConstants {
    * The name of the key binding element in the commands extension point.
    */
   static const QString TAG_KEY_BINDING; // "keyBinding";
-
-  /**
-   * The name of the deprecated key configuration element in the commands
-   * extension point. This element has been replaced with the scheme element
-   * in the bindings extension point.
-   */
-  static const QString TAG_KEY_CONFIGURATION; // "keyConfiguration";
 
   /**
    * The name of the element storing a location.
@@ -1148,11 +1105,6 @@ struct WorkbenchRegistryConstants {
    * The name of the scheme element in the bindings extension point.
    */
   static const QString TAG_SCHEME; // "scheme";
-
-  /**
-   * The name of the element storing a deprecated scope.
-   */
-  static const QString TAG_SCOPE; // "scope";
 
   /**
    * Selectiont tag. Value <code>selection</code>.

@@ -18,41 +18,49 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  //##Documentation
-  //## @brief Operation, that holds everything necessary for an rotation operation on mitk::BaseData.
-  //##
-  //## @ingroup Undo
+  /**
+   * \brief Operation that holds everything necessary for a rotation operation on mitk::BaseData.
+   *
+   * \sa Operation
+   * \ingroup Undo
+   */
   class MITKCORE_EXPORT RotationOperation : public Operation
   {
   public:
     /**
-     * @brief RotationOperation constructor to create the operation.
-     * @param operationType this has to be set to OpROTATE.
-     * @param pointOfRotation Anchor point for rotation.
-     * @param vectorOfRotation Axis for rotation.
-     * @param angleOfRotation Angle for rotation in degree.
+     * \brief Constructor to create a rotation operation.
+     *
+     * \param operationType this has to be set to OpROTATE.
+     * \param pointOfRotation anchor point for rotation.
+     * \param vectorOfRotation axis for rotation.
+     * \param angleOfRotation angle for rotation in degrees.
      */
     RotationOperation(OperationType operationType,
                       Point3D pointOfRotation,
                       Vector3D vectorOfRotation,
                       ScalarType angleOfRotation);
+
+    /** \brief Destructor. */
     ~RotationOperation(void) override;
 
     /**
-     * @brief GetAngleOfRotation getter for rotation angle.
-     * @return Angle in degree.
+     * \brief Returns the rotation angle.
+     *
+     * \return Angle in degrees.
      */
     virtual ScalarType GetAngleOfRotation();
 
     /**
-     * @brief GetCenterOfRotation getter for the anchor point of rotation.
-     * @return The anchor point to rotate the base data around.
+     * \brief Returns the anchor point of rotation.
+     *
+     * \return The anchor point to rotate the base data around.
      */
     virtual const Point3D GetCenterOfRotation();
 
     /**
-     * @brief GetVectorOfRotation getter for the rotation axis.
-     * @return Rotation axis as vector.
+     * \brief Returns the rotation axis.
+     *
+     * \return Rotation axis as vector.
      */
     virtual const Vector3D GetVectorOfRotation();
 

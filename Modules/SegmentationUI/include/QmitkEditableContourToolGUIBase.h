@@ -28,22 +28,31 @@ namespace Ui
 }
 
 /**
-\ingroup org_mitk_gui_qt_interactivesegmentation_internal
-\brief GUI for mitk::EditableContourTool based classes.
-\sa mitk::LassoTool
-*/
+ * \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+ * \brief Base GUI class for editable contour-based segmentation tools.
+ *
+ * Provides common UI controls for contour tools including confirm/clear buttons,
+ * auto-confirm toggle, add/subtract mode toggle, and an information panel. Used as the
+ * base class for tool GUIs such as QmitkLassoToolGUI and QmitkLiveWireTool2DGUI.
+ *
+ * \sa mitk::EditableContourTool
+ * \sa QmitkLassoToolGUI
+ * \sa QmitkLiveWireTool2DGUI
+ * \sa QmitkToolGUI
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitkEditableContourToolGUIBase : public QmitkToolGUI
 {
   Q_OBJECT
 
 public:
-  /// \cond
-  enum class MITKSEGMENTATIONUI_EXPORT Mode
+  /**
+   * \brief Mode of operation for the contour tool.
+   */
+  enum class Mode
   {
-    Add,
-    Subtract
+    Add,      ///< Add contour to the segmentation.
+    Subtract  ///< Subtract contour from the segmentation.
   };
-  /// \endcond
 
   mitkClassMacro(QmitkEditableContourToolGUIBase, QmitkToolGUI);
   itkFactorylessNewMacro(Self);

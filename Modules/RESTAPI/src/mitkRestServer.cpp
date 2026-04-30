@@ -106,7 +106,6 @@ namespace
   {
     return path == "/api/v1/health" ||
            path == "/api/v1/info" ||
-           path == "/api/v1/" ||
            path == "/api/v1/docs" ||
            path == "/api/v1/docs/" ||
            path == "/api/v1/docs/swagger-ui.css" ||
@@ -822,13 +821,6 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  // API root info
-  m_Server->Get(apiBase + "/",
-    [this](const httplib::Request& req, httplib::Response& res) {
-      m_HealthController->HandleGET_info(req, res);
-      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
-    });
-
   // File access config discovery endpoint
   m_Server->Get(apiBase + "/config/file-access",
     [this](const httplib::Request& req, httplib::Response& res) {
@@ -970,6 +962,68 @@ void RestServer::RegisterRoutes()
   m_Server->Get(apiBase + "/rendering/screenshot",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_screenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  // Register the list path before the parameterised path so the list isn't
+  // captured as a window name.
+  m_Server->Get(apiBase + "/rendering/editors",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_editors(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiInfo(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindows(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindow(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiCamera(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_stdmultiCamera(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiScreenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 

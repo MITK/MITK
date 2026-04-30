@@ -3,6 +3,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
+  QmitkRestApiBridgeBindings.cpp
   QmitkRestApiPreferencePage.cpp
   QmitkRestApiView.cpp
 )

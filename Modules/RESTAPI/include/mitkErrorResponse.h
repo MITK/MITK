@@ -57,6 +57,9 @@ namespace mitk
     static constexpr const char* CODE_RENDER_WINDOW_NOT_AVAILABLE = "RENDER_WINDOW_NOT_AVAILABLE";
     static constexpr const char* CODE_TIME_NAVIGATION_NOT_AVAILABLE = "TIME_NAVIGATION_NOT_AVAILABLE";
     static constexpr const char* CODE_TIME_STEPPER_NOT_AVAILABLE = "TIME_STEPPER_NOT_AVAILABLE";
+    static constexpr const char* CODE_EDITOR_NOT_ACTIVE = "EDITOR_NOT_ACTIVE";
+    static constexpr const char* CODE_RENDER_WINDOW_NOT_FOUND = "RENDER_WINDOW_NOT_FOUND";
+    static constexpr const char* CODE_UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION";
 
     /**
      * \brief Create an RFC 7807 error response.
@@ -307,6 +310,45 @@ namespace mitk
      * \return JSON error response with status 500
      */
     static Json TimeStepperNotAvailable(const std::string& instance = "");
+
+    /**
+     * \brief Create an "Editor not active" error response.
+     *
+     * Used when the targeted editor instance (e.g. StdMultiWidgetEditor) is not
+     * currently open in the workbench, even though the render window bridge
+     * callback is installed. Distinct from RENDER_WINDOW_NOT_AVAILABLE, which
+     * signals that no callback is registered at all (headless / plugin not
+     * loaded).
+     *
+     * \param detail Optional description (e.g. which editor is missing)
+     * \param instance Request path
+     * \return JSON error response with status 503
+     */
+    static Json EditorNotActive(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * \brief Create a "Render window not found" error response.
+     *
+     * Used when a per-window URL segment does not name a known render window
+     * of the targeted editor.
+     *
+     * \param windowName The window name from the URL
+     * \param instance Request path
+     * \return JSON error response with status 404
+     */
+    static Json RenderWindowNotFound(const std::string& windowName, const std::string& instance = "");
+
+    /**
+     * \brief Create an "Unsupported operation" error response.
+     *
+     * Used when a sub-resource does not apply to the addressed window (e.g.
+     * selected-slice on the 3d window).
+     *
+     * \param detail Description of the unsupported operation
+     * \param instance Request path
+     * \return JSON error response with status 404
+     */
+    static Json UnsupportedOperation(const std::string& detail, const std::string& instance = "");
   };
 }
 

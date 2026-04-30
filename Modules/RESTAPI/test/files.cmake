@@ -9,4 +9,5 @@ set(MODULE_TESTS
   mitkSecurityMiddlewareTest.cpp
   mitkInputValidationTest.cpp
   mitkRenderingControllerTest.cpp
+  mitkRenderWindowBridgeTest.cpp
 )

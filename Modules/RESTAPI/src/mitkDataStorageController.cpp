@@ -901,7 +901,8 @@ void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib
   }
   response["meta"]["property_scope"] = scopeStr;
 
-  // Add path_query to meta when path filter is used (per API spec Section 6.4)
+  // Echo the request's path filter back in meta as path_query (see "Path Query
+  // Response" in the MITK REST API specification under Documentation/).
   if (params.path.has_value())
   {
     response["meta"]["path_query"] = params.path.value();
@@ -1362,7 +1363,8 @@ void DataStorageController::HandleGET_nodes_uid_children(const httplib::Request&
   response["meta"]["offset"] = queryResult.offset;
   response["meta"]["returned_count"] = returnedCount;
 
-  // Add path_query to meta when path filter is used (per API spec Section 6.4)
+  // Echo the request's path filter back in meta as path_query (see "Path Query
+  // Response" in the MITK REST API specification under Documentation/).
   if (params.path.has_value())
   {
     response["meta"]["path_query"] = params.path.value();

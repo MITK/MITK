@@ -19,8 +19,10 @@ found in the LICENSE file.
 #include <mitkStepper.h>
 #include <mitkTimeNavigationController.h>
 
+#include <algorithm>
 #include <functional>
 #include <optional>
+#include <set>
 #include <vector>
 
 namespace mitk
@@ -33,6 +35,7 @@ RenderingController::RenderingController(DataStorageBridge& bridge)
 
 void RenderingController::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
 {
+  std::lock_guard<std::mutex> lock(m_DispatcherMutex);
   m_Dispatcher = dispatcher;
 }
 
@@ -269,6 +272,12 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
   {
     posInfo = m_RenderWindowBridge->GetSelectedPosition();
   }
+  catch (const RenderWindowBridgeNoEditorException& e)
+  {
+    const auto error = ErrorResponse::EditorNotActive(e.what(), req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
   catch (const std::exception& e)
   {
     const auto error = ErrorResponse::InternalError(
@@ -361,6 +370,11 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
     m_RenderWindowBridge->SetSelectedPosition(newPos);
     res.status = 204;
   }
+  catch (const RenderWindowBridgeNoEditorException& e)
+  {
+    const auto error = ErrorResponse::EditorNotActive(e.what(), req.path);
+    this->SendErrorResponse(res, 503, error);
+  }
   catch (const std::exception& e)
   {
     const auto error = ErrorResponse::InternalError(
@@ -371,11 +385,11 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
 
 void RenderingController::HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const
 {
-  int timestep = 0;
+  TimeStepType timestep = 0;
   double timepointMs = 0.0;
   double minTimepointMs = 0.0;
   double maxTimepointMs = 0.0;
-  int steps = 0;
+  TimeStepType steps = 0;
 
   bool tncNull = false;
   try
@@ -389,13 +403,13 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
         return;
       }
 
-      timestep = static_cast<int>(tnc->GetSelectedTimeStep());
+      timestep = tnc->GetSelectedTimeStep();
       timepointMs = tnc->GetSelectedTimePoint();
 
       const auto tg = tnc->GetInputWorldTimeGeometry();
       if (nullptr != tg)
       {
-        steps = static_cast<int>(tg->CountTimeSteps());
+        steps = tg->CountTimeSteps();
         minTimepointMs = tg->GetMinimumTimePoint();
         maxTimepointMs = tg->GetMaximumTimePoint();
       }
@@ -404,17 +418,10 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
         const auto* stepper = tnc->GetStepper();
         if (stepper != nullptr)
         {
-          steps = static_cast<int>(stepper->GetSteps());
+          steps = stepper->GetSteps();
         }
       }
     });
-  }
-  catch (const mitk::Exception& e)
-  {
-    const auto error = ErrorResponse::InternalError(
-      std::string("Failed to read time navigation state: ") + e.what(), req.path);
-    this->SendErrorResponse(res, 500, error);
-    return;
   }
   catch (const std::exception& e)
   {
@@ -508,10 +515,10 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
 
   try
   {
-    std::function<unsigned int(TimeNavigationController*)> computeStep;
+    std::function<TimeStepType(TimeNavigationController*)> computeStep;
     if (hasTimestep)
     {
-      const auto ts = static_cast<unsigned int>(body["timestep"].get<int>());
+      const auto ts = static_cast<TimeStepType>(body["timestep"].get<int>());
       computeStep = [ts](TimeNavigationController*) { return ts; };
     }
     else
@@ -520,10 +527,10 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
       computeStep = [tp](TimeNavigationController* tnc)
       {
         const auto tg = tnc->GetInputWorldTimeGeometry();
-        unsigned int ts = 0;
+        TimeStepType ts = 0;
         if (nullptr != tg)
         {
-          ts = static_cast<unsigned int>(tg->TimePointToTimeStep(tp));
+          ts = tg->TimePointToTimeStep(tp);
         }
         return ts;
       };
@@ -545,7 +552,7 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
         stepperNull = true;
         return;
       }
-      stepper->SetPos(computeStep(tnc));
+      stepper->SetPos(static_cast<unsigned int>(computeStep(tnc)));
       tnc->SendTime();
     });
 
@@ -578,6 +585,700 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
   }
 }
 
+namespace
+{
+  nlohmann::json EditorInfoToJson(const mitk::EditorInfo& info, bool includeWindowList)
+  {
+    nlohmann::json j;
+    j["alias"] = info.alias;
+    j["plugin_id"] = info.pluginId;
+    j["active"] = info.active;
+    if (includeWindowList)
+    {
+      j["windows"] = nlohmann::json::array();
+      for (const auto& n : info.windowNames)
+        j["windows"].push_back(n);
+    }
+    return j;
+  }
+
+  bool IsValidStandardViewName(const std::string& v)
+  {
+    // Restricted to the six values CameraController::StandardView exposes.
+    return v == "anterior" || v == "posterior" ||
+           v == "left"     || v == "right"     ||
+           v == "cranial"  || v == "caudal";
+  }
+
+  // Read a JSON array of exactly 3 numbers into `out`. Returns nullopt on OK,
+  // or a diagnostic fragment (appended by the caller to the field name) on failure.
+  std::optional<std::string> ReadPoint3D(const nlohmann::json& arr, mitk::Point3D& out)
+  {
+    if (!arr.is_array())
+      return "must be an array of 3 numbers";
+    if (arr.size() != 3)
+      return "must have exactly 3 elements, got " + std::to_string(arr.size());
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      if (!arr[i].is_number())
+        return "element " + std::to_string(i) + " is not a number";
+      out[i] = arr[i].get<double>();
+    }
+    return std::nullopt;
+  }
+
+  std::optional<std::string> ReadVector3D(const nlohmann::json& arr, mitk::Vector3D& out)
+  {
+    if (!arr.is_array())
+      return "must be an array of 3 numbers";
+    if (arr.size() != 3)
+      return "must have exactly 3 elements, got " + std::to_string(arr.size());
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+      if (!arr[i].is_number())
+        return "element " + std::to_string(i) + " is not a number";
+      out[i] = arr[i].get<double>();
+    }
+    return std::nullopt;
+  }
+
+  /**
+   * \brief Parse and validate a camera patch body for a given window kind.
+   *
+   * On success, fills `patch` and returns nullopt. On failure, returns the
+   * HTTP 400 error payload (the caller already knows the status).
+   *
+   * Rules:
+   * - Unknown top-level fields → 400.
+   * - position/focal_point/view_up: array of 3 numbers if present.
+   * - parallel_scale: number > 0, only for 2D windows.
+   * - perspective_angle: number in (0, 180), only for 3D windows.
+   * - standard_view: one of anterior/posterior/left/right/cranial/caudal.
+   * - Empty body (no recognised field) → 400.
+   */
+  std::optional<std::string> ParseCameraPatch(
+    const nlohmann::json& body, bool is3d, mitk::CameraPatch& patch)
+  {
+    static const std::set<std::string> knownFields = {
+      "position", "focal_point", "view_up",
+      "parallel_scale", "perspective_angle", "standard_view"
+    };
+
+    if (!body.is_object())
+      return "Request body must be a JSON object.";
+
+    for (auto it = body.begin(); it != body.end(); ++it)
+    {
+      if (!knownFields.count(it.key()))
+        return "Unknown field '" + it.key() + "'.";
+    }
+
+    if (body.contains("position"))
+    {
+      mitk::Point3D p;
+      if (const auto err = ReadPoint3D(body["position"], p))
+        return "'position' " + *err + ".";
+      patch.position = p;
+    }
+    if (body.contains("focal_point"))
+    {
+      mitk::Point3D p;
+      if (const auto err = ReadPoint3D(body["focal_point"], p))
+        return "'focal_point' " + *err + ".";
+      patch.focalPoint = p;
+    }
+    if (body.contains("view_up"))
+    {
+      mitk::Vector3D v;
+      if (const auto err = ReadVector3D(body["view_up"], v))
+        return "'view_up' " + *err + ".";
+      patch.viewUp = v;
+    }
+    if (body.contains("parallel_scale"))
+    {
+      if (is3d)
+        return "'parallel_scale' is not applicable to the 3D window.";
+      if (!body["parallel_scale"].is_number())
+        return "'parallel_scale' must be a positive number.";
+      const double s = body["parallel_scale"].get<double>();
+      if (!(s > 0.0))
+        return "'parallel_scale' must be a positive number.";
+      patch.parallelScale = s;
+    }
+    if (body.contains("perspective_angle"))
+    {
+      if (!is3d)
+        return "'perspective_angle' is only applicable to the 3D window.";
+      if (!body["perspective_angle"].is_number())
+        return "'perspective_angle' must be a number in (0, 180).";
+      const double a = body["perspective_angle"].get<double>();
+      if (!(a > 0.0 && a < 180.0))
+        return "'perspective_angle' must be a number in (0, 180).";
+      patch.perspectiveAngle = a;
+    }
+    if (body.contains("standard_view"))
+    {
+      if (!body["standard_view"].is_string())
+        return "'standard_view' must be a string.";
+      const auto v = body["standard_view"].get<std::string>();
+      if (!IsValidStandardViewName(v))
+        return "'standard_view' has unknown value '" + v + "'. "
+               "Allowed: anterior, posterior, left, right, cranial, caudal.";
+      patch.standardView = v;
+    }
+
+    // 'standard_view' programs the CameraController, while explicit pose fields
+    // bypass it and write the raw vtkCamera. Combining them leaves the
+    // controller's internal "standard view" memo inconsistent with the actual
+    // pose, so we reject the combination outright. Scalar fields
+    // (parallel_scale, perspective_angle) do not move the camera and remain
+    // compatible with standard_view.
+    if (patch.standardView && (patch.position || patch.focalPoint || patch.viewUp))
+    {
+      return "'standard_view' cannot be combined with 'position', 'focal_point', "
+             "or 'view_up'. Send either a standard view or an explicit pose.";
+    }
+
+    if (!patch.position && !patch.focalPoint && !patch.viewUp &&
+        !patch.parallelScale && !patch.perspectiveAngle && !patch.standardView)
+    {
+      return "Request body must set at least one camera field.";
+    }
+
+    return std::nullopt;
+  }
+
+  constexpr const char* ContentTypeFor(mitk::ScreenshotFormat f)
+  {
+    return (f == mitk::ScreenshotFormat::Jpeg) ? "image/jpeg" : "image/png";
+  }
+
+  /**
+   * \brief Resolved query parameters for the screenshot endpoints.
+   *
+   * Shared between /rendering/screenshot, /rendering/editors/stdmulti/screenshot,
+   * and /rendering/editors/stdmulti/windows/{name}/screenshot — the contract
+   * is intentionally identical.
+   */
+  struct ScreenshotQueryParams
+  {
+    mitk::ScreenshotFormat format = mitk::ScreenshotFormat::Png;
+    std::optional<std::pair<int, int>> size;
+  };
+
+  /**
+   * \brief Thrown by ParseScreenshotQueryParams on invalid query parameters.
+   *
+   * Carries the human-readable detail string that the handler turns into a
+   * 400 InvalidRequest response. Internal to this translation unit.
+   */
+  struct InvalidScreenshotRequest
+  {
+    std::string detail;
+  };
+
+  /**
+   * \brief Parse `format` / `width` / `height` query parameters.
+   *
+   * \throws InvalidScreenshotRequest if any parameter is malformed.
+   */
+  ScreenshotQueryParams ParseScreenshotQueryParams(const httplib::Request& req)
+  {
+    ScreenshotQueryParams p;
+
+    if (req.has_param("format"))
+    {
+      const auto formatStr = req.get_param_value("format");
+      if (formatStr == "png")
+        p.format = mitk::ScreenshotFormat::Png;
+      else if (formatStr == "jpeg")
+        p.format = mitk::ScreenshotFormat::Jpeg;
+      else
+        throw InvalidScreenshotRequest{
+          "Invalid format '" + formatStr + "'. Must be 'png' or 'jpeg'."};
+    }
+
+    const bool hasWidth = req.has_param("width");
+    const bool hasHeight = req.has_param("height");
+    if (hasWidth != hasHeight)
+      throw InvalidScreenshotRequest{
+        "Both 'width' and 'height' must be provided together."};
+
+    if (hasWidth)
+    {
+      int width = 0;
+      int height = 0;
+      try
+      {
+        width = std::stoi(req.get_param_value("width"));
+        height = std::stoi(req.get_param_value("height"));
+      }
+      catch (const std::exception&)
+      {
+        throw InvalidScreenshotRequest{"'width' and 'height' must be integers."};
+      }
+
+      if (width <= 0 || height <= 0)
+        throw InvalidScreenshotRequest{
+          "'width' and 'height' must be positive integers."};
+
+      static constexpr int maxDimension = 8192;
+      if (width > maxDimension || height > maxDimension)
+        throw InvalidScreenshotRequest{
+          "'width' and 'height' must not exceed " + std::to_string(maxDimension) + "."};
+
+      p.size = {width, height};
+    }
+
+    return p;
+  }
+
+  nlohmann::json SliceStateToJson(const mitk::SliceState& s)
+  {
+    nlohmann::json j;
+    j["step"] = s.step;
+    j["position"] = {s.position[0], s.position[1], s.position[2]};
+    j["bounds"]["steps"] = s.bounds.steps;
+    if (s.bounds.hasPositions)
+    {
+      j["bounds"]["min_position"] = {s.bounds.minPosition[0], s.bounds.minPosition[1], s.bounds.minPosition[2]};
+      j["bounds"]["max_position"] = {s.bounds.maxPosition[0], s.bounds.maxPosition[1], s.bounds.maxPosition[2]};
+    }
+    else
+    {
+      j["bounds"]["min_position"] = nullptr;
+      j["bounds"]["max_position"] = nullptr;
+    }
+    return j;
+  }
+
+  /**
+   * \brief Parse a selected-slice PUT body. Only `{"step": N}` is accepted
+   *        for StdMulti. Presence of `position` → hint to use selected-position.
+   *
+   * On success, fills `step`. On failure, returns the 400 error detail string.
+   */
+  std::optional<std::string> ParseSliceStepBody(const nlohmann::json& body, unsigned int& step)
+  {
+    if (!body.is_object())
+      return "Request body must be a JSON object.";
+
+    // `position` is reserved for /rendering/selected-position — explicit hint.
+    if (body.contains("position"))
+    {
+      return "'position' is not accepted on StdMulti selected-slice. "
+             "Use PUT /rendering/selected-position to move by world coordinates.";
+    }
+
+    for (auto it = body.begin(); it != body.end(); ++it)
+    {
+      if (it.key() != "step")
+        return "Unknown field '" + it.key() + "'.";
+    }
+
+    if (!body.contains("step"))
+      return "'step' field is required.";
+
+    const auto& s = body["step"];
+    if (!s.is_number_integer())
+      return "'step' must be a non-negative integer.";
+
+    const auto raw = s.get<long long>();
+    if (raw < 0)
+      return "'step' must be a non-negative integer.";
+
+    step = static_cast<unsigned int>(raw);
+    return std::nullopt;
+  }
+
+  nlohmann::json CameraStateToJson(const mitk::CameraState& s)
+  {
+    nlohmann::json j;
+    j["position"]    = {s.position[0],    s.position[1],    s.position[2]};
+    j["focal_point"] = {s.focalPoint[0],  s.focalPoint[1],  s.focalPoint[2]};
+    j["view_up"]     = {s.viewUp[0],      s.viewUp[1],      s.viewUp[2]};
+    if (s.parallelScale.has_value())    j["parallel_scale"]    = *s.parallelScale;
+    if (s.perspectiveAngle.has_value()) j["perspective_angle"] = *s.perspectiveAngle;
+    return j;
+  }
+}
+
+void RenderingController::HandleGET_editors(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<EditorInfo> editors;
+  try
+  {
+    editors = m_RenderWindowBridge->ListEditors();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  nlohmann::json arr = nlohmann::json::array();
+  for (const auto& ed : editors)
+    arr.push_back(EditorInfoToJson(ed, /*includeWindowList=*/false));
+
+  res.status = 200;
+  res.set_content(arr.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiInfo(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<EditorInfo> editors;
+  try
+  {
+    editors = m_RenderWindowBridge->ListEditors();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  for (const auto& ed : editors)
+  {
+    if (ed.alias == "stdmulti")
+    {
+      if (!ed.active)
+      {
+        const auto error = ErrorResponse::EditorNotActive(
+          "StdMultiWidgetEditor is not open", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
+      res.status = 200;
+      res.set_content(j.dump(), "application/json");
+      return;
+    }
+  }
+
+  // The alias list is authoritative; stdmulti missing means the provider is broken.
+  const auto error = ErrorResponse::InternalError(
+    "Editor list does not contain 'stdmulti'.", req.path);
+  this->SendErrorResponse(res, 500, error);
+}
+
+void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<WindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListStdMultiWindows();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  nlohmann::json arr = nlohmann::json::array();
+  for (const auto& w : windows)
+  {
+    nlohmann::json wj;
+    wj["name"] = w.name;
+    wj["kind"] = WindowKindToString(w.kind);
+    arr.push_back(wj);
+  }
+
+  res.status = 200;
+  res.set_content(arr.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  // Compose summary locally; the bridge already exposes enough state via the
+  // windows-list provider, and no per-window "summary" callback is needed.
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<WindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListStdMultiWindows();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  // The controller-side name validation already accepts only canonical names,
+  // so an empty window list at this point means the editor reports no windows
+  // — that is an editor state we also surface as RENDER_WINDOW_NOT_FOUND.
+  const bool present = std::any_of(windows.begin(), windows.end(),
+    [&](const WindowInfo& w) { return w.name == name; });
+  if (!present)
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  const bool is3d = IsStdMulti3dWindow(name);
+
+  nlohmann::json j;
+  j["name"] = name;
+  j["kind"] = is3d ? "3d" : "2d";
+  j["has_camera"] = true;
+  j["has_selected_slice"] = !is3d;
+
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiCameraGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  CameraState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetStdMultiCamera(name);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  const auto j = CameraStateToJson(state);
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  CameraPatch patch;
+  if (const auto err = ParseCameraPatch(body, IsStdMulti3dWindow(name), patch))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiCameraSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetStdMultiCamera(name, patch);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Camera update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (IsStdMulti3dWindow(name))
+  {
+    const auto error = ErrorResponse::UnsupportedOperation(
+      "selected-slice is not applicable to the 3D window.", req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiSelectedSliceGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  SliceState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetStdMultiSelectedSlice(name);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  const auto j = SliceStateToJson(state);
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (IsStdMulti3dWindow(name))
+  {
+    const auto error = ErrorResponse::UnsupportedOperation(
+      "selected-slice is not applicable to the 3D window.", req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  unsigned int step = 0;
+  if (const auto err = ParseSliceStepBody(body, step))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiSelectedSliceStepSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStep(name, step);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Slice update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
 void RenderingController::HandleGET_screenshot(const httplib::Request& req, httplib::Response& res) const
 {
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasScreenshotProvider())
@@ -587,101 +1288,121 @@ void RenderingController::HandleGET_screenshot(const httplib::Request& req, http
     return;
   }
 
-  // Parse format parameter (default: png).
-  ScreenshotFormat format = ScreenshotFormat::Png;
-  if (req.has_param("format"))
+  ScreenshotQueryParams params;
+  try
   {
-    const auto formatStr = req.get_param_value("format");
-    if (formatStr == "png")
-    {
-      format = ScreenshotFormat::Png;
-    }
-    else if (formatStr == "jpeg")
-    {
-      format = ScreenshotFormat::Jpeg;
-    }
-    else
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "Invalid format '" + formatStr + "'. Must be 'png' or 'jpeg'.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
+    params = ParseScreenshotQueryParams(req);
   }
-
-  const std::string contentType = (format == ScreenshotFormat::Jpeg) ? "image/jpeg" : "image/png";
-
-  // Parse optional width/height — both must be given together.
-  const bool hasWidth = req.has_param("width");
-  const bool hasHeight = req.has_param("height");
-
-  if (hasWidth != hasHeight)
+  catch (const InvalidScreenshotRequest& e)
   {
-    const auto error = ErrorResponse::InvalidRequest(
-      "Both 'width' and 'height' must be provided together.", req.path);
-    this->SendErrorResponse(res, 400, error);
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
     return;
   }
 
-  std::optional<std::pair<int, int>> size;
-  if (hasWidth)
-  {
-    int width = 0;
-    int height = 0;
-    try
-    {
-      width = std::stoi(req.get_param_value("width"));
-      height = std::stoi(req.get_param_value("height"));
-    }
-    catch (const std::exception&)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must be integers.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    if (width <= 0 || height <= 0)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must be positive integers.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    static constexpr int maxDimension = 8192;
-    if (width > maxDimension || height > maxDimension)
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'width' and 'height' must not exceed " + std::to_string(maxDimension) + ".", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
-
-    size = {width, height};
-  }
-
-  // Take screenshot — the bridge dispatches to the UI thread internally.
   try
   {
-    const auto imageData = m_RenderWindowBridge->TakeScreenshot(size, format);
+    const auto imageData = m_RenderWindowBridge->TakeScreenshot(params.size, params.format);
     res.status = 200;
     res.set_content(
       reinterpret_cast<const char*>(imageData.data()),
       imageData.size(),
-      contentType);
+      ContentTypeFor(params.format));
   }
   catch (const std::exception& e)
   {
-    const auto error = ErrorResponse::InternalError(
-      std::string("Screenshot capture failed: ") + e.what(), req.path);
-    this->SendErrorResponse(res, 500, error);
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiEditorScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeStdMultiEditorScreenshot(params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto name = ReadRequiredPathParam(req, "name");
+
+  if (!IsValidStdMultiWindowName(name))
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeStdMultiWindowScreenshot(name, params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
   }
 }
 
 void RenderingController::Dispatch(std::function<void()> task) const
 {
-  auto dispatcher = m_Dispatcher.Lock();
+  StorageThreadDispatcherBase::Pointer dispatcher;
+  {
+    std::lock_guard<std::mutex> lock(m_DispatcherMutex);
+    dispatcher = m_Dispatcher.Lock();
+  }
   if (dispatcher.IsNull())
   {
     task();
@@ -696,6 +1417,38 @@ void RenderingController::SendErrorResponse(httplib::Response& res, int status, 
 {
   res.status = status;
   res.set_content(error.dump(), "application/json");
+}
+
+bool RenderingController::IsValidStdMultiWindowName(const std::string& name)
+{
+  return name == "axial" || name == "sagittal" || name == "coronal" || name == "3d";
+}
+
+bool RenderingController::IsStdMulti3dWindow(const std::string& name)
+{
+  return name == "3d";
+}
+
+std::string RenderingController::ReadRequiredPathParam(const httplib::Request& req,
+                                                      const std::string& key)
+{
+  const auto it = req.path_params.find(key);
+  return (it != req.path_params.end()) ? it->second : std::string();
+}
+
+std::pair<int, nlohmann::json> RenderingController::MapBridgeException(
+  const std::exception& e, const std::string& instance)
+{
+  if (const auto* ne = dynamic_cast<const RenderWindowBridgeNoEditorException*>(&e))
+    return {503, ErrorResponse::EditorNotActive(ne->what(), instance)};
+
+  if (const auto* uw = dynamic_cast<const RenderWindowBridgeUnknownWindowException*>(&e))
+    return {404, ErrorResponse::RenderWindowNotFound(uw->what(), instance)};
+
+  if (const auto* us = dynamic_cast<const RenderWindowBridgeUnsupportedOperationException*>(&e))
+    return {404, ErrorResponse::UnsupportedOperation(us->what(), instance)};
+
+  return {500, ErrorResponse::InternalError(e.what(), instance)};
 }
 
 }

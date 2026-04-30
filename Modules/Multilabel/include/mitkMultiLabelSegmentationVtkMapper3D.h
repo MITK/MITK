@@ -113,6 +113,14 @@ namespace mitk
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
 
+      /** \brief Last applied surface-nets smoothing state for this renderer.
+       *
+       * Resolved from the per-node "org.mitk.multilabel.3D.smoothed" property if set,
+       * otherwise from the "3D rendering smoothed" preference. Tracking the resolved
+       * value lets us re-extract surfaces only when the effective state actually changes.
+       */
+      bool m_LastSmoothed;
+
       /** \brief Pointer to the segmentation preferences. */
       IPreferences* m_SegPreferences;
 

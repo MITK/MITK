@@ -13,9 +13,12 @@ found in the LICENSE file.
 #include "Qmitk3DMultiSegVisStyleAction.h"
 
 // mitk core
+#include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkImage.h>
-#include <mitkLookupTableProperty.h>
 #include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkRenderingModeProperty.h>
 
@@ -24,6 +27,36 @@ found in the LICENSE file.
 
 // qt
 #include <QMenu>
+
+namespace
+{
+  // The three rendering modes the context menu exposes for a multi-label segmentation.
+  // Encoded as a single int stored in the QAction data so the triggered slot can
+  // dispatch from the sender.
+  enum class Vis3DMode : int
+  {
+    Off = 0,
+    Exact = 1,    // Surface extracted at the literal voxel boundary, no smoothing.
+    Smoothed = 2  // Surface with constrained smoothing applied.
+  };
+
+  bool ResolveSmoothed(mitk::DataNode* node, mitk::BaseRenderer* renderer)
+  {
+    bool smoothed = true;
+    if (node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", smoothed, renderer))
+    {
+      return smoothed;
+    }
+    if (auto* prefService = mitk::CoreServices::GetPreferencesService())
+    {
+      if (auto* systemPref = prefService->GetSystemPreferences())
+      {
+        return systemPref->Node("/org.mitk.views.segmentation")->GetBool("3D rendering smoothed", true);
+      }
+    }
+    return true;
+  }
+}
 
 Qmitk3DMultiSegVisStyleAction::Qmitk3DMultiSegVisStyleAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : Qmitk3DMultiSegVisStyleAction(parent, workbenchpartSite.GetPointer())
@@ -56,20 +89,28 @@ void Qmitk3DMultiSegVisStyleAction::OnMenuAboutShow()
 
   bool hide3Dvisualize = false;
   dataNode->GetBoolProperty("org.mitk.multilabel.3D.hide", hide3Dvisualize, baseRenderer);
+  const bool smoothed = ResolveSmoothed(dataNode, baseRenderer);
+
+  Vis3DMode currentMode = Vis3DMode::Off;
+  if (!hide3Dvisualize)
+  {
+    currentMode = smoothed ? Vis3DMode::Smoothed : Vis3DMode::Exact;
+  }
 
   this->menu()->clear();
 
-  auto visAction = menu()->addAction("off");
-  visAction->setCheckable(true);
-  visAction->setChecked(hide3Dvisualize);
-  visAction->setData(true);
-  connect(visAction, &QAction::triggered, this, &Qmitk3DMultiSegVisStyleAction::OnActionTriggered);
+  auto addItem = [this, currentMode](const QString& text, Vis3DMode mode)
+  {
+    auto* action = menu()->addAction(text);
+    action->setCheckable(true);
+    action->setChecked(currentMode == mode);
+    action->setData(static_cast<int>(mode));
+    connect(action, &QAction::triggered, this, &Qmitk3DMultiSegVisStyleAction::OnActionTriggered);
+  };
 
-  visAction = menu()->addAction("on");
-  visAction->setCheckable(true);
-  visAction->setChecked(!hide3Dvisualize);
-  visAction->setData(false);
-  connect(visAction, &QAction::triggered, this, &Qmitk3DMultiSegVisStyleAction::OnActionTriggered);
+  addItem(tr("Off"), Vis3DMode::Off);
+  addItem(tr("Exact"), Vis3DMode::Exact);
+  addItem(tr("Smoothed"), Vis3DMode::Smoothed);
 }
 
 void Qmitk3DMultiSegVisStyleAction::OnActionTriggered(bool /*checked*/)
@@ -82,7 +123,7 @@ void Qmitk3DMultiSegVisStyleAction::OnActionTriggered(bool /*checked*/)
   if (nullptr == senderAction)
     return;
 
-  auto hide3Dvisualize = senderAction->data().toBool();
+  const auto mode = static_cast<Vis3DMode>(senderAction->data().toInt());
 
   for (auto& dataNode : selectedNodes)
   {
@@ -91,7 +132,20 @@ void Qmitk3DMultiSegVisStyleAction::OnActionTriggered(bool /*checked*/)
       continue;
     }
 
-    dataNode->SetBoolProperty("org.mitk.multilabel.3D.hide", hide3Dvisualize, baseRenderer);
+    switch (mode)
+    {
+      case Vis3DMode::Off:
+        dataNode->SetBoolProperty("org.mitk.multilabel.3D.hide", true, baseRenderer);
+        break;
+      case Vis3DMode::Exact:
+        dataNode->SetBoolProperty("org.mitk.multilabel.3D.hide", false, baseRenderer);
+        dataNode->SetBoolProperty("org.mitk.multilabel.3D.smoothed", false, baseRenderer);
+        break;
+      case Vis3DMode::Smoothed:
+        dataNode->SetBoolProperty("org.mitk.multilabel.3D.hide", false, baseRenderer);
+        dataNode->SetBoolProperty("org.mitk.multilabel.3D.smoothed", true, baseRenderer);
+        break;
+    }
   }
 
   if (nullptr == baseRenderer)

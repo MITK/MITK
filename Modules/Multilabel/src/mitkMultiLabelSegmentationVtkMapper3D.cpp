@@ -112,6 +112,9 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   const bool highlightingActive = !highlightedLabelValues.empty();
   localStorage->m_UseFadedPipeline = highlightingActive;
 
+  float nodeOpacity = 1.0f;
+  node->GetFloatProperty("opacity", nodeOpacity);
+
   // Reset the entire LUT so labels that were removed since the last update
   // map to fully transparent. The MAX_LABEL_VALUE+1 entries are configured
   // once in the LocalStorage constructor; here we just clear the contents.
@@ -130,8 +133,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
     {
       const bool isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
       if (!isHighlightedValue)
-      {
-        rgba[3] *= 0.01;
+      { //make all none highlighted values more transparent
+        rgba[3] *= 0.3;
       }
       else
       {
@@ -141,6 +144,10 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
         }
       }
     }
+
+    // Node-level "opacity" multiplies into the per-label alpha. The actor's own
+    // opacity is fixed at 1.0 so the LUT alpha is the sole source of transparency.
+    rgba[3] *= nodeOpacity;
 
     lut->SetTableValue(value, rgba);
   }
@@ -325,6 +332,21 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage*
       pipeline->m_SurfaceNets->SetLabel(static_cast<int>(i), static_cast<double>(groupLabels[i]));
     }
 
+    pipeline->m_SurfaceNets->SetSmoothing(localStorage->m_LastSmoothed);
+
+    // In the unsmoothed case the surface-nets output is axis-aligned quads with a single
+    // flat normal per face. vtkPolyDataMapper's auto-generated cell normals are sufficient,
+    // so the vtkPolyDataNormals stage is bypassed to keep the pipeline minimal. The
+    // smoothed case keeps the normals filter to get smooth Phong shading on curved triangles.
+    if (localStorage->m_LastSmoothed)
+    {
+      pipeline->m_PolyMapper->SetInputConnection(pipeline->m_NormalsFilter->GetOutputPort());
+    }
+    else
+    {
+      pipeline->m_PolyMapper->SetInputConnection(pipeline->m_SurfaceNets->GetOutputPort());
+    }
+
     // Force the algorithm's superclass MTime to bump. vtkSurfaceNets3D's RequestData uses
     // Superclass::GetMTime() to decide whether the cached extraction can be reused; SetLabel
     // and SetInputData do not always trigger this. Without the bump the cache is hit and
@@ -372,9 +394,23 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
 
   const bool timeStepChanged = this->GetTimestep() != localStorage->m_LastUpdateTimeStep;
 
+  // Resolve the smoothing state from the per-node property if set, otherwise from the
+  // segmentation preference. A change in the resolved state forces all groups to re-extract
+  // (the smoothing flag is applied to vtkSurfaceNets3D in UpdateSurfaceMapping).
+  bool currentSmoothed = true;
+  if (!node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", currentSmoothed, renderer))
+  {
+    if (nullptr != localStorage->m_SegPreferences)
+    {
+      currentSmoothed = localStorage->m_SegPreferences->GetBool("3D rendering smoothed", true);
+    }
+  }
+  const bool smoothedChanged = currentSmoothed != localStorage->m_LastSmoothed;
+  localStorage->m_LastSmoothed = currentSmoothed;
+
   // Lookup-only changes (color, alpha, highlight, per-label visibility via alpha=0) do not
   // require surface re-extraction: the polydata mapper picks up the LUT change automatically.
-  if (isGeometryModified || visibilityChanged || timeStepChanged)
+  if (isGeometryModified || visibilityChanged || timeStepChanged || smoothedChanged)
   {
     outdatedGroups.clear();
     for (auto& [key, pipeline] : localStorage->m_GroupPipelines)
@@ -408,6 +444,18 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   const auto pref3DRendering = nullptr != localStorage->m_SegPreferences ? localStorage->m_SegPreferences->GetBool("activate 3D rendering", true) : true;
   const auto changed3DRendering = pref3DRendering != localStorage->m_3DRenderingPreference;
   localStorage->m_3DRenderingPreference = pref3DRendering;
+
+  // Detect a change in the resolved smoothing state so a preference flip
+  // (without any per-node property change) still triggers re-extraction.
+  bool resolvedSmoothed = true;
+  if (!node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", resolvedSmoothed, renderer))
+  {
+    if (nullptr != localStorage->m_SegPreferences)
+    {
+      resolvedSmoothed = localStorage->m_SegPreferences->GetBool("3D rendering smoothed", true);
+    }
+  }
+  const auto changedSmoothed = resolvedSmoothed != localStorage->m_LastSmoothed;
 
   if (!visible
     || hide3Dvisualize
@@ -449,7 +497,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()) ||
-      changed3DRendering)
+      changed3DRendering ||
+      changedSmoothed)
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
@@ -489,6 +538,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUp
 
   m_SegPreferences = nullptr;
   m_3DRenderingPreference = true;
+  m_LastSmoothed = true;
 
   auto prefService = mitk::CoreServices::GetPreferencesService();
   if (nullptr != prefService)

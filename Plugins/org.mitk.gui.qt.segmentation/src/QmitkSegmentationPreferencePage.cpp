@@ -57,6 +57,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
   connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
   connect(m_Ui->comboBuiltInSuggestions, &QComboBox::currentIndexChanged, this, &QmitkSegmentationPreferencePage::OnBuilInSuggestionsChanged);
+  connect(m_Ui->check3DRendering, &QCheckBox::toggled, m_Ui->check3DSmoothed, &QCheckBox::setEnabled);
 
   this->Update();
   m_Initializing = false;
@@ -102,6 +103,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
 
   prefs->PutBool("activate 3D rendering", m_Ui->check3DRendering->isChecked());
+  prefs->PutBool("3D rendering smoothed", m_Ui->check3DSmoothed->isChecked());
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 
   return true;
@@ -174,7 +176,10 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
   m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
 
-  m_Ui->check3DRendering->setChecked(prefs->GetBool("activate 3D rendering", true));
+  const bool activate3D = prefs->GetBool("activate 3D rendering", true);
+  m_Ui->check3DRendering->setChecked(activate3D);
+  m_Ui->check3DSmoothed->setChecked(prefs->GetBool("3D rendering smoothed", true));
+  m_Ui->check3DSmoothed->setEnabled(activate3D);
 }
 
 void QmitkSegmentationPreferencePage::FillBuiltInSuggestionComboBox(std::string& standardLabelSuggestions)

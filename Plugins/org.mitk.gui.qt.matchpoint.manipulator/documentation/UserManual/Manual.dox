@@ -121,7 +121,7 @@ combo box. The yellow diamond-shaped indicator (\ref MAP_REGMANIP_CoRIndicator) 
 point in the render windows, regardless of which center mode is active.
 
 \section MAP_REGMANIP_3DPreview 3D preview
-\imageMacro{map_view_manipulator_3d_preview.png, "3D render window showing the wireframe preview of the moving image.", 10}
+\imageMacroEx{map_view_manipulator_3d_preview.png, "3D render window showing the wireframe preview of the moving image.", 10, 640px}
 
 The <b>Show 3D preview</b> checkbox on the <em>Evaluation settings</em> tab enables a live 3D preview of the moving
 image's current registered position. When active, two additional helper objects appear in the 3D render window:\n

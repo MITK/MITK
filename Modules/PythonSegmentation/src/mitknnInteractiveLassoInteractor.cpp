@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkEventStateMachine.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkProperties.h>
+#include <mitkProportionalTimeGeometry.h>
 #include <mitkRenderingManager.h>
 #include <mitkSegTool2D.h>
 #include <mitkToolManager.h>
@@ -28,6 +29,37 @@ found in the LICENSE file.
 
 namespace
 {
+  // Aligns a single-time-step ContourModel's time bounds with the time step
+  // the renderer is currently displaying for the reference image. Without
+  // this, ContourModel::New() produces a default time geometry that only
+  // covers time point 0, so the contour stays invisible at any other time
+  // step of a 4D reference image.
+  void AlignContourToCurrentTimeStep(mitk::ContourModel* contour,
+                                     const mitk::Image* referenceImage,
+                                     const mitk::BaseRenderer* renderer)
+  {
+    if (contour == nullptr || referenceImage == nullptr || renderer == nullptr)
+      return;
+
+    const auto* refTimeGeometry = referenceImage->GetTimeGeometry();
+    if (refTimeGeometry == nullptr)
+      return;
+
+    const auto timeStep = renderer->GetTimeStep(referenceImage);
+    if (!refTimeGeometry->IsValidTimeStep(timeStep))
+      return;
+
+    const auto firstTimePoint = refTimeGeometry->GetMinimumTimePoint(timeStep);
+    const auto stepDuration = refTimeGeometry->GetMaximumTimePoint(timeStep) - firstTimePoint;
+
+    auto contourTimeGeometry = mitk::ProportionalTimeGeometry::New();
+    contourTimeGeometry->Initialize(contour->GetGeometry(), 1);
+    contourTimeGeometry->SetFirstTimePoint(firstTimePoint);
+    contourTimeGeometry->SetStepDuration(stepDuration);
+
+    contour->SetTimeGeometry(contourTimeGeometry);
+  }
+
   // Internal event fired when a contour stroke is completed. Carries the
   // closed contour (in 3D world coords, for persistent display), the 2D
   // uint8 painting slice and its slicing plane (for the outer Impl to
@@ -163,6 +195,14 @@ namespace
       m_LiveContour = mitk::ContourModel::New();
       m_LiveContour->SetClosed(true);
       m_LiveContour->AddVertex(positionEvent->GetPositionInWorld());
+
+      // Align the (single-time-step) contour's time bounds with the time
+      // step the renderer is currently displaying. Without this, the
+      // contour's default time bounds cover only time point 0 and it stays
+      // invisible whenever the user views any other time step of a 4D
+      // reference image.
+      AlignContourToCurrentTimeStep(m_LiveContour, m_ReferenceImage,
+                                    positionEvent->GetSender());
 
       this->EnsureFeedbackNode();
       m_FeedbackNode->SetData(m_LiveContour);

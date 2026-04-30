@@ -132,6 +132,8 @@ namespace mitk
     Image::Pointer InitialSeg;
     bool AutoZoom;
     bool AutoRefine;
+    TimeStepType SessionReferenceDataTimeStep = 0;
+    TimeStepType SessionWorkingDataTimeStep = 0;
 
   private:
     std::optional<Backend> m_Backend;
@@ -140,7 +142,8 @@ namespace mitk
 }
 
 mitk::nnInteractiveTool::nnInteractiveTool()
-  : m_Impl(std::make_unique<Impl>())
+  : SegWithPreviewTool(true),
+    m_Impl(std::make_unique<Impl>())
 {
   this->KeepActiveAfterAcceptOn();
   this->ResetsToEmptyPreviewOn();
@@ -176,13 +179,7 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
 
 bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
 {
-  if (!Superclass::CanHandle(referenceData, workingData))
-    return false;
-
-  if (static_cast<const Image*>(referenceData)->GetDimension() > 3)
-    return false;
-
-  return true;
+  return Superclass::CanHandle(referenceData, workingData);
 }
 
 void mitk::nnInteractiveTool::Deactivated()
@@ -666,6 +663,19 @@ void mitk::nnInteractiveTool::StartSession()
     "torch_target_buffer = torch.from_numpy(target_buffer)\n"
     "session.set_image(image[None], {'spacing': spacing})\n"
     "session.set_target_buffer(torch_target_buffer)\n");
+
+  // Pin the session to the time steps that were active when it was started.
+  // OnTimePointChanged() ends the session if either changes, since the Python
+  // model is bound to a single 3D slice.
+  m_Impl->SessionReferenceDataTimeStep = timeStep;
+
+  const auto* workingData = this->GetToolManager()->GetWorkingData(0);
+  const auto* workingSeg = workingData != nullptr
+    ? dynamic_cast<const MultiLabelSegmentation*>(workingData->GetData())
+    : nullptr;
+  m_Impl->SessionWorkingDataTimeStep = workingSeg != nullptr
+    ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
+    : 0;
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -683,6 +693,52 @@ void mitk::nnInteractiveTool::EndSession()
 
   m_Impl->GetPythonContext()->Execute(pyCommands.str());
   m_Impl->DestroyPythonContext();
+
+  m_Impl->SessionReferenceDataTimeStep = 0;
+  m_Impl->SessionWorkingDataTimeStep = 0;
+
+  this->SessionEndedEvent.Send();
+}
+
+void mitk::nnInteractiveTool::OnTimePointChanged()
+{
+  // The Python session is bound to a single 3D slice extracted at the time
+  // step that was active when StartSession() ran. Without a session there is
+  // nothing to reconcile, and DoUpdatePreview() short-circuits when no
+  // Python context exists, so we deliberately do not call the base class
+  // handler (which would invoke UpdatePreview against a stale binding).
+  if (!this->IsSessionRunning())
+    return;
+
+  const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
+
+  const auto* referenceNode = this->GetToolManager()->GetReferenceData(0);
+  const auto* referenceImage = referenceNode != nullptr
+    ? dynamic_cast<const Image*>(referenceNode->GetData())
+    : nullptr;
+  if (referenceImage == nullptr)
+    return;
+
+  const auto* workingNode = this->GetToolManager()->GetWorkingData(0);
+  const auto* workingSeg = workingNode != nullptr
+    ? dynamic_cast<const MultiLabelSegmentation*>(workingNode->GetData())
+    : nullptr;
+
+  const auto currentImageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  const auto currentWorkingTimeStep = workingSeg != nullptr
+    ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
+    : TimeStepType(0);
+
+  if (currentImageTimeStep == m_Impl->SessionReferenceDataTimeStep &&
+      currentWorkingTimeStep == m_Impl->SessionWorkingDataTimeStep)
+  {
+    return;
+  }
+
+  this->DisableInteractor();
+  this->ResetInteractions();
+  this->ResetPreviewContent();
+  this->EndSession();
 }
 
 bool mitk::nnInteractiveTool::IsSessionRunning() const

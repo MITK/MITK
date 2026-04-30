@@ -172,6 +172,9 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
     tool->DeactivatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
 
+    tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionEnded);
+
     tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
 
@@ -219,6 +222,9 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   this->GetTool()->DeactivatedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
     this, &QmitknnInteractiveToolGUI::OnToolDeactivated);
+
+  this->GetTool()->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionEnded);
 
   Superclass::InitializeUI(mainLayout);
 
@@ -720,6 +726,27 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
 
     segmentation->RemoveLabel(value);
   });
+}
+
+void QmitknnInteractiveToolGUI::OnSessionEnded()
+{
+  // Restore cursor and uncheck any active interactor button. The tool has
+  // already disabled its interactor; this just keeps the GUI's check state in
+  // sync.
+  this->UncheckOtherInteractorButtons(nullptr);
+
+  m_Ui->resetButton->setEnabled(false);
+  m_Ui->promptTypeGroupBox->setEnabled(false);
+  m_Ui->interactionToolsGroupBox->setEnabled(false);
+
+  // Re-enable Initialize and uncheck it without re-triggering OnInitializeButtonToggled,
+  // which would immediately start a new session against the user's intent.
+  {
+    QSignalBlocker blocker(m_Ui->initializeButton);
+    m_Ui->initializeButton->setChecked(false);
+  }
+  m_Ui->initializeButton->setEnabled(true);
+  m_Ui->settingsButton->setEnabled(true);
 }
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()

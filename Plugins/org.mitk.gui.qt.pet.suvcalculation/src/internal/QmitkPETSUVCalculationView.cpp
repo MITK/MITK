@@ -93,58 +93,58 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
   connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
   // Tree view for decay times
-  m_Controls.decayTimeView->setAlternatingRowColors(true);
-  m_Controls.decayTimeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.decayTimeView->setRootIsDecorated(true);
-  m_Controls.decayTimeView->setSortingEnabled(false);
+  m_Controls->decayTimeView->setAlternatingRowColors(true);
+  m_Controls->decayTimeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls->decayTimeView->setRootIsDecorated(true);
+  m_Controls->decayTimeView->setSortingEnabled(false);
 
   // Set up model and delegate
   m_decayTimeModel = std::make_unique<DecayTimeMapModel>(this);
 
-  m_Controls.decayTimeView->setModel(m_decayTimeModel.get());
-  m_Controls.decayTimeView->setItemDelegate(new DecayTimeDelegate(this));
+  m_Controls->decayTimeView->setModel(m_decayTimeModel.get());
+  m_Controls->decayTimeView->setItemDelegate(new DecayTimeDelegate(this));
 
   // Configure tree view appearance
-  m_Controls.decayTimeView->header()->setStretchLastSection(false);
-  m_Controls.decayTimeView->header()->resizeSection(0, 200);
-  m_Controls.decayTimeView->header()->resizeSection(1, 150);
-  m_Controls.decayTimeView->header()->setDefaultSectionSize(150);
+  m_Controls->decayTimeView->header()->setStretchLastSection(false);
+  m_Controls->decayTimeView->header()->resizeSection(0, 200);
+  m_Controls->decayTimeView->header()->resizeSection(1, 150);
+  m_Controls->decayTimeView->header()->setDefaultSectionSize(150);
 
 
 
   connect(m_Controls->halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
   connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
-  connect(m_Controls.weightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBodyWeightChanged(double)));
+  connect(m_Controls->weightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBodyWeightChanged(double)));
   connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
 
   connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls.radioTimeUser, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::UpdateWidgets);
+  connect(m_Controls->radioTimeUser, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::UpdateWidgets);
 
-  connect(m_Controls.checkPETonly, &QCheckBox::toggled, this, &QmitkPETSUVCalculationView::OnCheckPETOnlyToggled);
+  connect(m_Controls->checkPETonly, &QCheckBox::toggled, this, &QmitkPETSUVCalculationView::OnCheckPETOnlyToggled);
 
-  connect(m_Controls.petNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkPETSUVCalculationView::OnPETSelectionChanged);
+  connect(m_Controls->petNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkPETSUVCalculationView::OnPETSelectionChanged);
 
 
-  m_Controls.petNodeSelector->SetSelectionIsOptional(false);
+  m_Controls->petNodeSelector->SetSelectionIsOptional(false);
 
-  this->m_Controls.petNodeSelector->SetInvalidInfo("Select PET image for conversion.");
-  this->m_Controls.petNodeSelector->SetEmptyInfo("Select PET image for conversion.");
-  this->m_Controls.petNodeSelector->SetPopUpTitel("Select PET image.");
-  this->m_Controls.petNodeSelector->SetPopUpHint("Select a PET image that should be the source for the SUV conversion.");
+  this->m_Controls->petNodeSelector->SetInvalidInfo("Select PET image for conversion.");
+  this->m_Controls->petNodeSelector->SetEmptyInfo("Select PET image for conversion.");
+  this->m_Controls->petNodeSelector->SetPopUpTitel("Select PET image.");
+  this->m_Controls->petNodeSelector->SetPopUpHint("Select a PET image that should be the source for the SUV conversion.");
 
-  m_Controls.petNodeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls->petNodeSelector->SetDataStorage(this->GetDataStorage());
 
-  m_Controls.petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls.checkPETonly->isChecked()));
+  m_Controls->petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls->checkPETonly->isChecked()));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
-  m_Controls.petNodeSelector->SetAutoSelectNewNodes(true);
+  m_Controls->petNodeSelector->SetAutoSelectNewNodes(true);
 
   this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::OnCheckPETOnlyToggled(bool)
 {
-  m_Controls.petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls.checkPETonly->isChecked()));
+  m_Controls->petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls->checkPETonly->isChecked()));
 }
 
 void QmitkPETSUVCalculationView::OnInjectedActivityChanged(double value)
@@ -230,7 +230,7 @@ std::string GetBaseDatePropValueAsString(const mitk::BaseData *data, const mitk:
 
 void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
 {
-  auto inputNode = m_Controls.petNodeSelector->GetSelectedNode();
+  auto inputNode = m_Controls->petNodeSelector->GetSelectedNode();
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
   std::string nameOfResultImage = inputNode->GetName();
   nameOfResultImage.append("_SUV");
@@ -405,11 +405,11 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     m_Controls->weightSpinBox->setValue(this->m_bodyweight);
 
     m_Controls->timeInfo->clear();
-    m_Controls.timeSpinBox->setEnabled(m_Controls.radioTimeUser->isChecked());
+    m_Controls->timeSpinBox->setEnabled(m_Controls->radioTimeUser->isChecked());
 
-    if (m_Controls.radioTimeUser->isChecked())
+    if (m_Controls->radioTimeUser->isChecked())
     {
-      m_Controls->timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
+      //m_Controls->timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
     }
     else
     {
@@ -434,11 +434,11 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
 
     m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
 
-    bool valid = m_Controls.petNodeSelector->GetSelectedNode().IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
+    bool valid = m_Controls->petNodeSelector->GetSelectedNode().IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
                  (/*m_userDecayTime != 0 || */ m_validAutoTime) && m_halfLife != 0;
     m_Controls->btnCalculateSUV->setEnabled(valid);
 
-    m_decayTimeModel->SetMode(m_Controls.radioTimeAuto->isChecked() ? DecayTimeMapModel::Mode::Auto : DecayTimeMapModel::Mode::UserDefined);
+    m_decayTimeModel->SetMode(m_Controls->radioTimeAuto->isChecked() ? DecayTimeMapModel::Mode::Auto : DecayTimeMapModel::Mode::UserDefined);
 
     this->m_internalUpdate = false;
   }
@@ -447,16 +447,17 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
 void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   m_Controls->btnCalculateSUV->setEnabled(false);
-  auto newNode = m_Controls.petNodeSelector->GetSelectedNode();
+  auto newNode = m_Controls->petNodeSelector->GetSelectedNode();
 
   this->m_injectedActivity = 0.;
   this->m_bodyweight = 0.;
   this->m_autoDecayTime.clear();
   this->m_validAutoTime = false;
+  this->m_DecayStrategy = mitk::DecayCorrectionStrategy::None;
   this->m_DefinedNuclide.clear();
   this->m_halfLife = 0.;
 
-  if (newNode.IsNotNull() && this->m_Controls.checkAuto->isChecked())
+  if (newNode.IsNotNull() && this->m_Controls->checkAuto->isChecked())
   {
     auto activities = mitk::GetRadionuclideTotalDose(newNode->GetData());
     if (activities.empty())
@@ -499,17 +500,26 @@ void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Poi
       this->m_halfLife = halflifes[0];
     }
 
-    if (this->m_Controls.radioTimeAuto->isChecked())
+    if (this->m_Controls->radioTimeAuto->isChecked())
     {
       try
       {
-        this->m_autoDecayTime = mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(newNode->GetData());
+        const auto* slicedData = dynamic_cast<const mitk::SlicedData*>(newNode->GetData());
+        const auto info = mitk::DeduceDecayCorrection(slicedData);
+        this->m_autoDecayTime = info.decayTimes;
+        this->m_DecayStrategy = info.strategy;
         m_validAutoTime = true;
+      }
+      catch (const mitk::SUVHelperException& e)
+      {
+        m_validAutoTime = false;
+        MITK_ERROR << "Error deducing decay time (" << e.GetNameOfClass()
+                   << "). Error details: " << e;
       }
       catch (const mitk::Exception& e)
       {
         m_validAutoTime = false;
-        MITK_ERROR << "Error deducing decay time. Error details:" << e;
+        MITK_ERROR << "Error deducing decay time. Error details: " << e;
       }
     }
     else
@@ -546,6 +556,12 @@ QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
 {
   GenerateHalfLifeMap();
 }
+
+// Out-of-line destructor: required because m_Controls is a
+// std::unique_ptr to a forward-declared Ui type; the implicit
+// destructor needs the complete type, which is only visible in
+// this translation unit.
+QmitkPETSUVCalculationView::~QmitkPETSUVCalculationView() = default;
 
 
 

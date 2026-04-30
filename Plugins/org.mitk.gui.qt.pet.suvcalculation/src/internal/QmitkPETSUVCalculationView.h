@@ -170,6 +170,8 @@ private:
   /** Time between injection and image acquesition in sec. Used when defined by user and not autodetected.*/
   bool m_validAutoTime;
   mitk::DecayTimeMapType m_autoDecayTime;
+  /** DICOM decay-correction strategy detected on the selected node. Reset on each new selection. */
+  mitk::DecayCorrectionStrategy m_DecayStrategy = mitk::DecayCorrectionStrategy::None;
 
   /** Half life in sec*/
   double m_halfLife;

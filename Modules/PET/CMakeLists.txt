@@ -8,3 +8,5 @@ MITK_CREATE_MODULE(PET
     PRIVATE DCMTK|ofstd+dcmdata
 )
 
+add_subdirectory(test)
+

@@ -184,14 +184,6 @@ void QmitkUploadToXNATAction::SetFunctionality(berry::QtViewPart* /*functionalit
 {
 }
 
-void QmitkUploadToXNATAction::SetSmoothed(bool /*smoothed*/)
-{
-}
-
-void QmitkUploadToXNATAction::SetDecimated(bool /*smoothed*/)
-{
-}
-
 std::string QmitkUploadToXNATAction::ReplaceSpecialChars(const std::string& input) const
 {
   QString convertedString = QString(QUrl::toPercentEncoding(QString::fromStdString(input)));

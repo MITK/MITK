@@ -12,24 +12,56 @@ found in the LICENSE file.
 #include "QmitkCreatePolygonModelAction.h"
 
 // MITK
-#include <mitkShowSegmentationAsSmoothedSurface.h>
-#include <mitkShowSegmentationAsSurface.h>
-#include <mitkProgressBar.h>
-#include <mitkStatusBar.h>
-
-#include <mitkIRenderWindowPart.h>
-
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
+#include <mitkColorProperty.h>
+#include <mitkDataStorage.h>
 #include <mitkLabelSetImage.h>
+#include <mitkMultiLabelSurfaceNetsExtractor.h>
+#include <mitkProperties.h>
+#include <mitkStatusBar.h>
+#include <mitkSurface.h>
 
-// Blueberry
-#include <berryIWorkbenchPage.h>
+#include <vtkPolyData.h>
+
+#include <QApplication>
 
 using namespace berry;
 using namespace mitk;
 using namespace std;
+
+namespace
+{
+  std::string MakeNodeName(const std::string& parentName, const std::string& labelName, bool smoothed)
+  {
+    auto base = parentName.empty()
+      ? std::string("segmentation")
+      : parentName;
+
+    if (!labelName.empty())
+      base += "_" + labelName;
+
+    if (smoothed)
+      base += "_smoothed";
+
+    return base;
+  }
+
+  void AddSurfaceNode(
+    DataStorage* dataStorage,
+    DataNode* parentNode,
+    Surface::Pointer surface,
+    const std::string& parentName,
+    const std::string& labelName,
+    const Color& color,
+    bool smoothed)
+  {
+    auto node = DataNode::New();
+    node->SetData(surface);
+    node->SetName(MakeNodeName(parentName, labelName, smoothed));
+    node->SetColor(color);
+    node->SetProperty("scalar visibility", BoolProperty::New(false));
+    dataStorage->Add(node, parentNode);
+  }
+}
 
 QmitkCreatePolygonModelAction::QmitkCreatePolygonModelAction()
 {
@@ -41,102 +73,108 @@ QmitkCreatePolygonModelAction::~QmitkCreatePolygonModelAction()
 
 void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 {
-  DataNode::Pointer selectedNode = selectedNodes[0];
-  mitk::MultiLabelSegmentation::Pointer segmentation = dynamic_cast<mitk::MultiLabelSegmentation *>(selectedNode->GetData());
-  mitk::Image::Pointer imageMask = dynamic_cast<mitk::Image*>(selectedNode->GetData());
-
-  if (segmentation.IsNull() && imageMask.IsNull())
+  if (selectedNodes.empty() || m_DataStorage.IsNull())
   {
     return;
   }
 
+  DataNode::Pointer selectedNode = selectedNodes[0];
+  auto segmentation = dynamic_cast<MultiLabelSegmentation*>(selectedNode->GetData());
+  auto imageMask = dynamic_cast<Image*>(selectedNode->GetData());
+
+  if (nullptr == segmentation && nullptr == imageMask)
+  {
+    return;
+  }
+
+  StatusBar::GetInstance()->DisplayText(
+    m_IsSmoothed ? "Smoothed surface creation started..." : "Surface creation started...");
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+
+  const std::string parentName = selectedNode->GetName();
+
   try
   {
-    // Get preference properties for smoothing and decimation
-    auto* prefService = mitk::CoreServices::GetPreferencesService();
-    auto* segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    MultiLabelSurfaceNetsExtractor extractor;
+    extractor.SetSmoothing(m_IsSmoothed);
 
-    bool smoothingHint = segPref->GetBool("smoothing hint", true);
-    ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
-    ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
-
-    if (smoothingHint)
+    if (nullptr != segmentation)
     {
-      smoothing = 0.0;
-      Vector3D spacing = selectedNode->GetData()->GetGeometry()->GetSpacing();
+      const TimeStepType timeStep = 0;
 
-      for (Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
-        smoothing = max(smoothing, *iter);
-    }
+      const auto numGroups = segmentation->GetNumberOfGroups();
+      for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < numGroups; ++groupID)
+      {
+        auto groupImage = const_cast<Image*>(segmentation->GetGroupImage(groupID));
+        if (nullptr == groupImage)
+        {
+          continue;
+        }
 
-    ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
+        auto vtkImage = groupImage->GetVtkImageData(timeStep);
+        const auto labelValues = segmentation->GetLabelValuesByGroup(groupID);
+        if (labelValues.empty())
+        {
+          continue;
+        }
 
-    // Activate callback functions
-    itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer successCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-    successCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-    surfaceFilter->AddObserver(ResultAvailable(), successCommand);
+        auto results = extractor.ExtractPerLabel(vtkImage, labelValues);
+        for (const auto& [labelValue, polyData] : results)
+        {
+          if (nullptr == polyData || polyData->GetNumberOfCells() == 0)
+          {
+            continue;
+          }
 
-    itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-    errorCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-    surfaceFilter->AddObserver(ProcessingError(), errorCommand);
+          auto surface = Surface::New();
+          surface->SetVtkPolyData(polyData);
 
-    // set filter parameter
-    surfaceFilter->SetDataStorage(*m_DataStorage);
-    if (segmentation.IsNotNull())
-    {
-      surfaceFilter->SetPointerParameter("Input", segmentation);
-    }
-    else
-    {
-      surfaceFilter->SetPointerParameter("Input", imageMask);
-    }
-    surfaceFilter->SetPointerParameter("Group node", selectedNode);
-    surfaceFilter->SetParameter("Show result", true);
-    surfaceFilter->SetParameter("Sync visibility", false);
-    surfaceFilter->SetParameter("Median kernel size", 3u);
-    surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-    surfaceFilter->SetParameter("Decimation rate", decimation);
+          const auto label = segmentation->GetLabel(labelValue);
+          const std::string labelName = label != nullptr ? label->GetName() : std::string();
+          const Color labelColor = label != nullptr ? label->GetColor() : Color{};
 
-    if (m_IsSmoothed)
-    {
-      surfaceFilter->SetParameter("Apply median", true);
-      surfaceFilter->SetParameter("Smooth", true);
-      surfaceFilter->SetParameter("Gaussian SD", sqrt(smoothing)); // use sqrt to account for setting of variance in preferences
-      StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
+          AddSurfaceNode(m_DataStorage, selectedNode, surface, parentName, labelName, labelColor, m_IsSmoothed);
+        }
+      }
     }
     else
     {
-      surfaceFilter->SetParameter("Apply median", false);
-      surfaceFilter->SetParameter("Smooth", false);
-      StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
-    }
+      // Plain binary mask: treat the foreground as a single label with value 1.
+      auto vtkImage = imageMask->GetVtkImageData(0);
+      const std::vector<MultiLabelSegmentation::LabelValueType> labels{1};
+      auto results = extractor.ExtractPerLabel(vtkImage, labels);
+      for (const auto& [labelValue, polyData] : results)
+      {
+        if (nullptr == polyData || polyData->GetNumberOfCells() == 0)
+        {
+          continue;
+        }
 
-    surfaceFilter->StartAlgorithm();
+        auto surface = Surface::New();
+        surface->SetVtkPolyData(polyData);
+
+        Color color;
+        color.Set(1.0f, 1.0f, 1.0f);
+        AddSurfaceNode(m_DataStorage, selectedNode, surface, parentName, std::string(), color, m_IsSmoothed);
+      }
+    }
   }
-  catch(...)
+  catch (const std::exception& e)
   {
-    MITK_ERROR << "Surface creation failed!";
+    MITK_ERROR << "Surface creation failed: " << e.what();
   }
-}
+  catch (...)
+  {
+    MITK_ERROR << "Surface creation failed.";
+  }
 
-void QmitkCreatePolygonModelAction::OnSurfaceCalculationDone()
-{
+  QApplication::restoreOverrideCursor();
   StatusBar::GetInstance()->Clear();
 }
 
 void QmitkCreatePolygonModelAction::SetDataStorage(DataStorage *dataStorage)
 {
   m_DataStorage = dataStorage;
-}
-
-void QmitkCreatePolygonModelAction::SetSmoothed(bool smoothed)
-{
-  m_IsSmoothed = smoothed;
-}
-
-void QmitkCreatePolygonModelAction::SetDecimated(bool decimated)
-{
-  m_IsDecimated = decimated;
 }
 
 void QmitkCreatePolygonModelAction::SetFunctionality(QtViewPart *)

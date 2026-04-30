@@ -58,8 +58,6 @@ public:
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
 
-  void SetSurfaceDecimation(bool surfaceDecimation);
-
   void SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes);
 
 public Q_SLOTS:
@@ -136,8 +134,6 @@ private:
   QmitkDataNodeTextureInterpolationAction* m_TextureInterpolationAction;
   QmitkDataNodeSurfaceRepresentationAction* m_SurfaceRepresentationAction;
   Qmitk3DMultiSegVisStyleAction* m_3DMultiSegVisStyleAction;
-
-  bool m_SurfaceDecimation;
 };
 
 #endif

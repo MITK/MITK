@@ -67,11 +67,6 @@ void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
   }
 }
 
-void QmitkDataNodeContextMenu::SetSurfaceDecimation(bool surfaceDecimation)
-{
-  m_SurfaceDecimation = surfaceDecimation;
-}
-
 void QmitkDataNodeContextMenu::SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
   m_SelectedNodes = selectedNodes;
@@ -322,12 +317,6 @@ void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(QAction* action)
 
   if (dataStorage.IsNotNull())
     contextMenuAction->SetDataStorage(dataStorage);
-
-  if ("QmitkCreatePolygonModelAction" == configElement->GetAttribute("class"))
-  {
-    contextMenuAction->SetSmoothed("true" == configElement->GetAttribute("smoothed"));
-    contextMenuAction->SetDecimated(m_SurfaceDecimation);
-  }
 
   contextMenuAction->Run(m_SelectedNodes);
 }

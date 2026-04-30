@@ -14,9 +14,10 @@ found in the LICENSE file.
 
 // MITK
 #include <mitkDataNode.h>
+#include <mitkLabelHighlightGuard.h>
+#include <mitkMultiLabelSurfaceNetsExtractor.h>
 #include <mitkProperties.h>
 #include <mitkVectorProperty.h>
-#include <mitkLabelHighlightGuard.h>
 
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
@@ -26,13 +27,11 @@ found in the LICENSE file.
 #include <vtkImageData.h>
 #include <vtkLookupTable.h>
 #include <vtkMatrix4x4.h>
-#include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPolyDataNormals.h>
 #include <vtkProperty.h>
 #include <vtkPropAssembly.h>
 #include <vtkSmartPointer.h>
-#include <vtkSurfaceNets3D.h>
 
 namespace
 {
@@ -53,22 +52,20 @@ namespace mitk
   class MultiLabelSegmentationGroupMapping
   {
   public:
-    vtkSmartPointer<vtkSurfaceNets3D>     m_SurfaceNets;
-    vtkSmartPointer<vtkPolyDataNormals>   m_NormalsFilter;
-    vtkSmartPointer<vtkPolyDataMapper>    m_PolyMapper;
-    vtkSmartPointer<vtkActor>             m_Actor;
-    vtkSmartPointer<vtkImageData>         m_VtkImage;
+    std::unique_ptr<MultiLabelSurfaceNetsExtractor> m_Extractor;
+    vtkSmartPointer<vtkPolyDataMapper>              m_PolyMapper;
+    vtkSmartPointer<vtkActor>                       m_Actor;
+    vtkSmartPointer<vtkImageData>                   m_VtkImage;
 
     // The actor index in the group order. Used to detect group reordering.
     MultiLabelSegmentation::GroupIndexType m_ActorOrder = 0;
 
     MultiLabelSegmentationGroupMapping()
+      : m_Extractor(std::make_unique<MultiLabelSurfaceNetsExtractor>()),
+        m_PolyMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
+        m_Actor(vtkSmartPointer<vtkActor>::New()),
+        m_VtkImage(vtkSmartPointer<vtkImageData>::New())
     {
-      m_VtkImage     = vtkSmartPointer<vtkImageData>::New();
-      m_SurfaceNets  = vtkSmartPointer<vtkSurfaceNets3D>::New();
-      m_NormalsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
-      m_PolyMapper   = vtkSmartPointer<vtkPolyDataMapper>::New();
-      m_Actor        = vtkSmartPointer<vtkActor>::New();
     }
   };
 }
@@ -192,21 +189,8 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
 
       auto& pipeline = newPipeline.first->second;
 
-      // Wire the per-group surface-extraction pipeline:
-      //   vtkImageData -> vtkSurfaceNets3D -> vtkPolyDataNormals -> vtkPolyDataMapper -> vtkActor
-      // DataCaching stays at its default (on). Disabling it triggers a separate VTK 9.5.2
-      // bug where the smoothing-or-copy block reads from an empty cache and emits empty
-      // output. We force a fresh extraction on every UpdateSurfaceMapping below by calling
-      // Modified() on the filter (the surface-nets cache check at RequestData uses the
-      // superclass MTime, which SetLabel/SetInputData alone do not always bump).
-      pipeline->m_NormalsFilter->SetInputConnection(pipeline->m_SurfaceNets->GetOutputPort());
-      pipeline->m_NormalsFilter->SplittingOn();
-      pipeline->m_NormalsFilter->ConsistencyOn();
-      pipeline->m_NormalsFilter->ComputePointNormalsOn();
-      pipeline->m_NormalsFilter->ComputeCellNormalsOff();
-      pipeline->m_NormalsFilter->SetFeatureAngle(30.0);
-
-      pipeline->m_PolyMapper->SetInputConnection(pipeline->m_NormalsFilter->GetOutputPort());
+      // Configure the per-group polydata mapper. The mapper's input is set per render
+      // by UpdateSurfaceMapping with the polydata returned by the surface-nets extractor.
       pipeline->m_PolyMapper->SetScalarModeToUseCellFieldData();
       pipeline->m_PolyMapper->SelectColorArray("BoundaryLabels");
       // BoundaryLabels component 0 always holds a foreground label: vtkSurfaceNets3D
@@ -312,49 +296,11 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage*
     auto nonConstImage = const_cast<Image*>(groupImage);
     pipeline->m_VtkImage = nonConstImage->GetVtkImageData(timeStep);
 
-    // The vtkImageData wraps an MITK-owned buffer via SetVoidArray; in-place edits do
-    // not bump the wrapper's MTime. Force VTK to treat the data as modified so the
-    // pipeline re-executes against the current contents.
-    if (auto scalars = pipeline->m_VtkImage->GetPointData()->GetScalars())
-    {
-      scalars->Modified();
-    }
-    pipeline->m_VtkImage->Modified();
+    pipeline->m_Extractor->SetSmoothing(localStorage->m_LastSmoothed);
 
-    pipeline->m_SurfaceNets->SetInputData(pipeline->m_VtkImage);
-
-    // Tell vtkSurfaceNets3D which labels to extract for this group. Labels not in this
-    // list are treated as background and produce no surface.
     const auto groupLabels = segmentation->GetLabelValuesByGroup(groupID);
-    pipeline->m_SurfaceNets->SetNumberOfLabels(static_cast<int>(groupLabels.size()));
-    for (size_t i = 0; i < groupLabels.size(); ++i)
-    {
-      pipeline->m_SurfaceNets->SetLabel(static_cast<int>(i), static_cast<double>(groupLabels[i]));
-    }
-
-    pipeline->m_SurfaceNets->SetSmoothing(localStorage->m_LastSmoothed);
-
-    // In the unsmoothed case the surface-nets output is axis-aligned quads with a single
-    // flat normal per face. vtkPolyDataMapper's auto-generated cell normals are sufficient,
-    // so the vtkPolyDataNormals stage is bypassed to keep the pipeline minimal. The
-    // smoothed case keeps the normals filter to get smooth Phong shading on curved triangles.
-    if (localStorage->m_LastSmoothed)
-    {
-      pipeline->m_PolyMapper->SetInputConnection(pipeline->m_NormalsFilter->GetOutputPort());
-    }
-    else
-    {
-      pipeline->m_PolyMapper->SetInputConnection(pipeline->m_SurfaceNets->GetOutputPort());
-    }
-
-    // Force the algorithm's superclass MTime to bump. vtkSurfaceNets3D's RequestData uses
-    // Superclass::GetMTime() to decide whether the cached extraction can be reused; SetLabel
-    // and SetInputData do not always trigger this. Without the bump the cache is hit and
-    // the local newScalars stays null, which the downstream TransformMeshType in VTK 9.5.2
-    // dereferences without checking, causing an access violation.
-    pipeline->m_SurfaceNets->Modified();
-
-    pipeline->m_PolyMapper->Update();
+    auto polyData = pipeline->m_Extractor->Extract(pipeline->m_VtkImage, groupLabels);
+    pipeline->m_PolyMapper->SetInputData(polyData);
   }
 
   localStorage->m_Actors->Modified();

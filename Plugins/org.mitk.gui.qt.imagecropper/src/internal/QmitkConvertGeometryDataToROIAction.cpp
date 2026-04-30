@@ -129,11 +129,3 @@ void QmitkConvertGeometryDataToROIAction::SetDataStorage(mitk::DataStorage* data
 void QmitkConvertGeometryDataToROIAction::SetFunctionality(berry::QtViewPart*)
 {
 }
-
-void QmitkConvertGeometryDataToROIAction::SetSmoothed(bool)
-{
-}
-
-void QmitkConvertGeometryDataToROIAction::SetDecimated(bool)
-{
-}

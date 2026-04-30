@@ -277,6 +277,7 @@ ALIASES                = bundlemainpage{1}=\mainpage \
                          "isHtml=\if NO_SUCH_THING" \
                          "isHtmlend=\endif" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
+                         "imageMacroEx{4}=\image html \1 \2 width=\4 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\page \1" \
                          "usersguidemainpage{1}=\page \1" \
                          "nondependentPluginLink{3}= <a href=\"qthelp://\2/bundle/\1.html\"> \3 </a>"

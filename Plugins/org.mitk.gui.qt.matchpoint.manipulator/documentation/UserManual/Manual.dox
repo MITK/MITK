@@ -93,7 +93,7 @@ Typical use:\n
 - Fine-tune the alignment using the sliders, spinboxes, or the mouse interaction tool (\ref MAP_REGMANIP_MouseInteraction).
 
 \section MAP_REGMANIP_MouseInteraction Mouse-based interaction
-\imageMacro{map_view_manipulator_mouse_interaction.png, "Transform tab showing the mouse interaction controls.", 10}
+\imageMacroEx{map_view_manipulator_mouse_interaction.png, "Transform tab showing the mouse interaction controls.", 10, 320px}
 
 In addition to the sliders and spinboxes, you can manipulate the registration directly in the 2D render windows
 using the mouse. This is particularly useful for large, coarse adjustments where dragging feels more natural than

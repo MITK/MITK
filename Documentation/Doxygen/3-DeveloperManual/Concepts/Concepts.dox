@@ -12,6 +12,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage BasicDataTypesPage
  -# \subpage DataManagementPage
  -# \subpage ReaderWriterPage
+ -# \subpage MITKSceneJsonFormatPage
  -# \subpage MitkImagePage
  -# \subpage MITKSegmentationTaskListsPage
  -# \subpage MITKSegmentationStackFormatPage

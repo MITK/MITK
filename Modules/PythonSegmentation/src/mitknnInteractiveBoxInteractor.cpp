@@ -169,7 +169,7 @@ namespace mitk::nnInteractive
 }
 
 mitk::nnInteractive::BoxInteractor::BoxInteractor()
-  : Interactor(InteractionType::Box, InteractionMode::BlockLMBDisplayInteraction),
+  : Interactor(InteractionType::Box),
     m_Impl(std::make_unique<Impl>(this))
 {
 }

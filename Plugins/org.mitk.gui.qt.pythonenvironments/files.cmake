@@ -1,15 +1,15 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkPythonSettingsView.cpp
+  QmitkPythonEnvironmentsView.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkPythonSettingsView.ui
+  src/internal/QmitkPythonEnvironmentsView.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkPythonSettingsView.h
+  src/internal/QmitkPythonEnvironmentsView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -18,7 +18,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/QmitkPythonSettings.qrc
+  resources/QmitkPythonEnvironments.qrc
 )
 
 foreach(file ${SRC_CPP_FILES})

@@ -57,17 +57,6 @@ namespace mitk::nnInteractive
    */
   MITKPYTHONSEGMENTATION_EXPORT const std::array<InteractionType, 4>& GetAllInteractionTypes();
 
-  /** \brief Specifies the interaction modes for interactors.
-   *
-   * Interaction modes define specific behaviors during interactions, such as
-   * blocking left mouse button display interactions resp. crosshair navigation.
-   */
-  enum class InteractionMode
-  {
-    Default,                   /**< Default interaction mode */
-    BlockLMBDisplayInteraction /**< Block left mouse button display interaction */
-  };
-
   /** \brief Specifies the types of prompts used in %nnInteractive.
    *
    * Prompt types distinguish between positive and negative prompts, e.g.,

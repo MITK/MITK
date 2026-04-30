@@ -10,37 +10,38 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSceneFileReader.h"
+#include "mitkSceneJsonFileReader.h"
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
-#include <mitkSceneIO.h>
+#include <mitkSceneJsonReader.h>
 #include <mitkStandaloneDataStorage.h>
+
+#include <algorithm>
 
 namespace mitk
 {
-  SceneFileReader::SceneFileReader() : AbstractFileReader()
+  SceneJsonFileReader::SceneJsonFileReader() : AbstractFileReader()
   {
-    CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".scene");
-    mimeType.SetComment("MITK Scene Files");
+    CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".scene.json");
+    mimeType.SetComment("MITK JSON Scene Files");
     mimeType.SetCategory("MITK Scenes");
-    mimeType.AddExtension("mitk");
+    mimeType.AddExtension("mitkscene.json");
 
-    this->SetDescription("MITK Scene Reader");
+    this->SetDescription("MITK JSON Scene Reader");
     this->SetMimeType(mimeType);
 
     this->RegisterService();
   }
 
-  DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage &ds)
+  DataStorage::SetOfObjects::Pointer SceneJsonFileReader::Read(DataStorage &ds)
   {
-    // const DataStorage::SetOfObjects::STLContainerType& oldNodes = ds.GetAll()->CastToSTLConstContainer();
     DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
-    SceneIO::Pointer sceneIO = SceneIO::New();
-    sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
+    SceneJsonReader::Pointer reader = SceneJsonReader::New();
+    reader->LoadScene(this->GetLocalFileName(), &ds, false);
     DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();
 
-    // Compute the difference
+    // Compute the difference: nodes present after load but not before.
     DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
 
     unsigned int index = 0;
@@ -61,8 +62,13 @@ namespace mitk
     return result;
   }
 
-  std::vector<BaseData::Pointer> SceneFileReader::DoRead()
+  std::vector<BaseData::Pointer> SceneJsonFileReader::DoRead()
   {
+    // The AbstractFileReader::DoRead contract returns BaseData only, so
+    // node properties and parent/child relationships are intentionally
+    // lost on this code path. Callers that need the scene graph should
+    // use Read(DataStorage&) instead. Data-less nodes are skipped here
+    // to avoid handing nullptrs back to IOUtil::Load.
     std::vector<BaseData::Pointer> result;
 
     DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
@@ -72,10 +78,13 @@ namespace mitk
       iter != iterEnd;
       ++iter)
     {
-      result.push_back(iter.Value()->GetData());
+      if (BaseData::Pointer data = iter.Value()->GetData())
+      {
+        result.push_back(data);
+      }
     }
     return result;
   }
 
-  SceneFileReader *SceneFileReader::Clone() const { return new SceneFileReader(*this); }
+  SceneJsonFileReader *SceneJsonFileReader::Clone() const { return new SceneJsonFileReader(*this); }
 }

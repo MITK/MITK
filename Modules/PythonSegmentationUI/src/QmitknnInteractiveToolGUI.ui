@@ -65,7 +65,7 @@
          <string>Reset Interactions</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Reset</normaloff>:/nnInteractive/Reset</iconset>
         </property>
        </widget>
@@ -88,7 +88,7 @@
          <string>Positive</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Positive</normaloff>:/nnInteractive/Positive</iconset>
         </property>
         <property name="checkable">
@@ -105,7 +105,7 @@
          <string>Negative</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Negative</normaloff>:/nnInteractive/Negative</iconset>
         </property>
         <property name="checkable">
@@ -198,7 +198,7 @@
          <string>Initialize with Mask</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/nnInteractive/nnInteractive.qrc">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
           <normaloff>:/nnInteractive/Mask</normaloff>:/nnInteractive/Mask</iconset>
         </property>
         <property name="iconSize">
@@ -232,7 +232,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/nnInteractive/nnInteractive.qrc"/>
+  <include location="../resource/nnInteractive/nnInteractive.qrc"/>
  </resources>
  <connections/>
 </ui>

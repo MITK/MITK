@@ -14,10 +14,19 @@ found in the LICENSE file.
 #define QmitknnInteractiveToolGUI_h
 
 #include <QmitkSegWithPreviewToolGUIBase.h>
+#include <mitkIPreferences.h>
+#include <mitkLabelSetImage.h>
 #include <mitknnInteractiveTool.h>
+#include <mitkWeakPointer.h>
 #include <MitkPythonSegmentationUIExports.h>
-#include <memory>
 
+#include <QString>
+
+#include <memory>
+#include <optional>
+#include <vector>
+
+class QAbstractButton;
 class QButtonGroup;
 class QPushButton;
 
@@ -36,6 +45,10 @@ namespace Ui
  * - Interactor mode buttons (point, box, scribble, lasso)
  * - Auto-zoom and auto-refine options
  * - Mask-based session initialization
+ * - Automation modes (auto-confirm after a single interaction;
+ *   auto-create-next-label on confirm, with an optional bypass of the
+ *   global label-naming preferences)
+ * - Optional shortcut hints in button labels
  * - Keyboard shortcuts for common actions (R: reset, C: confirm,
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
@@ -103,6 +116,10 @@ protected:
   void OnSettingsButtonClicked();
 
   /** \brief Resets all interactions and switches to positive prompt type.
+   *
+   * Also clears the auto-created-label tracking via
+   * InvalidateAutoCreatedLabel() so the next deactivation does not try to
+   * remove a label the user has effectively re-claimed by resetting.
    */
   void OnResetInteractionsButtonClicked();
 
@@ -150,6 +167,23 @@ protected:
    */
   void OnConfirmCleanUp(bool isConfirmed);
 
+  /** \brief Handles the tool's PreviewUpdatedEvent.
+   *
+   * When "auto-confirm" is enabled, schedules an auto-click of the Confirm
+   * button on the next event-loop tick. No-op otherwise.
+   */
+  void OnPreviewUpdated();
+
+  /** \brief Handles the tool's DeactivatedEvent.
+   *
+   * Runs on a proper user-initiated tool deactivation (as opposed to the
+   * GUI's Qt destructor, which may fire during application shutdown when
+   * observers and widgets are partially destroyed). Performs the unused-
+   * auto-label cleanup here so we never touch the segmentation from the
+   * destructor path.
+   */
+  void OnToolDeactivated();
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.
@@ -173,10 +207,80 @@ protected:
   bool Install();
 
 private:
+  /** \brief Reads the "auto-create next label" preference. Not cached. */
+  bool IsAutoCreateNextLabelEnabled() const;
+
+  /** \brief Reads the "auto-confirm after single interaction" preference. Not cached. */
+  bool IsAutoConfirmEnabled() const;
+
+  /** \brief Reads the "skip naming prompt on auto-create" sub-preference. Not cached.
+   *
+   * When true, AutoCreateAndSelectNewLabel() bypasses the global "default
+   * label naming" and "enforce suggestions" preferences for this flow only.
+   */
+  bool IsNamingPromptSkippedOnAutoCreate() const;
+
+  /** \brief Reads the "show shortcuts in button labels" preference. Not cached. */
+  bool AreShortcutsShownInLabels() const;
+
+  /** \brief Decorates each shortcut-bound widget's text with its key, or
+   *         restores the plain base text, based on the current preference.
+   *
+   * Idempotent: labels are always derived from the cached base text in
+   * \c m_ShortcutLabels, never from the widget's current text.
+   */
+  void ApplyShortcutLabels();
+
+  /** \brief Reacts to preference node changes and refreshes shortcut labels
+   *         when the relevant key changes. Other keys are ignored.
+   */
+  void OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event);
+
+  /** \brief Creates a new label in the working segmentation and selects it.
+   *
+   * The new label is placed into the group of the previously-active label.
+   * Tracks the new label value and segmentation so it can be removed on
+   * tool deactivation if it remains unused.
+   *
+   * \return \c true if a new label was created, \c false otherwise (a
+   *         precondition was not met, or the user canceled the rename
+   *         dialog when "Ignore label naming preferences" is off).
+   */
+  bool AutoCreateAndSelectNewLabel();
+
+  /** \brief Stops tracking the auto-created label without removing it. */
+  void InvalidateAutoCreatedLabel();
+
+  /** \brief Callback fired via itk::DeleteEvent when the tracked segmentation
+   *         is destroyed. Clears the tracking state so we never dereference a
+   *         dangling pointer in the destructor.
+   */
+  void OnAutoCreatedSegmentationDeleted();
+
+  /** \brief Re-checks the last-active interactor button, if any. */
+  void ReEnableLastInteractor();
+
+  struct ShortcutLabel
+  {
+    QPushButton* button;
+    Qt::Key key;
+    QString baseText;
+  };
+
   std::unique_ptr<Ui::QmitknnInteractiveToolGUI> m_Ui;
   QButtonGroup* m_PromptTypeButtonGroup;
   PromptType m_PromptType;
   std::unordered_map<InteractionType, QPushButton*> m_InteractorButtons;
+
+  std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_AutoCreatedLabelValue;
+  std::optional<mitk::MultiLabelSegmentation::LabelValueType> m_PreviousActiveLabelValue;
+  mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
+  QAbstractButton* m_LastInteractorButton = nullptr;
+  bool m_AutoConfirmInProgress = false;
+
+  mitk::IPreferences* m_Preferences = nullptr;
+  std::vector<ShortcutLabel> m_ShortcutLabels;
+  QString m_PromptTypeBaseTitle;
 };
 
 #endif

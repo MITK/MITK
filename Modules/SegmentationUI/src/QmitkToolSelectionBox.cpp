@@ -254,6 +254,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       if (gui)
       {
         gui->SetTool(tool);
+        gui->SetMultiLabelInspector(m_MultiLabelInspector);
 
         gui->setParent(m_ToolGUIWidget);
         gui->move(gui->geometry().topLeft());
@@ -630,5 +631,10 @@ void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
 void QmitkToolSelectionBox::SetToolGUIArea(QWidget *parentWidget)
 {
   m_ToolGUIWidget = parentWidget;
+}
+
+void QmitkToolSelectionBox::SetMultiLabelInspector(QmitkMultiLabelInspector *inspector)
+{
+  m_MultiLabelInspector = inspector;
 }
 

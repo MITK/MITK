@@ -10,14 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkPluginActivator.h"
-#include "QmitkPythonSettingsView.h"
+#include <mitkAbstractSceneReader.h>
 
-void mitk::mitkPluginActivator::start(ctkPluginContext* context)
-{
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonSettingsView, context)
-}
+mitk::AbstractSceneReader::AbstractSceneReader() = default;
 
-void mitk::mitkPluginActivator::stop(ctkPluginContext*)
-{
-}
+mitk::AbstractSceneReader::~AbstractSceneReader() = default;

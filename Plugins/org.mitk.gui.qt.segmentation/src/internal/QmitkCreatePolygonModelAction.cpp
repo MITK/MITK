@@ -22,8 +22,11 @@ found in the LICENSE file.
 
 #include <vtkImageData.h>
 #include <vtkImageThreshold.h>
+#include <vtkMatrix4x4.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 #include <QApplication>
 
@@ -71,6 +74,25 @@ namespace
     node->SetColor(color);
     node->SetProperty("scalar visibility", BoolProperty::New(false));
     dataStorage->Add(node, parentNode);
+  }
+
+  vtkSmartPointer<vtkPolyData> ApplyImageToWorld(vtkPolyData* poly, const BaseGeometry* geometry)
+  {
+    // The extractor emits polydata in image-local coordinates (vtkImageData has origin
+    // (0,0,0), identity direction; spacing is already applied). Bake the [direction | origin]
+    // transform into the polydata so the resulting Surface lives in world space and lines
+    // up with the source segmentation.
+    auto transform = vtkSmartPointer<vtkTransform>::New();
+    transform->SetMatrix(MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(geometry));
+
+    auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    transformFilter->SetInputData(poly);
+    transformFilter->SetTransform(transform);
+    transformFilter->Update();
+
+    auto result = vtkSmartPointer<vtkPolyData>::New();
+    result->ShallowCopy(transformFilter->GetOutput());
+    return result;
   }
 
   vtkSmartPointer<vtkImageData> BinarizeMask(vtkImageData* mask)
@@ -157,7 +179,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
           }
 
           auto surface = Surface::New();
-          surface->SetVtkPolyData(polyData);
+          surface->SetVtkPolyData(ApplyImageToWorld(polyData, groupImage->GetGeometry()));
 
           const auto label = segmentation->GetLabel(labelValue);
           const Color labelColor = label != nullptr ? label->GetColor() : Color{};
@@ -174,7 +196,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       if (it != results.end() && it->second != nullptr && it->second->GetNumberOfCells() > 0)
       {
         auto surface = Surface::New();
-        surface->SetVtkPolyData(it->second);
+        surface->SetVtkPolyData(ApplyImageToWorld(it->second, imageMask->GetGeometry()));
 
         Color color;
         color.Set(1.0f, 1.0f, 1.0f);

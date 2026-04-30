@@ -12,7 +12,10 @@ found in the LICENSE file.
 
 #include <mitkMultiLabelSurfaceNetsExtractor.h>
 
+#include <mitkBaseGeometry.h>
+
 #include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
@@ -129,4 +132,27 @@ mitk::MultiLabelSurfaceNetsExtractor::ExtractPerLabel(
   }
 
   return results;
+}
+
+vtkSmartPointer<vtkMatrix4x4> mitk::MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(const BaseGeometry* geometry)
+{
+  auto matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+  matrix->Identity();
+  if (geometry == nullptr)
+    return matrix;
+
+  // GetVtkMatrix() returns the index-to-world matrix where the rotation columns are
+  // pre-scaled by spacing. vtkSurfaceNets3D consumes a vtkImageData whose spacing is
+  // already applied (origin (0,0,0), identity direction), so the polydata it emits is
+  // in mm-scaled image-local coordinates. Strip the spacing here to leave a pure
+  // [direction | origin] transform that maps those coordinates into world space.
+  matrix->DeepCopy(geometry->GetVtkMatrix());
+  const auto spacing = geometry->GetSpacing();
+  for (int i = 0; i < 3; ++i)
+  {
+    matrix->SetElement(i, 0, matrix->GetElement(i, 0) / spacing[0]);
+    matrix->SetElement(i, 1, matrix->GetElement(i, 1) / spacing[1]);
+    matrix->SetElement(i, 2, matrix->GetElement(i, 2) / spacing[2]);
+  }
+  return matrix;
 }

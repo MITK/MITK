@@ -290,18 +290,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage*
 
   segmentation->Update();
 
-  // Compute normalized orientation matrix of segmentation to ensure that the surface
-  // is shown at the right spot (same geometry as the segmentation).
-  const auto geometry = segmentation->GetGeometry();
-  auto spacing = geometry->GetSpacing();
-  auto orientationMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
-  orientationMatrix->DeepCopy(geometry->GetVtkMatrix());
-  for (int i = 0; i < 3; ++i)
-  {
-    orientationMatrix->SetElement(i, 0, orientationMatrix->GetElement(i, 0) / spacing[0]);
-    orientationMatrix->SetElement(i, 1, orientationMatrix->GetElement(i, 1) / spacing[1]);
-    orientationMatrix->SetElement(i, 2, orientationMatrix->GetElement(i, 2) / spacing[2]);
-  }
+  const auto orientationMatrix = MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(segmentation->GetGeometry());
 
   const auto timeStep = this->GetTimestep();
 

@@ -22,12 +22,14 @@ found in the LICENSE file.
 #include <vector>
 
 class vtkImageData;
+class vtkMatrix4x4;
 class vtkPolyData;
 class vtkPolyDataNormals;
 class vtkSurfaceNets3D;
 
 namespace mitk
 {
+  class BaseGeometry;
   /**
    * \brief Extracts label-boundary polygonal surfaces from a multi-label segmentation
    * group image using vtkSurfaceNets3D.
@@ -88,6 +90,18 @@ namespace mitk
     std::map<LabelValueType, vtkSmartPointer<vtkPolyData>> ExtractPerLabel(
       vtkImageData* groupImage,
       const std::vector<LabelValueType>& labelValues);
+
+    /**
+     * \brief Build the image-local-frame to world-frame transform for the polydata produced by Extract.
+     *
+     * vtkSurfaceNets3D operates on the raw vtkImageData (origin (0,0,0), identity direction,
+     * image spacing already applied) and returns polydata in that local frame. The returned
+     * 4x4 matrix is the [direction | origin] transform that places those coordinates back
+     * into world space. The live 3D mapper applies it as the actor's UserMatrix; consumers
+     * of the polydata that bypass the rendering pipeline (e.g. the convert-to-surface action)
+     * should bake it into the polydata via vtkTransformPolyDataFilter.
+     */
+    static vtkSmartPointer<vtkMatrix4x4> GetImageToWorldMatrix(const BaseGeometry* geometry);
 
   private:
     void ConfigureLabels(const std::vector<LabelValueType>& labelValues);

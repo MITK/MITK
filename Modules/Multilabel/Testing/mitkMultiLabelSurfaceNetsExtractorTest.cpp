@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <mitkGeometry3D.h>
 #include <mitkMultiLabelSurfaceNetsExtractor.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -17,6 +18,7 @@ found in the LICENSE file.
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
 #include <vtkNew.h>
 #include <vtkPolyData.h>
 
@@ -30,6 +32,9 @@ class mitkMultiLabelSurfaceNetsExtractorTestSuite : public mitk::TestFixture
   MITK_TEST(ExtractPerLabel_ReturnsOnePolyDataPerPresentLabel);
   MITK_TEST(ExtractPerLabel_OmitsLabelsWithNoBoundary);
   MITK_TEST(SmoothingToggle_ChangesPointPositions);
+  MITK_TEST(GetImageToWorldMatrix_NullGeometry_ReturnsIdentity);
+  MITK_TEST(GetImageToWorldMatrix_StripsSpacingAndKeepsOrigin);
+  MITK_TEST(GetImageToWorldMatrix_PreservesNonIdentityDirection);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -180,6 +185,69 @@ public:
     }
     CPPUNIT_ASSERT_MESSAGE("Smoothed output should not be point-identical to exact output",
                            foundDifference);
+  }
+
+  void GetImageToWorldMatrix_NullGeometry_ReturnsIdentity()
+  {
+    auto matrix = mitk::MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(nullptr);
+    CPPUNIT_ASSERT(matrix != nullptr);
+    for (int i = 0; i < 4; ++i)
+      for (int j = 0; j < 4; ++j)
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(i == j ? 1.0 : 0.0, matrix->GetElement(i, j), 1e-9);
+  }
+
+  void GetImageToWorldMatrix_StripsSpacingAndKeepsOrigin()
+  {
+    // Geometry with non-zero origin and non-unit spacing, identity direction.
+    // Confirms the spacing is removed and the origin column survives, so polydata in
+    // mm-scaled image-local coords lands at world = local + origin.
+    auto geometry = mitk::Geometry3D::New();
+    mitk::Vector3D spacing;
+    spacing[0] = 2.0; spacing[1] = 3.0; spacing[2] = 4.0;
+    geometry->SetSpacing(spacing);
+    mitk::Point3D origin;
+    origin[0] = 10.0; origin[1] = 20.0; origin[2] = 30.0;
+    geometry->SetOrigin(origin);
+
+    auto matrix = mitk::MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(geometry);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, matrix->GetElement(0, 0), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, matrix->GetElement(1, 1), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, matrix->GetElement(2, 2), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(10.0, matrix->GetElement(0, 3), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(20.0, matrix->GetElement(1, 3), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(30.0, matrix->GetElement(2, 3), 1e-9);
+
+    // (1, 2, 3) in image-local coords → (11, 22, 33) in world.
+    double world[4];
+    const double local[4] = {1.0, 2.0, 3.0, 1.0};
+    matrix->MultiplyPoint(local, world);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(11.0, world[0], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(22.0, world[1], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(33.0, world[2], 1e-9);
+  }
+
+  void GetImageToWorldMatrix_PreservesNonIdentityDirection()
+  {
+    // 90 degrees around z: x→y, y→-x, z→z.
+    auto geometry = mitk::Geometry3D::New();
+    mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
+    mitk::AffineTransform3D::MatrixType matrixComponent;
+    matrixComponent[0][0] = 0.0; matrixComponent[0][1] = -1.0; matrixComponent[0][2] = 0.0;
+    matrixComponent[1][0] = 1.0; matrixComponent[1][1] = 0.0;  matrixComponent[1][2] = 0.0;
+    matrixComponent[2][0] = 0.0; matrixComponent[2][1] = 0.0;  matrixComponent[2][2] = 1.0;
+    transform->SetMatrix(matrixComponent);
+    geometry->SetIndexToWorldTransform(transform);
+
+    auto matrix = mitk::MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(geometry);
+
+    // (1, 0, 0) in image-local → (0, 1, 0) in world after the rotation.
+    double world[4];
+    const double local[4] = {1.0, 0.0, 0.0, 1.0};
+    matrix->MultiplyPoint(local, world);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, world[0], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, world[1], 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, world[2], 1e-9);
   }
 };
 

@@ -80,20 +80,6 @@ namespace mitk
      */
     us::ModuleResource GetIconResource() const override;
 
-    /** \brief Checks whether this tool can handle the given data.
-     *
-     * The tool requires valid reference and working data (as checked by the
-     * superclass). Both 3D and 4D reference images are supported. For 4D
-     * reference images, the tool binds a session to a single time step and
-     * tears it down whenever the image or segmentation time step changes.
-     *
-     * \param[in] referenceData The reference image data.
-     * \param[in] workingData The working segmentation data.
-     *
-     * \return \c true if the tool can handle the data, \c false otherwise.
-     */
-    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
-
     /** \brief Called when the tool is deactivated.
      *
      * Disables any active interactor, resets all interactions, and ends the

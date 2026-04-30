@@ -177,11 +177,6 @@ us::ModuleResource mitk::nnInteractiveTool::GetIconResource() const
   return iconResource;
 }
 
-bool mitk::nnInteractiveTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
-{
-  return Superclass::CanHandle(referenceData, workingData);
-}
-
 void mitk::nnInteractiveTool::Deactivated()
 {
   this->DisableInteractor();
@@ -669,10 +664,7 @@ void mitk::nnInteractiveTool::StartSession()
   // model is bound to a single 3D slice.
   m_Impl->SessionReferenceDataTimeStep = timeStep;
 
-  const auto* workingData = this->GetToolManager()->GetWorkingData(0);
-  const auto* workingSeg = workingData != nullptr
-    ? dynamic_cast<const MultiLabelSegmentation*>(workingData->GetData())
-    : nullptr;
+  const auto* workingSeg = this->GetTargetSegmentation();
   m_Impl->SessionWorkingDataTimeStep = workingSeg != nullptr
     ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
     : 0;
@@ -714,20 +706,17 @@ void mitk::nnInteractiveTool::OnTimePointChanged()
 
   const auto* referenceNode = this->GetToolManager()->GetReferenceData(0);
   const auto* referenceImage = referenceNode != nullptr
-    ? dynamic_cast<const Image*>(referenceNode->GetData())
+    ? referenceNode->GetDataAs<Image>()
     : nullptr;
   if (referenceImage == nullptr)
     return;
 
-  const auto* workingNode = this->GetToolManager()->GetWorkingData(0);
-  const auto* workingSeg = workingNode != nullptr
-    ? dynamic_cast<const MultiLabelSegmentation*>(workingNode->GetData())
-    : nullptr;
-
   const auto currentImageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  const auto* workingSeg = this->GetTargetSegmentation();
   const auto currentWorkingTimeStep = workingSeg != nullptr
     ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
-    : TimeStepType(0);
+    : 0;
 
   if (currentImageTimeStep == m_Impl->SessionReferenceDataTimeStep &&
       currentWorkingTimeStep == m_Impl->SessionWorkingDataTimeStep)

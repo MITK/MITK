@@ -40,26 +40,35 @@ namespace mitk
   itkEventMacroDeclaration(RegistrationSelectPositionEvent, itk::AnyEvent);
 
   /**
-  * @brief Data interactor for mouse-based registration manipulation in 2D render windows.
-  *
-  * This interactor supports in-plane translation, in-plane rotation (around the view
-  * plane normal), and uniform scaling via modifier+mouse-drag combinations:
-  *   - Shift + Left-drag:       In-plane translation
-  *   - Ctrl + Left-drag:        In-plane rotation around the center of rotation
-  *   - Shift + Ctrl + Left-drag: Uniform scaling (when enabled)
-  *
-  * The interactor computes transform deltas and notifies observers via ITK events:
-  *   - RegistrationTranslationEvent
-  *   - RegistrationRotationEvent
-  *   - RegistrationScaleEvent
-  *
-  * It does NOT modify any data directly; the receiving widget/plugin is responsible
-  * for applying the deltas to the registration transform.
-  *
-  * @pre The center of rotation must be set before rotation/scaling interactions.
-  * @pre The interactor should be registered on a DataNode that is visible in the
-  *      2D render windows where interaction is desired.
-  */
+   * \brief Data interactor for mouse-based registration manipulation in 2D render windows.
+   *
+   * The interactor supports in-plane translation, in-plane rotation (around the
+   * view plane normal), and (optionally) uniform scaling via modifier+mouse-drag
+   * combinations, plus a plain click for navigator position selection:
+   *   - Shift + Left-drag:        In-plane translation
+   *   - Ctrl + Left-drag:         In-plane rotation around the center of rotation
+   *   - Shift + Ctrl + Left-drag: Uniform scaling (only active when explicitly enabled
+   *                               via SetScalingEnabled(true))
+   *   - Plain Left-click:         Selects the clicked world position as navigator
+   *                               position
+   *
+   * While a modifier is held without a pressed mouse button, the interactor
+   * foreshadows the upcoming gesture by switching the cursor.
+   *
+   * The interactor computes transform deltas and notifies observers via ITK events:
+   *   - RegistrationTranslationEvent
+   *   - RegistrationRotationEvent
+   *   - RegistrationScaleEvent
+   *   - RegistrationSelectPositionEvent
+   *
+   * It does NOT modify any data directly; the receiving widget/plugin is
+   * responsible for reading the corresponding delta/position via the matching
+   * getter and applying it to the registration transform.
+   *
+   * \pre The center of rotation must be set before rotation/scaling interactions.
+   * \pre The interactor should be registered on a DataNode that is visible in the
+   *      2D render windows where interaction is desired.
+   */
   class MITKMATCHPOINTREGISTRATION_EXPORT RegistrationManipulationInteractor : public DataInteractor
   {
   public:

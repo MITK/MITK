@@ -34,22 +34,27 @@ switch to the visual inspection mode and will be reinitialized once to the field
 
 \imageMacro{map_view_manipulator_started.png, "Controls after the manipulation session is started.", 14}
 
-(7) <b>New registration name</b>: You may choose to give the resulting registration a special name.\n\n
+(7) <b>Setting tabs</b>: The lower part of the view groups the controls into two tabs: <em>Transformation settings</em> for adjusting the registration transform (\ref MAP_REGMANIP_TransSettings) and <em>Evaluation settings</em> for the visual inspection rendering (\ref MAP_REGMANIP_EvalSettings).\n\n
 
-(8) Additionally you can choose the convenience
-option to map the moving image with the confirmed registration automatically and also store the mapped image.\n\n
+(8) <b>Translation parameters</b>: You can alter the translation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(9) <b>Settings</b>: You can alter the settings of the transform (\ref MAP_REGMANIP_TransSettings) and the rendering settings (\ref MAP_REGMANIP_EvalSettings) for the visual inspection.\n\n
+(9) <b>Rotation parameters</b>: You can alter the rotation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(10) <b>Translation parameters</b>: You can alter the translation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(10) <b>Center of rotation type</b>: You may choose the center of rotation for your manipulation. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(11) <b>Rotation parameters</b>: You can alter the rotation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(11) <b>Moving center correction</b>: Press <em>Translate moving center to navigator</em> for a one-click rough pre-alignment that shifts the moving image so its center maps to the current crosshair/navigator position; only the translation component of the transform is changed. See \ref MAP_REGMANIP_QuickAlign for details.\n\n
 
-(12) <b>Center of rotation</b>: You may choose the center of rotation for your manipulation. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(12) <b>Mouse interactions on/off</b>: Toggle the mouse-based manipulation tool on or off. When active, you can manipulate the registration directly in the 2D render windows via modifier+drag gestures. See \ref MAP_REGMANIP_MouseInteraction for details.\n\n
 
-(13) <b>Confirmation</b>: You may confirm the determined registration and store it in the data storage with the given name. The manipulation session will be automatically closed.\n\n
+(13) <b>New registration name</b>: You may choose to give the resulting registration a special name.\n\n
 
-(14) <b>Cancel</b>: You may cancel the session any time. No changes will be stored and the manipulation session will be automatically closed.\n
+(14) <b>Auto mapping/refinement</b>: Convenience options that are applied when the registration is confirmed:\n
+- <b>Generate + store mapped result</b>: maps the moving image with the confirmed registration and stores the resulting image in the data storage.
+- <b>Refine geometry + store result</b>: stores a copy of the moving image whose geometry is updated by the confirmed registration. The image data is not resampled, only the spatial geometry is composed with the transform. Only effective when the resulting registration is affine (always the case in this view, where the manipulator produces a rigid Euler transform); otherwise an error is reported on confirmation.\n\n
+
+(15) <b>Confirm registration</b>: You may confirm the determined registration and store it in the data storage with the given name. The manipulation session will be automatically closed.\n\n
+
+(16) <b>Cancel manipulation</b>: You may cancel the session any time. No changes will be stored and the manipulation session will be automatically closed.\n
 
 \section MAP_REGMANIP_TransSettings Transformation settings
 You can alter the translation and the rotation of the transform. In addition you may choose the center of rotation type.
@@ -103,9 +108,13 @@ restore the standard navigation behaviour.\n\n
 |---------|--------|
 | Shift + Drag | Translate the moving image in the current view plane |
 | Ctrl + Drag | Rotate the moving image around the current center of rotation, within the current view plane |
+| Left click (no modifier) | Move the navigator/crosshair to the clicked position |
 
-\remark All gestures act relative to the plane of the render window in which you drag. Working in different 2D views
+\remark All drag gestures act relative to the plane of the render window in which you drag. Working in different 2D views
 therefore lets you constrain the manipulation to the desired anatomical plane.
+
+\remark The plain left-click gesture is convenient when the <em>Current navigator position</em> center mode is active:
+clicking sets the pivot for the next rotation in a single step, without having to leave the interaction tool.
 
 \remark The center of rotation used for Ctrl + Drag is exactly the one selected in the <em>Center of rotation</em>
 combo box. The yellow diamond-shaped indicator (\ref MAP_REGMANIP_CoRIndicator) always shows the current pivot

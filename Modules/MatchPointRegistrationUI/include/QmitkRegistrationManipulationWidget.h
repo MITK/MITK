@@ -42,9 +42,11 @@ namespace Ui
  * with a preceding (baseline) registration.
  *
  * The widget maintains both direct and inverse transforms internally and emits
- * RegistrationChanged whenever the user modifies any parameter. The interim registration
- * can be queried at any time via GetInterimRegistration(), while GenerateRegistration()
- * creates a finalized independent copy (optionally composed with the preceding registration).
+ * RegistrationChanged whenever the transform is changed, either by the user via the
+ * widget controls or programmatically through ApplyTranslationDelta() /
+ * ApplyRotationDelta(). The interim registration can be queried at any time via
+ * GetInterimRegistration(), while GenerateRegistration() creates a finalized
+ * independent copy (optionally composed with the preceding registration).
  *
  * The center of rotation can be configured to be relative to the target space (in which case
  * it is automatically updated through the inverse transform) or relative to the moving space.
@@ -121,18 +123,28 @@ public:
    */
   map::core::RegistrationBase::Pointer GenerateRegistration()const ;
 
-  /** Apply an incremental translation in world coordinates to the current transform.
-  * @pre delta must be a valid 3D vector (no NaN/Inf components).
-  */
+  /**
+   * \brief Applies an incremental translation in world coordinates to the current transform.
+   *
+   * Updates the widget controls and emits RegistrationChanged.
+   *
+   * \param[in] delta Translation vector to add to the current translation, in world (mm) coordinates.
+   * \pre \p delta must be a valid 3D vector (no NaN/Inf components).
+   */
   void ApplyTranslationDelta(const mitk::Vector3D& delta);
 
-  /** Apply an incremental rotation around the given world-space axis.
-  * The rotation is composed with the current rotation matrix and decomposed
-  * back into Euler angles.
-  * @pre axis must be a non-zero vector. It will be normalized internally.
-  * @param axis  Rotation axis in world coordinates (e.g. view plane normal).
-  * @param angleDeg  Rotation angle in degrees.
-  */
+  /**
+   * \brief Applies an incremental rotation around the given world-space axis.
+   *
+   * The rotation is composed with the current rotation matrix and decomposed
+   * back into Euler angles. The pivot point matches the current center-of-rotation
+   * configuration of the widget. Updates the widget controls and emits
+   * RegistrationChanged.
+   *
+   * \param[in] axis Rotation axis in world coordinates (e.g. view plane normal).
+   * \param[in] angleDeg Rotation angle in degrees.
+   * \pre \p axis must be a non-zero vector. It will be normalized internally.
+   */
   void ApplyRotationDelta(const mitk::Vector3D& axis, double angleDeg);
 
 public Q_SLOTS:
@@ -159,7 +171,11 @@ public Q_SLOTS:
 
 signals:
   /**
-   * \brief Emitted whenever the user modifies the registration transform via the widget controls.
+   * \brief Emitted whenever the registration transform is updated.
+   *
+   * Triggered both by user input on the widget controls (sliders, spin boxes) and
+   * by programmatic transform changes via ApplyTranslationDelta() / ApplyRotationDelta().
+   *
    * \param[in] registration Pointer to the updated interim registration.
    */
   void RegistrationChanged(map::core::RegistrationBase *registration);

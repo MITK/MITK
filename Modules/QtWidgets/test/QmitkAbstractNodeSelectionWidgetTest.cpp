@@ -10,17 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestQApplication.h"
+
 #include <QmitkAbstractNodeSelectionWidget.h>
-#include <QApplication>
 #include <mitkNodePredicateFunction.h>
 #include <mitkStandaloneDataStorage.h>
 #include <QmitkModelViewSelectionConnector.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-#include <mitkRenderingTestHelper.h>
-
-extern std::vector<std::string> globalCmdLineArgs;
 
 class TestWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -111,11 +109,11 @@ class QmitkAbstractNodeSelectionWidgetTestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_Node2;
   mitk::DataNode::Pointer m_Node3;
 
-  QApplication* m_TestApp;
-
 public:
   void setUp() override
   {
+    EnsureQApplication();
+
     m_DataStorage = mitk::StandaloneDataStorage::New();
     m_Node1 = mitk::DataNode::New();
     m_Node1->SetName("node1_1");
@@ -133,11 +131,6 @@ public:
     m_DataStorage->Add(m_Node2);
     m_DataStorage->Add(m_Node3);
     m_DataStorage->Add(m_Node1_2);
-
-    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
-    auto argc = cmdLineArgs.GetArgc();
-    auto argv = cmdLineArgs.GetArgv();
-    m_TestApp = new QApplication(argc, argv);
   }
 
   mitk::NodePredicateBase::Pointer GeneratTestPredicate(const std::string& name)
@@ -152,7 +145,11 @@ public:
 
   void tearDown() override
   {
-    delete m_TestApp;
+    m_Node1 = nullptr;
+    m_Node1_2 = nullptr;
+    m_Node2 = nullptr;
+    m_Node3 = nullptr;
+    m_DataStorage = nullptr;
   }
 
   void SetDataStorageTest()

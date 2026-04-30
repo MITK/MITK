@@ -295,13 +295,19 @@ namespace mitk
 
     bool ConfirmBeforeDeactivation() override;
 
+    /** Called when the selected time point changes (subscribed to ToolManager::SelectedTimePointChanged
+     * by the base class on Activated()). The default implementation calls UpdatePreview() if the tool
+     * is in lazy-dynamic mode or has a static segmentation on a dynamic reference image. Derived tools
+     * may override this hook to implement different time-point change semantics, for example to discard
+     * unconfirmed state when the bound time step is no longer current.*/
+    virtual void OnTimePointChanged();
+
   private:
     void TransferSegmentationsAtTimeStep(const MultiLabelSegmentation* sourceSeg, MultiLabelSegmentation* destinationSeg, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
     void CreateResultSegmentationFromPreview();
 
     void OnRoiDataChanged();
-    void OnTimePointChanged();
 
     /**Internal helper that ensures that the stored active label is up to date.
      This is a fix for T28131 / T28986. It should be refactored if T28524 is being worked on.

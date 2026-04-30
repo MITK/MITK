@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mitk.org/schemas/mxn-layout-2.0.json",
+  "title": "MITK MxN Multi-Widget Layout (v2.0)",
+  "description": "Canonical layout description for QmitkMxNMultiWidgetEditor. The on-disk format of `mxnLayout_*.json` preset files and the document consumed by `QmitkMxNMultiWidget::ApplyLayout` / produced by `QmitkMxNMultiWidget::SerializeLayout`. Layout describes only the splitter tree, per-window placement state (view direction, synchronization links), and per-group state. It does NOT describe global rendering state (selected position, time, camera).\n\nWindow names: each window's `name` MUST be unique within the document. The C++ loader enforces uniqueness at apply time. The recommended default form for tool-generated layouts is `widget<i>` where `<i>` is the leaf's pre-order traversal index (0-based, no gaps). Hand-authored presets MAY use any unique, URL-segment-safe string.\n\nSynchronization model: cells declare per-dimension links via `links.<dim>: <groupName>`. Cells with the same value for the same dimension are mutually linked and share that dimension's runtime bundle. The same group name MAY be used across multiple dimensions (e.g. `links: { selection: \"main\", zoom: \"main\" }`) — group names live in a single namespace, dimensions are orthogonal. Per-group persisted state lives in the top-level `groups` dict. v2.0 knows one such property: `select_all` (the selection bundle's UX-mode). Future v3.0 dimensions that need per-group state add their properties to the same group entry additively.\n\nLazy vs. strict mode: the top-level `groups` dict is OPTIONAL. When present, it is authoritative — every label appearing in any cell's `links` MUST be a key in `groups`; otherwise the loader throws (catches typos and tool-output drift). When absent, every label referenced becomes an implicit group with property defaults (`select_all: true`). Tool-generated documents SHOULD always include `groups` explicitly with every property spelled out — round-trip stability and reviewer clarity outweigh the few bytes saved by omission. Treat omission as ergonomic shorthand for human authors, not a stylistic choice for machines.\n\nSchema is closed (`additionalProperties: false` everywhere, including inside `links` and inside group entries). v2.0 only knows the `selection` synchronization dimension and the `select_all` group property. A future v3.0 schema will add further dimensions inside `links` and possibly further properties inside group entries, with a deliberate version bump — older loaders will refuse v3.0 documents loudly at the version check. The C++ loader does not run a JSON-schema validator, so `additionalProperties: false` enforces closure only for consumers that validate the document against this schema; the loader's own defence is the explicit version check plus per-field type validation in `PrewalkValidate`.",
+
+  "type": "object",
+  "required": ["version", "root"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "2.0",
+      "description": "Schema version. New documents MUST be \"2.0\". The C++ loader rejects any other version; writers MUST emit \"2.0\"."
+    },
+    "name": {
+      "type": "string",
+      "description": "Optional human-readable preset name. Pure metadata - does not affect loading or rendering."
+    },
+    "groups": {
+      "$ref": "#/$defs/groups",
+      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative — every label appearing in any cell's `links` MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field."
+    },
+    "root": {
+      "$ref": "#/$defs/split",
+      "description": "Root of the layout tree. Always a split, even for a single-window layout (which is a split with one window child)."
+    }
+  },
+
+  "$defs": {
+    "groups": {
+      "type": "object",
+      "description": "Map from group name to group entry. Group names are arbitrary URL-segment-safe identifiers; the same name MAY be referenced from multiple dimensions in cells' `links`.",
+      "additionalProperties": { "$ref": "#/$defs/group_entry" },
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_.-]+$"
+      }
+    },
+
+    "group_entry": {
+      "type": "object",
+      "description": "Properties shared across cells linked to this group. v2.0 knows one property (`select_all`, the selection bundle's UX-mode). Future v3.0 dimensions that need per-group persisted state add their own properties here additively. Schema is closed — unknown properties are rejected.",
+      "additionalProperties": false,
+      "properties": {
+        "select_all": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode. Cells linked to this group via `links.selection` share this setting at runtime. Optional; defaults to true. Has no effect if no cell references this group via `links.selection` (in which case the property is dormant)."
+        }
+      }
+    },
+
+    "node": {
+      "description": "A layout-tree node. Either an interior split or a leaf window.",
+      "oneOf": [
+        { "$ref": "#/$defs/split" },
+        { "$ref": "#/$defs/window" }
+      ]
+    },
+
+    "split": {
+      "type": "object",
+      "description": "An interior splitter dividing its area among children along one axis. Maps to QSplitter.",
+      "required": ["type", "orientation", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "split" },
+        "orientation": {
+          "enum": ["horizontal", "vertical"],
+          "description": "\"horizontal\" arranges children left-to-right (Qt::Horizontal); \"vertical\" arranges children top-to-bottom (Qt::Vertical)."
+        },
+        "size": {
+          "$ref": "#/$defs/size",
+          "description": "Splitter weight assigned by this node's parent. Required when this node appears inside another split's `children`; absent on the document root (which has no parent)."
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Ordered list of child nodes. Each child MUST carry a `size` (enforced here, not on the child types themselves, because the root has no `size`).",
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/node" },
+              { "required": ["size"] }
+            ]
+          }
+        }
+      }
+    },
+
+    "window": {
+      "type": "object",
+      "description": "A leaf render-window. Maps to QmitkRenderWindowWidget.",
+      "required": ["type", "name", "view_direction", "links"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "window" },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Window identity. The same string is used as the engine-side render-window bare name (qualified at load time as '<editorName>.<name>'). The schema enforces only URL-segment safety (alphanumeric, underscore, dot, hyphen); structural uniqueness across the document is enforced by the C++ loader at apply time. Recommended default for tool-generated layouts is \"widget<i>\" where <i> is the leaf's pre-order traversal index (0-based, no gaps); custom names are accepted as long as they are unique within the document."
+        },
+        "view_direction": {
+          "enum": ["axial", "sagittal", "coronal", "original"],
+          "description": "Anatomical plane shown in this window. Lowercase, matching the rest of the rendering REST surface (e.g. StdMulti window names, `/slice` plane field). \"original\" preserves the data's native orientation."
+        },
+        "links": {
+          "$ref": "#/$defs/links",
+          "description": "Per-dimension synchronization links for this window. Required: every window MUST declare `links.selection` explicitly (no implicit singletons). Tool-generated documents emit every link explicitly."
+        },
+        "size": {
+          "$ref": "#/$defs/size",
+          "description": "Splitter weight assigned by this window's parent split. Always present in well-formed documents (a window is always inside a split)."
+        }
+      }
+    },
+
+    "links": {
+      "type": "object",
+      "description": "Per-dimension synchronization links. Each value is a group name (string). Cells with the same value for the same dimension are mutually linked. The same group name MAY be referenced across multiple dimensions. v2.0 knows only the `selection` dimension; v3.0 will add further dimensions (zoom, time, crosshair, ...) here additively, referring to the same `groups` dict.",
+      "required": ["selection"],
+      "additionalProperties": false,
+      "properties": {
+        "selection": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "description": "Group name for the selection bundle (selection list, stack order, visibility, select_all). Cells with the same value form an implicit group; their selection state is synchronized at runtime. The named group's persisted properties live in the top-level `groups` dict if it is declared; otherwise property defaults apply."
+        }
+      }
+    },
+
+    "size": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Splitter-child weight. Qt redistributes these proportionally on resize. Absolute values are not pixel-exact."
+    }
+  },
+
+  "examples": [
+    {
+      "version": "2.0",
+      "name": "Three Views (axial / sagittal / coronal, all in one selection group)",
+      "groups": {
+        "main": { "select_all": true }
+      },
+      "root": {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    },
+    {
+      "version": "2.0",
+      "name": "Two rows with each view direction; row 2 is its own selection group",
+      "groups": {
+        "main":      { "select_all": true  },
+        "row2":      { "select_all": false }
+      },
+      "root": {
+        "type": "split",
+        "orientation": "vertical",
+        "children": [
+          {
+            "type": "split",
+            "orientation": "horizontal",
+            "size": 418,
+            "children": [
+              { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 403 },
+              { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 403 },
+              { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 403 }
+            ]
+          },
+          {
+            "type": "split",
+            "orientation": "horizontal",
+            "size": 418,
+            "children": [
+              { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 403 },
+              { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 403 },
+              { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 403 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "version": "2.0",
+      "name": "Hand-authored lazy mode (no `groups` block; defaults apply)",
+      "root": {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    }
+  ]
+}

@@ -198,9 +198,28 @@ public:
    */
   virtual QString GetNameFromIndex(int row, int column) const;
   /**
-   * \brief Returns the widget name for the given linear index.
+   * \brief Returns the qualified widget name for the given linear index.
+   *
+   *   For 'index' < current cell count: returns the i-th registered qualified
+   *   name in map (sorted-by-key) order. Works under any naming scheme,
+   *   including v2 layouts with custom names.
+   *
+   *   For 'index' == current cell count: returns the legacy positional name
+   *   '<multiWidgetName>.widget<index>'. The call does not register or create
+   *   anything. This look-ahead is what the configuration toolbar uses to
+   *   predict the next cell's name.
+   *
+   *   For 'index' > current cell count: returns an empty QString.
+   *
+   *   Superseded for new code: the MxN editor's v2 layout pipeline registers
+   *   render windows by the explicit 'name' field carried in the layout
+   *   document (see 'QmitkMxNMultiWidget::CreateRenderWindowWidget(const
+   *   QString&)'). New consumers should look up windows by the registered
+   *   qualified name (via 'GetRenderWindowWidget(const QString&)') rather than
+   *   reconstructing it from a positional index.
+   *
    * \param[in] index The linear index.
-   * \return The widget name string.
+   * \return The qualified widget name string, or an empty string if out of range.
    */
   virtual QString GetNameFromIndex(size_t index) const;
 
@@ -315,8 +334,23 @@ protected:
    * \param[in] renderWindowWidget  The render window widget to add.
    */
   virtual void AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget);
-  /** \brief Removes the last render window widget. */
+  /**
+   * \brief Removes the last render window widget by reverse map order.
+   *
+   *   The map is keyed by qualified name (sorted lexicographically), so
+   *   "removes the last" here means the lexicographically last name. This
+   *   keeps the call point-free with respect to positional naming, which
+   *   is what makes it safe for layouts that mix custom and 'widget<i>'
+   *   names.
+   */
   virtual void RemoveRenderWindowWidget();
+  /**
+   * \brief Removes the render window widget registered under the given
+   *        qualified name. No-op if no such widget is registered.
+   * \param[in] widgetName  The qualified widget name (as registered via
+   *                        AddRenderWindowWidget).
+   */
+  virtual void RemoveRenderWindowWidget(const QString& widgetName);
 
 private:
 

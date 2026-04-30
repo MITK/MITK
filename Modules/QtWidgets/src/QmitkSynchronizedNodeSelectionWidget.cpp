@@ -56,7 +56,7 @@ QmitkSynchronizedNodeSelectionWidget::QmitkSynchronizedNodeSelectionWidget(QWidg
 
 QmitkSynchronizedNodeSelectionWidget::~QmitkSynchronizedNodeSelectionWidget()
 {
-emit DeregisterSynchronization();
+  emit DeregisterSynchronization();
 
   auto baseRenderer = m_BaseRenderer.Lock();
   if (baseRenderer.IsNull())

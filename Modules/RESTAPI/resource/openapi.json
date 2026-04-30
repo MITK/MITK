@@ -76,7 +76,7 @@
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -156,7 +156,7 @@
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
                     "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/api/v1",
+                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -233,7 +233,7 @@
           "Nodes"
         ],
         "summary": "List nodes",
-        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n",
+        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n\nIn addition to the declared parameters, any query parameter of the form `filter.{property}=value` is interpreted as a property-value filter on the node. The `{property}` part is the MITK property name. Supported operators on the value: exact match (`filter.visible=true`), inequality (`filter.visible!=true`), wildcard `*` (zero or more characters, e.g. `filter.name=CT*`), and wildcard `?` (exactly one character, e.g. `filter.name=Node_0?`). The optional `context` and `property_scope` parameters control how the property is looked up. See the user manual §5.3 \"Query Parameters\" for the full filter contract — the OpenAPI schema cannot model the dynamic `filter.{property}` family directly.\n",
         "operationId": "listNodes",
         "parameters": [
           {
@@ -698,7 +698,7 @@
           "Children"
         ],
         "summary": "List child nodes",
-        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /nodes.",
+        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /datastorage/nodes, including the dynamic `filter.{property}=value` family with `*`/`?` wildcards and `!=` negation. See GET /datastorage/nodes (and user manual §5.3) for the full filter contract.",
         "operationId": "listChildren",
         "parameters": [
           {
@@ -1379,7 +1379,27 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "description": "Result of the replace operation"
+                      "description": "Result of the replace operation.",
+                      "required": [
+                        "replaced",
+                        "removed"
+                      ],
+                      "properties": {
+                        "replaced": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Names of properties whose values were written by this request."
+                        },
+                        "removed": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Names of properties that existed in the previous state but were absent from the request body and have been removed."
+                        }
+                      }
                     },
                     "meta": {
                       "type": "object",
@@ -2014,7 +2034,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get crosshair position and scene bounds",
-        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "getRenderingSelectedPosition",
         "responses": {
           "200": {
@@ -2063,30 +2083,13 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "StdMultiWidgetEditor is not open — cannot read crosshair position.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/selected-position"
-                  }
-                }
-              }
-            }
-          }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       },
       "put": {
         "tags": ["Rendering"],
         "summary": "Set crosshair position",
-        "description": "Moves the crosshair to the given 3D world position via IRenderWindowPart::SetSelectedPosition() on the StdMultiWidgetEditor. Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).",
+        "description": "Moves the crosshair to the given 3D world position via IRenderWindowPart::SetSelectedPosition() on the StdMultiWidgetEditor. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "putRenderingSelectedPosition",
         "requestBody": {
           "required": true,
@@ -2113,24 +2116,311 @@
           "204": { "description": "Crosshair position updated" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "No render window bridge connected (headless mode, Qt plugin not loaded, or StdMultiWidgetEditor not open)",
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "List known editors",
+        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors. The `mxn` alias is reported with `active: false` until the MxN multi-widget editor is implemented; clients treating this endpoint as the source of truth for editor availability will future-proof.",
+        "operationId": "getRenderingEditors",
+        "responses": {
+          "200": {
+            "description": "List of editor aliases and activity state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/EditorListItem" }
+                },
+                "example": [
+                  { "alias": "stdmulti", "plugin_id": "org.mitk.editors.stdmultiwidget", "active": true },
+                  { "alias": "mxn",      "plugin_id": "org.mitk.editors.mxnmultiwidget", "active": false }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get StdMultiWidget editor info",
+        "description": "Returns metadata about the StdMultiWidget editor, including its current window names when the editor is open.",
+        "operationId": "getRenderingStdmultiInfo",
+        "responses": {
+          "200": {
+            "description": "StdMultiWidget editor info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EditorInfo" },
+                "example": {
+                  "alias": "stdmulti",
+                  "plugin_id": "org.mitk.editors.stdmultiwidget",
+                  "active": true,
+                  "windows": ["axial", "sagittal", "coronal", "3d"]
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "List StdMultiWidget render windows",
+        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window name (URL segment for sub-resources) and its kind (2D or 3D). No `plane` field is reported — under swivel mode the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
+        "operationId": "getRenderingStdmultiWindows",
+        "responses": {
+          "200": {
+            "description": "List of StdMultiWidget render windows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/WindowListItem" }
+                },
+                "example": [
+                  { "name": "axial",    "kind": "2d" },
+                  { "name": "sagittal", "kind": "2d" },
+                  { "name": "coronal",  "kind": "2d" },
+                  { "name": "3d",       "kind": "3d" }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get StdMultiWidget window summary",
+        "description": "Per-window summary. `kind` drives which sub-resources apply. `has_selected_slice` is false for the 3D window.",
+        "operationId": "getRenderingStdmultiWindow",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Window summary",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WindowInfo" },
+                "examples": {
+                  "axial": {
+                    "summary": "2D window",
+                    "value": { "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+                  },
+                  "threeD": {
+                    "summary": "3D window",
+                    "value": { "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}/camera": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get camera state of a StdMultiWidget window",
+        "description": "Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.",
+        "operationId": "getRenderingStdmultiCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Camera state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CameraState" },
+                "examples": {
+                  "twoD": {
+                    "summary": "2D window",
+                    "value": {
+                      "position":       [127.5,  83.2, 200.0],
+                      "focal_point":    [127.5,  83.2,  45.0],
+                      "view_up":        [0.0,    1.0,   0.0],
+                      "parallel_scale": 120.0
+                    }
+                  },
+                  "threeD": {
+                    "summary": "3D window",
+                    "value": {
+                      "position":          [200.0, 200.0, 200.0],
+                      "focal_point":       [127.5,  83.2,  45.0],
+                      "view_up":           [0.0,    0.0,   1.0],
+                      "perspective_angle": 30.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Update camera state of a StdMultiWidget window",
+        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying CameraController; explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw vtkCamera, so combining the two would leave the controller's internal state inconsistent — this combination is rejected with 400. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`, which only adjust scale/angle. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked. Only the addressed window is refreshed; coupled crosshair/slice updates on sibling 2D windows happen through their own UI events.",
+        "operationId": "putRenderingStdmultiCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CameraPatch" },
+              "examples": {
+                "twoD": { "summary": "2D window — standard view + scale", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
+                "twoDPose": { "summary": "2D window — explicit pose", "value": { "position": [127.5, 83.2, 45.0], "focal_point": [127.5, 83.2, 0.0], "view_up": [0.0, 1.0, 0.0] } },
+                "threeD": { "summary": "3D window", "value": { "perspective_angle": 45.0 } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Camera updated" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "422": {
+            "description": "MITK rendering framework raised an error while applying the patch.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "StdMultiWidgetEditor is not open — cannot set crosshair position.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/selected-position"
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Camera update failed: ...",
+                    "status": 422
                   }
                 }
               }
             }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}/selected-slice": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get selected slice of a StdMultiWidget 2D window",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "operationId": "getRenderingStdmultiSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slice state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SliceState" },
+                "example": {
+                  "step": 45,
+                  "position": [127.5, 83.2, 45.0],
+                  "bounds": {
+                    "steps": 90,
+                    "min_position": [0.0, 0.0, 0.0],
+                    "max_position": [255.0, 255.0, 90.0]
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Set selected slice of a StdMultiWidget 2D window",
+        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked — out-of-range values are clamped/snapped by MITK.",
+        "operationId": "putRenderingStdmultiSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["step"],
+                "properties": {
+                  "step": { "type": "integer", "minimum": 0, "description": "Target step index" }
+                }
+              },
+              "example": { "step": 42 }
+            }
           }
+        },
+        "responses": {
+          "204": { "description": "Slice updated" },
+          "400": {
+            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti — use /rendering/selected-position).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/INVALID_REQUEST",
+                    "code": "INVALID_REQUEST",
+                    "title": "Invalid Request",
+                    "message": "'position' is not accepted on StdMulti selected-slice. Use PUT /rendering/selected-position to move by world coordinates.",
+                    "status": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
+          "422": {
+            "description": "MITK rendering framework raised an error while applying the step.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "code": "RENDERING_ERROR",
+                    "title": "Rendering Error",
+                    "message": "Slice update failed: ...",
+                    "status": 422
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       }
     },
@@ -2239,60 +2529,55 @@
         "description": "Captures a screenshot of the active Qt application window. Requires the Qt workbench plugin to be running. Returns binary image data in PNG or JPEG format.",
         "operationId": "getRenderingScreenshot",
         "parameters": [
-          {
-            "name": "format",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "enum": ["png", "jpeg"], "default": "png" },
-            "description": "Image encoding format"
-          },
-          {
-            "name": "width",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
-            "description": "Output width in pixels. Must be provided together with 'height'."
-          },
-          {
-            "name": "height",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
-            "description": "Output height in pixels. Must be provided together with 'width'."
-          }
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
         ],
         "responses": {
-          "200": {
-            "description": "Screenshot image",
-            "content": {
-              "image/png": {
-                "schema": { "type": "string", "format": "binary" }
-              },
-              "image/jpeg": {
-                "schema": { "type": "string", "format": "binary" }
-              }
-            }
-          },
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "No screenshot provider connected (headless mode or Qt plugin not loaded)",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "example": {
-                  "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                    "title": "Render Window Not Available",
-                    "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                    "status": 503,
-                    "instance": "/api/v1/rendering/screenshot"
-                  }
-                }
-              }
-            }
-          }
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of the StdMultiWidget editor canvas",
+        "description": "Grabs the StdMultiWidget editor's canvas area (all four render windows together, no side panels). Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingStdmultiScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+        }
+      }
+    },
+    "/rendering/editors/stdmulti/windows/{name}/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of a single StdMultiWidget render window",
+        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit) — pass dimensions matching the source ratio if a faithful aspect is needed. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingStdmultiWindowScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/StdMultiWindowName" },
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       }
     }
@@ -2739,9 +3024,128 @@
             "description": "Field selection (present only when fields parameter is used)"
           }
         }
+      },
+      "EditorListItem": {
+        "type": "object",
+        "description": "Editor list entry returned by GET /rendering/editors.",
+        "required": ["alias", "plugin_id", "active"],
+        "properties": {
+          "alias":     { "type": "string", "description": "Stable short alias used in URL paths", "example": "stdmulti" },
+          "plugin_id": { "type": "string", "description": "Berry editor plugin id", "example": "org.mitk.editors.stdmultiwidget" },
+          "active":    { "type": "boolean", "description": "True if an editor instance is currently open" }
+        }
+      },
+      "EditorInfo": {
+        "type": "object",
+        "description": "Editor metadata returned by GET /rendering/editors/{alias}.",
+        "required": ["alias", "plugin_id", "active", "windows"],
+        "properties": {
+          "alias":     { "type": "string", "example": "stdmulti" },
+          "plugin_id": { "type": "string", "example": "org.mitk.editors.stdmultiwidget" },
+          "active":    { "type": "boolean" },
+          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window names" }
+        }
+      },
+      "WindowListItem": {
+        "type": "object",
+        "description": "Window list entry returned by GET /rendering/editors/stdmulti/windows.",
+        "required": ["name", "kind"],
+        "properties": {
+          "name": { "type": "string", "description": "Render window name (URL segment for sub-resources)" },
+          "kind": { "type": "string", "enum": ["2d", "3d"], "description": "Window kind — drives which sub-resources apply" }
+        }
+      },
+      "WindowInfo": {
+        "type": "object",
+        "description": "Per-window summary returned by GET /rendering/editors/stdmulti/windows/{name}.",
+        "required": ["name", "kind", "has_camera", "has_selected_slice"],
+        "properties": {
+          "name": { "type": "string" },
+          "kind": { "type": "string", "enum": ["2d", "3d"] },
+          "has_camera":         { "type": "boolean" },
+          "has_selected_slice": { "type": "boolean", "description": "True for 2D windows, false for the 3D window" }
+        }
+      },
+      "CameraState": {
+        "type": "object",
+        "description": "Camera state of a single render window. 2D windows carry `parallel_scale`; the 3D window carries `perspective_angle`.",
+        "required": ["position", "focal_point", "view_up"],
+        "properties": {
+          "position":    { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "focal_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "view_up":     { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "parallel_scale":    { "type": "number", "description": "Orthographic zoom; 2D windows only." },
+          "perspective_angle": { "type": "number", "description": "Vertical FOV in degrees; 3D window only." }
+        }
+      },
+      "SliceState": {
+        "type": "object",
+        "description": "Slice navigator state returned by GET .../selected-slice. `bounds.min_position` / `bounds.max_position` are null when no geometry is loaded.",
+        "required": ["step", "position", "bounds"],
+        "properties": {
+          "step":     { "type": "integer", "minimum": 0, "description": "Current step index" },
+          "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "World position on the live slice plane" },
+          "bounds": {
+            "type": "object",
+            "required": ["steps", "min_position", "max_position"],
+            "properties": {
+              "steps":        { "type": "integer", "minimum": 0, "description": "Total step count" },
+              "min_position": { "oneOf": [ { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" } ] },
+              "max_position": { "oneOf": [ { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" } ] }
+            }
+          }
+        }
+      },
+      "CameraPatch": {
+        "type": "object",
+        "description": "Partial camera update. At least one field must be present. `standard_view` is applied before any other field.",
+        "additionalProperties": false,
+        "properties": {
+          "position":    { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "focal_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "view_up":     { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+          "parallel_scale":    { "type": "number", "exclusiveMinimum": 0, "description": "2D windows only." },
+          "perspective_angle": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180, "description": "3D window only." },
+          "standard_view": {
+            "type": "string",
+            "enum": ["anterior", "posterior", "left", "right", "cranial", "caudal"]
+          }
+        }
       }
     },
     "parameters": {
+      "ScreenshotFormat": {
+        "name": "format",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "string", "enum": ["png", "jpeg"], "default": "png" },
+        "description": "Image encoding format."
+      },
+      "ScreenshotWidth": {
+        "name": "width",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "description": "Output width in pixels. Must be provided together with 'height'."
+      },
+      "ScreenshotHeight": {
+        "name": "height",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "description": "Output height in pixels. Must be provided together with 'width'."
+      },
+      "StdMultiWindowName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "description": "StdMultiWidget render window name.",
+        "schema": {
+          "type": "string",
+          "enum": ["axial", "sagittal", "coronal", "3d"]
+        },
+        "example": "axial"
+      },
       "NodeUid": {
         "name": "uid",
         "in": "path",
@@ -2870,7 +3274,8 @@
                 "code": "INVALID_REQUEST",
                 "title": "Invalid Request",
                 "message": "Invalid JSON: parse error at line 1",
-                "status": 400
+                "status": 400,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -2889,7 +3294,8 @@
                 "code": "UNSUPPORTED_FORMAT",
                 "title": "Unsupported Format",
                 "message": "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.",
-                "status": 415
+                "status": 415,
+                "instance": "/api/v1/datastorage/nodes/node_1/data"
               }
             }
           }
@@ -2929,6 +3335,7 @@
                 "title": "Transfer Mode Not Available",
                 "message": "Requested transfer mode 'invalid' is not supported",
                 "status": 406,
+                "instance": "/api/v1/datastorage/nodes/node_1/data",
                 "available_modes": [
                   "file-reference",
                   "direct"
@@ -2970,7 +3377,8 @@
                 "code": "INTERNAL_ERROR",
                 "title": "Internal Server Error",
                 "message": "An unexpected error occurred",
-                "status": 500
+                "status": 500,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -2989,7 +3397,8 @@
                 "code": "TIME_NAVIGATION_NOT_AVAILABLE",
                 "title": "Time Navigation Not Available",
                 "message": "Time navigation controller is not available.",
-                "status": 503
+                "status": 503,
+                "instance": "/api/v1/rendering/selected-time"
               }
             }
           }
@@ -3008,7 +3417,8 @@
                 "code": "TIME_STEPPER_NOT_AVAILABLE",
                 "title": "Time Stepper Not Available",
                 "message": "Time stepper is not available.",
-                "status": 500
+                "status": 500,
+                "instance": "/api/v1/rendering/selected-time"
               }
             }
           }
@@ -3027,7 +3437,8 @@
                 "code": "DATASTORAGE_NOT_AVAILABLE",
                 "title": "DataStorage Not Available",
                 "message": "No DataStorage is currently connected to the REST API server",
-                "status": 503
+                "status": 503,
+                "instance": "/api/v1/datastorage/nodes"
               }
             }
           }
@@ -3109,6 +3520,121 @@
                 "message": "Path outside allowed directories",
                 "status": 403,
                 "instance": "/api/v1/datastorage/nodes/node_1/data"
+              }
+            }
+          }
+        }
+      },
+      "RenderWindowNotAvailable": {
+        "description": "No render window bridge callback is registered (headless mode or Qt workbench plugin not loaded).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                "title": "Render Window Not Available",
+                "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                "status": 503,
+                "instance": "/api/v1/rendering/screenshot"
+              }
+            }
+          }
+        }
+      },
+      "EditorOrBridgeUnavailable": {
+        "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE) or the addressed editor is not currently open (EDITOR_NOT_ACTIVE).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "renderWindowNotAvailable": {
+                "summary": "No callback registered",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
+                  }
+                }
+              },
+              "editorNotActive": {
+                "summary": "Editor not open",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
+                    "code": "EDITOR_NOT_ACTIVE",
+                    "title": "Editor Not Active",
+                    "message": "StdMultiWidgetEditor is not open",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RenderWindowNotFound": {
+        "description": "The URL addressed a render window name that is not known to the editor.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": {
+              "error": {
+                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                "code": "RENDER_WINDOW_NOT_FOUND",
+                "title": "Render Window Not Found",
+                "message": "No render window named 'bogus' in the addressed editor",
+                "status": 404,
+                "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus"
+              }
+            }
+          }
+        }
+      },
+      "ScreenshotImage": {
+        "description": "Screenshot image. Content-Type is `image/png` or `image/jpeg` depending on the `format` query parameter.",
+        "content": {
+          "image/png":  { "schema": { "type": "string", "format": "binary" } },
+          "image/jpeg": { "schema": { "type": "string", "format": "binary" } }
+        }
+      },
+      "WindowNotFoundOrUnsupported": {
+        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window — e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "examples": {
+              "renderWindowNotFound": {
+                "summary": "Unknown window name",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                    "code": "RENDER_WINDOW_NOT_FOUND",
+                    "title": "Render Window Not Found",
+                    "message": "No render window named 'bogus' in the addressed editor",
+                    "status": 404,
+                    "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus/camera"
+                  }
+                }
+              },
+              "unsupportedOperation": {
+                "summary": "Sub-resource not applicable",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/UNSUPPORTED_OPERATION",
+                    "code": "UNSUPPORTED_OPERATION",
+                    "title": "Unsupported Operation",
+                    "message": "selected-slice is not applicable to the 3D window.",
+                    "status": 404,
+                    "instance": "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice"
+                  }
+                }
               }
             }
           }

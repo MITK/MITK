@@ -16,11 +16,14 @@ found in the LICENSE file.
 #include <MitkRESTAPIExports.h>
 #include <mitkPoint.h>
 #include <mitkStorageThreadDispatcherBase.h>
+#include <mitkVector.h>
 #include <mitkWeakPointer.h>
 
 #include <functional>
 #include <mutex>
 #include <optional>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -40,6 +43,8 @@ namespace mitk
   {
     Point3D min;
     Point3D max;
+
+    WorldBounds() : min(), max() {}
   };
 
   /**
@@ -51,6 +56,118 @@ namespace mitk
 
     /** World bounding box, if available at read time. */
     std::optional<WorldBounds> bounds;
+
+    SelectedPositionInfo() : position() {}
+  };
+
+  /**
+   * \brief Thrown by bridge callbacks when the target editor instance is not
+   *        open in the workbench.
+   *
+   * Mapped by the controller layer to HTTP 503 EDITOR_NOT_ACTIVE.
+   */
+  class MITKRESTAPI_EXPORT RenderWindowBridgeNoEditorException : public std::runtime_error
+  {
+  public:
+    using std::runtime_error::runtime_error;
+  };
+
+  /**
+   * \brief Thrown by bridge callbacks when the window name is not known.
+   *
+   * Mapped by the controller layer to HTTP 404 RENDER_WINDOW_NOT_FOUND.
+   */
+  class MITKRESTAPI_EXPORT RenderWindowBridgeUnknownWindowException : public std::runtime_error
+  {
+  public:
+    using std::runtime_error::runtime_error;
+  };
+
+  /**
+   * \brief Thrown by bridge callbacks when the requested sub-resource does not
+   *        apply to the addressed window (e.g. selected-slice on a 3D window).
+   *
+   * Mapped by the controller layer to HTTP 404 UNSUPPORTED_OPERATION.
+   */
+  class MITKRESTAPI_EXPORT RenderWindowBridgeUnsupportedOperationException : public std::runtime_error
+  {
+  public:
+    using std::runtime_error::runtime_error;
+  };
+
+  /** Summary of a known editor alias and its current activity state. */
+  struct EditorInfo
+  {
+    std::string alias;
+    std::string pluginId;
+    bool active = false;
+    std::vector<std::string> windowNames; // empty when !active
+  };
+
+  /**
+   * \brief Closed set of render window kinds reported by the bridge.
+   *
+   * Drives which sub-resources apply (e.g. selected-slice is only valid for
+   * TwoD windows). Adding a new value here must also extend WindowKindToString.
+   */
+  enum class WindowKind
+  {
+    TwoD,
+    ThreeD
+  };
+
+  /** \return Wire/JSON form of a WindowKind ("2d" or "3d"). */
+  MITKRESTAPI_EXPORT const char* WindowKindToString(WindowKind kind);
+
+  /** Summary of a single render window exposed by an editor. */
+  struct WindowInfo
+  {
+    std::string name; // "axial" | "sagittal" | "coronal" | "3d"
+    WindowKind  kind = WindowKind::TwoD;
+  };
+
+  /** Camera state of a single render window. */
+  struct CameraState
+  {
+    Point3D position;
+    Point3D focalPoint;
+    Vector3D viewUp;
+    std::optional<double> parallelScale;    // 2D windows only
+    std::optional<double> perspectiveAngle; // 3D windows only
+
+    CameraState() : position(), focalPoint(), viewUp() {}
+  };
+
+  /** Partial camera update. */
+  struct CameraPatch
+  {
+    std::optional<Point3D>     position;
+    std::optional<Point3D>     focalPoint;
+    std::optional<Vector3D>    viewUp;
+    std::optional<double>      parallelScale;
+    std::optional<double>      perspectiveAngle;
+    std::optional<std::string> standardView; // applied first if present
+  };
+
+  /** Bounds for a slice navigator. */
+  struct SliceBounds
+  {
+    unsigned int steps = 0;
+    Point3D minPosition;
+    Point3D maxPosition;
+    bool hasPositions = false; // false if no geometry loaded
+
+    SliceBounds() : minPosition(), maxPosition() {}
+  };
+
+  /** Slice state of a 2D render window. */
+  struct SliceState
+  {
+    unsigned int step = 0;
+    Point3D position;
+    SliceBounds bounds;
+
+    SliceState() : position() {}
   };
 
   /**
@@ -113,6 +230,43 @@ namespace mitk
      */
     using PositionSetter = std::function<void(const Point3D& pos)>;
 
+    /** Callback type: list all known editor aliases with their activity state. */
+    using EditorListProvider = std::function<std::vector<EditorInfo>()>;
+
+    /** Callback type: list the windows of the StdMultiWidget editor. */
+    using StdMultiWindowListProvider = std::function<std::vector<WindowInfo>()>;
+
+    /** Callback type: grab the StdMultiWidget editor canvas. */
+    using StdMultiEditorScreenshotProvider =
+      std::function<std::vector<unsigned char>(
+        std::optional<std::pair<int, int>> size,
+        ScreenshotFormat format)>;
+
+    /** Callback type: grab a single StdMulti render window. */
+    using StdMultiWindowScreenshotProvider =
+      std::function<std::vector<unsigned char>(
+        const std::string& windowName,
+        std::optional<std::pair<int, int>> size,
+        ScreenshotFormat format)>;
+
+    /** Callback type: read camera state of a StdMulti render window. */
+    using StdMultiCameraGetter = std::function<CameraState(const std::string& windowName)>;
+
+    /** Callback type: apply a camera patch on a StdMulti render window. */
+    using StdMultiCameraSetter = std::function<void(const std::string& windowName, const CameraPatch& patch)>;
+
+    /** Callback type: read the selected-slice state of a StdMulti 2D window. */
+    using StdMultiSelectedSliceGetter = std::function<SliceState(const std::string& windowName)>;
+
+    /**
+     * \brief Callback type: set the selected slice of a StdMulti 2D window by step index.
+     *
+     * StdMulti only supports step-based slice selection; world-position
+     * addressing is reserved for /rendering/selected-position. If MxN later
+     * needs position-based addressing, add a separate setter alias for it.
+     */
+    using StdMultiSelectedSliceStepSetter = std::function<void(const std::string& windowName, unsigned int step)>;
+
     /**
      * \brief Set the thread dispatcher for UI thread dispatching.
      *
@@ -150,11 +304,41 @@ namespace mitk
      */
     void SetPositionSetter(PositionSetter setter);
 
+    /** Set or clear the editor list provider. */
+    void SetEditorListProvider(EditorListProvider provider);
+
+    /** Set or clear the StdMulti window list provider. */
+    void SetStdMultiWindowListProvider(StdMultiWindowListProvider provider);
+
+    /** Set or clear the StdMulti editor screenshot provider. */
+    void SetStdMultiEditorScreenshotProvider(StdMultiEditorScreenshotProvider provider);
+
+    /** Set or clear the StdMulti per-window screenshot provider. */
+    void SetStdMultiWindowScreenshotProvider(StdMultiWindowScreenshotProvider provider);
+
+    /** Set or clear the StdMulti camera getter. */
+    void SetStdMultiCameraGetter(StdMultiCameraGetter getter);
+
+    /** Set or clear the StdMulti camera setter. */
+    void SetStdMultiCameraSetter(StdMultiCameraSetter setter);
+
+    /** Set or clear the StdMulti selected-slice getter. */
+    void SetStdMultiSelectedSliceGetter(StdMultiSelectedSliceGetter getter);
+
+    /** Set or clear the StdMulti selected-slice step setter. */
+    void SetStdMultiSelectedSliceStepSetter(StdMultiSelectedSliceStepSetter setter);
+
     /**
      * \brief Clear all registered callbacks in a single atomic operation.
      *
      * Should be called by the UI-layer owner (e.g. the workbench plugin activator)
      * before the objects captured by the callbacks are destroyed.
+     *
+     * \note The dispatcher (set via SetDispatcher) is intentionally retained:
+     *       it is owned by the REST server, which outlives the callback owner,
+     *       so clearing it here would create a needless re-bind on every plugin
+     *       cycle. Use SetDispatcher(nullptr) explicitly if a separation is
+     *       ever required.
      */
     void ResetCallbacks();
 
@@ -166,6 +350,15 @@ namespace mitk
 
     /** \return true if a position setter is currently set. */
     bool HasPositionSetter() const;
+
+    bool HasEditorListProvider() const;
+    bool HasStdMultiWindowListProvider() const;
+    bool HasStdMultiEditorScreenshotProvider() const;
+    bool HasStdMultiWindowScreenshotProvider() const;
+    bool HasStdMultiCameraGetter() const;
+    bool HasStdMultiCameraSetter() const;
+    bool HasStdMultiSelectedSliceGetter() const;
+    bool HasStdMultiSelectedSliceStepSetter() const;
 
     /**
      * \brief Capture a screenshot using the registered provider.
@@ -204,10 +397,55 @@ namespace mitk
      */
     void SetSelectedPosition(const Point3D& pos) const;
 
+    /**
+     * \brief Invoke the editor list provider.
+     * \throws std::runtime_error if no provider is set.
+     */
+    std::vector<EditorInfo> ListEditors() const;
+
+    /**
+     * \brief Invoke the StdMulti window list provider.
+     * \throws std::runtime_error if no provider is set.
+     * \throws RenderWindowBridgeNoEditorException if the editor is not open.
+     */
+    std::vector<WindowInfo> ListStdMultiWindows() const;
+
+    /**
+     * \brief Invoke the StdMulti editor screenshot provider.
+     * \throws std::runtime_error if no provider is set.
+     * \throws RenderWindowBridgeNoEditorException if the editor is not open.
+     */
+    std::vector<unsigned char> TakeStdMultiEditorScreenshot(
+      std::optional<std::pair<int, int>> size,
+      ScreenshotFormat format) const;
+
+    /**
+     * \brief Invoke the StdMulti per-window screenshot provider.
+     * \throws std::runtime_error if no provider is set.
+     * \throws RenderWindowBridgeNoEditorException / RenderWindowBridgeUnknownWindowException.
+     */
+    std::vector<unsigned char> TakeStdMultiWindowScreenshot(
+      const std::string& windowName,
+      std::optional<std::pair<int, int>> size,
+      ScreenshotFormat format) const;
+
+    CameraState GetStdMultiCamera(const std::string& windowName) const;
+    void SetStdMultiCamera(const std::string& windowName, const CameraPatch& patch) const;
+    SliceState GetStdMultiSelectedSlice(const std::string& windowName) const;
+    void SetStdMultiSelectedSliceStep(const std::string& windowName, unsigned int step) const;
+
   private:
     ScreenshotProvider m_ScreenshotProvider;
     PositionGetter m_PositionGetter;
     PositionSetter m_PositionSetter;
+    EditorListProvider m_EditorListProvider;
+    StdMultiWindowListProvider m_StdMultiWindowListProvider;
+    StdMultiEditorScreenshotProvider m_StdMultiEditorScreenshotProvider;
+    StdMultiWindowScreenshotProvider m_StdMultiWindowScreenshotProvider;
+    StdMultiCameraGetter m_StdMultiCameraGetter;
+    StdMultiCameraSetter m_StdMultiCameraSetter;
+    StdMultiSelectedSliceGetter m_StdMultiSelectedSliceGetter;
+    StdMultiSelectedSliceStepSetter m_StdMultiSelectedSliceStepSetter;
     mutable std::mutex m_Mutex;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
   };

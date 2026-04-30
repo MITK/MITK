@@ -64,7 +64,7 @@ struct QmitkAbstractMultiWidget::Impl final
   // is undefined behaviour. Any path that destroys a layout/splitter that
   // contains cells must drop the shared_ptrs first; see 'TearDownAllCells'
   // for the canonical sequence. (Architectural debt: dual ownership model
-  // is brittle; tracked in 'plan_mxn_post_rest.md' B19.)
+  // is brittle and worth replacing with a single ownership domain.)
   RenderWindowWidgetMap m_RenderWindowWidgets;
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
 
@@ -425,6 +425,13 @@ void QmitkAbstractMultiWidget::OnFocusChanged(itk::Object*, const itk::EventObje
 void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget)
 {
   m_Impl->m_RenderWindowWidgets.insert(std::make_pair(widgetName, renderWindowWidget));
+}
+
+void QmitkAbstractMultiWidget::ResetGridState()
+{
+  m_Impl->m_MultiWidgetRows = 0;
+  m_Impl->m_MultiWidgetColumns = 0;
+  m_Impl->m_ActiveRenderWindowWidget = nullptr;
 }
 
 void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()

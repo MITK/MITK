@@ -68,9 +68,16 @@ namespace
   // per-window names + referenced group labels. Throws on missing required
   // field, type mismatch on a known field, or duplicate window name. Does
   // not mutate engine state.
+  //
+  // 'seedingOrder' captures (bareWindowName, groupName) pairs in pre-order
+  // traversal order (splits' children walked in array order), used by
+  // ApplyLayout's group-seeding pass to identify each group's seed cell -
+  // the cell that appears first in document order whose links.selection
+  // names that group.
   void PrewalkValidate(const nlohmann::json& node,
                        std::set<std::string>& seenNames,
-                       std::set<std::string>& referencedGroups)
+                       std::set<std::string>& referencedGroups,
+                       std::vector<std::pair<std::string, std::string>>& seedingOrder)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
     {
@@ -96,7 +103,7 @@ namespace
       }
       for (const auto& child : node["children"])
       {
-        PrewalkValidate(child, seenNames, referencedGroups);
+        PrewalkValidate(child, seenNames, referencedGroups, seedingOrder);
       }
     }
     else if (type == "window")
@@ -129,7 +136,9 @@ namespace
         mitkThrow() << "Layout window '" << name
                     << "' is missing the required 'links.selection' string.";
       }
-      referencedGroups.insert(links["selection"].get<std::string>());
+      const auto groupName = links["selection"].get<std::string>();
+      referencedGroups.insert(groupName);
+      seedingOrder.emplace_back(name, groupName);
     }
     else
     {
@@ -671,12 +680,13 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
     mitkThrow() << "SerializeLayout: top-level widget is not a QSplitter.";
   }
 
-  // Pre-walk: collect engine-internal sync-group indices in pre-order encounter
-  // order and assign deterministic bare names. Engine-internal index 1 maps to
-  // "main"; other indices map to "g_<i>" where <i> is a counter assigned by
-  // pre-order encounter order over the cell list (see schema description).
+  // Pre-walk: collect engine-internal sync-group indices encountered in the
+  // cell tree, then look up each one's bare name in the engine's group-name
+  // registry ('m_GroupNameByIndex'). The registry is populated by every
+  // 'AddSynchronizationGroup' call, so every group in the cell tree must
+  // have an entry. A missing entry here would indicate engine-state
+  // corruption and is surfaced as a throw rather than papered over.
   std::map<GroupSyncIndexType, std::string> groupNames;
-  int counter = 1;
   std::function<void(const QSplitter*)> walk = [&](const QSplitter* split)
   {
     for (int i = 0; i < split->count(); ++i)
@@ -691,8 +701,14 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
         const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
         if (groupNames.find(idx) == groupNames.end())
         {
-          groupNames[idx] = (idx == 1) ? std::string("main")
-                                       : ("g_" + std::to_string(counter++));
+          const auto recorded = m_GroupNameByIndex.find(idx);
+          if (recorded == m_GroupNameByIndex.end())
+          {
+            mitkThrow() << "SerializeLayout: cell sync group " << idx
+                        << " has no entry in the group-name registry; "
+                        << "engine state is corrupt.";
+          }
+          groupNames[idx] = recorded->second;
         }
       }
     }
@@ -840,9 +856,8 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
     // 'TearDownAllCells' at the start, so every cell currently in the map
     // was created by this same call - draining them all here is correct.
     std::vector<QString> names;
-    for (const auto& [name, _] : this->GetRenderWindowWidgets())
+    for ([[maybe_unused]] const auto& [name, widget] : this->GetRenderWindowWidgets())
     {
-      (void)_;
       names.push_back(name);
     }
     for (const auto& name : names)
@@ -854,6 +869,170 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
 
   split->setSizes(sizes);
   return split.release();
+}
+
+void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
+  const std::vector<std::pair<std::string, std::string>>& seedingOrder,
+  const std::map<std::string, GroupSyncIndexType>& nameToInt)
+{
+  // Resolve the seed cell per group: first window in document order whose
+  // links.selection names that group. 'seedingOrder' is captured pre-order
+  // during validation (cells did not exist yet); resolve to widget pointers
+  // now that the cell map is populated.
+  std::map<std::string, RenderWindowWidgetPointer> seedCells;
+  std::map<std::string, std::vector<RenderWindowWidgetPointer>> groupMembers;
+  for (const auto& [bareName, groupName] : seedingOrder)
+  {
+    const auto qualifiedName = this->MakeQualifiedName(QString::fromStdString(bareName));
+    const auto cell = this->GetRenderWindowWidget(qualifiedName);
+    if (nullptr == cell)
+    {
+      // Engine-state corruption: the validation pass said this cell would
+      // exist. Surface rather than silently skip.
+      mitkThrow() << "SeedAndNormalizeGroups: cell '" << qualifiedName.toStdString()
+                  << "' referenced in seeding order is not registered after build.";
+    }
+    groupMembers[groupName].push_back(cell);
+    seedCells.emplace(groupName, cell);  // emplace: first wins
+  }
+
+  // Cap noisy warnings - cross-scene loads where the same data node has
+  // diverged across renderers could otherwise emit one warning per node.
+  // Document the cap so suppressed warnings are not invisible.
+  //
+  // Note: on a fresh ApplyLayout, this divergence pass is silent by design.
+  // TearDownAllCells() destroys the previous renderers and connector state;
+  // the new cells are constructed in lock-step against a fresh connector
+  // and therefore have no per-renderer divergence to detect at the moment
+  // SeedAndNormalizeGroups runs. The instrumentation surfaces drift if a
+  // scene applied AFTER the layout reintroduces divergence between the
+  // seed and other group members before normalisation completes.
+  constexpr int kWarnCap = 16;
+  int warnCount = 0;
+  bool warnCapHit = false;
+  // TODO(C6): exercise the divergence path via a path-2 integration test once
+  // scene-after-layout reseeding is implemented (see plan_mxn_post_rest.md C6).
+  // Until then this lambda has no CI coverage by design - fresh layouts have
+  // no divergence to detect.
+  auto emitDivergence = [&](const std::string& groupName,
+                            const std::string& dim,
+                            const std::string& nodeLabel,
+                            const QString& cellName)
+  {
+    if (warnCount < kWarnCap)
+    {
+      MITK_WARN << "ApplyLayout: per-renderer '" << dim << "' divergence in group '"
+                << groupName << "' for node '" << nodeLabel << "' between seed and cell '"
+                << cellName.toStdString() << "'; normalising to seed value.";
+      ++warnCount;
+    }
+    else
+    {
+      warnCapHit = true;
+    }
+  };
+
+  for (const auto& [groupName, seedCell] : seedCells)
+  {
+    auto* const seedUtility = seedCell->GetUtilityWidget();
+    if (nullptr == seedUtility)
+    {
+      mitkThrow() << "SeedAndNormalizeGroups: seed cell for group '" << groupName
+                  << "' has no utility widget.";
+    }
+    auto* const seedSelectionWidget = seedUtility->GetNodeSelectionWidget();
+    auto* const seedRenderer = mitk::BaseRenderer::GetInstance(
+      seedCell->GetRenderWindow()->GetVtkRenderWindow());
+    if (nullptr == seedRenderer)
+    {
+      mitkThrow() << "SeedAndNormalizeGroups: seed cell for group '" << groupName
+                  << "' has no base renderer.";
+    }
+
+    const auto seedSelection = seedSelectionWidget->GetSelectedNodes();
+
+    // Divergence detection (pre-seed): compare every non-seed member's
+    // per-renderer 'visible' / 'layer' to the seed's, for each node in the
+    // seed's selection. This is best-effort observability for cross-scene
+    // loads where the same data node appears in both old and new layouts
+    // with divergent per-renderer state. For fresh editor loads, every cell
+    // starts in lock-step, so this loop emits nothing.
+    const auto memberIt = groupMembers.find(groupName);
+    if (memberIt != groupMembers.end())
+    {
+      for (const auto& member : memberIt->second)
+      {
+        if (member.get() == seedCell.get())
+        {
+          continue;
+        }
+        auto* const memberRenderer = mitk::BaseRenderer::GetInstance(
+          member->GetRenderWindow()->GetVtkRenderWindow());
+        if (nullptr == memberRenderer)
+        {
+          continue;
+        }
+
+        for (const auto& node : seedSelection)
+        {
+          if (node.IsNull())
+          {
+            continue;
+          }
+          const auto nodeLabel = node->GetName();
+          if (node->IsVisible(seedRenderer) != node->IsVisible(memberRenderer))
+          {
+            emitDivergence(groupName, "visible", nodeLabel, member->GetWidgetName());
+          }
+          int seedLayer = 0;
+          int memberLayer = 0;
+          const bool seedHasLayer   = node->GetIntProperty("layer", seedLayer,   seedRenderer);
+          const bool memberHasLayer = node->GetIntProperty("layer", memberLayer, memberRenderer);
+          if (seedHasLayer && memberHasLayer && seedLayer != memberLayer)
+          {
+            emitDivergence(groupName, "layer", nodeLabel, member->GetWidgetName());
+          }
+        }
+      }
+    }
+
+    // Seed the connector from this group's seed cell, then push the seeded
+    // state to every member (including the seed - this is a no-op for it).
+    const auto groupIt = nameToInt.find(groupName);
+    if (groupIt == nameToInt.end())
+    {
+      mitkThrow() << "SeedAndNormalizeGroups: group '" << groupName
+                  << "' has no engine-internal index assigned.";
+    }
+    auto* connector = this->GetSyncGroupConnector(groupIt->second);
+    if (nullptr == connector)
+    {
+      mitkThrow() << "SeedAndNormalizeGroups: connector for group '" << groupName
+                  << "' is missing.";
+    }
+    connector->SeedFromMember(seedSelection, seedRenderer);
+
+    if (memberIt != groupMembers.end())
+    {
+      for (const auto& member : memberIt->second)
+      {
+        auto* const memberUtility = member->GetUtilityWidget();
+        if (nullptr == memberUtility)
+        {
+          mitkThrow() << "SeedAndNormalizeGroups: member cell '"
+                      << member->GetWidgetName().toStdString()
+                      << "' in group '" << groupName << "' has no utility widget.";
+        }
+        connector->SynchronizeWidget(memberUtility->GetNodeSelectionWidget());
+      }
+    }
+  }
+
+  if (warnCapHit)
+  {
+    MITK_WARN << "ApplyLayout: per-renderer divergence warnings capped at "
+              << kWarnCap << "; further occurrences suppressed.";
+  }
 }
 
 void QmitkMxNMultiWidget::TearDownAllCells()
@@ -875,9 +1054,8 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   this->SetActiveRenderWindowWidget(nullptr);
 
   std::vector<QString> names;
-  for (const auto& [name, _] : this->GetRenderWindowWidgets())
+  for ([[maybe_unused]] const auto& [name, widget] : this->GetRenderWindowWidgets())
   {
-    (void)_;
     names.push_back(name);
   }
   for (const auto& name : names)
@@ -885,10 +1063,11 @@ void QmitkMxNMultiWidget::TearDownAllCells()
     this->RemoveRenderWindowWidget(name);
   }
 
-  // Drop sync-group connectors. Per E12 (v2 concept doc) selection state is
-  // not preserved across loads. The next ApplyLayout pass re-allocates the
-  // groups it needs from JSON.
+  // Drop sync-group connectors. Selection state is not preserved across
+  // layout loads; the next ApplyLayout pass re-allocates the groups it
+  // needs from the document.
   m_SynchronizedWidgetConnectors.clear();
+  m_GroupNameByIndex.clear();
 
   // Delete the splitter and the layout that held it. The render-window widgets
   // are already gone; the splitter (and any sub-splitters) have no
@@ -936,6 +1115,19 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     const auto version = doc["version"].get<std::string>();
     if (version != "2.0")
     {
+      // Point v1.x documents at the migration script. This message is read by
+      // end users via the QMessageBox load wrapper, so the path it names must
+      // match the in-tree script name verbatim - the test 'Version_RejectsAllNonV2'
+      // pins this string.
+      const bool looksV1 = version.size() >= 2 && version[0] == '1' && version[1] == '.';
+      if (looksV1)
+      {
+        mitkThrow() << "Layout document version is '" << version
+                    << "'; only '2.0' is supported. If this is a v1.x layout from "
+                    << "before the format change, run "
+                    << "'Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py "
+                    << "<file>' to convert it.";
+      }
       mitkThrow() << "Layout document version is '" << version
                   << "'; only '2.0' is supported.";
     }
@@ -945,10 +1137,12 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
 
     // Pre-walk: validate structural shape, collect window names + referenced
-    // group labels.
+    // group labels, and capture document-order seeding pairs for the
+    // post-build group-seeding pass.
     std::set<std::string> seenNames;
     std::set<std::string> referencedGroups;
-    PrewalkValidate(doc.at("root"), seenNames, referencedGroups);
+    std::vector<std::pair<std::string, std::string>> seedingOrder;
+    PrewalkValidate(doc.at("root"), seenNames, referencedGroups, seedingOrder);
 
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode
     // (no 'groups' block) defaults every referenced label to select_all=true.
@@ -985,6 +1179,12 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     }
 
     // ----- Tear down existing state -----
+    // Invalidate the grid-layout sentinel BEFORE tearing down: from this
+    // point on the editor no longer holds a regular grid, so GetRowCount()
+    // / GetColumnCount() return 0 to signal callers that the cell set must
+    // be enumerated through the cell map. The rollback path also re-runs
+    // SetLayout(1, 1), which restores both fields to (1, 1).
+    this->ResetGridState();
     this->TearDownAllCells();
     didMutate = true;
 
@@ -996,18 +1196,29 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     std::map<std::string, GroupSyncIndexType> nameToInt;
     if (groupSelectAll.find("main") != groupSelectAll.end())
     {
-      this->AddSynchronizationGroup(1);
+      this->AddSynchronizationGroup(1, "main");
       this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at("main"));
       nameToInt["main"] = 1;
     }
+    else if (!groupSelectAll.empty())
+    {
+      // No 'main' group declared - the first referenced label takes engine
+      // index 1 to preserve the editor's default-group convention. Iterating
+      // 'groupSelectAll' (a std::map) walks groups in alphabetical order,
+      // matching the assignment order used by the loop below.
+      const auto& firstName = groupSelectAll.begin()->first;
+      this->AddSynchronizationGroup(1, firstName);
+      this->GetSyncGroupConnector(1)->ChangeSelectionMode(groupSelectAll.at(firstName));
+      nameToInt[firstName] = 1;
+    }
     for (const auto& [groupName, selectAll] : groupSelectAll)
     {
-      if (groupName == "main")
+      if (nameToInt.find(groupName) != nameToInt.end())
       {
         continue;
       }
       const auto idx = this->NextFreeSyncGroupIndex();
-      this->AddSynchronizationGroup(idx);
+      this->AddSynchronizationGroup(idx, groupName);
       this->GetSyncGroupConnector(idx)->ChangeSelectionMode(selectAll);
       nameToInt[groupName] = idx;
     }
@@ -1017,6 +1228,16 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     auto* hBoxLayout = new QHBoxLayout(this);
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(rootSplitter);
+
+    // ----- Group seeding pass + divergence detection -----
+    // Make the seed cell of each group authoritative for the group's runtime
+    // synchronized state (per the seeding rule documented on the schema's
+    // 'groups' field): seed = cell that appears first in document order whose
+    // links.selection names that group. After seeding, normalize every other
+    // member to the seed's per-renderer values for the keys we fan out
+    // (visible, layer). Divergence is reported via MITK_WARN, capped to keep
+    // the log usable when many nodes are involved.
+    this->SeedAndNormalizeGroups(seedingOrder, nameToInt);
 
     // Point at the first cell so downstream code that dereferences
     // GetActive... has a sane target after a fresh load.
@@ -1068,6 +1289,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   // ones stay in the map and are then double-deleted by 'delete this->layout()').
   // Mirroring 'ApplyLayout's structure (tear down, allocate groups, build
   // fresh) avoids that hazard regardless of the prior naming scheme.
+  this->ResetGridState();
   this->TearDownAllCells();
 
   auto vSplit = new QSplitter(Qt::Vertical);
@@ -1113,13 +1335,22 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   auto hBoxLayout = new QHBoxLayout(this);
   this->setLayout(hBoxLayout);
   hBoxLayout->addWidget(vSplit);
+
+  // Deterministic active-cell assignment after rebuild. ResetGridState()
+  // nulled out the previous active pointer; without this the editor would
+  // be left with a null active cell until the user clicks one.
+  if (auto firstCell = this->GetFirstRenderWindowWidget())
+  {
+    this->SetActiveRenderWindowWidget(firstCell);
+  }
+
   emit UpdateUtilityWidgetViewPlanes();
 
   this->EnableCrosshair();
   emit LayoutChanged();
 }
 
-void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index)
+void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name)
 {
   if (index < 1)
   {
@@ -1127,7 +1358,8 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
                 << "'. Group index must be >= 1.";
   }
 
-  // Idempotent: an existing group is preserved (no replacement, no extra signal).
+  // Idempotent: an existing group is preserved (no replacement, no extra
+  // signal, and the previously recorded name wins over any new one passed in).
   if (m_SynchronizedWidgetConnectors.find(index) != m_SynchronizedWidgetConnectors.end())
   {
     return;
@@ -1154,6 +1386,10 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   auto connector = std::make_unique<QmitkSynchronizedWidgetConnector>();
   connector->ChangeSelection(currentSelection);
   m_SynchronizedWidgetConnectors[index] = std::move(connector);
+
+  m_GroupNameByIndex[index] = name.empty()
+    ? ((index == 1) ? std::string("main") : ("g_" + std::to_string(index)))
+    : name;
 
   emit SyncGroupAdded(index);
 }

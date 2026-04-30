@@ -36,6 +36,25 @@ found in the LICENSE file.
 *        'SynchronizeWidget(QmitkSynchronizedNodeSelectionWidget*' can be used to initially set
 *        the current selection and the current selection mode.
 *        For this, both values are stored in this class internally.
+*
+* \note  Per-renderer node properties this connector fans out via per-cell writes:
+*          - visible (bool) - written via QmitkSynchronizedNodeSelectionWidget::SetNodeVisibility
+*                             and propagated to other widgets through the
+*                             NodeVisibilityChanged signal pair on this connector.
+*          - layer   (int)  - written via QmitkRenderWindowDataNodeTableModel::moveNodesLayer
+*                             (which calls mitk::RenderWindowLayerController::MoveNodeToPosition)
+*                             and propagated through the NodesLayerMoved signal pair.
+*
+*        Connector-internal state (NOT fanned out via per-renderer property writes):
+*          - selection list   (m_InternalSelection)
+*          - select_all mode  (m_SelectAll)
+*          - invisibles set   (m_InternalInvisibles)
+*
+*        Selection-list membership is propagated to other widgets via the
+*        NodeSelectionChanged signal, not via per-renderer writes - selection is
+*        a runtime concept tracked at the widget level. select_all is group-scoped
+*        and authored in the layout document; the protected SeedFromMember entry
+*        deliberately does NOT touch it.
 */
 class MITKQTWIDGETS_EXPORT QmitkSynchronizedWidgetConnector : public QObject
 {
@@ -87,6 +106,7 @@ public:
   * \return NodeList  The current internal node selection stored as a member variable.
   */
   NodeList GetNodeSelection() const;
+
   /**
   * \brief Get the current internal selection mode.
   *
@@ -163,7 +183,42 @@ public Q_SLOTS:
   */
   void DeregisterWidget();
 
+protected:
+
+  /**
+  * \brief Seed this connector's runtime selection from a designated member cell.
+  *
+  *        Used by the v2 layout applier to make a group's seed cell authoritative
+  *        for the connector's `m_InternalSelection` and `m_InternalInvisibles`.
+  *        The seed cell is the cell that appears first in document order whose
+  *        `links.selection` references this group (see the schema description
+  *        of the seeding rule).
+  *
+  *        The connector takes the seed cell's selection list verbatim and
+  *        rebuilds its invisible-nodes set by reading per-renderer visibility
+  *        from `seedRenderer` for each selected node.
+  *
+  *        Group-scoped state is not touched: `m_SelectAll` is set from the
+  *        layout document's `groups` dict, not derived from any cell, so
+  *        SeedFromMember leaves it alone.
+  *
+  *        This method is intended for layout-load seeding only. Calling it
+  *        outside of `ApplyLayout`'s seeding pass risks clobbering the
+  *        runtime state that the user has built up since load time. Access
+  *        is restricted to `QmitkMxNMultiWidget` (via friendship) and to
+  *        test fixtures that subclass this type to exercise the contract
+  *        directly.
+  *
+  * \param seedSelection  The selection list of the seed cell.
+  * \param seedRenderer   The base renderer of the seed cell. Per-node
+  *                       visibility is read from this renderer to rebuild
+  *                       `m_InternalInvisibles`. Must not be null.
+  */
+  void SeedFromMember(const NodeList& seedSelection, const mitk::BaseRenderer* seedRenderer);
+
 private:
+
+  friend class QmitkMxNMultiWidget;
 
   NodeList m_InternalSelection;
   std::set<mitk::DataNode*> m_InternalInvisibles;

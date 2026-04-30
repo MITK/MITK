@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkVectorProperty.h>
 
+#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
@@ -35,7 +36,7 @@ found in the LICENSE file.
 
 namespace
 {
-  itk::ModifiedTimeType PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
+  bool PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
   {
     const std::string context = renderer != nullptr ? renderer->GetName() : "";
     auto prop = provider->GetConstProperty(propName, context);
@@ -45,6 +46,24 @@ namespace
     }
     return false;
   }
+}
+
+bool mitk::MultiLabelSegmentationVtkMapper3D::ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer)
+{
+  bool smoothed = true;
+  if (node != nullptr && node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", smoothed, renderer))
+  {
+    return smoothed;
+  }
+
+  if (auto* prefService = mitk::CoreServices::GetPreferencesService())
+  {
+    if (auto* systemPref = prefService->GetSystemPreferences())
+    {
+      return systemPref->Node("/org.mitk.views.segmentation")->GetBool("3D rendering smoothed", true);
+    }
+  }
+  return true;
 }
 
 namespace mitk
@@ -112,14 +131,16 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   float nodeOpacity = 1.0f;
   node->GetFloatProperty("opacity", nodeOpacity);
 
-  // Reset the entire LUT so labels that were removed since the last update
-  // map to fully transparent. The MAX_LABEL_VALUE+1 entries are configured
-  // once in the LocalStorage constructor; here we just clear the contents.
+  // Clear only the entries we populated last time. Labels that disappeared since
+  // the previous update are reset to fully transparent without touching the
+  // ~65k entries that have always been zero.
   auto& lut = localStorage->m_VtkLookupTable;
-  for (vtkIdType i = 0; i <= mitk::Label::MAX_LABEL_VALUE; ++i)
+  for (auto idx : localStorage->m_PopulatedLabelEntries)
   {
-    lut->SetTableValue(i, 0.0, 0.0, 0.0, 0.0);
+    lut->SetTableValue(idx, 0.0, 0.0, 0.0, 0.0);
   }
+  localStorage->m_PopulatedLabelEntries.clear();
+  localStorage->m_PopulatedLabelEntries.reserve(labelValues.size());
 
   double rgba[4];
   for (const auto& value : labelValues)
@@ -147,6 +168,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
     rgba[3] *= nodeOpacity;
 
     lut->SetTableValue(value, rgba);
+    localStorage->m_PopulatedLabelEntries.push_back(static_cast<vtkIdType>(value));
   }
 
   localStorage->m_LabelLookupTable->Modified();
@@ -180,7 +202,11 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
       {
         result.push_back({ groupID, groupImage });
 
-        if (groupPositionHasChanged) positionChanges.push_back({ groupID, groupImage });
+        if (groupPositionHasChanged)
+        {
+          positionChanges.push_back({ groupID, groupImage });
+          finding->second->m_ActorOrder = groupID;
+        }
       }
     }
     else
@@ -340,17 +366,9 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
 
   const bool timeStepChanged = this->GetTimestep() != localStorage->m_LastUpdateTimeStep;
 
-  // Resolve the smoothing state from the per-node property if set, otherwise from the
-  // segmentation preference. A change in the resolved state forces all groups to re-extract
+  // A change in the resolved smoothing state forces all groups to re-extract
   // (the smoothing flag is applied to vtkSurfaceNets3D in UpdateSurfaceMapping).
-  bool currentSmoothed = true;
-  if (!node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", currentSmoothed, renderer))
-  {
-    if (nullptr != localStorage->m_SegPreferences)
-    {
-      currentSmoothed = localStorage->m_SegPreferences->GetBool("3D rendering smoothed", true);
-    }
-  }
+  const bool currentSmoothed = ResolveSmoothed(node, renderer);
   const bool smoothedChanged = currentSmoothed != localStorage->m_LastSmoothed;
   localStorage->m_LastSmoothed = currentSmoothed;
 
@@ -393,15 +411,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
 
   // Detect a change in the resolved smoothing state so a preference flip
   // (without any per-node property change) still triggers re-extraction.
-  bool resolvedSmoothed = true;
-  if (!node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", resolvedSmoothed, renderer))
-  {
-    if (nullptr != localStorage->m_SegPreferences)
-    {
-      resolvedSmoothed = localStorage->m_SegPreferences->GetBool("3D rendering smoothed", true);
-    }
-  }
-  const auto changedSmoothed = resolvedSmoothed != localStorage->m_LastSmoothed;
+  const auto changedSmoothed = ResolveSmoothed(node, renderer) != localStorage->m_LastSmoothed;
 
   if (!visible
     || hide3Dvisualize

@@ -20,7 +20,10 @@ found in the LICENSE file.
 #include <mitkStatusBar.h>
 #include <mitkSurface.h>
 
+#include <vtkImageData.h>
+#include <vtkImageThreshold.h>
 #include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
 #include <QApplication>
 
@@ -30,14 +33,14 @@ using namespace std;
 
 namespace
 {
-  std::string MakeNodeName(const std::string& parentName, const std::string& labelName, bool smoothed)
+  std::string MakeNodeName(const std::string& parentName, const std::string& labelSuffix, bool smoothed)
   {
     auto base = parentName.empty()
       ? std::string("segmentation")
       : parentName;
 
-    if (!labelName.empty())
-      base += "_" + labelName;
+    if (!labelSuffix.empty())
+      base += "_" + labelSuffix;
 
     if (smoothed)
       base += "_smoothed";
@@ -45,21 +48,48 @@ namespace
     return base;
   }
 
+  std::string LabelSuffix(const Label* label, MultiLabelSegmentation::LabelValueType value)
+  {
+    if (label != nullptr && !label->GetName().empty())
+      return label->GetName();
+
+    return "label_" + std::to_string(value);
+  }
+
   void AddSurfaceNode(
     DataStorage* dataStorage,
     DataNode* parentNode,
     Surface::Pointer surface,
     const std::string& parentName,
-    const std::string& labelName,
+    const std::string& labelSuffix,
     const Color& color,
     bool smoothed)
   {
     auto node = DataNode::New();
     node->SetData(surface);
-    node->SetName(MakeNodeName(parentName, labelName, smoothed));
+    node->SetName(MakeNodeName(parentName, labelSuffix, smoothed));
     node->SetColor(color);
     node->SetProperty("scalar visibility", BoolProperty::New(false));
     dataStorage->Add(node, parentNode);
+  }
+
+  vtkSmartPointer<vtkImageData> BinarizeMask(vtkImageData* mask)
+  {
+    // Normalize the foreground to 1 so masks with arbitrary non-zero foreground values
+    // (commonly 0/255 binary masks) extract correctly when we ask vtkSurfaceNets3D for
+    // label 1. Mirrors the threshold(0.5) behavior of the previous mitkShowSegmentationAsSurface
+    // path.
+    auto thresholdFilter = vtkSmartPointer<vtkImageThreshold>::New();
+    thresholdFilter->SetInputData(mask);
+    thresholdFilter->ThresholdByUpper(0.5);
+    thresholdFilter->SetInValue(1);
+    thresholdFilter->SetOutValue(0);
+    thresholdFilter->SetOutputScalarTypeToUnsignedChar();
+    thresholdFilter->Update();
+
+    auto result = vtkSmartPointer<vtkImageData>::New();
+    result->ShallowCopy(thresholdFilter->GetOutput());
+    return result;
   }
 }
 
@@ -130,28 +160,21 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
           surface->SetVtkPolyData(polyData);
 
           const auto label = segmentation->GetLabel(labelValue);
-          const std::string labelName = label != nullptr ? label->GetName() : std::string();
           const Color labelColor = label != nullptr ? label->GetColor() : Color{};
 
-          AddSurfaceNode(m_DataStorage, selectedNode, surface, parentName, labelName, labelColor, m_IsSmoothed);
+          AddSurfaceNode(m_DataStorage, selectedNode, surface, parentName, LabelSuffix(label, labelValue), labelColor, m_IsSmoothed);
         }
       }
     }
     else
     {
-      // Plain binary mask: treat the foreground as a single label with value 1.
-      auto vtkImage = imageMask->GetVtkImageData(0);
-      const std::vector<MultiLabelSegmentation::LabelValueType> labels{1};
-      auto results = extractor.ExtractPerLabel(vtkImage, labels);
-      for (const auto& [labelValue, polyData] : results)
+      auto binarized = BinarizeMask(imageMask->GetVtkImageData(0));
+      auto results = extractor.ExtractPerLabel(binarized, {1});
+      auto it = results.find(1);
+      if (it != results.end() && it->second != nullptr && it->second->GetNumberOfCells() > 0)
       {
-        if (nullptr == polyData || polyData->GetNumberOfCells() == 0)
-        {
-          continue;
-        }
-
         auto surface = Surface::New();
-        surface->SetVtkPolyData(polyData);
+        surface->SetVtkPolyData(it->second);
 
         Color color;
         color.Set(1.0f, 1.0f, 1.0f);

@@ -90,6 +90,8 @@ namespace mitk
       const std::vector<LabelValueType>& labelValues);
 
   private:
+    void ConfigureLabels(const std::vector<LabelValueType>& labelValues);
+
     vtkSmartPointer<vtkSurfaceNets3D> m_SurfaceNets;
     vtkSmartPointer<vtkPolyDataNormals> m_NormalsFilter;
     bool m_Smoothing;

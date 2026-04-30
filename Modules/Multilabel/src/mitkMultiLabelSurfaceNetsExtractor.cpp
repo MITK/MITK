@@ -60,6 +60,14 @@ bool mitk::MultiLabelSurfaceNetsExtractor::GetSmoothing() const
   return m_Smoothing;
 }
 
+void mitk::MultiLabelSurfaceNetsExtractor::ConfigureLabels(const std::vector<LabelValueType>& labelValues)
+{
+  m_SurfaceNets->SetSmoothing(m_Smoothing);
+  m_SurfaceNets->SetNumberOfLabels(static_cast<int>(labelValues.size()));
+  for (size_t i = 0; i < labelValues.size(); ++i)
+    m_SurfaceNets->SetLabel(static_cast<int>(i), static_cast<double>(labelValues[i]));
+}
+
 vtkSmartPointer<vtkPolyData> mitk::MultiLabelSurfaceNetsExtractor::Extract(
   vtkImageData* groupImage,
   const std::vector<LabelValueType>& labelValues)
@@ -74,14 +82,13 @@ vtkSmartPointer<vtkPolyData> mitk::MultiLabelSurfaceNetsExtractor::Extract(
   PrepareInput(groupImage);
 
   m_SurfaceNets->SetInputData(groupImage);
-  m_SurfaceNets->SetSmoothing(m_Smoothing);
-  m_SurfaceNets->SetOutputStyleToDefault();
+  this->ConfigureLabels(labelValues);
   m_SurfaceNets->InitializeSelectedLabelsList();
-  m_SurfaceNets->SetNumberOfLabels(static_cast<int>(labelValues.size()));
-
-  for (size_t i = 0; i < labelValues.size(); ++i)
-    m_SurfaceNets->SetLabel(static_cast<int>(i), static_cast<double>(labelValues[i]));
-
+  m_SurfaceNets->SetOutputStyleToDefault();
+  // TODO(VTK 9.5.2): force re-extraction. vtkSurfaceNets3D::RequestData reuses its
+  // cache based on Superclass::GetMTime(), which SetLabel/SetInputData do not always
+  // bump; the cached path then leaves newScalars null and TransformMeshType crashes.
+  // Drop this Modified() when VTK is upgraded past 9.5.2.
   m_SurfaceNets->Modified();
 
   m_NormalsFilter->Update();
@@ -104,19 +111,14 @@ mitk::MultiLabelSurfaceNetsExtractor::ExtractPerLabel(
   PrepareInput(groupImage);
 
   m_SurfaceNets->SetInputData(groupImage);
-  m_SurfaceNets->SetSmoothing(m_Smoothing);
-  m_SurfaceNets->SetNumberOfLabels(static_cast<int>(labelValues.size()));
-
-  for (size_t i = 0; i < labelValues.size(); ++i)
-    m_SurfaceNets->SetLabel(static_cast<int>(i), static_cast<double>(labelValues[i]));
-
+  this->ConfigureLabels(labelValues);
   m_SurfaceNets->SetOutputStyleToSelected();
 
   for (auto label : labelValues)
   {
     m_SurfaceNets->InitializeSelectedLabelsList();
     m_SurfaceNets->AddSelectedLabel(static_cast<double>(label));
-    m_SurfaceNets->Modified();
+    m_SurfaceNets->Modified(); // VTK 9.5.2 cache bust, see Extract().
 
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     m_NormalsFilter->Update();

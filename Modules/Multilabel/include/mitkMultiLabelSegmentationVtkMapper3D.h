@@ -25,6 +25,9 @@ found in the LICENSE file.
 
 // VTK
 #include <vtkSmartPointer.h>
+#include <vtkType.h>
+
+#include <vector>
 
 class vtkActor;
 class vtkImageData;
@@ -110,6 +113,13 @@ namespace mitk
       /** \brief Look up table for label colors (cloned from the segmentation). */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
+      /** \brief Label values whose LUT entries were populated during the previous update.
+       *
+       * Used to clear only those entries on the next refresh instead of zeroing the full
+       * MAX_LABEL_VALUE+1 range every time.
+       */
+      std::vector<vtkIdType> m_PopulatedLabelEntries;
+
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
 
@@ -139,6 +149,15 @@ namespace mitk
      * \param overwrite If true, existing properties will be overwritten.
      */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
+
+    /** \brief Resolve the active surface-smoothing state for a node.
+     *
+     * Reads the per-node "org.mitk.multilabel.3D.smoothed" property if set,
+     * otherwise falls back to the "/org.mitk.views.segmentation -> 3D rendering smoothed"
+     * preference (default true). Shared by the mapper and the 3D-visualization context-menu
+     * action so a single source of truth governs the smoothing flag.
+     */
+    static bool ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer);
 
   protected:
     /** \brief Default constructor. */

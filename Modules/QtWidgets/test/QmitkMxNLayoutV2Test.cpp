@@ -10,24 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestQApplication.h"
+
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindowWidget.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 
 #include <mitkException.h>
-#include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
 #include <nlohmann/json.hpp>
 
-#include <QApplication>
-
 #include <set>
 #include <string>
-
-extern std::vector<std::string> globalCmdLineArgs;
 
 /**
  * Tests the v2 layout I/O on QmitkMxNMultiWidget:
@@ -77,11 +74,11 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   mitk::DataNode::Pointer m_Node1;
   mitk::DataNode::Pointer m_Node2;
 
-  QApplication* m_TestApp = nullptr;
-
 public:
   void setUp() override
   {
+    EnsureQApplication();
+
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
     // QmitkRenderWindowDataNodeTableModel comparator workaround (see
@@ -95,17 +92,13 @@ public:
     m_Node2->SetName("node2");
     m_Node2->SetIntProperty("layer", 1);
     m_DataStorage->Add(m_Node2);
-
-    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
-    auto argc = cmdLineArgs.GetArgc();
-    auto argv = cmdLineArgs.GetArgv();
-    m_TestApp = new QApplication(argc, argv);
   }
 
   void tearDown() override
   {
-    delete m_TestApp;
-    m_TestApp = nullptr;
+    m_Node1 = nullptr;
+    m_Node2 = nullptr;
+    m_DataStorage = nullptr;
   }
 
   /** Make a usable, initialized MxN editor wired to the test data storage. */

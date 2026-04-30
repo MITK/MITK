@@ -10,19 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestQApplication.h"
+
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 
 #include <mitkException.h>
-#include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-
-#include <QApplication>
-
-extern std::vector<std::string> globalCmdLineArgs;
 
 /**
  * Tests the canonical sync-group lifecycle API on QmitkMxNMultiWidget:
@@ -66,35 +63,6 @@ class QmitkMxNSyncGroupApiTestSuite : public mitk::TestFixture
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::DataNode::Pointer m_Node1;
   mitk::DataNode::Pointer m_Node2;
-
-  /**
-   * Returns the process-wide QApplication, creating it on first use.
-   *
-   * A single, never-destroyed QApplication is required because:
-   *   1. NSApplication on macOS is a process singleton; tearing down
-   *      QApplication and recreating it across tests has been observed to
-   *      SegFault on macOS Tahoe (Qt 6.10).
-   *   2. QmitkMxNMultiWidget's ctor registers an observer on the
-   *      mitk::RenderingManager singleton and triggers state-machine
-   *      loading. That state outlives any single QApplication, so a
-   *      second-cycle QApplication would inherit dangling Qt-bound state.
-   *   3. QApplication stores `argc` by reference and `argv` as a pointer;
-   *      both must outlive the QApplication, so their backing storage is
-   *      held in function-local statics here rather than in setUp().
-   */
-  static QApplication& EnsureQApplication()
-  {
-    if (auto* const existing = QApplication::instance())
-    {
-      return *static_cast<QApplication*>(existing);
-    }
-
-    static mitk::RenderingTestHelper::ArgcHelperClass s_CmdLineArgs(globalCmdLineArgs);
-    static int s_Argc = s_CmdLineArgs.GetArgc();
-    static char** s_Argv = s_CmdLineArgs.GetArgv();
-    static auto* const s_App = new QApplication(s_Argc, s_Argv);
-    return *s_App;
-  }
 
 public:
   void setUp() override

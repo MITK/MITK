@@ -10,18 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "QmitkTestQApplication.h"
+
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
 #include <mitkException.h>
-#include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-
-#include <QApplication>
-
-extern std::vector<std::string> globalCmdLineArgs;
 
 /**
  * Tests the explicit-name 'CreateRenderWindowWidget(const QString&)' overload
@@ -48,11 +45,11 @@ class QmitkMxNExplicitNameTestSuite : public mitk::TestFixture
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::DataNode::Pointer m_Node1;
 
-  QApplication* m_TestApp = nullptr;
-
 public:
   void setUp() override
   {
+    EnsureQApplication();
+
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
     // QmitkRenderWindowDataNodeTableModel sorts its node list by the int
@@ -65,17 +62,12 @@ public:
     m_Node1->SetName("node1");
     m_Node1->SetIntProperty("layer", 0);
     m_DataStorage->Add(m_Node1);
-
-    mitk::RenderingTestHelper::ArgcHelperClass cmdLineArgs(globalCmdLineArgs);
-    auto argc = cmdLineArgs.GetArgc();
-    auto argv = cmdLineArgs.GetArgv();
-    m_TestApp = new QApplication(argc, argv);
   }
 
   void tearDown() override
   {
-    delete m_TestApp;
-    m_TestApp = nullptr;
+    m_Node1 = nullptr;
+    m_DataStorage = nullptr;
   }
 
   /**

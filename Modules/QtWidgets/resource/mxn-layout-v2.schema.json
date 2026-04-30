@@ -18,7 +18,7 @@
     },
     "groups": {
       "$ref": "#/$defs/groups",
-      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative — every label appearing in any cell's `links` MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field."
+      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative — every label appearing in any cell's `links` MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field.\n\nGroup seeding at load: when a layout is applied, each group's runtime synchronized state for per-renderer node properties (today: per-node `visible`, per-node `layer`; future v3 keys analogously) is seeded from the cell that appears first in document order whose `links.<dim>` names that group. After seeding, every other group member is normalised to the seed cell's values for those keys. Group-scoped persisted properties stored in this top-level `groups` dict (e.g. `select_all`) are not seeded from cells — the value declared here wins outright. Selection-list membership is a runtime concept (not encoded in the layout) and is seeded from the data storage's non-helper / non-hidden nodes. Hand-authors who want a specific cell to be the seed should list that cell first among the group's members in the layout document. Document order = pre-order traversal of the splitter tree (splits' `children` arrays in array order)."
     },
     "root": {
       "$ref": "#/$defs/split",
@@ -122,7 +122,7 @@
         "selection": {
           "type": "string",
           "pattern": "^[A-Za-z0-9_.-]+$",
-          "description": "Group name for the selection bundle (selection list, stack order, visibility, select_all). Cells with the same value form an implicit group; their selection state is synchronized at runtime. The named group's persisted properties live in the top-level `groups` dict if it is declared; otherwise property defaults apply."
+          "description": "Group name for the selection bundle (selection list, stack order, visibility, select_all). Cells with the same value form an implicit group; their selection state is synchronized at runtime. The named group's persisted properties live in the top-level `groups` dict if it is declared; otherwise property defaults apply. See the top-level `groups` description for the load-time seeding rule that determines which cell's per-renderer values are authoritative when group members diverge."
         }
       }
     },

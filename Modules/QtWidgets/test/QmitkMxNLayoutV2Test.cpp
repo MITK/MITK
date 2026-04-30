@@ -13,9 +13,11 @@ found in the LICENSE file.
 #include "QmitkTestQApplication.h"
 
 #include <QmitkMxNMultiWidget.h>
+#include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 
+#include <mitkBaseRenderer.h>
 #include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
@@ -41,20 +43,20 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkMxNLayoutV2TestSuite);
 
-  // --- T3: Serialize / Apply round-trip ---
+  // --- Serialize / Apply round-trip ---
   MITK_TEST(RoundTrip_Golden_TwoByThreeGrid);
   MITK_TEST(RoundTrip_Recursive_StrictModeFixture);
   MITK_TEST(RoundTrip_LazyModeFixture);
   MITK_TEST(MultiGroup_RoundTrip_PreservesSelectAll);
 
-  // --- T3: Validation ---
+  // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
   MITK_TEST(CustomNames_RegisterUnderEditorPrefix);
   MITK_TEST(DuplicateWindowNames_Throws);
   MITK_TEST(Version_RejectsAllNonV2);
   MITK_TEST(Version_AcceptsExactly_2_0);
 
-  // --- T3: Engine-state semantics ---
+  // --- Engine-state semantics ---
   MITK_TEST(TearDown_DestroysAllOldCells);
   MITK_TEST(Apply_Failure_RollsBackToDefault);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
@@ -62,11 +64,20 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
 
-  // --- T4: Strict parsing and exception boundary ---
+  // --- Strict parsing and exception boundary ---
   MITK_TEST(ViewDirection_TypoSagittal_Throws);
   MITK_TEST(ViewDirection_TypeMismatch_Throws);
   MITK_TEST(ApplyLayout_OutOfRange_Wraps);
   MITK_TEST(ApplyLayout_ParseError_NotPossibleAtThisLayer);
+
+  // --- Post-load grid-state invalidation + active-widget reset ---
+  MITK_TEST(SetLayout_PopulatesRowAndColumn);
+  MITK_TEST(ApplyLayout_InvalidatesRowAndColumn);
+  MITK_TEST(ApplyLayout_AssignsActiveWidgetFromNewMap);
+  MITK_TEST(ApplyLayout_RollbackKeepsActiveWidget);
+
+  // --- Group seeding rule + post-apply consistency ---
+  MITK_TEST(ApplyLayout_GroupMembersAgreeOnVisibility);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -111,7 +122,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #1: Round-trip golden — SetLayout(2, 3) → SerializeLayout
+  // Round-trip golden -- SetLayout(2, 3) -> SerializeLayout
   // ====================================================================
   void RoundTrip_Golden_TwoByThreeGrid()
   {
@@ -146,7 +157,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #2: Round-trip recursive — apply strict fixture, re-serialize
+  // Round-trip recursive -- apply strict fixture, re-serialize
   // ====================================================================
   void RoundTrip_Recursive_StrictModeFixture()
   {
@@ -191,7 +202,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #3: Lazy-mode fixture (no `groups` block); defaults applied
+  // Lazy-mode fixture (no `groups` block); defaults applied
   // ====================================================================
   void RoundTrip_LazyModeFixture()
   {
@@ -244,7 +255,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #4: Multi-group round-trip — different select_all per group
+  // Multi-group round-trip -- different select_all per group
   // ====================================================================
   void MultiGroup_RoundTrip_PreservesSelectAll()
   {
@@ -277,9 +288,10 @@ public:
     // Both groups must be present and must preserve select_all.
     CPPUNIT_ASSERT_EQUAL(true,  roundTrip.at("groups").at("main").at("select_all").get<bool>());
 
-    // The non-default group's name on serialize is deterministic (engine index 1
-    // = "main"; next allocated index gets bare name "g_1"). Find that other
-    // group and confirm select_all=false.
+    // The non-default group's original document label is preserved through the
+    // round-trip (the engine's group-name registry records the layout-document
+    // label at AddSynchronizationGroup time and SerializeLayout reads from
+    // there). Find the non-'main' group and confirm select_all=false.
     bool foundFalse = false;
     for (auto it = roundTrip.at("groups").begin(); it != roundTrip.at("groups").end(); ++it)
     {
@@ -292,9 +304,10 @@ public:
     // round-trip leaves (cell names are preserved) and group their engine sync
     // indices by 'links.selection' label. Cells sharing a label must land in
     // the same engine group; the set of distinct labels must produce the same
-    // count of distinct engine groups. (Group labels themselves may be renamed
-    // on serialize - 'main' is stable, others are reassigned to 'g_<n>' - so
-    // this test cannot pin the post-round-trip label, only the partition.)
+    // count of distinct engine groups. Group labels are also preserved across
+    // round-trip via the engine's group-name registry, but this test pins the
+    // partition only - the label-preservation invariant is covered by the
+    // assertions on the 'groups' dict above.
     std::map<std::string, QmitkMxNMultiWidget::GroupSyncIndexType> labelToEngineGroup;
     std::set<QmitkMxNMultiWidget::GroupSyncIndexType> distinctEngineGroups;
     std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
@@ -329,7 +342,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #5: Strict-mode missing reference throws
+  // Strict-mode missing reference throws
   // ====================================================================
   void StrictMode_MissingGroupReference_Throws()
   {
@@ -359,7 +372,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #6: Custom names register under editor prefix
+  // Custom names register under editor prefix
   // ====================================================================
   void CustomNames_RegisterUnderEditorPrefix()
   {
@@ -381,7 +394,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #7: Duplicate window names throws
+  // Duplicate window names throws
   // ====================================================================
   void DuplicateWindowNames_Throws()
   {
@@ -412,7 +425,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #8: Version rejection across many non-2.0 strings
+  // Version rejection across many non-2.0 strings
   // ====================================================================
   void Version_RejectsAllNonV2()
   {
@@ -434,15 +447,25 @@ public:
         editor->ApplyLayout(fixture);
         CPPUNIT_FAIL((std::string("Expected throw on version '") + bad + "'").c_str());
       }
-      catch (const mitk::Exception&)
+      catch (const mitk::Exception& e)
       {
-        // expected
+        // v1.x rejects must reference the migration script so the
+        // QMessageBox wrapper surfaces the exact path the user needs to run.
+        const std::string sBad(bad);
+        const bool looksV1 = sBad.size() >= 2 && sBad[0] == '1' && sBad[1] == '.';
+        if (looksV1)
+        {
+          const std::string msg = e.GetDescription();
+          CPPUNIT_ASSERT_MESSAGE(
+            "v1.x version-rejection message must reference migrate-mxn-layout-v1-to-v2",
+            msg.find("migrate-mxn-layout-v1-to-v2") != std::string::npos);
+        }
       }
     }
   }
 
   // ====================================================================
-  // T3 #9: Single-cell v2.0 fixture applies cleanly
+  // Single-cell v2.0 fixture applies cleanly
   // ====================================================================
   void Version_AcceptsExactly_2_0()
   {
@@ -464,7 +487,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #10: Tear-down evidence — old cells destroyed before construction
+  // Tear-down evidence -- old cells destroyed before construction
   // ====================================================================
   void TearDown_DestroysAllOldCells()
   {
@@ -479,9 +502,8 @@ public:
     // refcount hitting zero (= ~QmitkRenderWindowWidget ran), which is exactly
     // the invariant we want to verify.
     std::vector<std::weak_ptr<QmitkRenderWindowWidget>> weakCells;
-    for (const auto& [name, widget] : editor->GetRenderWindowWidgets())
+    for ([[maybe_unused]] const auto& [name, widget] : editor->GetRenderWindowWidgets())
     {
-      (void)name;
       weakCells.emplace_back(widget);
     }
     CPPUNIT_ASSERT_EQUAL(std::size_t{4}, weakCells.size());
@@ -515,7 +537,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #11: Construction failure rolls back to single default cell
+  // Construction failure rolls back to single default cell
   // ====================================================================
   void Apply_Failure_RollsBackToDefault()
   {
@@ -544,7 +566,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #12: Group naming is deterministic across two consecutive serializations
+  // Group naming is deterministic across two consecutive serializations
   // ====================================================================
   void Serialize_GroupNaming_Deterministic()
   {
@@ -574,7 +596,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #13: Bare names in JSON have no editor prefix
+  // Bare names in JSON have no editor prefix
   // ====================================================================
   void Serialize_RegisteredNames_StripPrefix()
   {
@@ -604,7 +626,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #14: Nested splits round-trip cleanly
+  // Nested splits round-trip cleanly
   // ====================================================================
   void Apply_NestedSplits_RoundTrip()
   {
@@ -644,7 +666,7 @@ public:
   }
 
   // ====================================================================
-  // T3 #15: LoadLayout(nullptr) throws (covers the wrapper)
+  // LoadLayout(nullptr) throws (covers the wrapper)
   // ====================================================================
   void Apply_NullJson_Throws()
   {
@@ -653,7 +675,7 @@ public:
   }
 
   // ====================================================================
-  // T4 #16: View-direction typo throws strictly (no silent fallback)
+  // View-direction typo throws strictly (no silent fallback)
   // ====================================================================
   void ViewDirection_TypoSagittal_Throws()
   {
@@ -683,7 +705,7 @@ public:
   }
 
   // ====================================================================
-  // T4 #17: View-direction type mismatch (int instead of string) throws
+  // View-direction type mismatch (int instead of string) throws
   // ====================================================================
   void ViewDirection_TypeMismatch_Throws()
   {
@@ -705,7 +727,7 @@ public:
   }
 
   // ====================================================================
-  // T4 #18: Missing 'root' field surfaces as mitk::Exception
+  // Missing 'root' field surfaces as mitk::Exception
   // (rewrap of nlohmann::json::out_of_range, layered defence above prewalk)
   // ====================================================================
   void ApplyLayout_OutOfRange_Wraps()
@@ -720,7 +742,7 @@ public:
   }
 
   // ====================================================================
-  // T4 #19: Layering note — ApplyLayout takes parsed JSON, so parse_error
+  // Layering note -- ApplyLayout takes parsed JSON, so parse_error
   //         from nlohmann::json::parse cannot reach this layer; it is the
   //         popup wrapper's responsibility to catch parse_error. This test
   //         simply documents the layering: applying a valid JSON object
@@ -732,6 +754,157 @@ public:
     const auto emptyObject = nlohmann::json::object();
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(emptyObject), mitk::Exception);
+  }
+
+  // ====================================================================
+  // SetLayout(r, c) populates row + column count
+  // ====================================================================
+  void SetLayout_PopulatesRowAndColumn()
+  {
+    auto editor = MakeEditor();
+    editor->SetLayout(2, 3);
+    CPPUNIT_ASSERT_EQUAL(2, editor->GetRowCount());
+    CPPUNIT_ASSERT_EQUAL(3, editor->GetColumnCount());
+  }
+
+  // ====================================================================
+  // ApplyLayout invalidates the row/column sentinel to 0/0
+  // ====================================================================
+  void ApplyLayout_InvalidatesRowAndColumn()
+  {
+    auto editor = MakeEditor();
+    editor->SetLayout(2, 3);
+    CPPUNIT_ASSERT_EQUAL(2, editor->GetRowCount());
+    CPPUNIT_ASSERT_EQUAL(3, editor->GetColumnCount());
+
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    })json");
+    editor->ApplyLayout(fixture);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "ApplyLayout must invalidate the grid-row sentinel to 0 - the loaded layout is not a regular grid",
+      0, editor->GetRowCount());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "ApplyLayout must invalidate the grid-column sentinel to 0",
+      0, editor->GetColumnCount());
+  }
+
+  // ====================================================================
+  // ApplyLayout points the active widget at a cell of the new map
+  // ====================================================================
+  void ApplyLayout_AssignsActiveWidgetFromNewMap()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto active = editor->GetActiveRenderWindowWidget();
+    CPPUNIT_ASSERT_MESSAGE(
+      "ApplyLayout must leave the editor with a non-null active render-window widget",
+      active != nullptr);
+
+    bool found = false;
+    for ([[maybe_unused]] const auto& [name, widget] : editor->GetRenderWindowWidgets())
+    {
+      if (widget == active)
+      {
+        found = true;
+        break;
+      }
+    }
+    CPPUNIT_ASSERT_MESSAGE(
+      "Active render-window widget must be a member of the post-apply cell map",
+      found);
+  }
+
+  // ====================================================================
+  // After ApplyLayout, every cell of a group reports the same
+  //     per-renderer visibility for each selected node (the seeding pass
+  //     normalises divergence to the seed cell's values).
+  //
+  //     Note: on a fresh editor, all cells start in lock-step against a
+  //     single connector, so this assertion mostly pins the consistency
+  //     contract rather than a divergence-resolution outcome. Direct
+  //     'seed-wins' divergence assertions are deferred - on fresh cells
+  //     no divergence exists to resolve through the public API.
+  //     SeedFromMember's selection-replacement contract is unit-tested
+  //     in QmitkSynchronizedWidgetConnectorTest.
+  // ====================================================================
+  void ApplyLayout_GroupMembersAgreeOnVisibility()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    auto cell0 = editor->GetRenderWindowWidget(QString("mxn.widget0"));
+    auto cell1 = editor->GetRenderWindowWidget(QString("mxn.widget1"));
+    CPPUNIT_ASSERT(cell0 != nullptr);
+    CPPUNIT_ASSERT(cell1 != nullptr);
+
+    auto* renderer0 = mitk::BaseRenderer::GetInstance(cell0->GetRenderWindow()->GetVtkRenderWindow());
+    auto* renderer1 = mitk::BaseRenderer::GetInstance(cell1->GetRenderWindow()->GetVtkRenderWindow());
+    CPPUNIT_ASSERT(renderer0 != nullptr);
+    CPPUNIT_ASSERT(renderer1 != nullptr);
+
+    for (const auto& node : { m_Node1, m_Node2 })
+    {
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "After ApplyLayout, group members must agree on per-renderer visibility",
+        node->IsVisible(renderer0), node->IsVisible(renderer1));
+    }
+  }
+
+  void ApplyLayout_RollbackKeepsActiveWidget()
+  {
+    // Forces rollback via the unknown-view-direction path (strictness).
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+          { "type": "window", "name": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 100 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE(
+      "After rollback the editor must expose a usable active cell",
+      nullptr != editor->GetActiveRenderWindowWidget());
   }
 };
 

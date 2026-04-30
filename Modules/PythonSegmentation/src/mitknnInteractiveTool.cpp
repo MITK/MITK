@@ -101,16 +101,6 @@ namespace mitk
       m_Backend.reset();
     }
 
-    ToolManager* GetToolManager() const
-    {
-      return m_ToolManager;
-    }
-
-    void SetToolManager(ToolManager* toolManager)
-    {
-      m_ToolManager = toolManager;
-    }
-
     PythonContext* GetPythonContext() const
     {
       return m_PythonContext.get();
@@ -146,7 +136,6 @@ namespace mitk
   private:
     std::optional<Backend> m_Backend;
     std::unique_ptr<PythonContext> m_PythonContext;
-    ToolManager::Pointer m_ToolManager;
   };
 }
 
@@ -220,9 +209,7 @@ const Interactor* mitk::nnInteractiveTool::GetInteractor(InteractionType interac
 
 void mitk::nnInteractiveTool::EnableInteractor(InteractionType nextInteractionType, PromptType promptType)
 {
-  // Disable any other interactor if enabled. DisableInteractor clears the
-  // inner ToolManager's reference data as a side effect, which is why the
-  // SetReferenceData below must come after this loop -- not before.
+  // Disable any other interactor if enabled.
   for (const auto& [interactionType, interactor] : m_Impl->Interactors)
   {
     if (interactionType != nextInteractionType && interactor->IsEnabled())
@@ -231,9 +218,6 @@ void mitk::nnInteractiveTool::EnableInteractor(InteractionType nextInteractionTy
       break;
     }
   }
-
-  // Set reference image through our own tool manager for interactors.
-  m_Impl->GetToolManager()->SetReferenceData(this->GetToolManager()->GetReferenceData(0));
 
   // Enable the requested interactor for the given prompt type.
   m_Impl->Interactors[nextInteractionType]->Enable(promptType);
@@ -259,8 +243,6 @@ void mitk::nnInteractiveTool::DisableInteractor(std::optional<InteractionType> i
       }
     }
   }
-
-  m_Impl->GetToolManager()->SetReferenceData(nullptr);
 }
 
 void mitk::nnInteractiveTool::ResetInteractions()
@@ -321,11 +303,8 @@ void mitk::nnInteractiveTool::SetToolManager(ToolManager* toolManager)
 {
   Superclass::SetToolManager(toolManager);
 
-  auto ownToolManager = ToolManager::New(toolManager->GetDataStorage());
-  m_Impl->SetToolManager(ownToolManager);
-
   for (auto& [interactionType, interactor] : m_Impl->Interactors)
-    interactor->SetToolManager(ownToolManager);
+    interactor->SetToolManager(toolManager);
 }
 
 void mitk::nnInteractiveTool::InitializeSessionWithMask(Image* mask)

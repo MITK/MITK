@@ -100,7 +100,9 @@ namespace mitk::nnInteractive
 
   private:
     std::vector<std::pair<us::ServiceReference<InteractionEventObserver>, EventConfig>> m_EventConfigBackup;
-    ToolManager::Pointer m_ToolManager;
+    // Raw, like Tool::m_ToolManager: the manager owns the tool which owns the
+    // interactors, so it always outlives them. A smart pointer would cycle.
+    ToolManager* m_ToolManager = nullptr;
   };
 }
 

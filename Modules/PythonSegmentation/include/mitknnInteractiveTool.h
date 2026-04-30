@@ -363,14 +363,10 @@ namespace mitk
      */
     ~nnInteractiveTool() override;
 
-    /** \brief Sets the ToolManager and creates an internal ToolManager for interactors.
-     *
-     * Creates a dedicated internal ToolManager that shares the DataStorage
-     * with the provided ToolManager. All interactors are configured to use
-     * the internal ToolManager.
+    /** \brief Sets the ToolManager and forwards it to all interactors.
      *
      * \param[in] toolManager Pointer to the ToolManager to associate with
-     *                        this tool.
+     *                        this tool and its interactors.
      */
     void SetToolManager(ToolManager* toolManager) override;
 

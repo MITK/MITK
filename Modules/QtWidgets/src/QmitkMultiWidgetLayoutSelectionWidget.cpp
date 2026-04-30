@@ -183,7 +183,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
     return;
   }
 
-  auto jsonData = m_PresetMap[index];
+  auto jsonData = m_PresetMap.at(index);
   // Keep 'this' alive across the emit + potential error dialog; closing
   // before emit could leave the catch block using a dangling parent if the
   // widget ever gains 'Qt::WA_DeleteOnClose'. Close after the dialog path.

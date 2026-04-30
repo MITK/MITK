@@ -133,7 +133,7 @@ private:
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
   std::unique_ptr<QmitkRenderWindowDataNodeTableModel> m_StorageModel;
-  GroupSyncIndexType m_SyncGroupIndex;
+  GroupSyncIndexType m_SyncGroupIndex; // -1 = unassigned
 
 };
 

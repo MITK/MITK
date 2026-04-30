@@ -476,6 +476,12 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
       // No 'widget<i>' cell present - mixed with custom-named layout. Bail
       // rather than spinning; the caller is expected to ApplyLayout/
       // RollBackToSingleDefaultCell when entering an inconsistent state.
+      MITK_WARN << "SetLayout: cannot shrink to " << requiredRenderWindowWidgets
+                << " cells - " << this->GetNumberOfRenderWindowWidgets()
+                << " custom-named cells remain. Layout dimensions ("
+                << this->GetRowCount() << "x" << this->GetColumnCount()
+                << ") are now out of sync with the cell count. Use ApplyLayout "
+                   "or RollBackToSingleDefaultCell to recover a consistent state.";
       break;
     }
     ++difference;
@@ -709,6 +715,9 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
   doc["version"] = "2.0";
   doc["name"] = "Custom Layout";
   doc["groups"] = groupsJson;
+  // The recurser attaches 'size' to each child inside its parent's loop; the
+  // root has no parent loop here, so it never gets a 'size' field. See the
+  // matching note inside SerializeSplitter.
   doc["root"] = this->SerializeSplitter(rootSplitter, groupNames);
   return doc;
 }
@@ -1064,6 +1073,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
   auto vSplit = new QSplitter(Qt::Vertical);
 
   unsigned int rowCounter = 0;
+  unsigned int cellCounter = 0;
   for (auto node : nodes)
   {
     rowCounter++;
@@ -1074,10 +1084,14 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
     auto hSplit = new QSplitter(Qt::Horizontal);
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
-      auto window = this->CreateRenderWindowWidget();
+      // Use the explicit-name overload (which leaves cells unattached) and
+      // place each cell directly into its row group via the canonical API,
+      // mirroring ApplyLayout. Avoids the churn of the positional overload's
+      // initial seeding into group 1 followed by an immediate move.
+      const auto bareName = QStringLiteral("widget") + QString::number(cellCounter++);
+      auto window = this->CreateRenderWindowWidget(bareName);
+      this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
 
-      auto utilityWidget = window->GetUtilityWidget();
-      utilityWidget->SetSyncGroup(rowCounter);
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       auto baseRenderer = mitk::BaseRenderer::GetInstance(window->GetRenderWindow()->GetVtkRenderWindow());

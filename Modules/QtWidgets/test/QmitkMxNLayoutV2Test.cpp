@@ -183,6 +183,10 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.at("name"),           r.at("name"));
       CPPUNIT_ASSERT_EQUAL(f.at("view_direction"), r.at("view_direction"));
       CPPUNIT_ASSERT_EQUAL(f.at("links"),          r.at("links"));
+      // Lower-bound check on emitted sizes - guards against a future regression
+      // that emits zero or negative splitter sizes.
+      CPPUNIT_ASSERT_MESSAGE("Round-trip child size must be > 0",
+                             r.at("size").get<int>() > 0);
     }
   }
 
@@ -214,6 +218,29 @@ public:
     // Re-applying the strict-mode result must succeed and be a no-op.
     editor->ApplyLayout(roundTrip);
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+
+    // Strict-mode round-trip must be a fixpoint: serializing again yields the
+    // same document the second apply consumed. Ignore 'size', which Qt may
+    // redistribute on rebuild.
+    auto roundTrip2 = editor->SerializeLayout();
+    auto stripSizes = [](nlohmann::json& node)
+    {
+      auto recurse = [](nlohmann::json& n, auto& self) -> void
+      {
+        n.erase("size");
+        if (n.contains("children"))
+        {
+          for (auto& c : n.at("children")) self(c, self);
+        }
+      };
+      recurse(node.at("root"), recurse);
+    };
+    auto a = roundTrip;
+    auto b = roundTrip2;
+    stripSizes(a);
+    stripSizes(b);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Strict-mode round-trip must be a fixpoint (modulo splitter sizes)", a, b);
   }
 
   // ====================================================================
@@ -260,6 +287,45 @@ public:
       foundFalse = (it.value().at("select_all").get<bool>() == false);
     }
     CPPUNIT_ASSERT_MESSAGE("Non-default group's select_all must be preserved as false", foundFalse);
+
+    // Per-window cell-to-group mapping must survive the round-trip. Walk the
+    // round-trip leaves (cell names are preserved) and group their engine sync
+    // indices by 'links.selection' label. Cells sharing a label must land in
+    // the same engine group; the set of distinct labels must produce the same
+    // count of distinct engine groups. (Group labels themselves may be renamed
+    // on serialize - 'main' is stable, others are reassigned to 'g_<n>' - so
+    // this test cannot pin the post-round-trip label, only the partition.)
+    std::map<std::string, QmitkMxNMultiWidget::GroupSyncIndexType> labelToEngineGroup;
+    std::set<QmitkMxNMultiWidget::GroupSyncIndexType> distinctEngineGroups;
+    std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
+    {
+      const auto type = node.at("type").get<std::string>();
+      if (type == "split")
+      {
+        for (const auto& c : node.at("children")) walk(c);
+        return;
+      }
+      const auto bareName = QString::fromStdString(node.at("name").get<std::string>());
+      const auto label = node.at("links").at("selection").get<std::string>();
+      auto cell = editor->GetRenderWindowWidget(QString("mxn.") + bareName);
+      CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its qualified name",
+                             cell != nullptr);
+      const auto engineGroup = cell->GetUtilityWidget()->GetSyncGroup();
+      distinctEngineGroups.insert(engineGroup);
+      auto [it, inserted] = labelToEngineGroup.emplace(label, engineGroup);
+      if (!inserted)
+      {
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+          "Cells with the same 'links.selection' must map to the same engine sync group",
+          it->second, engineGroup);
+      }
+    };
+    walk(roundTrip.at("root"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Two distinct 'links.selection' labels must surface during the walk",
+                                 std::size_t{2}, labelToEngineGroup.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Distinct 'links.selection' labels must map to distinct engine sync groups",
+      std::size_t{2}, distinctEngineGroups.size());
   }
 
   // ====================================================================
@@ -471,6 +537,10 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "After a failed apply the editor must be left with exactly one default cell",
       1u, editor->GetNumberOfRenderWindowWidgets());
+    CPPUNIT_ASSERT_MESSAGE(
+      "After rollback the editor must expose a usable active cell, "
+      "not just a dangling single-cell placeholder",
+      nullptr != editor->GetActiveRenderWindowWidget());
   }
 
   // ====================================================================

@@ -56,7 +56,7 @@ data nodes simply applies the new geometry; the data stays.
         "name": "widget0",
         "view_direction": "axial",
         "links": { "selection": "main" },
-        "size": 100
+        "size": 1
       }
     ]
   }
@@ -81,7 +81,7 @@ A node in the tree is one of two kinds, distinguished by `type`:
 {
   "type": "split",
   "orientation": "horizontal" | "vertical",
-  "size": 100,            // omitted on the document root
+  "size": 1,              // omitted on the document root; optional elsewhere
   "children": [ <node>, ... ]
 }
 ```
@@ -92,15 +92,15 @@ A node in the tree is one of two kinds, distinguished by `type`:
   "name": "widget0",
   "view_direction": "axial",
   "links": { "selection": "<groupName>" },
-  "size": 100
+  "size": 1               // optional; defaults to 1 when omitted
 }
 ```
 
 A `split` divides its area among its children along one axis. `horizontal`
 arranges children left-to-right; `vertical` arranges them top-to-bottom. (Same
 semantics as Qt's `QSplitter::Horizontal` / `QSplitter::Vertical`.) Children
-must be a non-empty array; each child carries a `size`. The document root has
-no parent and therefore no `size`.
+must be a non-empty array. The document root has no parent and therefore no
+`size`.
 
 A `window` is a leaf render-window. Every window must declare:
 
@@ -112,12 +112,27 @@ A `window` is a leaf render-window. Every window must declare:
   strings throw at load time; there is no silent fallback.
 - `links`: per-dimension synchronization references. v2.0 has one dimension,
   `selection`; v3.0 will add more dimensions here additively (zoom, time,
-  crosshair, ...). Every window must declare `links.selection` explicitly —
+  crosshair, ...). Every window must declare `links.selection` explicitly --
   there are no implicit singletons.
 
-`size` on a child is a splitter weight (Qt redistributes weights
-proportionally on resize). Absolute values are not pixel-exact; only ratios
-matter at runtime.
+### `size` is a ratio, not pixels
+
+`size` on a child is a splitter weight. Only the **ratio between siblings**
+matters; Qt redistributes weights proportionally on resize. Absolute values
+are NOT pixel measurements -- prefer small numbers (e.g. `1`, `2`, `3`) over
+screenshot-derived pixel counts. `[size: 1, size: 1, size: 1]` and
+`[size: 100, size: 100, size: 100]` produce the exact same layout.
+
+`size` is **optional**. When omitted, the cell takes a default weight of `1`.
+Mixed-defined siblings compute as ratios:
+
+- `[size: 3, default, default]` -> `3:1:1` (first cell is 3/5 of the row)
+- `[size: 2, size: 1]`          -> `2:1` (first cell is 2/3 of the row)
+- `[default, default, default]` -> `1:1:1` (equal split)
+
+`size` must be `>= 1` if present (the schema rejects `0` and the C++ loader
+throws on `< 1`). The format has no first-class way to hide a cell while
+keeping it in the tree; `size: 0` is not a valid stand-in.
 
 ## Sync groups: cells reference, properties live in `groups`
 
@@ -187,21 +202,21 @@ is stable and reviewer-friendly.
       {
         "type": "split",
         "orientation": "horizontal",
-        "size": 418,
+        "size": 1,
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 403 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 403 },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 403 }
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
         ]
       },
       {
         "type": "split",
         "orientation": "horizontal",
-        "size": 418,
+        "size": 1,
         "children": [
-          { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 403 },
-          { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 403 },
-          { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 403 }
+          { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
         ]
       }
     ]
@@ -209,10 +224,15 @@ is stable and reviewer-friendly.
 }
 ```
 
-The result is a 2x3 grid. Row 1 (`widget0..widget2`) shares the selection
-bundle named `main`; row 2 (`widget3..widget5`) shares its own bundle named
-`row2`. Changing the selection in any row-1 cell propagates only to the other
-two row-1 cells; row 2 is independent.
+The result is a 2x3 grid with equal weights everywhere. Row 1
+(`widget0..widget2`) shares the selection bundle named `main`; row 2
+(`widget3..widget5`) shares its own bundle named `row2`. Changing the
+selection in any row-1 cell propagates only to the other two row-1 cells;
+row 2 is independent.
+
+To make the top row twice as tall as the bottom row, change the outer
+children's sizes to `2` and `1` (or omit one and leave the other at `2`,
+since the omitted child defaults to `1`).
 
 ## Group seeding at load
 

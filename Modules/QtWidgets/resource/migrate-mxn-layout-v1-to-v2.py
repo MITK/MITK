@@ -16,6 +16,15 @@ The v2.0 format is described by `mxn-layout-v2.schema.json` (next to this
 script). This tool consumes a v1.x layout document and emits a v2.0 document
 that the QmitkMxNMultiWidget editor accepts via `ApplyLayout`.
 
+Field mapping highlights:
+- `size` is optional in v2 (default weight 1). v1 nodes that omit `size` are
+  emitted as v2 nodes that also omit it; the loader and any schema-aware
+  consumer fill in the default.
+- `synchGroup` (the v1 typo) and `syncGroup` are both accepted; the integer
+  is mapped to the v2 group label `'main'` for index 1 and `'g_<N>'`
+  otherwise. Per-cell `selectAll` is folded into the group's `select_all`
+  property (first-encounter wins).
+
 Usage:
     migrate-mxn-layout-v1-to-v2.py INPUT [-o OUTPUT] [--schema SCHEMA]
 
@@ -119,6 +128,9 @@ def _convert_node(
             "view_direction": view_direction,
             "links": {"selection": group_name},
         }
+        # `size` is optional in v2; the loader defaults to 1 when omitted.
+        # Only the ratio between siblings matters at runtime, so a v1 source
+        # that omitted `size` becomes a v2 output that also omits it.
         if "size" in node:
             out["size"] = int(node["size"])
         return out
@@ -144,6 +156,8 @@ def _convert_node(
             for i, child in enumerate(children_raw)
         ],
     }
+    # `size` is optional in v2 (default weight 1). Pass through if the v1
+    # source had one; otherwise let the v2 loader's default apply.
     if "size" in node:
         out_split["size"] = int(node["size"])
     return out_split

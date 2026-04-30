@@ -24,7 +24,7 @@
             "links": {
               "selection": "main"
             },
-            "size": 403
+            "size": 1
           },
           {
             "type": "window",
@@ -33,7 +33,7 @@
             "links": {
               "selection": "main"
             },
-            "size": 403
+            "size": 1
           },
           {
             "type": "window",
@@ -42,10 +42,10 @@
             "links": {
               "selection": "main"
             },
-            "size": 403
+            "size": 1
           }
         ],
-        "size": 418
+        "size": 1
       },
       {
         "type": "split",
@@ -58,7 +58,7 @@
             "links": {
               "selection": "row2"
             },
-            "size": 403
+            "size": 1
           },
           {
             "type": "window",
@@ -67,7 +67,7 @@
             "links": {
               "selection": "row2"
             },
-            "size": 403
+            "size": 1
           },
           {
             "type": "window",
@@ -76,10 +76,10 @@
             "links": {
               "selection": "row2"
             },
-            "size": 403
+            "size": 1
           }
         ],
-        "size": 418
+        "size": 1
       }
     ]
   }

@@ -812,7 +812,17 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
     for (const auto& child : splitNode["children"])
     {
       const auto type = child["type"].get<std::string>();
-      const int childSize = child.value("size", 1000);
+      // 'size' is optional; default weight 1 matches the schema default.
+      // Only the ratio between siblings matters at runtime - QSplitter
+      // redistributes weights proportionally on resize. Reject size < 1
+      // (the schema also requires this): size 0 would collapse the pane
+      // in Qt, but the format has no documented 'hide this cell' semantics.
+      const int childSize = child.value("size", 1);
+      if (childSize < 1)
+      {
+        mitkThrow() << "Layout child has invalid 'size' " << childSize
+                    << "; size must be >= 1.";
+      }
       sizes.append(childSize);
 
       if (type == "split")

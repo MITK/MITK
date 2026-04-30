@@ -79,6 +79,12 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   // --- Group seeding rule + post-apply consistency ---
   MITK_TEST(ApplyLayout_GroupMembersAgreeOnVisibility);
 
+  // --- Optional size field + default weight 1 ---
+  MITK_TEST(Size_Omitted_LoadsWithDefaultWeight);
+  MITK_TEST(Size_PartiallyOmitted_MixedSiblings);
+  MITK_TEST(Size_Zero_Throws);
+  MITK_TEST(Size_Negative_Throws);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -168,8 +174,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -211,7 +217,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -268,13 +274,13 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "split", "orientation": "horizontal", "size": 100, "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-            { "type": "window", "name": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "name": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "name": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
-          { "type": "split", "orientation": "horizontal", "size": 100, "children": [
-            { "type": "window", "name": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 100 },
-            { "type": "window", "name": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 100 }
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "name": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "name": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
           ]}
         ]
       }
@@ -352,7 +358,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 100 }
+          { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
         ]
       }
     })json");
@@ -382,7 +388,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -404,8 +410,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -437,7 +443,7 @@ public:
         "root": {
           "type": "split", "orientation": "horizontal",
           "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+            { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
           ]
         }
       })json");
@@ -475,7 +481,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -514,7 +520,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -547,8 +553,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -580,9 +586,9 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 100 },
-          { "type": "window", "name": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 100 }
+          { "type": "window", "name": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "name": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
         ]
       }
     })json");
@@ -606,8 +612,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -636,13 +642,13 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "split", "orientation": "horizontal", "size": 100, "children": [
-            { "type": "window", "name": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-            { "type": "window", "name": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "name": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "name": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
-          { "type": "split", "orientation": "horizontal", "size": 100, "children": [
-            { "type": "window", "name": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 },
-            { "type": "window", "name": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 }
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "name": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "name": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
           ]}
         ]
       }
@@ -685,7 +691,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -715,7 +721,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -783,8 +789,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -809,8 +815,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -858,8 +864,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -894,8 +900,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -905,6 +911,101 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "After rollback the editor must expose a usable active cell",
       nullptr != editor->GetActiveRenderWindowWidget());
+  }
+
+  // ====================================================================
+  // 'size' is optional. When omitted on every child, the loader assigns
+  // each child the default weight 1 and the layout applies cleanly.
+  // ====================================================================
+  void Size_Omitted_LoadsWithDefaultWeight()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" } },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+  }
+
+  // ====================================================================
+  // 'size' may be omitted on some siblings while others declare a value.
+  // The loader treats omitted children as weight 1 and the layout applies
+  // cleanly; ratios resolve as e.g. [size: 3, default, default] -> 3:1:1.
+  // ====================================================================
+  void Size_PartiallyOmitted_MixedSiblings()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+  }
+
+  // ====================================================================
+  // size = 0 is rejected by the loader. The format has no documented
+  // 'hide this cell' semantics, so 0 is not a valid stand-in.
+  // ====================================================================
+  void Size_Zero_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+  }
+
+  // ====================================================================
+  // Negative size is rejected by the loader.
+  // ====================================================================
+  void Size_Negative_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
   }
 };
 

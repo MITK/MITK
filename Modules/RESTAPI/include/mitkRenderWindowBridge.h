@@ -333,6 +333,12 @@ namespace mitk
      *
      * Should be called by the UI-layer owner (e.g. the workbench plugin activator)
      * before the objects captured by the callbacks are destroyed.
+     *
+     * \note The dispatcher (set via SetDispatcher) is intentionally retained:
+     *       it is owned by the REST server, which outlives the callback owner,
+     *       so clearing it here would create a needless re-bind on every plugin
+     *       cycle. Use SetDispatcher(nullptr) explicitly if a separation is
+     *       ever required.
      */
     void ResetCallbacks();
 

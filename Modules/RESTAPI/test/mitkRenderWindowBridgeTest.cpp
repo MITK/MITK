@@ -91,8 +91,32 @@ public:
     CPPUNIT_ASSERT(m_Bridge->HasStdMultiSelectedSliceGetter());
     CPPUNIT_ASSERT(m_Bridge->HasStdMultiSelectedSliceStepSetter());
 
+    // Clear-and-verify each provider individually so a future
+    // SetX(provider) that forgets to handle the empty-function case is
+    // caught by this regression net, not just the bulk ResetCallbacks path.
     m_Bridge->SetEditorListProvider({});
     CPPUNIT_ASSERT(!m_Bridge->HasEditorListProvider());
+
+    m_Bridge->SetStdMultiWindowListProvider({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiWindowListProvider());
+
+    m_Bridge->SetStdMultiEditorScreenshotProvider({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiEditorScreenshotProvider());
+
+    m_Bridge->SetStdMultiWindowScreenshotProvider({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiWindowScreenshotProvider());
+
+    m_Bridge->SetStdMultiCameraGetter({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiCameraGetter());
+
+    m_Bridge->SetStdMultiCameraSetter({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiCameraSetter());
+
+    m_Bridge->SetStdMultiSelectedSliceGetter({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiSelectedSliceGetter());
+
+    m_Bridge->SetStdMultiSelectedSliceStepSetter({});
+    CPPUNIT_ASSERT(!m_Bridge->HasStdMultiSelectedSliceStepSetter());
   }
 
   void ResetCallbacksClearsAllCallbacks()

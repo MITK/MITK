@@ -2083,42 +2083,7 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE — headless mode or Qt plugin not loaded) or the StdMultiWidgetEditor is not currently open (EDITOR_NOT_ACTIVE).",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "examples": {
-                  "renderWindowNotAvailable": {
-                    "summary": "No callback registered",
-                    "value": {
-                      "error": {
-                        "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                        "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                        "title": "Render Window Not Available",
-                        "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                        "status": 503,
-                        "instance": "/api/v1/rendering/selected-position"
-                      }
-                    }
-                  },
-                  "editorNotActive": {
-                    "summary": "Editor not open",
-                    "value": {
-                      "error": {
-                        "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
-                        "code": "EDITOR_NOT_ACTIVE",
-                        "title": "Editor Not Active",
-                        "message": "StdMultiWidgetEditor is not open — cannot read crosshair position",
-                        "status": 503,
-                        "instance": "/api/v1/rendering/selected-position"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       },
       "put": {
@@ -2151,42 +2116,7 @@
           "204": { "description": "Crosshair position updated" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": {
-            "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE — headless mode or Qt plugin not loaded) or the StdMultiWidgetEditor is not currently open (EDITOR_NOT_ACTIVE).",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Error" },
-                "examples": {
-                  "renderWindowNotAvailable": {
-                    "summary": "No callback registered",
-                    "value": {
-                      "error": {
-                        "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
-                        "code": "RENDER_WINDOW_NOT_AVAILABLE",
-                        "title": "Render Window Not Available",
-                        "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
-                        "status": 503,
-                        "instance": "/api/v1/rendering/selected-position"
-                      }
-                    }
-                  },
-                  "editorNotActive": {
-                    "summary": "Editor not open",
-                    "value": {
-                      "error": {
-                        "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
-                        "code": "EDITOR_NOT_ACTIVE",
-                        "title": "Editor Not Active",
-                        "message": "StdMultiWidgetEditor is not open — cannot set crosshair position",
-                        "status": 503,
-                        "instance": "/api/v1/rendering/selected-position"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
         }
       }
     },
@@ -2194,7 +2124,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "List known editors",
-        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors.",
+        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors. The `mxn` alias is reported with `active: false` until the MxN multi-widget editor is implemented; clients treating this endpoint as the source of truth for editor availability will future-proof.",
         "operationId": "getRenderingEditors",
         "responses": {
           "200": {
@@ -2352,7 +2282,7 @@
       "put": {
         "tags": ["Rendering"],
         "summary": "Update camera state of a StdMultiWidget window",
-        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` is applied first, remaining fields after. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked.",
+        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying CameraController; explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw vtkCamera, so combining the two would leave the controller's internal state inconsistent — this combination is rejected with 400. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`, which only adjust scale/angle. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked. Only the addressed window is refreshed; coupled crosshair/slice updates on sibling 2D windows happen through their own UI events.",
         "operationId": "putRenderingStdmultiCamera",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowName" }
@@ -2363,7 +2293,8 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/CameraPatch" },
               "examples": {
-                "twoD": { "summary": "2D window", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
+                "twoD": { "summary": "2D window — standard view + scale", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
+                "twoDPose": { "summary": "2D window — explicit pose", "value": { "position": [127.5, 83.2, 45.0], "focal_point": [127.5, 83.2, 0.0], "view_up": [0.0, 1.0, 0.0] } },
                 "threeD": { "summary": "3D window", "value": { "perspective_angle": 45.0 } }
               }
             }
@@ -2633,7 +2564,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Capture a screenshot of a single StdMultiWidget render window",
-        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit) — pass dimensions matching the source ratio if a faithful aspect is needed. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
         "operationId": "getRenderingStdmultiWindowScreenshot",
         "parameters": [
           { "$ref": "#/components/parameters/StdMultiWindowName" },

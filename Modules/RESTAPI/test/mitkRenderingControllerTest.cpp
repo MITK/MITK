@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorageBridge.h>
 #include <mitkRenderWindowBridge.h>
 
+#include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
@@ -106,6 +107,10 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutCameraOnAxialReturns204);
   MITK_TEST(PutCameraOn3dReturns204);
   MITK_TEST(PutCameraStandardViewAppliedFirst);
+  MITK_TEST(PutCameraStandardViewWithPositionReturns400);
+  MITK_TEST(PutCameraStandardViewWithFocalPointReturns400);
+  MITK_TEST(PutCameraStandardViewWithViewUpReturns400);
+  MITK_TEST(PutCameraSetterThrowsMitkExceptionReturns422);
 
   // Selected-slice tests
   MITK_TEST(GetSliceUnknownWindowReturns404);
@@ -124,6 +129,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutSliceUnknownFieldReturns400);
   MITK_TEST(PutSliceWithoutSetterReturns503);
   MITK_TEST(PutSliceOnAxialReturns204);
+  MITK_TEST(PutSliceSetterThrowsMitkExceptionReturns422);
 
   // Window/editor screenshot tests
   MITK_TEST(GetEditorScreenshotWithoutProviderReturns503);
@@ -1092,70 +1098,127 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
   }
 
-  void PutCameraParallelScaleOn3dReturns400()
+  // Helper: assert that a PUT camera body produces 400 INVALID_REQUEST and
+  // that the error message contains the expected substring.
+  void AssertPutCameraReturns400(const std::string& windowName,
+                                 const std::string& body,
+                                 const std::string& expectedMessageSubstr)
   {
     const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
-      R"({"parallel_scale": 100.0})", {{"name", "3d"}});
+      "/api/v1/rendering/editors/stdmulti/windows/" + windowName + "/camera",
+      body, {{"name", windowName}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
     CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+    const auto msg = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(msg.find(expectedMessageSubstr) != std::string::npos);
+  }
+
+  void PutCameraParallelScaleOn3dReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "3d", R"({"parallel_scale": 100.0})", "parallel_scale");
   }
 
   void PutCameraPerspectiveAngleOn2dReturns400()
   {
-    const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"perspective_angle": 30.0})", {{"name", "axial"}});
-    httplib::Response res;
-    m_Controller->HandlePUT_stdmultiCamera(req, res);
-
-    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    this->AssertPutCameraReturns400(
+      "axial", R"({"perspective_angle": 30.0})", "perspective_angle");
   }
 
   void PutCameraNonPositiveParallelScaleReturns400()
   {
-    const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"parallel_scale": 0.0})", {{"name", "axial"}});
-    httplib::Response res;
-    m_Controller->HandlePUT_stdmultiCamera(req, res);
-
-    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    this->AssertPutCameraReturns400(
+      "axial", R"({"parallel_scale": 0.0})", "parallel_scale");
   }
 
   void PutCameraPerspectiveAngleOutOfRangeReturns400()
   {
-    const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
-      R"({"perspective_angle": 180.0})", {{"name", "3d"}});
-    httplib::Response res;
-    m_Controller->HandlePUT_stdmultiCamera(req, res);
-
-    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    this->AssertPutCameraReturns400(
+      "3d", R"({"perspective_angle": 180.0})", "perspective_angle");
   }
 
   void PutCameraUnknownStandardViewReturns400()
   {
-    const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"standard_view": "oblique"})", {{"name", "axial"}});
-    httplib::Response res;
-    m_Controller->HandlePUT_stdmultiCamera(req, res);
-
-    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    this->AssertPutCameraReturns400(
+      "axial", R"({"standard_view": "oblique"})", "standard_view");
   }
 
   void PutCameraWrongArrayLengthReturns400()
   {
+    this->AssertPutCameraReturns400(
+      "axial", R"({"position": [1.0, 2.0]})", "position");
+  }
+
+  void PutCameraStandardViewWithPositionReturns400()
+  {
+    // Issue #1: combining standard_view with explicit pose fields would leave
+    // the CameraController's internal "standard view" memo inconsistent with
+    // the actual camera pose — controller rejects the combination upfront.
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "position": [1.0, 2.0, 3.0]})",
+      "standard_view");
+  }
+
+  void PutCameraStandardViewWithFocalPointReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "focal_point": [0.0, 0.0, 0.0]})",
+      "standard_view");
+  }
+
+  void PutCameraStandardViewWithViewUpReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "view_up": [0.0, 1.0, 0.0]})",
+      "standard_view");
+  }
+
+  void PutCameraSetterThrowsMitkExceptionReturns422()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [](const std::string&, const mitk::CameraPatch&)
+      {
+        mitkThrow() << "synthetic camera failure";
+      });
+
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"position": [1.0, 2.0]})", {{"name", "axial"}});
+      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
-    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    CPPUNIT_ASSERT_EQUAL(422, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDERING_ERROR"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceSetterThrowsMitkExceptionReturns422()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStepSetter(
+      [](const std::string&, unsigned int)
+      {
+        mitkThrow() << "synthetic slice failure";
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(422, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDERING_ERROR"),
+                         json["error"]["code"].get<std::string>());
   }
 
   void PutCameraWithoutSetterReturns503()
@@ -1571,14 +1634,9 @@ public:
 
   void GetWindowScreenshotUnknownWindowReturns404()
   {
-    // Provider must be bound: bridge-availability (503) is checked before
-    // window-name validation (404), matching the editor-level handler.
-    m_RenderWindowBridge->SetStdMultiWindowScreenshotProvider(
-      [](const std::string&, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat)
-      {
-        return std::vector<unsigned char>{};
-      });
-
+    // Window-name validation runs before bridge-availability for all stdmulti
+    // window handlers, so an unknown name yields 404 regardless of whether a
+    // provider is bound.
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/screenshot", "",
       {{"name", "bogus"}});

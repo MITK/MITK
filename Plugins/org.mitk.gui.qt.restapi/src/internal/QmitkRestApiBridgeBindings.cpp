@@ -226,8 +226,8 @@ namespace mitk
         auto* const editor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(rwp);
         auto* const canvas = (editor != nullptr) ? editor->GetMultiWidget() : nullptr;
         if (canvas == nullptr)
-          throw std::runtime_error(
-            "Unexpected editor type — cannot locate QmitkAbstractMultiWidget canvas");
+          throw mitk::RenderWindowBridgeUnsupportedOperationException(
+            "Active editor does not expose a QmitkAbstractMultiWidget canvas");
 
         return EncodePixmap(canvas->grab(), size, format);
       });
@@ -275,6 +275,9 @@ namespace mitk
 
         mitk::EditorInfo mxn;
         mxn.alias = "mxn";
+        // TODO(MxN): the eventual plugin id will come from the MxN editor when
+        // implemented. If it differs from the placeholder below, clients that
+        // hard-coded the alias will break — track via the MxN integration ticket.
         mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
         // mxn.active stays false; activation is not yet implemented.
 

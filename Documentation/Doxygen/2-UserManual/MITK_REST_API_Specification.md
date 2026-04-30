@@ -2008,7 +2008,7 @@ Returns the camera state of the addressed render window. 2D windows (axial/sagit
 
 #### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/camera
 
-Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` is applied first, remaining fields after. World coordinates are not range-checked.
+Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying `mitk::CameraController`, while explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw `vtkCamera`. Combining the two would leave the controller's internal "standard view" memo inconsistent with the actual pose, so the combination is rejected with 400 `INVALID_REQUEST`. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`. Only the addressed window is refreshed; coupled crosshair/slice updates on the sibling 2D windows happen through their own UI events. World coordinates are not range-checked.
 
 **Request body (`application/json`, at least one field required):**
 
@@ -2043,7 +2043,7 @@ Content-Type: application/json
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 400 | `INVALID_REQUEST` | Invalid JSON; empty body; unknown field; wrong type or length; 2D-only field on 3D (or vice versa); unknown `standard_view`; non-positive `parallel_scale`; `perspective_angle` out of range |
+| 400 | `INVALID_REQUEST` | Invalid JSON; empty body; unknown field; wrong type or length; 2D-only field on 3D (or vice versa); unknown `standard_view`; `standard_view` combined with `position`/`focal_point`/`view_up`; non-positive `parallel_scale`; `perspective_angle` out of range |
 | 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
 | 422 | `RENDERING_ERROR` | MITK rendering framework raised an error while applying the patch |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
@@ -2125,7 +2125,7 @@ Content-Type: application/json
 
 #### GET /api/v1/rendering/editors/stdmulti/windows/{name}/screenshot
 
-Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact.
+Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit the requested dimensions). Pass dimensions matching the source ratio if a faithful aspect is needed.
 
 **Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
 

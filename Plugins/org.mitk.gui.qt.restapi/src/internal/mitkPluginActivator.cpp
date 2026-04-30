@@ -80,8 +80,10 @@ namespace mitk
         const auto refs = m_MitkContext->GetServiceReferences<IRestServerService>();
         if (!refs.empty())
           this->DisconnectRestServer(refs.front());
-        else
-          m_RenderWindowBridge = nullptr; // service already gone, just clear the guard
+
+        // Unconditional clear: DisconnectRestServer also resets the guard, but
+        // we still need to handle the "service already gone" branch.
+        m_RenderWindowBridge = nullptr;
       }
 
       m_MitkContext = nullptr;

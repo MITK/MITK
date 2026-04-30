@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkRenderWindowBridge.h"
 
+#include <cassert>
 #include <stdexcept>
 
 namespace
@@ -64,8 +65,10 @@ const char* WindowKindToString(WindowKind kind)
     case WindowKind::TwoD:   return "2d";
     case WindowKind::ThreeD: return "3d";
   }
-  // All enum values handled above; a value outside the enum domain is UB.
-  // Return a recognisable token rather than asserting, to keep the bridge safe.
+  // All enum values are handled above; a value outside the enum domain is UB.
+  // Trip an assert in debug to flag the contract break, keep a safe token in
+  // release so the bridge cannot crash callers.
+  assert(false && "WindowKindToString: value outside WindowKind enum domain");
   return "unknown";
 }
 

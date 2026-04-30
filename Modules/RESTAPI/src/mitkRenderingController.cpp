@@ -35,6 +35,7 @@ RenderingController::RenderingController(DataStorageBridge& bridge)
 
 void RenderingController::SetDispatcher(StorageThreadDispatcherBase* dispatcher)
 {
+  std::lock_guard<std::mutex> lock(m_DispatcherMutex);
   m_Dispatcher = dispatcher;
 }
 
@@ -384,11 +385,11 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
 
 void RenderingController::HandleGET_selectedTime(const httplib::Request& req, httplib::Response& res) const
 {
-  int timestep = 0;
+  TimeStepType timestep = 0;
   double timepointMs = 0.0;
   double minTimepointMs = 0.0;
   double maxTimepointMs = 0.0;
-  int steps = 0;
+  TimeStepType steps = 0;
 
   bool tncNull = false;
   try
@@ -402,13 +403,13 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
         return;
       }
 
-      timestep = static_cast<int>(tnc->GetSelectedTimeStep());
+      timestep = tnc->GetSelectedTimeStep();
       timepointMs = tnc->GetSelectedTimePoint();
 
       const auto tg = tnc->GetInputWorldTimeGeometry();
       if (nullptr != tg)
       {
-        steps = static_cast<int>(tg->CountTimeSteps());
+        steps = tg->CountTimeSteps();
         minTimepointMs = tg->GetMinimumTimePoint();
         maxTimepointMs = tg->GetMaximumTimePoint();
       }
@@ -417,17 +418,10 @@ void RenderingController::HandleGET_selectedTime(const httplib::Request& req, ht
         const auto* stepper = tnc->GetStepper();
         if (stepper != nullptr)
         {
-          steps = static_cast<int>(stepper->GetSteps());
+          steps = stepper->GetSteps();
         }
       }
     });
-  }
-  catch (const mitk::Exception& e)
-  {
-    const auto error = ErrorResponse::InternalError(
-      std::string("Failed to read time navigation state: ") + e.what(), req.path);
-    this->SendErrorResponse(res, 500, error);
-    return;
   }
   catch (const std::exception& e)
   {
@@ -521,10 +515,10 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
 
   try
   {
-    std::function<unsigned int(TimeNavigationController*)> computeStep;
+    std::function<TimeStepType(TimeNavigationController*)> computeStep;
     if (hasTimestep)
     {
-      const auto ts = static_cast<unsigned int>(body["timestep"].get<int>());
+      const auto ts = static_cast<TimeStepType>(body["timestep"].get<int>());
       computeStep = [ts](TimeNavigationController*) { return ts; };
     }
     else
@@ -533,10 +527,10 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
       computeStep = [tp](TimeNavigationController* tnc)
       {
         const auto tg = tnc->GetInputWorldTimeGeometry();
-        unsigned int ts = 0;
+        TimeStepType ts = 0;
         if (nullptr != tg)
         {
-          ts = static_cast<unsigned int>(tg->TimePointToTimeStep(tp));
+          ts = tg->TimePointToTimeStep(tp);
         }
         return ts;
       };
@@ -558,7 +552,7 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
         stepperNull = true;
         return;
       }
-      stepper->SetPos(computeStep(tnc));
+      stepper->SetPos(static_cast<unsigned int>(computeStep(tnc)));
       tnc->SendTime();
     });
 
@@ -731,6 +725,18 @@ namespace
         return "'standard_view' has unknown value '" + v + "'. "
                "Allowed: anterior, posterior, left, right, cranial, caudal.";
       patch.standardView = v;
+    }
+
+    // 'standard_view' programs the CameraController, while explicit pose fields
+    // bypass it and write the raw vtkCamera. Combining them leaves the
+    // controller's internal "standard view" memo inconsistent with the actual
+    // pose, so we reject the combination outright. Scalar fields
+    // (parallel_scale, perspective_angle) do not move the camera and remain
+    // compatible with standard_view.
+    if (patch.standardView && (patch.position || patch.focalPoint || patch.viewUp))
+    {
+      return "'standard_view' cannot be combined with 'position', 'focal_point', "
+             "or 'view_up'. Send either a standard view or an explicit pose.";
     }
 
     if (!patch.position && !patch.focalPoint && !patch.viewUp &&
@@ -1007,8 +1013,7 @@ void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req,
 
 void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
@@ -1050,7 +1055,7 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
     return;
   }
 
-  const bool is3d = IsStd3dWindow(name);
+  const bool is3d = IsStdMulti3dWindow(name);
 
   nlohmann::json j;
   j["name"] = name;
@@ -1064,8 +1069,7 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
 
 void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
@@ -1100,8 +1104,7 @@ void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, 
 
 void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
@@ -1130,7 +1133,7 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
   }
 
   CameraPatch patch;
-  if (const auto err = ParseCameraPatch(body, IsStd3dWindow(name), patch))
+  if (const auto err = ParseCameraPatch(body, IsStdMulti3dWindow(name), patch))
   {
     const auto error = ErrorResponse::InvalidRequest(*err, req.path);
     this->SendErrorResponse(res, 400, error);
@@ -1164,8 +1167,7 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
 
 void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
@@ -1174,7 +1176,7 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
     return;
   }
 
-  if (IsStd3dWindow(name))
+  if (IsStdMulti3dWindow(name))
   {
     const auto error = ErrorResponse::UnsupportedOperation(
       "selected-slice is not applicable to the 3D window.", req.path);
@@ -1208,8 +1210,7 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
 void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
@@ -1218,7 +1219,7 @@ void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request
     return;
   }
 
-  if (IsStd3dWindow(name))
+  if (IsStdMulti3dWindow(name))
   {
     const auto error = ErrorResponse::UnsupportedOperation(
       "selected-slice is not applicable to the 3D window.", req.path);
@@ -1352,20 +1353,19 @@ void RenderingController::HandleGET_stdmultiScreenshot(const httplib::Request& r
 
 void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const
 {
-  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowScreenshotProvider())
-  {
-    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
-    this->SendErrorResponse(res, 503, error);
-    return;
-  }
-
-  const auto nameIt = req.path_params.find("name");
-  const std::string name = (nameIt != req.path_params.end()) ? nameIt->second : std::string();
+  const auto name = ReadRequiredPathParam(req, "name");
 
   if (!IsValidStdMultiWindowName(name))
   {
     const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
     this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasStdMultiWindowScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
     return;
   }
 
@@ -1398,7 +1398,11 @@ void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Requ
 
 void RenderingController::Dispatch(std::function<void()> task) const
 {
-  auto dispatcher = m_Dispatcher.Lock();
+  StorageThreadDispatcherBase::Pointer dispatcher;
+  {
+    std::lock_guard<std::mutex> lock(m_DispatcherMutex);
+    dispatcher = m_Dispatcher.Lock();
+  }
   if (dispatcher.IsNull())
   {
     task();
@@ -1420,9 +1424,16 @@ bool RenderingController::IsValidStdMultiWindowName(const std::string& name)
   return name == "axial" || name == "sagittal" || name == "coronal" || name == "3d";
 }
 
-bool RenderingController::IsStd3dWindow(const std::string& name)
+bool RenderingController::IsStdMulti3dWindow(const std::string& name)
 {
   return name == "3d";
+}
+
+std::string RenderingController::ReadRequiredPathParam(const httplib::Request& req,
+                                                      const std::string& key)
+{
+  const auto it = req.path_params.find(key);
+  return (it != req.path_params.end()) ? it->second : std::string();
 }
 
 std::pair<int, nlohmann::json> RenderingController::MapBridgeException(

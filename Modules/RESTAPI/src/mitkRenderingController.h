@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <httplib.h>
 
 #include <functional>
+#include <mutex>
 #include <optional>
 #include <utility>
 
@@ -49,6 +50,9 @@ namespace mitk
      *
      * If set, all RenderingManager calls are dispatched to the storage-owning
      * (main/UI) thread. If nullptr, calls execute directly (headless/test mode).
+     *
+     * Thread-safety: serialised against Dispatch() via an internal mutex, so
+     * the dispatcher may be set or replaced while requests are in flight.
      *
      * \param dispatcher The dispatcher, or nullptr to clear.
      */
@@ -289,11 +293,22 @@ namespace mitk
     static bool IsValidStdMultiWindowName(const std::string& name);
 
     /** True if the given StdMulti window is the 3D window. */
-    static bool IsStd3dWindow(const std::string& name);
+    static bool IsStdMulti3dWindow(const std::string& name);
+
+    /**
+     * \brief Read the {name} path parameter, defaulting to the empty string.
+     *
+     * The httplib route pattern marks {name} as mandatory, so an absent entry
+     * cannot reach a handler in normal operation; the empty fallback exists
+     * solely to keep the call sites total.
+     */
+    static std::string ReadRequiredPathParam(const httplib::Request& req,
+                                             const std::string& key);
 
     DataStorageBridge& m_Bridge;
     RenderWindowBridge* m_RenderWindowBridge = nullptr;
     WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;
+    mutable std::mutex m_DispatcherMutex;
   };
 }
 

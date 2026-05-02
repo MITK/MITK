@@ -18,6 +18,7 @@ Below is a list of the command line apps included in the MITK Workbench release 
   <li> \subpage MitkGenericFittingPage – Performs generic fitting on 4D image data </li>
   <li> \subpage MitkMapImagePage – Maps an image or segmentation based on a registration </li>
   <li> \subpage MitkMatchImagePage – Determines the registration between a moving and a target image </li>
+  <li> \subpage MitkPETSUVCalculationPage – Computes PET SUV images (SUVbw, SUVlbm, SUVbsa) </li>
   <li> \subpage MitkSplit4Dto3DImagePage – Splits a 4D dynamic image into individual 3D frames </li>
   <li> \subpage MitkStitch3DImagesPage – Stitches multiple 3D images into a larger composite image </li>
 </ul>

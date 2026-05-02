@@ -9,4 +9,5 @@ MITK_CREATE_MODULE(PET
 )
 
 add_subdirectory(test)
+add_subdirectory(cmdapps)
 

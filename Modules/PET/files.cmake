@@ -6,5 +6,6 @@ set(CPP_FILES
   mitkSUVCalculationHelper.cpp
   mitkSUVCalculation.cpp
   mitkSUVFunctorPolicy.cpp
+  mitkSUVNormalizationStrategy.cpp
   mitkHalfLifeConstants.cpp
 )

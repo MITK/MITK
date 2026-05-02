@@ -34,6 +34,22 @@ namespace mitk
   class IPropertyProvider;
 
   /**
+   * \brief Patient sex modeled as a closed set.
+   *
+   * Only the two values needed by the SUV normalization strategies are
+   * accepted. Conversion from the open DICOM string (CS VR M / F / O / U)
+   * happens once at the helper boundary in GetPatientsSex(); downstream
+   * code never carries an open string sentinel.
+   *
+   * \sa GetPatientsSex
+   */
+  enum class Sex
+  {
+    Male,
+    Female
+  };
+
+  /**
    * \brief Base class for failures originating from the SUV calculation helpers.
    *
    * Callers can catch this base type to react to any helper failure, or one of
@@ -201,6 +217,42 @@ namespace mitk
    *        no patient-weight property.
    */
   double MITKPET_EXPORT GetPatientsWeight(const mitk::IPropertyProvider* provider);
+
+  /**
+   * \brief Get the patient's height (size) from DICOM properties.
+   *
+   * Extracts the patient height from DICOM tag (0010,1020) Patient Size,
+   * stored in the properties of the passed provider.
+   *
+   * \param[in] provider Source of DICOM properties.
+   * \return The patient's height in [m].
+   * \pre \p provider must point to a valid instance.
+   * \pre \p provider must contain a DICOM patient-size property.
+   * \throw MissingDICOMPropertyException if \p provider is \c nullptr or
+   *        contains no patient-size property.
+   */
+  double MITKPET_EXPORT GetPatientsHeight(const mitk::IPropertyProvider* provider);
+
+  /**
+   * \brief Get the patient's sex from DICOM properties as a typed enum.
+   *
+   * Reads DICOM tag (0010,0040) Patient Sex (CS VR). The string value is
+   * matched case-insensitively after trimming surrounding whitespace.
+   * Only the two clinically relevant values for SUV normalization
+   * (M, F) are accepted; any other value, including DICOM's "O"
+   * (Other) and "U" (Unknown), is reported as invalid so callers cannot
+   * silently fall through with an under-specified input.
+   *
+   * \param[in] provider Source of DICOM properties.
+   * \return The patient's sex as a \c Sex enum value.
+   * \pre \p provider must point to a valid instance.
+   * \pre \p provider must contain a DICOM patient-sex property.
+   * \throw MissingDICOMPropertyException if \p provider is \c nullptr or
+   *        contains no patient-sex property.
+   * \throw InvalidDICOMPropertyValueException if (0010,0040) holds a
+   *        value other than \c M or \c F.
+   */
+  Sex MITKPET_EXPORT GetPatientsSex(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Detect the DICOM Decay Correction strategy of the input data.

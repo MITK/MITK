@@ -371,6 +371,54 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
   return ConvertDICOMStrToValue<double>(props.begin()->second->GetValueAsString());
 }
 
+double mitk::GetPatientsHeight(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    mitkThrowException(MissingDICOMPropertyException)
+      << "Cannot retrieve patient height: property provider is null.";
+  }
+
+  const DICOMTagPath heightPath(0x0010, 0x1020);
+  const auto props = CollectPropertiesByDICOMTagPath(provider, heightPath);
+
+  if (props.empty())
+  {
+    mitkThrowException(MissingDICOMPropertyException)
+      << "Cannot retrieve patient height: no DICOM property for tag "
+         "(0010,1020) Patient Size was found.";
+  }
+
+  return ConvertDICOMStrToValue<double>(props.begin()->second->GetValueAsString());
+}
+
+mitk::Sex mitk::GetPatientsSex(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    mitkThrowException(MissingDICOMPropertyException)
+      << "Cannot retrieve patient sex: property provider is null.";
+  }
+
+  const DICOMTagPath sexPath(0x0010, 0x0040);
+  const std::string raw = ReadStringTag(provider, sexPath);
+  if (raw.empty())
+  {
+    mitkThrowException(MissingDICOMPropertyException)
+      << "Cannot retrieve patient sex: no DICOM property for tag "
+         "(0010,0040) Patient Sex was found.";
+  }
+
+  const std::string normalized = ToUpperAscii(TrimAsciiWhitespace(raw));
+
+  if ("M" == normalized) return Sex::Male;
+  if ("F" == normalized) return Sex::Female;
+
+  mitkThrowException(InvalidDICOMPropertyValueException)
+    << "DICOM tag (0010,0040) Patient Sex holds unsupported value '"
+    << raw << "'. Expected one of M, F.";
+}
+
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)
 {
   const DICOMTagPath decayCorrPath(0x0054, 0x1102);

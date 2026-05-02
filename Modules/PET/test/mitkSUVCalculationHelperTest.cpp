@@ -112,6 +112,19 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(PatientWeight_Found);
   MITK_TEST(PatientWeight_Missing_Throws_MissingDICOMPropertyException);
 
+  // Patient height
+  MITK_TEST(PatientHeight_Found);
+  MITK_TEST(PatientHeight_Missing_Throws_MissingDICOMPropertyException);
+
+  // Patient sex
+  MITK_TEST(PatientSex_Male);
+  MITK_TEST(PatientSex_Female);
+  MITK_TEST(PatientSex_TrimAndCaseInsensitive);
+  MITK_TEST(PatientSex_Missing_Throws_MissingDICOMPropertyException);
+  MITK_TEST(PatientSex_Other_Throws_InvalidDICOMPropertyValueException);
+  MITK_TEST(PatientSex_Unknown_Throws_InvalidDICOMPropertyValueException);
+  MITK_TEST(PatientSex_Garbage_Throws_InvalidDICOMPropertyValueException);
+
   // DeduceDecayCorrection
   MITK_TEST(Admin_AllZeros_SingleTimestep);
   MITK_TEST(Admin_FromImageGeometry_NoAcquisitionTags);
@@ -313,6 +326,79 @@ public:
     auto image = MakeSyntheticImage(1, 1);
     CPPUNIT_ASSERT_THROW(mitk::GetPatientsWeight(image),
                          mitk::MissingDICOMPropertyException);
+  }
+
+  // ---- Patient height ----
+
+  void PatientHeight_Found()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x1020), "1.78");
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.78, mitk::GetPatientsHeight(image), 1e-9);
+  }
+
+  void PatientHeight_Missing_Throws_MissingDICOMPropertyException()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    CPPUNIT_ASSERT_THROW(mitk::GetPatientsHeight(image),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  // ---- Patient sex ----
+
+  void PatientSex_Male()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), "M");
+    CPPUNIT_ASSERT_EQUAL(mitk::Sex::Male, mitk::GetPatientsSex(image));
+  }
+
+  void PatientSex_Female()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), "F");
+    CPPUNIT_ASSERT_EQUAL(mitk::Sex::Female, mitk::GetPatientsSex(image));
+  }
+
+  void PatientSex_TrimAndCaseInsensitive()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), " f ");
+    CPPUNIT_ASSERT_EQUAL(mitk::Sex::Female, mitk::GetPatientsSex(image));
+  }
+
+  void PatientSex_Missing_Throws_MissingDICOMPropertyException()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    CPPUNIT_ASSERT_THROW(mitk::GetPatientsSex(image),
+                         mitk::MissingDICOMPropertyException);
+  }
+
+  void PatientSex_Other_Throws_InvalidDICOMPropertyValueException()
+  {
+    // DICOM "O" (Other) is rejected: SUVlbm requires a binary classification.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), "O");
+    CPPUNIT_ASSERT_THROW(mitk::GetPatientsSex(image),
+                         mitk::InvalidDICOMPropertyValueException);
+  }
+
+  void PatientSex_Unknown_Throws_InvalidDICOMPropertyValueException()
+  {
+    // DICOM "U" (Unknown) is also rejected.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), "U");
+    CPPUNIT_ASSERT_THROW(mitk::GetPatientsSex(image),
+                         mitk::InvalidDICOMPropertyValueException);
+  }
+
+  void PatientSex_Garbage_Throws_InvalidDICOMPropertyValueException()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, PropName(0x0010, 0x0040), "yes");
+    CPPUNIT_ASSERT_THROW(mitk::GetPatientsSex(image),
+                         mitk::InvalidDICOMPropertyValueException);
   }
 
   // ---- DeduceDecayCorrection: ADMIN ----

@@ -22,64 +22,74 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSUVCalculation.h>
 
 
-mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy() = default;
+mitk::SUVFunctorPolicy::SUVFunctorPolicy() = default;
 
-mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy(double injectedActivity, double bodyweight, double halfLife)
+mitk::SUVFunctorPolicy::SUVFunctorPolicy(double injectedActivity, double scaleNumerator, double halfLife)
   : m_InjectedActivity(injectedActivity),
-    m_bodyweight(bodyweight),
-    m_halfLife(halfLife)
+    m_ScaleNumerator(scaleNumerator),
+    m_HalfLife(halfLife)
 {}
 
-mitk::SUVbwFunctorPolicy::~SUVbwFunctorPolicy() = default;
+mitk::SUVFunctorPolicy::~SUVFunctorPolicy() = default;
 
-unsigned int mitk::SUVbwFunctorPolicy::GetNumberOfOutputs() const
+unsigned int mitk::SUVFunctorPolicy::GetNumberOfOutputs() const
 {
   return 1;
 }
 
-void mitk::SUVbwFunctorPolicy::SetDecayTimeFunctor(const DecayTimeFunctionType& functor)
+void mitk::SUVFunctorPolicy::SetDecayTimeFunctor(const DecayTimeFunctionType& functor)
 {
   m_Functor = functor;
 }
 
-void mitk::SUVbwFunctorPolicy::SetInjectedActivity(double a)
+void mitk::SUVFunctorPolicy::SetInjectedActivity(double a)
 {
   m_InjectedActivity = a;
 }
 
-void mitk::SUVbwFunctorPolicy::SetBodyWeight(double w)
+void mitk::SUVFunctorPolicy::SetScaleNumerator(double n)
 {
-  m_bodyweight = w;
+  m_ScaleNumerator = n;
 }
 
-void mitk::SUVbwFunctorPolicy::SetHalfLife(double tau)
+void mitk::SUVFunctorPolicy::SetHalfLife(double tau)
 {
-  m_halfLife = tau;
+  m_HalfLife = tau;
 }
 
-bool mitk::SUVbwFunctorPolicy::IsConfigured() const
+bool mitk::SUVFunctorPolicy::IsConfigured() const
 {
   return std::isfinite(m_InjectedActivity)
-      && std::isfinite(m_bodyweight)
-      && std::isfinite(m_halfLife)
+      && std::isfinite(m_ScaleNumerator)
+      && std::isfinite(m_HalfLife)
       && static_cast<bool>(m_Functor);
 }
 
-bool mitk::SUVbwFunctorPolicy::operator!=(const SUVbwFunctorPolicy& other) const
+bool mitk::SUVFunctorPolicy::operator!=(const SUVFunctorPolicy& other) const
 {
   return !(*this == other);
 }
 
-bool mitk::SUVbwFunctorPolicy::operator==(const SUVbwFunctorPolicy& other) const
+bool mitk::SUVFunctorPolicy::operator==(const SUVFunctorPolicy& other) const
 {
   return (this->m_InjectedActivity == other.m_InjectedActivity) &&
-    (this->m_bodyweight == other.m_bodyweight) &&
-    (this->m_halfLife == other.m_halfLife);
+    (this->m_ScaleNumerator == other.m_ScaleNumerator) &&
+    (this->m_HalfLife == other.m_HalfLife);
 }
 
-mitk::SUVbwFunctorPolicy::SUVPixelType
-mitk::SUVbwFunctorPolicy::operator()(const SUVPixelType& value,
-                                     const IndexType& currentIndex) const
+mitk::SUVFunctorPolicy::SUVPixelType
+mitk::SUVFunctorPolicy::operator()(const SUVPixelType& value,
+                                   const IndexType& currentIndex) const
 {
-  return value * computeSUVbwScaleFactor(m_InjectedActivity, m_bodyweight, m_Functor(currentIndex), m_halfLife);
+  return value * computeSUVScaleFactor(m_InjectedActivity, m_ScaleNumerator, m_Functor(currentIndex), m_HalfLife);
+}
+
+
+mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy(double injectedActivity, double bodyweight, double halfLife)
+  : SUVFunctorPolicy(injectedActivity, bodyweight * 1000.0, halfLife)
+{}
+
+void mitk::SUVbwFunctorPolicy::SetBodyWeight(double w)
+{
+  SetScaleNumerator(w * 1000.0);
 }

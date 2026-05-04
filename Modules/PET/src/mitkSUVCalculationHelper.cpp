@@ -281,7 +281,8 @@ namespace
 }
 
 std::vector<mitk::RadiopharmaceuticalInfo>
-mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider)
+mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
+                                  mitk::DICOMReadPolicy policy)
 {
   using IndexedMap = std::map<DICOMTagPath::ItemSelectionIndex, RadiopharmaceuticalInfo>;
   IndexedMap byIndex;
@@ -314,12 +315,42 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider)
     info.halfLifeSeconds = ConvertDICOMStrToValue<double>(v);
   });
 
-  // Total dose (0018,1074).
+  // Total dose (0018,1074). The DICOM standard prescribes Bq, but some
+  // scanners and post-processing pipelines store the value in MBq.
+  // Empirically the two regimes are well separated: clinical FDG doses
+  // cluster around 4e2 (MBq) and 4e8 (Bq), with no plausible value in
+  // between. Per the IBSI-SUV recommendation, values strictly below the
+  // 1e4 threshold are interpreted as MBq and converted to Bq.
+  // DICOMReadPolicy controls the response: Lenient applies the
+  // conversion with a WARN; Strict refuses it and raises a dedicated
+  // exception so callers can surface the input issue.
   DICOMTagPath dosePath;
   dosePath.AddAnySelection(0x0054, 0x0016).AddElement(0x0018, 0x1074);
-  enumerate(dosePath, [](RadiopharmaceuticalInfo& info, const std::string& v)
+  enumerate(dosePath, [policy](RadiopharmaceuticalInfo& info, const std::string& v)
   {
-    info.totalDoseBq = ConvertDICOMStrToValue<double>(v);
+    const double raw = ConvertDICOMStrToValue<double>(v);
+    if (raw > 0.0 && raw < 1.0e4)
+    {
+      if (policy == DICOMReadPolicy::Strict)
+      {
+        mitkThrowException(ImplausibleRadionuclideDoseException)
+          << "Radionuclide Total Dose (0018,1074) value " << raw
+          << " is below the 1e4 plausibility threshold and would be "
+             "reinterpreted as MBq under the IBSI-SUV recommendation, "
+             "but DICOMReadPolicy::Strict is active. Re-export the "
+             "input with a Bq-magnitude value or rerun in lenient mode.";
+      }
+      const double converted = raw * 1.0e6;
+      MITK_WARN << "Radionuclide Total Dose (0018,1074) value " << raw
+                << " is below the 1e4 plausibility threshold; "
+                   "interpreting as MBq and converting to Bq (= "
+                << converted << " Bq) per IBSI-SUV recommendation.";
+      info.totalDoseBq = converted;
+    }
+    else
+    {
+      info.totalDoseBq = raw;
+    }
   });
 
   // Radionuclide code meaning, nested in (0054,0300). The outer index we

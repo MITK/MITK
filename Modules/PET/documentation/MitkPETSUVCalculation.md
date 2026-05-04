@@ -69,6 +69,7 @@ and no override is given, the run aborts with a clear error.
 |---------------------------|------------------------------------------------------------------------------------------------------|
 | `--ignore-modality-check` | Bypass the `(0008,0060)` `== "PT"` check.                                                            |
 | `--ignore-units-check`    | Bypass the `(0054,1001)` `== "BQML"` check. Resulting SUV will not be physically meaningful.         |
+| `--strict-dicom`          | Refuse benchmark-recommended adaptations of borderline DICOM input (see *Details*). Default: off.    |
 | `--tracer-index N`        | Explicit selection for multi-item Radiopharmaceutical Information Sequence `(0054,0016)` (0-based).  |
 
 ### Misc
@@ -199,6 +200,36 @@ match case-insensitively. Variants like `Bq/ml`, `BQ/ML` are
 **not** accepted; supply `--ignore-units-check` if the input uses one
 of these and you accept that the SUV will not be physically meaningful.
 
+### IBSI-SUV benchmark adaptations and `--strict-dicom`
+
+The IBSI-SUV benchmark catalogues a small number of recommendations
+that help MITK accept real-world PET DICOM input without losing
+physical meaning. Each one has a clearly bounded trigger, and by
+default the tool applies the recommendation and emits a `MITK_WARN`
+log entry so post-processing pipelines can audit the adaptation.
+
+Pass `--strict-dicom` to refuse all such adaptations; the tool then
+exits with code `8` (`BenchmarkAdaptationRefused`) and an error
+message identifying the offending input. Strict mode is intended for
+validation, regulatory, or strict-conformance contexts where silent
+reinterpretation of borderline input is unacceptable.
+
+The currently implemented adaptations:
+
+| Adaptation                                       | Trigger                                              | Lenient response                                            | Strict response                                                |
+|--------------------------------------------------|------------------------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------|
+| Radionuclide Total Dose `(0018,1074)` MBq detect | DICOM-side value strictly between `0` and `1e4`      | Multiply by `1e6` (interpret as MBq), emit `MITK_WARN`.     | Exit `8` with an `ImplausibleRadionuclideDoseException` message. |
+
+The threshold for the dose adaptation sits in the empirically empty
+gap between the two physical regimes (clinical FDG doses cluster
+around `4e2` MBq and `4e8` Bq), so it cannot misclassify a plausible
+clinical input.
+
+The `--injected-activity` override bypasses the dose adaptation
+entirely (regardless of `--strict-dicom`). It accepts the value
+verbatim in `[Bq]` as documented in the table above; an explicit
+override is treated as an opt-out from the magnitude heuristic.
+
 ### Exit codes
 
 | Code | Meaning                                                          |
@@ -211,6 +242,7 @@ of these and you accept that the SUV will not be physically meaningful.
 | `5`  | Multi-item Radiopharmaceutical Sequence without `--tracer-index` |
 | `6`  | A DICOM property holds an unsupported value                      |
 | `7`  | A required SUV input (e.g. height for `lbm`) is missing          |
+| `8`  | `--strict-dicom`: a benchmark-recommended adaptation was refused |
 
 ## Output Format
 

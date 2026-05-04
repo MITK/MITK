@@ -95,6 +95,49 @@ namespace mitk
   };
 
   /**
+   * \brief Base class for failures triggered by a benchmark-recommended
+   *        adaptation that the active policy refuses to perform.
+   *
+   * The IBSI-SUV benchmark catalogues a handful of recommendations that
+   * help MITK accept real-world DICOM input (e.g. interpreting a
+   * Radionuclide Total Dose value below 1e4 as MBq rather than Bq).
+   * In \c DICOMReadPolicy::Lenient those recommendations are applied
+   * silently-but-loudly (log at WARN). In \c DICOMReadPolicy::Strict
+   * they are refused, and the helper throws an instance of this
+   * exception (or one of its derived classes) so callers can decide
+   * whether to abort or to escalate to the user.
+   *
+   * Catch this base type to map the entire category to one CLI exit
+   * code or GUI message; catch a derived type when one specific
+   * category needs a tailored reaction.
+   *
+   * \sa DICOMReadPolicy
+   */
+  class MITKPET_EXPORT BenchmarkAdaptationRequiredException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(BenchmarkAdaptationRequiredException, SUVHelperException);
+  };
+
+  /**
+   * \brief Radionuclide Total Dose (0018,1074) is implausible as Bq and
+   *        would have been reinterpreted as MBq, but the active policy
+   *        is Strict.
+   *
+   * The DICOM standard prescribes Bq, but some scanners and post-processing
+   * pipelines store the value in MBq. The IBSI-SUV recommendation
+   * interprets values strictly between 0 and 1e4 as MBq and converts to Bq.
+   * In \c DICOMReadPolicy::Strict that conversion is refused and this
+   * exception is raised instead. The exception message contains the
+   * offending value.
+   */
+  class MITKPET_EXPORT ImplausibleRadionuclideDoseException : public BenchmarkAdaptationRequiredException
+  {
+  public:
+    mitkExceptionClassMacro(ImplausibleRadionuclideDoseException, BenchmarkAdaptationRequiredException);
+  };
+
+  /**
    * \brief Acquisition / radiopharmaceutical-injection timing cannot be reconciled.
    *
    * Raised in two situations:
@@ -111,6 +154,37 @@ namespace mitk
   {
   public:
     mitkExceptionClassMacro(AmbiguousDecayTimingException, SUVHelperException);
+  };
+
+  /**
+   * \brief Policy controlling whether benchmark-recommended adaptations
+   *        of borderline / non-spec DICOM input are applied.
+   *
+   * The IBSI-SUV benchmark catalogues several recommendations that help
+   * MITK accept real-world PET DICOM data without losing physical
+   * meaning (unit reinterpretation, vendor-specific fallbacks, etc.).
+   * Each recommendation has a clearly bounded trigger (an empirically
+   * empty value range, a specific vendor private tag, …) and is
+   * therefore safe to apply in routine processing — but validation,
+   * regulatory, or strict-conformance contexts may want to refuse the
+   * adaptation and surface the underlying input issue instead.
+   *
+   * \c Lenient   Apply the recommendation; emit \c MITK_WARN so the
+   *              adaptation can be audited downstream. Default.
+   * \c Strict    Refuse to adapt; raise a
+   *              \c BenchmarkAdaptationRequiredException (or a
+   *              category-specific subtype).
+   *
+   * The policy applies uniformly across all helpers that consult it.
+   * Per-rule overrides are not supported: if you need finer control,
+   * inspect the input upstream and pre-validate the offending tags.
+   *
+   * \sa BenchmarkAdaptationRequiredException
+   */
+  enum class DICOMReadPolicy
+  {
+    Lenient,
+    Strict
   };
 
   /**
@@ -199,18 +273,33 @@ namespace mitk
    * corresponds to the i-th item of the source sequence; fields missing from
    * an item come back as NaN / empty without affecting other items.
    *
+   * Radionuclide Total Dose values strictly between 0 and 1e4 are
+   * interpreted as the IBSI-SUV benchmark recommends: in
+   * \c DICOMReadPolicy::Lenient the value is reinterpreted as MBq and
+   * converted to Bq (factor 1e6) with a \c MITK_WARN announcing the
+   * conversion. In \c DICOMReadPolicy::Strict the conversion is refused
+   * and an \c ImplausibleRadionuclideDoseException is raised. Other
+   * fields (half-life, name) are read verbatim regardless of policy.
+   *
    * \param[in] provider Source of DICOM properties; typically the BaseData of a
    *            PET image.
+   * \param[in] policy   Policy for handling values that the IBSI-SUV
+   *                     benchmark recommends adapting. Defaults to
+   *                     \c DICOMReadPolicy::Lenient (apply with WARN).
    * \return A vector of RadiopharmaceuticalInfo, ordered by sequence-item
    *         index. Empty if no Radiopharmaceutical Information Sequence is
    *         present or if \p provider is \c nullptr.
+   * \throw ImplausibleRadionuclideDoseException if \p policy is
+   *        \c DICOMReadPolicy::Strict and an item's (0018,1074) value is
+   *        strictly between 0 and 1e4.
    *
    * \remark Multi-tracer datasets are surfaced honestly (more than one entry).
    *         Callers that only support one tracer should check
    *         \c result.size() and react accordingly.
    */
   std::vector<RadiopharmaceuticalInfo> MITKPET_EXPORT
-  GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider);
+  GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
+                              DICOMReadPolicy policy = DICOMReadPolicy::Lenient);
 
   /**
    * \brief Get the patient's weight from DICOM properties.

@@ -64,6 +64,7 @@ namespace
     MultiTracerWithoutIndex  = 5,
     InvalidDICOMPropertyValue= 6,
     MissingSUVInput          = 7,
+    BenchmarkAdaptationRefused = 8,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -87,6 +88,7 @@ namespace
 
     bool ignoreModalityCheck = false;
     bool ignoreUnitsCheck    = false;
+    bool strictDicom         = false;
     bool verbose             = false;
   };
 
@@ -210,6 +212,12 @@ namespace
     parser.addArgument("ignore-units-check", "", mitkCommandLineParser::Bool,
       "Ignore units check",
       "Bypass the (0054,1001) Units == 'BQML' check.");
+    parser.addArgument("strict-dicom", "", mitkCommandLineParser::Bool,
+      "Strict DICOM input policy",
+      "Refuse benchmark-recommended adaptations of borderline DICOM "
+      "input (currently: reinterpreting Radionuclide Total Dose "
+      "(0018,1074) below 1e4 as MBq). Without this flag the tool "
+      "applies the IBSI-SUV recommendation and emits a WARN log entry.");
     parser.addArgument("tracer-index", "", mitkCommandLineParser::Int,
       "Radiopharmaceutical sequence item index",
       "Explicit selection for multi-item Radiopharmaceutical Information "
@@ -286,6 +294,7 @@ namespace
 
     if (parsed.count("ignore-modality-check")) s.ignoreModalityCheck = us::any_cast<bool>(parsed.at("ignore-modality-check"));
     if (parsed.count("ignore-units-check"))    s.ignoreUnitsCheck    = us::any_cast<bool>(parsed.at("ignore-units-check"));
+    if (parsed.count("strict-dicom"))          s.strictDicom         = us::any_cast<bool>(parsed.at("strict-dicom"));
     if (parsed.count("verbose"))               s.verbose             = us::any_cast<bool>(parsed.at("verbose"));
 
     return true;
@@ -501,7 +510,10 @@ int main(int argc, char* argv[])
 
     // ---- Resolve scalar parameters --------------------------------------
 
-    auto rpiInfos = mitk::GetRadiopharmaceuticalInfos(image.GetPointer());
+    const auto dicomPolicy = s.strictDicom
+      ? mitk::DICOMReadPolicy::Strict
+      : mitk::DICOMReadPolicy::Lenient;
+    auto rpiInfos = mitk::GetRadiopharmaceuticalInfos(image.GetPointer(), dicomPolicy);
 
     ExitCode tracerExit = ExitCode::Generic;
     auto tracer = SelectTracer(rpiInfos, s, tracerExit);
@@ -664,6 +676,12 @@ int main(int argc, char* argv[])
   {
     MITK_ERROR << "Ambiguous decay timing: " << e.GetDescription();
     return AsInt(ExitCode::AmbiguousDecayTiming);
+  }
+  catch (const mitk::BenchmarkAdaptationRequiredException& e)
+  {
+    MITK_ERROR << "Strict DICOM input policy refused a benchmark-recommended "
+                  "adaptation: " << e.GetDescription();
+    return AsInt(ExitCode::BenchmarkAdaptationRefused);
   }
   catch (const mitk::InvalidDICOMPropertyValueException& e)
   {

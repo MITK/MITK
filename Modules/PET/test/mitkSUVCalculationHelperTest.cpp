@@ -103,6 +103,13 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(Radiopharm_SingleItem_FullyPopulated);
   MITK_TEST(Radiopharm_TwoItems_PreserveIndexPairing);
   MITK_TEST(Radiopharm_PartiallyPopulatedItem_NaNFields);
+  MITK_TEST(RadionuclideTotalDose_BelowThreshold_ConvertsFromMBq);
+  MITK_TEST(RadionuclideTotalDose_AboveThreshold_PassesThrough);
+  MITK_TEST(RadionuclideTotalDose_AtThresholdExactly_PassesThrough);
+  MITK_TEST(RadionuclideTotalDose_ZeroOrNegative_PassesThrough);
+  MITK_TEST(RadionuclideTotalDose_BelowThreshold_StrictPolicy_Throws);
+  MITK_TEST(RadionuclideTotalDose_BelowThreshold_StrictPolicy_CatchableAsBaseException);
+  MITK_TEST(RadionuclideTotalDose_AboveThreshold_StrictPolicy_PassesThrough);
 
   // Patient weight
   MITK_TEST(PatientWeight_Found);
@@ -307,6 +314,111 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.26, infos[1].halfLifeSeconds, 1e-9);
     CPPUNIT_ASSERT(std::isnan(infos[1].totalDoseBq));
     CPPUNIT_ASSERT(infos[1].name.empty());
+  }
+
+  // (0018,1074) is prescribed in Bq by the DICOM standard, but some
+  // scanners and post-processing pipelines store it in MBq. Per the
+  // IBSI-SUV recommendation, values strictly below 1e4 are interpreted
+  // as MBq and converted to Bq. The three tests below pin the
+  // boundary: convert if and only if 0 < raw < 1e4.
+
+  void RadionuclideTotalDose_BelowThreshold_ConvertsFromMBq()
+  {
+    // DRO_3_0 of the IBSI-SUV benchmark uses 368.08 (MBq), which after
+    // conversion must be 3.6808e8 Bq.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
+
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
+  }
+
+  void RadionuclideTotalDose_AboveThreshold_PassesThrough()
+  {
+    // A plausible Bq-magnitude FDG dose must not be touched.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
+
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
+  }
+
+  void RadionuclideTotalDose_AtThresholdExactly_PassesThrough()
+  {
+    // Pin the strict-less-than boundary: exactly 1e4 is *not* converted.
+    // The IBSI-SUV recommendation reads "lower than 10^4", which makes
+    // the upper edge exclusive. A future change to `<=` would silently
+    // multiply this value by 1e6.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "10000");
+
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0e4, infos[0].totalDoseBq, 0.0);
+  }
+
+  void RadionuclideTotalDose_ZeroOrNegative_PassesThrough()
+  {
+    // Zero and negative values must be propagated verbatim so that the
+    // CLI's downstream positive-value validation still rejects them as
+    // invalid input. Multiplying them by 1e6 would either lose
+    // information (0 -> 0) or paper over an upstream error in a way
+    // that would mask the original value in logs.
+
+    {
+      auto image = MakeSyntheticImage(1, 1);
+      SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "0");
+      const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+      CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(0.0, infos[0].totalDoseBq, 0.0);
+    }
+
+    {
+      auto image = MakeSyntheticImage(1, 1);
+      SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "-5");
+      const auto infos = mitk::GetRadiopharmaceuticalInfos(image);
+      CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(-5.0, infos[0].totalDoseBq, 0.0);
+    }
+  }
+
+  // DICOMReadPolicy::Strict: refuse to apply benchmark-recommended
+  // adaptations. Each rule must (a) raise its category-specific
+  // exception type so callers can react precisely, and (b) be catchable
+  // via the BenchmarkAdaptationRequiredException base type so the
+  // policy can be mapped to one CLI exit code or GUI message.
+
+  void RadionuclideTotalDose_BelowThreshold_StrictPolicy_Throws()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
+
+    CPPUNIT_ASSERT_THROW(
+      mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict),
+      mitk::ImplausibleRadionuclideDoseException);
+  }
+
+  void RadionuclideTotalDose_BelowThreshold_StrictPolicy_CatchableAsBaseException()
+  {
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "368.08");
+
+    CPPUNIT_ASSERT_THROW(
+      mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict),
+      mitk::BenchmarkAdaptationRequiredException);
+  }
+
+  void RadionuclideTotalDose_AboveThreshold_StrictPolicy_PassesThrough()
+  {
+    // Strict policy must not penalise plausible Bq-magnitude inputs.
+    auto image = MakeSyntheticImage(1, 1);
+    SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1074), "3.6808e8");
+
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(image, mitk::DICOMReadPolicy::Strict);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), infos.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3.6808e8, infos[0].totalDoseBq, 1.0);
   }
 
   void PatientWeight_Found()

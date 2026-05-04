@@ -520,6 +520,13 @@ private:
   */
   std::map<GroupSyncIndexType, std::string> m_GroupNameByIndex;
 
+  /**
+  * \brief Stashed layout-document `name` so it survives a load -> save
+  *        round-trip. Empty when the source document had no `name` field;
+  *        cleared by 'TearDownAllCells'.
+  */
+  std::string m_LayoutName;
+
   bool m_CrosshairVisibility;
 
 };

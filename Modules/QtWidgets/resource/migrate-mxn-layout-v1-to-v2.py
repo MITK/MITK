@@ -45,32 +45,55 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
+from functools import reduce
 from pathlib import Path
 from typing import Any
 
 
-# Default editor name produced by `QmitkMxNMultiWidget`. Used as the
-# `<editor_name>` segment of qualified ids (`<editor_name>__widget<i>`)
-# unless overridden via `--editor-name`.
+# Default `multiWidgetName` from `QmitkMxNMultiWidget`. Override with
+# `--editor-name` for non-default editor instances.
 DEFAULT_EDITOR_NAME = "mxn"
 
-# Namespace delimiter between editor name and bare id segment in the
-# canonical qualified-window-id form. Mirrors `kNamespaceDelimiter` in the
-# C++ engine.
 NAMESPACE_DELIMITER = "__"
 
-# Editor-name shape constraint. Mirrors the C++ engine's `kEditorNamePattern`
-# and the `<editor_name>` segment of the schema's id pattern: starts with a
-# letter, no `_` (which would break the first-`__` split rule), only
-# `[A-Za-z0-9.-]` afterwards.
+# Editor-name shape mirrors `EDITOR_NAME_PATTERN` in QmitkMxNMultiWidget.cpp;
+# the no-`_` rule keeps the first-`__` split between editor-name and bare-id
+# segments unambiguous.
 _EDITOR_NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9.-]*$")
 
 
 def _qualified_id(bare_id: str, editor_name: str = DEFAULT_EDITOR_NAME) -> str:
     """Build the canonical qualified id `<editor_name>__<bare_id>`."""
     return f"{editor_name}{NAMESPACE_DELIMITER}{bare_id}"
+
+
+def _normalize_sibling_sizes(children: list) -> None:
+    """Reduce explicit `size` values across siblings by their GCD, in place.
+
+    v1 commonly carries pixel-derived sizes (e.g. `403`, `807`) taken from a
+    screenshot. v2 splitter weights are ratios, so reducing by GCD aligns the
+    output with the schema's "prefer small numbers" guidance:
+    `[403, 403, 403]` becomes `[1, 1, 1]`, `[200, 400]` becomes `[1, 2]`.
+    Children that reduce to 1 drop the field, matching the v2 default weight.
+
+    Mixed-define sibling lists (some explicit, some omitted) are left alone
+    because the explicit-vs-default pattern is meaningful in v2.
+    """
+    if not children or not all("size" in c for c in children):
+        return
+    sizes = [int(c["size"]) for c in children]
+    g = reduce(math.gcd, sizes)
+    if g <= 0:
+        return
+    for child, size in zip(children, sizes):
+        reduced = size // g
+        if reduced == 1:
+            del child["size"]
+        else:
+            child["size"] = reduced
 
 
 def _group_label(group_int: int) -> str:
@@ -190,8 +213,7 @@ def _convert_node(
             for i, child in enumerate(children_raw)
         ],
     }
-    # `size` is optional in v2 (default weight 1). Pass through if the v1
-    # source had one; otherwise let the v2 loader's default apply.
+    _normalize_sibling_sizes(out_split["children"])
     if "size" in node:
         out_split["size"] = int(node["size"])
     return out_split
@@ -230,6 +252,14 @@ def migrate(v1_doc: dict, *, editor_name: str = DEFAULT_EDITOR_NAME) -> dict:
         group_select_all=group_select_all,
         editor_name=editor_name,
     )
+    # The v2 schema requires `root` to be a `split`. Wrap a v1 single-window
+    # root so the output validates without forcing the user to hand-edit it.
+    if root.get("type") == "window":
+        root = {
+            "type": "split",
+            "orientation": "horizontal",
+            "children": [root],
+        }
     # Strip a 'size' from the root - the v2 schema's root has no parent.
     root.pop("size", None)
 

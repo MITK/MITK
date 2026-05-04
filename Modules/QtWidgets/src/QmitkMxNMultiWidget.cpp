@@ -39,18 +39,20 @@ found in the LICENSE file.
 
 namespace
 {
-  // Matches the `<editor_name>` segment of the qualified window-id form
-  // `<editor_name>__<bare_id>`. Mirrors the schema's window-id pattern (see
-  // mxn-layout-v2.schema.json): starts with a letter; no underscores
-  // (which would break the first-`__` split rule); only `[A-Za-z0-9.-]`
-  // afterwards. Any name accepted at editor construction time is
-  // automatically guaranteed to produce schema-valid ids.
-  const QRegularExpression kEditorNamePattern(QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*$"));
+  // The no-underscore rule on the editor-name segment is what makes the
+  // first-`__` split into editor-name and bare-id unambiguous.
+  const QRegularExpression EDITOR_NAME_PATTERN(QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*$"));
 
-  // Namespace delimiter between editor name and bare id segment in the
-  // canonical qualified-window-id form. Lifted to a constant so the engine
-  // and any future caller share one definition.
-  const QString kNamespaceDelimiter = QStringLiteral("__");
+  const QString NAMESPACE_DELIMITER = QStringLiteral("__");
+
+  // Window-id and group-name patterns mirror mxn-layout-v2.schema.json.
+  // Enforced by PrewalkValidate so callers that do not run a JSON-schema
+  // validator still fail loudly at load rather than letting unsafe
+  // characters reach REST URLs or property-context keys downstream.
+  const QRegularExpression WINDOW_ID_PATTERN(
+    QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$"));
+  const QRegularExpression GROUP_NAME_PATTERN(
+    QStringLiteral("^[A-Za-z0-9_.-]+$"));
 
 
   // Translation helpers for the v2 layout's `view_direction` enum. Closed
@@ -131,6 +133,13 @@ namespace
       {
         mitkThrow() << "Layout window node has an empty 'id'.";
       }
+      if (!WINDOW_ID_PATTERN.match(QString::fromStdString(id)).hasMatch())
+      {
+        mitkThrow() << "Layout window id '" << id
+                    << "' does not match the required pattern '"
+                    << WINDOW_ID_PATTERN.pattern().toStdString()
+                    << "' (URL-segment-safe, qualified `<editor_name>__<bare_id>`).";
+      }
       if (!seenIds.insert(id).second)
       {
         mitkThrow() << "Layout document contains duplicate window id '" << id << "'.";
@@ -167,6 +176,14 @@ namespace
                     << "' is missing the required 'links.selection' string.";
       }
       const auto groupName = links["selection"].get<std::string>();
+      if (!GROUP_NAME_PATTERN.match(QString::fromStdString(groupName)).hasMatch())
+      {
+        mitkThrow() << "Layout window '" << id
+                    << "' references group name '" << groupName
+                    << "' which does not match the required pattern '"
+                    << GROUP_NAME_PATTERN.pattern().toStdString()
+                    << "' (URL-segment-safe).";
+      }
       referencedGroups.insert(groupName);
       seedingOrder.emplace_back(id, groupName);
     }
@@ -185,17 +202,15 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_CrosshairVisibility(false)
 {
-  // Editor-name shape constraint. The qualified-window-id form
-  // `<multiWidgetName>__<bare>` is split by the FIRST occurrence of `__`,
-  // so the editor-name segment must contain no `_` and start with a letter.
-  // Reject malformed names loudly here rather than later when they would
-  // produce schema-invalid ids or ambiguous splits at apply time.
-  if (!kEditorNamePattern.match(multiWidgetName).hasMatch())
+  // Reject malformed names at construction; once stored, an `_` in the
+  // editor name would later produce schema-invalid ids or break the
+  // first-`__` split rule that separates editor-name from bare-id segments.
+  if (!EDITOR_NAME_PATTERN.match(multiWidgetName).hasMatch())
   {
     mitkThrow() << "QmitkMxNMultiWidget: multiWidgetName '"
                 << multiWidgetName.toStdString()
                 << "' does not match the required pattern '"
-                << kEditorNamePattern.pattern().toStdString()
+                << EDITOR_NAME_PATTERN.pattern().toStdString()
                 << "'. Editor names must start with a letter, contain no '_', "
                 << "and use only the alphabet [A-Za-z0-9.-].";
   }
@@ -516,7 +531,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     bool removed = false;
     for (std::size_t i = this->GetNumberOfRenderWindowWidgets(); i-- > 0; )
     {
-      const auto id = this->GetMultiWidgetName() + kNamespaceDelimiter + QStringLiteral("widget") + QString::number(i);
+      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER + QStringLiteral("widget") + QString::number(i);
       if (nullptr != this->GetRenderWindowWidget(id))
       {
         this->RemoveRenderWindowWidget(id);
@@ -557,7 +572,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // custom-id'd cells already used the same index (e.g. existing
   // {widget0, widget3} + adding a 4th cell would have produced 'widget3'
   // again, which std::map::insert silently rejects).
-  const auto prefix = this->GetMultiWidgetName() + kNamespaceDelimiter + QStringLiteral("widget");
+  const auto prefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER + QStringLiteral("widget");
   std::size_t i = 0;
   while (this->GetRenderWindowWidget(prefix + QString::number(i)) != nullptr)
   {
@@ -581,12 +596,9 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
     mitkThrow() << "CreateRenderWindowWidget: id must not be empty.";
   }
 
-  // The id must already be in this editor's canonical qualified form: the
-  // engine registers it verbatim, with no prefix concatenation. This guards
-  // in-process API misuse (e.g. a caller passing an unqualified bare name);
-  // document-driven creation is additionally gated by
-  // ValidateIdsForThisEditor() up the stack.
-  const auto requiredPrefix = this->GetMultiWidgetName() + kNamespaceDelimiter;
+  // Guards in-process API misuse (an unqualified bare name slipping through);
+  // document-driven creation is additionally gated by ValidateIdsForThisEditor.
+  const auto requiredPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
   if (!id.startsWith(requiredPrefix))
   {
     mitkThrow() << "CreateRenderWindowWidget: id '" << id.toStdString()
@@ -770,7 +782,13 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
 
   nlohmann::json doc;
   doc["version"] = "2.0";
-  doc["name"] = "Custom Layout";
+  // Round-trip the optional `name` from the document that produced the
+  // current state; emit the field only when set so empty strings never
+  // land on disk.
+  if (!m_LayoutName.empty())
+  {
+    doc["name"] = m_LayoutName;
+  }
   doc["groups"] = groupsJson;
   // The recurser attaches 'size' to each child inside its parent's loop; the
   // root has no parent loop here, so it never gets a 'size' field. See the
@@ -845,9 +863,6 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   }
 
   WindowDescriptor descriptor;
-  // The cell's render-window name is the canonical fully-qualified id,
-  // used verbatim everywhere (layout JSON, REST URL, scene-file context
-  // keys, log lines). No translation step.
   descriptor.id = cell->GetWidgetName();
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
@@ -950,9 +965,8 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
       }
       else  // "window"
       {
-        // Id is used verbatim: the document carries the canonical
-        // qualified form (`<multiWidgetName>__<bare>`); ValidateIdsForThisEditor
-        // has already ensured the prefix matches this editor instance.
+        // Id passes through verbatim - validation already happened upstream
+        // (PrewalkValidate + ValidateIdsForThisEditor).
         const auto id = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
         const auto groupName = child["links"]["selection"].get<std::string>();
@@ -1020,7 +1034,6 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   std::map<std::string, std::vector<RenderWindowWidgetPointer>> groupMembers;
   for (const auto& [id, groupName] : seedingOrder)
   {
-    // The id is the canonical fully-qualified name; look the cell up directly.
     const auto cell = this->GetRenderWindowWidget(QString::fromStdString(id));
     if (nullptr == cell)
     {
@@ -1206,6 +1219,9 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   m_SynchronizedWidgetConnectors.clear();
   m_GroupNameByIndex.clear();
 
+  // The rolled-back single-default-cell state has no preset name to claim.
+  m_LayoutName.clear();
+
   // Delete the splitter and the layout that held it. The render-window widgets
   // are already gone; the splitter (and any sub-splitters) have no
   // QmitkRenderWindowWidget children left.
@@ -1232,18 +1248,16 @@ void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()
 
 void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) const
 {
-  // The schema's id pattern enforces the structural shape `<name>__<bare>`
-  // for any consumer that runs JSON-schema validation, but it cannot
-  // encode "matches THIS editor instance's `multiWidgetName`": that is a
-  // loader-instance-specific constraint. Walk every window node and reject
-  // ids that do not start with this editor's required prefix.
-  const auto requiredPrefix = (this->GetMultiWidgetName() + kNamespaceDelimiter).toStdString();
+  // The schema's id pattern cannot encode "matches THIS editor instance's
+  // `multiWidgetName`" - that is a loader-instance constraint. Walk every
+  // window node and reject ids that do not start with this editor's prefix.
+  const auto requiredPrefix = (this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString();
   std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
   {
     if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
     {
-      // Shape errors are surfaced by PrewalkValidate downstream; this pass
-      // only checks ids on well-shaped window nodes.
+      // Shape errors are surfaced by PrewalkValidate; this pass focuses on
+      // the prefix check and only inspects well-shaped window nodes.
       return;
     }
     const auto type = node["type"].get<std::string>();
@@ -1303,18 +1317,19 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     const auto version = doc["version"].get<std::string>();
     if (version != "2.0")
     {
-      // Point v1.x documents at the migration script. This message is read by
-      // end users via the QMessageBox load wrapper, so the path it names must
-      // match the in-tree script name verbatim - the test 'Version_RejectsAllNonV2'
-      // pins this string.
+      // Point v1.x documents at the migration documentation. This message
+      // surfaces to end users via the QMessageBox load wrapper, so it stays
+      // neutral about install location: the developer documentation is the
+      // canonical reference for the migration tool. The phrase 'migration
+      // tool' is pinned by the 'Version_RejectsAllNonV2' test for v1.x
+      // versions.
       const bool looksV1 = version.size() >= 2 && version[0] == '1' && version[1] == '.';
       if (looksV1)
       {
         mitkThrow() << "Layout document version is '" << version
-                    << "'; only '2.0' is supported. If this is a v1.x layout from "
-                    << "before the format change, run "
-                    << "'Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py "
-                    << "<file>' to convert it.";
+                    << "'; only '2.0' is supported. If this is a v1.x layout "
+                    << "from before the format change, see the MxN layout "
+                    << "developer documentation for the migration tool.";
       }
       mitkThrow() << "Layout document version is '" << version
                   << "'; only '2.0' is supported.";
@@ -1324,10 +1339,9 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       mitkThrow() << "Layout document is missing the 'root' field.";
     }
 
-    // Loader-instance check: every window id must start with this editor's
-    // `<multiWidgetName>__` prefix. Run before PrewalkValidate so a misrouted
-    // document fails with a precise "wrong editor" message rather than a
-    // downstream symptom; both passes run before any engine state is touched.
+    // Run the prefix check before PrewalkValidate so a misrouted document
+    // fails with a precise "wrong editor" message rather than a downstream
+    // symptom. Both passes run before any engine state is mutated.
     this->ValidateIdsForThisEditor(doc);
 
     // Pre-walk: validate structural shape, collect window ids + referenced
@@ -1348,6 +1362,18 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       if (!groupsDict.is_object())
       {
         mitkThrow() << "Layout 'groups' field must be a JSON object.";
+      }
+      // Covers group names declared in 'groups' but never referenced by a
+      // cell - those would not pass through PrewalkValidate's per-cell loop.
+      for (auto it = groupsDict.begin(); it != groupsDict.end(); ++it)
+      {
+        if (!GROUP_NAME_PATTERN.match(QString::fromStdString(it.key())).hasMatch())
+        {
+          mitkThrow() << "Layout 'groups' contains key '" << it.key()
+                      << "' which does not match the required pattern '"
+                      << GROUP_NAME_PATTERN.pattern().toStdString()
+                      << "' (URL-segment-safe).";
+        }
       }
       for (const auto& g : referencedGroups)
       {
@@ -1372,6 +1398,14 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       }
     }
 
+    // Read the optional `name` here, after validation but before mutation,
+    // so a malformed document does not pollute the existing stash.
+    std::string stashedName;
+    if (doc.contains("name") && doc.at("name").is_string())
+    {
+      stashedName = doc.at("name").get<std::string>();
+    }
+
     // ----- Tear down existing state -----
     // Invalidate the grid-layout sentinel BEFORE tearing down: from this
     // point on the editor no longer holds a regular grid, so GetRowCount()
@@ -1380,6 +1414,7 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // SetLayout(1, 1), which restores both fields to (1, 1).
     this->ResetGridState();
     this->TearDownAllCells();
+    m_LayoutName = stashedName;
     didMutate = true;
 
     // ----- Allocate engine-internal sync groups -----
@@ -1504,7 +1539,7 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       // place each cell directly into its row group via the canonical API,
       // mirroring ApplyLayout. Avoids the churn of the positional overload's
       // initial seeding into group 1 followed by an immediate move.
-      const auto id = this->GetMultiWidgetName() + kNamespaceDelimiter
+      const auto id = this->GetMultiWidgetName() + NAMESPACE_DELIMITER
                       + QStringLiteral("widget") + QString::number(cellCounter++);
       auto window = this->CreateRenderWindowWidget(id);
       this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);

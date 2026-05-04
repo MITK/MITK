@@ -51,6 +51,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
+  MITK_TEST(StrictMode_EmptyGroupsDict_Throws);
   MITK_TEST(CustomIds_RegisterUnderEditorPrefix);
   MITK_TEST(DuplicateWindowIds_Throws);
   MITK_TEST(Version_RejectsAllNonV2);
@@ -60,7 +61,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(TearDown_DestroysAllOldCells);
   MITK_TEST(Apply_Failure_RollsBackToDefault);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
-  MITK_TEST(Serialize_RegisteredIds_StripPrefix);
+  MITK_TEST(Serialize_EmitsIdsVerbatim);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
 
@@ -396,11 +397,36 @@ public:
     }
   }
 
-  // ====================================================================
-  // Custom ids register verbatim under their canonical fully-qualified
-  // form. The engine does not prepend a prefix at apply time; the
-  // document's id is the registration key.
-  // ====================================================================
+  // An empty 'groups' dict is strict mode with zero declared groups; any
+  // cell's 'links.selection' reference therefore fails the strict-mode
+  // lookup. Pinned because the test name alone could read as "lazy mode".
+  void StrictMode_EmptyGroupsDict_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": {},
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw when 'groups' is present but empty");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the unresolved group",
+                             msg.find("main") != std::string::npos);
+    }
+  }
+
   void CustomIds_RegisterUnderEditorPrefix()
   {
     const auto fixture = nlohmann::json::parse(R"json({
@@ -476,16 +502,18 @@ public:
       }
       catch (const mitk::Exception& e)
       {
-        // v1.x rejects must reference the migration script so the
-        // QMessageBox wrapper surfaces the exact path the user needs to run.
+        // v1.x rejects must point users at the migration tool. The exact
+        // path is install-dependent, so the test pins only the phrase
+        // 'migration tool'; the QMessageBox wrapper relays the rest of the
+        // message to the developer documentation.
         const std::string sBad(bad);
         const bool looksV1 = sBad.size() >= 2 && sBad[0] == '1' && sBad[1] == '.';
         if (looksV1)
         {
           const std::string msg = e.GetDescription();
           CPPUNIT_ASSERT_MESSAGE(
-            "v1.x version-rejection message must reference migrate-mxn-layout-v1-to-v2",
-            msg.find("migrate-mxn-layout-v1-to-v2") != std::string::npos);
+            "v1.x version-rejection message must reference the migration tool",
+            msg.find("migration tool") != std::string::npos);
         }
       }
     }
@@ -622,11 +650,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(first.at("root"),   second.at("root"));
   }
 
-  // ====================================================================
-  // Serialize emits each cell's id verbatim: the canonical fully-qualified
-  // form goes in, the same string comes out (no prefix prepend, no strip).
-  // ====================================================================
-  void Serialize_RegisteredIds_StripPrefix()
+  void Serialize_EmitsIdsVerbatim()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -693,13 +717,16 @@ public:
     }
   }
 
-  // ====================================================================
-  // LoadLayout(nullptr) throws (covers the wrapper)
-  // ====================================================================
   void Apply_NullJson_Throws()
   {
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->LoadLayout(nullptr), mitk::Exception);
+
+    // Default-constructed nlohmann::json is a JSON null value, distinct
+    // from a nullptr pointer; the wrapper rejects both paths.
+    nlohmann::json nullDoc;
+    CPPUNIT_ASSERT(nullDoc.is_null());
+    CPPUNIT_ASSERT_THROW(editor->LoadLayout(&nullDoc), mitk::Exception);
   }
 
   // ====================================================================
@@ -1317,11 +1344,6 @@ public:
       std::string{}, descriptors[1].displayName.toStdString());
   }
 
-  // ====================================================================
-  // A document whose id has no '<editor>__' prefix is rejected up-front.
-  // The loader's instance check runs before any engine state mutation,
-  // so the existing layout survives the failed apply.
-  // ====================================================================
   void ApplyLayout_UnprefixedId_Throws()
   {
     const auto fixture = nlohmann::json::parse(R"json({
@@ -1349,14 +1371,10 @@ public:
       CPPUNIT_ASSERT_MESSAGE("Exception message must name the required prefix",
                              msg.find("mxn__") != std::string::npos);
     }
-    // Pre-mutation throw: the existing single-cell layout from MakeEditor
-    // must still be intact.
+    // The pre-mutation throw must leave MakeEditor's single default cell intact.
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
   }
 
-  // ====================================================================
-  // A document whose id carries a different editor's prefix is rejected.
-  // ====================================================================
   void ApplyLayout_WrongEditorPrefix_Throws()
   {
     const auto fixture = nlohmann::json::parse(R"json({
@@ -1385,10 +1403,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
   }
 
-  // ====================================================================
-  // The constructor rejects multiWidgetName values that would produce
-  // schema-invalid ids (containing '_' / '__', empty, leading digit, ...).
-  // ====================================================================
   void Construct_BadMultiWidgetName_Throws()
   {
     for (const auto& bad : { QString("bad__name"),

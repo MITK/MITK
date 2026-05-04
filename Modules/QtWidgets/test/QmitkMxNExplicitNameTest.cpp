@@ -26,14 +26,6 @@ found in the LICENSE file.
  * 'SetLayout(r, c)'. Together they replace an earlier 'widget<count>'
  * naming scheme that silently collided when custom-named cells already
  * used the same index (std::map::insert silently rejects duplicate keys).
- *
- * Ids passed to the explicit overload are in the canonical fully-qualified
- * form `<multiWidgetName>__<bare>`; the engine registers them verbatim and
- * does not prepend or strip a prefix at any boundary.
- *
- * The fixture deliberately avoids 'SetLayout(...)' for the explicit-id
- * tests so they focus on the naming contract; the positional overload is
- * exercised via the public 'SetLayout' path.
  */
 class QmitkMxNExplicitNameTestSuite : public mitk::TestFixture
 {
@@ -200,8 +192,6 @@ public:
 
   void CustomEditorName_RegistersWithItsPrefix()
   {
-    // An editor instantiated with a non-default 'multiWidgetName' accepts
-    // ids prefixed with that name and registers them verbatim.
     QmitkMxNMultiWidget widget(nullptr, Qt::WindowFlags{}, QString("custom"));
     widget.SetDataStorage(m_DataStorage);
 
@@ -212,12 +202,11 @@ public:
 
   void CustomEditorName_RejectsOtherEditorPrefix()
   {
-    // The same custom-named editor must reject ids carrying any other
-    // editor's prefix; the contract is "ids belong to one editor instance,
-    // identified by its multiWidgetName".
     QmitkMxNMultiWidget widget(nullptr, Qt::WindowFlags{}, QString("custom"));
     widget.SetDataStorage(m_DataStorage);
 
+    // Ids belong to one editor instance, identified by its multiWidgetName;
+    // a custom-named editor rejects ids carrying any other prefix.
     CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha"), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
   }

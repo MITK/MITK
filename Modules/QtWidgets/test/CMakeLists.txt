@@ -53,4 +53,16 @@ if(MITK_USE_Python3 AND BUILD_TESTING)
   set_tests_properties(mitkMxNLayoutSchemaLint PROPERTIES
     LABELS "MxN;Schema"
     SKIP_RETURN_CODE 77)
+
+  # Behavioural tests for the v1 -> v2 migration script. The script's
+  # self-validation covers structural drift; this unittest pins
+  # behavioural details (group naming convention, selectAll first-encounter,
+  # pre-order widget numbering, sibling-size GCD reduction, root wrapping).
+  add_test(
+    NAME mitkMxNLayoutMigrationScriptTest
+    COMMAND ${Python3_EXECUTABLE} -m unittest
+            -v test_migrate_mxn_layout
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  set_tests_properties(mitkMxNLayoutMigrationScriptTest PROPERTIES
+    LABELS "MxN;Migration")
 endif()

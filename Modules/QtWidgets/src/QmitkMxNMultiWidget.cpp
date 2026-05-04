@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <QBoxLayout>
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QSplitter>
 
 #include <algorithm>
@@ -38,6 +39,19 @@ found in the LICENSE file.
 
 namespace
 {
+  // Matches the `<editor_name>` segment of the qualified window-id form
+  // `<editor_name>__<bare_id>`. Mirrors the schema's window-id pattern (see
+  // mxn-layout-v2.schema.json): starts with a letter; no underscores
+  // (which would break the first-`__` split rule); only `[A-Za-z0-9.-]`
+  // afterwards. Any name accepted at editor construction time is
+  // automatically guaranteed to produce schema-valid ids.
+  const QRegularExpression kEditorNamePattern(QStringLiteral("^[A-Za-z][A-Za-z0-9.-]*$"));
+
+  // Namespace delimiter between editor name and bare id segment in the
+  // canonical qualified-window-id form. Lifted to a constant so the engine
+  // and any future caller share one definition.
+  const QString kNamespaceDelimiter = QStringLiteral("__");
+
 
   // Translation helpers for the v2 layout's `view_direction` enum. Closed
   // mapping (axial/sagittal/coronal/original); throws on anything else.
@@ -171,6 +185,20 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_CrosshairVisibility(false)
 {
+  // Editor-name shape constraint. The qualified-window-id form
+  // `<multiWidgetName>__<bare>` is split by the FIRST occurrence of `__`,
+  // so the editor-name segment must contain no `_` and start with a letter.
+  // Reject malformed names loudly here rather than later when they would
+  // produce schema-invalid ids or ambiguous splits at apply time.
+  if (!kEditorNamePattern.match(multiWidgetName).hasMatch())
+  {
+    mitkThrow() << "QmitkMxNMultiWidget: multiWidgetName '"
+                << multiWidgetName.toStdString()
+                << "' does not match the required pattern '"
+                << kEditorNamePattern.pattern().toStdString()
+                << "'. Editor names must start with a letter, contain no '_', "
+                << "and use only the alphabet [A-Za-z0-9.-].";
+  }
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -488,10 +516,10 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
     bool removed = false;
     for (std::size_t i = this->GetNumberOfRenderWindowWidgets(); i-- > 0; )
     {
-      const auto qualifiedName = this->MakeQualifiedName(QStringLiteral("widget") + QString::number(i));
-      if (nullptr != this->GetRenderWindowWidget(qualifiedName))
+      const auto id = this->GetMultiWidgetName() + kNamespaceDelimiter + QStringLiteral("widget") + QString::number(i);
+      if (nullptr != this->GetRenderWindowWidget(id))
       {
-        this->RemoveRenderWindowWidget(qualifiedName);
+        this->RemoveRenderWindowWidget(id);
         removed = true;
         break;
       }
@@ -521,20 +549,17 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
-QString QmitkMxNMultiWidget::MakeQualifiedName(const QString& bareId) const
-{
-  return this->GetMultiWidgetName() + "." + bareId;
-}
-
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
-  // Pick the smallest non-negative 'i' such that 'widget<i>' is not already
-  // used as a bare id in this editor. Replaces the old 'widget<count>'
-  // form, which silently collided when custom-id'd cells already used the
-  // same index (e.g. existing {widget0, widget3} + adding a 4th cell would
-  // have produced 'widget3' again, which std::map::insert silently rejects).
+  // Pick the smallest non-negative 'i' such that
+  // '<multiWidgetName>__widget<i>' is not already registered in this editor.
+  // Replaces the old 'widget<count>' form, which silently collided when
+  // custom-id'd cells already used the same index (e.g. existing
+  // {widget0, widget3} + adding a 4th cell would have produced 'widget3'
+  // again, which std::map::insert silently rejects).
+  const auto prefix = this->GetMultiWidgetName() + kNamespaceDelimiter + QStringLiteral("widget");
   std::size_t i = 0;
-  while (this->GetRenderWindowWidget(this->MakeQualifiedName(QStringLiteral("widget") + QString::number(i))) != nullptr)
+  while (this->GetRenderWindowWidget(prefix + QString::number(i)) != nullptr)
   {
     ++i;
   }
@@ -544,33 +569,44 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // construction. The explicit-id overload stays free of side effects so
   // v2-layout callers can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
-  auto renderWindowWidget = this->CreateRenderWindowWidget(QStringLiteral("widget") + QString::number(i));
+  auto renderWindowWidget = this->CreateRenderWindowWidget(prefix + QString::number(i));
   this->SetSynchronizationGroup(renderWindowWidget->GetUtilityWidget()->GetNodeSelectionWidget(), 1);
   return renderWindowWidget;
 }
 
-QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& bareId)
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& id)
 {
-  if (bareId.isEmpty())
+  if (id.isEmpty())
   {
-    mitkThrow() << "CreateRenderWindowWidget: bare id must not be empty.";
+    mitkThrow() << "CreateRenderWindowWidget: id must not be empty.";
   }
 
-  const auto qualifiedName = this->MakeQualifiedName(bareId);
+  // The id must already be in this editor's canonical qualified form: the
+  // engine registers it verbatim, with no prefix concatenation. This guards
+  // in-process API misuse (e.g. a caller passing an unqualified bare name);
+  // document-driven creation is additionally gated by
+  // ValidateIdsForThisEditor() up the stack.
+  const auto requiredPrefix = this->GetMultiWidgetName() + kNamespaceDelimiter;
+  if (!id.startsWith(requiredPrefix))
+  {
+    mitkThrow() << "CreateRenderWindowWidget: id '" << id.toStdString()
+                << "' does not start with this editor's required prefix '"
+                << requiredPrefix.toStdString() << "'.";
+  }
 
   // Use the public lookup rather than reaching into m_RenderWindowWidgets so
   // the canonical accessor stays the single source of truth for what is
   // registered.
-  if (this->GetRenderWindowWidget(qualifiedName) != nullptr)
+  if (this->GetRenderWindowWidget(id) != nullptr)
   {
     mitkThrow() << "CreateRenderWindowWidget: a render window with name '"
-                << qualifiedName.toStdString() << "' already exists in this editor.";
+                << id.toStdString() << "' already exists in this editor.";
   }
 
   // create the render window widget and connect signal / slot
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, qualifiedName, this->GetDataStorage());
-  renderWindowWidget->SetCornerAnnotationText(qualifiedName.toStdString());
-  this->AddRenderWindowWidget(qualifiedName, renderWindowWidget);
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, id, this->GetDataStorage());
+  renderWindowWidget->SetCornerAnnotationText(id.toStdString());
+  this->AddRenderWindowWidget(id, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
 
@@ -666,17 +702,6 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
     mitkThrow() << "LoadLayout: jsonData must not be null.";
   }
   this->ApplyLayout(*jsonData);
-}
-
-QString QmitkMxNMultiWidget::StripEditorPrefix(const QString& qualifiedName) const
-{
-  const auto prefix = this->GetMultiWidgetName() + ".";
-  if (!qualifiedName.startsWith(prefix))
-  {
-    mitkThrow() << "StripEditorPrefix: '" << qualifiedName.toStdString()
-                << "' does not start with editor prefix '" << prefix.toStdString() << "'.";
-  }
-  return qualifiedName.mid(prefix.size());
 }
 
 nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
@@ -820,7 +845,10 @@ QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) c
   }
 
   WindowDescriptor descriptor;
-  descriptor.id = this->StripEditorPrefix(cell->GetWidgetName());
+  // The cell's render-window name is the canonical fully-qualified id,
+  // used verbatim everywhere (layout JSON, REST URL, scene-file context
+  // keys, log lines). No translation step.
+  descriptor.id = cell->GetWidgetName();
   descriptor.displayName = cell->GetDisplayName();
   descriptor.viewDirection = QString::fromStdString(
     ViewDirectionToV2String(
@@ -922,12 +950,15 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
       }
       else  // "window"
       {
-        const auto bareId = QString::fromStdString(child["id"].get<std::string>());
+        // Id is used verbatim: the document carries the canonical
+        // qualified form (`<multiWidgetName>__<bare>`); ValidateIdsForThisEditor
+        // has already ensured the prefix matches this editor instance.
+        const auto id = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
         const auto groupName = child["links"]["selection"].get<std::string>();
         const auto targetIdx = nameToInt.at(groupName);
 
-        auto window = this->CreateRenderWindowWidget(bareId);
+        auto window = this->CreateRenderWindowWidget(id);
         // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
@@ -987,15 +1018,15 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   // now that the cell map is populated.
   std::map<std::string, RenderWindowWidgetPointer> seedCells;
   std::map<std::string, std::vector<RenderWindowWidgetPointer>> groupMembers;
-  for (const auto& [bareId, groupName] : seedingOrder)
+  for (const auto& [id, groupName] : seedingOrder)
   {
-    const auto qualifiedName = this->MakeQualifiedName(QString::fromStdString(bareId));
-    const auto cell = this->GetRenderWindowWidget(qualifiedName);
+    // The id is the canonical fully-qualified name; look the cell up directly.
+    const auto cell = this->GetRenderWindowWidget(QString::fromStdString(id));
     if (nullptr == cell)
     {
       // Engine-state corruption: the validation pass said this cell would
       // exist. Surface rather than silently skip.
-      mitkThrow() << "SeedAndNormalizeGroups: cell '" << qualifiedName.toStdString()
+      mitkThrow() << "SeedAndNormalizeGroups: cell '" << id
                   << "' referenced in seeding order is not registered after build.";
     }
     groupMembers[groupName].push_back(cell);
@@ -1199,6 +1230,57 @@ void QmitkMxNMultiWidget::RollBackToSingleDefaultCell()
   this->SetLayout(1, 1);
 }
 
+void QmitkMxNMultiWidget::ValidateIdsForThisEditor(const nlohmann::json& doc) const
+{
+  // The schema's id pattern enforces the structural shape `<name>__<bare>`
+  // for any consumer that runs JSON-schema validation, but it cannot
+  // encode "matches THIS editor instance's `multiWidgetName`": that is a
+  // loader-instance-specific constraint. Walk every window node and reject
+  // ids that do not start with this editor's required prefix.
+  const auto requiredPrefix = (this->GetMultiWidgetName() + kNamespaceDelimiter).toStdString();
+  std::function<void(const nlohmann::json&)> walk = [&](const nlohmann::json& node)
+  {
+    if (!node.is_object() || !node.contains("type") || !node["type"].is_string())
+    {
+      // Shape errors are surfaced by PrewalkValidate downstream; this pass
+      // only checks ids on well-shaped window nodes.
+      return;
+    }
+    const auto type = node["type"].get<std::string>();
+    if (type == "split")
+    {
+      if (node.contains("children") && node["children"].is_array())
+      {
+        for (const auto& child : node["children"])
+        {
+          walk(child);
+        }
+      }
+    }
+    else if (type == "window")
+    {
+      if (!node.contains("id") || !node["id"].is_string())
+      {
+        return;  // Defer to PrewalkValidate for the missing/wrong-type message.
+      }
+      const auto id = node["id"].get<std::string>();
+      if (id.rfind(requiredPrefix, 0) != 0)
+      {
+        mitkThrow() << "ApplyLayout: window id '" << id
+                    << "' does not start with this editor's required prefix '"
+                    << requiredPrefix
+                    << "'. The layout was written for a different editor instance, "
+                    << "or the id is malformed.";
+      }
+    }
+  };
+
+  if (doc.is_object() && doc.contains("root"))
+  {
+    walk(doc.at("root"));
+  }
+}
+
 void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
 {
   // 'didMutate' guards rollback. As long as we are in the validation phase
@@ -1241,6 +1323,12 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     {
       mitkThrow() << "Layout document is missing the 'root' field.";
     }
+
+    // Loader-instance check: every window id must start with this editor's
+    // `<multiWidgetName>__` prefix. Run before PrewalkValidate so a misrouted
+    // document fails with a precise "wrong editor" message rather than a
+    // downstream symptom; both passes run before any engine state is touched.
+    this->ValidateIdsForThisEditor(doc);
 
     // Pre-walk: validate structural shape, collect window ids + referenced
     // group labels, and capture document-order seeding pairs for the
@@ -1416,8 +1504,9 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
       // place each cell directly into its row group via the canonical API,
       // mirroring ApplyLayout. Avoids the churn of the positional overload's
       // initial seeding into group 1 followed by an immediate move.
-      const auto bareId = QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(bareId);
+      const auto id = this->GetMultiWidgetName() + kNamespaceDelimiter
+                      + QStringLiteral("widget") + QString::number(cellCounter++);
+      auto window = this->CreateRenderWindowWidget(id);
       this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
 
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);

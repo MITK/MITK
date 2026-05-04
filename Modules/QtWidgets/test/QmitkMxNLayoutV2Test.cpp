@@ -99,6 +99,11 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(WindowName_DisplayNotString_Throws);
   MITK_TEST(ListWindowDescriptors_CarriesDisplayName);
 
+  // --- Qualified-id contract: id must start with this editor's prefix ---
+  MITK_TEST(ApplyLayout_UnprefixedId_Throws);
+  MITK_TEST(ApplyLayout_WrongEditorPrefix_Throws);
+  MITK_TEST(Construct_BadMultiWidgetName_Throws);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -188,8 +193,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -231,7 +236,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -289,12 +294,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "id": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-            { "type": "window", "id": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+            { "type": "window", "id": "mxn__w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
           ]}
         ]
       }
@@ -338,10 +343,10 @@ public:
         for (const auto& c : node.at("children")) walk(c);
         return;
       }
-      const auto bareId = QString::fromStdString(node.at("id").get<std::string>());
+      const auto id = QString::fromStdString(node.at("id").get<std::string>());
       const auto label = node.at("links").at("selection").get<std::string>();
-      auto cell = editor->GetRenderWindowWidget(QString("mxn.") + bareId);
-      CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its qualified name",
+      auto cell = editor->GetRenderWindowWidget(id);
+      CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its canonical id",
                              cell != nullptr);
       const auto engineGroup = cell->GetUtilityWidget()->GetSyncGroup();
       distinctEngineGroups.insert(engineGroup);
@@ -372,7 +377,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
         ]
       }
     })json");
@@ -392,7 +397,9 @@ public:
   }
 
   // ====================================================================
-  // Custom ids register under editor prefix
+  // Custom ids register verbatim under their canonical fully-qualified
+  // form. The engine does not prepend a prefix at apply time; the
+  // document's id is the registration key.
   // ====================================================================
   void CustomIds_RegisterUnderEditorPrefix()
   {
@@ -402,15 +409,15 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
-    CPPUNIT_ASSERT_MESSAGE("Cell must register under '<editorName>.<bareId>'",
-                           nullptr != editor->GetRenderWindowWidget(QString("mxn.alpha")));
+    CPPUNIT_ASSERT_MESSAGE("Cell must register under the document's canonical id verbatim",
+                           nullptr != editor->GetRenderWindowWidget(QString("mxn__alpha")));
   }
 
   // ====================================================================
@@ -424,8 +431,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -457,7 +464,7 @@ public:
         "root": {
           "type": "split", "orientation": "horizontal",
           "children": [
-            { "type": "window", "id": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
           ]
         }
       })json");
@@ -495,7 +502,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -503,7 +510,7 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
-    CPPUNIT_ASSERT(nullptr != editor->GetRenderWindowWidget(QString("mxn.only")));
+    CPPUNIT_ASSERT(nullptr != editor->GetRenderWindowWidget(QString("mxn__only")));
   }
 
   // ====================================================================
@@ -534,7 +541,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -567,8 +574,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -600,9 +607,9 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "window", "id": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "id": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
         ]
       }
     })json");
@@ -616,7 +623,8 @@ public:
   }
 
   // ====================================================================
-  // Bare ids in JSON have no editor prefix
+  // Serialize emits each cell's id verbatim: the canonical fully-qualified
+  // form goes in, the same string comes out (no prefix prepend, no strip).
   // ====================================================================
   void Serialize_RegisteredIds_StripPrefix()
   {
@@ -626,8 +634,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -641,8 +649,8 @@ public:
       emittedIds.insert(c.at("id").get<std::string>());
     }
     CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emittedIds.size());
-    CPPUNIT_ASSERT(emittedIds.count("alpha")   == 1);
-    CPPUNIT_ASSERT(emittedIds.count("widget0") == 1);
+    CPPUNIT_ASSERT(emittedIds.count("mxn__alpha")   == 1);
+    CPPUNIT_ASSERT(emittedIds.count("mxn__widget0") == 1);
   }
 
   // ====================================================================
@@ -657,12 +665,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "id": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "id": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
           ]}
         ]
       }
@@ -705,7 +713,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -735,7 +743,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -803,8 +811,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -829,8 +837,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -878,8 +886,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -887,8 +895,8 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
 
-    auto cell0 = editor->GetRenderWindowWidget(QString("mxn.widget0"));
-    auto cell1 = editor->GetRenderWindowWidget(QString("mxn.widget1"));
+    auto cell0 = editor->GetRenderWindowWidget(QString("mxn__widget0"));
+    auto cell1 = editor->GetRenderWindowWidget(QString("mxn__widget1"));
     CPPUNIT_ASSERT(cell0 != nullptr);
     CPPUNIT_ASSERT(cell1 != nullptr);
 
@@ -914,8 +922,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -939,9 +947,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" } },
-          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
@@ -949,9 +957,9 @@ public:
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
 
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget2")) != nullptr);
   }
 
   // ====================================================================
@@ -967,18 +975,18 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
-          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget2")) != nullptr);
   }
 
   // ====================================================================
@@ -993,7 +1001,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
         ]
       }
     })json");
@@ -1013,7 +1021,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
         ]
       }
     })json");
@@ -1027,9 +1035,10 @@ public:
   //
   // This is the public engine surface the REST window-list provider calls
   // (instead of going through SerializeLayout-then-parse). The descriptor
-  // shape -- bare id, view direction, selection group -- mirrors what
-  // the v2 layout document persists per cell, so per-cell field values
-  // agree by construction with what GET /editors/mxn/layout would emit.
+  // shape -- canonical fully-qualified id, view direction, selection group
+  // -- mirrors what the v2 layout document persists per cell, so per-cell
+  // field values agree by construction with what GET /editors/mxn/layout
+  // would emit.
   // ====================================================================
   void ListWindowDescriptors_DefaultGrid_ReturnsBareIds()
   {
@@ -1039,8 +1048,8 @@ public:
     const auto descriptors = editor->ListWindowDescriptors();
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), descriptors.size());
-    CPPUNIT_ASSERT_EQUAL(std::string("widget0"), descriptors[0].id.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("widget1"), descriptors[1].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget1"), descriptors[1].id.toStdString());
     // Default grid uses the conventional 'main' group label.
     CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[0].selectionGroup.toStdString());
     CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[1].selectionGroup.toStdString());
@@ -1057,14 +1066,14 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "id": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-            { "type": "window", "id": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
-            { "type": "window", "id": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+            { "type": "window", "id": "mxn__widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
           ]}
         ]
       }
@@ -1077,7 +1086,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(6), descriptors.size());
     for (size_t i = 0; i < 6; ++i)
     {
-      const auto expected = std::string("widget") + std::to_string(i);
+      const auto expected = std::string("mxn__widget") + std::to_string(i);
       CPPUNIT_ASSERT_EQUAL(expected, descriptors[i].id.toStdString());
     }
     // Row 1 is "main", row 2 is "row2".
@@ -1091,17 +1100,17 @@ public:
   {
     // Apply a fixture with three view directions and verify each survives
     // round-trip through the descriptor query. Custom ids exercise the
-    // bare-id path (no positional reassignment).
+    // explicit-id path (no positional reassignment).
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
       "groups": { "main": { "select_all": true } },
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "axView",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "sagView",   "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "corView",   "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "originalV", "view_direction": "original", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__axView",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__sagView",   "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__corView",   "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__originalV", "view_direction": "original", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1112,17 +1121,17 @@ public:
     const auto descriptors = editor->ListWindowDescriptors();
     CPPUNIT_ASSERT_EQUAL(std::size_t(4), descriptors.size());
 
-    CPPUNIT_ASSERT_EQUAL(std::string("axView"),    descriptors[0].id.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("axial"),     descriptors[0].viewDirection.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__axView"),    descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"),          descriptors[0].viewDirection.toStdString());
 
-    CPPUNIT_ASSERT_EQUAL(std::string("sagView"),   descriptors[1].id.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("sagittal"),  descriptors[1].viewDirection.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__sagView"),   descriptors[1].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("sagittal"),       descriptors[1].viewDirection.toStdString());
 
-    CPPUNIT_ASSERT_EQUAL(std::string("corView"),   descriptors[2].id.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("coronal"),   descriptors[2].viewDirection.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__corView"),   descriptors[2].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("coronal"),        descriptors[2].viewDirection.toStdString());
 
-    CPPUNIT_ASSERT_EQUAL(std::string("originalV"), descriptors[3].id.toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("original"),  descriptors[3].viewDirection.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__originalV"), descriptors[3].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("original"),       descriptors[3].viewDirection.toStdString());
 
     for (const auto& d : descriptors)
       CPPUNIT_ASSERT_EQUAL(std::string("main"), d.selectionGroup.toStdString());
@@ -1139,7 +1148,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": "Tumor axial", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1149,8 +1158,8 @@ public:
 
     const auto roundTrip = editor->SerializeLayout();
     const auto& child = roundTrip.at("root").at("children").at(0);
-    CPPUNIT_ASSERT_EQUAL(std::string("widget0"),     child.at("id").get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"), child.at("name").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"),  child.at("name").get<std::string>());
   }
 
   // ====================================================================
@@ -1165,7 +1174,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1175,7 +1184,7 @@ public:
 
     const auto roundTrip = editor->SerializeLayout();
     const auto& child = roundTrip.at("root").at("children").at(0);
-    CPPUNIT_ASSERT_EQUAL(std::string("widget0"), child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), child.at("id").get<std::string>());
     CPPUNIT_ASSERT_MESSAGE(
       "Cells without a display label must NOT emit a 'name' key on serialize",
       !child.contains("name"));
@@ -1193,8 +1202,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": "View", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "widget1", "name": "View", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "View", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1", "name": "View", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1215,7 +1224,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": "Brain - axial (T1, FLAIR)", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "Brain - axial (T1, FLAIR)", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1239,7 +1248,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": "", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1269,7 +1278,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": 42, "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": 42, "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1291,8 +1300,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "id": "widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "id": "widget1",                          "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1",                          "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -1306,6 +1315,100 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Cells without a display label must surface an empty displayName",
       std::string{}, descriptors[1].displayName.toStdString());
+  }
+
+  // ====================================================================
+  // A document whose id has no '<editor>__' prefix is rejected up-front.
+  // The loader's instance check runs before any engine state mutation,
+  // so the existing layout survives the failed apply.
+  // ====================================================================
+  void ApplyLayout_UnprefixedId_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on an unprefixed window id");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending id",
+                             msg.find("widget0") != std::string::npos);
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the required prefix",
+                             msg.find("mxn__") != std::string::npos);
+    }
+    // Pre-mutation throw: the existing single-cell layout from MakeEditor
+    // must still be intact.
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  // ====================================================================
+  // A document whose id carries a different editor's prefix is rejected.
+  // ====================================================================
+  void ApplyLayout_WrongEditorPrefix_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "stdmulti__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on a wrong-editor prefix");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending id",
+                             msg.find("stdmulti__widget0") != std::string::npos);
+    }
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  // ====================================================================
+  // The constructor rejects multiWidgetName values that would produce
+  // schema-invalid ids (containing '_' / '__', empty, leading digit, ...).
+  // ====================================================================
+  void Construct_BadMultiWidgetName_Throws()
+  {
+    for (const auto& bad : { QString("bad__name"),
+                             QString("bad_name"),
+                             QString(""),
+                             QString("1abc"),
+                             QString(".abc"),
+                             QString("ab cd") })
+    {
+      try
+      {
+        QmitkMxNMultiWidget invalid(/*parent=*/nullptr, /*flags=*/{}, bad);
+        CPPUNIT_FAIL((std::string("Constructor must throw on multiWidgetName '")
+                      + bad.toStdString() + "'").c_str());
+      }
+      catch (const mitk::Exception&)
+      {
+        // expected
+      }
+    }
   }
 };
 

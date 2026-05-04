@@ -50,8 +50,10 @@ public:
   * \brief Construct a render-window widget.
   *
   * \param parent       Owning Qt parent. Must not be null.
-  * \param widgetName   Qualified name registered with the rendering manager
-  *                     (typically '<editorName>.<bareName>'). Must not be empty.
+  * \param widgetName   Canonical name registered with the rendering manager
+  *                     (e.g. 'stdmulti.axial' for StdMulti, or 'mxn__widget0'
+  *                     for MxN; the editor that owns this widget chooses the
+  *                     convention). Must not be empty.
   * \param dataStorage  Data storage backing the render window. Must not be null;
   *                     the widget unconditionally talks to it during 'InitializeGUI'.
   *

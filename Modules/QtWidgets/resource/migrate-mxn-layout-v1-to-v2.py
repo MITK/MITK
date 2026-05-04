@@ -24,9 +24,14 @@ Field mapping highlights:
   is mapped to the v2 group label `'main'` for index 1 and `'g_<N>'`
   otherwise. Per-cell `selectAll` is folded into the group's `select_all`
   property (first-encounter wins).
+- Window ids are emitted in the v2 canonical fully-qualified form
+  `<editor_name>__widget<i>` (default editor name `mxn`, override with
+  `--editor-name`). v1 layouts had no stable per-cell identity worth
+  preserving, so `<i>` is the leaf's pre-order traversal index.
 
 Usage:
-    migrate-mxn-layout-v1-to-v2.py INPUT [-o OUTPUT] [--schema SCHEMA]
+    migrate-mxn-layout-v1-to-v2.py INPUT [-o OUTPUT] [--editor-name NAME]
+                                         [--schema SCHEMA]
 
 If `--schema` is omitted, the v2 schema is loaded from a file called
 `mxn-layout-v2.schema.json` next to this script. When `jsonschema` is
@@ -40,9 +45,32 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
+
+
+# Default editor name produced by `QmitkMxNMultiWidget`. Used as the
+# `<editor_name>` segment of qualified ids (`<editor_name>__widget<i>`)
+# unless overridden via `--editor-name`.
+DEFAULT_EDITOR_NAME = "mxn"
+
+# Namespace delimiter between editor name and bare id segment in the
+# canonical qualified-window-id form. Mirrors `kNamespaceDelimiter` in the
+# C++ engine.
+NAMESPACE_DELIMITER = "__"
+
+# Editor-name shape constraint. Mirrors the C++ engine's `kEditorNamePattern`
+# and the `<editor_name>` segment of the schema's id pattern: starts with a
+# letter, no `_` (which would break the first-`__` split rule), only
+# `[A-Za-z0-9.-]` afterwards.
+_EDITOR_NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9.-]*$")
+
+
+def _qualified_id(bare_id: str, editor_name: str = DEFAULT_EDITOR_NAME) -> str:
+    """Build the canonical qualified id `<editor_name>__<bare_id>`."""
+    return f"{editor_name}{NAMESPACE_DELIMITER}{bare_id}"
 
 
 def _group_label(group_int: int) -> str:
@@ -84,12 +112,15 @@ def _convert_node(
     path: str,
     widget_counter: list,
     group_select_all: dict,
+    editor_name: str,
 ) -> dict:
     """Recursively convert a v1 node to a v2 node.
 
     `widget_counter` is a single-element list used as a mutable integer counter
     (pre-order index across the whole tree); `group_select_all` records the
     `selectAll` state for each group encountered (first-encounter wins).
+    `editor_name` becomes the `<editor_name>` segment of every emitted
+    qualified id.
     """
     if not isinstance(node, dict):
         raise ValueError(f"v1 node at {path} is not an object: {node!r}")
@@ -124,7 +155,7 @@ def _convert_node(
 
         out: dict = {
             "type": "window",
-            "id": f"widget{idx}",
+            "id": _qualified_id(f"widget{idx}", editor_name),
             "view_direction": view_direction,
             "links": {"selection": group_name},
         }
@@ -154,6 +185,7 @@ def _convert_node(
                 path=f"{path}/content[{i}]",
                 widget_counter=widget_counter,
                 group_select_all=group_select_all,
+                editor_name=editor_name,
             )
             for i, child in enumerate(children_raw)
         ],
@@ -165,10 +197,22 @@ def _convert_node(
     return out_split
 
 
-def migrate(v1_doc: dict) -> dict:
-    """Convert a parsed v1.x layout document to a v2.0 document."""
+def migrate(v1_doc: dict, *, editor_name: str = DEFAULT_EDITOR_NAME) -> dict:
+    """Convert a parsed v1.x layout document to a v2.0 document.
+
+    `editor_name` becomes the `<editor_name>` segment of every emitted
+    qualified id and must match the loading editor's `multiWidgetName`
+    (default `mxn`).
+    """
     if not isinstance(v1_doc, dict):
         raise ValueError("v1 document must be a JSON object at the top level.")
+
+    if not _EDITOR_NAME_PATTERN.match(editor_name):
+        raise ValueError(
+            f"editor name {editor_name!r} does not match {_EDITOR_NAME_PATTERN.pattern!r}: "
+            f"editor names must start with a letter, contain no '_', and use only "
+            f"the alphabet [A-Za-z0-9.-]."
+        )
 
     version = str(v1_doc.get("version", ""))
     if not version.startswith("1."):
@@ -184,6 +228,7 @@ def migrate(v1_doc: dict) -> dict:
         path="$",
         widget_counter=widget_counter,
         group_select_all=group_select_all,
+        editor_name=editor_name,
     )
     # Strip a 'size' from the root - the v2 schema's root has no parent.
     root.pop("size", None)
@@ -253,6 +298,15 @@ def main(argv: list) -> int:
         help="Output path for the v2.0 document; stdout if omitted.",
     )
     parser.add_argument(
+        "--editor-name",
+        default=DEFAULT_EDITOR_NAME,
+        help=(
+            "MxN editor name to embed in the qualified id of every window "
+            f"(default {DEFAULT_EDITOR_NAME!r}). Must match the loading editor's "
+            "`multiWidgetName`."
+        ),
+    )
+    parser.add_argument(
         "--schema",
         type=Path,
         default=Path(__file__).resolve().parent / "mxn-layout-v2.schema.json",
@@ -274,7 +328,7 @@ def main(argv: list) -> int:
         return 1
 
     try:
-        v2_doc = migrate(v1_doc)
+        v2_doc = migrate(v1_doc, editor_name=args.editor_name)
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2

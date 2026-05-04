@@ -413,10 +413,11 @@ mitk::Sex mitk::GetPatientsSex(const mitk::IPropertyProvider* provider)
 
   if ("M" == normalized) return Sex::Male;
   if ("F" == normalized) return Sex::Female;
+  if ("O" == normalized) return Sex::Other;
 
   mitkThrowException(InvalidDICOMPropertyValueException)
     << "DICOM tag (0010,0040) Patient Sex holds unsupported value '"
-    << raw << "'. Expected one of M, F.";
+    << raw << "'. Expected one of M, F, O.";
 }
 
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)

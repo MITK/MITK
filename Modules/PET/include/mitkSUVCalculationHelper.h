@@ -46,7 +46,14 @@ namespace mitk
   enum class Sex
   {
     Male,
-    Female
+    Female,
+    /** DICOM (0010,0040) value 'O' (Other). Strategies that consume
+     *  patient sex must define how this case is handled. The Janmahasatian
+     *  LBM strategy follows the IBSI-SUV benchmark recommendation:
+     *  the mean of the male- and female-specific scale numerators.
+     *  DICOM 'U' (Unknown) has no benchmark-supported convention and is
+     *  rejected at the helper boundary. */
+    Other
   };
 
   /**
@@ -240,10 +247,12 @@ namespace mitk
    *
    * Reads DICOM tag (0010,0040) Patient Sex (CS VR). The string value is
    * matched case-insensitively after trimming surrounding whitespace.
-   * Only the two clinically relevant values for SUV normalization
-   * (M, F) are accepted; any other value, including DICOM's "O"
-   * (Other) and "U" (Unknown), is reported as invalid so callers cannot
-   * silently fall through with an under-specified input.
+   * The values M, F, and O (Other) are accepted; the policy applied to
+   * \c Sex::Other is defined by the consuming normalization strategy and
+   * follows the IBSI-SUV benchmark recommendation (mean of male- and
+   * female-specific factors). DICOM's "U" (Unknown) and any other value
+   * remain invalid so callers cannot silently fall through with an
+   * under-specified input.
    *
    * \param[in] provider Source of DICOM properties.
    * \return The patient's sex as a \c Sex enum value.
@@ -252,7 +261,7 @@ namespace mitk
    * \throw MissingDICOMPropertyException if \p provider is \c nullptr or
    *        contains no patient-sex property.
    * \throw InvalidDICOMPropertyValueException if (0010,0040) holds a
-   *        value other than \c M or \c F.
+   *        value other than \c M, \c F, or \c O.
    */
   Sex MITKPET_EXPORT GetPatientsSex(const mitk::IPropertyProvider* provider);
 

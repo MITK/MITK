@@ -119,6 +119,7 @@ namespace
     const std::string v = ToUpperAscii(TrimAsciiWhitespace(raw));
     if ("M" == v) return mitk::Sex::Male;
     if ("F" == v) return mitk::Sex::Female;
+    if ("O" == v) return mitk::Sex::Other;
     return std::nullopt;
   }
 
@@ -184,8 +185,10 @@ namespace
       "Patient height [m]",
       "Override DICOM (0010,1020) Patient Size. Required for variant lbm/bsa.");
     parser.addArgument("patient-sex", "", mitkCommandLineParser::String,
-      "Patient sex (M|F)",
-      "Override DICOM (0010,0040) Patient Sex. Required for variant lbm.");
+      "Patient sex (M|F|O)",
+      "Override DICOM (0010,0040) Patient Sex. Required for variant lbm. "
+      "Value 'O' (Other) follows the IBSI-SUV benchmark convention: the "
+      "mean of the male- and female-specific normalization factors.");
     parser.addArgument("half-life", "", mitkCommandLineParser::Float,
       "Half-life [s]",
       "Override DICOM (0018,1075) Radionuclide Half-Life.");
@@ -259,7 +262,7 @@ namespace
       const auto sx  = ParseSex(raw);
       if (!sx.has_value())
       {
-        MITK_ERROR << "Invalid --patient-sex value '" << raw << "'. Expected M or F.";
+        MITK_ERROR << "Invalid --patient-sex value '" << raw << "'. Expected one of M, F, O.";
         return false;
       }
       s.sex = sx.value();

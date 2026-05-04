@@ -31,6 +31,7 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   // Lean body mass (Janmahasatian)
   MITK_TEST(LBM_Male_KnownInputs);
   MITK_TEST(LBM_Female_KnownInputs);
+  MITK_TEST(LBM_Other_MeanOfMaleAndFemale);
   MITK_TEST(LBM_VariantId);
   MITK_TEST(LBM_MissingHeight_Throws);
   MITK_TEST(LBM_MissingSex_Throws);
@@ -123,6 +124,28 @@ public:
     inputs.bodyWeightKg = w;
     inputs.heightM      = h;
     inputs.sex          = mitk::Sex::Female;
+
+    mitk::LeanBodyMassStrategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+  }
+
+  void LBM_Other_MeanOfMaleAndFemale()
+  {
+    // IBSI-SUV benchmark recommends, for Sex == Other, the mean of the
+    // male- and female-specific Janmahasatian outputs (not the formulas
+    // applied to averaged inputs). Pinning that contract here.
+    constexpr double w = 70.0;       // kg
+    constexpr double h = 1.70;       // m
+    const double bmi   = w / (h * h);
+    const double lbmMaleKg   = (9270.0 * w) / (6680.0 + 216.0 * bmi);
+    const double lbmFemaleKg = (9270.0 * w) / (8780.0 + 244.0 * bmi);
+    const double expected    = 0.5 * (lbmMaleKg + lbmFemaleKg) * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = w;
+    inputs.heightM      = h;
+    inputs.sex          = mitk::Sex::Other;
 
     mitk::LeanBodyMassStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),

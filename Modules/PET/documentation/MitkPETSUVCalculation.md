@@ -58,7 +58,7 @@ and no override is given, the run aborts with a clear error.
 | `--injected-activity` | `(0018,1074)` `[Bq]`       | all                          |
 | `--body-weight`       | `(0010,1030)` `[kg]`       | all                          |
 | `--patient-height`    | `(0010,1020)` `[m]`        | `lbm`, `bsa`                 |
-| `--patient-sex`       | `(0010,0040)` (M / F)      | `lbm`                        |
+| `--patient-sex`       | `(0010,0040)` (M / F / O)  | `lbm`                        |
 | `--half-life`         | `(0018,1075)` `[s]`        | all                          |
 | `--nuclide`           | (alternative to half-life) | all (one of 18F, 68Ga, 11C, 15O) |
 | `--decay-time`        | uniform decay-time `[s]`   | -  (uniform; not a substitute for DICOM strategy NONE) |
@@ -157,7 +157,7 @@ NRRD does not carry the corresponding DICOM tags.
 | Variant | Normalization formula                                          | Output unit |
 |---------|----------------------------------------------------------------|-------------|
 | `bw`    | scale numerator = `bodyWeight_kg * 1000` (i.e. body weight in g) | `g/mL`      |
-| `lbm`   | Janmahasatian (2005): `LBM_kg = (9270 * W) / (sex-specific term * BMI + offset)`, then `* 1000` | `g/mL`      |
+| `lbm`   | Janmahasatian (2005): `LBM_kg = (9270 * W) / (sex-specific term * BMI + offset)`, then `* 1000`. For `Sex == O` (Other), the strategy returns the mean of the male- and female-specific outputs (IBSI-SUV benchmark convention). | `g/mL`      |
 | `bsa`   | DuBois (1916): `BSA_m^2 = 0.007184 * W^0.425 * H_cm^0.725`, then `* 10000` (cm^2) | `cm^2/mL`   |
 
 The math kernel is the same for all variants:

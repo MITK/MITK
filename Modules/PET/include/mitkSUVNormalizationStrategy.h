@@ -65,6 +65,10 @@ namespace mitk
    *
    * \li BodyWeightStrategy:       \c bodyWeightKg.
    * \li LeanBodyMassStrategy:     \c bodyWeightKg, \c heightM, \c sex.
+   *                              For \c sex == \c Sex::Other the strategy
+   *                              returns the mean of the male- and female-
+   *                              specific Janmahasatian outputs (IBSI-SUV
+   *                              benchmark convention).
    * \li BodySurfaceAreaStrategy:  \c bodyWeightKg, \c heightM.
    *
    * Unsupplied fields hold NaN (numeric) or have no value (\c sex);

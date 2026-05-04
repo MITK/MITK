@@ -117,7 +117,7 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
   MITK_TEST(PatientSex_Female);
   MITK_TEST(PatientSex_TrimAndCaseInsensitive);
   MITK_TEST(PatientSex_Missing_Throws_MissingDICOMPropertyException);
-  MITK_TEST(PatientSex_Other_Throws_InvalidDICOMPropertyValueException);
+  MITK_TEST(PatientSex_Other_ReturnsOther);
   MITK_TEST(PatientSex_Unknown_Throws_InvalidDICOMPropertyValueException);
   MITK_TEST(PatientSex_Garbage_Throws_InvalidDICOMPropertyValueException);
 
@@ -371,13 +371,14 @@ public:
                          mitk::MissingDICOMPropertyException);
   }
 
-  void PatientSex_Other_Throws_InvalidDICOMPropertyValueException()
+  void PatientSex_Other_ReturnsOther()
   {
-    // DICOM "O" (Other) is rejected: SUVlbm requires a binary classification.
+    // DICOM "O" (Other) is accepted; consuming strategies define the
+    // policy (IBSI-SUV benchmark convention: mean of M and F factors).
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0010, 0x0040), "O");
-    CPPUNIT_ASSERT_THROW(mitk::GetPatientsSex(image),
-                         mitk::InvalidDICOMPropertyValueException);
+    MITK_TEST_CONDITION_REQUIRED(mitk::GetPatientsSex(image) == mitk::Sex::Other,
+                                 "GetPatientsSex returns Sex::Other for DICOM 'O'.");
   }
 
   void PatientSex_Unknown_Throws_InvalidDICOMPropertyValueException()

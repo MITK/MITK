@@ -60,10 +60,18 @@ double mitk::LeanBodyMassStrategy::ComputeScaleNumerator(const SUVNormalizationI
   const double h   = inputs.heightM;
   const double bmi = w / (h * h);
 
-  const double lbmKg = (inputs.sex.value() == Sex::Male)
-    ? (9270.0 * w) / (6680.0 + 216.0 * bmi)
-    : (9270.0 * w) / (8780.0 + 244.0 * bmi);
+  const double lbmMaleKg   = (9270.0 * w) / (6680.0 + 216.0 * bmi);
+  const double lbmFemaleKg = (9270.0 * w) / (8780.0 + 244.0 * bmi);
 
+  // Sex == Other: IBSI-SUV benchmark recommends the mean of the male and
+  // female outputs (not the formulas applied to averaged inputs).
+  double lbmKg = 0.0;
+  switch (inputs.sex.value())
+  {
+    case Sex::Male:   lbmKg = lbmMaleKg;                       break;
+    case Sex::Female: lbmKg = lbmFemaleKg;                     break;
+    case Sex::Other:  lbmKg = 0.5 * (lbmMaleKg + lbmFemaleKg); break;
+  }
   return lbmKg * 1000.0;
 }
 

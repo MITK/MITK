@@ -59,9 +59,10 @@ void mitk::SUVFunctorPolicy::SetHalfLife(double tau)
 
 bool mitk::SUVFunctorPolicy::IsConfigured() const
 {
-  return std::isfinite(m_InjectedActivity)
-      && std::isfinite(m_ScaleNumerator)
-      && std::isfinite(m_HalfLife)
+  auto isPositiveFinite = [](double x) { return std::isfinite(x) && x > 0.0; };
+  return isPositiveFinite(m_InjectedActivity)
+      && isPositiveFinite(m_ScaleNumerator)
+      && isPositiveFinite(m_HalfLife)
       && static_cast<bool>(m_Functor);
 }
 

@@ -123,7 +123,9 @@ namespace mitk
     Start,
     /** Pixel data is not decay-corrected. The residual correction uses the
      *  per-slice acquisition date and time. */
-    None
+    None,
+    /** Decay time supplied manually (e.g., CLI override); not derived from DICOM. */
+    Manual
   };
 
   /**
@@ -154,7 +156,7 @@ namespace mitk
    */
   struct MITKPET_EXPORT DecayCorrectionInfo
   {
-    DecayCorrectionStrategy strategy;
+    DecayCorrectionStrategy strategy = DecayCorrectionStrategy::None;
     DecayTimeMapType        decayTimes;
   };
 

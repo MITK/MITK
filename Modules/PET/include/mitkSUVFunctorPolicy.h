@@ -47,7 +47,9 @@ namespace mitk
    * Such an instance is intentionally invalid: use the parameterised
    * constructor or the corresponding setters to bring it into a usable
    * state, and call IsConfigured() to verify the contract before
-   * invoking operator().
+   * invoking operator(). Zero and negative values are also invalid
+   * even though they are finite: they cause a zero or negative
+   * denominator in the SUV formula and produce NaN/Inf output.
    *
    * If operator() is called on an unconfigured instance, the NaN values
    * propagate through the math and produce a fully NaN output image.
@@ -153,9 +155,9 @@ namespace mitk
      * \brief Check whether the policy is fully configured and safe to invoke.
      *
      * Returns \c true iff all three numeric parameters (injected
-     * activity, scale numerator, half-life) are finite and a decay-time
-     * functor has been set. Callers should validate at the boundary
-     * before invoking operator().
+     * activity, scale numerator, half-life) are finite and strictly
+     * positive, and a decay-time functor has been set. Callers should
+     * validate at the boundary before invoking operator().
      *
      * \return \c true if every required parameter has been supplied.
      */

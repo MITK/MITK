@@ -347,12 +347,14 @@ namespace
       // No DICOM RPI sequence available. Caller must have provided overrides
       // for both injected activity and half-life — the resolution step
       // checks for that and reports a clear message.
+      outExitCode = ExitCode::Success;
       sel.index = -1;
       return sel;
     }
 
     if (infos.size() == 1 && !s.tracerIndex.has_value())
     {
+      outExitCode = ExitCode::Success;
       sel.index = 0;
       sel.info  = infos[0];
       return sel;
@@ -369,6 +371,7 @@ namespace
         sel.index = -2;
         return sel;
       }
+      outExitCode = ExitCode::Success;
       sel.index = idx;
       sel.info  = infos[idx];
       return sel;
@@ -497,12 +500,14 @@ int main(int argc, char* argv[])
 
     auto rpiInfos = mitk::GetRadiopharmaceuticalInfos(image.GetPointer());
 
-    ExitCode tracerExit = ExitCode::Success;
+    ExitCode tracerExit = ExitCode::Generic;
     auto tracer = SelectTracer(rpiInfos, s, tracerExit);
-    if (tracer.index < -1)  // -1 means "no DICOM info, must rely on overrides"
+    if (tracer.index < -1)
     {
       return AsInt(tracerExit);
     }
+    // tracer.index == -1 here means no DICOM RPI sequence; CLI overrides must supply activity / half-life.
+    // tracer.index >= 0 means a tracer was selected.
 
     const double injectedActivity = s.injectedActivityBq.has_value()
       ? s.injectedActivityBq.value()
@@ -518,11 +523,25 @@ int main(int argc, char* argv[])
                     "or supply DICOM (0018,1074).";
       return AsInt(ExitCode::MissingDICOMProperty);
     }
+    if (injectedActivity <= 0.0)
+    {
+      MITK_ERROR << "Injected activity must be a positive value (got "
+                 << injectedActivity << " Bq). Provide --injected-activity "
+                    "or check DICOM (0018,1074).";
+      return AsInt(ExitCode::InvalidDICOMPropertyValue);
+    }
     if (!std::isfinite(halfLife))
     {
       MITK_ERROR << "Half-life is unknown. Provide --half-life or --nuclide, "
                     "or supply DICOM (0018,1075).";
       return AsInt(ExitCode::MissingDICOMProperty);
+    }
+    if (halfLife <= 0.0)
+    {
+      MITK_ERROR << "Half-life must be a positive value (got "
+                 << halfLife << " s). Provide --half-life or --nuclide, "
+                    "or check DICOM (0018,1075).";
+      return AsInt(ExitCode::InvalidDICOMPropertyValue);
     }
 
     // Patient measurements: always need body weight; LBM and BSA need
@@ -570,6 +589,7 @@ int main(int argc, char* argv[])
           decayInfo.decayTimes[t][z] = s.decayTimeS.value();
         }
       }
+      decayInfo.strategy = mitk::DecayCorrectionStrategy::Manual;
     }
     else
     {

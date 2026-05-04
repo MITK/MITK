@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <cmath>
 
@@ -31,6 +27,9 @@ class mitkSUVFunctorPolicyTestSuite : public mitk::TestFixture
   MITK_TEST(Default_IsNotConfigured);
   MITK_TEST(SetAll_IsConfigured);
   MITK_TEST(Default_OperatorReturnsNaN);
+  MITK_TEST(ZeroInjectedActivity_IsNotConfigured);
+  MITK_TEST(ZeroHalfLife_IsNotConfigured);
+  MITK_TEST(ZeroScaleNumerator_IsNotConfigured);
 
   // Generic SUVFunctorPolicy
   MITK_TEST(Generic_AppliesScaleNumerator);
@@ -85,6 +84,44 @@ public:
     f.SetDecayTimeFunctor(ConstantDecay(0.0));
     const auto out = f(1.0, mitk::SUVFunctorPolicy::IndexType{ {0, 0, 0} });
     CPPUNIT_ASSERT(std::isnan(out));
+  }
+
+  void ZeroInjectedActivity_IsNotConfigured()
+  {
+    // Zero injected activity is a valid IEEE float but a physical
+    // nonsense: it would make the SUV denominator zero and produce
+    // NaN/Inf voxels. IsConfigured() must reject it.
+    mitk::SUVFunctorPolicy f;
+    f.SetInjectedActivity(0.0);
+    f.SetScaleNumerator(kWeight * 1000.0);
+    f.SetHalfLife(kHalfLife);
+    f.SetDecayTimeFunctor(ConstantDecay(0.0));
+    CPPUNIT_ASSERT(!f.IsConfigured());
+  }
+
+  void ZeroHalfLife_IsNotConfigured()
+  {
+    // Zero half-life causes division by zero in the decay exponent.
+    // IsConfigured() must reject it even though 0.0 is finite.
+    mitk::SUVFunctorPolicy f;
+    f.SetInjectedActivity(kActivity);
+    f.SetScaleNumerator(kWeight * 1000.0);
+    f.SetHalfLife(0.0);
+    f.SetDecayTimeFunctor(ConstantDecay(0.0));
+    CPPUNIT_ASSERT(!f.IsConfigured());
+  }
+
+  void ZeroScaleNumerator_IsNotConfigured()
+  {
+    // Zero scale numerator (body weight, LBM, or BSA) would make the
+    // SUV numerator zero and produce an all-zero output image.
+    // IsConfigured() must reject it.
+    mitk::SUVFunctorPolicy f;
+    f.SetInjectedActivity(kActivity);
+    f.SetScaleNumerator(0.0);
+    f.SetHalfLife(kHalfLife);
+    f.SetDecayTimeFunctor(ConstantDecay(0.0));
+    CPPUNIT_ASSERT(!f.IsConfigured());
   }
 
   // ---- Generic SUVFunctorPolicy ----

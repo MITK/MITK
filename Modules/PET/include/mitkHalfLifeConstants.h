@@ -24,7 +24,7 @@ namespace mitk
  * from the same source. Where NNDC reports the half-life in minutes, the
  * value here is the minute value multiplied by 60 (no further rounding).
  *
- * \sa computeSUVbw, computeSUVbwScaleFactor, SUVbwFunctorPolicy
+ * \sa computeSUVScaleFactor, SUVFunctorPolicy
  */
 struct MITKPET_EXPORT HALFLIFECONSTANTS
 {

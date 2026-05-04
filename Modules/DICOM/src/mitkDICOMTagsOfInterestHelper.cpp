@@ -191,6 +191,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x0031))); //dicom.pet.Radiopharmaceutical
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1072))); //dicom.pet.RadiopharmaceuticalStartTime
+    result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1078))); //dicom.pet.RadiopharmaceuticalStartDateTime
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1074))); //dicom.pet.RadionuclideTotalDose
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1075))); //dicom.pet.RadionuclideHalfLife
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1076))); //dicom.pet.RadionuclidePositronFraction

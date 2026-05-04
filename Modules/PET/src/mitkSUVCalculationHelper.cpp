@@ -548,6 +548,10 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
              "Tag is missing.";
       }
 
+      // Injection time is image-level; resolve once and reuse across all slices/timesteps.
+      const std::string firstSliceAcqDate = acqDateProp->GetValue(0, 0, true, true);
+      const auto injection = ResolveInjectionDateTime(data, firstSliceAcqDate);
+
       const auto timeSteps = data->GetTimeSteps();
       for (TimeStepType t = 0; t < timeSteps; ++t)
       {
@@ -567,12 +571,17 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               << "' at timestep " << t << " slice " << s << ".";
           }
 
-          const auto injection = ResolveInjectionDateTime(data, acqDate);
           sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
             ComputeDecayTimeWithRolloverGuard(injection.first, ofAcq, injection.second);
         }
       }
       return info;
+    }
+
+    case DecayCorrectionStrategy::Manual:
+    {
+      mitkThrow() << "DeduceDecayCorrection cannot return Manual strategy; "
+                     "Manual is set by callers that provide a decay time directly.";
     }
   }
 

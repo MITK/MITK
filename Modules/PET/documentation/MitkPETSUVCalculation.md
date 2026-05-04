@@ -186,7 +186,7 @@ resulting decay would be negative).
 
 The `--decay-time` flag bypasses all of the above and applies the
 supplied duration uniformly to every voxel. It is intended for inputs
-without DICOM timing tags (Example 5 below) or to reproduce ADMIN-style
+without DICOM timing tags (Example 5 above) or to reproduce ADMIN-style
 behaviour by passing `0`. Because it is uniform-by-construction, it is
 not a substitute for the per-slice handling that DICOM strategy `NONE`
 performs when reading from DICOM.

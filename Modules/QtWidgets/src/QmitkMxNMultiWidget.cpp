@@ -1047,10 +1047,10 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   constexpr int kWarnCap = 16;
   int warnCount = 0;
   bool warnCapHit = false;
-  // TODO(C6): exercise the divergence path via a path-2 integration test once
-  // scene-after-layout reseeding is implemented (see plan_mxn_post_rest.md C6).
-  // Until then this lambda has no CI coverage by design - fresh layouts have
-  // no divergence to detect.
+  // The divergence path here is uncovered by CI today by design: fresh
+  // layouts have no divergence to detect. Once scene-after-layout reseeding
+  // is implemented, an integration test should exercise this lambda with
+  // a scene that injects per-renderer divergence after the layout was applied.
   auto emitDivergence = [&](const std::string& groupName,
                             const std::string& dim,
                             const std::string& nodeLabel,

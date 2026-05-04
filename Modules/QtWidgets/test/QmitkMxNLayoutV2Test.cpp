@@ -85,7 +85,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Size_Zero_Throws);
   MITK_TEST(Size_Negative_Throws);
 
-  // --- ListWindowDescriptors (engine query consumed by REST WP3) ---
+  // --- ListWindowDescriptors (engine query consumed by REST bindings) ---
   MITK_TEST(ListWindowDescriptors_DefaultGrid_ReturnsBareIds);
   MITK_TEST(ListWindowDescriptors_AfterApply_PreOrderTraversal);
   MITK_TEST(ListWindowDescriptors_CarriesViewDirectionAndSelectionGroup);
@@ -1031,7 +1031,7 @@ public:
   }
 
   // ====================================================================
-  // ListWindowDescriptors -- engine query consumed by REST WP3 bindings.
+  // ListWindowDescriptors -- engine query consumed by the REST bindings.
   //
   // This is the public engine surface the REST window-list provider calls
   // (instead of going through SerializeLayout-then-parse). The descriptor

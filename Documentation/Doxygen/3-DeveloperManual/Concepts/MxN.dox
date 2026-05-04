@@ -65,4 +65,14 @@ Connected \ref QmitkSynchronizedNodeSelectionWidget will inform each other of ch
 node selections and their visibility / ordering. To get newly connected widgets up to date, the
 \ref QmitkSynchronizedWidgetConnector internally saves the current selection and selection mode.
 
+
+\section MxNConceptPage_LayoutFormat Layout file format
+
+The on-disk layout files (`mxnLayout_*.json`), the documents accepted by
+`QmitkMxNMultiWidget::ApplyLayout`, and the documents emitted by
+`QmitkMxNMultiWidget::SerializeLayout` all share a single JSON format. The
+human-friendly walkthrough lives on a dedicated page:
+\ref MxNLayoutFormatPage. The closed, normative reference is the JSON Schema
+`Modules/QtWidgets/resource/mxn-layout-v2.schema.json`.
+
 */

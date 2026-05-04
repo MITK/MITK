@@ -28,8 +28,8 @@ A layout document captures:
 
 - The **splitter tree** that arranges render windows on screen (rows, columns,
   nesting, splitter weights).
-- Per-window **placement state** (window name, view direction, links into
-  synchronization groups).
+- Per-window **placement state** (window id, optional display name, view
+  direction, links into synchronization groups).
 - Per-group **persisted state** (today: the `select_all` UX-mode of the
   selection bundle).
 
@@ -53,7 +53,8 @@ data nodes simply applies the new geometry; the data stays.
     "children": [
       {
         "type": "window",
-        "name": "widget0",
+        "id": "widget0",
+        "name": "Tumor axial",
         "view_direction": "axial",
         "links": { "selection": "main" },
         "size": 1
@@ -67,7 +68,9 @@ data nodes simply applies the new geometry; the data stays.
   other value. v1.x files are upgraded out-of-band — see "Migrating from
   v1.x" below.
 - `name`: optional human-readable preset name. Pure metadata; ignored by the
-  loader and not used for routing.
+  loader and not used for routing. (The window leaves carry an optional
+  `name` of their own, used the same way — see "Window identity and display
+  label" below.)
 - `groups`: optional. When present, authoritative. See "Lazy vs. strict mode"
   below.
 - `root`: required. The root of the splitter tree. Always a `split`, even for
@@ -89,7 +92,8 @@ A node in the tree is one of two kinds, distinguished by `type`:
 ```json
 {
   "type": "window",
-  "name": "widget0",
+  "id": "widget0",
+  "name": "Tumor axial",  // optional display label; omit if absent
   "view_direction": "axial",
   "links": { "selection": "<groupName>" },
   "size": 1               // optional; defaults to 1 when omitted
@@ -104,9 +108,12 @@ must be a non-empty array. The document root has no parent and therefore no
 
 A `window` is a leaf render-window. Every window must declare:
 
-- `name`: a unique identifier within the document. Used as the engine-side
-  bare name; the editor qualifies it at load time as `<editorName>.<name>`
-  when registering with the rendering manager.
+- `id`: the window's identity. A unique identifier within the document; used
+  as the engine-side bare render-window name (qualified at load time as
+  `<editorName>.<id>` when registering with the rendering manager), as the
+  URL path segment in REST sub-resources, and as the per-renderer DataNode
+  property context key. Schema-enforced URL-segment-safe (alphanumeric,
+  underscore, dot, hyphen).
 - `view_direction`: which anatomical plane the window shows. The closed enum
   is `"axial"`, `"sagittal"`, `"coronal"`, `"original"` (lowercase). Unknown
   strings throw at load time; there is no silent fallback.
@@ -114,6 +121,14 @@ A `window` is a leaf render-window. Every window must declare:
   `selection`; v3.0 will add more dimensions here additively (zoom, time,
   crosshair, ...). Every window must declare `links.selection` explicitly --
   there are no implicit singletons.
+
+A window may additionally declare:
+
+- `name`: optional human-readable display label. Free-form (no pattern
+  constraint, not required to be unique within the document). Pure metadata;
+  the loader does not use it for routing, addressing, persisted-state
+  keying, or REST URL construction (those all use `id`). Omit the field
+  entirely if the cell has no display name — empty strings are rejected.
 
 ### `size` is a ratio, not pixels
 
@@ -204,9 +219,9 @@ is stable and reviewer-friendly.
         "orientation": "horizontal",
         "size": 1,
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "widget0", "name": "Row 1 - Axial",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
         ]
       },
       {
@@ -214,9 +229,9 @@ is stable and reviewer-friendly.
         "orientation": "horizontal",
         "size": 1,
         "children": [
-          { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+          { "type": "window", "id": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "id": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "id": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
         ]
       }
     ]
@@ -256,11 +271,20 @@ first among the group's members in the layout document. In the worked
 example above, `widget0` is the seed for `main` and `widget3` is the seed
 for `row2`.
 
-## Window names
+## Window identity and display label
 
-Within a document, window names must be unique. The schema enforces
-URL-segment safety (alphanumeric, underscore, dot, hyphen) so a name can
-drop into a future REST URL without escaping.
+Each window leaf carries a required identity (`id`) and an optional display
+label (`name`). The two are deliberately separate fields so that renaming
+the human-facing label never invalidates persisted references.
+
+**`id` (identity).** Within a document, window ids must be unique. The schema
+enforces URL-segment safety (alphanumeric, underscore, dot, hyphen) so an id
+can drop into a REST URL without escaping. Everything that addresses a
+window — the engine-side qualified render-window name, the
+`/rendering/editors/mxn/windows/{id}/...` REST sub-resources, the per-renderer
+DataNode property context key, and saved-session references — uses the `id`.
+Renaming an id therefore breaks every cached reference to it; treat it as
+permanent.
 
 The recommended default for tool-generated layouts is `widget<i>` where
 `<i>` is the leaf's pre-order traversal index (0-based, contiguous).
@@ -268,9 +292,24 @@ The recommended default for tool-generated layouts is `widget<i>` where
 unique URL-segment-safe string (e.g. `"alpha"`, `"upper_left"`).
 
 The loader registers each window under the qualified name
-`<editorName>.<bareName>`. For the default editor the prefix is `mxn.`, so a
-JSON `"name": "widget0"` lands as `mxn.widget0` in the rendering manager.
-On serialize the prefix is stripped again.
+`<editorName>.<id>`. For the default editor the prefix is `mxn.`, so a JSON
+`"id": "widget0"` lands as `mxn.widget0` in the rendering manager. On
+serialize the prefix is stripped again.
+
+**`name` (display label).** Optional, free-form, not required to be unique.
+Holds whatever string a user-facing surface should show for the cell —
+"Tumor axial", "Reference T1", "Comparison view 2". Pure metadata: the
+loader does not use it for routing, addressing, persisted-state keying, or
+REST URL construction. The schema rejects an empty `name`; tools should omit
+the field entirely instead of emitting `""`. Tools that auto-generate
+layouts (`SerializeLayout`, the migration script) leave `name` unset by
+default; hand-authors and UIs that surface a "rename window" action populate
+it.
+
+The convention is symmetric across the document: the top-level optional
+`name` is the display label of the *preset*, and a per-window optional
+`name` is the display label of *that window*. Both are pure metadata; both
+can be safely renamed at any time.
 
 ## Migrating from v1.x
 

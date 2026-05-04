@@ -32,7 +32,7 @@ found in the LICENSE file.
  * Tests the v2 layout I/O on QmitkMxNMultiWidget:
  *   - SerializeLayout produces a strict-mode v2.0 document.
  *   - ApplyLayout accepts both strict and lazy mode, rejects non-2.0 versions,
- *     enforces window-name uniqueness and group-reference validity (strict),
+ *     enforces window-id uniqueness and group-reference validity (strict),
  *     tears down existing cells, and rolls back to a single default cell on
  *     construction failure.
  *   - View-direction parsing throws on unknown strings (no silent fallback)
@@ -51,8 +51,8 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
-  MITK_TEST(CustomNames_RegisterUnderEditorPrefix);
-  MITK_TEST(DuplicateWindowNames_Throws);
+  MITK_TEST(CustomIds_RegisterUnderEditorPrefix);
+  MITK_TEST(DuplicateWindowIds_Throws);
   MITK_TEST(Version_RejectsAllNonV2);
   MITK_TEST(Version_AcceptsExactly_2_0);
 
@@ -60,7 +60,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(TearDown_DestroysAllOldCells);
   MITK_TEST(Apply_Failure_RollsBackToDefault);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
-  MITK_TEST(Serialize_RegisteredNames_StripPrefix);
+  MITK_TEST(Serialize_RegisteredIds_StripPrefix);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
 
@@ -84,6 +84,20 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Size_PartiallyOmitted_MixedSiblings);
   MITK_TEST(Size_Zero_Throws);
   MITK_TEST(Size_Negative_Throws);
+
+  // --- ListWindowDescriptors (engine query consumed by REST WP3) ---
+  MITK_TEST(ListWindowDescriptors_DefaultGrid_ReturnsBareIds);
+  MITK_TEST(ListWindowDescriptors_AfterApply_PreOrderTraversal);
+  MITK_TEST(ListWindowDescriptors_CarriesViewDirectionAndSelectionGroup);
+
+  // --- Optional display 'name' (free-form, non-unique label) ---
+  MITK_TEST(WindowName_OptionalDisplay_RoundTrips);
+  MITK_TEST(WindowName_DisplayOmitted_RoundTrips);
+  MITK_TEST(WindowName_DisplayDuplicates_OK);
+  MITK_TEST(WindowName_DisplayFreeForm_OK);
+  MITK_TEST(WindowName_DisplayEmptyString_Throws);
+  MITK_TEST(WindowName_DisplayNotString_Throws);
+  MITK_TEST(ListWindowDescriptors_CarriesDisplayName);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -174,8 +188,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -197,7 +211,7 @@ public:
       const auto& f = fixture.at("root").at("children").at(i);
       const auto& r = roundTrip.at("root").at("children").at(i);
       CPPUNIT_ASSERT_EQUAL(f.at("type"),           r.at("type"));
-      CPPUNIT_ASSERT_EQUAL(f.at("name"),           r.at("name"));
+      CPPUNIT_ASSERT_EQUAL(f.at("id"),             r.at("id"));
       CPPUNIT_ASSERT_EQUAL(f.at("view_direction"), r.at("view_direction"));
       CPPUNIT_ASSERT_EQUAL(f.at("links"),          r.at("links"));
       // Lower-bound check on emitted sizes - guards against a future regression
@@ -217,7 +231,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -275,12 +289,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-            { "type": "window", "name": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+            { "type": "window", "id": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
           ]}
         ]
       }
@@ -324,9 +338,9 @@ public:
         for (const auto& c : node.at("children")) walk(c);
         return;
       }
-      const auto bareName = QString::fromStdString(node.at("name").get<std::string>());
+      const auto bareId = QString::fromStdString(node.at("id").get<std::string>());
       const auto label = node.at("links").at("selection").get<std::string>();
-      auto cell = editor->GetRenderWindowWidget(QString("mxn.") + bareName);
+      auto cell = editor->GetRenderWindowWidget(QString("mxn.") + bareId);
       CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its qualified name",
                              cell != nullptr);
       const auto engineGroup = cell->GetUtilityWidget()->GetSyncGroup();
@@ -358,7 +372,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
+          { "type": "window", "id": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
         ]
       }
     })json");
@@ -378,9 +392,9 @@ public:
   }
 
   // ====================================================================
-  // Custom names register under editor prefix
+  // Custom ids register under editor prefix
   // ====================================================================
-  void CustomNames_RegisterUnderEditorPrefix()
+  void CustomIds_RegisterUnderEditorPrefix()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -388,21 +402,21 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
-    CPPUNIT_ASSERT_MESSAGE("Cell must register under '<editorName>.<bareName>'",
+    CPPUNIT_ASSERT_MESSAGE("Cell must register under '<editorName>.<bareId>'",
                            nullptr != editor->GetRenderWindowWidget(QString("mxn.alpha")));
   }
 
   // ====================================================================
-  // Duplicate window names throws
+  // Duplicate window ids throws
   // ====================================================================
-  void DuplicateWindowNames_Throws()
+  void DuplicateWindowIds_Throws()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -410,8 +424,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -420,7 +434,7 @@ public:
     try
     {
       editor->ApplyLayout(fixture);
-      CPPUNIT_FAIL("ApplyLayout must throw on duplicate window name");
+      CPPUNIT_FAIL("ApplyLayout must throw on duplicate window id");
     }
     catch (const mitk::Exception& e)
     {
@@ -443,7 +457,7 @@ public:
         "root": {
           "type": "split", "orientation": "horizontal",
           "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
           ]
         }
       })json");
@@ -481,7 +495,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -520,7 +534,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -553,8 +567,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -586,9 +600,9 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "name": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
+          { "type": "window", "id": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "id": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
         ]
       }
     })json");
@@ -602,9 +616,9 @@ public:
   }
 
   // ====================================================================
-  // Bare names in JSON have no editor prefix
+  // Bare ids in JSON have no editor prefix
   // ====================================================================
-  void Serialize_RegisteredNames_StripPrefix()
+  void Serialize_RegisteredIds_StripPrefix()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -612,8 +626,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -621,14 +635,14 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
     const auto doc = editor->SerializeLayout();
-    std::set<std::string> emittedNames;
+    std::set<std::string> emittedIds;
     for (const auto& c : doc.at("root").at("children"))
     {
-      emittedNames.insert(c.at("name").get<std::string>());
+      emittedIds.insert(c.at("id").get<std::string>());
     }
-    CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emittedNames.size());
-    CPPUNIT_ASSERT(emittedNames.count("alpha")   == 1);
-    CPPUNIT_ASSERT(emittedNames.count("widget0") == 1);
+    CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emittedIds.size());
+    CPPUNIT_ASSERT(emittedIds.count("alpha")   == 1);
+    CPPUNIT_ASSERT(emittedIds.count("widget0") == 1);
   }
 
   // ====================================================================
@@ -643,12 +657,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
           ]}
         ]
       }
@@ -691,7 +705,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -721,7 +735,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -789,8 +803,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -815,8 +829,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -864,8 +878,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -900,8 +914,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -925,9 +939,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" } },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" } },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
@@ -953,9 +967,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
@@ -979,7 +993,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
         ]
       }
     })json");
@@ -999,13 +1013,299 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+  }
+
+  // ====================================================================
+  // ListWindowDescriptors -- engine query consumed by REST WP3 bindings.
+  //
+  // This is the public engine surface the REST window-list provider calls
+  // (instead of going through SerializeLayout-then-parse). The descriptor
+  // shape -- bare id, view direction, selection group -- mirrors what
+  // the v2 layout document persists per cell, so per-cell field values
+  // agree by construction with what GET /editors/mxn/layout would emit.
+  // ====================================================================
+  void ListWindowDescriptors_DefaultGrid_ReturnsBareIds()
+  {
+    auto editor = MakeEditor();
+    editor->SetLayout(1, 2);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), descriptors.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("widget0"), descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("widget1"), descriptors[1].id.toStdString());
+    // Default grid uses the conventional 'main' group label.
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[0].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[1].selectionGroup.toStdString());
+  }
+
+  void ListWindowDescriptors_AfterApply_PreOrderTraversal()
+  {
+    // Two-row layout with three cells per row; pre-order traversal over the
+    // splitter tree yields widget0..widget5 in order.
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true }, "row2": { "select_all": false } },
+      "root": {
+        "type": "split", "orientation": "vertical",
+        "children": [
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+          ]},
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "id": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+          ]}
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(6), descriptors.size());
+    for (size_t i = 0; i < 6; ++i)
+    {
+      const auto expected = std::string("widget") + std::to_string(i);
+      CPPUNIT_ASSERT_EQUAL(expected, descriptors[i].id.toStdString());
+    }
+    // Row 1 is "main", row 2 is "row2".
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[0].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[2].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("row2"), descriptors[3].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("row2"), descriptors[5].selectionGroup.toStdString());
+  }
+
+  void ListWindowDescriptors_CarriesViewDirectionAndSelectionGroup()
+  {
+    // Apply a fixture with three view directions and verify each survives
+    // round-trip through the descriptor query. Custom ids exercise the
+    // bare-id path (no positional reassignment).
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "axView",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "sagView",   "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "corView",   "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "originalV", "view_direction": "original", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), descriptors.size());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("axView"),    descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"),     descriptors[0].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("sagView"),   descriptors[1].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("sagittal"),  descriptors[1].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("corView"),   descriptors[2].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("coronal"),   descriptors[2].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("originalV"), descriptors[3].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("original"),  descriptors[3].viewDirection.toStdString());
+
+    for (const auto& d : descriptors)
+      CPPUNIT_ASSERT_EQUAL(std::string("main"), d.selectionGroup.toStdString());
+  }
+
+  // ====================================================================
+  // Optional display 'name' round-trips through Apply -> Serialize.
+  // ====================================================================
+  void WindowName_OptionalDisplay_RoundTrips()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": "Tumor axial", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto roundTrip = editor->SerializeLayout();
+    const auto& child = roundTrip.at("root").at("children").at(0);
+    CPPUNIT_ASSERT_EQUAL(std::string("widget0"),     child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"), child.at("name").get<std::string>());
+  }
+
+  // ====================================================================
+  // Display 'name' omitted on input -> not emitted on output (no empty
+  // string lands on disk).
+  // ====================================================================
+  void WindowName_DisplayOmitted_RoundTrips()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto roundTrip = editor->SerializeLayout();
+    const auto& child = roundTrip.at("root").at("children").at(0);
+    CPPUNIT_ASSERT_EQUAL(std::string("widget0"), child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_MESSAGE(
+      "Cells without a display label must NOT emit a 'name' key on serialize",
+      !child.contains("name"));
+  }
+
+  // ====================================================================
+  // Display 'name' is not subject to uniqueness; two cells may share the
+  // same display label as long as their 'id' differs.
+  // ====================================================================
+  void WindowName_DisplayDuplicates_OK()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": "View", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget1", "name": "View", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+  }
+
+  // ====================================================================
+  // Display 'name' is free-form: spaces, punctuation, and non-ASCII are
+  // accepted.
+  // ====================================================================
+  void WindowName_DisplayFreeForm_OK()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": "Brain - axial (T1, FLAIR)", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+
+    const auto roundTrip = editor->SerializeLayout();
+    CPPUNIT_ASSERT_EQUAL(std::string("Brain - axial (T1, FLAIR)"),
+                         roundTrip.at("root").at("children").at(0).at("name").get<std::string>());
+  }
+
+  // ====================================================================
+  // Empty 'name' is rejected. Tools must omit the field instead.
+  // ====================================================================
+  void WindowName_DisplayEmptyString_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": "", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on empty display 'name'");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending cell id",
+                             msg.find("widget0") != std::string::npos);
+    }
+  }
+
+  // ====================================================================
+  // Non-string 'name' is rejected.
+  // ====================================================================
+  void WindowName_DisplayNotString_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": 42, "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+  }
+
+  // ====================================================================
+  // ListWindowDescriptors surfaces the optional display label via
+  // WindowDescriptor::displayName; cells without one carry an empty
+  // string.
+  // ====================================================================
+  void ListWindowDescriptors_CarriesDisplayName()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget1",                          "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), descriptors.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"), descriptors[0].displayName.toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Cells without a display label must surface an empty displayName",
+      std::string{}, descriptors[1].displayName.toStdString());
   }
 };
 

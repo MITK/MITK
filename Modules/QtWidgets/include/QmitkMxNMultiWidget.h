@@ -167,38 +167,38 @@ public:
   GroupSyncIndexType NextFreeSyncGroupIndex() const;
 
   /**
-  * \brief Construct a render-window widget with a caller-supplied bare name.
+  * \brief Construct a render-window widget with a caller-supplied bare id.
   *
   *   The qualified name registered with `RenderingManager` is
-  *   `<m_MultiWidgetName>.<bareName>`. The bare name is what the v2 layout
-  *   format stores in the per-window 'name' field; the editor adds the prefix
+  *   `<m_MultiWidgetName>.<bareId>`. The bare id is what the v2 layout
+  *   format stores in the per-window 'id' field; the editor adds the prefix
   *   when registering with the rendering manager so that on-disk documents are
   *   independent of the editor instance's name.
   *
   *   This is the canonical creation API; callers that need a deterministic
-  *   name (e.g. the layout applier) should go through it. Internal positional
+  *   id (e.g. the layout applier) should go through it. Internal positional
   *   creation (used by 'SetLayout(r, c)') uses a private nullary overload that
-  *   delegates here with a collision-free 'widget<i>' name.
+  *   delegates here with a collision-free 'widget<i>' id.
   *
-  * \param bareName  The in-document bare name (e.g. "widget0", "alpha"). Must
-  *                  be non-empty and must not collide with an existing widget's
-  *                  qualified name in this editor.
+  * \param bareId  The in-document bare id (e.g. "widget0", "alpha"). Must
+  *                be non-empty and must not collide with an existing widget's
+  *                qualified name in this editor.
   *
   * \return  Shared pointer to the newly constructed render-window widget.
   *
-  * \pre  bareName is non-empty                          (otherwise mitk::Exception)
+  * \pre  bareId is non-empty                            (otherwise mitk::Exception)
   * \pre  no existing render-window uses the qualified name (otherwise mitk::Exception)
   *
   * \throws mitk::Exception on precondition violation.
   */
-  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& bareName);
+  RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& bareId);
 
   /**
   * \brief Serialize the current layout tree to a v2.0 JSON document
   *        (always strict mode).
   *
   *   Group naming convention: engine-internal sync-group index 1 maps to the
-  *   bare name "main"; other indices map to "g_<i>" where <i> is a counter
+  *   bare label "main"; other indices map to "g_<i>" where <i> is a counter
   *   assigned by pre-order encounter order over the cell list. Same engine
   *   state in produces the same group names out (round-trip stable).
   *
@@ -211,6 +211,51 @@ public:
   * \throws mitk::Exception if the layout-tree invariant is violated.
   */
   nlohmann::json SerializeLayout() const;
+
+  /**
+  * \brief Plain-data summary of one cell leaf in the layout tree.
+  *
+  *   Holds the per-cell fields that the v2 layout document persists for a
+  *   window -- identity (id), optional display label, view direction enum
+  *   value, and selection-group label -- without dragging the JSON or
+  *   QSplitter shape across the API boundary. Future v3 dimensions add
+  *   fields here additively.
+  *
+  *   Identity vs. display label: 'id' is the v2 schema's required `id`
+  *   field -- URL-segment-safe, unique within the document, used as the
+  *   engine-side bare render-window name and as the URL path segment for
+  *   REST sub-resources. 'displayName' is the optional `name` field -- a
+  *   free-form human-readable label, empty when absent.
+  */
+  struct WindowDescriptor
+  {
+    QString id;              // bare layout id (no '<editorPrefix>.' prefix)
+    QString displayName;     // optional human-readable label, empty when absent
+    QString viewDirection;   // "axial" | "sagittal" | "coronal" | "original"
+    QString selectionGroup;  // links.selection group label
+  };
+
+  /**
+  * \brief List all cell leaves in the current layout tree, in pre-order
+  *        traversal order.
+  *
+  *   This is the engine query that the REST bridge layer (and any other
+  *   consumer that needs to know which windows the editor currently has)
+  *   should use. Returns plain structs - no JSON, no Qt widget pointers.
+  *   `SerializeLayout` shares the per-cell descriptor logic via
+  *   `MakeWindowDescriptor` but performs its own splitter-tree walk to
+  *   emit topology + sizes; both walks therefore agree on per-cell
+  *   field values by construction.
+  *
+  * \pre  Must be called on the UI thread.
+  * \pre  The root layout contains exactly one QSplitter (canonical
+  *       post-load shape).
+  *
+  * \throws mitk::Exception if the layout-tree invariant is violated, or
+  *         if a cell references a sync-group index with no entry in the
+  *         engine's group-name registry.
+  */
+  std::vector<WindowDescriptor> ListWindowDescriptors() const;
 
   /**
   * \brief Apply a v2.0 JSON document.
@@ -232,7 +277,7 @@ public:
   * \pre  Must be called on the UI thread.
   *
   * \throws mitk::Exception on: version != "2.0"; structural shape violation;
-  *         duplicate window names; unknown view_direction; missing group
+  *         duplicate window ids; unknown view_direction; missing group
   *         reference in strict mode; nlohmann parse / type errors (rewrapped
   *         from 'nlohmann::json::exception' subtypes).
   */
@@ -257,7 +302,7 @@ public Q_SLOTS:
   *
   * \throws mitk::Exception (rethrown from 'ApplyLayout') on null pointer,
   *         JSON null value, version != "2.0", structural shape violation,
-  *         duplicate window names, unknown view_direction, missing group
+  *         duplicate window ids, unknown view_direction, missing group
   *         reference in strict mode, or wrapped 'nlohmann::json::exception'
   *         subtypes.
   */
@@ -332,9 +377,9 @@ private:
   *        'InitializeMultiWidget', and 'SetDataBasedLayout'.
   *
   *   Picks the smallest non-negative 'i' such that 'widget<i>' is not already
-  *   used as a bare name in this editor, then delegates to the explicit-name
+  *   used as a bare id in this editor, then delegates to the explicit-id
   *   overload. This replaces the old 'widget<count>' form, which silently
-  *   collided when custom-named cells already used the same index.
+  *   collided when custom-id'd cells already used the same index.
   */
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
 
@@ -355,10 +400,28 @@ private:
                                    const std::map<GroupSyncIndexType, std::string>& groupNames) const;
 
   /**
+  * \brief Build a 'WindowDescriptor' for a single cell.
+  *
+  *   Centralizes the per-cell field lookup: bare id from the qualified
+  *   render-window name (via 'StripEditorPrefix'), display name from the
+  *   cell's own state, view-direction from the slice-navigation controller's
+  *   default direction, selection group label from the engine's group-name
+  *   registry. Both 'ListWindowDescriptors' and 'SerializeSplitter' use this
+  *   so the per-cell descriptor logic lives in one place.
+  *
+  * \pre  cell != nullptr
+  * \pre  cell's qualified name carries the editor prefix
+  * \pre  cell's sync-group index has an entry in 'm_GroupNameByIndex'
+  *
+  * \throws mitk::Exception on precondition violation.
+  */
+  WindowDescriptor MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) const;
+
+  /**
   * \brief Recursive constructor for a v2 'split' subtree. Returns a freshly
   *        allocated QSplitter with the cell tree below.
   *
-  *   Window leaves are created via 'CreateRenderWindowWidget(bareName)',
+  *   Window leaves are created via 'CreateRenderWindowWidget(bareId)',
   *   then re-parented to the new splitter and moved into their target sync
   *   group via 'SetSynchronizationGroup'.
   */
@@ -391,10 +454,10 @@ private:
   *        cells, hundreds of nodes); worth re-checking for groups with
   *        many members and very large data storages.
   *
-  * \param seedingOrder  Pre-order (bareWindowName, groupName) pairs captured
+  * \param seedingOrder  Pre-order (bareWindowId, groupName) pairs captured
   *                      during PrewalkValidate.
-  * \param nameToInt     Resolved layout-name to engine-internal sync-group
-  *                      index mapping.
+  * \param nameToInt     Resolved layout group-label to engine-internal
+  *                      sync-group index mapping.
   */
   void SeedAndNormalizeGroups(
     const std::vector<std::pair<std::string, std::string>>& seedingOrder,
@@ -418,7 +481,7 @@ private:
 
   /**
   * \brief Strip the editor's '<multiWidgetName>.' prefix from a qualified
-  *        widget name to obtain the v2 bare name.
+  *        widget name to obtain the v2 bare id.
   *
   *        Throws if the prefix is absent (would indicate engine-state
   *        corruption — every cell registered through the canonical creation

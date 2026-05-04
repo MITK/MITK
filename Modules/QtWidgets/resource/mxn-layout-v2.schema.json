@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mitk.org/schemas/mxn-layout-2.0.json",
   "title": "MITK MxN Multi-Widget Layout (v2.0)",
-  "description": "Canonical layout description for QmitkMxNMultiWidgetEditor. The on-disk format of `mxnLayout_*.json` preset files and the document consumed by `QmitkMxNMultiWidget::ApplyLayout` / produced by `QmitkMxNMultiWidget::SerializeLayout`. Layout describes only the splitter tree, per-window placement state (view direction, synchronization links), and per-group state. It does NOT describe global rendering state (selected position, time, camera).\n\nWindow names: each window's `name` MUST be unique within the document. The C++ loader enforces uniqueness at apply time. The recommended default form for tool-generated layouts is `widget<i>` where `<i>` is the leaf's pre-order traversal index (0-based, no gaps). Hand-authored presets MAY use any unique, URL-segment-safe string.\n\nSynchronization model: cells declare per-dimension links via `links.<dim>: <groupName>`. Cells with the same value for the same dimension are mutually linked and share that dimension's runtime bundle. The same group name MAY be used across multiple dimensions (e.g. `links: { selection: \"main\", zoom: \"main\" }`) — group names live in a single namespace, dimensions are orthogonal. Per-group persisted state lives in the top-level `groups` dict. v2.0 knows one such property: `select_all` (the selection bundle's UX-mode). Future v3.0 dimensions that need per-group state add their properties to the same group entry additively.\n\nLazy vs. strict mode: the top-level `groups` dict is OPTIONAL. When present, it is authoritative — every label appearing in any cell's `links` MUST be a key in `groups`; otherwise the loader throws (catches typos and tool-output drift). When absent, every label referenced becomes an implicit group with property defaults (`select_all: true`). Tool-generated documents SHOULD always include `groups` explicitly with every property spelled out — round-trip stability and reviewer clarity outweigh the few bytes saved by omission. Treat omission as ergonomic shorthand for human authors, not a stylistic choice for machines.\n\nSchema is closed (`additionalProperties: false` everywhere, including inside `links` and inside group entries). v2.0 only knows the `selection` synchronization dimension and the `select_all` group property. A future v3.0 schema will add further dimensions inside `links` and possibly further properties inside group entries, with a deliberate version bump — older loaders will refuse v3.0 documents loudly at the version check. The C++ loader does not run a JSON-schema validator, so `additionalProperties: false` enforces closure only for consumers that validate the document against this schema; the loader's own defence is the explicit version check plus per-field type validation in `PrewalkValidate`.",
+  "description": "Canonical layout description for QmitkMxNMultiWidgetEditor. The on-disk format of `mxnLayout_*.json` preset files and the document consumed by `QmitkMxNMultiWidget::ApplyLayout` / produced by `QmitkMxNMultiWidget::SerializeLayout`. Layout describes only the splitter tree, per-window placement state (view direction, synchronization links), and per-group state. It does NOT describe global rendering state (selected position, time, camera).\n\nWindow identity vs. display label: each window has a required `id` (the identity) and an optional `name` (a human-readable display label). The `id` MUST be unique within the document, MUST be URL-segment-safe, and is used everywhere a window is addressed: as the engine-side bare render-window name (qualified at load time as `<editorName>.<id>`), as the URL path segment in the REST `/rendering/editors/mxn/windows/{id}/...` sub-resources, as the per-renderer DataNode property context key, and in persisted state. The C++ loader enforces uniqueness at apply time. The recommended default form for tool-generated layouts is `widget<i>` where `<i>` is the leaf's pre-order traversal index (0-based, no gaps). Hand-authored presets MAY use any unique, URL-segment-safe string. The optional `name` is free-form metadata: not required to be unique, not constrained by a pattern, and never used for routing or addressing. Tools omit `name` unless authored by a human.\n\nSynchronization model: cells declare per-dimension links via `links.<dim>: <groupName>`. Cells with the same value for the same dimension are mutually linked and share that dimension's runtime bundle. The same group name MAY be used across multiple dimensions (e.g. `links: { selection: \"main\", zoom: \"main\" }`) — group names live in a single namespace, dimensions are orthogonal. Per-group persisted state lives in the top-level `groups` dict. v2.0 knows one such property: `select_all` (the selection bundle's UX-mode). Future v3.0 dimensions that need per-group state add their properties to the same group entry additively.\n\nLazy vs. strict mode: the top-level `groups` dict is OPTIONAL. When present, it is authoritative — every label appearing in any cell's `links` MUST be a key in `groups`; otherwise the loader throws (catches typos and tool-output drift). When absent, every label referenced becomes an implicit group with property defaults (`select_all: true`). Tool-generated documents SHOULD always include `groups` explicitly with every property spelled out — round-trip stability and reviewer clarity outweigh the few bytes saved by omission. Treat omission as ergonomic shorthand for human authors, not a stylistic choice for machines.\n\nSchema is closed (`additionalProperties: false` everywhere, including inside `links` and inside group entries). v2.0 only knows the `selection` synchronization dimension and the `select_all` group property. A future v3.0 schema will add further dimensions inside `links` and possibly further properties inside group entries, with a deliberate version bump — older loaders will refuse v3.0 documents loudly at the version check. The C++ loader does not run a JSON-schema validator, so `additionalProperties: false` enforces closure only for consumers that validate the document against this schema; the loader's own defence is the explicit version check plus per-field type validation in `PrewalkValidate`.",
 
   "type": "object",
   "required": ["version", "root"],
@@ -86,14 +86,19 @@
     "window": {
       "type": "object",
       "description": "A leaf render-window. Maps to QmitkRenderWindowWidget.",
-      "required": ["type", "name", "view_direction", "links"],
+      "required": ["type", "id", "view_direction", "links"],
       "additionalProperties": false,
       "properties": {
         "type": { "const": "window" },
-        "name": {
+        "id": {
           "type": "string",
           "pattern": "^[A-Za-z0-9_.-]+$",
-          "description": "Window identity. The same string is used as the engine-side render-window bare name (qualified at load time as '<editorName>.<name>'). The schema enforces only URL-segment safety (alphanumeric, underscore, dot, hyphen); structural uniqueness across the document is enforced by the C++ loader at apply time. Recommended default for tool-generated layouts is \"widget<i>\" where <i> is the leaf's pre-order traversal index (0-based, no gaps); custom names are accepted as long as they are unique within the document."
+          "description": "Window identity. The same string is used as the engine-side render-window bare name (qualified at load time as '<editorName>.<id>'). It is also the URL path segment for REST sub-resources (`/rendering/editors/mxn/windows/{id}/...`) and the per-renderer DataNode property context key. The schema enforces only URL-segment safety (alphanumeric, underscore, dot, hyphen); structural uniqueness across the document is enforced by the C++ loader at apply time. Recommended default for tool-generated layouts is \"widget<i>\" where <i> is the leaf's pre-order traversal index (0-based, no gaps); custom ids are accepted as long as they are unique within the document."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional human-readable display label. Free-form: no pattern constraint, not required to be unique within the document. Pure metadata; ignored by the loader for routing, addressing, persisted-state keying, and REST URL construction (those all use `id`). Omit when absent rather than emitting an empty string."
         },
         "view_direction": {
           "enum": ["axial", "sagittal", "coronal", "original"],
@@ -143,9 +148,9 @@
         "type": "split",
         "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     },
@@ -165,9 +170,9 @@
             "orientation": "horizontal",
             "size": 1,
             "children": [
-              { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-              { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
-              { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+              { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+              { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+              { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
             ]
           },
           {
@@ -175,9 +180,9 @@
             "orientation": "horizontal",
             "size": 1,
             "children": [
-              { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-              { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
-              { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+              { "type": "window", "id": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+              { "type": "window", "id": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+              { "type": "window", "id": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
             ]
           }
         ]
@@ -190,7 +195,7 @@
         "type": "split",
         "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" } }
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" } }
         ]
       }
     },
@@ -202,9 +207,9 @@
         "type": "split",
         "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "id": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     }

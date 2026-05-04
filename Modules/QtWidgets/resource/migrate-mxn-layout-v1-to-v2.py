@@ -124,10 +124,12 @@ def _convert_node(
 
         out: dict = {
             "type": "window",
-            "name": f"widget{idx}",
+            "id": f"widget{idx}",
             "view_direction": view_direction,
             "links": {"selection": group_name},
         }
+        # The optional v2 `name` (free-form display label) has no v1 source;
+        # we deliberately do not synthesize one. Hand-author after migration.
         # `size` is optional in v2; the loader defaults to 1 when omitted.
         # Only the ratio between siblings matters at runtime, so a v1 source
         # that omitted `size` becomes a v2 output that also omits it.

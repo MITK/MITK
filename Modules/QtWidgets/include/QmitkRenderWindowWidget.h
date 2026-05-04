@@ -71,6 +71,18 @@ public:
   const QString& GetWidgetName() const { return m_WidgetName; };
   QmitkRenderWindow* GetRenderWindow() const { return m_RenderWindow; };
 
+  /**
+  * \brief Optional human-readable display label.
+  *
+  *   Persisted as the optional `name` field of the corresponding window leaf
+  *   in the v2 layout document; empty when the layout omits that field. Pure
+  *   metadata: not used for routing, addressing, persisted-state keying, or
+  *   REST URL construction (those all use the bare widget id, derivable from
+  *   `GetWidgetName` via the editor-prefix strip).
+  */
+  const QString& GetDisplayName() const { return m_DisplayName; };
+  void SetDisplayName(const QString& displayName) { m_DisplayName = displayName; };
+
   mitk::SliceNavigationController* GetSliceNavigationController() const;
 
   void RequestUpdate();
@@ -78,6 +90,7 @@ public:
 
   void AddUtilityWidget(QWidget* utilityWidget);
   QmitkRenderWindowUtilityWidget* GetUtilityWidget();
+  const QmitkRenderWindowUtilityWidget* GetUtilityWidget() const;
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -121,6 +134,7 @@ private:
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
+  QString m_DisplayName;
   QVBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;

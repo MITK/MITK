@@ -65,17 +65,17 @@ namespace
   }
 
   // Pre-walks a v2 'root' subtree to validate structural shape and collect
-  // per-window names + referenced group labels. Throws on missing required
-  // field, type mismatch on a known field, or duplicate window name. Does
+  // per-window ids + referenced group labels. Throws on missing required
+  // field, type mismatch on a known field, or duplicate window id. Does
   // not mutate engine state.
   //
-  // 'seedingOrder' captures (bareWindowName, groupName) pairs in pre-order
+  // 'seedingOrder' captures (bareWindowId, groupName) pairs in pre-order
   // traversal order (splits' children walked in array order), used by
   // ApplyLayout's group-seeding pass to identify each group's seed cell -
   // the cell that appears first in document order whose links.selection
   // names that group.
   void PrewalkValidate(const nlohmann::json& node,
-                       std::set<std::string>& seenNames,
+                       std::set<std::string>& seenIds,
                        std::set<std::string>& referencedGroups,
                        std::vector<std::pair<std::string, std::string>>& seedingOrder)
   {
@@ -103,42 +103,58 @@ namespace
       }
       for (const auto& child : node["children"])
       {
-        PrewalkValidate(child, seenNames, referencedGroups, seedingOrder);
+        PrewalkValidate(child, seenIds, referencedGroups, seedingOrder);
       }
     }
     else if (type == "window")
     {
-      if (!node.contains("name") || !node["name"].is_string())
+      if (!node.contains("id") || !node["id"].is_string())
       {
-        mitkThrow() << "Layout window node is missing the 'name' string field.";
+        mitkThrow() << "Layout window node is missing the 'id' string field.";
       }
-      const auto name = node["name"].get<std::string>();
-      if (name.empty())
+      const auto id = node["id"].get<std::string>();
+      if (id.empty())
       {
-        mitkThrow() << "Layout window node has an empty 'name'.";
+        mitkThrow() << "Layout window node has an empty 'id'.";
       }
-      if (!seenNames.insert(name).second)
+      if (!seenIds.insert(id).second)
       {
-        mitkThrow() << "Layout document contains duplicate window name '" << name << "'.";
+        mitkThrow() << "Layout document contains duplicate window id '" << id << "'.";
+      }
+      // Optional display label: free-form, not unique. If present, must be
+      // a non-empty string. Anything else (wrong type, empty string) throws.
+      if (node.contains("name"))
+      {
+        if (!node["name"].is_string())
+        {
+          mitkThrow() << "Layout window '" << id
+                      << "' has a 'name' field that is not a string.";
+        }
+        if (node["name"].get<std::string>().empty())
+        {
+          mitkThrow() << "Layout window '" << id
+                      << "' has an empty 'name'. Omit the field instead of"
+                         " emitting an empty string.";
+        }
       }
       if (!node.contains("view_direction") || !node["view_direction"].is_string())
       {
-        mitkThrow() << "Layout window '" << name
+        mitkThrow() << "Layout window '" << id
                     << "' is missing the 'view_direction' string field.";
       }
       if (!node.contains("links") || !node["links"].is_object())
       {
-        mitkThrow() << "Layout window '" << name << "' is missing the 'links' object.";
+        mitkThrow() << "Layout window '" << id << "' is missing the 'links' object.";
       }
       const auto& links = node["links"];
       if (!links.contains("selection") || !links["selection"].is_string())
       {
-        mitkThrow() << "Layout window '" << name
+        mitkThrow() << "Layout window '" << id
                     << "' is missing the required 'links.selection' string.";
       }
       const auto groupName = links["selection"].get<std::string>();
       referencedGroups.insert(groupName);
-      seedingOrder.emplace_back(name, groupName);
+      seedingOrder.emplace_back(id, groupName);
     }
     else
     {
@@ -505,16 +521,16 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
-QString QmitkMxNMultiWidget::MakeQualifiedName(const QString& bareName) const
+QString QmitkMxNMultiWidget::MakeQualifiedName(const QString& bareId) const
 {
-  return this->GetMultiWidgetName() + "." + bareName;
+  return this->GetMultiWidgetName() + "." + bareId;
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // Pick the smallest non-negative 'i' such that 'widget<i>' is not already
-  // used as a bare name in this editor. Replaces the old 'widget<count>'
-  // form, which silently collided when custom-named cells already used the
+  // used as a bare id in this editor. Replaces the old 'widget<count>'
+  // form, which silently collided when custom-id'd cells already used the
   // same index (e.g. existing {widget0, widget3} + adding a 4th cell would
   // have produced 'widget3' again, which std::map::insert silently rejects).
   std::size_t i = 0;
@@ -525,7 +541,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   // The positional convenience overload owns the editor's "default group 1"
   // convention: the cell is placed into engine sync-group 1 right after
-  // construction. The explicit-name overload stays free of side effects so
+  // construction. The explicit-id overload stays free of side effects so
   // v2-layout callers can move the cell to its document-declared group
   // without churning through an intermediate group-1 placement.
   auto renderWindowWidget = this->CreateRenderWindowWidget(QStringLiteral("widget") + QString::number(i));
@@ -533,14 +549,14 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   return renderWindowWidget;
 }
 
-QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& bareName)
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget(const QString& bareId)
 {
-  if (bareName.isEmpty())
+  if (bareId.isEmpty())
   {
-    mitkThrow() << "CreateRenderWindowWidget: bare name must not be empty.";
+    mitkThrow() << "CreateRenderWindowWidget: bare id must not be empty.";
   }
 
-  const auto qualifiedName = this->MakeQualifiedName(bareName);
+  const auto qualifiedName = this->MakeQualifiedName(bareId);
 
   // Use the public lookup rather than reaching into m_RenderWindowWidgets so
   // the canonical accessor stays the single source of truth for what is
@@ -758,21 +774,27 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
     }
     else if (auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(child))
     {
+      // Sanity: the pre-walk must have visited every cell and added its
+      // sync-group index to 'groupNames'. A miss here would be engine
+      // corruption (cell with an index not seen during the pre-walk).
       const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
-      const auto groupIt = groupNames.find(idx);
-      if (groupIt == groupNames.end())
+      if (groupNames.find(idx) == groupNames.end())
       {
-        // Unreachable: the pre-walk must have visited every cell. Throwing
-        // here surfaces the engine corruption rather than silently emitting
-        // a phantom group reference.
         mitkThrow() << "SerializeLayout: cell sync group " << idx
                     << " was not seen during the pre-walk pass.";
       }
+      const auto descriptor = this->MakeWindowDescriptor(cell);
       childJson["type"] = "window";
-      childJson["name"] = this->StripEditorPrefix(cell->GetWidgetName()).toStdString();
-      childJson["view_direction"] = ViewDirectionToV2String(
-        cell->GetSliceNavigationController()->GetDefaultViewDirection());
-      childJson["links"] = nlohmann::json{ { "selection", groupIt->second } };
+      childJson["id"] = descriptor.id.toStdString();
+      // Optional display label: omit the JSON key when the cell has no
+      // display name, so empty strings never appear on disk (see schema:
+      // `name` requires minLength 1 when present).
+      if (!descriptor.displayName.isEmpty())
+      {
+        childJson["name"] = descriptor.displayName.toStdString();
+      }
+      childJson["view_direction"] = descriptor.viewDirection.toStdString();
+      childJson["links"] = nlohmann::json{ { "selection", descriptor.selectionGroup.toStdString() } };
     }
     else
     {
@@ -787,6 +809,74 @@ nlohmann::json QmitkMxNMultiWidget::SerializeSplitter(
   // attaches 'size' to each child before pushing into the children array,
   // and the root, having no parent loop, never gets one.
   return node;
+}
+
+QmitkMxNMultiWidget::WindowDescriptor
+QmitkMxNMultiWidget::MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) const
+{
+  if (nullptr == cell)
+  {
+    mitkThrow() << "MakeWindowDescriptor: null cell.";
+  }
+
+  WindowDescriptor descriptor;
+  descriptor.id = this->StripEditorPrefix(cell->GetWidgetName());
+  descriptor.displayName = cell->GetDisplayName();
+  descriptor.viewDirection = QString::fromStdString(
+    ViewDirectionToV2String(
+      cell->GetSliceNavigationController()->GetDefaultViewDirection()));
+
+  const auto idx = cell->GetUtilityWidget()->GetSyncGroup();
+  const auto recorded = m_GroupNameByIndex.find(idx);
+  if (recorded == m_GroupNameByIndex.end())
+  {
+    mitkThrow() << "MakeWindowDescriptor: cell sync group " << idx
+                << " has no entry in the group-name registry; "
+                << "engine state is corrupt.";
+  }
+  descriptor.selectionGroup = QString::fromStdString(recorded->second);
+  return descriptor;
+}
+
+std::vector<QmitkMxNMultiWidget::WindowDescriptor>
+QmitkMxNMultiWidget::ListWindowDescriptors() const
+{
+  // Validate layout shape: same precondition as SerializeLayout.
+  auto* topLayout = this->layout();
+  if (nullptr == topLayout || topLayout->count() == 0)
+  {
+    mitkThrow() << "ListWindowDescriptors: editor has no top-level layout.";
+  }
+  auto* item = topLayout->itemAt(0);
+  auto* widget = (item == nullptr) ? nullptr : item->widget();
+  auto* rootSplitter = dynamic_cast<QSplitter*>(widget);
+  if (nullptr == rootSplitter)
+  {
+    mitkThrow() << "ListWindowDescriptors: top-level widget is not a QSplitter.";
+  }
+
+  std::vector<WindowDescriptor> result;
+  std::function<void(const QSplitter*)> walk = [&](const QSplitter* split)
+  {
+    for (int i = 0; i < split->count(); ++i)
+    {
+      auto* child = split->widget(i);
+      if (auto* sub = dynamic_cast<QSplitter*>(child))
+      {
+        walk(sub);
+      }
+      else if (auto* cell = dynamic_cast<QmitkRenderWindowWidget*>(child))
+      {
+        result.push_back(this->MakeWindowDescriptor(cell));
+      }
+      else
+      {
+        mitkThrow() << "ListWindowDescriptors: unknown child widget type at splitter index " << i << ".";
+      }
+    }
+  };
+  walk(rootSplitter);
+  return result;
 }
 
 QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
@@ -832,17 +922,23 @@ QSplitter* QmitkMxNMultiWidget::BuildSplitterFromJsonV2(
       }
       else  // "window"
       {
-        const auto bareName = QString::fromStdString(child["name"].get<std::string>());
+        const auto bareId = QString::fromStdString(child["id"].get<std::string>());
         const auto viewDirection = ParseViewDirection(child["view_direction"].get<std::string>());
         const auto groupName = child["links"]["selection"].get<std::string>();
         const auto targetIdx = nameToInt.at(groupName);
 
-        auto window = this->CreateRenderWindowWidget(bareName);
-        // The explicit-name overload leaves the cell unattached to any sync
+        auto window = this->CreateRenderWindowWidget(bareId);
+        // The explicit-id overload leaves the cell unattached to any sync
         // group; place it into its document-declared target group here.
         this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), targetIdx);
         window->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
         window->GetSliceNavigationController()->Update();
+        // Optional display label (free-form, non-unique). Pre-walk has
+        // already validated type and non-emptiness.
+        if (child.contains("name"))
+        {
+          window->SetDisplayName(QString::fromStdString(child["name"].get<std::string>()));
+        }
         split->addWidget(window.get());
         window->show();
       }
@@ -891,9 +987,9 @@ void QmitkMxNMultiWidget::SeedAndNormalizeGroups(
   // now that the cell map is populated.
   std::map<std::string, RenderWindowWidgetPointer> seedCells;
   std::map<std::string, std::vector<RenderWindowWidgetPointer>> groupMembers;
-  for (const auto& [bareName, groupName] : seedingOrder)
+  for (const auto& [bareId, groupName] : seedingOrder)
   {
-    const auto qualifiedName = this->MakeQualifiedName(QString::fromStdString(bareName));
+    const auto qualifiedName = this->MakeQualifiedName(QString::fromStdString(bareId));
     const auto cell = this->GetRenderWindowWidget(qualifiedName);
     if (nullptr == cell)
     {
@@ -1146,13 +1242,13 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
       mitkThrow() << "Layout document is missing the 'root' field.";
     }
 
-    // Pre-walk: validate structural shape, collect window names + referenced
+    // Pre-walk: validate structural shape, collect window ids + referenced
     // group labels, and capture document-order seeding pairs for the
     // post-build group-seeding pass.
-    std::set<std::string> seenNames;
+    std::set<std::string> seenIds;
     std::set<std::string> referencedGroups;
     std::vector<std::pair<std::string, std::string>> seedingOrder;
-    PrewalkValidate(doc.at("root"), seenNames, referencedGroups, seedingOrder);
+    PrewalkValidate(doc.at("root"), seenIds, referencedGroups, seedingOrder);
 
     // Group resolution. Strict mode = top-level 'groups' present; lazy mode
     // (no 'groups' block) defaults every referenced label to select_all=true.
@@ -1316,12 +1412,12 @@ void QmitkMxNMultiWidget::SetDataBasedLayout(const QmitkAbstractNodeSelectionWid
     auto hSplit = new QSplitter(Qt::Horizontal);
     for (auto viewPlane : { mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Coronal, mitk::AnatomicalPlane::Sagittal })
     {
-      // Use the explicit-name overload (which leaves cells unattached) and
+      // Use the explicit-id overload (which leaves cells unattached) and
       // place each cell directly into its row group via the canonical API,
       // mirroring ApplyLayout. Avoids the churn of the positional overload's
       // initial seeding into group 1 followed by an immediate move.
-      const auto bareName = QStringLiteral("widget") + QString::number(cellCounter++);
-      auto window = this->CreateRenderWindowWidget(bareName);
+      const auto bareId = QStringLiteral("widget") + QString::number(cellCounter++);
+      auto window = this->CreateRenderWindowWidget(bareId);
       this->SetSynchronizationGroup(window->GetUtilityWidget()->GetNodeSelectionWidget(), rowCounter);
 
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);

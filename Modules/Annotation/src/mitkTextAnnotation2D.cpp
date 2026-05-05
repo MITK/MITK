@@ -32,13 +32,7 @@ mitk::TextAnnotation2D::TextAnnotation2D()
 
 mitk::TextAnnotation2D::~TextAnnotation2D()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::Annotation::Bounds mitk::TextAnnotation2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const

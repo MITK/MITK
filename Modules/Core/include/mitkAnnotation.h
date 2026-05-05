@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
 
+#include <vector>
+
 namespace mitk
 {
   /**
@@ -438,6 +440,17 @@ namespace mitk
     itk::TimeStamp m_DataReferenceChangedTime;
 
     void SetUSProperty(const std::string &propertyKey, us::Any value);
+
+    /** \brief Calls RemoveFromBaseRenderer on every non-null entry, swallowing any exception.
+     *
+     * Helper for derived destructors. Each derived class owns its own
+     * LocalStorageHandler (templated on a class-specific LocalStorage), so the
+     * list of registered renderers cannot be reached from ~Annotation();
+     * derived destructors must hand it in. The destructor is implicitly
+     * noexcept, and at process-exit teardown the rendering stack can throw
+     * (e.g. from the microservice framework), which would otherwise reach
+     * std::terminate. */
+    void RemoveFromAllRegisteredBaseRenderers(const std::vector<BaseRenderer *> &renderers) noexcept;
 
   private:
     /** \brief render this Annotation on a foreground renderer */

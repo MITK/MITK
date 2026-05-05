@@ -400,6 +400,12 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
 
   // Detect a change in the resolved smoothing state so a preference flip
   // (without any per-node property change) still triggers re-extraction.
+  // m_LastSmoothed reflects the smoothing of the cached polydata, so it is only
+  // updated after a successful re-extraction in GenerateDataForRenderer. Reading
+  // it before the early-return paths below is intentional: comparing the resolved
+  // request against the cache is the correct staleness check, and on the unhide
+  // frame the visibility-property MTime independently triggers GenerateDataForRenderer
+  // (its inner visibilityChanged path forces all groups to refresh).
   const auto changedSmoothed = ResolveSmoothed(node, renderer) != localStorage->m_LastSmoothed;
 
   if (!visible

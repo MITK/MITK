@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <vtkNew.h>
 #include <vtkPolyData.h>
 
+#include <cmath>
+
 class mitkMultiLabelSurfaceNetsExtractorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkMultiLabelSurfaceNetsExtractorTestSuite);
@@ -164,27 +166,44 @@ public:
     exactExtractor.SetSmoothing(false);
     auto exactPoly = exactExtractor.Extract(image, {1});
 
-    CPPUNIT_ASSERT(smoothPoly->GetNumberOfPoints() > 0);
     CPPUNIT_ASSERT(exactPoly->GetNumberOfPoints() > 0);
+    CPPUNIT_ASSERT(smoothPoly->GetNumberOfPoints() > 0);
 
-    // Smoothing relaxes points off the voxel grid; exact output should align with it.
-    // Sample a few points from the exact output and confirm at least one smoothed point
-    // disagrees on a sub-voxel scale.
-    bool foundDifference = false;
-    const vtkIdType n = std::min(smoothPoly->GetNumberOfPoints(), exactPoly->GetNumberOfPoints());
-    for (vtkIdType i = 0; i < n && !foundDifference; ++i)
+    // vtkSurfaceNets3D places exact-mode vertices on the dual grid (between voxel
+    // centers), so for unit-spacing input every coordinate is a multiple of 0.5.
+    // Smoothing relaxes them off that grid. Checking grid alignment is order- and
+    // count-independent; comparing point-by-point would be unreliable because
+    // vtkSurfaceNets3D + vtkPolyDataNormals can change point order and count
+    // between independent extractions, so a per-index check could pass under
+    // arbitrary reorderings even if smoothing were a no-op.
+    auto onHalfGrid = [](double v)
     {
-      double s[3], e[3];
-      smoothPoly->GetPoint(i, s);
-      exactPoly->GetPoint(i, e);
-      const double dx = s[0] - e[0];
-      const double dy = s[1] - e[1];
-      const double dz = s[2] - e[2];
-      if (dx * dx + dy * dy + dz * dz > 1e-6)
-        foundDifference = true;
+      const double doubled = 2.0 * v;
+      return std::abs(doubled - std::round(doubled)) < 1e-4;
+    };
+    auto allOnHalfGrid = [&](const double p[3])
+    {
+      return onHalfGrid(p[0]) && onHalfGrid(p[1]) && onHalfGrid(p[2]);
+    };
+
+    for (vtkIdType i = 0; i < exactPoly->GetNumberOfPoints(); ++i)
+    {
+      double p[3];
+      exactPoly->GetPoint(i, p);
+      CPPUNIT_ASSERT_MESSAGE("Exact-mode points must lie on the voxel half-grid",
+                             allOnHalfGrid(p));
     }
-    CPPUNIT_ASSERT_MESSAGE("Smoothed output should not be point-identical to exact output",
-                           foundDifference);
+
+    bool foundOffGrid = false;
+    for (vtkIdType i = 0; i < smoothPoly->GetNumberOfPoints() && !foundOffGrid; ++i)
+    {
+      double p[3];
+      smoothPoly->GetPoint(i, p);
+      if (!allOnHalfGrid(p))
+        foundOffGrid = true;
+    }
+    CPPUNIT_ASSERT_MESSAGE("Smoothed output must contain at least one point off the voxel half-grid",
+                           foundOffGrid);
   }
 
   void GetImageToWorldMatrix_NullGeometry_ReturnsIdentity()

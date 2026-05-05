@@ -53,7 +53,9 @@ namespace mitk
    *   - "visible" (BoolProperty)
    *   - "opacity" (FloatProperty)
    *   - "org.mitk.multilabel.3D.hide" (BoolProperty)
+   *   - "org.mitk.multilabel.3D.smoothed" (BoolProperty)
    *   - "/org.mitk.views.segmentation" -> "activate 3D rendering" preference
+   *   - "/org.mitk.views.segmentation" -> "3D rendering smoothed" preference
    *   - LabelHighlightGuard properties to fade non-highlighted labels
    *
    * \ingroup Mapper
@@ -123,11 +125,14 @@ namespace mitk
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
 
-      /** \brief Last applied surface-nets smoothing state for this renderer.
+      /** \brief Smoothing state with which the cached polydata was last extracted.
        *
-       * Resolved from the per-node "org.mitk.multilabel.3D.smoothed" property if set,
-       * otherwise from the "3D rendering smoothed" preference. Tracking the resolved
-       * value lets us re-extract surfaces only when the effective state actually changes.
+       * Tracks the *cached* extraction state, not the user's currently requested state.
+       * Written only after a successful re-extraction inside GenerateDataForRenderer.
+       * Comparing ResolveSmoothed(...) against this value detects when the cached
+       * surfaces no longer match the requested smoothing and forces a re-extraction;
+       * preserving it across early-return paths in Update() (hidden node, 3D rendering
+       * disabled, uninitialised segmentation) keeps that staleness check correct.
        */
       bool m_LastSmoothed;
 
@@ -154,8 +159,12 @@ namespace mitk
      *
      * Reads the per-node "org.mitk.multilabel.3D.smoothed" property if set,
      * otherwise falls back to the "/org.mitk.views.segmentation -> 3D rendering smoothed"
-     * preference (default true). Shared by the mapper and the 3D-visualization context-menu
-     * action so a single source of truth governs the smoothing flag.
+     * preference (default true).
+     *
+     * \remark The 3D-visualization context-menu action (Qmitk3DMultiSegVisStyleAction)
+     * mirrors this resolution rule. It is duplicated rather than reused because
+     * org.mitk.gui.qt.application must not depend on MitkMultilabel. Keep both
+     * implementations in sync if defaults or preference keys change.
      */
     static bool ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer);
 

@@ -157,7 +157,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       const auto numGroups = segmentation->GetNumberOfGroups();
       for (MultiLabelSegmentation::GroupIndexType groupID = 0; groupID < numGroups; ++groupID)
       {
-        auto groupImage = const_cast<Image*>(segmentation->GetGroupImage(groupID));
+        auto groupImage = segmentation->GetGroupImage(groupID);
         if (nullptr == groupImage)
         {
           continue;

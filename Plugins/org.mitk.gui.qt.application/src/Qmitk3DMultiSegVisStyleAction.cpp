@@ -40,6 +40,9 @@ namespace
     Smoothed = 2  // Surface with constrained smoothing applied.
   };
 
+  // Mirrors mitk::MultiLabelSegmentationVtkMapper3D::ResolveSmoothed. Duplicated
+  // rather than reused because org.mitk.gui.qt.application must not depend on
+  // MitkMultilabel. Keep both copies in sync if defaults or preference keys change.
   bool ResolveSmoothed(mitk::DataNode* node, mitk::BaseRenderer* renderer)
   {
     bool smoothed = true;

@@ -84,7 +84,7 @@ public:
 
   void GetPropertyByDICOMTagPath()
   {
-    std::map< std::string, mitk::BaseProperty::Pointer> result = mitk::GetPropertyByDICOMTagPath(data, simplePath);
+    std::map<std::string, mitk::BaseProperty::ConstPointer> result = mitk::GetPropertyByDICOMTagPath(data, simplePath);
     CPPUNIT_ASSERT(result.size() == 1);
     CPPUNIT_ASSERT_EQUAL(result.begin()->second->GetValueAsString(), std::string("simplePath"));
 
@@ -116,7 +116,7 @@ public:
 
   void GetPropertyByDICOMTagPath_2()
   {
-    std::map< std::string, mitk::BaseProperty::Pointer> result = mitk::GetPropertyByDICOMTagPath(data->GetPropertyList(), simplePath);
+    std::map<std::string, mitk::BaseProperty::ConstPointer> result = mitk::GetPropertyByDICOMTagPath(data->GetPropertyList(), simplePath);
     CPPUNIT_ASSERT(result.size() == 1);
     CPPUNIT_ASSERT_EQUAL(result.begin()->second->GetValueAsString(), std::string("simplePath"));
 

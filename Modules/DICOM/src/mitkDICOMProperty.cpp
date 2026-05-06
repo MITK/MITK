@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkDICOMProperty.h>
 
+#include <mitkIPropertyProvider.h>
+
 
 mitk::BaseProperty::Pointer
 mitk::GetDICOMPropertyForDICOMValuesFunctor(const mitk::DICOMCachedValueLookupTable& cacheLookupTable)
@@ -27,29 +29,44 @@ mitk::GetDICOMPropertyForDICOMValuesFunctor(const mitk::DICOMCachedValueLookupTa
   return prop.GetPointer();
 }
 
-std::map< std::string, mitk::BaseProperty::Pointer> mitk::GetPropertyByDICOMTagPath(const mitk::PropertyList* list, const mitk::DICOMTagPath& path)
+std::map<std::string, mitk::BaseProperty::ConstPointer>
+mitk::GetPropertyByDICOMTagPath(const mitk::IPropertyProvider* provider, const mitk::DICOMTagPath& path)
 {
-  std::map< std::string, mitk::BaseProperty::Pointer> result;
+  std::map<std::string, mitk::BaseProperty::ConstPointer> result;
 
-  for (const auto& iter : *(list->GetMap()))
+  if (nullptr == provider)
   {
-    DICOMTagPath propPath = PropertyNameToDICOMTagPath(iter.first);
+    return result;
+  }
+
+  for (const auto& key : provider->GetPropertyKeys())
+  {
+    const DICOMTagPath propPath = PropertyNameToDICOMTagPath(key);
     if (!propPath.IsEmpty() && path.Equals(propPath))
     {
-      result.insert(iter);
+      auto baseProp = provider->GetConstProperty(key);
+      if (baseProp.IsNotNull())
+      {
+        result.emplace(key, baseProp);
+      }
     }
   }
   return result;
-};
+}
 
-std::map< std::string, mitk::BaseProperty::Pointer> mitk::GetPropertyByDICOMTagPath(const mitk::BaseData* data, const mitk::DICOMTagPath& path)
+std::string
+mitk::GetFirstDICOMValueAsString(const mitk::IPropertyProvider* provider, const mitk::DICOMTagPath& path)
 {
-  std::map< std::string, mitk::BaseProperty::Pointer> result;
-
-  if (data)
+  const auto matches = GetPropertyByDICOMTagPath(provider, path);
+  if (matches.empty())
   {
-    result = GetPropertyByDICOMTagPath(data->GetPropertyList(), path);
+    return {};
   }
-
-  return result;
-};
+  const auto* dicomProp =
+    dynamic_cast<const mitk::DICOMProperty*>(matches.begin()->second.GetPointer());
+  if (nullptr == dicomProp)
+  {
+    return {};
+  }
+  return dicomProp->GetValue(0, 0, true, true);
+}

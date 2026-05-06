@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <map>
 #include <set>
 #include <string>
+#include <utility>
+#include <vector>
 
 class QSplitter;
 
@@ -116,14 +118,20 @@ public:
   *   This is the canonical creation API; callers should go through it rather
   *   than mutating 'm_SynchronizedWidgetConnectors' directly.
   *
-  * \param index             The 1-based group index. Must be >= 1.
+  * \param index   The 1-based group index. Must be >= 1.
+  * \param name    Optional bare group label to record in the engine's group-
+  *                name registry. When empty (the default), the registry
+  *                receives the conventional auto-generated label: 'main' for
+  *                index 1, otherwise 'g_<index>'. Idempotent calls (the group
+  *                already exists) leave the previously recorded name in
+  *                place.
   *
   * \pre  index >= 1                       (otherwise mitk::Exception)
   * \pre  GetDataStorage() != nullptr      (otherwise mitk::Exception)
   *
   * \throws mitk::Exception on precondition violation.
   */
-  void AddSynchronizationGroup(const GroupSyncIndexType index);
+  void AddSynchronizationGroup(const GroupSyncIndexType index, const std::string& name = std::string());
 
   /**
   * \brief Move a synchronized node selection widget to the group with the given index.
@@ -213,6 +221,12 @@ public:
   *
   *   See 'mxn-layout-v2.schema.json' for the accepted document shape.
   *
+  *   Group seeding: after the new cell tree is built, each group's runtime
+  *   synchronized state (per-renderer 'visible' / 'layer') is seeded from
+  *   the cell that appears first in document order whose links.selection
+  *   names that group; remaining members are normalised to the seed. See
+  *   the canonical rule on the schema's `groups` description.
+  *
   * \param doc  A parsed v2.0 layout document.
   *
   * \pre  Must be called on the UI thread.
@@ -235,14 +249,17 @@ public Q_SLOTS:
   * \brief Slot wrapper around 'ApplyLayout'. Loads a v2.0 layout document
   *        (replaces the current cell tree).
   *
-  * \param jsonData  Pointer to a parsed layout document. Must not be null.
+  * \param jsonData  Pointer to a parsed layout document. Must not be null
+  *                  and must not represent a JSON null value.
   *
   * \pre   jsonData != nullptr                            (otherwise mitk::Exception)
+  * \pre   !jsonData->is_null()                           (otherwise mitk::Exception)
   *
-  * \throws mitk::Exception (rethrown from 'ApplyLayout') on null input,
-  *         version != "2.0", structural shape violation, duplicate window
-  *         names, unknown view_direction, missing group reference in strict
-  *         mode, or wrapped 'nlohmann::json::exception' subtypes.
+  * \throws mitk::Exception (rethrown from 'ApplyLayout') on null pointer,
+  *         JSON null value, version != "2.0", structural shape violation,
+  *         duplicate window names, unknown view_direction, missing group
+  *         reference in strict mode, or wrapped 'nlohmann::json::exception'
+  *         subtypes.
   */
   void LoadLayout(const nlohmann::json* jsonData);
 
@@ -350,6 +367,40 @@ private:
                                      QSplitter* parentSplitter);
 
   /**
+  * \brief Group seeding pass for ApplyLayout.
+  *
+  *        Runs after the new cell tree has been constructed (so cells are
+  *        registered under their qualified names). For each referenced
+  *        group, the cell that appears first in document order in
+  *        'seedingOrder' becomes that group's seed. Its per-renderer node
+  *        properties (visible, layer) are written into the connector via
+  *        'SeedFromMember', then propagated to every other member of the
+  *        group via 'SynchronizeWidget'. Pre-seeding divergence between the
+  *        seed and other members is reported via 'MITK_WARN', capped to a
+  *        small budget.
+  *
+  *        Group-scoped state in the layout document's 'groups' dict
+  *        (e.g. 'select_all') is set by the caller before this method runs
+  *        and is not touched here.
+  *
+  * \note  Cost of the propagation pass on a group is O(N_nodes * N_members^2):
+  *        for each of the N_members cells, 'SynchronizeWidget' iterates the
+  *        selected node list and writes per-cell visibility, which fans
+  *        back through the connector to each of the (N_members - 1) other
+  *        already-connected widgets. Acceptable for typical layouts (a few
+  *        cells, hundreds of nodes); worth re-checking for groups with
+  *        many members and very large data storages.
+  *
+  * \param seedingOrder  Pre-order (bareWindowName, groupName) pairs captured
+  *                      during PrewalkValidate.
+  * \param nameToInt     Resolved layout-name to engine-internal sync-group
+  *                      index mapping.
+  */
+  void SeedAndNormalizeGroups(
+    const std::vector<std::pair<std::string, std::string>>& seedingOrder,
+    const std::map<std::string, GroupSyncIndexType>& nameToInt);
+
+  /**
   * \brief Tear down the current cell set: disconnect all per-cell signals,
   *        drop strong refs (cells self-destruct), delete the layout/splitter
   *        tree, clear sync-group connectors, null the active-widget pointer.
@@ -376,6 +427,22 @@ private:
   QString StripEditorPrefix(const QString& qualifiedName) const;
 
   std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
+
+  /**
+  * \brief Engine-internal group-name registry keyed by sync-group index.
+  *
+  *        Group names live nowhere else in memory: the connector map
+  *        ('m_SynchronizedWidgetConnectors') is integer-keyed, and layout
+  *        documents are not retained after load. This registry is populated
+  *        by 'AddSynchronizationGroup' for every group the editor creates
+  *        (whether from a layout document, from runtime "+ new group"
+  *        actions, or from default initialization), and cleared by
+  *        'TearDownAllCells'. 'SerializeLayout' reads from here directly, so
+  *        a load -> save round-trip preserves the layout-document labels
+  *        (e.g. a doc that uses 'alpha' for engine index 1 round-trips as
+  *        'alpha', not the convention default 'main').
+  */
+  std::map<GroupSyncIndexType, std::string> m_GroupNameByIndex;
 
   bool m_CrosshairVisibility;
 

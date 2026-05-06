@@ -18,7 +18,7 @@
     },
     "groups": {
       "$ref": "#/$defs/groups",
-      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative — every label appearing in any cell's `links` MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field."
+      "description": "Synchronization groups referenced by cells via `links.<dim>`. Optional. When present, authoritative — every label appearing in any cell's `links` MUST be a key here; missing labels throw at load time. When absent, every referenced label becomes an implicit group with property defaults. Tool-generated documents SHOULD always include this field.\n\nGroup seeding at load: when a layout is applied, each group's runtime synchronized state for per-renderer node properties (today: per-node `visible`, per-node `layer`; future v3 keys analogously) is seeded from the cell that appears first in document order whose `links.<dim>` names that group. After seeding, every other group member is normalised to the seed cell's values for those keys. Group-scoped persisted properties stored in this top-level `groups` dict (e.g. `select_all`) are not seeded from cells — the value declared here wins outright. Selection-list membership is a runtime concept (not encoded in the layout) and is seeded from the data storage's non-helper / non-hidden nodes. Hand-authors who want a specific cell to be the seed should list that cell first among the group's members in the layout document. Document order = pre-order traversal of the splitter tree (splits' `children` arrays in array order)."
     },
     "root": {
       "$ref": "#/$defs/split",
@@ -70,17 +70,14 @@
         },
         "size": {
           "$ref": "#/$defs/size",
-          "description": "Splitter weight assigned by this node's parent. Required when this node appears inside another split's `children`; absent on the document root (which has no parent)."
+          "description": "Splitter weight assigned by this node's parent. Optional inside another split's `children` (default weight 1 applies when omitted); absent on the document root (which has no parent)."
         },
         "children": {
           "type": "array",
           "minItems": 1,
-          "description": "Ordered list of child nodes. Each child MUST carry a `size` (enforced here, not on the child types themselves, because the root has no `size`).",
+          "description": "Ordered list of child nodes. `size` is optional on each child; omitted children take the default weight 1. Mixed siblings compute as ratios, e.g. `[size: 3, default, default]` yields 3:1:1.",
           "items": {
-            "allOf": [
-              { "$ref": "#/$defs/node" },
-              { "required": ["size"] }
-            ]
+            "$ref": "#/$defs/node"
           }
         }
       }
@@ -108,7 +105,7 @@
         },
         "size": {
           "$ref": "#/$defs/size",
-          "description": "Splitter weight assigned by this window's parent split. Always present in well-formed documents (a window is always inside a split)."
+          "description": "Splitter weight assigned by this window's parent split. Optional; default weight 1 applies when omitted."
         }
       }
     },
@@ -122,15 +119,16 @@
         "selection": {
           "type": "string",
           "pattern": "^[A-Za-z0-9_.-]+$",
-          "description": "Group name for the selection bundle (selection list, stack order, visibility, select_all). Cells with the same value form an implicit group; their selection state is synchronized at runtime. The named group's persisted properties live in the top-level `groups` dict if it is declared; otherwise property defaults apply."
+          "description": "Group name for the selection bundle (selection list, stack order, visibility, select_all). Cells with the same value form an implicit group; their selection state is synchronized at runtime. The named group's persisted properties live in the top-level `groups` dict if it is declared; otherwise property defaults apply. See the top-level `groups` description for the load-time seeding rule that determines which cell's per-renderer values are authoritative when group members diverge."
         }
       }
     },
 
     "size": {
       "type": "integer",
-      "minimum": 0,
-      "description": "Splitter-child weight. Qt redistributes these proportionally on resize. Absolute values are not pixel-exact."
+      "minimum": 1,
+      "default": 1,
+      "description": "Splitter-child weight. Only the ratio between siblings matters; Qt redistributes weights proportionally on resize. Absolute values are NOT pixel measurements - prefer small numbers (e.g. 1, 2, 3) over screenshot-derived pixel counts. Optional; defaults to 1 when omitted, so `[size: 3, default, default]` yields a 3:1:1 split. Must be >= 1: 0 would collapse the pane in Qt, but the format has no documented 'hide this cell' semantics, so 0 is rejected by both the schema and the C++ loader."
     }
   },
 
@@ -145,9 +143,9 @@
         "type": "split",
         "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     },
@@ -165,21 +163,21 @@
           {
             "type": "split",
             "orientation": "horizontal",
-            "size": 418,
+            "size": 1,
             "children": [
-              { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 403 },
-              { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 403 },
-              { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 403 }
+              { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+              { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+              { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
             ]
           },
           {
             "type": "split",
             "orientation": "horizontal",
-            "size": 418,
+            "size": 1,
             "children": [
-              { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 403 },
-              { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 403 },
-              { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 403 }
+              { "type": "window", "name": "widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+              { "type": "window", "name": "widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+              { "type": "window", "name": "widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
             ]
           }
         ]
@@ -187,12 +185,26 @@
     },
     {
       "version": "2.0",
-      "name": "Hand-authored lazy mode (no `groups` block; defaults apply)",
+      "name": "Hand-authored lazy mode (no `groups` block; size omitted - defaults to 1)",
       "root": {
         "type": "split",
         "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 100 }
+          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" } }
+        ]
+      }
+    },
+    {
+      "version": "2.0",
+      "name": "Mixed size defaults: first cell takes 3/5, others share equally",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split",
+        "orientation": "horizontal",
+        "children": [
+          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     }

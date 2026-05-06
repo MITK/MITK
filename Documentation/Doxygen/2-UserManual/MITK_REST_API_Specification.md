@@ -107,7 +107,7 @@ http(s)://{host}:{port}/api/v{major}
 ### Version Discovery
 
 ```http
-GET /api/v1/
+GET /api/v1/info
 ```
 
 Returns API metadata including supported versions and deprecation notices.
@@ -118,10 +118,14 @@ Returns API metadata including supported versions and deprecation notices.
 
 ### Phase 1: API Token Authentication
 
+The server expects an [RFC 6750](https://datatracker.ietf.org/doc/html/rfc6750) Bearer token in the `Authorization` header:
+
 ```http
 GET /api/v1/datastorage/nodes
-X-MITK-API-Token: {token}
+Authorization: Bearer {token}
 ```
+
+When authentication fails, the server responds with `401 Unauthorized` and a `WWW-Authenticate: Bearer` header. When `requireAuth` is disabled (development mode), the header may be omitted.
 
 ### Future: OAuth2/OIDC
 
@@ -146,8 +150,8 @@ security:
 |--------|----------|-------------|
 | `Content-Type` | For POST/PUT/PATCH | `application/json` for metadata |
 | `Accept` | Optional | Desired response format |
-| `X-MITK-API-Token` | When auth enabled | Authentication token |
-| `X-MITK-Transfer-Mode` | For data endpoints | `direct`, `file-reference`, `shared-memory` |
+| `Authorization` | When auth enabled | `Bearer {token}` — see §4 |
+| `X-MITK-Transfer-Mode` | For data endpoints | `direct`, `file-reference` (`shared-memory` is planned, not yet accepted by the server) |
 
 ### 5.2 Standard Response Envelope
 
@@ -195,7 +199,7 @@ Pagination links (`links.prev`, `links.next`) are only included when applicable.
 **System field filters** use direct parameters:
 
 ```
-?data_type=mitk::Image&parent_uid=node-001
+?data_type=Image&parent_uid=node-001
 ```
 
 **Property filters** use the `filter.` prefix:
@@ -206,7 +210,7 @@ Pagination links (`links.prev`, `links.next`) are only included when applicable.
 
 **Combined example:**
 ```http
-GET /api/v1/datastorage/nodes?data_type=mitk::Image&filter.visible=true
+GET /api/v1/datastorage/nodes?data_type=Image&filter.visible=true
 ```
 
 Supported filter operators:
@@ -216,7 +220,7 @@ Supported filter operators:
 - Wildcard `?` (exactly one character): `filter.name=Node_0?`, `filter.name=????`
 
 **Supported system field filters:**
-- `data_type` — MITK class name (e.g., `mitk::Image`, `mitk::LabelSetImage`, `mitk::Surface`)
+- `data_type` — Unqualified MITK class name as returned by `BaseData::GetNameOfClass()` (e.g., `Image`, `LabelSetImage`, `Surface` — note: no `mitk::` prefix)
 - `parent_uid` — Filter by parent (use `null` for top-level nodes)
 - `path` — Path-based lookup
 
@@ -303,7 +307,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661400
     }
   ],
@@ -324,7 +328,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661400
     },
     {
@@ -332,7 +336,7 @@ GET /api/v1/datastorage/nodes?path=/CT_Scan/Segmentation
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "timestamp": 1705661700
     }
   ],
@@ -353,7 +357,7 @@ Node responses contain **system information only**. The `name` property is inclu
   "name": "CT_Scan",
   "path": "/CT_Scan",
   "parent_uid": null,
-  "data_type": "mitk::Image",
+  "data_type": "Image",
   "children_count": 2,
   "timestamp": 1705661400
 }
@@ -367,7 +371,7 @@ Node responses contain **system information only**. The `name` property is inclu
 | `name` | string | Node name (shortcut to name property) |
 | `path` | string | Full path in hierarchy |
 | `parent_uid` | string | Parent node UID (null for top-level) |
-| `data_type` | string | MITK data class (e.g., `mitk::Image`) |
+| `data_type` | string | Unqualified MITK data class name (e.g., `Image`, `LabelSetImage`, `Surface`) |
 | `children_count` | integer | Number of child nodes |
 | `timestamp` | integer | ITK modified time (ever-increasing integer within session; higher values are newer) |
 
@@ -571,7 +575,7 @@ The server accepts any file format supported by MITK I/O. Format detection is ba
 
 ### 8.1 Discovery and Health
 
-#### GET /api/v1/
+#### GET /api/v1/info
 
 API information and capabilities.
 
@@ -581,18 +585,26 @@ API information and capabilities.
   "data": {
     "name": "MITK Workbench REST API",
     "api_version": "v1",
-    "mitk_version": "2024.12",
+    "mitk_version": "2026.02.0",
     "capabilities": {
       "transfer_modes": ["direct", "file-reference"],
       "authentication": ["api-token"]
     },
-    "documentation_url": "https://docs.mitk.org/api/v1"
+    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html"
   }
 }
 ```
 
+The `documentation_url` is constructed from the running MITK version as `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`.
+
 > **Note:** The `capabilities.events` section with `zeromq_endpoint` is planned for a future version when ZeroMQ event notification support is implemented. Currently, this field is not included in the response.
-```
+
+#### Interactive Documentation
+
+The server also exposes the OpenAPI document and a Swagger UI for live exploration. These resources are not part of the versioned contract:
+
+- `GET /api/v1/openapi.json` — raw OpenAPI 3 document
+- `GET /api/v1/docs/` — interactive Swagger UI (with associated CSS/JS assets under `/api/v1/docs/`)
 
 #### GET /api/v1/health
 
@@ -676,7 +688,7 @@ List all nodes in the data storage. Always returns an array.
 
 **Example Request:**
 ```http
-GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.visible=true
+GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=Image&filter.visible=true
 ```
 
 **Response:**
@@ -688,7 +700,7 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
       "name": "CT_Scan",
       "path": "/CT_Scan",
       "parent_uid": null,
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 2,
       "timestamp": 1705659600
     },
@@ -697,7 +709,7 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
       "name": "MRI_T1",
       "path": "/MRI_T1",
       "parent_uid": null,
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 0,
       "timestamp": 1705659900
     }
@@ -738,8 +750,8 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=mitk::Image&filter.vi
     "limit": 50,
     "offset": 50,
     "links": {
-      "prev": "/api/v1/datastorage/nodes?data_type=mitk::Image&limit=50&offset=0",
-      "next": "/api/v1/datastorage/nodes?data_type=mitk::Image&limit=50&offset=100"
+      "prev": "/api/v1/datastorage/nodes?data_type=Image&limit=50&offset=0",
+      "next": "/api/v1/datastorage/nodes?data_type=Image&limit=50&offset=100"
     }
   }
 }
@@ -784,7 +796,7 @@ X-MITK-Data-Format: nrrd
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705661400
   },
@@ -840,7 +852,7 @@ Get node system information.
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 2,
     "timestamp": 1705661400
   },
@@ -882,7 +894,7 @@ Content-Type: application/json
     "name": "CT_Scan",
     "path": "/Parent_Node/CT_Scan",
     "parent_uid": "node-010",
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 2,
     "timestamp": 1705663500
   }
@@ -1031,7 +1043,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705663200
   }
@@ -1046,7 +1058,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
     "name": "CT_Scan",
     "path": "/CT_Scan",
     "parent_uid": null,
-    "data_type": "mitk::Image",
+    "data_type": "Image",
     "children_count": 0,
     "timestamp": 1705663200
   },
@@ -1081,7 +1093,7 @@ Same filtering/pagination as `GET /datastorage/nodes`.
       "name": "Segmentation",
       "path": "/CT_Scan/Segmentation",
       "parent_uid": "node-001",
-      "data_type": "mitk::LabelSetImage",
+      "data_type": "LabelSetImage",
       "children_count": 0,
       "timestamp": 1705661400
     },
@@ -1090,7 +1102,7 @@ Same filtering/pagination as `GET /datastorage/nodes`.
       "name": "Mask",
       "path": "/CT_Scan/Mask",
       "parent_uid": "node-001",
-      "data_type": "mitk::Image",
+      "data_type": "Image",
       "children_count": 0,
       "timestamp": 1705661700
     }
@@ -1140,7 +1152,7 @@ Content-Type: application/json
     "name": "Segmentation",
     "path": "/CT_Scan/Segmentation",
     "parent_uid": "node-001",
-    "data_type": "mitk::LabelSetImage",
+    "data_type": "LabelSetImage",
     "children_count": 0,
     "timestamp": 1705663200
   },
@@ -1569,6 +1581,8 @@ Rendering endpoints control how MITK Workbench render windows refresh and orient
 
 All rendering calls are dispatched to the main/UI thread by the server — callers do not need to account for threading.
 
+The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). The `mxn` editor alias is also exposed by `GET /rendering/editors` for forward compatibility — its `active` flag is currently always `false`, and a symmetric `/rendering/editors/mxn/...` hierarchy is reserved but not yet implemented.
+
 #### POST /api/v1/rendering/update
 
 Request a redraw of all registered render windows.
@@ -1658,7 +1672,7 @@ Content-Type: application/json
 
 Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
 
-Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
+Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
 
 **Response 200 (`application/json`):**
 
@@ -1676,7 +1690,8 @@ Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to b
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless mode or Qt workbench plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open in the workbench |
 | 500 | `INTERNAL_ERROR` | Unexpected error reading crosshair or geometry state |
 
 ---
@@ -1685,7 +1700,7 @@ Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to b
 
 Moves the crosshair to the given 3D world position via `IRenderWindowPart::SetSelectedPosition()` on the StdMultiWidgetEditor, which updates all synchronized views.
 
-Requires the Qt workbench plugin to be running and the StdMultiWidgetEditor to be open (503 otherwise).
+Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise).
 
 **Request body (required, `application/json`):**
 
@@ -1708,7 +1723,8 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Body missing, not valid JSON, `position` field absent, or not an array of exactly 3 numbers |
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | StdMultiWidgetEditor is not open or workbench plugin not connected |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless mode or Qt workbench plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open in the workbench |
 | 500 | `INTERNAL_ERROR` | Unexpected error setting crosshair position |
 
 ---
@@ -1818,6 +1834,312 @@ GET /api/v1/rendering/screenshot?format=jpeg&width=1280&height=720
 
 ---
 
+#### GET /api/v1/rendering/editors
+
+Lists all known editor aliases with their current activity state. The alias list is always complete even if no editor is open, so clients can discover capabilities without polling sub-resources.
+
+**Response 200 (`application/json`):**
+
+```json
+[
+  { "alias": "stdmulti", "plugin_id": "org.mitk.editors.stdmultiwidget", "active": true  },
+  { "alias": "mxn",      "plugin_id": "org.mitk.editors.mxnmultiwidget", "active": false }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `alias` | string | Stable short alias used in URL paths (`stdmulti`, `mxn`) |
+| `plugin_id` | string | Berry editor plugin id |
+| `active` | boolean | `true` if an editor instance is currently open |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No editor list provider registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error walking the workbench |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti
+
+Returns metadata about the StdMultiWidget editor, including its current window names. `alias` is the sole editor discriminator — no separate `type` field is reported.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "alias": "stdmulti",
+  "plugin_id": "org.mitk.editors.stdmultiwidget",
+  "active": true,
+  "windows": ["axial", "sagittal", "coronal", "3d"]
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/screenshot
+
+Captures the StdMultiWidget editor canvas (all four render windows together, no side panels).
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`. Only the capture surface differs. Any future change to the global screenshot contract must be applied to this endpoint in the same commit.
+
+**Editor-specific error (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows
+
+Lists the StdMultiWidget render windows. No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane. Live orientation, when needed, is derivable from the window's `/camera`.
+
+**Response 200 (`application/json`):**
+
+```json
+[
+  { "name": "axial",    "kind": "2d" },
+  { "name": "sagittal", "kind": "2d" },
+  { "name": "coronal",  "kind": "2d" },
+  { "name": "3d",       "kind": "3d" }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Render window name (URL segment for sub-resources) |
+| `kind` | string | `"2d"` or `"3d"` — drives which sub-resources apply |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}
+
+Per-window summary.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}. Any other value returns 404 `RENDER_WINDOW_NOT_FOUND` at the controller layer before any bridge dispatch.
+
+**Response 200 (`application/json`) — 2D window:**
+
+```json
+{ "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+```
+
+**Response 200 — 3D window:**
+
+```json
+{ "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Echo of the path parameter |
+| `kind` | string | `"2d"` or `"3d"` |
+| `has_camera` | boolean | Always `true` in StdMulti |
+| `has_selected_slice` | boolean | `true` for 2D, `false` for `3d` |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | `{name}` is not a known StdMulti window |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+
+Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
+
+**Response 200 — 2D window:**
+
+```json
+{
+  "position":       [127.5,  83.2, 200.0],
+  "focal_point":    [127.5,  83.2,  45.0],
+  "view_up":        [0.0,    1.0,   0.0],
+  "parallel_scale": 120.0
+}
+```
+
+**Response 200 — 3D window:**
+
+```json
+{
+  "position":          [200.0, 200.0, 200.0],
+  "focal_point":       [127.5,  83.2,  45.0],
+  "view_up":           [0.0,    0.0,   1.0],
+  "perspective_angle": 30.0
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+
+Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying `mitk::CameraController`, while explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw `vtkCamera`. Combining the two would leave the controller's internal "standard view" memo inconsistent with the actual pose, so the combination is rejected with 400 `INVALID_REQUEST`. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`. Only the addressed window is refreshed; coupled crosshair/slice updates on the sibling 2D windows happen through their own UI events. World coordinates are not range-checked.
+
+**Request body (`application/json`, at least one field required):**
+
+| Field | Type | Applies to | Notes |
+|-------|------|------------|-------|
+| `position` | number[3] | 2D, 3D | |
+| `focal_point` | number[3] | 2D, 3D | |
+| `view_up` | number[3] | 2D, 3D | |
+| `parallel_scale` | number > 0 | 2D | Orthographic zoom |
+| `perspective_angle` | number in (0, 180) | 3D | Vertical FOV in degrees |
+| `standard_view` | string | 2D, 3D | One of `anterior`, `posterior`, `left`, `right`, `cranial`, `caudal` |
+
+**Examples:**
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/axial/camera
+Content-Type: application/json
+
+{ "standard_view": "anterior", "parallel_scale": 120.0 }
+```
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/3d/camera
+Content-Type: application/json
+
+{ "perspective_angle": 45.0 }
+```
+
+**Response: 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Invalid JSON; empty body; unknown field; wrong type or length; 2D-only field on 3D (or vice versa); unknown `standard_view`; `standard_view` combined with `position`/`focal_point`/`view_up`; non-positive `parallel_scale`; `perspective_angle` out of range |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 422 | `RENDERING_ERROR` | MITK rendering framework raised an error while applying the patch |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+
+Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "step": 45,
+  "position": [127.5, 83.2, 45.0],
+  "bounds": {
+    "steps": 90,
+    "min_position": [0.0, 0.0, 0.0],
+    "max_position": [255.0, 255.0, 90.0]
+  }
+}
+```
+
+When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window name identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+
+For StdMulti only `{"step": N}` is accepted — the three 2D slices are coupled, so moving by world coordinate is done via `PUT /rendering/selected-position`. Sending a `position` field returns 400 with a hint. `step` is not range-checked; out-of-range values are clamped/snapped by MITK.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`} (`3d` returns 404 `UNSUPPORTED_OPERATION`).
+
+**Request body (required, `application/json`):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `step` | integer ≥ 0 | Target step index |
+
+**Example:**
+
+```http
+PUT /api/v1/rendering/editors/stdmulti/windows/axial/selected-slice
+Content-Type: application/json
+
+{ "step": 42 }
+```
+
+**Response: 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 422 | `RENDERING_ERROR` | MITK raised an error while applying the step |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/screenshot
+
+Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit the requested dimensions). Pass dimensions matching the source ratio if a faithful aspect is needed.
+
+**Path parameter:** `name` ∈ {`axial`, `sagittal`, `coronal`, `3d`}.
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`.
+
+**Window-specific errors (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
+
+---
+
 ## 9. Error Handling
 
 ### 9.1 Error Response Format
@@ -1853,6 +2175,8 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window name is not known to the editor |
+| 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed window (e.g. `selected-slice` on `3d`) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
@@ -1867,7 +2191,8 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
 | 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
-| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | Qt workbench plugin not loaded or StdMultiWidgetEditor not open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
+| 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
 | 503 | `SERVICE_UNAVAILABLE` | Server temporarily unavailable |
 
@@ -1905,7 +2230,7 @@ For validation failures, include field-level details:
 import requests
 
 BASE_URL = "http://localhost:8080/api/v1"
-HEADERS = {"X-MITK-API-Token": "my-token"}
+HEADERS = {"Authorization": "Bearer my-token"}
 
 # Load image
 response = requests.post(
@@ -1995,7 +2320,7 @@ response = requests.get(
     headers=HEADERS,
     params={
         "hierarchy": "toplevel",
-        "data_type": "mitk::Image",
+        "data_type": "Image",
         "filter.visible": "true",
         "fields": "uid,name,data_type"
     }
@@ -2079,6 +2404,7 @@ requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uids": [ui
 | Shared memory transfer | v1.2 | Zero-copy data transfer |
 | Batch operations | v1.3 | `/datastorage/nodes/batch` endpoint |
 | Async operations | v1.3 | Long-running operations with task tracking |
+| MxN multi-widget editor | TBD | Activate the `mxn` editor alias and add the `/rendering/editors/mxn/...` hierarchy |
 
 ### 11.2 Extension Points
 
@@ -2098,7 +2424,7 @@ The API is designed for extension:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/` | API info |
+| `GET` | `/api/v1/info` | API info |
 | `GET` | `/api/v1/health` | Health check |
 | `GET` | `/api/v1/config/file-access` | File access configuration |
 | `GET` | `/api/v1/datastorage/nodes` | List nodes |
@@ -2118,6 +2444,21 @@ The API is designed for extension:
 | `DELETE` | `/api/v1/datastorage/nodes/{uid}/properties/{name}` | Delete property |
 | `POST` | `/api/v1/rendering/update` | Trigger render window update |
 | `POST` | `/api/v1/rendering/reinit` | Fit all views to visible data, or to one/multiple nodes when `uids` body field is given |
+| `GET` | `/api/v1/rendering/selected-position` | Get the workbench's globally selected world position |
+| `PUT` | `/api/v1/rendering/selected-position` | Set the workbench's globally selected world position |
+| `GET` | `/api/v1/rendering/selected-time` | Get the workbench's globally selected time step |
+| `PUT` | `/api/v1/rendering/selected-time` | Set the workbench's globally selected time step |
+| `GET` | `/api/v1/rendering/screenshot` | Screenshot of the active editor's primary window |
+| `GET` | `/api/v1/rendering/editors` | List render-window editors that expose a REST surface |
+| `GET` | `/api/v1/rendering/editors/stdmulti` | StdMultiWidgetEditor metadata |
+| `GET` | `/api/v1/rendering/editors/stdmulti/screenshot` | Composite screenshot of the StdMultiWidget editor |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows` | List render windows of the StdMultiWidget editor |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}` | Metadata of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/screenshot` | Screenshot of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Get camera state of a StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Update camera state of a StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Get selected slice index of a 2D StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Set selected slice index of a 2D StdMultiWidget render window |
 
 ### Query Parameters Summary
 
@@ -2144,8 +2485,8 @@ The API is designed for extension:
 |--------|-----------|--------|-------------|
 | `Content-Type` | POST/PUT/PATCH | `application/json`, `application/octet-stream` | Request body format |
 | `Accept` | GET | `application/json`, `application/octet-stream` | Desired response format |
-| `X-MITK-API-Token` | All | Token string | Authentication (when enabled) |
-| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference`, `shared-memory` | Data transfer mode |
+| `Authorization` | All | `Bearer {token}` | Authentication (when enabled) |
+| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference` (`shared-memory` planned) | Data transfer mode |
 
 ### HTTP Methods by Endpoint
 
@@ -2153,7 +2494,7 @@ All endpoints are relative to the base URL `/api/v1`.
 
 | Endpoint | GET | POST | PUT | PATCH | DELETE |
 |----------|-----|------|-----|-------|--------|
-| `/` | ✓ Info | — | — | — | — |
+| `/info` | ✓ Info | — | — | — | — |
 | `/health` | ✓ Health | — | — | — | — |
 | `/config/file-access` | ✓ Config | — | — | — | — |
 | `/datastorage/nodes` | ✓ List | ✓ Create | — | — | — |
@@ -2164,6 +2505,17 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/datastorage/nodes/{uid}/properties/{name}` | ✓ Read | — | ✓ Set | — | ✓ Delete |
 | `/rendering/update` | — | ✓ Update | — | — | — |
 | `/rendering/reinit` | — | ✓ Reinit (global or node-scoped) | — | — | — |
+| `/rendering/selected-position` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/selected-time` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/screenshot` | ✓ Active editor | — | — | — | — |
+| `/rendering/editors` | ✓ List | — | — | — | — |
+| `/rendering/editors/stdmulti` | ✓ Metadata | — | — | — | — |
+| `/rendering/editors/stdmulti/screenshot` | ✓ Composite | — | — | — | — |
+| `/rendering/editors/stdmulti/windows` | ✓ List | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}` | ✓ Read | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/screenshot` | ✓ Screenshot | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/camera` | ✓ Read | — | ✓ Update | — | — |
+| `/rendering/editors/stdmulti/windows/{name}/selected-slice` | ✓ Read | — | ✓ Set | — | — |
 
 ---
 

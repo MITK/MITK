@@ -94,9 +94,24 @@ public:
    */
   mitk::DataStorage* GetDataStorage() const;
 
-  /** \brief Returns the number of rows in the current layout. */
+  /**
+   * \brief Returns the row count of the last `SetLayout(r, c)` call, or 0 if
+   *        a non-grid layout has been loaded since (e.g. via `ApplyLayout` or
+   *        `SetDataBasedLayout`).
+   *
+   *        Callers that need to enumerate cells should use
+   *        `GetNumberOfRenderWindowWidgets()` / `GetRenderWindowWidgets()`
+   *        rather than this row/column pair, which only describes the regular
+   *        grid set by `SetLayout` and is invalidated to 0 when a layout that
+   *        is not a regular grid takes over.
+   */
   int GetRowCount() const;
-  /** \brief Returns the number of columns in the current layout. */
+  /**
+   * \brief Returns the column count of the last `SetLayout(r, c)` call, or 0
+   *        if a non-grid layout has been loaded since.
+   *
+   *        See `GetRowCount` for the full semantics.
+   */
   int GetColumnCount() const;
   /**
    * \brief Sets the layout to the given number of rows and columns.
@@ -351,6 +366,19 @@ protected:
    *                        AddRenderWindowWidget).
    */
   virtual void RemoveRenderWindowWidget(const QString& widgetName);
+
+  /**
+   * \brief Reset the grid-layout sentinel: row/column counts to 0 and the
+   *        active render-window pointer to nullptr.
+   *
+   *        Called by subclasses immediately before they tear down the
+   *        existing cell tree (e.g. `QmitkMxNMultiWidget::ApplyLayout` /
+   *        `SetDataBasedLayout`). After this call, `GetRowCount()` and
+   *        `GetColumnCount()` both return 0 to signal that the current cell
+   *        set is no longer a regular grid; subsequent `SetLayout(r, c)`
+   *        calls restore both fields.
+   */
+  void ResetGridState();
 
 private:
 

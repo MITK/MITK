@@ -52,6 +52,20 @@
 
 	\imageMacro{layoutWidget.png, "Layout widget" , 16.00}
 
+\subsubsection org_mitk_editors_mxnmultiwidget_LayoutFile Layout file format
+	Saved layouts are persisted as v2.0 JSON documents. The canonical reference for fields,
+	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v2.schema.json</tt>;
+	both the in-tree presets and any file produced by "Save layout" follow this schema.
+
+	Files written by older MITK releases use the v1.x format. The current editor does <b>not</b>
+	load v1.x files directly; loading one surfaces an error message that points at a one-shot
+	conversion script. To upgrade a v1.x file, run:
+
+	<tt>python3 Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py &lt;file.json&gt;</tt>
+
+	The script writes a v2.0 document to standard output (or to the path given via <tt>-o</tt>)
+	that the editor's "Load layout" action accepts unchanged.
+
 	By moving the cursor to the upper right corner of any window you can activate the window menu. It consists of three buttons:
 	<ul>
 		<li> The crosshair button allows to toggle the crosshair and to reset the view.

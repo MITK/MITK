@@ -300,4 +300,34 @@ namespace mitk
       500,
       instance);
   }
+
+  ErrorResponse::Json ErrorResponse::EditorNotActive(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_EDITOR_NOT_ACTIVE,
+      "Editor Not Active",
+      detail,
+      503,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::RenderWindowNotFound(const std::string& windowName, const std::string& instance)
+  {
+    return Create(
+      CODE_RENDER_WINDOW_NOT_FOUND,
+      "Render Window Not Found",
+      "No render window named '" + windowName + "' in the addressed editor",
+      404,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::UnsupportedOperation(const std::string& detail, const std::string& instance)
+  {
+    return Create(
+      CODE_UNSUPPORTED_OPERATION,
+      "Unsupported Operation",
+      detail,
+      404,
+      instance);
+  }
 }

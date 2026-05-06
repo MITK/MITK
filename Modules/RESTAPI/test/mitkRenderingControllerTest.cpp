@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataStorageBridge.h>
 #include <mitkRenderWindowBridge.h>
 
+#include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
@@ -52,8 +53,10 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   // GET /rendering/selected-position tests
   MITK_TEST(GetSelectedPositionWithoutBridgeReturns503);
   MITK_TEST(GetSelectedPositionWithGetterReturns200);
+  MITK_TEST(GetSelectedPositionEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(PutSelectedPositionWithoutBridgeReturns503);
   MITK_TEST(PutSelectedPositionWithSetterReturns204);
+  MITK_TEST(PutSelectedPositionEditorNotOpenReturns503EditorNotActive);
   MITK_TEST(PutSelectedPositionMissingPositionFieldReturns400);
   MITK_TEST(PutSelectedPositionWrongArrayLengthReturns400);
   MITK_TEST(PutSelectedPositionInvalidJsonReturns400);
@@ -71,6 +74,73 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetScreenshotWithInvalidFormatReturns400);
   MITK_TEST(GetScreenshotWithNonPositiveWidthReturns400);
   MITK_TEST(GetScreenshotWithExcessiveDimensionsReturns400);
+
+  // Editor discovery tests
+  MITK_TEST(GetEditorsWithoutProviderReturns503);
+  MITK_TEST(GetEditorsReturns200WithAliases);
+  MITK_TEST(GetStdmultiInfoWithEditorActiveReturns200);
+  MITK_TEST(GetStdmultiInfoWhenEditorInactiveReturns503EditorNotActive);
+  MITK_TEST(GetStdmultiWindowsWithoutProviderReturns503);
+  MITK_TEST(GetStdmultiWindowsEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetStdmultiWindowsReturns200);
+  MITK_TEST(GetStdmultiWindowForUnknownNameReturns404);
+  MITK_TEST(GetStdmultiWindowForAxialReturns200With2d);
+  MITK_TEST(GetStdmultiWindowFor3dReturns200NoSelectedSlice);
+
+  // Camera tests
+  MITK_TEST(GetCameraUnknownWindowReturns404);
+  MITK_TEST(GetCameraWithoutGetterReturns503);
+  MITK_TEST(GetCameraForAxialReturns200With2dFields);
+  MITK_TEST(GetCameraFor3dReturns200With3dFields);
+  MITK_TEST(GetCameraEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(PutCameraUnknownWindowReturns404);
+  MITK_TEST(PutCameraInvalidJsonReturns400);
+  MITK_TEST(PutCameraEmptyBodyReturns400);
+  MITK_TEST(PutCameraUnknownFieldReturns400);
+  MITK_TEST(PutCameraParallelScaleOn3dReturns400);
+  MITK_TEST(PutCameraPerspectiveAngleOn2dReturns400);
+  MITK_TEST(PutCameraNonPositiveParallelScaleReturns400);
+  MITK_TEST(PutCameraPerspectiveAngleOutOfRangeReturns400);
+  MITK_TEST(PutCameraUnknownStandardViewReturns400);
+  MITK_TEST(PutCameraWrongArrayLengthReturns400);
+  MITK_TEST(PutCameraWithoutSetterReturns503);
+  MITK_TEST(PutCameraOnAxialReturns204);
+  MITK_TEST(PutCameraOn3dReturns204);
+  MITK_TEST(PutCameraStandardViewAppliedFirst);
+  MITK_TEST(PutCameraStandardViewWithPositionReturns400);
+  MITK_TEST(PutCameraStandardViewWithFocalPointReturns400);
+  MITK_TEST(PutCameraStandardViewWithViewUpReturns400);
+  MITK_TEST(PutCameraSetterThrowsMitkExceptionReturns422);
+
+  // Selected-slice tests
+  MITK_TEST(GetSliceUnknownWindowReturns404);
+  MITK_TEST(GetSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(GetSliceWithoutGetterReturns503);
+  MITK_TEST(GetSliceForAxialReturns200);
+  MITK_TEST(GetSliceNoGeometryBoundsNull);
+  MITK_TEST(PutSliceUnknownWindowReturns404);
+  MITK_TEST(PutSliceOn3dReturns404UnsupportedOperation);
+  MITK_TEST(PutSliceInvalidJsonReturns400);
+  MITK_TEST(PutSliceEmptyBodyReturns400);
+  MITK_TEST(PutSliceMissingStepReturns400);
+  MITK_TEST(PutSliceNegativeStepReturns400);
+  MITK_TEST(PutSliceNonIntegerStepReturns400);
+  MITK_TEST(PutSlicePositionFieldReturns400WithHint);
+  MITK_TEST(PutSliceUnknownFieldReturns400);
+  MITK_TEST(PutSliceWithoutSetterReturns503);
+  MITK_TEST(PutSliceOnAxialReturns204);
+  MITK_TEST(PutSliceSetterThrowsMitkExceptionReturns422);
+
+  // Window/editor screenshot tests
+  MITK_TEST(GetEditorScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetEditorScreenshotEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetEditorScreenshotReturns200Png);
+  MITK_TEST(GetEditorScreenshotWithJpegAndSizeReturns200);
+  MITK_TEST(GetEditorScreenshotInvalidFormatReturns400);
+  MITK_TEST(GetEditorScreenshotExcessiveDimensionsReturns400);
+  MITK_TEST(GetWindowScreenshotUnknownWindowReturns404);
+  MITK_TEST(GetWindowScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetWindowScreenshotReturns200Png);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -405,6 +475,26 @@ public:
     CPPUNIT_ASSERT(json["bounds"].contains("max"));
   }
 
+  void GetSelectedPositionEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetPositionGetter(
+      []() -> mitk::SelectedPositionInfo
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open — cannot read crosshair position");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
+    httplib::Response res;
+
+    m_Controller->HandleGET_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
   void PutSelectedPositionWithoutBridgeReturns503()
   {
     m_Controller->SetRenderWindowBridge(nullptr);
@@ -438,6 +528,27 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, capturedPos[0], 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(2.0, capturedPos[1], 1e-6);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3.0, capturedPos[2], 1e-6);
+  }
+
+  void PutSelectedPositionEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetPositionSetter(
+      [](const mitk::Point3D&)
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open — cannot set crosshair position");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
+                                       R"({"position": [1.0, 2.0, 3.0]})");
+    httplib::Response res;
+
+    m_Controller->HandlePUT_selectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
   }
 
   void PutSelectedPositionMissingPositionFieldReturns400()
@@ -629,6 +740,947 @@ public:
     CPPUNIT_ASSERT_EQUAL(400, res.status);
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"), json["error"]["code"].get<std::string>());
+  }
+
+  // ===== Editor discovery =====
+
+  static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive)
+  {
+    mitk::EditorInfo stdmulti;
+    stdmulti.alias = "stdmulti";
+    stdmulti.pluginId = "org.mitk.editors.stdmultiwidget";
+    stdmulti.active = stdmultiActive;
+    if (stdmultiActive)
+      stdmulti.windowNames = {"axial", "sagittal", "coronal", "3d"};
+
+    mitk::EditorInfo mxn;
+    mxn.alias = "mxn";
+    mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
+    mxn.active = false;
+
+    return {stdmulti, mxn};
+  }
+
+  void GetEditorsWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors");
+    httplib::Response res;
+    m_Controller->HandleGET_editors(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorsReturns200WithAliases()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors");
+    httplib::Response res;
+    m_Controller->HandleGET_editors(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), json.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("stdmulti"), json[0]["alias"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn"), json[1]["alias"].get<std::string>());
+    CPPUNIT_ASSERT(json[0]["active"].get<bool>());
+    CPPUNIT_ASSERT(!json[1]["active"].get<bool>());
+    // E1 never reports the windows list (that is an E2-only field).
+    CPPUNIT_ASSERT(!json[0].contains("windows"));
+  }
+
+  void GetStdmultiInfoWithEditorActiveReturns200()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("stdmulti"), json["alias"].get<std::string>());
+    CPPUNIT_ASSERT(json["active"].get<bool>());
+    CPPUNIT_ASSERT(json["windows"].is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), json["windows"].size());
+  }
+
+  void GetStdmultiInfoWhenEditorInactiveReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/false); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() -> std::vector<mitk::WindowInfo>
+      {
+        throw mitk::RenderWindowBridgeNoEditorException(
+          "StdMultiWidgetEditor is not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowsReturns200()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), json.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json[0]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"), json[0]["kind"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["kind"].get<std::string>());
+    // No `plane` field on window list items — orientation is read from the camera.
+    CPPUNIT_ASSERT(!json[0].contains("plane"));
+  }
+
+  void GetStdmultiWindowForUnknownNameReturns404()
+  {
+    // No providers set — unknown name must still be rejected controller-side.
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetStdmultiWindowForAxialReturns200With2d()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT(json["has_camera"].get<bool>());
+    CPPUNIT_ASSERT(json["has_selected_slice"].get<bool>());
+    CPPUNIT_ASSERT(!json.contains("plane"));
+  }
+
+  void GetStdmultiWindowFor3dReturns200NoSelectedSlice()
+  {
+    m_RenderWindowBridge->SetStdMultiWindowListProvider(
+      []() {
+        return std::vector<mitk::WindowInfo>{
+          {"axial",    mitk::WindowKind::TwoD},
+          {"sagittal", mitk::WindowKind::TwoD},
+          {"coronal",  mitk::WindowKind::TwoD},
+          {"3d",       mitk::WindowKind::ThreeD}
+        };
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT(json["has_camera"].get<bool>());
+    CPPUNIT_ASSERT(!json["has_selected_slice"].get<bool>());
+  }
+  // ===== Camera =====
+
+  static mitk::CameraState MakeFakeCameraState(bool is3d)
+  {
+    mitk::CameraState s;
+    s.position[0] = 1.0;  s.position[1] = 2.0;  s.position[2] = 3.0;
+    s.focalPoint[0] = 4.0; s.focalPoint[1] = 5.0; s.focalPoint[2] = 6.0;
+    s.viewUp[0] = 0.0;    s.viewUp[1] = 1.0;    s.viewUp[2] = 0.0;
+    if (is3d) s.perspectiveAngle = 30.0;
+    else      s.parallelScale    = 120.0;
+    return s;
+  }
+
+  void GetCameraUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/camera", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetCameraWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetCameraForAxialReturns200With2dFields()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) { return MakeFakeCameraState(/*is3d=*/false); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("position"));
+    CPPUNIT_ASSERT(json.contains("focal_point"));
+    CPPUNIT_ASSERT(json.contains("view_up"));
+    CPPUNIT_ASSERT(json.contains("parallel_scale"));
+    CPPUNIT_ASSERT(!json.contains("perspective_angle"));
+  }
+
+  void GetCameraFor3dReturns200With3dFields()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) { return MakeFakeCameraState(/*is3d=*/true); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("perspective_angle"));
+    CPPUNIT_ASSERT(!json.contains("parallel_scale"));
+  }
+
+  void GetCameraEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraGetter(
+      [](const std::string&) -> mitk::CameraState
+      {
+        throw mitk::RenderWindowBridgeNoEditorException("editor not open");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/camera",
+      R"({"parallel_scale": 120.0})",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+  }
+
+  void PutCameraInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      "not-json", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutCameraEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      "{}", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraUnknownFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"mystery": 42})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  // Helper: assert that a PUT camera body produces 400 INVALID_REQUEST and
+  // that the error message contains the expected substring.
+  void AssertPutCameraReturns400(const std::string& windowName,
+                                 const std::string& body,
+                                 const std::string& expectedMessageSubstr)
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/" + windowName + "/camera",
+      body, {{"name", windowName}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+    const auto msg = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(msg.find(expectedMessageSubstr) != std::string::npos);
+  }
+
+  void PutCameraParallelScaleOn3dReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "3d", R"({"parallel_scale": 100.0})", "parallel_scale");
+  }
+
+  void PutCameraPerspectiveAngleOn2dReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial", R"({"perspective_angle": 30.0})", "perspective_angle");
+  }
+
+  void PutCameraNonPositiveParallelScaleReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial", R"({"parallel_scale": 0.0})", "parallel_scale");
+  }
+
+  void PutCameraPerspectiveAngleOutOfRangeReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "3d", R"({"perspective_angle": 180.0})", "perspective_angle");
+  }
+
+  void PutCameraUnknownStandardViewReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial", R"({"standard_view": "oblique"})", "standard_view");
+  }
+
+  void PutCameraWrongArrayLengthReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial", R"({"position": [1.0, 2.0]})", "position");
+  }
+
+  void PutCameraStandardViewWithPositionReturns400()
+  {
+    // Issue #1: combining standard_view with explicit pose fields would leave
+    // the CameraController's internal "standard view" memo inconsistent with
+    // the actual camera pose — controller rejects the combination upfront.
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "position": [1.0, 2.0, 3.0]})",
+      "standard_view");
+  }
+
+  void PutCameraStandardViewWithFocalPointReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "focal_point": [0.0, 0.0, 0.0]})",
+      "standard_view");
+  }
+
+  void PutCameraStandardViewWithViewUpReturns400()
+  {
+    this->AssertPutCameraReturns400(
+      "axial",
+      R"({"standard_view": "anterior", "view_up": [0.0, 1.0, 0.0]})",
+      "standard_view");
+  }
+
+  void PutCameraSetterThrowsMitkExceptionReturns422()
+  {
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [](const std::string&, const mitk::CameraPatch&)
+      {
+        mitkThrow() << "synthetic camera failure";
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(422, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDERING_ERROR"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceSetterThrowsMitkExceptionReturns422()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStepSetter(
+      [](const std::string&, unsigned int)
+      {
+        mitkThrow() << "synthetic slice failure";
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(422, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDERING_ERROR"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraWithoutSetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutCameraOnAxialReturns204()
+  {
+    mitk::CameraPatch captured;
+    std::string capturedName;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string& n, const mitk::CameraPatch& p)
+      { capturedName = n; captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"position": [1.0, 2.0, 3.0], "parallel_scale": 150.0})",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT(captured.position.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.0, (*captured.position)[0], 1e-6);
+    CPPUNIT_ASSERT(captured.parallelScale.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(150.0, *captured.parallelScale, 1e-6);
+    CPPUNIT_ASSERT(!captured.perspectiveAngle.has_value());
+  }
+
+  void PutCameraOn3dReturns204()
+  {
+    mitk::CameraPatch captured;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string&, const mitk::CameraPatch& p) { captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
+      R"({"perspective_angle": 45.0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT(captured.perspectiveAngle.has_value());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(45.0, *captured.perspectiveAngle, 1e-6);
+  }
+
+  void PutCameraStandardViewAppliedFirst()
+  {
+    mitk::CameraPatch captured;
+    m_RenderWindowBridge->SetStdMultiCameraSetter(
+      [&](const std::string&, const mitk::CameraPatch& p) { captured = p; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
+      R"({"standard_view": "anterior", "parallel_scale": 120.0})",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    // The controller forwards both fields; ordering is a plugin-side concern
+    // (standard_view applied first before individual fields). We assert the
+    // wire contract: both fields were sent through intact.
+    CPPUNIT_ASSERT(captured.standardView.has_value());
+    CPPUNIT_ASSERT_EQUAL(std::string("anterior"), *captured.standardView);
+    CPPUNIT_ASSERT(captured.parallelScale.has_value());
+  }
+  // ===== Selected-slice =====
+
+  static mitk::SliceState MakeFakeSliceState(bool withBounds)
+  {
+    mitk::SliceState s;
+    s.step = 5;
+    s.position[0] = 10.0; s.position[1] = 20.0; s.position[2] = 30.0;
+    s.bounds.steps = 90;
+    if (withBounds)
+    {
+      s.bounds.minPosition[0] = 0.0;  s.bounds.minPosition[1] = 0.0;  s.bounds.minPosition[2] = 0.0;
+      s.bounds.maxPosition[0] = 100.0; s.bounds.maxPosition[1] = 100.0; s.bounds.maxPosition[2] = 100.0;
+      s.bounds.hasPositions = true;
+    }
+    return s;
+  }
+
+  void GetSliceUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceOn3dReturns404UnsupportedOperation()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice", "",
+      {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetSliceForAxialReturns200()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceGetter(
+      [](const std::string&) { return MakeFakeSliceState(/*withBounds=*/true); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(5, json["step"].get<int>());
+    CPPUNIT_ASSERT(json["position"].is_array());
+    CPPUNIT_ASSERT_EQUAL(90, json["bounds"]["steps"].get<int>());
+    CPPUNIT_ASSERT(json["bounds"]["min_position"].is_array());
+    CPPUNIT_ASSERT(json["bounds"]["max_position"].is_array());
+    // No `plane` field on slice response — orientation is read from the camera.
+    CPPUNIT_ASSERT(!json.contains("plane"));
+  }
+
+  void GetSliceNoGeometryBoundsNull()
+  {
+    m_RenderWindowBridge->SetStdMultiSelectedSliceGetter(
+      [](const std::string&) { return MakeFakeSliceState(/*withBounds=*/false); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json["bounds"]["min_position"].is_null());
+    CPPUNIT_ASSERT(json["bounds"]["max_position"].is_null());
+  }
+
+  void PutSliceUnknownWindowReturns404()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice",
+      R"({"step": 0})", {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+  }
+
+  void PutSliceOn3dReturns404UnsupportedOperation()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice",
+      R"({"step": 0})", {{"name", "3d"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("UNSUPPORTED_OPERATION"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "not-json", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceMissingStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      "{}", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutSliceNegativeStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": -1})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceNonIntegerStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 1.5})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSlicePositionFieldReturns400WithHint()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"position": [1.0, 2.0, 3.0]})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    const auto msg = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(msg.find("selected-position") != std::string::npos);
+  }
+
+  void PutSliceUnknownFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"mystery": 0})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutSliceWithoutSetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 5})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+  }
+
+  void PutSliceOnAxialReturns204()
+  {
+    std::string capturedName;
+    unsigned int capturedStep = 0;
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStepSetter(
+      [&](const std::string& n, unsigned int s) { capturedName = n; capturedStep = s; });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
+      R"({"step": 42})", {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(42u, capturedStep);
+  }
+  // ===== Window/editor screenshots =====
+
+  void GetEditorScreenshotWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorScreenshotEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) -> std::vector<unsigned char>
+      {
+        throw mitk::RenderWindowBridgeNoEditorException("editor not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetEditorScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [fakeBytes](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return fakeBytes; });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/stdmulti/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    // Content-Type is set via set_content; body bytes match provider output.
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
+  }
+
+  void GetEditorScreenshotWithJpegAndSizeReturns200()
+  {
+    mitk::ScreenshotFormat capturedFormat = mitk::ScreenshotFormat::Png;
+    std::optional<std::pair<int, int>> capturedSize;
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [&](std::optional<std::pair<int, int>> s, mitk::ScreenshotFormat f) {
+        capturedSize = s; capturedFormat = f;
+        return std::vector<unsigned char>{0xFF, 0xD8};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("format", "jpeg");
+    req.params.emplace("width", "640");
+    req.params.emplace("height", "480");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT(capturedFormat == mitk::ScreenshotFormat::Jpeg);
+    CPPUNIT_ASSERT(capturedSize.has_value());
+    CPPUNIT_ASSERT_EQUAL(640, capturedSize->first);
+    CPPUNIT_ASSERT_EQUAL(480, capturedSize->second);
+  }
+
+  void GetEditorScreenshotInvalidFormatReturns400()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("format", "bmp");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetEditorScreenshotExcessiveDimensionsReturns400()
+  {
+    m_RenderWindowBridge->SetStdMultiEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/stdmulti/screenshot";
+    req.params.emplace("width", "9000");
+    req.params.emplace("height", "9000");
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetWindowScreenshotUnknownWindowReturns404()
+  {
+    // Window-name validation runs before bridge-availability for all stdmulti
+    // window handlers, so an unknown name yields 404 regardless of whether a
+    // provider is bound.
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/bogus/screenshot", "",
+      {{"name", "bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetWindowScreenshotWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+  }
+
+  void GetWindowScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    std::string capturedName;
+    m_RenderWindowBridge->SetStdMultiWindowScreenshotProvider(
+      [fakeBytes, &capturedName](
+        const std::string& name, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat)
+      {
+        capturedName = name;
+        return fakeBytes;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
+      {{"name", "axial"}});
+    httplib::Response res;
+    m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
   }
 };
 

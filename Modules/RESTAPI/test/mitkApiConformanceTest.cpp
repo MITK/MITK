@@ -299,6 +299,46 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_screenshot(req, res);
       };
+    m_EndpointRegistry[{"/rendering/editors", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_editors(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiInfo(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindows(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindow(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiCamera(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_stdmultiCamera(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiScreenshot(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
+      };
   }
 
   /// Read required fields from components.schemas.<schemaName>.required.
@@ -461,7 +501,10 @@ private:
       mitk::ErrorResponse::CODE_FILE_ACCESS_DENIED,
       mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_TIME_NAVIGATION_NOT_AVAILABLE,
-      mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE
+      mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE,
+      mitk::ErrorResponse::CODE_EDITOR_NOT_ACTIVE,
+      mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_FOUND,
+      mitk::ErrorResponse::CODE_UNSUPPORTED_OPERATION
     };
   }
 

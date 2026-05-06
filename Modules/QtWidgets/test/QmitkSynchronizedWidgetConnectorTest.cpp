@@ -15,11 +15,28 @@ found in the LICENSE file.
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 
+#include <mitkBaseRenderer.h>
+#include <mitkException.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
+#include <mitkVtkPropRenderer.h>
+
+#include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
 
 #include <algorithm>
+
+/**
+ * Test-only subclass that surfaces the protected `SeedFromMember` contract
+ * for direct unit testing. Production code reaches `SeedFromMember` through
+ * `QmitkMxNMultiWidget` (a friend of the base connector).
+ */
+class TestableSynchronizedWidgetConnector : public QmitkSynchronizedWidgetConnector
+{
+public:
+  using QmitkSynchronizedWidgetConnector::SeedFromMember;
+};
 
 /**
  * Direct unit test for QmitkSynchronizedWidgetConnector. The connector hub
@@ -46,6 +63,12 @@ class QmitkSynchronizedWidgetConnectorTestSuite : public mitk::TestFixture
   MITK_TEST(ChangeSelection_StoresSelection);
   MITK_TEST(ChangeSelection_EmitsOnlyWhenChanged);
   MITK_TEST(ChangeSelectionMode_EmitsOnlyWhenChanged);
+
+  // group seeding contract
+  MITK_TEST(SeedFromMember_NullRenderer_Throws);
+  MITK_TEST(SeedFromMember_ReplacesInternalSelection);
+  MITK_TEST(SeedFromMember_DoesNotTouchSelectAll);
+
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -241,6 +264,78 @@ public:
     sel2.append(m_Node2);
     connector.ChangeSelection(sel2);
     CPPUNIT_ASSERT_EQUAL(2, emissions);
+  }
+
+  // ---------- SeedFromMember (group seeding contract) ----------
+
+  void SeedFromMember_NullRenderer_Throws()
+  {
+    TestableSynchronizedWidgetConnector connector;
+    QmitkSynchronizedWidgetConnector::NodeList sel;
+    sel.append(m_Node1);
+    CPPUNIT_ASSERT_THROW(connector.SeedFromMember(sel, nullptr), mitk::Exception);
+  }
+
+  void SeedFromMember_ReplacesInternalSelection()
+  {
+    TestableSynchronizedWidgetConnector connector;
+
+    // Pre-load with a different selection.
+    QmitkSynchronizedWidgetConnector::NodeList preExisting;
+    preExisting.append(m_Node1);
+    connector.ChangeSelection(preExisting);
+    CPPUNIT_ASSERT(ListContains(connector.GetNodeSelection(), m_Node1));
+
+    // Build a real renderer so SeedFromMember can call IsVisible(...) on
+    // its node entries. The renderer's GL state is irrelevant for this
+    // assertion; only the BaseRenderer pointer must be non-null and have
+    // a registered association with the vtkRenderWindow. VtkPropRenderer's
+    // constructor performs that registration via BaseRenderer::AddInstance.
+    auto vtkWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    mitk::VtkPropRenderer::Pointer renderer =
+      mitk::VtkPropRenderer::New("seed-test-renderer", vtkWindow);
+    CPPUNIT_ASSERT_MESSAGE("Test setup: renderer must instantiate",
+                           renderer.IsNotNull());
+
+    QmitkSynchronizedWidgetConnector::NodeList seed;
+    seed.append(m_Node2);
+    seed.append(m_Node3);
+    connector.SeedFromMember(seed, renderer.GetPointer());
+
+    const auto stored = connector.GetNodeSelection();
+    CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(stored.size()));
+    CPPUNIT_ASSERT_MESSAGE("Seeded selection must contain m_Node2",
+                           ListContains(stored, m_Node2));
+    CPPUNIT_ASSERT_MESSAGE("Seeded selection must contain m_Node3",
+                           ListContains(stored, m_Node3));
+    CPPUNIT_ASSERT_MESSAGE("Pre-existing selection must be replaced",
+                           !ListContains(stored, m_Node1));
+
+    // Drop the renderer; ~BaseRenderer removes the registration before the
+    // vtk window dies.
+    renderer = nullptr;
+  }
+
+  void SeedFromMember_DoesNotTouchSelectAll()
+  {
+    TestableSynchronizedWidgetConnector connector;
+    connector.ChangeSelectionMode(false);
+    CPPUNIT_ASSERT_EQUAL(false, connector.GetSelectionMode());
+
+    auto vtkWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    mitk::VtkPropRenderer::Pointer renderer =
+      mitk::VtkPropRenderer::New("seed-test-renderer", vtkWindow);
+    CPPUNIT_ASSERT(renderer.IsNotNull());
+
+    QmitkSynchronizedWidgetConnector::NodeList seed;
+    seed.append(m_Node1);
+    connector.SeedFromMember(seed, renderer.GetPointer());
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "select_all is group-scoped and must not be derived from any single cell",
+      false, connector.GetSelectionMode());
+
+    renderer = nullptr;
   }
 
   void ChangeSelectionMode_EmitsOnlyWhenChanged()

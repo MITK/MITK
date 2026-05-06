@@ -14,28 +14,29 @@ found in the LICENSE file.
 
 // MITK
 #include <mitkDataNode.h>
+#include <mitkLabelHighlightGuard.h>
+#include <mitkMultiLabelSurfaceNetsExtractor.h>
 #include <mitkProperties.h>
 #include <mitkVectorProperty.h>
-#include <mitkLabelHighlightGuard.h>
 
+#include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 // VTK
+#include <vtkActor.h>
 #include <vtkImageData.h>
 #include <vtkLookupTable.h>
-#include <vtkVolume.h>
-#include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkVolumeProperty.h>
-#include <vtkSmartPointer.h>
-#include <vtkColorTransferFunction.h>
-#include <vtkPiecewiseFunction.h>
-#include <vtkPointData.h>
+#include <vtkMatrix4x4.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkPropAssembly.h>
+#include <vtkSmartPointer.h>
 
 namespace
 {
-  itk::ModifiedTimeType PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
+  bool PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
   {
     const std::string context = renderer != nullptr ? renderer->GetName() : "";
     auto prop = provider->GetConstProperty(propName, context);
@@ -47,31 +48,43 @@ namespace
   }
 }
 
+bool mitk::MultiLabelSegmentationVtkMapper3D::ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer)
+{
+  bool smoothed = true;
+  if (node != nullptr && node->GetBoolProperty("org.mitk.multilabel.3D.smoothed", smoothed, renderer))
+  {
+    return smoothed;
+  }
+
+  if (auto* prefService = mitk::CoreServices::GetPreferencesService())
+  {
+    if (auto* systemPref = prefService->GetSystemPreferences())
+    {
+      return systemPref->Node("/org.mitk.views.segmentation")->GetBool("3D rendering smoothed", true);
+    }
+  }
+  return true;
+}
+
 namespace mitk
 {
   class MultiLabelSegmentationGroupMapping
   {
   public:
-    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_VolumeMapper;
-    vtkSmartPointer<vtkVolume> m_Volume;
+    std::unique_ptr<MultiLabelSurfaceNetsExtractor> m_Extractor;
+    vtkSmartPointer<vtkPolyDataMapper>              m_PolyMapper;
+    vtkSmartPointer<vtkActor>                       m_Actor;
+    vtkSmartPointer<vtkImageData>                   m_VtkImage;
 
-    /** In highlighting mode used for all labels that are faded out.*/
-    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_FadedVolumeMapper;
-    /** In highlighting mode used for all labels that are faded out.*/
-    vtkSmartPointer<vtkVolume> m_FadedVolume;
-
-    vtkSmartPointer<vtkImageData> m_VtkImage;
-    //indicated the index it was added to the actor in order to identify if there are changes
-    //in sequence
+    // The actor index in the group order. Used to detect group reordering.
     MultiLabelSegmentation::GroupIndexType m_ActorOrder = 0;
 
     MultiLabelSegmentationGroupMapping()
+      : m_Extractor(std::make_unique<MultiLabelSurfaceNetsExtractor>()),
+        m_PolyMapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
+        m_Actor(vtkSmartPointer<vtkActor>::New()),
+        m_VtkImage(vtkSmartPointer<vtkImageData>::New())
     {
-      m_VtkImage = vtkSmartPointer<vtkImageData>::New();
-      m_VolumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
-      m_Volume = vtkSmartPointer<vtkVolume>::New();
-      m_FadedVolumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
-      m_FadedVolume = vtkSmartPointer<vtkVolume>::New();
     }
   };
 }
@@ -86,7 +99,6 @@ mitk::MultiLabelSegmentationVtkMapper3D::~MultiLabelSegmentationVtkMapper3D()
 
 vtkProp *mitk::MultiLabelSegmentationVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  // return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actors;
 }
 
@@ -103,7 +115,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   assert(image && image->IsInitialized());
 
   localStorage->m_LabelLookupTable = image->GetLookupTable()->Clone();
-  auto lookUpTable = localStorage->m_LabelLookupTable->GetVtkLookupTable();
+  auto sourceLookUpTable = localStorage->m_LabelLookupTable->GetVtkLookupTable();
 
   const auto labelValues = image->GetAllLabelValues();
 
@@ -116,42 +128,51 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   const bool highlightingActive = !highlightedLabelValues.empty();
   localStorage->m_UseFadedPipeline = highlightingActive;
 
+  float nodeOpacity = 1.0f;
+  node->GetFloatProperty("opacity", nodeOpacity);
+
+  // Clear only the entries we populated last time. Labels that disappeared since
+  // the previous update are reset to fully transparent without touching the
+  // ~65k entries that have always been zero.
+  auto& lut = localStorage->m_VtkLookupTable;
+  for (auto idx : localStorage->m_PopulatedLabelEntries)
+  {
+    lut->SetTableValue(idx, 0.0, 0.0, 0.0, 0.0);
+  }
+  localStorage->m_PopulatedLabelEntries.clear();
+  localStorage->m_PopulatedLabelEntries.reserve(labelValues.size());
+
   double rgba[4];
   for (const auto& value : labelValues)
   {
-    lookUpTable->GetTableValue(value, rgba);
-    bool isHighlightedValue = false;
+    sourceLookUpTable->GetTableValue(value, rgba);
 
     if (highlightingActive)
     {
-      isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
+      const bool isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
       if (!isHighlightedValue)
       { //make all none highlighted values more transparent
-        rgba[3] *= 0.01;
+        rgba[3] *= 0.3;
       }
       else
       {
         if (rgba[3] != 0 || highlightInvisibleLabels)
-        { //highlight a label if it is visible or if also invisible labels should be highlighted
-          rgba[3] = 1.;
+        {
+          rgba[3] = 1.0;
         }
       }
     }
-    lookUpTable->SetTableValue(value, rgba);
 
-    localStorage->m_TransferFunction->AddRGBPoint(value, rgba[0], rgba[1], rgba[2]);
+    // Node-level "opacity" multiplies into the per-label alpha. The actor's own
+    // opacity is fixed at 1.0 so the LUT alpha is the sole source of transparency.
+    rgba[3] *= nodeOpacity;
 
-    const double opacityNormal = (isHighlightedValue || !highlightingActive) ? rgba[3] : 0.;
-    const double opacityFaded = !(isHighlightedValue || !highlightingActive) ? rgba[3] : 0.;
-
-    localStorage->m_OpacityTransferFunction->AddPoint(value, opacityNormal);
-    localStorage->m_FadedOpacityTransferFunction->AddPoint(value, opacityFaded);
+    lut->SetTableValue(value, rgba);
+    localStorage->m_PopulatedLabelEntries.push_back(static_cast<vtkIdType>(value));
   }
-  localStorage->m_LabelLookupTable->Modified(); // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is
 
-  localStorage->m_TransferFunction->Build();
-  localStorage->m_OpacityTransferFunction->Modified();
-  localStorage->m_FadedOpacityTransferFunction->Modified();
+  localStorage->m_LabelLookupTable->Modified();
+  lut->Modified();
 }
 
 mitk::MultiLabelSegmentationVtkMapper3D::OutdatedGroupVectorType
@@ -173,7 +194,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
     auto finding = ls->m_GroupPipelines.find(groupImage);
 
     if (finding != ls->m_GroupPipelines.end())
-    { //group image has a pipeline
+    {
       const bool imageIsOutdated = groupImage->GetMTime() > ls->m_LastDataUpdateTime
         || groupImage->GetPipelineMTime() > ls->m_LastDataUpdateTime;
       const bool groupPositionHasChanged = groupID != finding->second->m_ActorOrder;
@@ -181,42 +202,54 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
       {
         result.push_back({ groupID, groupImage });
 
-        if (groupPositionHasChanged) positionChanges.push_back({ groupID, groupImage });
+        if (groupPositionHasChanged)
+        {
+          positionChanges.push_back({ groupID, groupImage });
+          finding->second->m_ActorOrder = groupID;
+        }
       }
     }
     else
-    { //new group image, we need a pipeline for that
+    {
       auto newPipeline = ls->m_GroupPipelines.insert(std::make_pair(groupImage, std::make_unique<mitk::MultiLabelSegmentationGroupMapping>()));
 
-      //pipeline->m_VtkImage will be set and connected in the update function
       auto& pipeline = newPipeline.first->second;
 
-      //configure the normal pipeline
-      pipeline->m_Volume->GetProperty()->ShadeOn();
-      pipeline->m_Volume->GetProperty()->SetDiffuse(1.0);
-      pipeline->m_Volume->GetProperty()->SetAmbient(0.4);
-      pipeline->m_Volume->GetProperty()->SetSpecular(0.2);
-      pipeline->m_Volume->GetProperty()->SetInterpolationTypeToNearest();
-      pipeline->m_Volume->SetMapper(pipeline->m_VolumeMapper);
+      // Configure the per-group polydata mapper. The mapper's input is set per render
+      // by UpdateSurfaceMapping with the polydata returned by the surface-nets extractor.
+      pipeline->m_PolyMapper->SetScalarModeToUseCellFieldData();
+      pipeline->m_PolyMapper->SelectColorArray("BoundaryLabels");
+      // BoundaryLabels component 0 always holds a foreground label: vtkSurfaceNets3D
+      // places the background value into component 1 for boundary cells, and orders
+      // foreground values ascending for interior (label-vs-label) cells. Component 0
+      // is therefore the right scalar to drive label-color lookup.
+      pipeline->m_PolyMapper->SetArrayComponent(0);
+      pipeline->m_PolyMapper->SetUseLookupTableScalarRange(true);
+      pipeline->m_PolyMapper->SetLookupTable(ls->m_VtkLookupTable);
+      pipeline->m_PolyMapper->ScalarVisibilityOn();
+      pipeline->m_PolyMapper->InterpolateScalarsBeforeMappingOff();
 
-      //configure the pipeline for faded labels in highlight mode
-      pipeline->m_FadedVolume->GetProperty()->ShadeOff();
-      pipeline->m_FadedVolume->GetProperty()->SetDiffuse(0.7);
-      pipeline->m_FadedVolume->GetProperty()->SetAmbient(0.3);
-      pipeline->m_FadedVolume->GetProperty()->SetSpecular(0.0);
-      pipeline->m_FadedVolume->GetProperty()->SetInterpolationTypeToNearest();
-      pipeline->m_FadedVolume->SetMapper(pipeline->m_FadedVolumeMapper);
+      pipeline->m_Actor->SetMapper(pipeline->m_PolyMapper);
+      pipeline->m_Actor->GetProperty()->SetAmbient(0.4);
+      pipeline->m_Actor->GetProperty()->SetDiffuse(1.0);
+      pipeline->m_Actor->GetProperty()->SetSpecular(0.2);
+      pipeline->m_Actor->GetProperty()->SetSpecularPower(20.0);
+      pipeline->m_Actor->GetProperty()->SetInterpolationToPhong();
+      pipeline->m_Actor->GetProperty()->SetBackfaceCulling(false);
+      // Opacity is encoded in the lookup table; keep the actor opacity at 1.0 so it
+      // does not stack multiplicatively with the per-label alpha.
+      pipeline->m_Actor->GetProperty()->SetOpacity(1.0);
 
       pipeline->m_ActorOrder = groupID;
 
-      //new pipelines are always outdated
+      // New pipelines are always outdated.
       result.push_back({ groupID, groupImage });
       positionChanges.push_back({ groupID, groupImage });
     }
   }
 
-  //find all pipelines that refer to image that are not needed anymore and remove them
-  std::vector < const mitk::Image*> missing;
+  // Find pipelines that refer to images no longer in the segmentation and remove them.
+  std::vector<const mitk::Image*> missing;
   for (auto const& [key, value] : ls->m_GroupPipelines)
   {
     if (std::find(existingGroupImages.begin(), existingGroupImages.end(), key)
@@ -225,37 +258,31 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
       missing.push_back(key);
     }
   }
-  //now remove it
   for (auto& key : missing)
   {
-    ls->m_Actors->RemovePart(ls->m_GroupPipelines[key]->m_Volume);
-    ls->m_Actors->RemovePart(ls->m_GroupPipelines[key]->m_FadedVolume);
+    ls->m_Actors->RemovePart(ls->m_GroupPipelines[key]->m_Actor);
     ls->m_GroupPipelines.erase(key);
   }
 
-
-  if (!positionChanges.empty() //update due to position change
-    || fadedPipelineChanged //update because the faded pipeline was (de)activated
-    || (!ls->m_GroupPipelines.empty() && ls->m_Actors->GetParts()->GetNumberOfItems()==0) //we have pipelines but no actor parts
-                                                                                          //can happen e.g. if 3D rendering pref
-                                                                                          //changes
+  if (!positionChanges.empty()
+    || fadedPipelineChanged
+    || (!ls->m_GroupPipelines.empty() && ls->m_Actors->GetParts()->GetNumberOfItems() == 0)
     )
   {
-    // connect actor from scratch with all pipelines as some positions have changed
-    // (this includes the case where a new group has been added or a group was deleted in between).
-    // or if the usage state of the faded pipeline has changed
+    // Reassemble the actor set from scratch: positions changed (group added, removed,
+    // reordered), the highlight-mode flag flipped, or rendering was previously empty
+    // (e.g., the 3D-rendering preference was just turned on).
     ls->m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
     for (auto& [key, pipeline] : ls->m_GroupPipelines)
     {
-      ls->m_Actors->AddPart(pipeline->m_Volume);
-      if (ls->m_UseFadedPipeline) ls->m_Actors->AddPart(pipeline->m_FadedVolume);
+      ls->m_Actors->AddPart(pipeline->m_Actor);
     }
   }
 
   return result;
 }
 
-void mitk::MultiLabelSegmentationVtkMapper3D::UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedGroups)
+void mitk::MultiLabelSegmentationVtkMapper3D::UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedGroups)
 {
   mitk::DataNode* node = this->GetDataNode();
   auto* segmentation = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
@@ -263,19 +290,7 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateVolumeMapping(LocalStorage* 
 
   segmentation->Update();
 
-  //Compute normalized orientation matrix of segmentation to ensure that the volume is shown
-  //at the right spot (same geometry like segmentation)
-  const auto geometry = segmentation->GetGeometry();
-  auto spacing = geometry->GetSpacing();
-  auto orientationMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
-  orientationMatrix->DeepCopy(geometry->GetVtkMatrix());
-  //normalize orientationMatrix
-  for (int i = 0; i < 3; ++i)
-  {
-    orientationMatrix->SetElement(i, 0, orientationMatrix->GetElement(i, 0) / spacing[0]);
-    orientationMatrix->SetElement(i, 1, orientationMatrix->GetElement(i, 1) / spacing[1]);
-    orientationMatrix->SetElement(i, 2, orientationMatrix->GetElement(i, 2) / spacing[2]);
-  }
+  const auto orientationMatrix = MultiLabelSurfaceNetsExtractor::GetImageToWorldMatrix(segmentation->GetGeometry());
 
   const auto timeStep = this->GetTimestep();
 
@@ -288,38 +303,19 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateVolumeMapping(LocalStorage* 
       return;
     }
     auto& pipeline = finding->second;
-    pipeline->m_Volume->SetUserMatrix(orientationMatrix);
-    pipeline->m_FadedVolume->SetUserMatrix(orientationMatrix);
+
+    pipeline->m_Actor->SetUserMatrix(orientationMatrix);
 
     // we could also search for the nonConst groupImage in segmentation, but the const cast
     // is faster and legit as we have access to the non const segmentation anyways.
     auto nonConstImage = const_cast<Image*>(groupImage);
     pipeline->m_VtkImage = nonConstImage->GetVtkImageData(timeStep);
-    pipeline->m_VolumeMapper->SetInputData(pipeline->m_VtkImage);
-    pipeline->m_FadedVolumeMapper->SetInputData(pipeline->m_VtkImage);
 
-    // Force VTK to recompute scalar range from the actual data
-    auto scalars = pipeline->m_VtkImage->GetPointData()->GetScalars();
-    if (scalars)
-    {
-      // This forces VTK to scan the actual data and recompute range
-      scalars->Modified();
-      scalars->GetRange(); // Forces recomputation
-    }
+    pipeline->m_Extractor->SetSmoothing(localStorage->m_LastSmoothed);
 
-    // Force the vtkImageData to update its cached range
-    pipeline->m_VtkImage->Modified();
-    pipeline->m_VtkImage->GetScalarRange(); // This should now be correct
-
-    pipeline->m_VolumeMapper->Update();
-    pipeline->m_FadedVolumeMapper->Update();
-
-    pipeline->m_Volume->GetProperty()->SetColor(localStorage->m_TransferFunction);
-    pipeline->m_Volume->GetProperty()->SetScalarOpacity(localStorage->m_OpacityTransferFunction);
-    pipeline->m_Volume->Update();
-    pipeline->m_FadedVolume->GetProperty()->SetColor(localStorage->m_TransferFunction);
-    pipeline->m_FadedVolume->GetProperty()->SetScalarOpacity(localStorage->m_FadedOpacityTransferFunction);
-    pipeline->m_FadedVolume->Update();
+    const auto groupLabels = segmentation->GetLabelValuesByGroup(groupID);
+    auto polyData = pipeline->m_Extractor->Extract(pipeline->m_VtkImage, groupLabels);
+    pipeline->m_PolyMapper->SetInputData(polyData);
   }
 
   localStorage->m_Actors->Modified();
@@ -353,44 +349,32 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
   const bool isGeometryModified = (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
     (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 
-  // check if visibility has been switched on since last update
   const bool visibilityChanged =
     PropertyTimeStampIsNewer(node, renderer, "visible", localStorage->m_LastDataUpdateTime) ||
     PropertyTimeStampIsNewer(node, renderer, "org.mitk.multilabel.3D.hide", localStorage->m_LastDataUpdateTime);
 
   const bool timeStepChanged = this->GetTimestep() != localStorage->m_LastUpdateTimeStep;
 
-  if (isGeometryModified || visibilityChanged || isLookupModified || timeStepChanged)
+  // A change in the resolved smoothing state forces all groups to re-extract
+  // (the smoothing flag is applied to vtkSurfaceNets3D in UpdateSurfaceMapping).
+  const bool currentSmoothed = ResolveSmoothed(node, renderer);
+  const bool smoothedChanged = currentSmoothed != localStorage->m_LastSmoothed;
+  localStorage->m_LastSmoothed = currentSmoothed;
+
+  // Lookup-only changes (color, alpha, highlight, per-label visibility via alpha=0) do not
+  // require surface re-extraction: the polydata mapper picks up the LUT change automatically.
+  if (isGeometryModified || visibilityChanged || timeStepChanged || smoothedChanged)
   {
-    //if geometry is outdated, lookup table, timestep or visibility changed all groups need regeneration
     outdatedGroups.clear();
-    MultiLabelSegmentation::GroupIndexType groupID = 0;
     for (auto& [key, pipeline] : localStorage->m_GroupPipelines)
     {
-      outdatedGroups.emplace_back(groupID, key);
+      outdatedGroups.emplace_back(pipeline->m_ActorOrder, key);
     }
   }
 
   if (!outdatedGroups.empty())
   {
-    this->UpdateVolumeMapping(localStorage, outdatedGroups);
-  }
-}
-
-namespace
-{
-  bool IsGPUMapperSupported(mitk::BaseRenderer* renderer)
-  {
-    vtkNew<vtkImageData> tiny;
-    tiny->SetDimensions(2, 2, 2);
-    tiny->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-
-    vtkNew<vtkGPUVolumeRayCastMapper> mapper;
-    mapper->SetInputData(tiny);
-
-    bool supported = (0 != mapper->IsRenderSupported(renderer->GetVtkRenderer()->GetRenderWindow(), nullptr));
-
-    return supported;
+    this->UpdateSurfaceMapping(localStorage, outdatedGroups);
   }
 }
 
@@ -404,21 +388,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
     return;
   }
 
-  if (!localStorage->m_GPUCheckSuccessfull.has_value())
-  {
-    const auto hasGPU = IsGPUMapperSupported(renderer);
-    localStorage->m_GPUCheckSuccessfull = hasGPU;
-    if (!hasGPU)
-    {
-      MITK_INFO << "No GPU available. 3D rendering of MultilabelSegmentation is deactivated for node: " << node->GetName();
-    }
-  }
-
-  if (!localStorage->m_GPUCheckSuccessfull.value())
-  {
-    return;
-  }
-
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");
 
@@ -428,6 +397,16 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   const auto pref3DRendering = nullptr != localStorage->m_SegPreferences ? localStorage->m_SegPreferences->GetBool("activate 3D rendering", true) : true;
   const auto changed3DRendering = pref3DRendering != localStorage->m_3DRenderingPreference;
   localStorage->m_3DRenderingPreference = pref3DRendering;
+
+  // Detect a change in the resolved smoothing state so a preference flip
+  // (without any per-node property change) still triggers re-extraction.
+  // m_LastSmoothed reflects the smoothing of the cached polydata, so it is only
+  // updated after a successful re-extraction in GenerateDataForRenderer. Reading
+  // it before the early-return paths below is intentional: comparing the resolved
+  // request against the cache is the correct staleness check, and on the unhide
+  // frame the visibility-property MTime independently triggers GenerateDataForRenderer
+  // (its inner visibilityChanged path forces all groups to refresh).
+  const auto changedSmoothed = ResolveSmoothed(node, renderer) != localStorage->m_LastSmoothed;
 
   if (!visible
     || hide3Dvisualize
@@ -460,8 +439,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
 
   segmentation->UpdateOutputInformation();
 
-  // check if something important has changed and we need to re-render
-
   if (localStorage->m_LabelLookupTable.IsNull() ||
       (localStorage->m_LabelLookupTable->GetMTime() < segmentation->GetLookupTable()->GetMTime()) ||
       (localStorage->m_LastDataUpdateTime < segmentation->GetMTime()) ||
@@ -471,7 +448,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()) ||
-      changed3DRendering)
+      changed3DRendering ||
+      changedSmoothed)
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
@@ -484,7 +462,6 @@ void mitk::MultiLabelSegmentationVtkMapper3D::SetDefaultProperties(mitk::DataNod
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 
-  // add/replace the following properties
   node->SetProperty("org.mitk.multilabel.3D.hide", BoolProperty::New(false), renderer);
 }
 
@@ -494,29 +471,25 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::~LocalStorage()
 
 mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUpdateTimeStep(0)
 {
-  // Do as much actions as possible in here to avoid double executions.
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
-  m_TransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-  m_OpacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
-  m_FadedOpacityTransferFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+
+  m_VtkLookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_VtkLookupTable->SetNumberOfTableValues(static_cast<vtkIdType>(mitk::Label::MAX_LABEL_VALUE) + 1);
+  m_VtkLookupTable->SetTableRange(0.0, static_cast<double>(mitk::Label::MAX_LABEL_VALUE));
+  m_VtkLookupTable->IndexedLookupOff();
+  // Initialize all entries to fully transparent so unused label values do not pick up
+  // a default ramp color when referenced by surface-nets cell scalars.
+  for (vtkIdType i = 0; i <= mitk::Label::MAX_LABEL_VALUE; ++i)
+  {
+    m_VtkLookupTable->SetTableValue(i, 0.0, 0.0, 0.0, 0.0);
+  }
+  m_VtkLookupTable->Build();
 
   m_UseFadedPipeline = false;
-  m_TransferFunction->AllowDuplicateScalarsOff();
-  m_TransferFunction->SetColorSpaceToRGB();
-
-  m_TransferFunction->SetClamping(0);  // Disable clamping
-  m_OpacityTransferFunction->SetClamping(0);  // Disable clamping
-
-  m_TransferFunction->AddRGBPoint(0, 0., 0., 0.);
-  m_OpacityTransferFunction->AddPoint(0, 0.);
-  m_FadedOpacityTransferFunction->AddPoint(0, 0.);
-
-  m_TransferFunction->AddRGBPoint(mitk::Label::MAX_LABEL_VALUE, 1., 1., 1.);
-  m_OpacityTransferFunction->AddPoint(mitk::Label::MAX_LABEL_VALUE, 0.0);
-  m_FadedOpacityTransferFunction->AddPoint(mitk::Label::MAX_LABEL_VALUE, 0.0);
 
   m_SegPreferences = nullptr;
   m_3DRenderingPreference = true;
+  m_LastSmoothed = true;
 
   auto prefService = mitk::CoreServices::GetPreferencesService();
   if (nullptr != prefService)
@@ -524,7 +497,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUp
     auto systemPref = prefService->GetSystemPreferences();
     if (nullptr != systemPref)
     {
-      m_SegPreferences= systemPref->Node("/org.mitk.views.segmentation");
+      m_SegPreferences = systemPref->Node("/org.mitk.views.segmentation");
     }
   }
 }

@@ -27,6 +27,9 @@ found in the LICENSE file.
 #include <QCoreApplication>
 #include <QMessageBox>
 
+#include <QDir>
+#include <QFileDialog>
+
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -67,6 +70,13 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
 #if !MITK_HAS_PYTHON
   m_Ui->uninstallButton->setVisible(false);
 #endif
+
+  connect(m_Ui->hfSourceRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnModelSourceToggled);
+  connect(m_Ui->localSourceRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnModelSourceToggled);
+  connect(m_Ui->localModelPathBrowseButton, &QToolButton::clicked,
+    this, &QmitknnInteractivePreferencePage::OnBrowseLocalModelPath);
 
   this->Update();
 }
@@ -112,6 +122,11 @@ bool QmitknnInteractivePreferencePage::PerformOk()
 
   prefs->Put("nnInteractive/modelCheckpoint", modelCheckpoint);
 
+  prefs->Put("nnInteractive/modelSource",
+    m_Ui->localSourceRadioButton->isChecked() ? "local" : "huggingface");
+  prefs->Put("nnInteractive/localModelPath",
+    m_Ui->localModelPathLineEdit->text().trimmed().toStdString());
+
   return true;
 }
 
@@ -129,6 +144,8 @@ void QmitknnInteractivePreferencePage::Update()
   const auto backend = prefs->Get("nnInteractive/backend", "auto");
   const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+  const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
+  const auto localModelPath = prefs->Get("nnInteractive/localModelPath", "");
 
   m_Ui->autoCreateNextLabelCheckBox->setChecked(autoCreateNextLabel);
   m_Ui->skipNamingPromptCheckBox->setChecked(skipNamingPrompt);
@@ -149,12 +166,48 @@ void QmitknnInteractivePreferencePage::Update()
   {
     m_Ui->autoBackendRadioButton->setChecked(true);
   }
-  
+
   m_Ui->gpuBackendLineEdit->setText(QString::fromStdString(gpuBackend));
 
   m_Ui->checkpointLineEdit->setText(QString::fromStdString(modelCheckpoint));
 
+  if (modelSource == "local")
+    m_Ui->localSourceRadioButton->setChecked(true);
+  else
+    m_Ui->hfSourceRadioButton->setChecked(true);
+
+  m_Ui->localModelPathLineEdit->setText(QString::fromStdString(localModelPath));
+
+  this->OnModelSourceToggled();
+
   this->UpdateUninstallButton();
+}
+
+void QmitknnInteractivePreferencePage::OnModelSourceToggled()
+{
+  const bool local = m_Ui->localSourceRadioButton->isChecked();
+
+  m_Ui->checkpointLabel->setEnabled(!local);
+  m_Ui->checkpointLineEdit->setEnabled(!local);
+
+  m_Ui->localModelPathLabel->setEnabled(local);
+  m_Ui->localModelPathLineEdit->setEnabled(local);
+  m_Ui->localModelPathBrowseButton->setEnabled(local);
+}
+
+void QmitknnInteractivePreferencePage::OnBrowseLocalModelPath()
+{
+  auto seed = m_Ui->localModelPathLineEdit->text();
+  if (seed.isEmpty())
+    seed = QDir::homePath();
+
+  const auto selected = QFileDialog::getExistingDirectory(
+    m_Control,
+    QStringLiteral("Select nnInteractive checkpoint folder"),
+    seed);
+
+  if (!selected.isEmpty())
+    m_Ui->localModelPathLineEdit->setText(QDir::toNativeSeparators(selected));
 }
 
 void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()

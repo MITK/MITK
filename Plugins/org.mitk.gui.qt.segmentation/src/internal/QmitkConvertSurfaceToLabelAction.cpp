@@ -78,16 +78,6 @@ void QmitkConvertSurfaceToLabelAction::Run( const QList<mitk::DataNode::Pointer>
   }
 }
 
-void QmitkConvertSurfaceToLabelAction::SetSmoothed(bool /*smoothed*/)
-{
- //not needed
-}
-
-void QmitkConvertSurfaceToLabelAction::SetDecimated(bool /*decimated*/)
-{
-  //not needed
-}
-
 void QmitkConvertSurfaceToLabelAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
 {
   //not needed

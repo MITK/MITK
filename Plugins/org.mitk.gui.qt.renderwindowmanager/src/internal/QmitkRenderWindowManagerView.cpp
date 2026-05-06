@@ -95,7 +95,6 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   m_InspectorView = m_RenderWindowInspector->GetView();
   m_DataNodeContextMenu = new QmitkDataNodeContextMenu(GetSite(), m_InspectorView);
   m_DataNodeContextMenu->SetDataStorage(GetDataStorage());
-  //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   // connect objects
   connect(m_Controls->comboBoxRenderWindowSelection, &QComboBox::currentIndexChanged, [this](int index) {

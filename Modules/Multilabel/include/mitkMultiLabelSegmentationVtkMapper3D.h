@@ -25,33 +25,39 @@ found in the LICENSE file.
 
 // VTK
 #include <vtkSmartPointer.h>
+#include <vtkType.h>
 
-class vtkPolyDataMapper;
+#include <vector>
+
+class vtkActor;
 class vtkImageData;
 class vtkLookupTable;
-class vtkVolumeProperty;
-class vtkVolume;
-class vtkSmartVolumeMapper;
-class vtkColorTransferFunction;
-class vtkPiecewiseFunction;
+class vtkPolyDataMapper;
+class vtkPolyDataNormals;
+class vtkSurfaceNets3D;
 
 namespace mitk
 {
   class MultiLabelSegmentationGroupMapping;
   class IPreferences;
 
-  /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
+  /** \brief 3D mapper for mitk::MultiLabelSegmentation.
    *
-   * Properties that can be set for labelset images and influence this mapper are:
+   * Renders all label groups of a multi-label segmentation as smooth polygonal
+   * surfaces, using vtkSurfaceNets3D to extract a single shared mesh per group
+   * (one execution covers all labels in that group). The internal constrained
+   * smoothing filter preserves sharp inter-label boundaries while removing voxel
+   * staircasing.
    *
-   *   - \b "labelset.contour.active": (BoolProperty) whether to show only the active label as a contour or not
-   *   - \b "labelset.contour.width": (FloatProperty) line width of the contour
-
-   * The default properties are:
-
-   *   - \b "labelset.contour.active", mitk::BoolProperty::New( true ), renderer, overwrite )
-   *   - \b "labelset.contour.width", mitk::FloatProperty::New( 2.0 ), renderer, overwrite )
-
+   * Properties consumed:
+   *   - "visible" (BoolProperty)
+   *   - "opacity" (FloatProperty)
+   *   - "org.mitk.multilabel.3D.hide" (BoolProperty)
+   *   - "org.mitk.multilabel.3D.smoothed" (BoolProperty)
+   *   - "/org.mitk.views.segmentation" -> "activate 3D rendering" preference
+   *   - "/org.mitk.views.segmentation" -> "3D rendering smoothed" preference
+   *   - LabelHighlightGuard properties to fade non-highlighted labels
+   *
    * \ingroup Mapper
    */
   class MITKMULTILABEL_EXPORT MultiLabelSegmentationVtkMapper3D : public VtkMapper
@@ -73,31 +79,28 @@ namespace mitk
      */
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-    /**
-       * To render axial, coronal, and sagittal, the mapper is called three times.
-       * For performance reasons, the corresponding data for each view is saved in the
-       * internal helper class LocalStorage. This allows rendering n views with just
-       * 1 mitkMapper using n vtkMapper.
-       * */
+    /** \brief Per-renderer cache of VTK actors and the surface-extraction state. */
     class MITKMULTILABEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Assembly of all VTK actors used for rendering. */
+      /** \brief Assembly of all VTK actors used for rendering (one actor per group). */
       vtkSmartPointer<vtkPropAssembly> m_Actors;
 
       /** \brief Map from group images to their respective rendering pipelines. */
       std::map<const Image*, std::unique_ptr<MultiLabelSegmentationGroupMapping>> m_GroupPipelines;
 
-      /** \brief Color transfer function for label rendering. */
-      vtkSmartPointer<vtkColorTransferFunction> m_TransferFunction;
-      /** \brief Opacity transfer function for label rendering. */
-      vtkSmartPointer<vtkPiecewiseFunction> m_OpacityTransferFunction;
-      /** \brief Faded opacity transfer function for non-highlighted labels. */
-      vtkSmartPointer<vtkPiecewiseFunction> m_FadedOpacityTransferFunction;
+      /** \brief Lookup table keyed by integer label value, shared by all per-group mappers.
+       *
+       * Replaces the previous color/opacity transfer-function trio. Highlighting is encoded
+       * here directly via the alpha channel: highlighted labels are forced opaque and
+       * non-highlighted labels are faded.
+       */
+      vtkSmartPointer<vtkLookupTable> m_VtkLookupTable;
 
-      /** \brief Indicates if highlighting is in use and therefore the faded
-       * pipeline should be used for non-highlighted labels.
+      /** \brief Indicates whether label highlighting is active.
+       *
+       * Kept as a flag so CheckForOutdatedGroups can detect highlight-mode toggles, even
+       * though there is no longer a separate faded actor.
        */
       bool m_UseFadedPipeline;
 
@@ -109,17 +112,29 @@ namespace mitk
       /** \brief The last time step that was updated. */
       mitk::TimeStepType m_LastUpdateTimeStep;
 
-      /** \brief Look up table for label colors. */
+      /** \brief Look up table for label colors (cloned from the segmentation). */
       mitk::LookupTable::Pointer m_LabelLookupTable;
 
-      /** \brief Indicates if GPU is available for the mapper.
+      /** \brief Label values whose LUT entries were populated during the previous update.
        *
-       * True: Yes, mapper will work. False: No, mapper will not render something.
-       * If optional has no value it means that no check was done so far.
+       * Used to clear only those entries on the next refresh instead of zeroing the full
+       * MAX_LABEL_VALUE+1 range every time.
        */
-      std::optional<bool> m_GPUCheckSuccessfull;
+      std::vector<vtkIdType> m_PopulatedLabelEntries;
+
       /** \brief Whether 3D rendering is preferred. */
       bool m_3DRenderingPreference;
+
+      /** \brief Smoothing state with which the cached polydata was last extracted.
+       *
+       * Tracks the *cached* extraction state, not the user's currently requested state.
+       * Written only after a successful re-extraction inside GenerateDataForRenderer.
+       * Comparing ResolveSmoothed(...) against this value detects when the cached
+       * surfaces no longer match the requested smoothing and forces a re-extraction;
+       * preserving it across early-return paths in Update() (hidden node, 3D rendering
+       * disabled, uninitialised segmentation) keeps that staleness check correct.
+       */
+      bool m_LastSmoothed;
 
       /** \brief Pointer to the segmentation preferences. */
       IPreferences* m_SegPreferences;
@@ -140,24 +155,26 @@ namespace mitk
      */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
+    /** \brief Resolve the active surface-smoothing state for a node.
+     *
+     * Reads the per-node "org.mitk.multilabel.3D.smoothed" property if set,
+     * otherwise falls back to the "/org.mitk.views.segmentation -> 3D rendering smoothed"
+     * preference (default true).
+     *
+     * \remark The 3D-visualization context-menu action (Qmitk3DMultiSegVisStyleAction)
+     * mirrors this resolution rule. It is duplicated rather than reused because
+     * org.mitk.gui.qt.application must not depend on MitkMultilabel. Keep both
+     * implementations in sync if defaults or preference keys change.
+     */
+    static bool ResolveSmoothed(const mitk::DataNode* node, mitk::BaseRenderer* renderer);
+
   protected:
     /** \brief Default constructor. */
     MultiLabelSegmentationVtkMapper3D();
     /** \brief Default destructor. */
     ~MultiLabelSegmentationVtkMapper3D() override;
 
-    /** \brief Does the actual resampling, without rendering the image yet.
-      * All the data is generated inside this method. The vtkProp (or Actor)
-      * is filled with content (i.e. the resliced image).
-      *
-      * After generation, a 4x4 transformation matrix(t) of the current slice is obtained
-      * from the vtkResliceImage object via GetReslicesAxis(). This matrix is
-      * applied to each textured plane (actor->SetUserTransform(t)) to transform everything
-      * to the actual 3D position (cf. the following image).
-      *
-      * \image html cameraPositioning3D.png
-      *
-      */
+    /** \brief Drives surface re-extraction and lookup-table refresh for all outdated groups. */
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /** \brief Generates the look up table that should be used.
@@ -180,11 +197,11 @@ namespace mitk
     OutdatedGroupVectorType CheckForOutdatedGroups(mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage* ls,
       mitk::MultiLabelSegmentation* seg, bool fadedPipelineChanged);
 
-    /** \brief Update the volume mapping for the given outdated groups.
+    /** \brief Update the surface mapping for the given outdated groups.
       * \param localStorage The local storage to update.
       * \param outdatedData The outdated group data to process.
       */
-    void UpdateVolumeMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
+    void UpdateSurfaceMapping(LocalStorage* localStorage, const OutdatedGroupVectorType& outdatedData);
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

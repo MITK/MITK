@@ -16,6 +16,7 @@ set(INTERNAL_CPP_FILES
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   QmitkCreatePolygonModelAction.cpp
+  QmitkCreateSmoothedPolygonModelAction.cpp
   QmitkLoadMultiLabelPresetAction.cpp
   QmitkSaveMultiLabelPresetAction.cpp
   QmitkConvertSurfaceToLabelAction.cpp
@@ -49,6 +50,7 @@ set(MOC_H_FILES
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/QmitkCreatePolygonModelAction.h
+  src/internal/QmitkCreateSmoothedPolygonModelAction.h
   src/internal/QmitkLoadMultiLabelPresetAction.h
   src/internal/QmitkSaveMultiLabelPresetAction.h
   src/internal/QmitkConvertSurfaceToLabelAction.h

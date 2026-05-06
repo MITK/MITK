@@ -7,6 +7,7 @@ set(MODULE_TESTS
     mitkMultiLabelSegmentationIOTest.cpp
     mitkMultiLabelSegmentationStackReaderTest.cpp
     mitkMultiLabelSegmentationStackWriterTest.cpp
+    mitkMultiLabelSurfaceNetsExtractorTest.cpp
     mitkTransferLabelTest.cpp
 )
 

@@ -15,4 +15,5 @@ set(CPP_FILES
   mitkMultilabelObjectFactory.cpp
   mitkMultiLabelPredicateHelper.cpp
   mitkMultiLabelSegmentationVtkMapper3D.cpp
+  mitkMultiLabelSurfaceNetsExtractor.cpp
 )

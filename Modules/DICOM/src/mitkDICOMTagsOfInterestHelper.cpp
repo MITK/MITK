@@ -204,6 +204,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1102))); //dicom.pet.DecayCorrection
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1321))); //dicom.pet.DecayFactor
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1300))); //dicom.pet.FrameReferenceTime
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x1242))); //dicom.pet.ActualFrameDuration
 
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1030))); //dicom.patient.PatientWeight
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1020))); //dicom.patient.PatientSize

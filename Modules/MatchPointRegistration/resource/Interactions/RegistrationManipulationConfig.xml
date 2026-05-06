@@ -19,16 +19,6 @@
     <attribute name="Modifiers" value="ctrl"/>
   </event_variant>
 
-  <!-- Scaling: Shift + Ctrl + Left mouse button -->
-  <event_variant name="StartScaling" class="MousePressEvent">
-    <attribute name="EventButton" value="LeftMouseButton"/>
-    <attribute name="Modifiers" value="shift,ctrl"/>
-  </event_variant>
-  <event_variant name="Scaling" class="MouseMoveEvent">
-    <attribute name="ButtonState" value="LeftMouseButton"/>
-    <attribute name="Modifiers" value="shift,ctrl"/>
-  </event_variant>
-
   <!-- Position selection: plain Left mouse button (no modifiers) -->
   <event_variant name="StartSelectPosition" class="MousePressEvent">
     <attribute name="EventButton" value="LeftMouseButton"/>

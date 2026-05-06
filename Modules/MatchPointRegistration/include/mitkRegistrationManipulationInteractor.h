@@ -33,24 +33,19 @@ namespace mitk
   /** Event carrying a rotation delta (axis as Vector3D and angle in degrees). */
   itkEventMacroDeclaration(RegistrationRotationEvent, itk::AnyEvent);
 
-  /** Event carrying a uniform scale factor. */
-  itkEventMacroDeclaration(RegistrationScaleEvent, itk::AnyEvent);
-
   /** Event fired when the user clicks without a modifier to select a navigator position. */
   itkEventMacroDeclaration(RegistrationSelectPositionEvent, itk::AnyEvent);
 
   /**
    * \brief Data interactor for mouse-based registration manipulation in 2D render windows.
    *
-   * The interactor supports in-plane translation, in-plane rotation (around the
-   * view plane normal), and (optionally) uniform scaling via modifier+mouse-drag
-   * combinations, plus a plain click for navigator position selection:
-   *   - Shift + Left-drag:        In-plane translation
-   *   - Ctrl + Left-drag:         In-plane rotation around the center of rotation
-   *   - Shift + Ctrl + Left-drag: Uniform scaling (only active when explicitly enabled
-   *                               via SetScalingEnabled(true))
-   *   - Plain Left-click:         Selects the clicked world position as navigator
-   *                               position
+   * The interactor supports in-plane translation and in-plane rotation (around the
+   * view plane normal) via modifier+mouse-drag combinations, plus a plain click
+   * for navigator position selection:
+   *   - Shift + Left-drag: In-plane translation
+   *   - Ctrl + Left-drag:  In-plane rotation around the center of rotation
+   *   - Plain Left-click:  Selects the clicked world position as navigator
+   *                        position
    *
    * While a modifier is held without a pressed mouse button, the interactor
    * foreshadows the upcoming gesture by switching the cursor.
@@ -58,14 +53,13 @@ namespace mitk
    * The interactor computes transform deltas and notifies observers via ITK events:
    *   - RegistrationTranslationEvent
    *   - RegistrationRotationEvent
-   *   - RegistrationScaleEvent
    *   - RegistrationSelectPositionEvent
    *
    * It does NOT modify any data directly; the receiving widget/plugin is
    * responsible for reading the corresponding delta/position via the matching
    * getter and applying it to the registration transform.
    *
-   * \pre The center of rotation must be set before rotation/scaling interactions.
+   * \pre The center of rotation must be set before rotation interactions.
    * \pre The interactor should be registered on a DataNode that is visible in the
    *      2D render windows where interaction is desired.
    */
@@ -77,14 +71,8 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Set the center of rotation in world coordinates.
-     * Used for rotation angle computation and scaling. */
+     * Used for rotation angle computation. */
     void SetCenterOfRotation(const Point3D& center);
-
-    /** Enable or disable the scaling interaction mode. */
-    void SetScalingEnabled(bool enabled);
-
-    /** @return true if scaling interaction is enabled. */
-    bool GetScalingEnabled() const;
 
     /** Struct to transport the rotation delta via ITK event. */
     struct RotationDelta
@@ -98,9 +86,6 @@ namespace mitk
 
     /** @return The last computed rotation delta. Valid after RegistrationRotationEvent. */
     const RotationDelta& GetRotationDelta() const;
-
-    /** @return The last computed scale factor. Valid after RegistrationScaleEvent. */
-    double GetScaleFactor() const;
 
     /** @return The world position where the user clicked for position selection.
      *  Valid after RegistrationSelectPositionEvent. */
@@ -133,9 +118,6 @@ namespace mitk
 
     void ConnectActionsAndFunctions() override;
 
-    // State machine conditions
-    bool ScalingEnabled(const InteractionEvent*);
-
     // State machine actions: hover cursor foreshadowing
     void HintTranslate(StateMachineAction*, InteractionEvent*);
     void HintRotate(StateMachineAction*, InteractionEvent*);
@@ -150,10 +132,6 @@ namespace mitk
     void Rotate(StateMachineAction*, InteractionEvent*);
     void EndRotation(StateMachineAction*, InteractionEvent*);
 
-    void InitScaling(StateMachineAction*, InteractionEvent*);
-    void Scale(StateMachineAction*, InteractionEvent*);
-    void EndScaling(StateMachineAction*, InteractionEvent*);
-
     void SelectPosition(StateMachineAction*, InteractionEvent*);
 
     // Interaction state
@@ -164,12 +142,9 @@ namespace mitk
     Point2D m_CenterOfRotation2D;
     Point3D m_CenterOfRotation;
 
-    bool m_ScalingEnabled = false;
-
     // Output deltas / positions (populated before emitting events)
     Vector3D m_TranslationDelta;
     RotationDelta m_RotationDelta;
-    double m_ScaleFactor = 1.0;
     Point3D m_SelectPosition;
 
     // Cursor management helpers

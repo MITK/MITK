@@ -45,8 +45,6 @@ QmitkRegistrationManipulationWidget::QmitkRegistrationManipulationWidget(QWidget
   connect(m_Controls->sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
   connect(m_Controls->slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
   connect(m_Controls->sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
-
-  m_Controls->groupScale->setVisible(false);
 }
 
 QmitkRegistrationManipulationWidget::~QmitkRegistrationManipulationWidget()

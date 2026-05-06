@@ -1,11 +1,5 @@
 <statemachine NAME="RegistrationManipulationInteractor">
     <state name="start" startstate="true" >
-        <!-- Shift+Ctrl+LeftMouse first: must appear before the single-modifier entries
-             so the more specific variant is tested first -->
-        <transition event_class="MousePressEvent" event_variant="StartScaling" target="scaling">
-            <condition name="ScalingEnabled"/>
-            <action name="InitScaling"/>
-        </transition>
         <!-- Shift+LeftMouse: start translation -->
         <transition event_class="MousePressEvent" event_variant="StartTranslation" target="translating">
             <action name="InitTranslation"/>
@@ -66,24 +60,6 @@
         </transition>
         <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShiftCtrl" target="start">
             <action name="EndRotation"/>
-        </transition>
-    </state>
-
-    <state name="scaling">
-        <transition event_class="MouseMoveEvent" event_variant="Scaling" target="scaling">
-            <action name="Scale"/>
-        </transition>
-        <transition event_class="MouseReleaseEvent" event_variant="EndInteraction" target="start">
-            <action name="EndScaling"/>
-        </transition>
-        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShift" target="start">
-            <action name="EndScaling"/>
-        </transition>
-        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionCtrl" target="start">
-            <action name="EndScaling"/>
-        </transition>
-        <transition event_class="MouseReleaseEvent" event_variant="EndInteractionShiftCtrl" target="start">
-            <action name="EndScaling"/>
         </transition>
     </state>
 

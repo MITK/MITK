@@ -35,7 +35,7 @@ found in the LICENSE file.
 #include <vtkMitkThickSlicesFilter.h>
 #include <vtkMitkLevelWindowFilter.h>
 #include <vtkNeverTranslucentTexture.h>
-#include "vtkInformation.h"
+#include <vtkInformation.h>
 
 //VTK
 #include <vtkProperty.h>
@@ -601,11 +601,12 @@ void mitk::RegEvaluationMapper2D::PrepareCheckerBoard( mitk::DataNode* datanode,
 
   const int dimX = wholeExt[1] - wholeExt[0] + 1;
   const int dimY = wholeExt[3] - wholeExt[2] + 1;
-  const int dimZ = wholeExt[5] - wholeExt[4] + 1;
 
   const int clampedX = std::max(1, std::min(checkerCount, dimX));
   const int clampedY = std::max(1, std::min(checkerCount, dimY));
-  const int clampedZ = std::min(1, dimZ);
+  // The 2D mapper always sees a single slice, so a single Z division is correct
+  // and avoids any chance of a divide-by-zero when the slice extent is degenerate.
+  const int clampedZ = 1;
 
   checkerboardFilter->SetNumberOfDivisions(clampedX, clampedY, clampedZ);
 

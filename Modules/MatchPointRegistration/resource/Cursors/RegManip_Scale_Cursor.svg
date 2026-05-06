@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <!-- Scale cursor: diagonal bidirectional arrow -->
-  <g stroke="#00ADFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="6" y1="26" x2="26" y2="6"/>
-    <polyline points="20,6 26,6 26,12"/>
-    <polyline points="12,26 6,26 6,20"/>
-  </g>
-</svg>

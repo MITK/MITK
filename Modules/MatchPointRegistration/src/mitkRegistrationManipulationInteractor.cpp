@@ -31,7 +31,6 @@ namespace mitk
 {
   itkEventMacroDefinition(RegistrationTranslationEvent, itk::AnyEvent);
   itkEventMacroDefinition(RegistrationRotationEvent, itk::AnyEvent);
-  itkEventMacroDefinition(RegistrationScaleEvent, itk::AnyEvent);
   itkEventMacroDefinition(RegistrationSelectPositionEvent, itk::AnyEvent);
 }
 
@@ -53,16 +52,6 @@ void mitk::RegistrationManipulationInteractor::SetCenterOfRotation(const Point3D
   m_CenterOfRotation = center;
 }
 
-void mitk::RegistrationManipulationInteractor::SetScalingEnabled(bool enabled)
-{
-  m_ScalingEnabled = enabled;
-}
-
-bool mitk::RegistrationManipulationInteractor::GetScalingEnabled() const
-{
-  return m_ScalingEnabled;
-}
-
 const mitk::Vector3D& mitk::RegistrationManipulationInteractor::GetTranslationDelta() const
 {
   return m_TranslationDelta;
@@ -74,11 +63,6 @@ mitk::RegistrationManipulationInteractor::GetRotationDelta() const
   return m_RotationDelta;
 }
 
-double mitk::RegistrationManipulationInteractor::GetScaleFactor() const
-{
-  return m_ScaleFactor;
-}
-
 const mitk::Point3D& mitk::RegistrationManipulationInteractor::GetSelectPosition() const
 {
   return m_SelectPosition;
@@ -86,8 +70,6 @@ const mitk::Point3D& mitk::RegistrationManipulationInteractor::GetSelectPosition
 
 void mitk::RegistrationManipulationInteractor::ConnectActionsAndFunctions()
 {
-  CONNECT_CONDITION("ScalingEnabled", ScalingEnabled);
-
   CONNECT_FUNCTION("HintTranslate", HintTranslate);
   CONNECT_FUNCTION("HintRotate",    HintRotate);
   CONNECT_FUNCTION("HintNeutral",   HintNeutral);
@@ -100,16 +82,7 @@ void mitk::RegistrationManipulationInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("Rotate", Rotate);
   CONNECT_FUNCTION("EndRotation", EndRotation);
 
-  CONNECT_FUNCTION("InitScaling", InitScaling);
-  CONNECT_FUNCTION("Scale", Scale);
-  CONNECT_FUNCTION("EndScaling", EndScaling);
-
   CONNECT_FUNCTION("SelectPosition", SelectPosition);
-}
-
-bool mitk::RegistrationManipulationInteractor::ScalingEnabled(const InteractionEvent*)
-{
-  return m_ScalingEnabled;
 }
 
 // --- Hover cursor foreshadowing ---
@@ -271,54 +244,6 @@ void mitk::RegistrationManipulationInteractor::EndRotation(StateMachineAction*, 
   m_RotationDelta.AngleDeg = 0.0;
 }
 
-// --- Scaling ---
-
-void mitk::RegistrationManipulationInteractor::InitScaling(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == nullptr)
-    return;
-
-  this->PushCursorFromResource("Cursors/RegManip_Scale_Cursor.svg");
-
-  m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
-
-  // Project center of rotation to screen coordinates
-  positionEvent->GetSender()->WorldToDisplay(m_CenterOfRotation, m_CenterOfRotation2D);
-}
-
-void mitk::RegistrationManipulationInteractor::Scale(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == nullptr)
-    return;
-
-  const Point2D currentPosition2D = positionEvent->GetPointerPositionOnScreen();
-
-  const double initialDistance = (m_InitialClickPosition2D - m_CenterOfRotation2D).GetNorm();
-  const double currentDistance = (currentPosition2D - m_CenterOfRotation2D).GetNorm();
-
-  if (initialDistance > 1e-6)
-  {
-    m_ScaleFactor = currentDistance / initialDistance;
-  }
-  else
-  {
-    m_ScaleFactor = 1.0;
-  }
-
-  // Reset for next frame (incremental)
-  m_InitialClickPosition2D = currentPosition2D;
-
-  this->InvokeEvent(RegistrationScaleEvent());
-}
-
-void mitk::RegistrationManipulationInteractor::EndScaling(StateMachineAction*, InteractionEvent*)
-{
-  this->PopCursorSafe();
-  m_ScaleFactor = 1.0;
-}
-
 // --- Position selection ---
 
 void mitk::RegistrationManipulationInteractor::SelectPosition(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -368,7 +293,7 @@ void mitk::RegistrationManipulationInteractor::EnableOriginalInteraction()
   {
     if (displayInteractionConfig.first)
     {
-      auto* displayActionEventBroadcast = static_cast<DisplayActionEventBroadcast*>(
+      auto* displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(
         us::GetModuleContext()->GetService<InteractionEventObserver>(displayInteractionConfig.first));
       if (displayActionEventBroadcast != nullptr)
       {
@@ -387,15 +312,23 @@ void mitk::RegistrationManipulationInteractor::PushCursorFromResource(const std:
 {
   auto* module = us::GetModuleContext()->GetModule();
   if (module == nullptr)
+  {
+    MITK_WARN << "RegistrationManipulationInteractor: cannot push cursor '" << resourceName
+              << "', module context has no owning module.";
     return;
+  }
 
   us::ModuleResource resource = module->GetResource(resourceName);
-  if (resource.IsValid())
+  if (!resource.IsValid())
   {
-    us::ModuleResourceStream cursor(resource, std::ios::binary);
-    ApplicationCursor::GetInstance()->PushCursor(cursor, 0, 0);
-    ++m_NumPushedCursors;
+    MITK_WARN << "RegistrationManipulationInteractor: cursor resource '" << resourceName
+              << "' is missing or invalid; check files.cmake.";
+    return;
   }
+
+  us::ModuleResourceStream cursor(resource, std::ios::binary);
+  ApplicationCursor::GetInstance()->PushCursor(cursor, 0, 0);
+  ++m_NumPushedCursors;
 }
 
 void mitk::RegistrationManipulationInteractor::PopCursorSafe()

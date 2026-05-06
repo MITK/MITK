@@ -332,40 +332,30 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  if (input->GetPixelType().GetNumberOfComponents() > 1)
+  if (input->GetTimeSteps() > 1)
   {
-    if (input->GetTimeSteps() == 1)
-    {
-      AccessFixedTypeByItk_n(input, doMITKMap,
-        MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ, (3),
-        (result, registration, throwOnOutOfInputAreaError, paddingValue,
-         resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-    }
-    else
-    {
-      auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
-      result = mitk::Image::New();
-      result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
+    // Multiple time steps: pre-allocate the result image and map each time step
+    // individually. doMapTimesteps internally dispatches between scalar and
+    // composite pixel types per time step.
+    auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
+    result = mitk::Image::New();
+    result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
 
-      doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError,
-        paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
-    }
+    doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError,
+      paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
+  }
+  else if (input->GetPixelType().GetNumberOfComponents() > 1)
+  {
+    AccessFixedTypeByItk_n(input, doMITKMap,
+      MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ, (3),
+      (result, registration, throwOnOutOfInputAreaError, paddingValue,
+       resultGeometry, throwOnMappingError, errorValue, interpolatorType));
   }
   else
   {
-    if (input->GetTimeSteps() == 1)
-    { //map the image and done
-      AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-    }
-    else
-    { //map every time step and compose
-
-      auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
-      result = mitk::Image::New();
-      result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
-
-      doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
-    }
+    AccessByItk_n(input, doMITKMap,
+      (result, registration, throwOnOutOfInputAreaError, paddingValue,
+       resultGeometry, throwOnMappingError, errorValue, interpolatorType));
   }
 
   return result;

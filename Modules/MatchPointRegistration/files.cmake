@@ -38,5 +38,4 @@ set(RESOURCE_FILES
   Cursors/RegManip_Base_Cursor.svg
   Cursors/RegManip_Translate_Cursor.svg
   Cursors/RegManip_Rotate_Cursor.svg
-  Cursors/RegManip_Scale_Cursor.svg
 )

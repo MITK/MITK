@@ -8,6 +8,7 @@ set(CPP_FILES
   mitkMAPRegistrationWrapperObjectFactory.cpp
   mitkRegEvaluationObjectFactory.cpp
   mitkRegEvaluationObject.cpp
+  mitkRegistrationManipulationInteractor.cpp
   Helper/mitkUIDHelper.cpp
   Helper/mitkMAPAlgorithmHelper.cpp
   Helper/mitkMaskedAlgorithmHelper.cpp
@@ -29,4 +30,12 @@ set(CPP_FILES
   Rendering/mitkRegVisHelper.cpp
   Rendering/mitkRegEvalStyleProperty.cpp
   Rendering/mitkRegEvalWipeStyleProperty.cpp
+)
+
+set(RESOURCE_FILES
+  Interactions/RegistrationManipulationStates.xml
+  Interactions/RegistrationManipulationConfig.xml
+  Cursors/RegManip_Base_Cursor.svg
+  Cursors/RegManip_Translate_Cursor.svg
+  Cursors/RegManip_Rotate_Cursor.svg
 )

@@ -30,26 +30,31 @@ for the manipulation, which will be "on top" of the existing registration.
 (5) <b>Target image slot</b>: To allow for visual inspection of the manipulation a target image must be specified. This image is used to compare against the mapped moving image to illustrate the effects of the manipulation. Click to change the image.\n\n
 
 (6) <b>Start manual registration</b>: If all settings are valid, you can start the manipulation. The render windows will automatically
-switch to the visual inspection mode. The views will be reinitialized to the field of view of the target image.\n\n\n
+switch to the visual inspection mode and will be reinitialized once to the field of view of the target image.\n\n\n
 
 \imageMacro{map_view_manipulator_started.png, "Controls after the manipulation session is started.", 14}
 
-(7) <b>New registration name</b>: You may choose to give the resulting registration a special name.\n\n
+(7) <b>Setting tabs</b>: The lower part of the view groups the controls into two tabs: <em>Transformation settings</em> for adjusting the registration transform (\ref MAP_REGMANIP_TransSettings) and <em>Evaluation settings</em> for the visual inspection rendering (\ref MAP_REGMANIP_EvalSettings).\n\n
 
-(8) Additionally you can choose the convenience
-option to map the moving image with the confirmed registration automatically and also store the mapped image.\n\n
+(8) <b>Translation parameters</b>: You can alter the translation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(9) <b>Settings</b>: You can alter the settings of the transform (\ref MAP_REGMANIP_TransSettings) and the rendering settings (\ref MAP_REGMANIP_EvalSettings) for the visual inspection.\n\n
+(9) <b>Rotation parameters</b>: You can alter the rotation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(10) <b>Translation parameters</b>: You can alter the translation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(10) <b>Center of rotation type</b>: You may choose the center of rotation for your manipulation. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
 
-(11) <b>Rotation parameters</b>: You can alter the rotation parameter of the transform by using the sliders or the spinboxes. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(11) <b>Moving center correction</b>: Press <em>Translate moving center to navigator</em> for a one-click rough pre-alignment that shifts the moving image so its center maps to the current crosshair/navigator position; only the translation component of the transform is changed. See \ref MAP_REGMANIP_QuickAlign for details.\n\n
 
-(12) <b>Center of rotation</b>: You may choose the center of rotation for your manipulation. For more details see transform settings section (\ref MAP_REGMANIP_TransSettings).\n\n
+(12) <b>Mouse interactions on/off</b>: Toggle the mouse-based manipulation tool on or off. When active, you can manipulate the registration directly in the 2D render windows via modifier+drag gestures. See \ref MAP_REGMANIP_MouseInteraction for details.\n\n
 
-(13) <b>Confirmation</b>: You may confirm the determined registration and store it in the data storage with the given name. The manipulation session will be automatically closed.\n\n
+(13) <b>New registration name</b>: You may choose to give the resulting registration a special name.\n\n
 
-(14) <b>Cancel</b>: You may cancel the session any time. No changes will be stored and the manipulation session will be automatically closed.\n
+(14) <b>Auto mapping/refinement</b>: Convenience options that are applied when the registration is confirmed:\n
+- <b>Generate + store mapped result</b>: maps the moving image with the confirmed registration and stores the resulting image in the data storage.
+- <b>Refine geometry + store result</b>: stores a copy of the moving image whose geometry is updated by the confirmed registration. The image data is not resampled, only the spatial geometry is composed with the transform. Only effective when the resulting registration is affine (always the case in this view, where the manipulator produces a rigid Euler transform); otherwise an error is reported on confirmation.\n\n
+
+(15) <b>Confirm registration</b>: You may confirm the determined registration and store it in the data storage with the given name. The manipulation session will be automatically closed.\n\n
+
+(16) <b>Cancel manipulation</b>: You may cancel the session any time. No changes will be stored and the manipulation session will be automatically closed.\n
 
 \section MAP_REGMANIP_TransSettings Transformation settings
 You can alter the translation and the rotation of the transform. In addition you may choose the center of rotation type.
@@ -67,8 +72,71 @@ The offset as well as the rotation matrix stay constant if the center point chan
 
 \note To ease the orientation, the edit fields have background colors which resemble the colors of the plane the changes will
 "happen".\n
-For translation, the translation vector will be perpendicular to the indicated plane (The image moves "through" the plane).
+For translation, the translation vector will be parallel to the indicated plane (The image slides "over" the plane).
 For rotation, the rotation axis will be perpendicular to the indicated plane.
+
+\subsection MAP_REGMANIP_CoRIndicator Center of rotation indicator
+A yellow diamond-shaped indicator is displayed in the 2D render windows to mark the exact center of rotation.
+This helps you keep track of the pivot point while manipulating the registration, especially after the image has been
+translated or rotated away from its original position.
+The indicator size scales automatically with the moving image extent so it remains visible without dominating small
+fields of view.
+
+\subsection MAP_REGMANIP_QuickAlign Quick alignment: translate moving center to navigator
+The <b>Translate moving center to navigator</b> button provides a fast way to achieve a rough pre-alignment when
+the misregistration between moving and target image is very large. Pressing the button computes a pure translation
+that moves the center of the moving image to the current crosshair/navigator position in the render windows.
+The rotation component of the current transform is fully preserved; only the translation changes.\n\n
+Typical use:\n
+- Navigate the crosshair in the target image to a recognizable anatomical landmark.
+- Press <em>Translate moving center to navigator</em> to shift the moving image so its center overlaps that landmark.
+- Fine-tune the alignment using the sliders, spinboxes, or the mouse interaction tool (\ref MAP_REGMANIP_MouseInteraction).
+
+\section MAP_REGMANIP_MouseInteraction Mouse-based interaction
+\imageMacroEx{map_view_manipulator_mouse_interaction.png, "Transform tab showing the mouse interaction controls.", 10, 320px}
+
+In addition to the sliders and spinboxes, you can manipulate the registration directly in the 2D render windows
+using the mouse. This is particularly useful for large, coarse adjustments where dragging feels more natural than
+editing numerical values.\n\n
+
+<b>Enabling the tool:</b> Press the <em>Enable mouse interaction</em> toggle button on the <em>Transformation settings</em> tab
+to activate the tool. The cursor changes to indicate that the tool is active. Press the button again to deactivate it and
+restore the standard navigation behaviour.\n\n
+
+<b>Gesture mapping:</b>
+| Gesture | Effect |
+|---------|--------|
+| Shift + Drag | Translate the moving image in the current view plane |
+| Ctrl + Drag | Rotate the moving image around the current center of rotation, within the current view plane |
+| Left click (no modifier) | Move the navigator/crosshair to the clicked position |
+
+\remark All drag gestures act relative to the plane of the render window in which you drag. Working in different 2D views
+therefore lets you constrain the manipulation to the desired anatomical plane.
+
+\remark The plain left-click gesture is convenient when the <em>Current navigator position</em> center mode is active:
+clicking sets the pivot for the next rotation in a single step, without having to leave the interaction tool.
+
+\remark The center of rotation used for Ctrl + Drag is exactly the one selected in the <em>Center of rotation</em>
+combo box. The yellow diamond-shaped indicator (\ref MAP_REGMANIP_CoRIndicator) always shows the current pivot
+point in the render windows, regardless of which center mode is active.
+
+\section MAP_REGMANIP_3DPreview 3D preview
+\imageMacroEx{map_view_manipulator_3d_preview.png, "3D render window showing the wireframe preview of the moving image.", 10, 640px}
+
+The <b>Show 3D preview</b> checkbox on the <em>Evaluation settings</em> tab enables a live 3D preview of the moving
+image's current registered position. When active, two additional helper objects appear in the 3D render window:\n
+- A semi-transparent clone of the moving image rendered at the position defined by the current registration transform,
+  so you can see how the volume is spatially positioned relative to the target.
+- A green wireframe bounding box that outlines the moving image's transformed extent, making the spatial relationship
+  visible even when the image content itself is not well-contrasted in 3D.
+
+Both objects update continuously as you change the transform, giving immediate spatial feedback in 3D while you work
+in the 2D views.\n\n
+
+\remark The preview objects require additional memory because the moving image data is cloned. For large volumes,
+consider activating the preview only when needed.
+
+\remark The preview objects are automatically removed when the session is cancelled or confirmed.
 
 \section MAP_REGMANIP_EvalSettings Evaluation settings
 The settings you can choose are equal to the settings of the evaluation view (\ref org_mitk_views_matchpoint_evaluator).

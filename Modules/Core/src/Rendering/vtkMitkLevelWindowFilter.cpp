@@ -152,7 +152,9 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter *self,
                                T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
-  vtkImageIterator<T> outputIt(outData, outExt);
+  // Output is always declared as VTK_UNSIGNED_CHAR with 4 components in RequestInformation,
+  // so the output iterator must always use unsigned char regardless of the input type.
+  vtkImageIterator<unsigned char> outputIt(outData, outExt);
   vtkLookupTable *lookupTable;
   const int maxC = inData->GetNumberOfScalarComponents();
 
@@ -177,8 +179,8 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter *self,
   while (!outputIt.IsAtEnd())
   {
     T *inputSI = inputIt.BeginSpan();
-    T *outputSI = outputIt.BeginSpan();
-    T *outputSIEnd = outputIt.EndSpan();
+    unsigned char *outputSI = outputIt.BeginSpan();
+    unsigned char *outputSIEnd = outputIt.EndSpan();
 
     if (y >= clippingBounds[2] && y < clippingBounds[3])
     {
@@ -204,11 +206,11 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter *self,
           hsi[2] /= 255.0;
           HSItoRGB<double>(hsi, rgb);
 
-          *outputSI = static_cast<T>(rgb[0]);
+          *outputSI = static_cast<unsigned char>(rgb[0]);
           outputSI++;
-          *outputSI = static_cast<T>(rgb[1]);
+          *outputSI = static_cast<unsigned char>(rgb[1]);
           outputSI++;
-          *outputSI = static_cast<T>(rgb[2]);
+          *outputSI = static_cast<unsigned char>(rgb[2]);
           outputSI++;
 
           unsigned char finalAlpha = 255;
@@ -234,7 +236,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter *self,
               inputSI++;
           }
 
-          *outputSI = static_cast<T>(finalAlpha);
+          *outputSI = finalAlpha;
           outputSI++;
         }
         else

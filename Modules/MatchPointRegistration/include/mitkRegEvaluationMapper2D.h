@@ -38,6 +38,7 @@ class vtkPlaneSource;
 class vtkImageData;
 class vtkLookupTable;
 class vtkImageExtractComponents;
+class vtkImageLuminance;
 class vtkImageReslice;
 class vtkImageChangeInformation;
 class vtkPoints;
@@ -136,6 +137,25 @@ public:
 
     vtkSmartPointer<vtkImageExtractComponents> m_TargetExtractFilter;
     vtkSmartPointer<vtkImageExtractComponents> m_MappedExtractFilter;
+
+    /** \brief Luminance filters for converting multi-component images to perceptual grayscale. */
+    vtkSmartPointer<vtkImageLuminance> m_TargetLuminanceFilter;
+    vtkSmartPointer<vtkImageLuminance> m_MappedLuminanceFilter;
+
+    /** Cached output ports for scalar evaluation modes. Set in GenerateDataForRenderer
+     *  to either the extract filter output (scalar) or luminance filter output (multi-component). */
+    vtkAlgorithmOutput* m_TargetScalarOutput = nullptr;
+    vtkAlgorithmOutput* m_MappedScalarOutput = nullptr;
+
+    /** \brief Extract filters for color output path (always 3-component RGB). */
+    vtkSmartPointer<vtkImageExtractComponents> m_TargetColorExtractFilter;
+    vtkSmartPointer<vtkImageExtractComponents> m_MappedColorExtractFilter;
+
+    /** Cached output ports for color-capable evaluation modes (blend, checker, wipe).
+     *  Always 3-component RGB: for grayscale images R=G=B (neutral gray);
+     *  for RGB images the actual hue and saturation are preserved. */
+    vtkAlgorithmOutput* m_TargetColorOutput = nullptr;
+    vtkAlgorithmOutput* m_MappedColorOutput = nullptr;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();

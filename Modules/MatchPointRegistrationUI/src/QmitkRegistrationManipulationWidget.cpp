@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mapRegistrationCombinator.h>
 
 #include <itkCompositeTransform.h>
+#include <itkVersor.h>
 
 #include <boost/math/constants/constants.hpp>
 
@@ -44,8 +45,6 @@ QmitkRegistrationManipulationWidget::QmitkRegistrationManipulationWidget(QWidget
   connect(m_Controls->sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
   connect(m_Controls->slideTransZ, SIGNAL(valueChanged(int)), this, SLOT(OnTransZSlideChanged(int)));
   connect(m_Controls->sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
-
-  m_Controls->groupScale->setVisible(false);
 }
 
 QmitkRegistrationManipulationWidget::~QmitkRegistrationManipulationWidget()
@@ -116,12 +115,78 @@ void QmitkRegistrationManipulationWidget::SetCenterOfRotation(const mitk::Point3
   this->UpdateTransformWidgets();
 };
 
-/** Sets the internal m_CenterOfRotationIsRelativeToTarget. see below.*/
 void QmitkRegistrationManipulationWidget::SetCenterOfRotationIsRelativeToTarget(bool targetRelative)
 {
   this->m_CenterOfRotationIsRelativeToTarget = targetRelative;
   this->ConfigureTransformCenter();
   this->UpdateTransformWidgets();
+};
+
+void QmitkRegistrationManipulationWidget::ApplyTranslationDelta(const mitk::Vector3D& delta)
+{
+  auto currentTranslation = this->m_DirectCurrentTransform->GetTranslation();
+  currentTranslation[0] += delta[0];
+  currentTranslation[1] += delta[1];
+  currentTranslation[2] += delta[2];
+
+  this->m_DirectCurrentTransform->SetTranslation(currentTranslation);
+  this->m_DirectCurrentTransform->GetInverse(this->m_InverseCurrentTransform);
+
+  this->UpdateTransformWidgets();
+  emit RegistrationChanged(this->m_CurrentRegistration);
+};
+
+void QmitkRegistrationManipulationWidget::ApplyRotationDelta(const mitk::Vector3D& axis, double angleDeg)
+{
+  const double angleRad = angleDeg * boost::math::double_constants::pi / 180.0;
+
+  // Build incremental rotation using itk::Versor (axis-angle representation)
+  using VersorType = itk::Versor<::map::core::continuous::ScalarType>;
+  VersorType deltaVersor;
+  // SetRotationAroundAxis expects a normalized axis
+  mitk::Vector3D normalizedAxis = axis;
+  normalizedAxis.Normalize();
+  VersorType::VectorType itkAxis;
+  itkAxis[0] = normalizedAxis[0];
+  itkAxis[1] = normalizedAxis[1];
+  itkAxis[2] = normalizedAxis[2];
+  deltaVersor.Set(itkAxis, angleRad);
+
+  // Get the current rotation matrix and compose with the incremental rotation
+  const auto currentMatrix = this->m_DirectCurrentTransform->GetMatrix();
+  const auto deltaMatrix = deltaVersor.GetMatrix();
+  const auto newMatrix = deltaMatrix * currentMatrix;
+
+  // Compute the correct new offset so the rotation pivots around the same fixed-space
+  // point that the slider-based rotation uses: T_old(c_itk), i.e. the ITK transform
+  // center mapped through the current transform.
+  //
+  // This is consistent across all center modes:
+  //   Mode 0 (moving image center): c_itk = image center; T(c_itk) shifts with translation.
+  //   Mode 1 (world origin):        c_itk = (0,0,0);       T(c_itk) = current translation.
+  //   Mode 2 (navigator position):  c_itk = T_inv(nav);    T(c_itk) = nav position.
+  //
+  // Derivation: T_new(x) = R_delta * T_old(x) + (I - R_delta) * p_world
+  //   => new_offset = R_delta * (old_offset - p_world) + p_world
+  const auto currentOffset = this->m_DirectCurrentTransform->GetOffset();
+  using OffsetType = TransformType::OffsetType;
+  const auto p_world_point =
+    this->m_DirectCurrentTransform->TransformPoint(this->m_DirectCurrentTransform->GetCenter());
+  OffsetType p_world_vec;
+  p_world_vec[0] = p_world_point[0];
+  p_world_vec[1] = p_world_point[1];
+  p_world_vec[2] = p_world_point[2];
+  const OffsetType newOffset = deltaMatrix * (currentOffset - p_world_vec) + p_world_vec;
+
+  // SetMatrix decomposes the rotation matrix back into Euler angles internally.
+  // This may throw if the matrix is not a valid rotation (should not happen here).
+  this->m_DirectCurrentTransform->SetMatrix(newMatrix);
+  this->m_DirectCurrentTransform->SetOffset(newOffset);
+
+  this->m_DirectCurrentTransform->GetInverse(this->m_InverseCurrentTransform);
+
+  this->UpdateTransformWidgets();
+  emit RegistrationChanged(this->m_CurrentRegistration);
 };
 
 void QmitkRegistrationManipulationWidget::InitControls()

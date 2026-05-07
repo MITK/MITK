@@ -1383,6 +1383,96 @@ public:
     CPPUNIT_ASSERT_EQUAL(parentUid,
       json["meta"]["parent_uid"].get<std::string>());
   }
+
+  // ==========================================
+  // Category 7: Spec MD <-> openapi.json triangle
+  // ==========================================
+
+  void EveryOpenApiEndpointIsDocumentedInSpecMd()
+  {
+    // For every (path, method) in openapi.json, the spec MD must have a
+    // matching `#### <METHOD> /api/v1<PATH>` heading. Drift in either direction
+    // means a user reading the spec MD sees a different surface than the
+    // implementation actually exposes.
+    const auto md = this->LoadSpecMarkdown();
+    const auto specMdEndpoints = this->ExtractSpecMdEndpoints(md);
+
+    for (const auto& [path, pathItem] : m_Spec["paths"].items())
+    {
+      for (const auto& [method, operation] : pathItem.items())
+      {
+        // Spec MD does not (yet) document a few openapi entries that are
+        // discovery / aliases, not first-class user-facing API:
+        //   /              -- alias for /info
+        //   /docs          -- Swagger UI redirect
+        //   /openapi.json  -- the OpenAPI spec itself
+        // If you add user-facing detail for any of these later, drop the skip.
+        if (path == "/" || path == "/docs" || path == "/openapi.json")
+          continue;
+
+        const EndpointKey key{path, method};
+        CPPUNIT_ASSERT_MESSAGE(
+          "openapi.json endpoint not documented in MITK_REST_API_Specification.md: "
+          + method + " " + path,
+          specMdEndpoints.count(key) > 0);
+      }
+    }
+  }
+
+  void SpecMdMajorVersionMatchesOpenApi()
+  {
+    // The OAS info.version (SemVer "X.Y.Z") and the MD "**Version:** X.Y.Z"
+    // header must agree on the major. Minor/patch may drift between releases
+    // but a major mismatch indicates one of the two artifacts shipped without
+    // its sibling update.
+    const auto oasVersion = m_Spec["info"]["version"].get<std::string>();
+    const auto oasDot = oasVersion.find('.');
+    CPPUNIT_ASSERT_MESSAGE("OAS info.version is not SemVer-shaped: " + oasVersion,
+                           oasDot != std::string::npos);
+    const auto oasMajor = oasVersion.substr(0, oasDot);
+
+    const auto md = this->LoadSpecMarkdown();
+    const std::string marker = "**Version:**";
+    const auto markerPos = md.find(marker);
+    CPPUNIT_ASSERT_MESSAGE("Spec MD is missing '**Version:**' header line",
+                           markerPos != std::string::npos);
+    auto cursor = markerPos + marker.size();
+    while (cursor < md.size() && (md[cursor] == ' ' || md[cursor] == '\t')) ++cursor;
+    std::string mdVersion;
+    while (cursor < md.size() && md[cursor] != '\r' && md[cursor] != '\n')
+    {
+      mdVersion.push_back(md[cursor++]);
+    }
+    while (!mdVersion.empty() && (mdVersion.back() == ' ' || mdVersion.back() == '\t'))
+    {
+      mdVersion.pop_back();
+    }
+    const auto mdDot = mdVersion.find('.');
+    CPPUNIT_ASSERT_MESSAGE("Spec MD version is not SemVer-shaped: " + mdVersion,
+                           mdDot != std::string::npos);
+    const auto mdMajor = mdVersion.substr(0, mdDot);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "OAS info.version major and Spec MD '**Version:**' major disagree",
+      mdMajor, oasMajor);
+  }
+
+  void EverySpecMdEndpointIsInOpenApi()
+  {
+    // Reverse direction: every endpoint heading in the spec MD must have a
+    // corresponding entry in openapi.json. Catches an outdated spec entry
+    // describing an endpoint that has since been removed or renamed.
+    const auto md = this->LoadSpecMarkdown();
+    const auto specMdEndpoints = this->ExtractSpecMdEndpoints(md);
+    const auto& paths = m_Spec["paths"];
+
+    for (const auto& [specPath, specMethod] : specMdEndpoints)
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "Spec MD endpoint not in openapi.json: " + specMethod + " " + specPath,
+        paths.contains(specPath) && paths[specPath].contains(specMethod));
+    }
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkApiConformance)

@@ -287,9 +287,18 @@ def repair_wheel(wheel_path, output_dir, search_paths):
         ]
     elif system == "Darwin":
         env = os.environ.copy()
+        # delocate resolves @rpath via each dylib's own LC_RPATH, which CMake
+        # rewrites to @loader_path/.. on install. Provide the build-tree
+        # search paths via DYLD_FALLBACK_LIBRARY_PATH so delocate can locate
+        # external dependencies the staged dylibs no longer point to directly.
         env["DYLD_LIBRARY_PATH"] = ":".join(search_paths) + ":" + env.get("DYLD_LIBRARY_PATH", "")
+        env["DYLD_FALLBACK_LIBRARY_PATH"] = ":".join(search_paths) + ":" + env.get("DYLD_FALLBACK_LIBRARY_PATH", "")
+        # -v emits one log line per copied library. Without it delocate is
+        # silent for 10+ minutes on a slow Intel host, indistinguishable
+        # from a hang.
         cmd = [
             sys.executable, "-m", "delocate.cmd.delocate_wheel",
+            "-v",
             str(wheel_path),
             "-w", str(output_dir),
         ]

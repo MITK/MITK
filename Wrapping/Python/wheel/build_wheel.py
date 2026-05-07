@@ -70,18 +70,43 @@ def get_abi_tag():
     return get_python_tag()
 
 
-def pep440_version(version_string):
-    """Convert MITK version string to PEP 440 compliant version.
+def get_source_dir(build_dir):
+    """Read CMAKE_HOME_DIRECTORY (the MITK source dir) from CMakeCache.txt."""
+    cache_file = Path(build_dir) / "CMakeCache.txt"
+    for line in cache_file.read_text().splitlines():
+        match = re.match(r"^CMAKE_HOME_DIRECTORY:INTERNAL=(.+)$", line)
+        if match:
+            return Path(match.group(1))
+    return None
 
-    MITK uses "major.minor.99-shortid" for development versions.
-    PEP 440 does not allow dashes, so we convert to "major.minor.99.devN".
+
+def compute_version(source_dir, base_version):
+    """Return a PEP 440 version derived from git state.
+
+    If HEAD is at a tag, use it (stripping a leading 'v'). Otherwise return
+    ``base_version + '+g<shorthash>'`` as a PEP 440 local version label.
+    Falls back to base_version if git is unavailable or source_dir is not a
+    git repository (e.g. source tarball, missing .git, no git on PATH).
     """
-    if "-" in version_string:
-        base, suffix = version_string.split("-", 1)
-        # Use a hash of the suffix as a numeric dev identifier
-        dev_num = int(hashlib.sha1(suffix.encode()).hexdigest()[:6], 16)
-        return f"{base}.dev{dev_num}"
-    return version_string
+    if source_dir is None or not (source_dir / ".git").exists():
+        return base_version
+    try:
+        tags = subprocess.run(
+            ["git", "-C", str(source_dir), "tag", "--points-at", "HEAD"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip().splitlines()
+        if tags:
+            tag = tags[0]
+            return tag[1:] if tag.startswith("v") else tag
+        short = subprocess.run(
+            ["git", "-C", str(source_dir), "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if short:
+            return f"{base_version}+g{short}"
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pass
+    return base_version
 
 
 def cmake_install_wheel_component(build_dir, staging_dir, cmake_command="cmake"):
@@ -271,15 +296,24 @@ def repair_wheel(wheel_path, output_dir, search_paths):
     else:
         raise RuntimeError(f"Unsupported platform: {system}")
 
+    # Snapshot existing wheels so we can identify the one produced by this
+    # invocation. Stale wheels from previous builds may share the directory
+    # (output_dir is typically MITK-build, not a temp dir), and auditwheel
+    # may rewrite the platform tag so the output filename can differ from
+    # wheel_path.name. Tracking name+mtime handles both cases.
+    before = {p: p.stat().st_mtime for p in output_dir.glob("mitk-*.whl")}
+
     print(f"Repairing wheel: {' '.join(cmd)}")
     env_to_use = env if system != "Windows" else None
     subprocess.check_call(cmd, env=env_to_use)
 
-    # Find the repaired wheel
-    repaired = list(Path(output_dir).glob("mitk-*.whl"))
-    if not repaired:
-        raise RuntimeError("No repaired wheel found")
-    return repaired[-1]
+    new_or_updated = [
+        p for p in output_dir.glob("mitk-*.whl")
+        if p not in before or p.stat().st_mtime > before[p]
+    ]
+    if not new_or_updated:
+        raise RuntimeError("No repaired wheel produced")
+    return max(new_or_updated, key=lambda p: p.stat().st_mtime)
 
 
 def main():
@@ -315,8 +349,10 @@ def main():
         print(f"Error: build directory not found: {build_dir}", file=sys.stderr)
         return 1
 
-    # Get version
-    version = pep440_version(get_mitk_version(build_dir))
+    # Get version: tag at HEAD if present, otherwise base + '+g<shorthash>'
+    base_version = get_mitk_version(build_dir)
+    source_dir = get_source_dir(build_dir)
+    version = compute_version(source_dir, base_version)
     print(f"MITK version: {version}")
 
     with tempfile.TemporaryDirectory() as tmpdir:

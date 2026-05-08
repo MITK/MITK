@@ -14,15 +14,8 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cctype>
 #include <map>
-#include <memory>
 #include <optional>
-#include <sstream>
 #include <string>
-#include <vector>
-
-// itk includes
-#include <itkImage.h>
-#include <itkIndex.h>
 
 // CTK includes
 #include <mitkCommandLineParser.h>
@@ -32,21 +25,13 @@ found in the LICENSE file.
 #include <mitkDICOMTagPath.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
-#include <mitkImageCast.h>
-#include <mitkImageReadAccessor.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkITKImageImport.h>
 #include <mitkLog.h>
-#include <mitkPixelType.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-#include <mitkProperties.h>
 
 // MITK PET
-#include <itkIndexedUnaryFunctorImageFilter.h>
 #include <mitkHalfLifeConstants.h>
-#include <mitkSUVCalculation.h>
 #include <mitkSUVCalculationHelper.h>
-#include <mitkSUVFunctorPolicy.h>
+#include <mitkSUVImageFilter.h>
 #include <mitkSUVNormalizationStrategy.h>
 
 
@@ -56,14 +41,14 @@ namespace
   // reason for failure rather than parse log messages.
   enum class ExitCode : int
   {
-    Success                  = 0,
-    Generic                  = 1,
-    MissingDICOMProperty     = 2,
-    AmbiguousDecayTiming     = 3,
-    InvalidArguments         = 4,
-    MultiTracerWithoutIndex  = 5,
-    InvalidDICOMPropertyValue= 6,
-    MissingSUVInput          = 7,
+    Success                    = 0,
+    Generic                    = 1,
+    MissingDICOMProperty       = 2,
+    AmbiguousDecayTiming       = 3,
+    InvalidArguments           = 4,
+    MultiTracerWithoutIndex    = 5,
+    InvalidDICOMPropertyValue  = 6,
+    MissingSUVInput            = 7,
     BenchmarkAdaptationRefused = 8,
   };
 
@@ -110,9 +95,11 @@ namespace
   std::optional<mitk::SUVVariant> ParseVariant(const std::string& raw)
   {
     const std::string v = ToUpperAscii(TrimAsciiWhitespace(raw));
-    if ("BW"  == v) return mitk::SUVVariant::BW;
-    if ("LBM" == v) return mitk::SUVVariant::LBM;
-    if ("BSA" == v) return mitk::SUVVariant::BSA;
+    if ("BW"           == v) return mitk::SUVVariant::BW;
+    if ("LBM-JANMA"    == v) return mitk::SUVVariant::LBM_Janmahasatian;
+    if ("LBM-JAMES128" == v) return mitk::SUVVariant::LBM_James128;
+    if ("IBW"          == v) return mitk::SUVVariant::IBW;
+    if ("BSA"          == v) return mitk::SUVVariant::BSA;
     return std::nullopt;
   }
 
@@ -135,14 +122,6 @@ namespace
     return std::nullopt;
   }
 
-  std::string ReadFirstStringTag(const mitk::BaseData* data, const mitk::DICOMTagPath& path)
-  {
-    const auto props = mitk::GetPropertyByDICOMTagPath(data, path);
-    if (props.empty()) return {};
-    auto* dicomProp = dynamic_cast<const mitk::DICOMProperty*>(props.begin()->second.GetPointer());
-    if (nullptr == dicomProp) return {};
-    return dicomProp->GetValue(0, 0, true, true);
-  }
 
   void setupParser(mitkCommandLineParser& parser)
   {
@@ -171,7 +150,9 @@ namespace
     parser.beginGroup("Variant selection");
     parser.addArgument("variant", "", mitkCommandLineParser::String,
       "SUV variant",
-      "One of: bw (body weight, default), lbm (lean body mass, Janmahasatian), "
+      "One of: bw (body weight, default), lbm-janma (lean body mass, "
+      "Janmahasatian 2005, IBSI-SUV recommended), lbm-james128 (lean body "
+      "mass, James 1976), ibw (ideal body weight, Devine 1974), "
       "bsa (body surface area, DuBois).",
       us::Any(std::string("bw")));
     parser.endGroup();
@@ -211,13 +192,22 @@ namespace
       "Bypass the (0008,0060) Modality == 'PT' check.");
     parser.addArgument("ignore-units-check", "", mitkCommandLineParser::Bool,
       "Ignore units check",
-      "Bypass the (0054,1001) Units == 'BQML' check.");
+      "Force activity-concentration semantics (legacy --ignore-units-check). "
+      "Equivalent to passing the input through the standard SUV formula as "
+      "if Units = BQML, regardless of the actual (0054,1001) value. "
+      "Bypasses both the input-units classification (no Philips private "
+      "factor consulted) and any pre-normalized re-scale path.");
     parser.addArgument("strict-dicom", "", mitkCommandLineParser::Bool,
       "Strict DICOM input policy",
-      "Refuse benchmark-recommended adaptations of borderline DICOM "
-      "input (currently: reinterpreting Radionuclide Total Dose "
-      "(0018,1074) below 1e4 as MBq). Without this flag the tool "
-      "applies the IBSI-SUV recommendation and emits a WARN log entry.");
+      "Refuse IBSI-SUV-recommended empirical adaptations of borderline / "
+      "ambiguous DICOM input. Currently affects: (a) reinterpreting "
+      "Radionuclide Total Dose (0018,1074) below 1e4 as MBq, and "
+      "(b) DC=START vendor-specific decay-timing fallbacks (Siemens / "
+      "Philips T_ave - FrameReferenceTime, GE -FrameReferenceTime). "
+      "Without this flag the tool applies the recommendations and emits "
+      "a WARN log entry. With this flag, supply unambiguous timing "
+      "(vendor private datetime, AcquisitionTime == SeriesTime) or use "
+      "--decay-time.");
     parser.addArgument("tracer-index", "", mitkCommandLineParser::Int,
       "Radiopharmaceutical sequence item index",
       "Explicit selection for multi-item Radiopharmaceutical Information "
@@ -251,7 +241,8 @@ namespace
       const auto v   = ParseVariant(raw);
       if (!v.has_value())
       {
-        MITK_ERROR << "Invalid --variant value '" << raw << "'. Expected one of bw, lbm, bsa.";
+        MITK_ERROR << "Invalid --variant value '" << raw
+                   << "'. Expected one of bw, lbm-janma, lbm-james128, ibw, bsa.";
         return false;
       }
       s.variant = v.value();
@@ -301,11 +292,9 @@ namespace
   }
 
   // Validate (0008,0060) Modality == "PT" (case-insensitive, trimmed).
-  // Returns true if check passes (or is bypassed); false if the CLI
-  // should abort.
   bool ValidateModality(const mitk::Image* image, bool ignore)
   {
-    const std::string raw = ReadFirstStringTag(image, mitk::DICOMTagPath(0x0008, 0x0060));
+    const std::string raw = mitk::GetFirstDICOMValueAsString(image, mitk::DICOMTagPath(0x0008, 0x0060));
     const std::string normalized = ToUpperAscii(TrimAsciiWhitespace(raw));
     if ("PT" == normalized) return true;
 
@@ -320,147 +309,6 @@ namespace
     return false;
   }
 
-  // Validate (0054,1001) Units == "BQML" (trimmed, uppercased; exact match).
-  bool ValidateUnits(const mitk::Image* image, bool ignore)
-  {
-    const std::string raw = ReadFirstStringTag(image, mitk::DICOMTagPath(0x0054, 0x1001));
-    const std::string normalized = ToUpperAscii(TrimAsciiWhitespace(raw));
-    if ("BQML" == normalized) return true;
-
-    if (ignore)
-    {
-      MITK_WARN << "Units (0054,1001) = '" << raw
-                << "' (expected BQML). Continuing because --ignore-units-check is set; "
-                << "the resulting SUV will not be physically meaningful.";
-      return true;
-    }
-    MITK_ERROR << "Units (0054,1001) = '" << raw
-               << "' (expected BQML). Use --ignore-units-check to bypass.";
-    return false;
-  }
-
-  // Pick a single Radiopharmaceutical Information Sequence item, honouring
-  // CLI overrides for activity/half-life. Returns the resolved index or
-  // an exit code via the throw-int convention used only inside main.
-  struct TracerSelection
-  {
-    int                                       index = -1;            // -1 = no item available, all from overrides
-    mitk::RadiopharmaceuticalInfo             info;                  // empty if index == -1
-  };
-
-  TracerSelection SelectTracer(const std::vector<mitk::RadiopharmaceuticalInfo>& infos,
-                               const Settings& s,
-                               ExitCode& outExitCode)
-  {
-    TracerSelection sel;
-
-    if (infos.empty())
-    {
-      // No DICOM RPI sequence available. Caller must have provided overrides
-      // for both injected activity and half-life — the resolution step
-      // checks for that and reports a clear message.
-      outExitCode = ExitCode::Success;
-      sel.index = -1;
-      return sel;
-    }
-
-    if (infos.size() == 1 && !s.tracerIndex.has_value())
-    {
-      outExitCode = ExitCode::Success;
-      sel.index = 0;
-      sel.info  = infos[0];
-      return sel;
-    }
-
-    if (s.tracerIndex.has_value())
-    {
-      const int idx = s.tracerIndex.value();
-      if (idx < 0 || static_cast<std::size_t>(idx) >= infos.size())
-      {
-        MITK_ERROR << "--tracer-index " << idx << " is out of range. Sequence has "
-                   << infos.size() << " item(s).";
-        outExitCode = ExitCode::InvalidArguments;
-        sel.index = -2;
-        return sel;
-      }
-      outExitCode = ExitCode::Success;
-      sel.index = idx;
-      sel.info  = infos[idx];
-      return sel;
-    }
-
-    // Multi-item sequence and no explicit selection: refuse.
-    std::ostringstream names;
-    for (std::size_t i = 0; i < infos.size(); ++i)
-    {
-      if (i > 0) names << ", ";
-      names << "[" << i << "] " << (infos[i].name.empty() ? "<unnamed>" : infos[i].name);
-    }
-    MITK_ERROR << "Input contains a multi-item Radiopharmaceutical Information "
-                  "Sequence (0054,0016). Pass --tracer-index N to select one. "
-                  "Items: " << names.str();
-    outExitCode = ExitCode::MultiTracerWithoutIndex;
-    sel.index = -2;
-    return sel;
-  }
-
-  // Densify the per-(timestep, slice) decay-time map for one timestep
-  // into a vector indexed by slice index (idx[2]). The lambda inside the
-  // pipeline then becomes O(1) per voxel rather than O(log slices).
-  std::vector<double> DensifyDecayTimes(const mitk::DecayTimeSliceMapType& sliceMap,
-                                        std::size_t expectedSlices)
-  {
-    std::vector<double> result(expectedSlices,
-                               std::numeric_limits<double>::quiet_NaN());
-    for (const auto& kv : sliceMap)
-    {
-      const auto idx = static_cast<std::size_t>(kv.first);
-      if (idx < expectedSlices)
-      {
-        result[idx] = kv.second;
-      }
-    }
-    return result;
-  }
-
-  // Apply the SUV functor to a single 3D timestep input image and write
-  // the result into the destination 4D output at \p dstStep.
-  void ProcessTimeStep(const mitk::Image* stepIn,
-                       mitk::Image* dst,
-                       mitk::TimeStepType dstStep,
-                       double injectedActivity,
-                       double scaleNumerator,
-                       double halfLife,
-                       const std::vector<double>& sliceDecay)
-  {
-    using ImageT = itk::Image<double, 3>;
-    ImageT::Pointer itkIn;
-    mitk::CastToItkImage(stepIn, itkIn);
-
-    mitk::SUVFunctorPolicy functor(injectedActivity, scaleNumerator, halfLife);
-    functor.SetDecayTimeFunctor(
-      [&sliceDecay](const itk::Index<3>& idx) {
-        const auto z = static_cast<std::size_t>(idx[2]);
-        return (z < sliceDecay.size())
-          ? sliceDecay[z]
-          : std::numeric_limits<double>::quiet_NaN();
-      });
-
-    if (!functor.IsConfigured())
-    {
-      mitkThrow() << "SUV functor is not fully configured (NaN scalar parameter).";
-    }
-
-    using FilterT = itk::IndexedUnaryFunctorImageFilter<ImageT, ImageT, mitk::SUVFunctorPolicy>;
-    auto filter = FilterT::New();
-    filter->SetFunctor(functor);
-    filter->SetInput(itkIn);
-    filter->Update();
-
-    auto suvSlab = mitk::ImportItkImage(filter->GetOutput());
-    mitk::ImageReadAccessor acc(suvSlab);
-    dst->SetVolume(acc.GetData(), dstStep);
-  }
 }
 
 
@@ -503,166 +351,44 @@ int main(int argc, char* argv[])
     {
       return AsInt(ExitCode::InvalidArguments);
     }
-    if (!ValidateUnits(image, s.ignoreUnitsCheck))
+
+    // ---- Configure filter ----------------------------------------------
+
+    auto filter = mitk::SUVImageFilter::New();
+    filter->SetInput(image);
+    filter->SetTargetVariant(s.variant);
+    filter->SetDICOMReadPolicy(s.strictDicom ? mitk::DICOMReadPolicy::Strict
+                                             : mitk::DICOMReadPolicy::Lenient);
+    if (s.injectedActivityBq) filter->SetInjectedActivityInBq(*s.injectedActivityBq);
+    if (s.bodyWeightKg)       filter->SetPatientWeightInGram(*s.bodyWeightKg * 1000.0);
+    if (s.heightM)            filter->SetPatientHeightInCm(*s.heightM * 100.0);
+    if (s.sex)                filter->SetPatientSex(*s.sex);
+    if (s.halfLifeS)          filter->SetHalfLifeInSec(*s.halfLifeS);
+    if (s.decayTimeS)         filter->SetDecayTimeOverrideInSec(*s.decayTimeS);
+    if (s.tracerIndex)        filter->SetTracerIndex(*s.tracerIndex);
+
+    // Legacy --ignore-units-check escape: force activity-concentration
+    // semantics regardless of (0054,1001).
+    if (s.ignoreUnitsCheck)
     {
-      return AsInt(ExitCode::InvalidArguments);
+      mitk::SUVInputModel forced;
+      forced.semantics     = mitk::SUVPixelSemantics::ActivityConcentration;
+      forced.activityScale = 1.0;
+      filter->SetInputModelOverride(forced);
+      MITK_WARN << "--ignore-units-check is set; forcing activity-concentration "
+                   "semantics. The resulting SUV will only be physically meaningful "
+                   "if the input pixels really are in [Bq/mL].";
     }
 
-    // ---- Resolve scalar parameters --------------------------------------
+    // The filter's Update() will call ConfigureFromProperties() internally
+    // if it has not been called explicitly, using the input image as the
+    // property source. Calling it here is equivalent and lets us surface
+    // configuration errors with the exact same exit-code mapping the CLI
+    // had before the migration to the filter.
+    filter->ConfigureFromProperties(image);
+    filter->Update();
 
-    const auto dicomPolicy = s.strictDicom
-      ? mitk::DICOMReadPolicy::Strict
-      : mitk::DICOMReadPolicy::Lenient;
-    auto rpiInfos = mitk::GetRadiopharmaceuticalInfos(image.GetPointer(), dicomPolicy);
-
-    ExitCode tracerExit = ExitCode::Generic;
-    auto tracer = SelectTracer(rpiInfos, s, tracerExit);
-    if (tracer.index < -1)
-    {
-      return AsInt(tracerExit);
-    }
-    // tracer.index == -1 here means no DICOM RPI sequence; CLI overrides must supply activity / half-life.
-    // tracer.index >= 0 means a tracer was selected.
-
-    const double injectedActivity = s.injectedActivityBq.has_value()
-      ? s.injectedActivityBq.value()
-      : tracer.info.totalDoseBq;
-
-    const double halfLife = s.halfLifeS.has_value()
-      ? s.halfLifeS.value()
-      : tracer.info.halfLifeSeconds;
-
-    if (!std::isfinite(injectedActivity))
-    {
-      MITK_ERROR << "Injected activity is unknown. Provide --injected-activity "
-                    "or supply DICOM (0018,1074).";
-      return AsInt(ExitCode::MissingDICOMProperty);
-    }
-    if (injectedActivity <= 0.0)
-    {
-      MITK_ERROR << "Injected activity must be a positive value (got "
-                 << injectedActivity << " Bq). Provide --injected-activity "
-                    "or check DICOM (0018,1074).";
-      return AsInt(ExitCode::InvalidDICOMPropertyValue);
-    }
-    if (!std::isfinite(halfLife))
-    {
-      MITK_ERROR << "Half-life is unknown. Provide --half-life or --nuclide, "
-                    "or supply DICOM (0018,1075).";
-      return AsInt(ExitCode::MissingDICOMProperty);
-    }
-    if (halfLife <= 0.0)
-    {
-      MITK_ERROR << "Half-life must be a positive value (got "
-                 << halfLife << " s). Provide --half-life or --nuclide, "
-                    "or check DICOM (0018,1075).";
-      return AsInt(ExitCode::InvalidDICOMPropertyValue);
-    }
-
-    // Patient measurements: always need body weight; LBM and BSA need
-    // height; LBM also needs sex.
-    mitk::SUVNormalizationInputs normInputs;
-    normInputs.bodyWeightKg = s.bodyWeightKg.has_value()
-      ? s.bodyWeightKg.value()
-      : mitk::GetPatientsWeight(image.GetPointer());
-
-    if (s.variant == mitk::SUVVariant::LBM || s.variant == mitk::SUVVariant::BSA)
-    {
-      normInputs.heightM = s.heightM.has_value()
-        ? s.heightM.value()
-        : mitk::GetPatientsHeight(image.GetPointer());
-    }
-    if (s.variant == mitk::SUVVariant::LBM)
-    {
-      normInputs.sex = s.sex.has_value()
-        ? s.sex.value()
-        : mitk::GetPatientsSex(image.GetPointer());
-    }
-
-    auto strategy = mitk::MakeSUVNormalizationStrategy(s.variant);
-    const double scaleNumerator = strategy->ComputeScaleNumerator(normInputs);
-
-    // ---- Decay times ---------------------------------------------------
-
-    mitk::DecayCorrectionInfo decayInfo;
-    if (s.decayTimeS.has_value())
-    {
-      // Uniform override. Build a synthetic per-(timestep, slice) map
-      // with the same value everywhere. We deliberately do NOT consult
-      // DICOM here so the override also works for non-DICOM inputs
-      // (Example 5 in the user manual: NRRD without acquisition tags).
-      // The user accepts that --decay-time is uniform-by-construction
-      // and is therefore not a substitute for the per-slice handling
-      // the NONE strategy applies when reading from DICOM.
-      const auto timeSteps = image->GetTimeSteps();
-      for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
-      {
-        const auto* sliced = image->GetSlicedGeometry(t);
-        const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
-        for (unsigned int z = 0; z < slices; ++z)
-        {
-          decayInfo.decayTimes[t][z] = s.decayTimeS.value();
-        }
-      }
-      decayInfo.strategy = mitk::DecayCorrectionStrategy::Manual;
-    }
-    else
-    {
-      decayInfo = mitk::DeduceDecayCorrection(image);
-    }
-
-    // ---- 4D-correct output assembly ------------------------------------
-
-    const auto pixelType  = mitk::MakeScalarPixelType<double>();
-    auto outputTimeGeom   = image->GetTimeGeometry()->Clone();
-
-    auto output = mitk::Image::New();
-    output->Initialize(pixelType, *outputTimeGeom,
-                       /*channels*/ 1, image->GetTimeSteps());
-
-    // Property carry-over so DICOM provenance (study/series UIDs, patient
-    // info, time-resolved properties) survives. Time geometry is preserved
-    // so per-timestep entries remain valid. NB: (0054,1001) Units = BQML
-    // is carried over verbatim even though the SUV output unit is no
-    // longer Bq/mL — see the user manual for the documented limitation.
-    if (image->GetPropertyList())
-    {
-      for (const auto& [key, prop] : *image->GetPropertyList()->GetMap())
-      {
-        if (prop.IsNotNull())
-        {
-          output->SetProperty(key.c_str(), prop->Clone());
-        }
-      }
-    }
-
-    auto runStep = [&](mitk::TimeStepType t, const mitk::Image* stepIn)
-    {
-      const auto* slicedGeom = image->GetSlicedGeometry(t);
-      const std::size_t expectedSlices =
-        (nullptr != slicedGeom) ? slicedGeom->GetSlices() : 1u;
-      const auto sliceDecay = DensifyDecayTimes(decayInfo.decayTimes[t], expectedSlices);
-      ProcessTimeStep(stepIn, output, t,
-                      injectedActivity, scaleNumerator, halfLife,
-                      sliceDecay);
-    };
-
-    if (image->GetTimeSteps() == 1)
-    {
-      // 3D fast path
-      runStep(0, image);
-    }
-    else
-    {
-      for (mitk::TimeStepType t = 0; t < image->GetTimeSteps(); ++t)
-      {
-        auto sel = mitk::ImageTimeSelector::New();
-        sel->SetInput(image);
-        sel->SetTimeNr(t);
-        sel->UpdateLargestPossibleRegion();
-        runStep(t, sel->GetOutput());
-      }
-    }
+    auto output = filter->GetOutput();
 
     // ---- Save -----------------------------------------------------------
 

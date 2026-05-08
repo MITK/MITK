@@ -217,7 +217,7 @@ std::string GetBaseDatePropValueAsString(const mitk::BaseData *data, const mitk:
 
   if (data)
   {
-    std::map<std::string, mitk::BaseProperty::Pointer> props = mitk::GetPropertyByDICOMTagPath(data, path);
+    auto props = mitk::GetPropertyByDICOMTagPath(data, path);
 
     if (!props.empty())
     {

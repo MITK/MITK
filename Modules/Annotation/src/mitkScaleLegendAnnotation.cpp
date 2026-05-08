@@ -32,13 +32,7 @@ mitk::ScaleLegendAnnotation::ScaleLegendAnnotation()
 
 mitk::ScaleLegendAnnotation::~ScaleLegendAnnotation()
 {
-  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
-  {
-    if (renderer)
-    {
-      this->RemoveFromBaseRenderer(renderer);
-    }
-  }
+  this->RemoveFromAllRegisteredBaseRenderers(m_LSH.GetRegisteredBaseRenderer());
 }
 
 mitk::ScaleLegendAnnotation::LocalStorage::~LocalStorage()

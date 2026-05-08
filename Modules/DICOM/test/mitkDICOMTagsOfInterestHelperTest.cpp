@@ -251,6 +251,7 @@ public:
   void PETTopLevelTags()
   {
     RequireTopLevel(0x0054, 0x1001, "(0054,1001) RadioactivityUnits");
+    RequireTopLevel(0x0054, 0x1006, "(0054,1006) SUVType");
     RequireTopLevel(0x0054, 0x1102, "(0054,1102) DecayCorrection");
     RequireTopLevel(0x0054, 0x1321, "(0054,1321) DecayFactor");
     RequireTopLevel(0x0054, 0x1300, "(0054,1300) FrameReferenceTime");

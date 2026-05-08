@@ -29,13 +29,26 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   MITK_TEST(BW_NegativeWeight_Throws);
 
   // Lean body mass (Janmahasatian)
-  MITK_TEST(LBM_Male_KnownInputs);
-  MITK_TEST(LBM_Female_KnownInputs);
-  MITK_TEST(LBM_Other_MeanOfMaleAndFemale);
-  MITK_TEST(LBM_VariantId);
-  MITK_TEST(LBM_MissingHeight_Throws);
-  MITK_TEST(LBM_MissingSex_Throws);
-  MITK_TEST(LBM_MissingWeight_Throws);
+  MITK_TEST(LBMJanma_Male_KnownInputs);
+  MITK_TEST(LBMJanma_Female_KnownInputs);
+  MITK_TEST(LBMJanma_Other_Throws);
+  MITK_TEST(LBMJanma_VariantId);
+  MITK_TEST(LBMJanma_MissingHeight_Throws);
+  MITK_TEST(LBMJanma_MissingSex_Throws);
+  MITK_TEST(LBMJanma_MissingWeight_Throws);
+
+  // Lean body mass (James 128)
+  MITK_TEST(LBMJames128_Male_KnownInputs);
+  MITK_TEST(LBMJames128_Female_KnownInputs);
+  MITK_TEST(LBMJames128_Other_Throws);
+  MITK_TEST(LBMJames128_VariantId);
+
+  // Ideal body weight (Devine)
+  MITK_TEST(IBW_Male_KnownInputs);
+  MITK_TEST(IBW_Female_KnownInputs);
+  MITK_TEST(IBW_Other_Throws);
+  MITK_TEST(IBW_VariantId);
+  MITK_TEST(IBW_MissingHeight_Throws);
 
   // Body surface area (DuBois)
   MITK_TEST(BSA_KnownInputs);
@@ -45,7 +58,9 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
 
   // Factory
   MITK_TEST(Factory_BW_ReturnsBodyWeightStrategy);
-  MITK_TEST(Factory_LBM_ReturnsLeanBodyMassStrategy);
+  MITK_TEST(Factory_LBMJanma_ReturnsCorrectStrategy);
+  MITK_TEST(Factory_LBMJames128_ReturnsCorrectStrategy);
+  MITK_TEST(Factory_IBW_ReturnsCorrectStrategy);
   MITK_TEST(Factory_BSA_ReturnsBodySurfaceAreaStrategy);
 
   CPPUNIT_TEST_SUITE_END();
@@ -94,7 +109,7 @@ public:
   //   LBM_female [kg] = (9270 * W) / (8780 + 244 * BMI)
   // with BMI = W / H^2.
 
-  void LBM_Male_KnownInputs()
+  void LBMJanma_Male_KnownInputs()
   {
     constexpr double w = 75.0;       // kg
     constexpr double h = 1.78;       // m
@@ -107,12 +122,12 @@ public:
     inputs.heightM      = h;
     inputs.sex          = mitk::Sex::Male;
 
-    mitk::LeanBodyMassStrategy strategy;
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
   }
 
-  void LBM_Female_KnownInputs()
+  void LBMJanma_Female_KnownInputs()
   {
     constexpr double w = 60.0;
     constexpr double h = 1.65;
@@ -125,66 +140,184 @@ public:
     inputs.heightM      = h;
     inputs.sex          = mitk::Sex::Female;
 
-    mitk::LeanBodyMassStrategy strategy;
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
   }
 
-  void LBM_Other_MeanOfMaleAndFemale()
+  void LBMJanma_Other_Throws()
   {
-    // IBSI-SUV benchmark recommends, for Sex == Other, the mean of the
-    // male- and female-specific Janmahasatian outputs (not the formulas
-    // applied to averaged inputs). Pinning that contract here.
-    constexpr double w = 70.0;       // kg
-    constexpr double h = 1.70;       // m
-    const double bmi   = w / (h * h);
-    const double lbmMaleKg   = (9270.0 * w) / (6680.0 + 216.0 * bmi);
-    const double lbmFemaleKg = (9270.0 * w) / (8780.0 + 244.0 * bmi);
-    const double expected    = 0.5 * (lbmMaleKg + lbmFemaleKg) * 1000.0;
-
+    // Sex-closed contract: Sex::Other must be resolved upstream
+    // (e.g. by SUVImageFilter under DICOMReadPolicy). The strategy
+    // itself rejects it.
     mitk::SUVNormalizationInputs inputs;
-    inputs.bodyWeightKg = w;
-    inputs.heightM      = h;
+    inputs.bodyWeightKg = 70.0;
+    inputs.heightM      = 1.70;
     inputs.sex          = mitk::Sex::Other;
 
-    mitk::LeanBodyMassStrategy strategy;
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
-                                 expected * 1e-12);
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
+    CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
+                         mitk::MissingSUVInputException);
   }
 
-  void LBM_VariantId()
+  void LBMJanma_VariantId()
   {
-    mitk::LeanBodyMassStrategy strategy;
-    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM, strategy.Variant());
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_Janmahasatian, strategy.Variant());
   }
 
-  void LBM_MissingHeight_Throws()
+  void LBMJanma_MissingHeight_Throws()
   {
     mitk::SUVNormalizationInputs inputs;
     inputs.bodyWeightKg = 70.0;
     inputs.sex          = mitk::Sex::Male;
-    mitk::LeanBodyMassStrategy strategy;
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
     CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
                          mitk::MissingSUVInputException);
   }
 
-  void LBM_MissingSex_Throws()
+  void LBMJanma_MissingSex_Throws()
   {
     mitk::SUVNormalizationInputs inputs;
     inputs.bodyWeightKg = 70.0;
     inputs.heightM      = 1.78;
-    // sex left as empty optional
-    mitk::LeanBodyMassStrategy strategy;
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
     CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
                          mitk::MissingSUVInputException);
   }
 
-  void LBM_MissingWeight_Throws()
+  void LBMJanma_MissingWeight_Throws()
   {
     mitk::SUVNormalizationInputs inputs;
     inputs.heightM = 1.78;
     inputs.sex     = mitk::Sex::Female;
-    mitk::LeanBodyMassStrategy strategy;
+    mitk::LeanBodyMassJanmahasatianStrategy strategy;
+    CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
+                         mitk::MissingSUVInputException);
+  }
+
+  // ---- Lean body mass (James 128) ----
+  //
+  //   LBM_male   [kg] = 1.10 * W - 0.0128 * W^2 / H^2
+  //   LBM_female [kg] = 1.07 * W - 0.0148 * W^2 / H^2
+  // with W in kg and H in m.
+
+  void LBMJames128_Male_KnownInputs()
+  {
+    constexpr double w  = 75.0;
+    constexpr double h  = 1.78;
+    const double w2     = w * w;
+    const double h2     = h * h;
+    const double expectedKg = 1.10 * w - 0.0128 * w2 / h2;
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = w;
+    inputs.heightM      = h;
+    inputs.sex          = mitk::Sex::Male;
+
+    mitk::LeanBodyMassJames128Strategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+  }
+
+  void LBMJames128_Female_KnownInputs()
+  {
+    constexpr double w  = 60.0;
+    constexpr double h  = 1.65;
+    const double w2     = w * w;
+    const double h2     = h * h;
+    const double expectedKg = 1.07 * w - 0.0148 * w2 / h2;
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = w;
+    inputs.heightM      = h;
+    inputs.sex          = mitk::Sex::Female;
+
+    mitk::LeanBodyMassJames128Strategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+  }
+
+  void LBMJames128_Other_Throws()
+  {
+    mitk::SUVNormalizationInputs inputs;
+    inputs.bodyWeightKg = 70.0;
+    inputs.heightM      = 1.70;
+    inputs.sex          = mitk::Sex::Other;
+
+    mitk::LeanBodyMassJames128Strategy strategy;
+    CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
+                         mitk::MissingSUVInputException);
+  }
+
+  void LBMJames128_VariantId()
+  {
+    mitk::LeanBodyMassJames128Strategy strategy;
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_James128, strategy.Variant());
+  }
+
+  // ---- Ideal body weight (IBSI-SUV) ----
+  //
+  //   IBW_male   [kg] = 48.0 + 1.06 * (H_cm - 152)
+  //   IBW_female [kg] = 45.5 + 0.91 * (H_cm - 152)
+  // with H in cm.
+
+  void IBW_Male_KnownInputs()
+  {
+    constexpr double h = 1.78;          // m
+    const double hCm   = h * 100.0;
+    const double expectedKg = 48.0 + 1.06 * (hCm - 152.0);
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.heightM = h;
+    inputs.sex     = mitk::Sex::Male;
+
+    mitk::IdealBodyWeightStrategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+  }
+
+  void IBW_Female_KnownInputs()
+  {
+    constexpr double h = 1.65;
+    const double hCm   = h * 100.0;
+    const double expectedKg = 45.5 + 0.91 * (hCm - 152.0);
+    const double expected   = expectedKg * 1000.0;
+
+    mitk::SUVNormalizationInputs inputs;
+    inputs.heightM = h;
+    inputs.sex     = mitk::Sex::Female;
+
+    mitk::IdealBodyWeightStrategy strategy;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
+                                 expected * 1e-12);
+  }
+
+  void IBW_Other_Throws()
+  {
+    mitk::SUVNormalizationInputs inputs;
+    inputs.heightM = 1.70;
+    inputs.sex     = mitk::Sex::Other;
+
+    mitk::IdealBodyWeightStrategy strategy;
+    CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
+                         mitk::MissingSUVInputException);
+  }
+
+  void IBW_VariantId()
+  {
+    mitk::IdealBodyWeightStrategy strategy;
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::IBW, strategy.Variant());
+  }
+
+  void IBW_MissingHeight_Throws()
+  {
+    mitk::SUVNormalizationInputs inputs;
+    inputs.sex = mitk::Sex::Male;
+    mitk::IdealBodyWeightStrategy strategy;
     CPPUNIT_ASSERT_THROW(strategy.ComputeScaleNumerator(inputs),
                          mitk::MissingSUVInputException);
   }
@@ -244,11 +377,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::BW, s->Variant());
   }
 
-  void Factory_LBM_ReturnsLeanBodyMassStrategy()
+  void Factory_LBMJanma_ReturnsCorrectStrategy()
   {
-    auto s = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::LBM);
+    auto s = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::LBM_Janmahasatian);
     CPPUNIT_ASSERT(s != nullptr);
-    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM, s->Variant());
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_Janmahasatian, s->Variant());
+  }
+
+  void Factory_LBMJames128_ReturnsCorrectStrategy()
+  {
+    auto s = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::LBM_James128);
+    CPPUNIT_ASSERT(s != nullptr);
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::LBM_James128, s->Variant());
+  }
+
+  void Factory_IBW_ReturnsCorrectStrategy()
+  {
+    auto s = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::IBW);
+    CPPUNIT_ASSERT(s != nullptr);
+    CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::IBW, s->Variant());
   }
 
   void Factory_BSA_ReturnsBodySurfaceAreaStrategy()

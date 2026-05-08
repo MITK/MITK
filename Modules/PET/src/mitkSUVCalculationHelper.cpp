@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <functional>
 
 #include <dcmtk/dcmdata/dcvrdt.h>
@@ -31,39 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLog.h>
 #include <mitkSlicedGeometry3D.h>
 
+#include <chrono>
 namespace
 {
-  // Iterate the property keys of an IPropertyProvider and return those whose
-  // names parse back into a DICOMTagPath equal to the given path. This keeps
-  // MitkDICOM untouched: only PropertyList* and BaseData* overloads of
-  // mitk::GetPropertyByDICOMTagPath ship there, and we want to take
-  // IPropertyProvider* without forcing a dependency change in MitkDICOM.
-  std::map<std::string, mitk::BaseProperty::ConstPointer>
-  CollectPropertiesByDICOMTagPath(const mitk::IPropertyProvider* provider,
-                                  const mitk::DICOMTagPath& path)
-  {
-    std::map<std::string, mitk::BaseProperty::ConstPointer> result;
-
-    if (nullptr == provider)
-    {
-      return result;
-    }
-
-    for (const auto& key : provider->GetPropertyKeys())
-    {
-      const mitk::DICOMTagPath propPath = mitk::PropertyNameToDICOMTagPath(key);
-      if (!propPath.IsEmpty() && path.Equals(propPath))
-      {
-        auto prop = provider->GetConstProperty(key);
-        if (prop.IsNotNull())
-        {
-          result[key] = prop;
-        }
-      }
-    }
-    return result;
-  }
-
   // String helpers used for the (0054,1102) value comparison.
   std::string TrimAsciiWhitespace(const std::string& s)
   {
@@ -84,13 +55,14 @@ namespace
   }
 
   // Pull the first matching property as a DICOMProperty so the caller can
-  // index by (timestep, slice). Returns nullptr if no match.
+  // index by (timestep, slice). Returns nullptr if no match. Wraps
+  // mitk::GetPropertyByDICOMTagPath so per-slice access stays available
+  // alongside the simpler mitk::GetFirstDICOMValueAsString convenience.
   const mitk::DICOMProperty* FindFirstDICOMProperty(
     const mitk::IPropertyProvider* provider,
-    const mitk::DICOMTagPath& path,
-    std::string* outKey = nullptr)
+    const mitk::DICOMTagPath& path)
   {
-    auto matches = CollectPropertiesByDICOMTagPath(provider, path);
+    const auto matches = mitk::GetPropertyByDICOMTagPath(provider, path);
     if (matches.empty())
     {
       return nullptr;
@@ -99,10 +71,6 @@ namespace
     {
       MITK_WARN << "Multiple properties match DICOM tag path " << path.ToStr()
                 << "; using the first match: " << matches.begin()->first;
-    }
-    if (outKey)
-    {
-      *outKey = matches.begin()->first;
     }
     return dynamic_cast<const mitk::DICOMProperty*>(matches.begin()->second.GetPointer());
   }
@@ -125,27 +93,28 @@ namespace
     return result.good();
   }
 
-  boost::posix_time::ptime ConvertOFDateTimeToPTime(const OFDateTime& time)
+  auto ConvertOFDateTimeToTimePoint(const OFDateTime& time)
   {
-    const boost::gregorian::date boostDate(
-      time.getDate().getYear(), time.getDate().getMonth(), time.getDate().getDay());
+    using namespace std::chrono;
+    const year_month_day ymd{
+      year{static_cast<int>(time.getDate().getYear())},
+      month{static_cast<unsigned>(time.getDate().getMonth())},
+      day{static_cast<unsigned>(time.getDate().getDay())}};
 
-    const boost::posix_time::time_duration boostTime =
-      boost::posix_time::hours(time.getTime().getHour())
-      + boost::posix_time::minutes(time.getTime().getMinute())
-      + boost::posix_time::seconds(time.getTime().getIntSecond())
-      + boost::posix_time::milliseconds(time.getTime().getMilliSecond());
-
-    return boost::posix_time::ptime(boostDate, boostTime);
+    return sys_days{ymd}
+         + hours{time.getTime().getHour()}
+         + minutes{time.getTime().getMinute()}
+         + seconds{time.getTime().getIntSecond()}
+         + milliseconds{time.getTime().getMilliSecond()};
   }
 
   // Returns (reference - injection) in seconds.
   double DurationInSeconds(const OFDateTime& injection, const OFDateTime& reference)
   {
-    const auto pInjection = ConvertOFDateTimeToPTime(injection);
-    const auto pReference = ConvertOFDateTimeToPTime(reference);
-    const boost::posix_time::time_duration delta = pReference - pInjection;
-    return static_cast<double>(delta.total_milliseconds()) / 1000.0;
+    using namespace std::chrono;
+    const auto delta = ConvertOFDateTimeToTimePoint(reference)
+                     - ConvertOFDateTimeToTimePoint(injection);
+    return duration<double>(delta).count();
   }
 
   // Resolve the radiopharmaceutical injection time into an absolute OFDateTime.
@@ -215,21 +184,20 @@ namespace
   //   AmbiguousDecayTimingException.
   // - For (0018,1078)-derived data, no rollover correction is applied; any
   //   negative duration throws.
-  double ComputeDecayTimeWithRolloverGuard(const OFDateTime& injection,
-                                           const OFDateTime& reference,
-                                           bool injectionFromTimeOnlyTag)
+  // Numeric rollover guard. Validates a precomputed (reference - injection)
+  // duration in seconds, optionally recovering a one-shot 24 h rollover when
+  // the injection time was derived from the (0018,1072) TM-only tag (whose
+  // date had to be assembled from the acquisition date).
+  double GuardDecayDurationSeconds(double durationSeconds,
+                                   bool injectionFromTimeOnlyTag)
   {
     constexpr double kSecondsIn24h = 24.0 * 60.0 * 60.0;
 
-    double seconds = DurationInSeconds(injection, reference);
+    double seconds = durationSeconds;
 
     if (seconds < 0.0 && injectionFromTimeOnlyTag)
     {
-      const auto pAdjustedInjection = ConvertOFDateTimeToPTime(injection)
-        - boost::posix_time::hours(24);
-      const auto pReference = ConvertOFDateTimeToPTime(reference);
-      const boost::posix_time::time_duration delta = pReference - pAdjustedInjection;
-      seconds = static_cast<double>(delta.total_milliseconds()) / 1000.0;
+      seconds += kSecondsIn24h;
     }
 
     if (seconds < 0.0 || seconds > kSecondsIn24h)
@@ -245,15 +213,85 @@ namespace
     return seconds;
   }
 
-  std::string ReadStringTag(const mitk::IPropertyProvider* provider,
-                            const mitk::DICOMTagPath& path)
+  double ComputeDecayTimeWithRolloverGuard(const OFDateTime& injection,
+                                           const OFDateTime& reference,
+                                           bool injectionFromTimeOnlyTag)
   {
-    const auto* prop = FindFirstDICOMProperty(provider, path);
-    if (prop == nullptr)
+    return GuardDecayDurationSeconds(
+      DurationInSeconds(injection, reference), injectionFromTimeOnlyTag);
+  }
+
+  // Pull a named property (attached out-of-band — e.g. the lifted vendor
+  // private datetimes from BaseDICOMReaderService, see issue #783) as a
+  // DICOMProperty so the caller can read per-(t, s) values uniformly with
+  // the standard tag-of-interest properties.
+  const mitk::DICOMProperty* FindNamedDICOMProperty(const mitk::IPropertyProvider* provider,
+                                                    const std::string& propertyName)
+  {
+    if (nullptr == provider) return nullptr;
+    auto baseProp = provider->GetConstProperty(propertyName.c_str());
+    if (baseProp.IsNull()) return nullptr;
+    return dynamic_cast<const mitk::DICOMProperty*>(baseProp.GetPointer());
+  }
+
+  // Parse a DICOM DT-format string ("YYYYMMDDHHMMSS[.FFFFFF][&ZZXX]") into
+  // an OFDateTime. Returns true on success.
+  bool ParseDICOMDateTime(const std::string& dt, OFDateTime& out)
+  {
+    return DcmDateTime::getOFDateTimeFromString(OFString(dt.c_str()), out).good();
+  }
+
+  // Read a numeric DICOM tag at (timestep, slice). Returns NaN if the tag
+  // is absent at that slot or cannot be parsed.
+  double ReadNumericTagAt(const mitk::DICOMProperty* prop,
+                          mitk::TimeStepType t,
+                          mitk::SlicedData::IndexValueType s)
+  {
+    if (nullptr == prop) return std::numeric_limits<double>::quiet_NaN();
+    const std::string raw = prop->GetValue(t, s, true, true);
+    if (raw.empty()) return std::numeric_limits<double>::quiet_NaN();
+    return mitk::ConvertDICOMStrToValue<double>(raw);
+  }
+
+  // Compare two OFDateTimes at second resolution: true if they represent
+  // the same wall-clock second (sub-second jitter is ignored). Used by
+  // DC=START Step 2 (AcquisitionTime equals SeriesTime in seconds).
+  bool EqualAtSecondResolution(const OFDateTime& a, const OFDateTime& b)
+  {
+    return std::fabs(DurationInSeconds(a, b)) < 1.0;
+  }
+
+  // Closed-form average count-rate time per IBSI-SUV recommendation
+  // (suv_text.txt:820-826):
+  //
+  //     T_ave = (1/lambda) * ln((lambda * T) / (1 - exp(-lambda * T)))
+  //
+  // with lambda = ln(2) / T_half and T = ActualFrameDuration.
+  //
+  // Physically: a non-decay-corrected voxel value is the count rate
+  // averaged over the frame; T_ave is the time inside the frame at
+  // which the *instantaneous* count rate equals that average. As
+  // lambda*T -> 0 the result approaches T/2 (frame midpoint). For 18F
+  // (lambda ~ 1.05e-4 /s) and a 5-minute frame, lambda*T ~ 0.03, so
+  // the formula and T/2 agree to about one part in a thousand.
+  //
+  // We use std::expm1(-lambda*T) instead of (1 - exp(-lambda*T)) for
+  // numerical stability when lambda*T is small.
+  double ComputeTAveSeconds(double frameDurationSeconds, double halfLifeSeconds)
+  {
+    if (frameDurationSeconds <= 0.0 || halfLifeSeconds <= 0.0
+        || !std::isfinite(frameDurationSeconds) || !std::isfinite(halfLifeSeconds))
     {
-      return {};
+      mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+        << "ComputeTAveSeconds requires positive, finite frame duration and "
+           "half-life (got T=" << frameDurationSeconds
+        << " s, T_half=" << halfLifeSeconds << " s).";
     }
-    return prop->GetValue(0, 0, true, true);
+    const double lambda = std::log(2.0) / halfLifeSeconds;
+    const double lambdaT = lambda * frameDurationSeconds;
+    // (1 - exp(-lambdaT)) computed stably as -expm1(-lambdaT).
+    const double denom = -std::expm1(-lambdaT);
+    return (1.0 / lambda) * std::log(lambdaT / denom);
   }
 }
 
@@ -294,7 +332,7 @@ mitk::GetRadiopharmaceuticalInfos(const mitk::IPropertyProvider* provider,
                        const std::function<void(RadiopharmaceuticalInfo&,
                                                 const std::string&)>& assigner)
   {
-    const auto matches = CollectPropertiesByDICOMTagPath(provider, queryPath);
+    const auto matches = mitk::GetPropertyByDICOMTagPath(provider, queryPath);
     for (const auto& finding : matches)
     {
       const DICOMTagPath storedPath = PropertyNameToDICOMTagPath(finding.first);
@@ -390,7 +428,7 @@ double mitk::GetPatientsWeight(const mitk::IPropertyProvider* provider)
   }
 
   const DICOMTagPath weightPath(0x0010, 0x1030);
-  const auto props = CollectPropertiesByDICOMTagPath(provider, weightPath);
+  const auto props = mitk::GetPropertyByDICOMTagPath(provider, weightPath);
 
   if (props.empty())
   {
@@ -411,7 +449,7 @@ double mitk::GetPatientsHeight(const mitk::IPropertyProvider* provider)
   }
 
   const DICOMTagPath heightPath(0x0010, 0x1020);
-  const auto props = CollectPropertiesByDICOMTagPath(provider, heightPath);
+  const auto props = mitk::GetPropertyByDICOMTagPath(provider, heightPath);
 
   if (props.empty())
   {
@@ -432,7 +470,7 @@ mitk::Sex mitk::GetPatientsSex(const mitk::IPropertyProvider* provider)
   }
 
   const DICOMTagPath sexPath(0x0010, 0x0040);
-  const std::string raw = ReadStringTag(provider, sexPath);
+  const std::string raw = mitk::GetFirstDICOMValueAsString(provider, sexPath);
   if (raw.empty())
   {
     mitkThrowException(MissingDICOMPropertyException)
@@ -451,11 +489,43 @@ mitk::Sex mitk::GetPatientsSex(const mitk::IPropertyProvider* provider)
     << raw << "'. Expected one of M, F, O.";
 }
 
+mitk::ManufacturerFamily mitk::GetManufacturerFamily(const mitk::IPropertyProvider* provider)
+{
+  if (nullptr == provider)
+  {
+    return ManufacturerFamily::Other;
+  }
+
+  const DICOMTagPath manufPath(0x0008, 0x0070);
+  const std::string raw = mitk::GetFirstDICOMValueAsString(provider, manufPath);
+  const std::string normalized = ToUpperAscii(TrimAsciiWhitespace(raw));
+
+  // Substring match: real-world values include "SIEMENS Healthineers",
+  // "GE MEDICAL SYSTEMS", "GE HEALTHCARE", "Philips Medical Systems".
+  // GE matches require word-boundary handling so a hypothetical
+  // manufacturer string starting with "GE" but not denoting GE
+  // Healthcare (none observed in practice) would fall through to Other.
+  if (std::string::npos != normalized.find("SIEMENS"))
+  {
+    return ManufacturerFamily::Siemens;
+  }
+  if (std::string::npos != normalized.find("PHILIPS"))
+  {
+    return ManufacturerFamily::Philips;
+  }
+  if ("GE" == normalized
+      || (normalized.size() >= 3 && normalized.substr(0, 3) == "GE "))
+  {
+    return ManufacturerFamily::GE;
+  }
+  return ManufacturerFamily::Other;
+}
+
 mitk::DecayCorrectionStrategy mitk::GetDecayCorrectionStrategy(const mitk::IPropertyProvider* provider)
 {
   const DICOMTagPath decayCorrPath(0x0054, 0x1102);
 
-  const std::string raw = ReadStringTag(provider, decayCorrPath);
+  const std::string raw = mitk::GetFirstDICOMValueAsString(provider, decayCorrPath);
   if (raw.empty())
   {
     mitkThrowException(MissingDICOMPropertyException)
@@ -502,16 +572,42 @@ namespace
   std::string ResolveSeriesReferenceDate(const mitk::IPropertyProvider* provider)
   {
     const std::string seriesDate =
-      ReadStringTag(provider, mitk::DICOMTagPath(0x0008, 0x0021));
+      mitk::GetFirstDICOMValueAsString(provider, mitk::DICOMTagPath(0x0008, 0x0021));
     if (!seriesDate.empty())
     {
       return seriesDate;
     }
-    return ReadStringTag(provider, mitk::DICOMTagPath(0x0008, 0x0022));
+    return mitk::GetFirstDICOMValueAsString(provider, mitk::DICOMTagPath(0x0008, 0x0022));
+  }
+
+  // Resolve the half-life: use the caller-supplied value if finite,
+  // otherwise fall back to item 0 of the Radiopharmaceutical Information
+  // Sequence. Returns NaN if neither source yields a half-life. Multi-tracer
+  // callers should always supply the resolved half-life explicitly so the
+  // selection matches their tracer-index choice.
+  double ResolveHalfLifeSeconds(const mitk::IPropertyProvider* provider,
+                                double providedHalfLifeSeconds)
+  {
+    if (std::isfinite(providedHalfLifeSeconds) && providedHalfLifeSeconds > 0.0)
+    {
+      return providedHalfLifeSeconds;
+    }
+    const auto infos = mitk::GetRadiopharmaceuticalInfos(provider);
+    if (infos.empty())
+    {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+    return infos[0].halfLifeSeconds;
   }
 }
 
-mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* data)
+// "Step 1" .. "Step 4" in the comments below refer to the canonical
+// DC=START fallback chain documented in the public Doxygen of
+// DeduceDecayCorrection() in mitkSUVCalculationHelper.h (Doxygen
+// anchor: DCStartFallbackChain). Tests use the same numbering.
+mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* data,
+                                                      double halfLifeSeconds,
+                                                      DICOMReadPolicy policy)
 {
   if (nullptr == data)
   {
@@ -531,6 +627,8 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
 
     case DecayCorrectionStrategy::Start:
     {
+      // Common: parse SeriesDate/Time and injection time. Required for
+      // every fallback step.
       const std::string referenceDate = ResolveSeriesReferenceDate(data);
       if (referenceDate.empty())
       {
@@ -541,7 +639,7 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       }
 
       const std::string seriesTime =
-        ReadStringTag(data, DICOMTagPath(0x0008, 0x0031));
+        mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0031));
       if (seriesTime.empty())
       {
         mitkThrowException(MissingDICOMPropertyException)
@@ -556,17 +654,247 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
       }
 
       const auto injection = ResolveInjectionDateTime(data, referenceDate);
-      const double decayTime =
-        ComputeDecayTimeWithRolloverGuard(injection.first, ofSeriesTime, injection.second);
+      const auto manuf = GetManufacturerFamily(data);
 
-      FillUniformDecayMap(data, decayTime, info.decayTimes);
-      return info;
+      // ---- Step 1: vendor private datetime (per slice via lifted property) ----
+      // The PET reader (BaseDICOMReaderService) lifts these values out of
+      // the corresponding private creator blocks per file and stores them
+      // as a TemporoSpatialStringProperty keyed by (timestep, slice). See
+      // issue #783 for the design discussion. We read per-(t, s) so that
+      // multi-bed acquisitions whose private datetime varies per file are
+      // handled correctly; uniform-across-files data degenerates to the
+      // same value for every slot via the property's default-context
+      // fallback, yielding a uniform decay map without special-casing.
+      if (ManufacturerFamily::Siemens == manuf || ManufacturerFamily::GE == manuf)
+      {
+        const auto* privateProp = FindNamedDICOMProperty(data,
+          (ManufacturerFamily::Siemens == manuf)
+            ? "mitk.pet.SiemensDecayDateTime"
+            : "mitk.pet.GEScanDateTime");
+        if (nullptr != privateProp)
+        {
+          const auto timeSteps = data->GetTimeSteps();
+          DecayTimeMapType candidateMap;
+          bool allSlicesValid = true;
+
+          for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
+          {
+            const auto* sliced = data->GetSlicedGeometry(t);
+            const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+            auto& sliceMap = candidateMap[t];
+
+            for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
+            {
+              const std::string privateDt = privateProp->GetValue(t, s, true, true);
+              OFDateTime ofPrivate;
+              if (privateDt.empty() || !ParseDICOMDateTime(privateDt, ofPrivate))
+              {
+                allSlicesValid = false;
+                break;
+              }
+              const double base = DurationInSeconds(injection.first, ofPrivate);
+              if (base < 0.0)
+              {
+                // Spec's "non-negative" precondition not met for this slice.
+                allSlicesValid = false;
+                break;
+              }
+              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
+                GuardDecayDurationSeconds(base, injection.second);
+            }
+          }
+
+          if (allSlicesValid)
+          {
+            info.decayTimes = std::move(candidateMap);
+            return info;
+          }
+          // Any per-slice precondition failure -> fall through to Step 2.
+        }
+      }
+
+      // ---- Per-slice acquisition-time tags (Steps 2/3/4) ----
+      const auto* acqDateProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0022));
+      const auto* acqTimeProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0032));
+      const bool haveAcqTags = (nullptr != acqDateProp) && (nullptr != acqTimeProp);
+
+      const bool stepVendorMatches =
+           (ManufacturerFamily::Siemens == manuf)
+        || (ManufacturerFamily::GE      == manuf)
+        || (ManufacturerFamily::Philips == manuf);
+
+      // ---- Step 2: AcquisitionTime equals SeriesTime in seconds ----
+      // Spec preconditions: vendor in {Siemens, GE, Philips}, per-slice
+      // AcqTime non-negative, AcqTime equals SeriesTime in seconds. The
+      // condition is evaluated at slice 0 (single-bed scans, or first bed
+      // of multi-bed scans, per the spec).
+      if (haveAcqTags && stepVendorMatches)
+      {
+        const std::string firstAcqDate = acqDateProp->GetValue(0, 0, true, true);
+        const std::string firstAcqTime = acqTimeProp->GetValue(0, 0, true, true);
+        OFDateTime firstAcq;
+        if (ConvertDICOMDateTimeString(firstAcqDate, firstAcqTime, firstAcq)
+            && EqualAtSecondResolution(firstAcq, ofSeriesTime))
+        {
+          const auto timeSteps = data->GetTimeSteps();
+          for (TimeStepType t = 0; t < timeSteps; ++t)
+          {
+            const auto* sliced = data->GetSlicedGeometry(t);
+            const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+            auto& sliceMap = info.decayTimes[t];
+            for (unsigned int s = 0; s < slices; ++s)
+            {
+              const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
+              const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
+              OFDateTime ofAcq;
+              if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
+              {
+                mitkThrowException(InvalidDICOMPropertyValueException)
+                  << "Cannot parse acquisition Date+Time '" << acqDate << acqTime
+                  << "' at timestep " << t << " slice " << s << ".";
+              }
+              sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
+                GuardDecayDurationSeconds(
+                  DurationInSeconds(injection.first, ofAcq), injection.second);
+            }
+          }
+          return info;
+        }
+      }
+
+      // ---- Steps 3/4: vendor T_ave (Siemens/Philips) or -Δt (GE) per slice ----
+      // Both require per-slice (0008,0032) AcqTime, (0054,0x1300)
+      // FrameReferenceTime, (0018,0x1242) ActualFrameDuration, and a known
+      // half-life (for T_ave; GE needs only the half-life-independent Δt).
+      // We require all preconditions across all slices; if any slice is
+      // incomplete we fall through rather than mix per-slice formulas with
+      // a partial result.
+      const auto* frameRefProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0054, 0x1300));
+      const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
+      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
+
+      const bool isStep3 = (ManufacturerFamily::Siemens == manuf
+                         || ManufacturerFamily::Philips == manuf);
+      const bool isStep4 = (ManufacturerFamily::GE      == manuf);
+      // Step 3 needs T_ave -> half-life. Step 4 needs only -Δt.
+      const bool halfLifeOK = std::isfinite(halfLife) && halfLife > 0.0;
+      const bool step3Possible = isStep3 && halfLifeOK;
+      const bool step4Possible = isStep4;
+
+      // Steps 3 and 4 are vendor-specific empirical formulas (not derivable
+      // from the DICOM spec alone). Under Strict policy we refuse them and
+      // surface the input ambiguity so the caller can supply timing
+      // out-of-band; under Lenient policy we apply them with the
+      // benchmark-recommended formula.
+      if (haveAcqTags && (step3Possible || step4Possible)
+          && nullptr != frameRefProp && nullptr != frameDurProp
+          && DICOMReadPolicy::Strict == policy)
+      {
+        mitkThrowException(VendorEmpiricalDecayFallbackRefusedException)
+          << "DC=START Steps 1 and 2 do not apply to this input "
+             "(no vendor private decay datetime, AcquisitionTime != "
+             "SeriesTime). Steps 3 / 4 would resolve the reference time "
+             "via a vendor-specific empirical formula, but "
+             "DICOMReadPolicy::Strict is active. Re-export the data with "
+             "an unambiguous reference (vendor private datetime, or "
+             "AcquisitionTime aligned with SeriesTime), or supply timing "
+             "via --decay-time / a manual decay-time override.";
+      }
+
+      if (haveAcqTags && (step3Possible || step4Possible)
+          && nullptr != frameRefProp && nullptr != frameDurProp)
+      {
+        const auto timeSteps = data->GetTimeSteps();
+        DecayTimeMapType candidateMap;
+        bool allSlicesValid = true;
+
+        for (TimeStepType t = 0; t < timeSteps && allSlicesValid; ++t)
+        {
+          const auto* sliced = data->GetSlicedGeometry(t);
+          const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1u;
+          auto& sliceMap = candidateMap[t];
+
+          for (unsigned int s = 0; s < slices && allSlicesValid; ++s)
+          {
+            const std::string acqDate = acqDateProp->GetValue(t, s, true, true);
+            const std::string acqTime = acqTimeProp->GetValue(t, s, true, true);
+            OFDateTime ofAcq;
+            if (!ConvertDICOMDateTimeString(acqDate, acqTime, ofAcq))
+            {
+              allSlicesValid = false;
+              break;
+            }
+
+            const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+            const double frameRefMs = ReadNumericTagAt(frameRefProp, t, s);
+            // Spec preconditions: ActualFrameDuration positive,
+            // FrameReferenceTime non-negative.
+            if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0
+                || !std::isfinite(frameRefMs) || frameRefMs < 0.0)
+            {
+              allSlicesValid = false;
+              break;
+            }
+
+            // (0054,0x1300) FrameReferenceTime and (0018,0x1242)
+            // ActualFrameDuration are stored in milliseconds per DICOM.
+            const double frameDurSec = frameDurMs / 1000.0;
+            const double frameRefSec = frameRefMs / 1000.0;
+
+            // Step 3 (Siemens/Philips): t_ref = AcqTime + T_ave - FrameReferenceTime
+            // Step 4 (GE):                t_ref = AcqTime - FrameReferenceTime
+            // The -FrameReferenceTime term undoes the scanner-applied offset
+            // from the per-frame midpoint back to the start of acquisition;
+            // T_ave additionally compensates for the average count-rate time
+            // inside the frame. Without the FrameReferenceTime term, Step 3
+            // diverges from IBSI-SUV expectations by exactly that offset
+            // (verified against DRO_3_2_0 / DRO_3_2_2).
+            const double offset = step3Possible
+              ? (ComputeTAveSeconds(frameDurSec, halfLife) - frameRefSec)  // Step 3
+              : -frameRefSec;                                              // Step 4 (Δt)
+
+            const double base = DurationInSeconds(injection.first, ofAcq);
+            sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
+              GuardDecayDurationSeconds(base + offset, injection.second);
+          }
+        }
+
+        if (allSlicesValid)
+        {
+          info.decayTimes = std::move(candidateMap);
+          return info;
+        }
+      }
+
+      // ---- Step 5: spec is silent. Refuse to extend a vendor formula to
+      //              an unclassifiable input or to silently fall back to
+      //              SeriesTime.
+      mitkThrowException(AmbiguousDecayTimingException)
+        << "DC=START fallback chain exhausted: manufacturer '"
+        << mitk::GetFirstDICOMValueAsString(data, DICOMTagPath(0x0008, 0x0070))
+        << "' / available DICOM input does not match any of the "
+           "IBSI-SUV-recommended reference-time paths. Required tags for "
+           "the vendor-aware paths: Siemens (0071,0x22) / GE (0009,0x0D) "
+           "private datetime, or per-slice (0008,0032) AcquisitionTime "
+           "equal to (0008,0031) SeriesTime, or per-slice (0008,0032) + "
+           "(0054,0x1300) + (0018,0x1242). Supply --decay-time / a "
+           "manual decay-time override at the consuming layer to bypass "
+           "DICOM-derived computation.";
     }
 
     case DecayCorrectionStrategy::None:
     {
+      // Spec: voxel values of non-decay-corrected images correspond to
+      // (AcquisitionTime + T_ave); decay-correct the dose to that time
+      // point. T_ave depends on per-slice (0018,0x1242) ActualFrameDuration
+      // and the half-life. Inputs that lack these tags are rejected — the
+      // approximation (t_acq - t_inj) silently introduces a ~3 % bias for
+      // typical 5-minute frames and is precisely the bug we are fixing.
+      // Use the consuming layer's decay-time override (e.g. CLI
+      // --decay-time) for inputs whose timing must be supplied externally.
       const auto* acqDateProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0022));
       const auto* acqTimeProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0008, 0x0032));
+      const auto* frameDurProp = FindFirstDICOMProperty(data, DICOMTagPath(0x0018, 0x1242));
       if (nullptr == acqDateProp)
       {
         mitkThrowException(MissingDICOMPropertyException)
@@ -578,6 +906,23 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
         mitkThrowException(MissingDICOMPropertyException)
           << "Strategy NONE requires (0008,0032) Acquisition Time per slice. "
              "Tag is missing.";
+      }
+      if (nullptr == frameDurProp)
+      {
+        mitkThrowException(MissingDICOMPropertyException)
+          << "Strategy NONE requires (0018,0x1242) Actual Frame Duration per "
+             "slice for the IBSI-SUV-recommended T_ave correction "
+             "((t_acq + T_ave) - t_inj). Tag is missing; supply a manual "
+             "decay-time override to bypass DICOM-derived computation.";
+      }
+
+      const double halfLife = ResolveHalfLifeSeconds(data, halfLifeSeconds);
+      if (!std::isfinite(halfLife) || halfLife <= 0.0)
+      {
+        mitkThrowException(MissingDICOMPropertyException)
+          << "Strategy NONE requires a positive radionuclide half-life for "
+             "the T_ave correction. Provide it via --half-life / --nuclide "
+             "or supply DICOM (0018,1075).";
       }
 
       // Injection time is image-level; resolve once and reuse across all slices/timesteps.
@@ -603,8 +948,21 @@ mitk::DecayCorrectionInfo mitk::DeduceDecayCorrection(const mitk::SlicedData* da
               << "' at timestep " << t << " slice " << s << ".";
           }
 
+          // (0018,0x1242) ActualFrameDuration is stored in milliseconds.
+          const double frameDurMs = ReadNumericTagAt(frameDurProp, t, s);
+          if (!std::isfinite(frameDurMs) || frameDurMs <= 0.0)
+          {
+            mitkThrowException(InvalidDICOMPropertyValueException)
+              << "Strategy NONE: (0018,0x1242) Actual Frame Duration at "
+                 "timestep " << t << " slice " << s
+              << " is missing or non-positive (got " << frameDurMs << " ms).";
+          }
+          const double tAveSec = ComputeTAveSeconds(frameDurMs / 1000.0, halfLife);
+
           sliceMap[static_cast<SlicedData::IndexValueType>(s)] =
-            ComputeDecayTimeWithRolloverGuard(injection.first, ofAcq, injection.second);
+            GuardDecayDurationSeconds(
+              DurationInSeconds(injection.first, ofAcq) + tAveSec,
+              injection.second);
         }
       }
       return info;

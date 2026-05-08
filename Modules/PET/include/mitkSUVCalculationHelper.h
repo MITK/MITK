@@ -138,6 +138,90 @@ namespace mitk
   };
 
   /**
+   * \brief Strategy DC=START would have been resolved via a vendor-specific
+   *        empirical fallback (Steps 3 / 4), but the active policy is Strict.
+   *
+   * Steps 1 (vendor private decay datetime) and 2 (AcquisitionTime equals
+   * SeriesTime) reflect spec-clean reference-time information. Steps 3 / 4
+   * extend the chain with per-vendor empirical formulas (Siemens / Philips
+   * \c AcquisitionTime + T_ave - FrameReferenceTime, GE
+   * \c AcquisitionTime - FrameReferenceTime). The formulas are derived from
+   * observed scanner behavior rather than a published DICOM-level
+   * specification, so \c DICOMReadPolicy::Strict refuses to apply them and
+   * raises this exception. Callers should either obtain spec-clean input
+   * (Steps 1 / 2) or supply timing externally (e.g. CLI \c --decay-time).
+   */
+  class MITKPET_EXPORT VendorEmpiricalDecayFallbackRefusedException : public BenchmarkAdaptationRequiredException
+  {
+  public:
+    mitkExceptionClassMacro(VendorEmpiricalDecayFallbackRefusedException, BenchmarkAdaptationRequiredException);
+  };
+
+  /**
+   * \brief Tag (0054,1001) Units holds a value the SUV pipeline cannot
+   *        interpret.
+   *
+   * Raised by SUVImageFilter when (0054,1001) is present but the value is
+   * outside the documented set the pipeline supports
+   * (BQML / GML / CM2ML / CNTS with Philips private factor). The
+   * IBSI-SUV catalogue defines no recommended adaptation for unknown
+   * Units values, so the exception is raised under both
+   * DICOMReadPolicy::Lenient and DICOMReadPolicy::Strict. Callers that
+   * want to force activity-concentration semantics regardless of the
+   * tag (the legacy --ignore-units-check escape hatch) supply
+   * SUVImageFilter::SetInputModelOverride explicitly.
+   */
+  class MITKPET_EXPORT UnsupportedPETUnitsException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(UnsupportedPETUnitsException, SUVHelperException);
+  };
+
+  /**
+   * \brief (0054,1001) Units == "CNTS" and the manufacturer is Philips,
+   *        but neither of the two Philips private scale factors is
+   *        present.
+   *
+   * Philips CNTS PET data carries either a SUV-scale factor
+   * (group 7053, element 0x00 under creator "Philips PET Private Group")
+   * or an activity-scale factor (element 0x09). Without either factor
+   * the pixel values cannot be converted into SUV, so the SUV pipeline
+   * refuses the input under both policies.
+   */
+  class MITKPET_EXPORT MissingPhilipsPETScaleException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(MissingPhilipsPETScaleException, SUVHelperException);
+  };
+
+  /**
+   * \brief Ambiguous patient sex would have been resolved as the IBSI
+   *        mean of the male- and female-specific normalization, but
+   *        the active policy is Strict.
+   *
+   * Sex-specific SUV variants (LBM_Janmahasatian, LBM_James128, IBW)
+   * have publication formulas defined for Male and Female only. The
+   * IBSI-SUV benchmark recommends, for ambiguous sex, using the mean
+   * of the male- and female-specific scale numerators. "Ambiguous"
+   * covers both \c Sex::Other and the case where no patient sex was
+   * resolved at all (DICOM tag absent / unknown / no override). That
+   * adaptation is applied automatically under
+   * \c DICOMReadPolicy::Lenient (with a \c MITK_WARN). Under
+   * \c DICOMReadPolicy::Strict it is refused and this exception is
+   * raised; the caller must either supply an unambiguous patient sex
+   * via override or relax the policy.
+   *
+   * The adaptation is invoked upstream of the
+   * \c SUVNormalizationStrategy implementations, which themselves are
+   * sex-closed and accept \c Sex::Male / \c Sex::Female only.
+   */
+  class MITKPET_EXPORT AmbiguousPatientSexAdaptationRefusedException : public BenchmarkAdaptationRequiredException
+  {
+  public:
+    mitkExceptionClassMacro(AmbiguousPatientSexAdaptationRefusedException, BenchmarkAdaptationRequiredException);
+  };
+
+  /**
    * \brief Acquisition / radiopharmaceutical-injection timing cannot be reconciled.
    *
    * Raised in two situations:
@@ -186,6 +270,43 @@ namespace mitk
     Lenient,
     Strict
   };
+
+  /**
+   * \brief Manufacturer family inferred from DICOM tag (0008,0070) Manufacturer.
+   *
+   * The IBSI-SUV-conformant decay-correction pipeline branches on
+   * manufacturer family (Siemens / GE / Philips use different vendor
+   * private datetime tags or different reference-time formulas). The
+   * classification is substring-and-case-insensitive on the trimmed
+   * (0008,0070) string: typical real-world values include "SIEMENS
+   * Healthineers", "GE MEDICAL SYSTEMS", "GE HEALTHCARE", "Philips
+   * Medical Systems".
+   *
+   * \c Other covers any unrecognized or empty value. The IBSI-SUV
+   * benchmark spec is silent for these vendors; consuming strategies
+   * must surface this honestly (e.g. raise
+   * \c AmbiguousDecayTimingException) rather than silently extend a
+   * vendor-specific formula to an input we cannot classify.
+   */
+  enum class ManufacturerFamily
+  {
+    Siemens,
+    GE,
+    Philips,
+    Other
+  };
+
+  /**
+   * \brief Classify the input's (0008,0070) Manufacturer into a family.
+   *
+   * Case-insensitive substring match against trimmed
+   * (0008,0070) Manufacturer. Returns \c ManufacturerFamily::Other if
+   * the tag is missing, empty, or matches none of the recognized vendors.
+   *
+   * \param[in] provider Source of DICOM properties.
+   * \return The inferred manufacturer family.
+   */
+  ManufacturerFamily MITKPET_EXPORT GetManufacturerFamily(const mitk::IPropertyProvider* provider);
 
   /**
    * \brief Strategy describing how (or whether) the input pixel data has been
@@ -376,15 +497,60 @@ namespace mitk
    * Reads (0054,1102) Decay Correction and produces a DecayCorrectionInfo whose
    * \c decayTimes map can be plugged into the SUV functor unchanged. The
    * residual decay term then accounts only for what the scanner did NOT already
-   * apply:
-   *   - Admin: pixel data is already decay-corrected to the administration
-   *     time; the helper fills the map with 0.0 for every (timestep, slice),
-   *     so the SUV decay term collapses to 2^0 = 1.
-   *   - Start: pixel data is decay-corrected to Series Time; the helper
-   *     computes one decay duration (SeriesTime - InjectionDateTime) and
-   *     uses that same value for every (timestep, slice).
-   *   - None:  pixel data is not decay-corrected; the helper computes a
-   *     per-slice (AcquisitionDateTime - InjectionDateTime) decay duration.
+   * apply.
+   *
+   * \par DC = ADMIN
+   * Pixel data is already decay-corrected to the administration time; the
+   * helper fills the map with 0.0 for every (timestep, slice), so the SUV
+   * decay term collapses to 2^0 = 1.
+   *
+   * \par DC = START
+   * Pixel data is decay-corrected to a vendor-specific reference time. The
+   * helper applies the IBSI-SUV-recommended fallback chain in priority order;
+   * the first condition whose preconditions are met determines the result.
+   * The numbered steps below define the chain; "Step N" anywhere in the PET
+   * sources, tests, or commit messages refers back to this list.
+   *
+   * \anchor DCStartFallbackChain
+   *  -# <b>Vendor private datetime tag.</b> Siemens: (0071,0x22) "SIEMENS
+   *     MEDCOM HEADER" decay-correction datetime (lifted to property
+   *     \c mitk.pet.SiemensDecayDateTime by \c BaseDICOMReaderService);
+   *     GE: (0009,0x0D) "GEMS_PETD_01" scan datetime (lifted to
+   *     \c mitk.pet.GEScanDateTime). Used as the uniform reference time
+   *     when present and yielding a non-negative decay.
+   *  -# <b>AcquisitionTime equals SeriesTime.</b> Manufacturer in
+   *     {Siemens, GE, Philips} and (0008,0032) AcquisitionTime equals
+   *     (0008,0031) SeriesTime in seconds at slice 0: use per-slice
+   *     AcquisitionTime as the reference.
+   *  -# <b>Siemens / Philips, vendor T_ave formula.</b> Manufacturer in
+   *     {Siemens, Philips}, per-slice (0008,0032) AcquisitionTime,
+   *     (0054,0x1300) FrameReferenceTime, and (0018,0x1242)
+   *     ActualFrameDuration available: per-slice reference time =
+   *     AcquisitionTime + T_ave - FrameReferenceTime, with T_ave the
+   *     closed-form average count-rate time over the frame.
+   *  -# <b>GE, vendor -ΔFrameRef formula.</b> Manufacturer = GE, same
+   *     per-slice tags available: per-slice reference time =
+   *     AcquisitionTime - FrameReferenceTime.
+   *
+   * Steps 3 and 4 are vendor-specific empirical formulas; they fire only
+   * under \c DICOMReadPolicy::Lenient. Under \c DICOMReadPolicy::Strict
+   * they are refused and the helper raises
+   * \c VendorEmpiricalDecayFallbackRefusedException.
+   *
+   * If none of these applies — typically an "Other" manufacturer with no
+   * private datetime tag and no per-slice frame timing — the helper raises
+   * \c AmbiguousDecayTimingException rather than silently extending one of
+   * the vendor-specific formulas to an input we cannot classify.
+   *
+   * \par DC = NONE
+   * Pixel data is not decay-corrected. The voxel value is the count rate
+   * averaged over the frame, which equals the instantaneous count rate at
+   * AcquisitionTime + T_ave. The helper therefore computes per-slice decay =
+   * (AcquisitionTime + T_ave) - InjectionDateTime, where T_ave is derived
+   * from per-slice (0018,0x1242) ActualFrameDuration. Inputs that lack the
+   * frame-duration tag raise \c MissingDICOMPropertyException; \c --decay-time
+   * is the documented escape hatch for inputs whose timing must be supplied
+   * out-of-band.
    *
    * The radiopharmaceutical injection time is read from
    * (0054,0016)[*](0018,1078) Radiopharmaceutical Start DateTime if present,
@@ -393,21 +559,49 @@ namespace mitk
    * timestamp, with a 24 h rollover correction if the resulting decay would
    * be negative).
    *
-   * \param[in] data The input data. Must be a valid SlicedData instance whose
-   *            time geometry and DICOM properties are populated.
+   * \param[in] data            The input data. Must be a valid SlicedData
+   *                            instance whose time geometry and DICOM
+   *                            properties are populated.
+   * \param[in] halfLifeSeconds The radionuclide half-life in seconds, used
+   *                            for T_ave in DC=START Steps 3 and DC=NONE.
+   *                            If \c NaN (default), the helper falls back
+   *                            to item 0 of the Radiopharmaceutical
+   *                            Information Sequence — convenient for tests
+   *                            and single-tracer datasets, but multi-tracer
+   *                            callers should pass the resolved value
+   *                            explicitly.
+   * \param[in] policy          Controls whether IBSI-SUV-recommended
+   *                            empirical adaptations are applied. \c Lenient
+   *                            (default) enables DC=START Steps 3 / 4 of
+   *                            the \ref DCStartFallbackChain "DC=START
+   *                            fallback chain"; \c Strict refuses them and
+   *                            raises
+   *                            \c VendorEmpiricalDecayFallbackRefusedException
+   *                            so callers can surface the underlying input
+   *                            ambiguity.
    * \return The strategy plus a fully populated decay-time map.
    * \throw mitk::Exception if \p data is \c nullptr.
    * \throw MissingDICOMPropertyException if a DICOM property required for the
-   *        detected strategy is missing.
+   *        detected strategy is missing (including frame-timing tags for
+   *        DC=NONE).
    * \throw InvalidDICOMPropertyValueException if (0054,1102) holds an
    *        unsupported value, or if a tag value cannot be parsed.
    * \throw AmbiguousDecayTimingException if the radiopharmaceutical injection
    *        time and the acquisition / series reference time cannot be
-   *        reconciled into a non-negative decay duration within 24 h.
+   *        reconciled into a non-negative decay duration within 24 h, or if
+   *        none of the DC=START fallback conditions applies.
+   * \throw VendorEmpiricalDecayFallbackRefusedException if \p policy is
+   *        \c Strict and DC=START would have been resolved through
+   *        Step 3 or Step 4 of the \ref DCStartFallbackChain "DC=START
+   *        fallback chain" (vendor-specific empirical formula).
    *
-   * \sa GetDecayCorrectionStrategy, computeSUVbwScaleFactor, SUVbwFunctorPolicy
+   * \sa GetDecayCorrectionStrategy, GetManufacturerFamily,
+   *     computeSUVbwScaleFactor, SUVbwFunctorPolicy
    */
-  DecayCorrectionInfo MITKPET_EXPORT DeduceDecayCorrection(const mitk::SlicedData* data);
+  DecayCorrectionInfo MITKPET_EXPORT DeduceDecayCorrection(
+    const mitk::SlicedData* data,
+    double halfLifeSeconds = std::numeric_limits<double>::quiet_NaN(),
+    DICOMReadPolicy policy = DICOMReadPolicy::Lenient);
 
 }
 

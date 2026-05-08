@@ -2,5 +2,7 @@ set(MODULE_TESTS
   mitkSUVCalculationTest.cpp
   mitkSUVCalculationHelperTest.cpp
   mitkSUVFunctorPolicyTest.cpp
+  mitkSUVImageFilterTest.cpp
+  mitkSUVInputModelTest.cpp
   mitkSUVNormalizationStrategyTest.cpp
 )

@@ -5,4 +5,5 @@ set(MODULE_TESTS
   mitkSUVImageFilterTest.cpp
   mitkSUVInputModelTest.cpp
   mitkSUVNormalizationStrategyTest.cpp
+  mitkPETIBSIBenchmarkTest.cpp
 )

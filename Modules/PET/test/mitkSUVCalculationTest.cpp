@@ -66,7 +66,7 @@ public:
 
   void ScaleFactor_OneHalfLife_DoublesRatio()
   {
-    // decayTime == halfLife → 2^(-1) decay term → factor = 2 * (weight*1000/activity).
+    // decayTime == halfLife -> 2^(-1) decay term -> factor = 2 * (weight*1000/activity).
     constexpr double activity = 1.0e8;
     constexpr double weight   = 75.0;
     constexpr double halfLife = 6586.26;
@@ -109,7 +109,7 @@ public:
 
   void ScaleFactor_LargeDecay_Finite()
   {
-    // 20 half-lives — extreme but legal input. Factor blows up to ~1e6 *
+    // 20 half-lives -- extreme but legal input. Factor blows up to ~1e6 *
     // (weight*1000/activity) but must remain finite.
     constexpr double activity = 1.0e8;
     constexpr double weight   = 75.0;

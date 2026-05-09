@@ -25,7 +25,7 @@ found in the LICENSE file.
 
 namespace
 {
-  // Build a 1×1×nSlices×nTimeSteps mitk::Image with float pixels. The data
+  // Build a 1x1xnSlicesxnTimeSteps mitk::Image with float pixels. The data
   // buffer is irrelevant for these tests; only the time geometry / slice
   // count is consulted by DeduceDecayCorrection's iteration loop.
   mitk::Image::Pointer MakeSyntheticImage(unsigned int nSlices, unsigned int nTimeSteps)
@@ -163,8 +163,8 @@ class mitkSUVCalculationHelperTestSuite : public mitk::TestFixture
 private:
 
   // Most decay-correction tests share a common acquisition-day setup.
-  // Series Time 12:15:30, injection (1078) on the same day at 11:00:00 →
-  // SeriesTime − InjectionTime = (12*3600+15*60+30) − (11*3600) = 4530 s.
+  // Series Time 12:15:30, injection (1078) on the same day at 11:00:00 ->
+  // SeriesTime - InjectionTime = (12*3600+15*60+30) - (11*3600) = 4530 s.
   // After the IBSI-SUV-conformant DC=START rewrite this fixture exercises
   // Step 2 of the fallback chain: Manufacturer is set to "SIEMENS" and
   // AcquisitionDate / AcquisitionTime equal SeriesDate / SeriesTime, so
@@ -573,7 +573,7 @@ public:
   //
   // The fallback chain (IBSI-SUV recommendation) tested below in priority
   // order: Step 1 (vendor private datetime), Step 2 (AcqTime == SeriesTime),
-  // Step 3 (Siemens/Philips T_ave), Step 4 (GE -Δt), Step 5 (throw).
+  // Step 3 (Siemens/Philips T_ave), Step 4 (GE -deltat), Step 5 (throw).
 
   void Start_Step2_AcqTimeEqualsSeriesTime_UsesAcqTime_SingleTimestep()
   {
@@ -643,7 +643,7 @@ public:
 
     const auto info = mitk::DeduceDecayCorrection(image);
     // privateDT - injection = 12:00:00 - 11:00:00 = 3600 s.
-    // (Step 2 would yield 4530 s — a different number — so this assertion
+    // (Step 2 would yield 4530 s -- a different number -- so this assertion
     // verifies Step 1's precedence.)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(3600.0, info.decayTimes.at(0).at(0), 1e-3);
   }
@@ -690,7 +690,7 @@ public:
   {
     // Manufacturer Siemens, AcqTime != SeriesTime (so Step 2 doesn't fire),
     // ActualFrameDuration and FrameReferenceTime present (so Step 3 fires).
-    // SeriesTime = 12:15:30, AcqTime = 12:16:00 — differs by 30 s, hence
+    // SeriesTime = 12:15:30, AcqTime = 12:16:00 -- differs by 30 s, hence
     // not "equal in seconds" -> Step 2 declined.
     // ActualFrameDuration = 60 s -> T_ave ~= 29.984 s for 18F (T_half = 6586.26 s).
     // T_ave hand-computed via Taylor: T/2 - lambda*T^2/24 = 30 - 0.01578.
@@ -866,7 +866,7 @@ public:
     // The IBSI-SUV-conformant DC=NONE path corrects to (t_acq + T_ave),
     // so the per-slice decay duration is (t_acq + T_ave - t_inj). We set
     // ActualFrameDuration to a tiny value (1 ms) so T_ave is at most
-    // 0.5 ms — well within the 1e-3 s assertion tolerance — and the
+    // 0.5 ms -- well within the 1e-3 s assertion tolerance -- and the
     // expected per-slice durations remain the trivial (t_acq - t_inj).
     auto image = MakeSyntheticImage(/*nSlices=*/2, /*nTimeSteps=*/1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "NONE");
@@ -942,16 +942,16 @@ public:
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
     SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0032), "121530");
-    // (0018,1078) — should be used.
+    // (0018,1078) -- should be used.
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
                      "20260430110000");
-    // (0018,1072) — present but with deliberately *different* value; must be
+    // (0018,1072) -- present but with deliberately *different* value; must be
     // ignored because (0018,1078) takes precedence.
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1072), "100000");
 
     const auto info = mitk::DeduceDecayCorrection(image);
     // If 1078 wins, decay = 4530 s. If 1072 was used (with date 20260430),
-    // decay would be (12:15:30 − 10:00:00) = 8130 s.
+    // decay would be (12:15:30 - 10:00:00) = 8130 s.
     CPPUNIT_ASSERT_DOUBLES_EQUAL(kStartExpectedDecaySeconds,
                                   info.decayTimes.at(0).at(0), 1e-3);
   }
@@ -960,9 +960,9 @@ public:
   {
     // Acquisition today at 01:00:00, injection (TM-only) at 23:00:00.
     // Naive subtraction yields -22 h; rollover guard subtracts 24 h from the
-    // injection day → +2 h decay duration.
+    // injection day -> +2 h decay duration.
     // ActualFrameDuration is set to 1 ms so the +T_ave correction added
-    // by the IBSI-SUV-conformant DC=NONE path is at most 0.5 ms — well
+    // by the IBSI-SUV-conformant DC=NONE path is at most 0.5 ms -- well
     // within the 1e-3 s assertion tolerance.
     auto image = MakeSyntheticImage(1, 1);
     SetDicomProperty(image, PropName(0x0054, 0x1102), "NONE");
@@ -977,8 +977,8 @@ public:
 
   void Rollover_1078_NoSilentCorrection_Throws_AmbiguousDecayTimingException()
   {
-    // (0018,1078) is unambiguous — a negative delta must surface, not be
-    // silently corrected by ±24 h. Fixture exercises DC=START Step 2
+    // (0018,1078) is unambiguous -- a negative delta must surface, not be
+    // silently corrected by +/-24 h. Fixture exercises DC=START Step 2
     // (Manufacturer Siemens, AcqTime equals SeriesTime); the rollover
     // guard fires inside the per-slice loop when (acq - inj) is negative.
     auto image = MakeSyntheticImage(1, 1);
@@ -988,7 +988,7 @@ public:
     SetDicomProperty(image, PropName(0x0008, 0x0070), "SIEMENS");
     SetDicomProperty(image, PropName(0x0008, 0x0022), "20260430");
     SetDicomProperty(image, PropName(0x0008, 0x0032), "121530");
-    // Injection AFTER series time → negative decay.
+    // Injection AFTER series time -> negative decay.
     SetDicomProperty(image, SeqPropName(0x0054, 0x0016, 0x0018, 0x1078),
                      "20260430130000");
 

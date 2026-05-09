@@ -125,9 +125,10 @@ namespace mitk
     for (unsigned int i = 0; i < 3; ++i)
       extent[i] = (this->m_Geometry->GetGeometry()->GetExtent(i));
 
+    constexpr unsigned int kIndexLoopLimit = VImageDimension < 3 ? VImageDimension : 3;
     for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
     {
-      for (unsigned int i = 0; i < 3; ++i)
+      for (unsigned int i = 0; i < kIndexLoopLimit; ++i)
         p[i] = inputIt.GetIndex()[i];
       inputGeometry->IndexToWorld(p, p);
       ScalarType p2[4];

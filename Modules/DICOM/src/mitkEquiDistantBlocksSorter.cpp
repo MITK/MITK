@@ -595,14 +595,14 @@ mitk::EquiDistantBlocksSorter
   // update tilt info to get maximum precision
   // earlier, tilt was only calculated from first and second slice.
   // now that we know the whole range, we can re-calculate using the very first and last slice
-  if ( result->ContainsGantryTilt() && result->GetBlockDatasets().size() > 1 )
+  DICOMDatasetList blockDatasets = result->GetBlockDatasets();
+  if ( result->ContainsGantryTilt() && blockDatasets.size() > 1 )
   {
     try
     {
-      DICOMDatasetList datasets = result->GetBlockDatasets();
-      DICOMDatasetAccess* firstDataset = datasets.front();
-      DICOMDatasetAccess* lastDataset = datasets.back();
-      unsigned int numberOfSlicesApart = datasets.size() - 1;
+      DICOMDatasetAccess* firstDataset = blockDatasets.front();
+      DICOMDatasetAccess* lastDataset = blockDatasets.back();
+      unsigned int numberOfSlicesApart = blockDatasets.size() - 1;
 
       std::string orientationString = firstDataset->GetTagValueAsString( tagImageOrientation ).value;
       std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient ).value;

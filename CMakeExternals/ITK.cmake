@@ -35,7 +35,7 @@ if(NOT DEFINED ITK_DIR)
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
      GIT_REPOSITORY https://github.com/MITK/ITK.git
-     GIT_TAG b60e158fb235badc6226d06ca883e4221d8640e8 # branch: v5.4.4-patched
+     GIT_TAG 2d98b3bdbe663a03f335939696f7ec70e21603b1 # branch: v5.4.6-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

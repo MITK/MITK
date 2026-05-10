@@ -12,18 +12,20 @@
 # ============================================================================
 """Validate MxN v2.0 layout fixtures against `mxn-layout-v2.schema.json`.
 
-Used as the optional `mitkMxNLayoutSchemaLint` CTest, gated on
-`MITK_USE_Python3`. Catches drift between the schema and the in-tree
-preset / test fixtures before it lands in a release.
+Used as the `mitkMxNLayoutSchemaLint` CTest, gated on `MITK_USE_Python3`.
+The CTest fixture `mitkMxNLayoutSchemaLintSetup` provisions a dedicated
+venv with `jsonschema` installed, so the script can assume the
+dependency is present when invoked from CTest. Catches drift between the
+schema and the in-tree preset / test fixtures before it lands in a
+release.
 
 Usage:
     validate_layout_fixtures.py SCHEMA FIXTURE [FIXTURE ...]
 
 Exit codes:
-    0  - schema and all fixtures validated.
-    1  - one or more fixtures failed validation.
-    77 - `jsonschema` not importable in the configured Python environment;
-         CTest interprets this as "skipped" (see SKIP_RETURN_CODE).
+    0 - schema and all fixtures validated.
+    1 - one or more fixtures failed validation, or `jsonschema` is not
+        importable in the running interpreter.
 """
 
 from __future__ import annotations
@@ -49,12 +51,11 @@ def main(argv: list) -> int:
     except ImportError:
         print(
             "validate_layout_fixtures: 'jsonschema' is not installed in this "
-            "Python environment; skipping. Install with "
-            "`{0} -m pip install jsonschema` to enable schema linting in "
-            "ctest.".format(sys.executable),
+            "Python environment. Install with "
+            "`{0} -m pip install jsonschema` and re-run.".format(sys.executable),
             file=sys.stderr,
         )
-        return 77
+        return 1
 
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))

@@ -17,30 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPETSUVCalculationView.h"
 #include <ui_QmitkPETSUVCalculationViewControls.h>
 
-#include <iostream>
-
-#include <itkIndexedUnaryFunctorImageFilter.h>
-#include <mitkITKImageImport.h>
-#include <mitkImageCast.h>
-
-#include <mitkSUVCalculation.h>
-#include <mitkSUVFunctorPolicy.h>
+#include <mitkSUVCalculationHelper.h>
+#include <mitkSUVImageFilter.h>
+#include <mitkSUVInputModel.h>
 #include <mitkWorkbenchUtil.h>
 
 #include <mitkDICOMProperty.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkHalfLifeConstants.h>
-#include <mitkImagePixelReadAccessor.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkSUVCalculationHelper.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkMultiLabelPredicateHelper.h>
 
+#include <QCheckBox>
+#include <QDoubleSpinBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSignalBlocker>
+#include <QSpinBox>
+
+#include <sstream>
 
 const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
 
@@ -78,6 +78,37 @@ namespace
     return petInputPredicate;
   }
 
+  // Keep the human-readable label in sync with the actual decay-correction
+  // strategy detected by the filter; the previous hard-coded text was
+  // misleading whenever the input used Admin / Start / None.
+  QString StrategyToString(mitk::DecayCorrectionStrategy s)
+  {
+    using S = mitk::DecayCorrectionStrategy;
+    switch (s)
+    {
+      case S::Admin:  return QStringLiteral("Administration time (DICOM Decay Correction = ADMIN)");
+      case S::Start:  return QStringLiteral("Series start time (DICOM Decay Correction = START)");
+      case S::None:   return QStringLiteral("Per-slice acquisition time (DICOM Decay Correction = NONE)");
+      case S::Manual: return QStringLiteral("User-defined decay time");
+    }
+    return QStringLiteral("Unknown");
+  }
+
+  std::string GetBaseDataPropValueAsString(const mitk::BaseData *data, const mitk::DICOMTagPath &path)
+  {
+    std::string result;
+
+    if (data)
+    {
+      auto props = mitk::GetPropertyByDICOMTagPath(data, path);
+      if (!props.empty())
+      {
+        result = props.begin()->second->GetValueAsString();
+      }
+    }
+
+    return result;
+  }
 }
 
 void QmitkPETSUVCalculationView::SetFocus()
@@ -92,48 +123,46 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls->btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
   connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
-  // Tree view for decay times
   m_Controls->decayTimeView->setAlternatingRowColors(true);
   m_Controls->decayTimeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls->decayTimeView->setRootIsDecorated(true);
   m_Controls->decayTimeView->setSortingEnabled(false);
 
-  // Set up model and delegate
   m_decayTimeModel = std::make_unique<DecayTimeMapModel>(this);
 
   m_Controls->decayTimeView->setModel(m_decayTimeModel.get());
   m_Controls->decayTimeView->setItemDelegate(new DecayTimeDelegate(this));
 
-  // Configure tree view appearance
   m_Controls->decayTimeView->header()->setStretchLastSection(false);
   m_Controls->decayTimeView->header()->resizeSection(0, 200);
   m_Controls->decayTimeView->header()->resizeSection(1, 150);
   m_Controls->decayTimeView->header()->setDefaultSectionSize(150);
 
+  connect(m_Controls->btnCalculateSUV,  &QPushButton::clicked,        this, &QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked);
+  connect(m_Controls->btnNuclideLookup, &QPushButton::clicked,        this, &QmitkPETSUVCalculationView::OnNuclideLookupClicked);
 
+  connect(m_Controls->halflifeSpinBox,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QmitkPETSUVCalculationView::OnHalfLifeChanged);
+  connect(m_Controls->activitySpinBox,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QmitkPETSUVCalculationView::OnInjectedActivityChanged);
+  connect(m_Controls->weightSpinBox,    QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QmitkPETSUVCalculationView::OnBodyWeightChanged);
+  connect(m_Controls->timeSpinBox,      QOverload<int>::of(&QSpinBox::valueChanged),          this, &QmitkPETSUVCalculationView::OnTimeToMeasurementChanged);
 
-  connect(m_Controls->halflifeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnHalfLifeChanged(double)));
-  connect(m_Controls->activitySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnInjectedActivityChanged(double)));
-  connect(m_Controls->weightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnBodyWeightChanged(double)));
-  connect(m_Controls->timeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnTimeToMeasurementChanged(int)));
-
-  connect(m_Controls->radioTimeUser, SIGNAL(toggled(bool)), m_Controls->timeSpinBox, SLOT(setEnabled(bool)));
-  connect(m_Controls->radioTimeUser, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::UpdateWidgets);
+  connect(m_Controls->radioTimeAuto, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::OnDecayTimeRadioToggled);
+  connect(m_Controls->radioTimeUser, &QRadioButton::toggled, this, &QmitkPETSUVCalculationView::OnDecayTimeRadioToggled);
 
   connect(m_Controls->checkPETonly, &QCheckBox::toggled, this, &QmitkPETSUVCalculationView::OnCheckPETOnlyToggled);
 
   connect(m_Controls->petNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkPETSUVCalculationView::OnPETSelectionChanged);
 
+  m_Controls->radioTimeAuto->setChecked(true);
+  m_Controls->timeSpinBox->setEnabled(false);
 
   m_Controls->petNodeSelector->SetSelectionIsOptional(false);
-
-  this->m_Controls->petNodeSelector->SetInvalidInfo("Select PET image for conversion.");
-  this->m_Controls->petNodeSelector->SetEmptyInfo("Select PET image for conversion.");
-  this->m_Controls->petNodeSelector->SetPopUpTitel("Select PET image.");
-  this->m_Controls->petNodeSelector->SetPopUpHint("Select a PET image that should be the source for the SUV conversion.");
+  m_Controls->petNodeSelector->SetInvalidInfo("Select PET image for conversion.");
+  m_Controls->petNodeSelector->SetEmptyInfo("Select PET image for conversion.");
+  m_Controls->petNodeSelector->SetPopUpTitel("Select PET image.");
+  m_Controls->petNodeSelector->SetPopUpHint("Select a PET image that should be the source for the SUV conversion.");
 
   m_Controls->petNodeSelector->SetDataStorage(this->GetDataStorage());
-
   m_Controls->petNodeSelector->SetNodePredicate(GenerateSelectionPredicate(m_Controls->checkPETonly->isChecked()));
 
   // Should be done last, if everything else is configured because it triggers the autoselection of data.
@@ -149,45 +178,56 @@ void QmitkPETSUVCalculationView::OnCheckPETOnlyToggled(bool)
 
 void QmitkPETSUVCalculationView::OnInjectedActivityChanged(double value)
 {
-  if (!this->m_internalUpdate)
-  {
-    this->m_injectedActivity = value * 1000.0; // widget is [kBq], internal is [Bq]
-    this->UpdateWidgets();
-  }
+  // widget is [kBq], filter override is [Bq]
+  m_Filter->SetInjectedActivityInBq(value * 1000.0);
+  this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::OnBodyWeightChanged(double value)
 {
-  if (!this->m_internalUpdate)
-  {
-    this->m_bodyweight = value;
-    this->UpdateWidgets();
-  }
+  // widget is [kg], filter override is [g]
+  m_Filter->SetPatientWeightInGram(value * 1000.0);
+  this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::OnTimeToMeasurementChanged(int value)
 {
-  if (!this->m_internalUpdate)
+  // The override slot is only meaningful while the user has chosen the
+  // user-defined branch. When auto is active the override must stay clear
+  // so the filter falls back to the DICOM-derived per-slice values.
+  if (m_Controls->radioTimeUser->isChecked())
   {
-//    this->m_userDecayTime = value * 60; // widget is [min], internal is [sec]
-    this->UpdateWidgets();
+    m_Filter->SetDecayTimeOverrideInSec(static_cast<double>(value) * 60.0);
   }
+  this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::OnHalfLifeChanged(double value)
 {
-  if (!this->m_internalUpdate)
+  // widget is [min], filter override is [s]
+  m_Filter->SetHalfLifeInSec(value * 60.0);
+  // The auto-detected nuclide name no longer matches an arbitrary user
+  // value; clear the label so we don't claim a wrong nuclide.
+  this->m_DefinedNuclide.clear();
+  this->UpdateWidgets();
+}
+
+void QmitkPETSUVCalculationView::OnDecayTimeRadioToggled()
+{
+  if (m_Controls->radioTimeUser->isChecked())
   {
-    this->m_halfLife = value * 60; // widget is [min], internal is [sec]
-    this->m_DefinedNuclide.clear();
-    this->UpdateWidgets();
+    m_Filter->SetDecayTimeOverrideInSec(static_cast<double>(m_Controls->timeSpinBox->value()) * 60.0);
   }
+  else
+  {
+    m_Filter->ClearDecayTimeOverrideInSec();
+  }
+  this->UpdateWidgets();
 }
 
 void QmitkPETSUVCalculationView::OnNuclideLookupClicked()
 {
   QStringList items;
-
   for (const auto &nuclide : this->m_HalfLifeMap)
   {
     items << tr(nuclide.first.c_str());
@@ -199,58 +239,41 @@ void QmitkPETSUVCalculationView::OnNuclideLookupClicked()
 
   if (ok && !item.isEmpty())
   {
-    HalfLifeMapType::const_iterator finding = this->m_HalfLifeMap.find(item.toStdString());
-
+    auto finding = this->m_HalfLifeMap.find(item.toStdString());
     if (finding != this->m_HalfLifeMap.end())
     {
-      this->m_halfLife = finding->second;
+      m_Filter->SetHalfLifeInSec(finding->second);
       this->m_DefinedNuclide = finding->first;
     }
-
     this->UpdateWidgets();
   }
-}
-
-std::string GetBaseDatePropValueAsString(const mitk::BaseData *data, const mitk::DICOMTagPath &path)
-{
-  std::string result = "";
-
-  if (data)
-  {
-    auto props = mitk::GetPropertyByDICOMTagPath(data, path);
-
-    if (!props.empty())
-    {
-      result = props.begin()->second->GetValueAsString();
-    }
-  }
-
-  return result;
 }
 
 void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
 {
   auto inputNode = m_Controls->petNodeSelector->GetSelectedNode();
-  mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-  std::string nameOfResultImage = inputNode->GetName();
-  nameOfResultImage.append("_SUV");
-  resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage));
-  const auto image = dynamic_cast<mitk::Image *>(inputNode->GetData());
-
+  if (inputNode.IsNull())
+  {
+    return;
+  }
+  auto image = dynamic_cast<mitk::Image *>(inputNode->GetData());
   if (nullptr == image)
   {
     mitkThrow() << "QmitkPETSUVCalculationView is in invalid state. Selected node does not contain an mitk::Image, despite the PET node selector should enforce it.";
   }
 
-  mitk::DICOMTagPath modalityPath(0x0008, 0x0060);
-  mitk::DICOMTagPath radioActivityUnitsPath(0x0054, 0x1001);
+  // The modality / units sanity dialogs duplicate checks the filter would
+  // also perform, but they let the user opt out of a hard fail when the
+  // DICOM tags are missing or wrong. Kept until the diagnostics surface is
+  // redesigned.
+  const mitk::DICOMTagPath modalityPath(0x0008, 0x0060);
+  const mitk::DICOMTagPath unitsPath(0x0054, 0x1001);
 
-  QString modality = QString::fromStdString(GetBaseDatePropValueAsString(image, modalityPath));
-  QString unit =
-    QString::fromStdString(GetBaseDatePropValueAsString(image, radioActivityUnitsPath));
+  const QString modality = QString::fromStdString(GetBaseDataPropValueAsString(image, modalityPath));
+  const QString unit     = QString::fromStdString(GetBaseDataPropValueAsString(image, unitsPath));
 
-  bool isPET = modality.compare(QString("PT"), Qt::CaseInsensitive) == 0;
-  bool isBqMl = unit.compare(QString("BQML"), Qt::CaseInsensitive) == 0;
+  bool isPET   = modality.compare(QString("PT"), Qt::CaseInsensitive) == 0;
+  bool isBqMl  = unit.compare(QString("BQML"), Qt::CaseInsensitive) == 0;
 
   if (!isPET)
   {
@@ -258,273 +281,225 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
     box.setText("No PET data!");
     box.setInformativeText(
       "Selected data seems to be no PET data. Dicom tag \"dicom.series.Modality\" is missing or has wrong value. Won't "
-      "calculate SUV map.You may ignore and force computation at own risk.");
+      "calculate SUV map. You may ignore and force computation at own risk.");
     box.setStandardButtons(QMessageBox::Ok | QMessageBox::Ignore);
     box.setDefaultButton(QMessageBox::Ok);
     box.setIcon(QMessageBox::Warning);
-    int ret = box.exec();
-    if (ret == QMessageBox::Ignore)
+    if (box.exec() == QMessageBox::Ignore)
     {
       isPET = true;
     }
   }
-
-  if (isPET)
+  if (!isPET)
   {
-    if (!isBqMl)
-    {
-      QMessageBox box;
-      box.setText("Wrong PET unit!");
-      box.setInformativeText(
-        "Selected data seems to have no or wrong PET unit (required: BQML). Dicom tag \"dicom.series.Unit\" is missing "
-        "or has wrong value. Won't calculate SUV map. You may ignore and force computation at own risk.");
-      box.setStandardButtons(QMessageBox::Ok | QMessageBox::Ignore);
-      box.setDefaultButton(QMessageBox::Ok);
-      box.setIcon(QMessageBox::Warning);
-      int ret = box.exec();
-      if (ret == QMessageBox::Ignore)
-      {
-        isBqMl = true;
-      }
-    }
+    return;
   }
 
-  bool hasValidInputs =
-    m_injectedActivity != 0 && m_bodyweight != 0 && (/*m_userDecayTime != 0 ||*/ m_validAutoTime) && m_halfLife != 0;
-  //TODO valid input should also check user times
-  if (isPET && isBqMl && hasValidInputs)
+  if (!isBqMl)
   {
-    if (m_validAutoTime)
+    QMessageBox box;
+    box.setText("Wrong PET unit!");
+    box.setInformativeText(
+      "Selected data seems to have no or wrong PET unit (required: BQML). Dicom tag \"dicom.series.Unit\" is missing "
+      "or has wrong value. Won't calculate SUV map. You may ignore and force computation at own risk.");
+    box.setStandardButtons(QMessageBox::Ok | QMessageBox::Ignore);
+    box.setDefaultButton(QMessageBox::Ok);
+    box.setIcon(QMessageBox::Warning);
+    if (box.exec() == QMessageBox::Ignore)
     {
-      MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
-        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = automatically detected"
-        << " min; Half Life = " << m_halfLife / 60 << " min";
+      // Force activity-concentration semantics through the filter so the
+      // SUV math runs as if the input were Bq/mL. Without re-running
+      // ConfigureFromProperties the override would not take effect, since
+      // the filter already cached the effective input model.
+      mitk::SUVInputModel forced;
+      forced.semantics     = mitk::SUVPixelSemantics::ActivityConcentration;
+      forced.activityScale = 1.0;
+      m_Filter->SetInputModelOverride(forced);
+      try
+      {
+        m_Filter->ConfigureFromProperties(image);
+        m_Configured = true;
+        m_LastConfigError.clear();
+      }
+      catch (const mitk::Exception& e)
+      {
+        m_LastConfigError = e.GetDescription();
+        MITK_ERROR << "PET SUV reconfiguration after units override failed: " << e;
+        this->UpdateWidgets();
+        return;
+      }
     }
     else
     {
-      MITK_INFO << "Calculating SUV: Injected activity = " << m_injectedActivity / 1000.0
-        << " kBq; Scaled body weight = " << m_bodyweight << " kg; Time to measurement = " /*<< m_userDecayTime / 60*/
-        << " min; Half Life = " << m_halfLife / 60 << " min";
+      return;
     }
+  }
 
-    mitk::Image::Pointer imageSUV = CalcSUV(image);
+  MITK_INFO << "Calculating SUV via mitk::SUVImageFilter for node '" << inputNode->GetName() << "'.";
 
-    resultNode->SetData(imageSUV); // set data of new node
+  try
+  {
+    m_Filter->Update();
+    auto suvImage = m_Filter->GetOutput();
+
+    auto resultNode = mitk::DataNode::New();
+    resultNode->SetName(inputNode->GetName() + "_SUV");
+    resultNode->SetData(suvImage);
     this->GetDataStorage()->Add(resultNode, inputNode);
   }
-}
-
-mitk::Image::Pointer QmitkPETSUVCalculationView::CalcSUV(mitk::Image *inputImage) const
-{
-  typedef itk::Image<double, 3> ImageType;
-  typedef itk::Image<double, 3> SUVImageType;
-
-  mitk::Image::Pointer tempImage = mitk::Image::New();
-  tempImage->Initialize(inputImage);
-  tempImage->SetTimeGeometry(inputImage->GetTimeGeometry()->Clone());
-
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-  imageTimeSelector->SetInput(inputImage);
-
-  for (unsigned int i = 0; i < inputImage->GetTimeSteps(); ++i)
+  catch (const mitk::Exception& e)
   {
-    ImageType::Pointer itkImage = ImageType::New();
-
-    imageTimeSelector->SetTimeNr(i);
-    imageTimeSelector->UpdateLargestPossibleRegion();
-
-    mitk::Image::Pointer mitkInputImage = imageTimeSelector->GetOutput();
-
-    mitk::CastToItkImage(mitkInputImage, itkImage);
-
-    typedef itk::IndexedUnaryFunctorImageFilter<ImageType, SUVImageType, mitk::SUVbwFunctorPolicy> SUVFilterType;
-    SUVFilterType::Pointer suvFilter = SUVFilterType::New();
-    mitk::SUVbwFunctorPolicy functor(m_injectedActivity, m_bodyweight, m_halfLife);
-
-    if (this->m_Controls->radioTimeAuto->isChecked())
-    {
-      const auto &sliceIter = m_autoDecayTime.find(i);
-      if (sliceIter == m_autoDecayTime.cend())
-      {
-        mitkThrow() << "Error while generating SUV image. No decay time available for at least one image timestep. "
-                       "Problematic time step: "
-                    << i;
-      }
-      const auto sliceDecayMap = sliceIter->second;
-
-      mitk::SUVbwFunctorPolicy::DecayTimeFunctionType decayFunction =
-        [sliceDecayMap](const mitk::SUVbwFunctorPolicy::IndexType &sliceIndex)
-      {
-        const auto &finding = sliceDecayMap.find(sliceIndex[2]);
-        if (finding == sliceDecayMap.cend())
-        {
-          mitkThrow() << "Error while generating SUV image. No decay time available for the current slice. Problematic "
-                         "slice index:"
-                      << sliceIndex;
-        }
-
-        return finding->second;
-      };
-
-      functor.SetDecayTimeFunctor(decayFunction);
-    }
-    else
-    {
-      mitk::SUVbwFunctorPolicy::DecayTimeFunctionType decayFunction =
-        [this](const mitk::SUVbwFunctorPolicy::IndexType& /*sliceIndex*/) { throw 0;
-      return 0; };
-      functor.SetDecayTimeFunctor(decayFunction);
-    }
-
-    if (!functor.IsConfigured())
-    {
-      mitkThrow() << "Cannot compute SUV: the functor policy is not fully configured "
-                     "(injected activity, body weight, half-life, or decay-time function "
-                     "is missing). Aborting at time step " << i << ".";
-    }
-
-    suvFilter->SetFunctor(functor);
-
-    suvFilter->SetInput(itkImage);
-
-    mitk::Image::Pointer outputImage = mitk::ImportItkImage(suvFilter->GetOutput())->Clone();
-
-    mitk::ImageReadAccessor accessor(outputImage);
-    tempImage->SetVolume(accessor.GetData(), i);
+    QMessageBox::critical(m_ParentWidget, tr("SUV computation failed"),
+      QString::fromStdString(e.GetDescription()));
+    MITK_ERROR << "SUV Update() failed: " << e;
   }
-
-  mitk::Image::Pointer newImage = tempImage;
-
-  return newImage;
 }
 
 void QmitkPETSUVCalculationView::UpdateWidgets()
 {
-  if (!this->m_internalUpdate)
+  // Programmatic writes to the spinboxes would otherwise re-enter the
+  // user-edit slots and clobber state (notably m_DefinedNuclide). Block
+  // signals at the call site instead of relying on a class-wide flag.
+  const QSignalBlocker blockA(m_Controls->activitySpinBox);
+  const QSignalBlocker blockW(m_Controls->weightSpinBox);
+  const QSignalBlocker blockH(m_Controls->halflifeSpinBox);
+  const QSignalBlocker blockT(m_Controls->timeSpinBox);
+
+  if (m_Configured)
   {
-    this->m_internalUpdate = true;
+    m_Controls->activitySpinBox->setValue(m_Filter->GetEffectiveInjectedActivityInBq() / 1000.0);
+    m_Controls->weightSpinBox  ->setValue(m_Filter->GetEffectivePatientWeightInGram() / 1000.0);
+    m_Controls->halflifeSpinBox->setValue(m_Filter->GetEffectiveHalfLifeInSec() / 60.0);
+  }
+  else
+  {
+    m_Controls->activitySpinBox->setValue(0.0);
+    m_Controls->weightSpinBox  ->setValue(0.0);
+    m_Controls->halflifeSpinBox->setValue(0.0);
+  }
 
-    m_Controls->activitySpinBox->setValue(this->m_injectedActivity / 1000.0); // widget is [kBq], internal is [Bq]
+  m_Controls->timeSpinBox->setEnabled(m_Controls->radioTimeUser->isChecked());
+  if (auto override = m_Filter->GetDecayTimeOverrideInSec())
+  {
+    m_Controls->timeSpinBox->setValue(static_cast<int>(*override / 60.0));
+  }
 
-    m_Controls->weightSpinBox->setValue(this->m_bodyweight);
-
-    m_Controls->timeInfo->clear();
-    m_Controls->timeSpinBox->setEnabled(m_Controls->radioTimeUser->isChecked());
-
-    if (m_Controls->radioTimeUser->isChecked())
+  m_Controls->timeInfo->clear();
+  if (!m_LastConfigError.empty())
+  {
+    m_Controls->timeInfo->setText(
+      QString::fromStdString("Configuration error: " + m_LastConfigError));
+  }
+  else if (m_Configured)
+  {
+    const auto info = m_Filter->GetEffectiveDecayCorrection();
+    std::ostringstream stream;
+    stream << "Detection strategy: " << StrategyToString(info.strategy).toStdString() << '\n';
+    for (const auto &timePos : info.decayTimes)
     {
-      //m_Controls->timeSpinBox->setValue(this->m_userDecayTime / 60.0); // widget is [min], internal is [sec]
+      for (const auto &slicePos : timePos.second)
+      {
+        stream << '[' << timePos.first << "][" << slicePos.first
+               << "]: " << slicePos.second / 60.0 << " [min]; ";
+      }
+    }
+    m_Controls->timeInfo->setText(QString::fromStdString(stream.str()));
+  }
+
+  m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
+
+  // Refresh the tree-view contents from current state. In auto mode the
+  // model mirrors the filter's per-(timestep, slice) decay times; in
+  // user-defined mode the override is applied uniformly, so we synthesize
+  // a one-entry-per-timestep map keyed on the timesteps the filter sees.
+  // Without this rebuild the view would keep showing the auto values from
+  // the previous mode.
+  const bool userMode = m_Controls->radioTimeUser->isChecked();
+  if (m_Configured)
+  {
+    const auto info = m_Filter->GetEffectiveDecayCorrection();
+    if (userMode)
+    {
+      const double overrideSec = m_Filter->GetDecayTimeOverrideInSec().value_or(0.0);
+      mitk::DecayTimeMapType userMap;
+      for (const auto &timePos : info.decayTimes)
+      {
+        userMap[timePos.first][0] = overrideSec;
+      }
+      m_decayTimeModel->SetDecayTimeMap(userMap);
     }
     else
     {
-      if (this->m_validAutoTime)
-      {
-        std::ostringstream stream;
-        stream << "Detection strategy: Duration start time and acquisition time" << std::endl;
-
-        for (const auto &timePos : m_autoDecayTime)
-        {
-          for (const auto &slicePos : timePos.second)
-          {
-            stream << "[" << timePos.first << "][" << slicePos.first << "]: " << slicePos.second / 60.0 << " [min]; ";
-          }
-        }
-
-        m_Controls->timeInfo->setText(QString::fromStdString(stream.str()));
-      }
+      m_decayTimeModel->SetDecayTimeMap(info.decayTimes);
     }
-
-    m_Controls->halflifeSpinBox->setValue(this->m_halfLife / 60.0); // widget is [min], internal is [sec]
-
-    m_Controls->labelAutoNuclide->setText(QString::fromStdString(this->m_DefinedNuclide));
-
-    bool valid = m_Controls->petNodeSelector->GetSelectedNode().IsNotNull() && m_injectedActivity != 0 && m_bodyweight != 0 &&
-                 (/*m_userDecayTime != 0 || */ m_validAutoTime) && m_halfLife != 0;
-    m_Controls->btnCalculateSUV->setEnabled(valid);
-
-    m_decayTimeModel->SetMode(m_Controls->radioTimeAuto->isChecked() ? DecayTimeMapModel::Mode::Auto : DecayTimeMapModel::Mode::UserDefined);
-
-    this->m_internalUpdate = false;
   }
+  else
+  {
+    m_decayTimeModel->SetDecayTimeMap({});
+  }
+  m_decayTimeModel->SetMode(
+    userMode ? DecayTimeMapModel::Mode::UserDefined : DecayTimeMapModel::Mode::Auto);
+
+  const bool valid =
+    m_Configured
+    && m_LastConfigError.empty()
+    && m_Controls->petNodeSelector->GetSelectedNode().IsNotNull();
+  m_Controls->btnCalculateSUV->setEnabled(valid);
 }
 
-void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkPETSUVCalculationView::OnPETSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   m_Controls->btnCalculateSUV->setEnabled(false);
+  m_DefinedNuclide.clear();
+  m_LastConfigError.clear();
+  m_Configured = false;
+  m_decayTimeModel->SetDecayTimeMap({});
+
+  // Replace the filter rather than clearing every slot individually so
+  // overrides from a previous selection cannot bleed into the new one.
+  m_Filter = mitk::SUVImageFilter::New();
+
   auto newNode = m_Controls->petNodeSelector->GetSelectedNode();
-
-  this->m_injectedActivity = 0.;
-  this->m_bodyweight = 0.;
-  this->m_autoDecayTime.clear();
-  this->m_validAutoTime = false;
-  this->m_DecayStrategy = mitk::DecayCorrectionStrategy::None;
-  this->m_DefinedNuclide.clear();
-  this->m_halfLife = 0.;
-
-  if (newNode.IsNotNull() && this->m_Controls->checkAuto->isChecked())
+  if (newNode.IsNull())
   {
-    const auto radiopharmInfos = mitk::GetRadiopharmaceuticalInfos(newNode->GetData());
+    this->UpdateWidgets();
+    return;
+  }
+  auto image = dynamic_cast<mitk::Image *>(newNode->GetData());
+  if (nullptr == image)
+  {
+    m_LastConfigError = "Selected node does not contain an mitk::Image.";
+    this->UpdateWidgets();
+    return;
+  }
 
-    if (radiopharmInfos.empty())
-    {
-      MITK_ERROR << "Error reading radiopharmaceutical information from DICOM properties. "
-                    "Cannot deduce injected activity, half-life, or nuclide name.";
-    }
-    else
-    {
-      if (radiopharmInfos.size() > 1)
-      {
-        MITK_WARN << "Multi-tracer dataset detected (" << radiopharmInfos.size()
-                  << " radiopharmaceutical sequence items). Multi-tracer SUV is not yet "
-                     "supported; the first item will be used.";
-      }
+  m_Filter->SetInput(image);
 
-      const auto& info = radiopharmInfos.front();
-      this->m_injectedActivity = info.totalDoseBq;
-      this->m_halfLife         = info.halfLifeSeconds;
-      this->m_DefinedNuclide   = info.name;
-    }
+  try
+  {
+    m_Filter->ConfigureFromProperties(image);
+    m_Configured = true;
 
+    // Best-effort lookup of a display name for the nuclide. The half-life
+    // itself has already been resolved by the filter; failure here is
+    // cosmetic and must not invalidate the configuration.
     try
     {
-      m_bodyweight = mitk::GetPatientsWeight(newNode->GetData());
+      const auto rpis = mitk::GetRadiopharmaceuticalInfos(image);
+      if (!rpis.empty())
+      {
+        m_DefinedNuclide = rpis.front().name;
+      }
     }
-    catch (const mitk::Exception& e)
+    catch (const mitk::Exception&)
     {
-      MITK_ERROR << "Error reading patient body weight. Error details:" << e;
+      // leave m_DefinedNuclide empty
     }
-
-    if (this->m_Controls->radioTimeAuto->isChecked())
-    {
-      try
-      {
-        const auto* slicedData = dynamic_cast<const mitk::SlicedData*>(newNode->GetData());
-        const auto info = mitk::DeduceDecayCorrection(slicedData);
-        this->m_autoDecayTime = info.decayTimes;
-        this->m_DecayStrategy = info.strategy;
-        m_validAutoTime = true;
-      }
-      catch (const mitk::SUVHelperException& e)
-      {
-        m_validAutoTime = false;
-        MITK_ERROR << "Error deducing decay time (" << e.GetNameOfClass()
-                   << "). Error details: " << e;
-      }
-      catch (const mitk::Exception& e)
-      {
-        m_validAutoTime = false;
-        MITK_ERROR << "Error deducing decay time. Error details: " << e;
-      }
-    }
-    else
-    {
-      m_autoDecayTime.clear();
-      for (mitk::TimeStepType ts = 0; ts < newNode->GetData()->GetTimeSteps(); ++ts)
-      {
-        m_autoDecayTime[ts][0] = 0.;
-      }
-    }
-    m_decayTimeModel->SetDecayTimeMap(m_autoDecayTime);
+  }
+  catch (const mitk::Exception& e)
+  {
+    m_LastConfigError = e.GetDescription();
+    MITK_ERROR << "PET SUV configuration failed: " << e;
   }
 
   this->UpdateWidgets();
@@ -542,11 +517,8 @@ void QmitkPETSUVCalculationView::GenerateHalfLifeMap()
 
 QmitkPETSUVCalculationView::QmitkPETSUVCalculationView()
   : m_Controls(std::make_unique<Ui::QmitkPETSUVCalculationViewControls>()),
-    m_injectedActivity(0),
-    m_bodyweight(0),
-    m_validAutoTime(false),
-    m_halfLife(0),
-    m_internalUpdate(false)
+    m_Filter(mitk::SUVImageFilter::New()),
+    m_ParentWidget(nullptr)
 {
   GenerateHalfLifeMap();
 }

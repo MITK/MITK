@@ -29,7 +29,7 @@ namespace mitk
   class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_segmentation")
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_pet_suvcalculation")
     Q_INTERFACES(ctkPluginActivator)
 
   public:

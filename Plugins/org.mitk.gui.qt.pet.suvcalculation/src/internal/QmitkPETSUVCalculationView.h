@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 #include <mitkSUVCalculationHelper.h>
+#include <mitkSUVImageFilter.h>
 #include <memory>
 
 namespace Ui
@@ -31,13 +32,6 @@ namespace Ui
 #include <QString>
 #include <QStyledItemDelegate>
 
-/**
-* @brief Custom tree model for displaying decay time data
-*
-* This model handles both auto and user - defined modes :
-*-Auto mode : Shows hierarchical structure(time steps->slices)
-* -User - defined mode : Shows flat structure with single decay time per time step
-*/
 /**
 * @brief Custom tree model for displaying decay time data
 *
@@ -105,7 +99,7 @@ private:
 };
 
 /*!
- *	@brief Test Plugin for SUV calculations of PET images
+ *	@brief Plugin for SUV calculations of PET images.
  */
 class QmitkPETSUVCalculationView : public QmitkAbstractView
 {
@@ -128,6 +122,7 @@ protected slots:
   void OnBodyWeightChanged(double);
   void OnHalfLifeChanged(double);
   void OnTimeToMeasurementChanged(int);
+  void OnDecayTimeRadioToggled();
   void OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
 protected:
@@ -153,28 +148,27 @@ protected:
   /**Function populates the nuclide half life map.*/
   void GenerateHalfLifeMap();
 
-  mitk::Image::Pointer CalcSUV(mitk::Image *inputImage) const;
-
   // Variables
 
   /*! @brief The view's UI controls */
   std::unique_ptr<Ui::QmitkPETSUVCalculationViewControls> m_Controls;
 
 private:
-  /**Activity in Bq*/
-  double m_injectedActivity;
+  /** SUV computation backend. Holds user overrides as std::optional slots and
+   *  derives the rest from the input image's DICOM properties on selection.
+   *  Replaced (not just reset) on every selection so previous overrides do
+   *  not bleed across nodes. */
+  mitk::SUVImageFilter::Pointer m_Filter;
 
-  /**Weight in kg*/
-  double m_bodyweight;
+  /** Description of the most recent ConfigureFromProperties failure, or
+   *  empty when the filter is configured. Surfaces in the UI so the user
+   *  understands why Calculate is disabled. */
+  std::string m_LastConfigError;
 
-  /** Time between injection and image acquisition in sec. Used when defined by user and not autodetected.*/
-  bool m_validAutoTime;
-  mitk::DecayTimeMapType m_autoDecayTime;
-  /** DICOM decay-correction strategy detected on the selected node. Reset on each new selection. */
-  mitk::DecayCorrectionStrategy m_DecayStrategy = mitk::DecayCorrectionStrategy::None;
-
-  /** Half life in sec*/
-  double m_halfLife;
+  /** Mirrors m_Filter's internal "configured" state. Needed because the
+   *  GetEffective* accessors throw when called pre-configuration; reading
+   *  this flag in UpdateWidgets keeps the widget refresh exception-free. */
+  bool m_Configured = false;
 
   /**The predefined nuclide by the image data. Empty string implies no definition/custom value.*/
   std::string m_DefinedNuclide;
@@ -182,9 +176,6 @@ private:
   typedef std::map<std::string, double> HalfLifeMapType;
 
   HalfLifeMapType m_HalfLifeMap;
-
-  /** Helper flag that helps to prevent recursive triggering in the gui logic.*/
-  bool m_internalUpdate;
 
   std::unique_ptr<DecayTimeMapModel> m_decayTimeModel;
 

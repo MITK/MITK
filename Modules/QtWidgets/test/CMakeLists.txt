@@ -22,13 +22,17 @@ mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWi
 
 # Schema lint for the MxN v2 layout. Gated on MITK_USE_Python3 so the test is
 # registered only in build configurations that already provide a Python
-# interpreter. The lint runs inside a dedicated venv provisioned by a CTest
-# fixture (mitkMxNLayoutSchemaLintSetup) - this keeps the host Python
-# untouched and lets a missing 'jsonschema' surface as a hard failure on CI
-# instead of being silently skipped. When MITK_USE_Python3 is OFF the test is
-# not registered at all - the C++ tests load every fixture through
-# ApplyLayout regardless, so structural drift is still caught.
-if(MITK_USE_Python3 AND BUILD_TESTING)
+# interpreter, and additionally skipped on macOS: the lint validates a
+# JSON schema, which is OS-independent, so Linux + Windows coverage is
+# sufficient. macOS Jenkins agents have shown the bundled venv interpreter
+# aborting on launch (SIGABRT during ensurepip and on `python -c` alike),
+# which adds CI flakiness without adding signal. The lint runs inside a
+# dedicated venv provisioned by a CTest fixture (mitkMxNLayoutSchemaLintSetup)
+# - this keeps the host Python untouched and lets a missing 'jsonschema'
+# surface as a hard failure on CI instead of being silently skipped. When the
+# gate is off the test is simply not registered - the C++ tests load every
+# fixture through ApplyLayout regardless, so structural drift is still caught.
+if(MITK_USE_Python3 AND BUILD_TESTING AND NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   set(_mitk_schema_lint_venv "${CMAKE_CURRENT_BINARY_DIR}/MxNLayoutSchemaLintEnv")
   if(WIN32)
     set(_mitk_schema_lint_python "${_mitk_schema_lint_venv}/Scripts/python.exe")
@@ -70,11 +74,16 @@ if(MITK_USE_Python3 AND BUILD_TESTING)
   set_tests_properties(mitkMxNLayoutSchemaLint PROPERTIES
     LABELS "MxN;Schema"
     FIXTURES_REQUIRED MxNLayoutSchemaLintEnv)
+endif()
 
-  # Behavioural tests for the v1 -> v2 migration script. The script's
-  # self-validation covers structural drift; this unittest pins
-  # behavioural details (group naming convention, selectAll first-encounter,
-  # pre-order widget numbering, sibling-size GCD reduction, root wrapping).
+# Behavioural tests for the v1 -> v2 migration script. The script's
+# self-validation covers structural drift; this unittest pins
+# behavioural details (group naming convention, selectAll first-encounter,
+# pre-order widget numbering, sibling-size GCD reduction, root wrapping).
+# Stays cross-OS (no Linux gate) because the unittest runs against the
+# Python stdlib only and verifies code behaviour, which is worth
+# exercising on every supported platform.
+if(MITK_USE_Python3 AND BUILD_TESTING)
   add_test(
     NAME mitkMxNLayoutMigrationScriptTest
     COMMAND ${Python3_EXECUTABLE} -m unittest

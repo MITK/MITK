@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <functional>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -531,6 +532,91 @@ private:
     us::ModuleResourceStream stream(resource, std::ios::binary);
 
     return nlohmann::json::parse(stream);
+  }
+
+  /**
+   * \brief Load the REST API spec markdown from the source tree.
+   *
+   * The path is injected at build time via the MITK_REST_API_SPEC_MD_PATH
+   * compile definition (see Modules/RESTAPI/test/CMakeLists.txt). Reading the
+   * markdown lets the conformance test verify the third side of the triangle:
+   * openapi.json <-> spec MD <-> handler. Without this check, a new endpoint
+   * could land in code + openapi.json but be missing from the user-facing
+   * documentation.
+   */
+  std::string LoadSpecMarkdown() const
+  {
+#ifndef MITK_REST_API_SPEC_MD_PATH
+    mitkThrow() << "MITK_REST_API_SPEC_MD_PATH compile definition not set; "
+                << "configure target_compile_definitions in test CMakeLists.";
+#else
+    std::ifstream in(MITK_REST_API_SPEC_MD_PATH);
+    if (!in.is_open())
+    {
+      mitkThrow() << "Cannot open REST API spec MD at "
+                  << MITK_REST_API_SPEC_MD_PATH;
+    }
+    std::stringstream ss;
+    ss << in.rdbuf();
+    return ss.str();
+#endif
+  }
+
+  /**
+   * \brief Extract every (METHOD, PATH) endpoint heading from the spec MD.
+   *
+   * Recognised heading shape: `#{4,6} <METHOD> /api/v1<PATH>` where METHOD is
+   * GET / POST / PUT / PATCH / DELETE. The spec MD uses `####` for the
+   * top-level rendering endpoints and `#####` for the data-storage endpoints
+   * (which live one level deeper, under 8.2.x sub-sections); both nesting
+   * levels are accepted. Headings with a non-API path (e.g. `#### Pagination`)
+   * are filtered by the leading-method-token check.
+   *
+   * Returns a set of {path, method-lowercase} pairs to match the openapi.json
+   * key shape exactly.
+   */
+  std::set<EndpointKey> ExtractSpecMdEndpoints(const std::string& md) const
+  {
+    std::set<EndpointKey> result;
+    std::istringstream lines(md);
+    std::string line;
+    while (std::getline(lines, line))
+    {
+      // Count leading '#' characters; require 4..6 to skip 8 / 8.x headers
+      // but accept both #### (rendering) and ##### (datastorage) endpoint forms.
+      size_t hashes = 0;
+      while (hashes < line.size() && line[hashes] == '#') ++hashes;
+      if (hashes < 4 || hashes > 6) continue;
+      if (hashes >= line.size() || line[hashes] != ' ') continue;
+      const std::string rest = line.substr(hashes + 1);
+
+      // Tokenize: <METHOD> <PATH> [trailing words ignored]
+      const auto firstSpace = rest.find(' ');
+      if (firstSpace == std::string::npos) continue;
+      std::string method = rest.substr(0, firstSpace);
+      std::string pathPart = rest.substr(firstSpace + 1);
+
+      // METHOD must be uppercase HTTP verb.
+      if (method != "GET" && method != "POST" && method != "PUT" &&
+          method != "PATCH" && method != "DELETE")
+        continue;
+
+      // Trim trailing whitespace from path.
+      while (!pathPart.empty() && std::isspace(static_cast<unsigned char>(pathPart.back())))
+        pathPart.pop_back();
+
+      // Path must start with /api/v1; strip the prefix to match openapi.json keys.
+      const std::string apiPrefix = "/api/v1";
+      if (pathPart.rfind(apiPrefix, 0) != 0) continue;
+      const std::string specPath = pathPart.substr(apiPrefix.size());
+
+      // Lowercase the method to match openapi.json's shape.
+      std::string methodLower = method;
+      for (auto& c : methodLower) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+      result.emplace(specPath, methodLower);
+    }
+    return result;
   }
 
 public:

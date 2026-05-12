@@ -19,11 +19,20 @@ namespace py = pybind11;
 
 void InitDICOMTagPath(py::module_& m)
 {
-  // DICOMTag binding (needed for DICOMTagPath construction)
-  py::class_<mitk::DICOMTag>(m, "DICOMTag")
+  py::class_<mitk::DICOMTag>(m, "DICOMTag",
+    R"(A single DICOM tag identified by ``(group, element)``.
+
+DICOM tags are hexadecimal pairs identifying a data element in the DICOM
+standard, e.g. ``(0x0010, 0x0010)`` is "Patient's Name".
+)")
     .def(py::init<int, int>(),
          py::arg("group"), py::arg("element"),
-         "Create a DICOM tag from group and element numbers.")
+         R"(Construct a DICOM tag.
+
+Args:
+    group: Tag group number (typically hexadecimal, e.g. ``0x0010``).
+    element: Tag element number (typically hexadecimal, e.g. ``0x0010``).
+)")
     .def("__eq__", &mitk::DICOMTag::operator==,
          py::arg("other"),
          "Check if two DICOM tags are equal.")
@@ -40,9 +49,22 @@ void InitDICOMTagPath(py::module_& m)
                            "The DICOM tag element number.")
     ;
 
-  // DICOMTagPath binding
-  py::class_<mitk::DICOMTagPath>(m, "DICOMTagPath")
-    .def(py::init<>(), "Create an empty DICOMTagPath.")
+  py::class_<mitk::DICOMTagPath>(m, "DICOMTagPath",
+    R"(Path through nested DICOM tags.
+
+A ``DICOMTagPath`` is to :py:class:`DICOMTag` what :py:class:`PropertyKeyPath`
+is to a property name: a structured, manipulable representation. Used to
+address tags inside sequences or nested data sets.
+
+Convert to/from MITK's flat property-name form via :py:meth:`from_string`,
+:py:meth:`from_property_name`, ``str(path)``, and :py:meth:`to_property_name`.
+
+Examples:
+    >>> p = mitk.DICOMTagPath(0x0010, 0x0010)
+    >>> p.to_property_name()
+    'DICOM.0010.0010'
+)")
+    .def(py::init<>(), "Construct an empty path.")
     
     // Construction from DICOM tag
     .def(py::init([](int group, int element)

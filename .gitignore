@@ -86,6 +86,11 @@ Icon
 __pycache__/
 .pytest_cache/
 
+## Sphinx autosummary output for the mitk Python docs
+## (regenerated on every mitk_python_docs build)
+/Wrapping/Python/docs/api/generated/
+/Wrapping/Python/docs/_build/
+
 ## Claude Code
 .claude/
 CLAUDE.md

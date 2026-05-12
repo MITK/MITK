@@ -36,9 +36,19 @@ static void setPropertyHelper(mitk::PropertyList &pl, const std::string &key, py
  */
 void InitPropertyList(py::module_ &m)
 {
-  auto propertyList_class = py::class_<mitk::PropertyList, mitk::PropertyList::Pointer>(m, "PropertyList");
+  auto propertyList_class = py::class_<mitk::PropertyList, mitk::PropertyList::Pointer>(m, "PropertyList",
+    R"(Standalone, owning collection of typed properties.
 
-  propertyList_class.def(py::init([]() { return mitk::PropertyList::New(); }))
+A ``PropertyList`` is a dict-like structure that maps ``str`` keys to
+:py:class:`BaseProperty` subclass values. Unlike the property view on an
+:py:class:`Image`, every property in a ``PropertyList`` is owned (writable).
+
+The :py:attr:`properties` accessor returns a
+:py:class:`mitk.property_view.PropertyView` for ergonomic dict-style use.
+)");
+
+  propertyList_class.def(py::init([]() { return mitk::PropertyList::New(); }),
+      "Construct an empty property list.")
     .def(
       "get_property",
       [](const mitk::PropertyList &pl, const std::string &key, bool raw) -> py::object
@@ -46,44 +56,70 @@ void InitPropertyList(py::module_ &m)
         auto prop = pl.GetProperty(key);
         if (!prop)
           return py::none();
-        // raw=True preserves the old behaviour and returns the mitk.BaseProperty object.
         if (raw)
           return py::cast(prop, py::return_value_policy::reference);
         return mitk::python::propertyToPythonValue(*prop);
       },
       py::arg("key"),
       py::arg("raw") = false,
-      "Return the property value for *key*, or None if not set.\n\n"
-      "By default returns a coerced Python-native value: ``bool``, ``int``, ``float``,\n"
-      "``str``, or an ``(r, g, b)`` tuple for ColorProperty. For types without a known\n"
-      "Python equivalent the raw ``mitk.BaseProperty`` object is returned.\n\n"
-      "Pass ``raw=True`` to always get the underlying ``mitk.BaseProperty`` object.")
+      R"(Return the property value for *key*, or ``None`` if not set.
+
+By default returns a coerced Python-native value (``bool``, ``int``,
+``float``, ``str``, or ``(r, g, b)`` tuple for color properties). Pass
+``raw=True`` to always get the underlying ``mitk.BaseProperty`` object.
+
+Args:
+    key: Property name.
+    raw: Return the underlying property object instead of a coerced
+        Python value. Defaults to False.
+)")
     .def(
       "property_is_owned",
       [](const mitk::PropertyList &pl, const std::string &key)
       {
-        // PropertyList owns all its properties -- True if key exists
         return pl.GetProperty(key) != nullptr;
       },
-      py::arg("key"))
-    .def("set_property", &setPropertyHelper, py::arg("key"), py::arg("value"))
+      py::arg("key"),
+      R"(Return True if *key* exists in the list.
+
+``PropertyList`` owns every property it stores, so this is equivalent to
+``key in pl.properties``.
+)")
+    .def("set_property", &setPropertyHelper, py::arg("key"), py::arg("value"),
+      R"(Set the property *key* to *value*.
+
+The value is auto-wrapped into the appropriate ``BaseProperty`` subtype
+(see :py:meth:`mitk.Image.set_property` for the type mapping).
+)")
     .def(
       "remove_property",
       [](mitk::PropertyList &pl, const std::string &key) { pl.RemoveProperty(key); },
-      py::arg("key"))
+      py::arg("key"),
+      "Remove the property *key* if it exists.")
     .def_property_readonly("property_keys",
                            [](const mitk::PropertyList &pl)
                            {
                              auto keys = pl.GetPropertyKeys();
                              return std::vector<std::string>(keys.begin(), keys.end());
-                           })
+                           },
+                           "List of all property keys currently stored.")
     .def("to_json",
-         [](const mitk::PropertyList &pl) { return mitk::ConvertPropertyListToSelfContainedJson(&pl).dump(); })
+         [](const mitk::PropertyList &pl) { return mitk::ConvertPropertyListToSelfContainedJson(&pl).dump(); },
+         R"(Serialize this property list to a self-contained JSON string.
+
+The string carries type information for every property so the list can be
+fully reconstructed with :py:meth:`from_json`.
+)")
     .def_static(
       "from_json",
       [](const std::string &json)
       { return mitk::ConvertPropertyListFromSelfContainedJson(nlohmann::json::parse(json)); },
-      py::arg("json"))
+      py::arg("json"),
+      R"(Reconstruct a property list from JSON.
+
+Args:
+    json: JSON string produced by :py:meth:`to_json`.
+)")
     .def(
       "to_dict",
       [](const mitk::PropertyList &pl)
@@ -99,7 +135,11 @@ void InitPropertyList(py::module_ &m)
         }
         return result;
       },
-      "Serialize all properties to a Python dict keyed by property name.")
+      R"(Serialize all properties to a Python ``dict`` keyed by property name.
+
+Each value is itself a dict describing the property's type and content,
+matching the format consumed by :py:func:`property_from_dict`.
+)")
     .def_static(
       "from_dict",
       [](const py::dict &d)
@@ -121,9 +161,15 @@ void InitPropertyList(py::module_ &m)
         return pl;
       },
       py::arg("d"),
-      "Reconstruct a PropertyList from a dict produced by to_dict().");
+      R"(Reconstruct a :py:class:`PropertyList` from a dict produced by :py:meth:`to_dict`.
 
-  // Attach properties view
+Args:
+    d: Dict mapping property names to property dicts.
+
+Returns:
+    A new :py:class:`PropertyList` with the properties from *d*.
+)");
+
   propertyList_class.def_property_readonly(
     "properties",
     [](mitk::PropertyList &self)
@@ -132,5 +178,10 @@ void InitPropertyList(py::module_ &m)
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);
     },
-    py::return_value_policy::reference);
+    py::return_value_policy::reference,
+    R"(Live, mutable view of the list's properties.
+
+Returns a :py:class:`mitk.property_view.PropertyView`, a ``MutableMapping``
+suitable for dict-style access.
+)");
 }

@@ -92,52 +92,116 @@ void BindGeometryAccessors(PyClass& cls)
   // Per-time-step accessors
   cls.def("get_spacing",
     [](const CppClass& obj, mitk::TimeStepType t) { return GetSpacing(obj.GetTimeGeometry(), t); },
-    py::arg("time_step") = 0);
+    py::arg("time_step") = 0,
+    R"(Return the voxel spacing at the given time step.
+
+Args:
+    time_step: Time-step index (default 0).
+
+Returns:
+    A 3-tuple ``(sx, sy, sz)`` in world units.
+)");
   cls.def("set_spacing",
     [](CppClass& obj, const std::array<double, 3>& s, mitk::TimeStepType t) { SetSpacing(obj.GetTimeGeometry(), s, t); },
-    py::arg("spacing"), py::arg("time_step") = 0);
+    py::arg("spacing"), py::arg("time_step") = 0,
+    R"(Set the voxel spacing at the given time step.
+
+Args:
+    spacing: 3-element sequence ``(sx, sy, sz)`` in world units.
+    time_step: Time-step index (default 0).
+)");
   cls.def("get_origin",
     [](const CppClass& obj, mitk::TimeStepType t) { return GetOrigin(obj.GetTimeGeometry(), t); },
-    py::arg("time_step") = 0);
+    py::arg("time_step") = 0,
+    R"(Return the origin at the given time step.
+
+Args:
+    time_step: Time-step index (default 0).
+
+Returns:
+    A 3-tuple ``(ox, oy, oz)`` in world coordinates.
+)");
   cls.def("set_origin",
     [](CppClass& obj, const std::array<double, 3>& o, mitk::TimeStepType t) { SetOrigin(obj.GetTimeGeometry(), o, t); },
-    py::arg("origin"), py::arg("time_step") = 0);
+    py::arg("origin"), py::arg("time_step") = 0,
+    R"(Set the origin at the given time step.
+
+Args:
+    origin: 3-element sequence ``(ox, oy, oz)`` in world coordinates.
+    time_step: Time-step index (default 0).
+)");
   cls.def("get_direction",
     [](const CppClass& obj, mitk::TimeStepType t) { return GetDirection(obj.GetTimeGeometry(), t); },
-    py::arg("time_step") = 0);
+    py::arg("time_step") = 0,
+    R"(Return the direction cosine matrix at the given time step.
+
+Args:
+    time_step: Time-step index (default 0).
+
+Returns:
+    A 3x3 NumPy array of doubles.
+)");
   cls.def("set_direction",
     [](CppClass& obj, py::array_t<double, py::array::c_style | py::array::forcecast> d, mitk::TimeStepType t) {
       SetDirection(obj.GetTimeGeometry(), d, t);
     },
-    py::arg("direction"), py::arg("time_step") = 0);
+    py::arg("direction"), py::arg("time_step") = 0,
+    R"(Set the direction cosine matrix at the given time step.
+
+Args:
+    direction: 3x3 array-like (NumPy array, nested list, etc.).
+    time_step: Time-step index (default 0).
+)");
   cls.def("get_direction_cosines",
     [](const CppClass& obj, mitk::TimeStepType t) { return GetDirectionCosines(obj.GetTimeGeometry(), t); },
-    py::arg("time_step") = 0);
+    py::arg("time_step") = 0,
+    R"(Return the direction cosines as a flat 9-element tuple.
+
+Args:
+    time_step: Time-step index (default 0).
+
+Returns:
+    A 9-element sequence in row-major order.
+)");
   cls.def("get_geometry",
     [](CppClass& obj, mitk::TimeStepType t) { return GetGeometryForTimeStep(obj.GetTimeGeometry(), t); },
-    py::arg("time_step") = 0);
+    py::arg("time_step") = 0,
+    R"(Return the full :py:class:`BaseGeometry` for the given time step.
 
-  // Convenience properties (time step 0)
+Args:
+    time_step: Time-step index (default 0).
+
+Returns:
+    The spatial geometry at the requested time step.
+)");
+
   cls.def_property("spacing",
     [](const CppClass& obj) { return GetSpacing(obj.GetTimeGeometry(), 0); },
-    [](CppClass& obj, const std::array<double, 3>& s) { SetSpacing(obj.GetTimeGeometry(), s, 0); });
+    [](CppClass& obj, const std::array<double, 3>& s) { SetSpacing(obj.GetTimeGeometry(), s, 0); },
+    R"(Voxel spacing at time step 0 as a 3-tuple ``(sx, sy, sz)``.)");
   cls.def_property("origin",
     [](const CppClass& obj) { return GetOrigin(obj.GetTimeGeometry(), 0); },
-    [](CppClass& obj, const std::array<double, 3>& o) { SetOrigin(obj.GetTimeGeometry(), o, 0); });
+    [](CppClass& obj, const std::array<double, 3>& o) { SetOrigin(obj.GetTimeGeometry(), o, 0); },
+    R"(Origin at time step 0 as a 3-tuple ``(ox, oy, oz)``.)");
   cls.def_property("direction",
     [](const CppClass& obj) { return GetDirection(obj.GetTimeGeometry(), 0); },
-    [](CppClass& obj, py::array_t<double, py::array::c_style | py::array::forcecast> d) { SetDirection(obj.GetTimeGeometry(), d, 0); });
+    [](CppClass& obj, py::array_t<double, py::array::c_style | py::array::forcecast> d) { SetDirection(obj.GetTimeGeometry(), d, 0); },
+    R"(Direction cosine matrix at time step 0 as a 3x3 NumPy array.)");
   cls.def_property_readonly("direction_cosines",
-    [](const CppClass& obj) { return GetDirectionCosines(obj.GetTimeGeometry(), 0); });
+    [](const CppClass& obj) { return GetDirectionCosines(obj.GetTimeGeometry(), 0); },
+    "Direction cosines at time step 0 as a flat 9-element tuple.");
   if constexpr (BindNdim)
   {
     cls.def_property_readonly("ndim",
-      [](const CppClass& obj) { return obj.GetDimension(); });
+      [](const CppClass& obj) { return obj.GetDimension(); },
+      "Number of dimensions of the object.");
   }
   cls.def_property_readonly("time_steps",
-    [](const CppClass& obj) { return obj.GetTimeGeometry()->CountTimeSteps(); });
+    [](const CppClass& obj) { return obj.GetTimeGeometry()->CountTimeSteps(); },
+    "Number of time steps.");
   cls.def_property_readonly("time_geometry",
-    [](CppClass& obj) { return mitk::TimeGeometry::Pointer(obj.GetTimeGeometry()); });
+    [](CppClass& obj) { return mitk::TimeGeometry::Pointer(obj.GetTimeGeometry()); },
+    "The full :py:class:`TimeGeometry` of this object.");
 }
 
 #endif

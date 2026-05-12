@@ -291,19 +291,50 @@ void SaveImage(const Image* img, const std::string& path)
 
 void InitImage(py::module_& m)
 {
-  auto image_class = py::class_<Image, Image::Pointer>(m, "Image");
+  auto image_class = py::class_<Image, Image::Pointer>(m, "Image",
+    R"(N-dimensional medical image with attached geometry and properties.
+
+``mitk.Image`` wraps the C++ ``mitk::Image`` class. It stores pixel data of
+arbitrary numeric type, supports up to four dimensions (three spatial plus
+time), and carries a full geometry (spacing, origin, direction cosines)
+plus a typed property dictionary.
+
+Construction is overloaded by argument type:
+
+- ``mitk.Image()`` constructs an empty image; call :py:meth:`initialize`
+  before reading or writing pixel data.
+- ``mitk.Image(path)`` loads from disk (accepts ``str`` or ``pathlib.Path``).
+- ``mitk.Image(array, spacing=..., origin=..., direction=...)`` wraps a
+  NumPy array.
+
+Equivalent factory methods :py:meth:`from_numpy` and :py:meth:`load` are
+also available.
+)");
 
   image_class
-    // Constructor overloads. pybind11 dispatches by argument type at call time;
-    // mitk.Image is the bound C++ class, so isinstance, type hints, and IDE
-    // autocomplete all work normally.
     .def(py::init([]() { return Image::New(); }),
-      "Construct an empty image. Call initialize(...) before use.")
+      R"(Construct an empty image.
+
+The pixel buffer is not allocated until :py:meth:`initialize` is called.
+)")
     .def(py::init([](const std::filesystem::path& path) {
         return LoadImage(path.string());
       }),
       py::arg("path"),
-      "Load an image from a file path. Accepts both str and pathlib.Path.")
+      R"(Load an image from a file path.
+
+Args:
+    path: Path to an image file. Accepts ``str``, ``pathlib.Path``, or any
+        object with a ``__fspath__`` method.
+
+Raises:
+    ValueError: If the file cannot be loaded (unknown format, no reader
+        available, or the path does not exist).
+
+Examples:
+    >>> import mitk
+    >>> img = mitk.Image("input.nrrd")
+)")
     .def(py::init([](py::array array,
                      std::optional<std::array<double, 3>> spacing,
                      std::optional<std::array<double, 3>> origin,
@@ -316,26 +347,86 @@ void InitImage(py::module_& m)
       py::arg("origin") = py::none(),
       py::arg("direction") = py::none(),
       py::arg("copy") = true,
-      "Construct an image from a numpy array, optionally with "
-      "spacing/origin/direction overrides.")
+      R"(Construct an image from a NumPy array.
+
+The array is copied; the resulting image owns its buffer. The NumPy array
+is interpreted in C order (slowest-varying axis first). For 4D arrays,
+the slowest axis becomes the time dimension.
+
+Args:
+    array: NumPy array with 2, 3, or 4 dimensions. Must be of a supported
+        dtype (``uint8``, ``int8``, ``uint16``, ``int16``, ``uint32``,
+        ``int32``, ``float32``, ``float64``).
+    spacing: Optional ``(sx, sy, sz)`` voxel spacing. Defaults to
+        ``(1, 1, 1)``.
+    origin: Optional ``(ox, oy, oz)`` origin in world coordinates.
+        Defaults to ``(0, 0, 0)``.
+    direction: Optional 3x3 direction cosine matrix. Defaults to identity.
+    copy: Reserved for future zero-copy support. Must currently be True.
+
+Raises:
+    TypeError: If ``array`` is not array-like.
+    ValueError: If ``array.ndim`` is not in ``[2, 4]``, or if ``copy=False``
+        (not yet supported).
+
+Examples:
+    >>> import numpy as np
+    >>> img = mitk.Image(np.zeros((64, 64, 64), dtype=np.float32),
+    ...                  spacing=(1.0, 1.0, 2.5))
+)")
     .def("initialize",
       [](Image& img, const py::object& dtype, const std::vector<unsigned int>& dims, unsigned int channels) {
         img.Initialize(MakePixelType(dtype), static_cast<unsigned int>(dims.size()), dims.data(), channels);
       },
       py::arg("dtype"),
       py::arg("dimensions"),
-      py::arg("channels") = 1)
+      py::arg("channels") = 1,
+      R"(Initialize the image with the given pixel type and dimensions.
+
+Args:
+    dtype: NumPy dtype or any value accepted by :py:func:`make_pixel_type`
+        (for example ``"float32"``, ``numpy.float32``, or a
+        :py:class:`PixelType` instance).
+    dimensions: List of dimension sizes in MITK order ``(x, y, z[, t])``.
+    channels: Number of components per pixel. Default 1; use 3 for RGB,
+        4 for RGBA.
+
+Examples:
+    >>> img = mitk.Image()
+    >>> img.initialize("float32", [64, 64, 64])
+    >>> img.initialize("uint8", [256, 256, 32], channels=3)
+)")
     .def("initialize",
       [](Image& img, const PixelType& type, const std::vector<unsigned int>& dims, unsigned int channels) {
         img.Initialize(type, static_cast<unsigned int>(dims.size()), dims.data(), channels);
       },
       py::arg("type"),
       py::arg("dimensions"),
-      py::arg("channels") = 1)
-    .def("get_dimension", py::overload_cast<>(&Image::GetDimension, py::const_))
-    .def("get_dimension", py::overload_cast<int>(&Image::GetDimension, py::const_), py::arg("i"))
+      py::arg("channels") = 1,
+      R"(Initialize the image with a pre-built :py:class:`PixelType`.
 
-    .def_property_readonly("ndim", [](const Image& img) { return img.GetDimension(); })
+Args:
+    type: A :py:class:`PixelType` instance describing the per-pixel layout.
+    dimensions: List of dimension sizes in MITK order ``(x, y, z[, t])``.
+    channels: Number of components per pixel (default 1).
+)")
+    .def("get_dimension", py::overload_cast<>(&Image::GetDimension, py::const_),
+      R"(Return the number of dimensions of the image.
+
+Equivalent to :py:attr:`ndim`.
+)")
+    .def("get_dimension", py::overload_cast<int>(&Image::GetDimension, py::const_), py::arg("i"),
+      R"(Return the size of the *i*-th dimension.
+
+Args:
+    i: Dimension index in MITK order (0 = x, 1 = y, 2 = z, 3 = t).
+
+Returns:
+    The size of the requested dimension, in voxels.
+)")
+
+    .def_property_readonly("ndim", [](const Image& img) { return img.GetDimension(); },
+      "Number of dimensions of the image (2, 3, or 4).")
     .def_property_readonly("shape",
       [](const Image& img) {
         auto shape = ComputeNumpyShape(img);
@@ -343,11 +434,22 @@ void InitImage(py::module_& m)
         for (size_t i = 0; i < shape.size(); ++i)
           result[i] = shape[i];
         return result;
-      })
-    .def_property_readonly("dtype", [](const Image& img) { return PixelTypeToDType(img.GetPixelType()); })
-    .def_property_readonly("array", [](Image& img) { return AsNumpyDirect(img, false, 0); })
+      },
+      R"(Image shape in NumPy order.
 
-    // Numpy views: direct (unlocked) by default, accessor-backed on request.
+For a 3D scalar image of MITK dimensions ``(x, y, z)`` this returns
+``(z, y, x)``. For a multi-channel image an extra trailing axis is
+appended for the per-pixel component count.
+)")
+    .def_property_readonly("dtype", [](const Image& img) { return PixelTypeToDType(img.GetPixelType()); },
+      "NumPy dtype matching the MITK pixel type.")
+    .def_property_readonly("array", [](Image& img) { return AsNumpyDirect(img, false, 0); },
+      R"(Read-only NumPy view of the image buffer at time step 0.
+
+Zero-copy. The view pins the image alive via a smart-pointer capsule.
+Equivalent to ``img.as_numpy(writeable=False, time_step=0)``.
+)")
+
     .def("as_numpy",
       [](Image& img, bool use_accessor, bool writeable, mitk::TimeStepType time_step) {
         if (use_accessor)
@@ -357,17 +459,43 @@ void InitImage(py::module_& m)
       py::arg("use_accessor") = false,
       py::arg("writeable") = true,
       py::arg("time_step") = 0,
-      "Return a numpy view of the image. Writeable by default (numpy "
-      "convention); pass writeable=False for an explicit read-only view. "
-      "For an implicit read-only view, use img.array or "
-      "np.asarray(img). By default uses direct, unlocked access (the "
-      "numpy view pins the Image alive via a smart pointer capsule). "
-      "Pass use_accessor=True to get the legacy "
-      "ImageReadAccessor/ImageWriteAccessor-backed view, which acquires "
-      "MITK's read/write lock and releases it when the numpy array is "
-      "garbage-collected.")
+      R"(Return a NumPy view of the image buffer.
 
-    // numpy array protocol.
+Writeable by default (matching NumPy convention). For a read-only view
+pass ``writeable=False``, use :py:attr:`array`, or wrap with
+``numpy.asarray(img)``.
+
+By default the view is *direct*: zero-copy, no locking. The view pins the
+image alive via a smart-pointer capsule. Pass ``use_accessor=True`` for a
+view backed by ``ImageReadAccessor`` / ``ImageWriteAccessor``, which
+acquires MITK's read/write lock and releases it when the NumPy array is
+garbage-collected. Use the accessor-backed mode when other threads
+(typically C++) may access the image concurrently.
+
+Args:
+    use_accessor: If True, return a view backed by
+        ``ImageReadAccessor``/``ImageWriteAccessor`` (lock-acquiring).
+        Defaults to False (direct, unlocked).
+    writeable: If True, return a writable view; otherwise read-only.
+        Defaults to True.
+    time_step: Time-step index for 4D images. Ignored when
+        ``use_accessor=True``. Defaults to 0.
+
+Returns:
+    NumPy array sharing memory with the image buffer.
+
+Raises:
+    RuntimeError: If the image data cannot be accessed.
+
+Examples:
+    >>> arr = img.as_numpy()
+    >>> arr[0, 0, 0] = 1.0
+    >>> # Concurrency-safe write:
+    >>> locked = img.as_numpy(use_accessor=True, writeable=True)
+    >>> locked[5, 5, 5] = 7
+    >>> del locked  # release the write lock
+)")
+
     .def("__array__",
       [](Image& img, py::object dtype, py::object copy) {
         auto arr = AsNumpyDirect(img, false, 0);
@@ -381,9 +509,14 @@ void InitImage(py::module_& m)
         return arr;
       },
       py::arg("dtype") = py::none(),
-      py::arg("copy") = py::none())
+      py::arg("copy") = py::none(),
+      R"(NumPy array protocol hook.
 
-    // Factory class methods.
+Allows ``numpy.asarray(img)`` and ``numpy.array(img)`` to work directly on
+an image. Returns a read-only direct view by default; passes ``dtype`` and
+``copy`` through with the standard NumPy semantics.
+)")
+
     .def_static("from_numpy",
       [](py::array array,
          std::optional<std::array<double, 3>> spacing,
@@ -396,15 +529,47 @@ void InitImage(py::module_& m)
       py::arg("spacing") = py::none(),
       py::arg("origin") = py::none(),
       py::arg("direction") = py::none(),
-      py::arg("copy") = true)
+      py::arg("copy") = true,
+      R"(Construct an image from a NumPy array (explicit factory).
 
-    // Load / save shortcuts.
+Equivalent to ``mitk.Image(array, spacing=..., origin=..., direction=...,
+copy=...)``. See the array-constructor overload of :py:class:`Image` for
+argument details.
+
+Returns:
+    A new :py:class:`Image` wrapping the array contents.
+)")
+
     .def_static("load",
       [](const std::string& path) { return LoadImage(path); },
-      py::arg("path"))
+      py::arg("path"),
+      R"(Load an image from a file path (explicit factory).
+
+Equivalent to ``mitk.Image(path)``.
+
+Args:
+    path: Path to an image file.
+
+Returns:
+    The loaded image.
+
+Raises:
+    ValueError: If the file cannot be loaded.
+)")
     .def("save",
       [](const Image* img, const std::string& path) { SaveImage(img, path); },
-      py::arg("path"));
+      py::arg("path"),
+      R"(Save the image to a file.
+
+The output format is inferred from the file extension. Common formats:
+``.nrrd``, ``.nii``, ``.nii.gz``, ``.mha``, ``.mhd``, ``.dcm``.
+
+Args:
+    path: Output file path.
+
+Raises:
+    ValueError: If the image is null or the format is not writable.
+)");
 
   // IPropertyOwner methods.
   bind_property_owner(image_class);
@@ -414,7 +579,6 @@ void InitImage(py::module_& m)
   // has a numpy-compatible shape property and overloaded GetDimension().
   BindGeometryAccessors<decltype(image_class), Image, false>(image_class);
 
-  // Live properties view (delegates to PropertyView in mitk.property_view).
   image_class.def_property_readonly(
     "properties",
     [](Image& self)
@@ -423,5 +587,19 @@ void InitImage(py::module_& m)
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);
     },
-    py::return_value_policy::reference);
+    py::return_value_policy::reference,
+    R"(Live, mutable view of the image's properties.
+
+Returns a :py:class:`mitk.property_view.PropertyView`, a ``MutableMapping``
+backed by the image's underlying ``IPropertyOwner`` interface. Reading
+delegates to :py:meth:`get_property`; writing and deletion delegate to
+:py:meth:`set_property` / :py:meth:`remove_property` and may raise
+:py:class:`PropertyNotOwnedError` for provided (read-only) properties.
+
+Examples:
+    >>> img.properties["DICOM.PatientName"] = "Doe^John"
+    >>> for key in img.properties:
+    ...     print(key, img.properties[key])
+    >>> del img.properties["my.custom.key"]
+)");
 }

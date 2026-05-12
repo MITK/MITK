@@ -232,6 +232,50 @@ python Wrapping/Python/wheel/build_wheel.py --build-dir <MITK-build>
 The wheel is written to the build directory by default.
 Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocator step for debugging.
 
+## API documentation (Sphinx)
+
+Doxygen does not handle Python well: it does not understand Google-style docstrings, dataclasses, or `typing.Literal`/union hints, and its native Python rendering undersells a typed binding surface.
+For that reason, the `mitk` Python package has its own Sphinx-based documentation site, built and published independently of this C++ Doxygen site.
+
+The Python documentation lives at <https://docs.mitk.org/python/latest/>.
+It is also reachable from the "Python API" tab in the top navigation bar of this Doxygen site.
+
+### Sources
+
+The Sphinx project sits next to the bindings, in `Wrapping/Python/docs/`:
+
+- `conf.py` — Sphinx configuration (autodoc + napoleon + autosummary + autodoc-typehints + myst-parser + sphinx-copybutton + `sphinx_book_theme`).
+- `requirements.txt` — Pinned toolchain.
+- `index.md`, `installation.md`, `getting_started.md`, `user_guide/*.md`, `api/index.md` — Narrative pages and the autosummary-driven API reference.
+
+The auto-generated API reference is populated by importing the freshly-built `mitk` package and reading docstrings off the compiled pybind11 extension.
+Google-style docstrings (with `Args:` / `Returns:` / `Raises:` / `Examples:` sections) on each binding are the source of truth; keep them in sync when the bindings change.
+
+### Building the docs locally
+
+There is a dedicated CMake target:
+
+```bash
+cmake --build <build-dir> --target mitk_python_docs
+```
+
+The target depends on `mitk_python_bindings` and on first invocation auto-installs the Sphinx toolchain from `requirements.txt` into the build Python (mirroring how `mitk_python_wheel` bootstraps `delvewheel`/`auditwheel`/`delocate`).
+The HTML lands in `<build-dir>/Documentation/PythonDocs/html/`.
+
+The `-W` flag (warnings-as-errors) is passed to `sphinx-build`, so broken cross-references or missing docstrings on the public surface fail the build.
+This is the same gate the CI publishing job uses.
+
+### Publishing
+
+The Jenkins job that already builds the wheel runs `sphinx-build` against the just-built wheel and publishes the resulting HTML tree alongside the C++ Doxygen output, under the `python/` subpath of `docs.mitk.org` (so the published site is `https://docs.mitk.org/python/latest/`).
+
+### What goes where
+
+- Consumer-facing (`pip install mitk`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
+- This Doxygen page (`PythonInMITK`) is the developer-facing reference: how the wheel is built, how the C++ side embeds Python, why Standalone Python Builds, platform quirks, and so on.
+
+The two are intentionally complementary, not duplicates.
+
 ## Quirks
 
 As mentioned at the beginning, Python integration is a complex and sometimes fragile feature that can easily break in certain scenarios.

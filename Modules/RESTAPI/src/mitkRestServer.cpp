@@ -455,7 +455,26 @@ std::optional<std::string> RestServer::GetServerUrl() const
   }
 
   const std::string protocol = m_RunningConfig->httpsEnabled ? "https" : "http";
-  return protocol + "://" + m_RunningConfig->host + ":" + std::to_string(m_RunningConfig->port);
+  const std::string& host = m_RunningConfig->host;
+
+  // Wildcard binds are not directly addressable — report them as "localhost"
+  // so the URL is something a client can actually open.
+  std::string hostPart;
+  if (host == "::" || host == "0.0.0.0")
+  {
+    hostPart = "localhost";
+  }
+  else if (host.find(':') != std::string::npos)
+  {
+    // IPv6 literal — must be wrapped in brackets per RFC 3986.
+    hostPart = "[" + host + "]";
+  }
+  else
+  {
+    hostPart = host;
+  }
+
+  return protocol + "://" + hostPart + ":" + std::to_string(m_RunningConfig->port);
 }
 
 std::optional<std::string> RestServer::GetLastError() const

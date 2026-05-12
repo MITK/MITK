@@ -54,7 +54,24 @@ namespace mitk
    */
   struct MITKRESTAPI_EXPORT RestServerConfig
   {
-    std::string host = "127.0.0.1";       ///< \brief IP address or hostname to bind to.
+    /**
+     * \brief IP address or hostname to bind to.
+     *
+     * Defaults to the IPv6 wildcard address \c "::" so the server accepts
+     * both IPv6 and IPv4 (4-mapped) connections from a single socket. This
+     * avoids the ~2 s IPv6-first / IPv4-fallback latency that Windows
+     * clients otherwise pay when resolving \c localhost (which Windows
+     * orders as \c [::1, 127.0.0.1]).
+     *
+     * cpp-httplib is built with \c CPPHTTPLIB_IPV6_V6ONLY=false, so it
+     * explicitly clears \c IPV6_V6ONLY on the listening socket; this is
+     * required for dual-stack on Windows where the OS default would
+     * otherwise be v6-only.
+     *
+     * Set to \c "127.0.0.1" to pin the server to IPv4 loopback only, to a
+     * specific interface address, or to \c "0.0.0.0" for the IPv4 wildcard.
+     */
+    std::string host = "::";
     int port = 8080;                       ///< \brief TCP port to listen on.
     bool enabled = false;                  ///< \brief Whether the server should be started automatically.
     int threadPoolSize = 4;                ///< \brief Number of worker threads for handling requests.

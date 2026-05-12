@@ -263,6 +263,22 @@ bool RestServer::Start()
     // Register routes
     this->RegisterRoutes();
 
+    // The Qt workbench plugin (org.mitk.gui.qt.restapi) configures the bridge
+    // callbacks during its activation. If we reach Start() without those
+    // callbacks in place, every /rendering/editors/* request will fail with
+    // 503 RENDER_WINDOW_NOT_AVAILABLE for an opaque reason. Surface this at
+    // startup so the misconfiguration is visible in the log before the first
+    // request lands.
+    if (m_RenderWindowBridge != nullptr && !m_RenderWindowBridge->HasEditorListProvider())
+    {
+      MITK_WARN << "REST server starting without a configured RenderWindowBridge: "
+                   "all /rendering/editors/* endpoints will return 503 "
+                   "RENDER_WINDOW_NOT_AVAILABLE until the Qt workbench plugin "
+                   "'org.mitk.gui.qt.restapi' activates and wires the bridge "
+                   "callbacks. Ensure the plugin is loaded (eager activation) "
+                   "in this application.";
+    }
+
     // Record start time for uptime tracking
     m_StartTime = std::chrono::steady_clock::now();
 

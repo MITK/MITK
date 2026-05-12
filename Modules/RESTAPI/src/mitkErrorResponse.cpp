@@ -266,7 +266,7 @@ namespace mitk
     return Create(
       CODE_RENDER_WINDOW_NOT_AVAILABLE,
       "Render Window Not Available",
-      "No screenshot provider is connected. The Qt workbench plugin must be running.",
+      "No render window provider is connected. The Qt workbench plugin must be running and needed editor must be open.",
       503,
       instance);
   }

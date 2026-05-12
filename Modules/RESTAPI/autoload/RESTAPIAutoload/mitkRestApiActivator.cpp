@@ -47,6 +47,23 @@ public:
   {
     m_Context = context;
 
+    // Detect a duplicate registration. Only one autoload-module instance is
+    // expected to register IRestServerService; a second one indicates a stale
+    // RESTAPIAutoload artifact in another autoload directory on disk (e.g.,
+    // a leftover from a previous AUTOLOAD_WITH target). Two RestServer
+    // instances would silently desync the bridge wired by the Qt plugin from
+    // the server consulted by IRestServerService consumers.
+    const auto existing = context->GetServiceReferences<IRestServerService>();
+    if (!existing.empty())
+    {
+      MITK_ERROR << "Another IRestServerService is already registered before "
+                    "RestApiActivator::Load. This usually means a stale "
+                    "RESTAPIAutoload binary exists in a second autoload "
+                    "directory on disk (e.g., a leftover from a previous "
+                    "AUTOLOAD_WITH target). Locate and remove duplicate "
+                    "RESTAPIAutoload artifacts in the build/install tree.";
+    }
+
     m_RestServer = std::make_unique<RestServer>();
 
     m_RestServerRegistration = context->RegisterService<IRestServerService>(m_RestServer.get());

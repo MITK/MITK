@@ -134,35 +134,52 @@ copybutton_prompt_is_regexp = True
 # -- Sphinx event hooks ------------------------------------------------------
 
 
-def _strip_namespace_in_docstring(app, what, name, obj, options, lines):
-    """Rewrite ``mitk.mitk.*`` to ``mitk.*`` in autodoc docstring text.
+import re as _re
 
-    The compiled pybind11 extension lives at ``mitk.mitk`` (the package is
-    ``mitk`` and the extension module inside is also named ``mitk``). The
-    package ``__init__`` rewrites every class's ``__module__`` to ``"mitk"``
-    but pybind11 bakes the original ``mitk.mitk.*`` paths into the
-    auto-generated overload signatures it emits inside docstrings (the
-    ``__init__(self: mitk.mitk.X) -> None`` lines that show up under
-    "Overloaded function"). Those strings are not regenerated when
-    ``__module__`` is rewritten, so fix them here at doc-build time.
-    """
+# Strip pybind11's inner ``mitk.mitk.*`` path. The compiled extension
+# lives at ``mitk.mitk`` (the package is ``mitk`` and the extension
+# module inside is also named ``mitk``); the top-level ``mitk`` package
+# rewrites every class's ``__module__`` to ``"mitk"`` at import time,
+# but pybind11 bakes the original ``mitk.mitk.*`` paths into the
+# auto-generated overload signatures emitted inside docstrings (the
+# ``__init__(self: mitk.mitk.X) -> None`` lines that show up under
+# "Overloaded function").
+_PYBIND_NAMESPACE_RE = _re.compile(r"\bmitk\.mitk\.")
+
+# Hide private submodule paths in pure-Python subpackages. ``mitk.mxn.layout``
+# is structured as a public ``__init__.py`` that re-exports from underscored
+# helper modules (``_model``, ``_builders``, ...); the dataclasses inside
+# carry ``__module__`` values like ``mitk.mxn.layout._model``, which leaks
+# into signatures and ``Raises:`` rendering. This pattern collapses any
+# ``mitk.<pkg>._<priv>.`` reference to ``mitk.<pkg>.`` so the rendered docs
+# match the listed autosummary path.
+_PRIVATE_SUBMODULE_RE = _re.compile(r"\b(mitk(?:\.[A-Za-z0-9_]+)*)\._[A-Za-z0-9_]+\.")
+
+
+def _normalise(text):
+    text = _PYBIND_NAMESPACE_RE.sub("mitk.", text)
+    text = _PRIVATE_SUBMODULE_RE.sub(r"\1.", text)
+    return text
+
+
+def _strip_namespace_in_docstring(app, what, name, obj, options, lines):
+    """Rewrite buried namespace paths in autodoc docstring text."""
     for i, line in enumerate(lines):
-        if "mitk.mitk." in line:
-            lines[i] = line.replace("mitk.mitk.", "mitk.")
+        normalised = _normalise(line)
+        if normalised != line:
+            lines[i] = normalised
 
 
 def _strip_namespace_in_signature(app, what, name, obj, options,
                                   signature, return_annotation):
-    """Rewrite ``mitk.mitk.*`` to ``mitk.*`` in the parsed signature.
-
-    Counterpart to :func:`_strip_namespace_in_docstring` for the signature
-    line itself, which autodoc strips from ``__doc__`` before invoking
+    """Counterpart to :func:`_strip_namespace_in_docstring` for the parsed
+    signature line, which autodoc strips from ``__doc__`` before invoking
     ``autodoc-process-docstring``.
     """
-    if signature and "mitk.mitk." in signature:
-        signature = signature.replace("mitk.mitk.", "mitk.")
-    if return_annotation and "mitk.mitk." in return_annotation:
-        return_annotation = return_annotation.replace("mitk.mitk.", "mitk.")
+    if signature:
+        signature = _normalise(signature)
+    if return_annotation:
+        return_annotation = _normalise(return_annotation)
     return signature, return_annotation
 
 

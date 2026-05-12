@@ -104,3 +104,66 @@ search box (top right) to jump straight to a class or function.
    mitk.Exception
    mitk.PropertyNotOwnedError
 ```
+
+## MxN layout DSL
+
+The `mitk.mxn.layout` subpackage is a typed, transport-free Python DSL
+for constructing, inspecting, transforming, and round-tripping the
+multi-widget layout documents that drive `QmitkMxNMultiWidget`. See
+{doc}`../user_guide/mxn_layout` for the narrative tour.
+
+### Model
+
+```{eval-rst}
+.. autosummary::
+   :toctree: generated/
+
+   mitk.mxn.layout.MxNLayoutDocument
+   mitk.mxn.layout.Split
+   mitk.mxn.layout.LayoutWindow
+   mitk.mxn.layout.Group
+   mitk.mxn.layout.Link
+   mitk.mxn.layout.MxNWindowSelector
+```
+
+### Builders
+
+```{eval-rst}
+.. autosummary::
+   :toctree: generated/
+
+   mitk.mxn.layout.grid
+   mitk.mxn.layout.three_up
+   mitk.mxn.layout.two_rows_each_direction
+   mitk.mxn.layout.single_window
+```
+
+### Presets
+
+```{eval-rst}
+.. autosummary::
+   :toctree: generated/
+
+   mitk.mxn.layout.preset
+   mitk.mxn.layout.list_presets
+```
+
+### File I/O
+
+```{eval-rst}
+.. autosummary::
+   :toctree: generated/
+
+   mitk.mxn.layout.load_preset
+   mitk.mxn.layout.save_preset
+```
+
+### Vocabulary
+
+```{eval-rst}
+.. autosummary::
+   :toctree: generated/
+
+   mitk.mxn.layout.LinkDimension
+   mitk.mxn.layout.ViewDirection
+```

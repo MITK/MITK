@@ -43,6 +43,7 @@ user_guide/images
 user_guide/geometry
 user_guide/io
 user_guide/properties
+user_guide/mxn_layout
 ```
 
 ```{toctree}

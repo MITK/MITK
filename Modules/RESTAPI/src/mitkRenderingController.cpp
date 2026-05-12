@@ -1737,7 +1737,7 @@ void RenderingController::HandlePUT_mxnLayout(const httplib::Request& req, httpl
   // would drift. nlohmann::parse failures surface as 400.
   try
   {
-    (void)nlohmann::json::parse(req.body);
+    [[maybe_unused]] const auto parsed = nlohmann::json::parse(req.body);
   }
   catch (const nlohmann::json::exception& e)
   {

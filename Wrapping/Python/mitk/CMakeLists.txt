@@ -114,6 +114,10 @@ add_custom_target(mitk_mxn_layout_staged
                   DEPENDS ${_mitk_layout_staged_files})
 add_dependencies(mitk_python_bindings mitk_mxn_layout_staged)
 
+set_target_properties(mitk_mxn_layout_staged PROPERTIES
+  FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
+)
+
 # The DSL examples are smoke-tested as part of the `mitkPythonBindingsTest`
 # pytest suite (see `Modules/Python/test/pytest/test_layout/
 # test_examples_smoke.py`). That suite runs inside the C++ test driver, which

@@ -368,6 +368,7 @@ class Split:
         *children: "Split | LayoutWindow",
         size: int = 1,
     ) -> Split:
+        """Build a left-to-right split from a vararg of child nodes."""
         return cls(orientation="horizontal", children=tuple(children), size=size)
 
     @classmethod
@@ -376,6 +377,7 @@ class Split:
         *children: "Split | LayoutWindow",
         size: int = 1,
     ) -> Split:
+        """Build a top-to-bottom split from a vararg of child nodes."""
         return cls(orientation="vertical", children=tuple(children), size=size)
 
     # ---- tree iteration (pre-order) -------------------------------------
@@ -400,6 +402,9 @@ class Split:
                 yield from child.splits()
 
     def find_window(self, id: str) -> LayoutWindow | None:
+        """Return the leaf window with the given id, or ``None`` if no
+        such window exists in this subtree.
+        """
         for window in self.windows():
             if window.id == id:
                 return window
@@ -409,6 +414,10 @@ class Split:
 
     @property
     def select_windows(self) -> "MxNWindowSelector[Split]":
+        """Entry point for the fluent
+        :class:`MxNWindowSelector` filter and bulk-transform API rooted at
+        this subtree.
+        """
         from ._selector import MxNWindowSelector
 
         return MxNWindowSelector(self)
@@ -565,16 +574,26 @@ class MxNLayoutDocument:
         return MappingProxyType(dict(self._groups))
 
     def windows(self) -> Iterator[LayoutWindow]:
+        """Pre-order iterator over every leaf window in the document."""
         return self.root.windows()
 
     def window_ids(self) -> list[str]:
+        """Pre-order list of window ids (the routing identities)."""
         return self.root.window_ids()
 
     def find_window(self, id: str) -> LayoutWindow | None:
+        """Return the leaf window with the given id, or ``None`` if the
+        document does not contain one.
+        """
         return self.root.find_window(id)
 
     @property
     def select_windows(self) -> "MxNWindowSelector[MxNLayoutDocument]":
+        """Entry point for the fluent
+        :class:`MxNWindowSelector` filter and bulk-transform API. Selector
+        terminals return a fresh :class:`MxNLayoutDocument` (the original
+        is left untouched).
+        """
         from ._selector import MxNWindowSelector
 
         return MxNWindowSelector(self)

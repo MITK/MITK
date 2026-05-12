@@ -24,9 +24,14 @@ Field mapping highlights:
   is mapped to the v2 group label `'main'` for index 1 and `'g_<N>'`
   otherwise. Per-cell `selectAll` is folded into the group's `select_all`
   property (first-encounter wins).
+- Window ids are emitted in the v2 canonical fully-qualified form
+  `<editor_name>__widget<i>` (default editor name `mxn`, override with
+  `--editor-name`). v1 layouts had no stable per-cell identity worth
+  preserving, so `<i>` is the leaf's pre-order traversal index.
 
 Usage:
-    migrate-mxn-layout-v1-to-v2.py INPUT [-o OUTPUT] [--schema SCHEMA]
+    migrate-mxn-layout-v1-to-v2.py INPUT [-o OUTPUT] [--editor-name NAME]
+                                         [--schema SCHEMA]
 
 If `--schema` is omitted, the v2 schema is loaded from a file called
 `mxn-layout-v2.schema.json` next to this script. When `jsonschema` is
@@ -40,9 +45,55 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 import sys
+from functools import reduce
 from pathlib import Path
 from typing import Any
+
+
+# Default `multiWidgetName` from `QmitkMxNMultiWidget`. Override with
+# `--editor-name` for non-default editor instances.
+DEFAULT_EDITOR_NAME = "mxn"
+
+NAMESPACE_DELIMITER = "__"
+
+# Editor-name shape mirrors `EDITOR_NAME_PATTERN` in QmitkMxNMultiWidget.cpp;
+# the no-`_` rule keeps the first-`__` split between editor-name and bare-id
+# segments unambiguous.
+_EDITOR_NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9.-]*$")
+
+
+def _qualified_id(bare_id: str, editor_name: str = DEFAULT_EDITOR_NAME) -> str:
+    """Build the canonical qualified id `<editor_name>__<bare_id>`."""
+    return f"{editor_name}{NAMESPACE_DELIMITER}{bare_id}"
+
+
+def _normalize_sibling_sizes(children: list) -> None:
+    """Reduce explicit `size` values across siblings by their GCD, in place.
+
+    v1 commonly carries pixel-derived sizes (e.g. `403`, `807`) taken from a
+    screenshot. v2 splitter weights are ratios, so reducing by GCD aligns the
+    output with the schema's "prefer small numbers" guidance:
+    `[403, 403, 403]` becomes `[1, 1, 1]`, `[200, 400]` becomes `[1, 2]`.
+    Children that reduce to 1 drop the field, matching the v2 default weight.
+
+    Mixed-define sibling lists (some explicit, some omitted) are left alone
+    because the explicit-vs-default pattern is meaningful in v2.
+    """
+    if not children or not all("size" in c for c in children):
+        return
+    sizes = [int(c["size"]) for c in children]
+    g = reduce(math.gcd, sizes)
+    if g <= 0:
+        return
+    for child, size in zip(children, sizes):
+        reduced = size // g
+        if reduced == 1:
+            del child["size"]
+        else:
+            child["size"] = reduced
 
 
 def _group_label(group_int: int) -> str:
@@ -84,12 +135,15 @@ def _convert_node(
     path: str,
     widget_counter: list,
     group_select_all: dict,
+    editor_name: str,
 ) -> dict:
     """Recursively convert a v1 node to a v2 node.
 
     `widget_counter` is a single-element list used as a mutable integer counter
     (pre-order index across the whole tree); `group_select_all` records the
     `selectAll` state for each group encountered (first-encounter wins).
+    `editor_name` becomes the `<editor_name>` segment of every emitted
+    qualified id.
     """
     if not isinstance(node, dict):
         raise ValueError(f"v1 node at {path} is not an object: {node!r}")
@@ -124,10 +178,12 @@ def _convert_node(
 
         out: dict = {
             "type": "window",
-            "name": f"widget{idx}",
+            "id": _qualified_id(f"widget{idx}", editor_name),
             "view_direction": view_direction,
             "links": {"selection": group_name},
         }
+        # The optional v2 `name` (free-form display label) has no v1 source;
+        # we deliberately do not synthesize one. Hand-author after migration.
         # `size` is optional in v2; the loader defaults to 1 when omitted.
         # Only the ratio between siblings matters at runtime, so a v1 source
         # that omitted `size` becomes a v2 output that also omits it.
@@ -152,21 +208,33 @@ def _convert_node(
                 path=f"{path}/content[{i}]",
                 widget_counter=widget_counter,
                 group_select_all=group_select_all,
+                editor_name=editor_name,
             )
             for i, child in enumerate(children_raw)
         ],
     }
-    # `size` is optional in v2 (default weight 1). Pass through if the v1
-    # source had one; otherwise let the v2 loader's default apply.
+    _normalize_sibling_sizes(out_split["children"])
     if "size" in node:
         out_split["size"] = int(node["size"])
     return out_split
 
 
-def migrate(v1_doc: dict) -> dict:
-    """Convert a parsed v1.x layout document to a v2.0 document."""
+def migrate(v1_doc: dict, *, editor_name: str = DEFAULT_EDITOR_NAME) -> dict:
+    """Convert a parsed v1.x layout document to a v2.0 document.
+
+    `editor_name` becomes the `<editor_name>` segment of every emitted
+    qualified id and must match the loading editor's `multiWidgetName`
+    (default `mxn`).
+    """
     if not isinstance(v1_doc, dict):
         raise ValueError("v1 document must be a JSON object at the top level.")
+
+    if not _EDITOR_NAME_PATTERN.match(editor_name):
+        raise ValueError(
+            f"editor name {editor_name!r} does not match {_EDITOR_NAME_PATTERN.pattern!r}: "
+            f"editor names must start with a letter, contain no '_', and use only "
+            f"the alphabet [A-Za-z0-9.-]."
+        )
 
     version = str(v1_doc.get("version", ""))
     if not version.startswith("1."):
@@ -182,7 +250,16 @@ def migrate(v1_doc: dict) -> dict:
         path="$",
         widget_counter=widget_counter,
         group_select_all=group_select_all,
+        editor_name=editor_name,
     )
+    # The v2 schema requires `root` to be a `split`. Wrap a v1 single-window
+    # root so the output validates without forcing the user to hand-edit it.
+    if root.get("type") == "window":
+        root = {
+            "type": "split",
+            "orientation": "horizontal",
+            "children": [root],
+        }
     # Strip a 'size' from the root - the v2 schema's root has no parent.
     root.pop("size", None)
 
@@ -251,6 +328,15 @@ def main(argv: list) -> int:
         help="Output path for the v2.0 document; stdout if omitted.",
     )
     parser.add_argument(
+        "--editor-name",
+        default=DEFAULT_EDITOR_NAME,
+        help=(
+            "MxN editor name to embed in the qualified id of every window "
+            f"(default {DEFAULT_EDITOR_NAME!r}). Must match the loading editor's "
+            "`multiWidgetName`."
+        ),
+    )
+    parser.add_argument(
         "--schema",
         type=Path,
         default=Path(__file__).resolve().parent / "mxn-layout-v2.schema.json",
@@ -272,7 +358,7 @@ def main(argv: list) -> int:
         return 1
 
     try:
-        v2_doc = migrate(v1_doc)
+        v2_doc = migrate(v1_doc, editor_name=args.editor_name)
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2

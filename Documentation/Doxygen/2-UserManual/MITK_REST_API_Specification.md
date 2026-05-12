@@ -1,7 +1,7 @@
 # MITK Workbench REST API Specification {#MITKRESTAPISpec}
 
-**Document Version:** 1.1
-**Date:** February 21, 2026
+**Version:** 1.2.0
+**Date:** May 2, 2026
 
 ---
 

@@ -50,8 +50,10 @@ public:
   * \brief Construct a render-window widget.
   *
   * \param parent       Owning Qt parent. Must not be null.
-  * \param widgetName   Qualified name registered with the rendering manager
-  *                     (typically '<editorName>.<bareName>'). Must not be empty.
+  * \param widgetName   Canonical name registered with the rendering manager
+  *                     (e.g. 'stdmulti.axial' for StdMulti, or 'mxn__widget0'
+  *                     for MxN; the editor that owns this widget chooses the
+  *                     convention). Must not be empty.
   * \param dataStorage  Data storage backing the render window. Must not be null;
   *                     the widget unconditionally talks to it during 'InitializeGUI'.
   *
@@ -71,6 +73,18 @@ public:
   const QString& GetWidgetName() const { return m_WidgetName; };
   QmitkRenderWindow* GetRenderWindow() const { return m_RenderWindow; };
 
+  /**
+  * \brief Optional human-readable display label.
+  *
+  *   Persisted as the optional `name` field of the corresponding window leaf
+  *   in the v2 layout document; empty when the layout omits that field. Pure
+  *   metadata: not used for routing, addressing, persisted-state keying, or
+  *   REST URL construction (those all use the bare widget id, derivable from
+  *   `GetWidgetName` via the editor-prefix strip).
+  */
+  const QString& GetDisplayName() const { return m_DisplayName; };
+  void SetDisplayName(const QString& displayName) { m_DisplayName = displayName; };
+
   mitk::SliceNavigationController* GetSliceNavigationController() const;
 
   void RequestUpdate();
@@ -78,6 +92,7 @@ public:
 
   void AddUtilityWidget(QWidget* utilityWidget);
   QmitkRenderWindowUtilityWidget* GetUtilityWidget();
+  const QmitkRenderWindowUtilityWidget* GetUtilityWidget() const;
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -121,6 +136,7 @@ private:
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
+  QString m_DisplayName;
   QVBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;

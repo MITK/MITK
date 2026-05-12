@@ -35,6 +35,7 @@ found in the LICENSE file.
 #include <functional>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -114,6 +115,11 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(ErrorResponseContainsInstancePath);
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
+
+  // Category 7: Spec MD <-> openapi.json triangle
+  MITK_TEST(EveryOpenApiEndpointIsDocumentedInSpecMd);
+  MITK_TEST(SpecMdMajorVersionMatchesOpenApi);
+  MITK_TEST(EverySpecMdEndpointIsInOpenApi);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -531,6 +537,91 @@ private:
     us::ModuleResourceStream stream(resource, std::ios::binary);
 
     return nlohmann::json::parse(stream);
+  }
+
+  /**
+   * \brief Load the REST API spec markdown from the source tree.
+   *
+   * The path is injected at build time via the MITK_REST_API_SPEC_MD_PATH
+   * compile definition (see Modules/RESTAPI/test/CMakeLists.txt). Reading the
+   * markdown lets the conformance test verify the third side of the triangle:
+   * openapi.json <-> spec MD <-> handler. Without this check, a new endpoint
+   * could land in code + openapi.json but be missing from the user-facing
+   * documentation.
+   */
+  std::string LoadSpecMarkdown() const
+  {
+#ifndef MITK_REST_API_SPEC_MD_PATH
+    mitkThrow() << "MITK_REST_API_SPEC_MD_PATH compile definition not set; "
+                << "configure target_compile_definitions in test CMakeLists.";
+#else
+    std::ifstream in(MITK_REST_API_SPEC_MD_PATH);
+    if (!in.is_open())
+    {
+      mitkThrow() << "Cannot open REST API spec MD at "
+                  << MITK_REST_API_SPEC_MD_PATH;
+    }
+    std::stringstream ss;
+    ss << in.rdbuf();
+    return ss.str();
+#endif
+  }
+
+  /**
+   * \brief Extract every (METHOD, PATH) endpoint heading from the spec MD.
+   *
+   * Recognised heading shape: `#{4,6} <METHOD> /api/v1<PATH>` where METHOD is
+   * GET / POST / PUT / PATCH / DELETE. The spec MD uses `####` for the
+   * top-level rendering endpoints and `#####` for the data-storage endpoints
+   * (which live one level deeper, under 8.2.x sub-sections); both nesting
+   * levels are accepted. Headings with a non-API path (e.g. `#### Pagination`)
+   * are filtered by the leading-method-token check.
+   *
+   * Returns a set of {path, method-lowercase} pairs to match the openapi.json
+   * key shape exactly.
+   */
+  std::set<EndpointKey> ExtractSpecMdEndpoints(const std::string& md) const
+  {
+    std::set<EndpointKey> result;
+    std::istringstream lines(md);
+    std::string line;
+    while (std::getline(lines, line))
+    {
+      // Count leading '#' characters; require 4..6 to skip 8 / 8.x headers
+      // but accept both #### (rendering) and ##### (datastorage) endpoint forms.
+      size_t hashes = 0;
+      while (hashes < line.size() && line[hashes] == '#') ++hashes;
+      if (hashes < 4 || hashes > 6) continue;
+      if (hashes >= line.size() || line[hashes] != ' ') continue;
+      const std::string rest = line.substr(hashes + 1);
+
+      // Tokenize: <METHOD> <PATH> [trailing words ignored]
+      const auto firstSpace = rest.find(' ');
+      if (firstSpace == std::string::npos) continue;
+      std::string method = rest.substr(0, firstSpace);
+      std::string pathPart = rest.substr(firstSpace + 1);
+
+      // METHOD must be uppercase HTTP verb.
+      if (method != "GET" && method != "POST" && method != "PUT" &&
+          method != "PATCH" && method != "DELETE")
+        continue;
+
+      // Trim trailing whitespace from path.
+      while (!pathPart.empty() && std::isspace(static_cast<unsigned char>(pathPart.back())))
+        pathPart.pop_back();
+
+      // Path must start with /api/v1; strip the prefix to match openapi.json keys.
+      const std::string apiPrefix = "/api/v1";
+      if (pathPart.rfind(apiPrefix, 0) != 0) continue;
+      const std::string specPath = pathPart.substr(apiPrefix.size());
+
+      // Lowercase the method to match openapi.json's shape.
+      std::string methodLower = method;
+      for (auto& c : methodLower) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+      result.emplace(specPath, methodLower);
+    }
+    return result;
   }
 
 public:
@@ -1382,6 +1473,96 @@ public:
       json["meta"].contains("parent_uid"));
     CPPUNIT_ASSERT_EQUAL(parentUid,
       json["meta"]["parent_uid"].get<std::string>());
+  }
+
+  // ==========================================
+  // Category 7: Spec MD <-> openapi.json triangle
+  // ==========================================
+
+  void EveryOpenApiEndpointIsDocumentedInSpecMd()
+  {
+    // For every (path, method) in openapi.json, the spec MD must have a
+    // matching `#### <METHOD> /api/v1<PATH>` heading. Drift in either direction
+    // means a user reading the spec MD sees a different surface than the
+    // implementation actually exposes.
+    const auto md = this->LoadSpecMarkdown();
+    const auto specMdEndpoints = this->ExtractSpecMdEndpoints(md);
+
+    for (const auto& [path, pathItem] : m_Spec["paths"].items())
+    {
+      for (const auto& [method, operation] : pathItem.items())
+      {
+        // Spec MD does not (yet) document a few openapi entries that are
+        // discovery / aliases, not first-class user-facing API:
+        //   /              -- alias for /info
+        //   /docs          -- Swagger UI redirect
+        //   /openapi.json  -- the OpenAPI spec itself
+        // If you add user-facing detail for any of these later, drop the skip.
+        if (path == "/" || path == "/docs" || path == "/openapi.json")
+          continue;
+
+        const EndpointKey key{path, method};
+        CPPUNIT_ASSERT_MESSAGE(
+          "openapi.json endpoint not documented in MITK_REST_API_Specification.md: "
+          + method + " " + path,
+          specMdEndpoints.count(key) > 0);
+      }
+    }
+  }
+
+  void SpecMdMajorVersionMatchesOpenApi()
+  {
+    // The OAS info.version (SemVer "X.Y.Z") and the MD "**Version:** X.Y.Z"
+    // header must agree on the major. Minor/patch may drift between releases
+    // but a major mismatch indicates one of the two artifacts shipped without
+    // its sibling update.
+    const auto oasVersion = m_Spec["info"]["version"].get<std::string>();
+    const auto oasDot = oasVersion.find('.');
+    CPPUNIT_ASSERT_MESSAGE("OAS info.version is not SemVer-shaped: " + oasVersion,
+                           oasDot != std::string::npos);
+    const auto oasMajor = oasVersion.substr(0, oasDot);
+
+    const auto md = this->LoadSpecMarkdown();
+    const std::string marker = "**Version:**";
+    const auto markerPos = md.find(marker);
+    CPPUNIT_ASSERT_MESSAGE("Spec MD is missing '**Version:**' header line",
+                           markerPos != std::string::npos);
+    auto cursor = markerPos + marker.size();
+    while (cursor < md.size() && (md[cursor] == ' ' || md[cursor] == '\t')) ++cursor;
+    std::string mdVersion;
+    while (cursor < md.size() && md[cursor] != '\r' && md[cursor] != '\n')
+    {
+      mdVersion.push_back(md[cursor++]);
+    }
+    while (!mdVersion.empty() && (mdVersion.back() == ' ' || mdVersion.back() == '\t'))
+    {
+      mdVersion.pop_back();
+    }
+    const auto mdDot = mdVersion.find('.');
+    CPPUNIT_ASSERT_MESSAGE("Spec MD version is not SemVer-shaped: " + mdVersion,
+                           mdDot != std::string::npos);
+    const auto mdMajor = mdVersion.substr(0, mdDot);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "OAS info.version major and Spec MD '**Version:**' major disagree",
+      mdMajor, oasMajor);
+  }
+
+  void EverySpecMdEndpointIsInOpenApi()
+  {
+    // Reverse direction: every endpoint heading in the spec MD must have a
+    // corresponding entry in openapi.json. Catches an outdated spec entry
+    // describing an endpoint that has since been removed or renamed.
+    const auto md = this->LoadSpecMarkdown();
+    const auto specMdEndpoints = this->ExtractSpecMdEndpoints(md);
+    const auto& paths = m_Spec["paths"];
+
+    for (const auto& [specPath, specMethod] : specMdEndpoints)
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "Spec MD endpoint not in openapi.json: " + specMethod + " " + specPath,
+        paths.contains(specPath) && paths[specPath].contains(specMethod));
+    }
   }
 };
 

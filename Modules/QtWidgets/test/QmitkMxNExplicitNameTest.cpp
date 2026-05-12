@@ -21,25 +21,23 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 /**
- * Tests the explicit-name 'CreateRenderWindowWidget(const QString&)' overload
+ * Tests the explicit-id 'CreateRenderWindowWidget(const QString&)' overload
  * on QmitkMxNMultiWidget plus the collision-free positional fallback used by
- * 'SetLayout(r, c)'. Together they replace the legacy 'widget<count>' naming
- * (which silently collided when custom-named cells already used the same
- * index, because std::map::insert silently rejects duplicate keys).
- *
- * The fixture deliberately avoids 'SetLayout(...)' so the tests focus on the
- * naming contract; the positional overload is exercised by direct calls to
- * the nullary 'CreateRenderWindowWidget()'.
+ * 'SetLayout(r, c)'. Together they replace an earlier 'widget<count>'
+ * naming scheme that silently collided when custom-named cells already
+ * used the same index (std::map::insert silently rejects duplicate keys).
  */
 class QmitkMxNExplicitNameTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(QmitkMxNExplicitNameTestSuite);
-  MITK_TEST(Create_WithBareName_RegistersQualifiedName);
-  MITK_TEST(Create_DuplicateBareName_Throws);
-  MITK_TEST(Create_EmptyBareName_Throws);
+  MITK_TEST(Create_WithExplicitId_RegistersVerbatim);
+  MITK_TEST(Create_UnprefixedId_Throws);
+  MITK_TEST(Create_DuplicateId_Throws);
+  MITK_TEST(Create_EmptyId_Throws);
   MITK_TEST(Positional_FillsGapsFromZero);
   MITK_TEST(Positional_SkipsAlreadyUsedSlots);
-  MITK_TEST(QualifiedName_UsesEditorPrefix);
+  MITK_TEST(CustomEditorName_RegistersWithItsPrefix);
+  MITK_TEST(CustomEditorName_RejectsOtherEditorPrefix);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
@@ -80,40 +78,52 @@ public:
     return static_cast<std::size_t>(widget.GetNumberOfRenderWindowWidgets());
   }
 
-  // ---------- Explicit-name overload ----------
+  // ---------- Explicit-id overload ----------
 
-  void Create_WithBareName_RegistersQualifiedName()
+  void Create_WithExplicitId_RegistersVerbatim()
   {
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell = widget.CreateRenderWindowWidget("alpha");
+    auto cell = widget.CreateRenderWindowWidget("mxn__alpha");
 
     CPPUNIT_ASSERT(nullptr != cell);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
-      "Bare name must be registered with the editor's '<multiWidgetName>.' prefix",
-      std::string("mxn.alpha"),
+      "Id is registered verbatim: no prefix prepend, no strip",
+      std::string("mxn__alpha"),
       cell->GetWidgetName().toStdString());
     CPPUNIT_ASSERT_MESSAGE(
-      "Render-window widget must be findable by qualified name",
-      nullptr != widget.GetRenderWindowWidget(QString("mxn.alpha")));
+      "Render-window widget must be findable by its canonical id",
+      nullptr != widget.GetRenderWindowWidget(QString("mxn__alpha")));
   }
 
-  void Create_DuplicateBareName_Throws()
+  void Create_UnprefixedId_Throws()
+  {
+    // The explicit overload requires the canonical qualified id; passing a
+    // bare-style id is in-process API misuse and must throw rather than
+    // silently land under a wrong name.
+    QmitkMxNMultiWidget widget;
+    widget.SetDataStorage(m_DataStorage);
+
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
+  }
+
+  void Create_DuplicateId_Throws()
   {
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    widget.CreateRenderWindowWidget("alpha");
+    widget.CreateRenderWindowWidget("mxn__alpha");
     CPPUNIT_ASSERT_EQUAL(std::size_t{1}, WidgetCount(widget));
 
-    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha"), mitk::Exception);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Map size must remain 1 after rejected duplicate",
       std::size_t{1}, WidgetCount(widget));
   }
 
-  void Create_EmptyBareName_Throws()
+  void Create_EmptyId_Throws()
   {
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
@@ -126,23 +136,23 @@ public:
 
   void Positional_FillsGapsFromZero()
   {
-    // Sanity check: the positional path produces 'widget0', 'widget1', ...
-    // when no custom-named cells are present.
+    // Sanity check: the positional path produces 'mxn__widget0',
+    // 'mxn__widget1', ... when no custom-named cells are present.
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell0 = widget.CreateRenderWindowWidget(QString("widget0"));
-    CPPUNIT_ASSERT_EQUAL(std::string("mxn.widget0"), cell0->GetWidgetName().toStdString());
-    CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("mxn.widget0")));
+    auto cell0 = widget.CreateRenderWindowWidget(QString("mxn__widget0"));
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), cell0->GetWidgetName().toStdString());
+    CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("mxn__widget0")));
 
     // Re-derive the expected positional behaviour by going through the same
-    // public path the layout applier uses: the explicit-name overload with
-    // the next 'widget<i>' name. This documents the intent without depending
+    // public path the layout applier uses: the explicit-id overload with
+    // the next qualified id. This documents the intent without depending
     // on the internal nullary helper signature.
-    auto cell1 = widget.CreateRenderWindowWidget(QString("widget1"));
-    auto cell2 = widget.CreateRenderWindowWidget(QString("widget2"));
-    CPPUNIT_ASSERT_EQUAL(std::string("mxn.widget1"), cell1->GetWidgetName().toStdString());
-    CPPUNIT_ASSERT_EQUAL(std::string("mxn.widget2"), cell2->GetWidgetName().toStdString());
+    auto cell1 = widget.CreateRenderWindowWidget(QString("mxn__widget1"));
+    auto cell2 = widget.CreateRenderWindowWidget(QString("mxn__widget2"));
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget1"), cell1->GetWidgetName().toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget2"), cell2->GetWidgetName().toStdString());
     CPPUNIT_ASSERT_EQUAL(std::size_t{3}, WidgetCount(widget));
   }
 
@@ -151,45 +161,54 @@ public:
     // The latent v1 bug this test locks down: with custom-named cells already
     // present, the legacy 'widget<count>' positional naming would produce
     // collisions ('widget3' twice). The new positional path picks the lowest
-    // unused 'widget<i>' name instead.
+    // unused 'widget<i>' index inside the canonical 'mxn__widget<i>' form.
     QmitkMxNMultiWidget widget;
     widget.SetDataStorage(m_DataStorage);
 
     // Pre-populate with a custom-indexed name occupying slot 3.
-    widget.CreateRenderWindowWidget(QString("widget3"));
+    widget.CreateRenderWindowWidget(QString("mxn__widget3"));
     CPPUNIT_ASSERT_EQUAL(std::size_t{1}, WidgetCount(widget));
 
     // Drive 'SetLayout(1, 5)': the public positional path used by the
     // configuration toolbar. The internal nullary 'CreateRenderWindowWidget'
-    // must skip 'widget3' and pick 'widget4' for the fifth cell.
+    // must skip 'mxn__widget3' and pick 'mxn__widget4' for the fifth cell.
     widget.SetLayout(1, 5);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(
       "Total cell count must match the requested grid",
       std::size_t{5}, WidgetCount(widget));
 
-    // Each expected name must be present exactly once.
-    for (const auto& bare : { "widget0", "widget1", "widget2", "widget3", "widget4" })
+    // Each expected id must be present exactly once.
+    for (const auto& id : { "mxn__widget0", "mxn__widget1", "mxn__widget2",
+                            "mxn__widget3", "mxn__widget4" })
     {
-      const auto qualified = QString("mxn.") + bare;
       CPPUNIT_ASSERT_MESSAGE(
-        ("Expected cell '" + std::string(qualified.toUtf8()) + "' missing").c_str(),
-        nullptr != widget.GetRenderWindowWidget(qualified));
+        ("Expected cell '" + std::string(id) + "' missing").c_str(),
+        nullptr != widget.GetRenderWindowWidget(QString(id)));
     }
   }
 
   // ---------- Editor-prefix invariant ----------
 
-  void QualifiedName_UsesEditorPrefix()
+  void CustomEditorName_RegistersWithItsPrefix()
   {
-    // An editor instantiated with a non-default 'multiWidgetName' must use
-    // that name (not the static "mxn" default) when prefixing the bare name.
     QmitkMxNMultiWidget widget(nullptr, Qt::WindowFlags{}, QString("custom"));
     widget.SetDataStorage(m_DataStorage);
 
-    auto cell = widget.CreateRenderWindowWidget("alpha");
-    CPPUNIT_ASSERT_EQUAL(std::string("custom.alpha"), cell->GetWidgetName().toStdString());
-    CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("custom.alpha")));
+    auto cell = widget.CreateRenderWindowWidget("custom__alpha");
+    CPPUNIT_ASSERT_EQUAL(std::string("custom__alpha"), cell->GetWidgetName().toStdString());
+    CPPUNIT_ASSERT(nullptr != widget.GetRenderWindowWidget(QString("custom__alpha")));
+  }
+
+  void CustomEditorName_RejectsOtherEditorPrefix()
+  {
+    QmitkMxNMultiWidget widget(nullptr, Qt::WindowFlags{}, QString("custom"));
+    widget.SetDataStorage(m_DataStorage);
+
+    // Ids belong to one editor instance, identified by its multiWidgetName;
+    // a custom-named editor rejects ids carrying any other prefix.
+    CPPUNIT_ASSERT_THROW(widget.CreateRenderWindowWidget("mxn__alpha"), mitk::Exception);
+    CPPUNIT_ASSERT_EQUAL(std::size_t{0}, WidgetCount(widget));
   }
 };
 

@@ -32,7 +32,7 @@ found in the LICENSE file.
  * Tests the v2 layout I/O on QmitkMxNMultiWidget:
  *   - SerializeLayout produces a strict-mode v2.0 document.
  *   - ApplyLayout accepts both strict and lazy mode, rejects non-2.0 versions,
- *     enforces window-name uniqueness and group-reference validity (strict),
+ *     enforces window-id uniqueness and group-reference validity (strict),
  *     tears down existing cells, and rolls back to a single default cell on
  *     construction failure.
  *   - View-direction parsing throws on unknown strings (no silent fallback)
@@ -48,11 +48,15 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(RoundTrip_Recursive_StrictModeFixture);
   MITK_TEST(RoundTrip_LazyModeFixture);
   MITK_TEST(MultiGroup_RoundTrip_PreservesSelectAll);
+  MITK_TEST(LayoutName_PreservedAcrossRoundTrip);
+  MITK_TEST(LayoutName_AbsentStaysAbsentAcrossRoundTrip);
+  MITK_TEST(LayoutName_ClearedAfterRollback);
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
-  MITK_TEST(CustomNames_RegisterUnderEditorPrefix);
-  MITK_TEST(DuplicateWindowNames_Throws);
+  MITK_TEST(StrictMode_EmptyGroupsDict_Throws);
+  MITK_TEST(CustomIds_RegisterUnderEditorPrefix);
+  MITK_TEST(DuplicateWindowIds_Throws);
   MITK_TEST(Version_RejectsAllNonV2);
   MITK_TEST(Version_AcceptsExactly_2_0);
 
@@ -60,7 +64,7 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(TearDown_DestroysAllOldCells);
   MITK_TEST(Apply_Failure_RollsBackToDefault);
   MITK_TEST(Serialize_GroupNaming_Deterministic);
-  MITK_TEST(Serialize_RegisteredNames_StripPrefix);
+  MITK_TEST(Serialize_EmitsIdsVerbatim);
   MITK_TEST(Apply_NestedSplits_RoundTrip);
   MITK_TEST(Apply_NullJson_Throws);
 
@@ -84,6 +88,25 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(Size_PartiallyOmitted_MixedSiblings);
   MITK_TEST(Size_Zero_Throws);
   MITK_TEST(Size_Negative_Throws);
+
+  // --- ListWindowDescriptors (engine query consumed by REST bindings) ---
+  MITK_TEST(ListWindowDescriptors_DefaultGrid_ReturnsBareIds);
+  MITK_TEST(ListWindowDescriptors_AfterApply_PreOrderTraversal);
+  MITK_TEST(ListWindowDescriptors_CarriesViewDirectionAndSelectionGroup);
+
+  // --- Optional display 'name' (free-form, non-unique label) ---
+  MITK_TEST(WindowName_OptionalDisplay_RoundTrips);
+  MITK_TEST(WindowName_DisplayOmitted_RoundTrips);
+  MITK_TEST(WindowName_DisplayDuplicates_OK);
+  MITK_TEST(WindowName_DisplayFreeForm_OK);
+  MITK_TEST(WindowName_DisplayEmptyString_Throws);
+  MITK_TEST(WindowName_DisplayNotString_Throws);
+  MITK_TEST(ListWindowDescriptors_CarriesDisplayName);
+
+  // --- Qualified-id contract: id must start with this editor's prefix ---
+  MITK_TEST(ApplyLayout_UnprefixedId_Throws);
+  MITK_TEST(ApplyLayout_WrongEditorPrefix_Throws);
+  MITK_TEST(Construct_BadMultiWidgetName_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -174,8 +197,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -197,7 +220,7 @@ public:
       const auto& f = fixture.at("root").at("children").at(i);
       const auto& r = roundTrip.at("root").at("children").at(i);
       CPPUNIT_ASSERT_EQUAL(f.at("type"),           r.at("type"));
-      CPPUNIT_ASSERT_EQUAL(f.at("name"),           r.at("name"));
+      CPPUNIT_ASSERT_EQUAL(f.at("id"),             r.at("id"));
       CPPUNIT_ASSERT_EQUAL(f.at("view_direction"), r.at("view_direction"));
       CPPUNIT_ASSERT_EQUAL(f.at("links"),          r.at("links"));
       // Lower-bound check on emitted sizes - guards against a future regression
@@ -217,7 +240,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -275,12 +298,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__w1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
-            { "type": "window", "name": "w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+            { "type": "window", "id": "mxn__w2", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__w3", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
           ]}
         ]
       }
@@ -324,10 +347,10 @@ public:
         for (const auto& c : node.at("children")) walk(c);
         return;
       }
-      const auto bareName = QString::fromStdString(node.at("name").get<std::string>());
+      const auto id = QString::fromStdString(node.at("id").get<std::string>());
       const auto label = node.at("links").at("selection").get<std::string>();
-      auto cell = editor->GetRenderWindowWidget(QString("mxn.") + bareName);
-      CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its qualified name",
+      auto cell = editor->GetRenderWindowWidget(id);
+      CPPUNIT_ASSERT_MESSAGE("Round-trip cell must be addressable by its canonical id",
                              cell != nullptr);
       const auto engineGroup = cell->GetUtilityWidget()->GetSyncGroup();
       distinctEngineGroups.insert(engineGroup);
@@ -358,7 +381,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "phantom" }, "size": 1 }
         ]
       }
     })json");
@@ -377,41 +400,18 @@ public:
     }
   }
 
-  // ====================================================================
-  // Custom names register under editor prefix
-  // ====================================================================
-  void CustomNames_RegisterUnderEditorPrefix()
+  // An empty 'groups' dict is strict mode with zero declared groups; any
+  // cell's 'links.selection' reference therefore fails the strict-mode
+  // lookup. Pinned because the test name alone could read as "lazy mode".
+  void StrictMode_EmptyGroupsDict_Throws()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
-      "groups": { "main": { "select_all": true } },
+      "groups": {},
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
-        ]
-      }
-    })json");
-
-    auto editor = MakeEditor();
-    editor->ApplyLayout(fixture);
-    CPPUNIT_ASSERT_MESSAGE("Cell must register under '<editorName>.<bareName>'",
-                           nullptr != editor->GetRenderWindowWidget(QString("mxn.alpha")));
-  }
-
-  // ====================================================================
-  // Duplicate window names throws
-  // ====================================================================
-  void DuplicateWindowNames_Throws()
-  {
-    const auto fixture = nlohmann::json::parse(R"json({
-      "version": "2.0",
-      "groups": { "main": { "select_all": true } },
-      "root": {
-        "type": "split", "orientation": "horizontal",
-        "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -420,7 +420,57 @@ public:
     try
     {
       editor->ApplyLayout(fixture);
-      CPPUNIT_FAIL("ApplyLayout must throw on duplicate window name");
+      CPPUNIT_FAIL("ApplyLayout must throw when 'groups' is present but empty");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the unresolved group",
+                             msg.find("main") != std::string::npos);
+    }
+  }
+
+  void CustomIds_RegisterUnderEditorPrefix()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+    CPPUNIT_ASSERT_MESSAGE("Cell must register under the document's canonical id verbatim",
+                           nullptr != editor->GetRenderWindowWidget(QString("mxn__alpha")));
+  }
+
+  // ====================================================================
+  // Duplicate window ids throws
+  // ====================================================================
+  void DuplicateWindowIds_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget0", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on duplicate window id");
     }
     catch (const mitk::Exception& e)
     {
@@ -443,7 +493,7 @@ public:
         "root": {
           "type": "split", "orientation": "horizontal",
           "children": [
-            { "type": "window", "name": "w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__w0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
           ]
         }
       })json");
@@ -455,16 +505,18 @@ public:
       }
       catch (const mitk::Exception& e)
       {
-        // v1.x rejects must reference the migration script so the
-        // QMessageBox wrapper surfaces the exact path the user needs to run.
+        // v1.x rejects must point users at the migration tool. The exact
+        // path is install-dependent, so the test pins only the phrase
+        // 'migration tool'; the QMessageBox wrapper relays the rest of the
+        // message to the developer documentation.
         const std::string sBad(bad);
         const bool looksV1 = sBad.size() >= 2 && sBad[0] == '1' && sBad[1] == '.';
         if (looksV1)
         {
           const std::string msg = e.GetDescription();
           CPPUNIT_ASSERT_MESSAGE(
-            "v1.x version-rejection message must reference migrate-mxn-layout-v1-to-v2",
-            msg.find("migrate-mxn-layout-v1-to-v2") != std::string::npos);
+            "v1.x version-rejection message must reference the migration tool",
+            msg.find("migration tool") != std::string::npos);
         }
       }
     }
@@ -481,7 +533,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -489,7 +541,7 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
-    CPPUNIT_ASSERT(nullptr != editor->GetRenderWindowWidget(QString("mxn.only")));
+    CPPUNIT_ASSERT(nullptr != editor->GetRenderWindowWidget(QString("mxn__only")));
   }
 
   // ====================================================================
@@ -520,7 +572,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__only", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -553,8 +605,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__ok",   "view_direction": "axial",     "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad",  "view_direction": "saggital",  "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -586,9 +638,9 @@ public:
       "root": {
         "type": "split", "orientation": "vertical",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
-          { "type": "window", "name": "c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__b", "view_direction": "axial", "links": { "selection": "row2" }, "size": 1 },
+          { "type": "window", "id": "mxn__c", "view_direction": "axial", "links": { "selection": "row3" }, "size": 1 }
         ]
       }
     })json");
@@ -601,10 +653,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(first.at("root"),   second.at("root"));
   }
 
-  // ====================================================================
-  // Bare names in JSON have no editor prefix
-  // ====================================================================
-  void Serialize_RegisteredNames_StripPrefix()
+  void Serialize_EmitsIdsVerbatim()
   {
     const auto fixture = nlohmann::json::parse(R"json({
       "version": "2.0",
@@ -612,8 +661,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha",   "view_direction": "axial", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -621,14 +670,14 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
     const auto doc = editor->SerializeLayout();
-    std::set<std::string> emittedNames;
+    std::set<std::string> emittedIds;
     for (const auto& c : doc.at("root").at("children"))
     {
-      emittedNames.insert(c.at("name").get<std::string>());
+      emittedIds.insert(c.at("id").get<std::string>());
     }
-    CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emittedNames.size());
-    CPPUNIT_ASSERT(emittedNames.count("alpha")   == 1);
-    CPPUNIT_ASSERT(emittedNames.count("widget0") == 1);
+    CPPUNIT_ASSERT_EQUAL(std::size_t{2}, emittedIds.size());
+    CPPUNIT_ASSERT(emittedIds.count("mxn__alpha")   == 1);
+    CPPUNIT_ASSERT(emittedIds.count("mxn__widget0") == 1);
   }
 
   // ====================================================================
@@ -643,12 +692,12 @@ public:
         "type": "split", "orientation": "vertical",
         "children": [
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__tl", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__tr", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
           ]},
           { "type": "split", "orientation": "horizontal", "size": 1, "children": [
-            { "type": "window", "name": "bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
-            { "type": "window", "name": "br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
+            { "type": "window", "id": "mxn__bl", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__br", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 }
           ]}
         ]
       }
@@ -671,13 +720,16 @@ public:
     }
   }
 
-  // ====================================================================
-  // LoadLayout(nullptr) throws (covers the wrapper)
-  // ====================================================================
   void Apply_NullJson_Throws()
   {
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->LoadLayout(nullptr), mitk::Exception);
+
+    // Default-constructed nlohmann::json is a JSON null value, distinct
+    // from a nullptr pointer; the wrapper rejects both paths.
+    nlohmann::json nullDoc;
+    CPPUNIT_ASSERT(nullDoc.is_null());
+    CPPUNIT_ASSERT_THROW(editor->LoadLayout(&nullDoc), mitk::Exception);
   }
 
   // ====================================================================
@@ -691,7 +743,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -721,7 +773,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__w0", "view_direction": 42, "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -789,8 +841,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__a", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__b", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -815,8 +867,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__alpha", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__beta",  "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -864,8 +916,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -873,8 +925,8 @@ public:
     auto editor = MakeEditor();
     editor->ApplyLayout(fixture);
 
-    auto cell0 = editor->GetRenderWindowWidget(QString("mxn.widget0"));
-    auto cell1 = editor->GetRenderWindowWidget(QString("mxn.widget1"));
+    auto cell0 = editor->GetRenderWindowWidget(QString("mxn__widget0"));
+    auto cell1 = editor->GetRenderWindowWidget(QString("mxn__widget1"));
     CPPUNIT_ASSERT(cell0 != nullptr);
     CPPUNIT_ASSERT(cell1 != nullptr);
 
@@ -900,8 +952,8 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
-          { "type": "window", "name": "bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+          { "type": "window", "id": "mxn__ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
         ]
       }
     })json");
@@ -925,9 +977,9 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" } },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
@@ -935,9 +987,9 @@ public:
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
 
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget2")) != nullptr);
   }
 
   // ====================================================================
@@ -953,18 +1005,18 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
-          { "type": "window", "name": "widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
-          { "type": "window", "name": "widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 3 },
+          { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" } },
+          { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" } }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget0")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget1")) != nullptr);
-    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn.widget2")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget0")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget1")) != nullptr);
+    CPPUNIT_ASSERT(editor->GetRenderWindowWidget(QString("mxn__widget2")) != nullptr);
   }
 
   // ====================================================================
@@ -979,7 +1031,7 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 0 }
         ]
       }
     })json");
@@ -999,13 +1051,475 @@ public:
       "root": {
         "type": "split", "orientation": "horizontal",
         "children": [
-          { "type": "window", "name": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": -3 }
         ]
       }
     })json");
 
     auto editor = MakeEditor();
     CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+  }
+
+  // ====================================================================
+  // ListWindowDescriptors -- engine query consumed by the REST bindings.
+  //
+  // This is the public engine surface the REST window-list provider calls
+  // (instead of going through SerializeLayout-then-parse). The descriptor
+  // shape -- canonical fully-qualified id, view direction, selection group
+  // -- mirrors what the v2 layout document persists per cell, so per-cell
+  // field values agree by construction with what GET /editors/mxn/layout
+  // would emit.
+  // ====================================================================
+  void ListWindowDescriptors_DefaultGrid_ReturnsBareIds()
+  {
+    auto editor = MakeEditor();
+    editor->SetLayout(1, 2);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), descriptors.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget1"), descriptors[1].id.toStdString());
+    // Default grid uses the conventional 'main' group label.
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[0].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[1].selectionGroup.toStdString());
+  }
+
+  void ListWindowDescriptors_AfterApply_PreOrderTraversal()
+  {
+    // Two-row layout with three cells per row; pre-order traversal over the
+    // splitter tree yields widget0..widget5 in order.
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true }, "row2": { "select_all": false } },
+      "root": {
+        "type": "split", "orientation": "vertical",
+        "children": [
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 }
+          ]},
+          { "type": "split", "orientation": "horizontal", "size": 1, "children": [
+            { "type": "window", "id": "mxn__widget3", "view_direction": "axial",    "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget4", "view_direction": "sagittal", "links": { "selection": "row2" }, "size": 1 },
+            { "type": "window", "id": "mxn__widget5", "view_direction": "coronal",  "links": { "selection": "row2" }, "size": 1 }
+          ]}
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(6), descriptors.size());
+    for (size_t i = 0; i < 6; ++i)
+    {
+      const auto expected = std::string("mxn__widget") + std::to_string(i);
+      CPPUNIT_ASSERT_EQUAL(expected, descriptors[i].id.toStdString());
+    }
+    // Row 1 is "main", row 2 is "row2".
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[0].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), descriptors[2].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("row2"), descriptors[3].selectionGroup.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("row2"), descriptors[5].selectionGroup.toStdString());
+  }
+
+  void ListWindowDescriptors_CarriesViewDirectionAndSelectionGroup()
+  {
+    // Apply a fixture with three view directions and verify each survives
+    // round-trip through the descriptor query. Custom ids exercise the
+    // explicit-id path (no positional reassignment).
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__axView",    "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__sagView",   "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__corView",   "view_direction": "coronal",  "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__originalV", "view_direction": "original", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(4), descriptors.size());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__axView"),    descriptors[0].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"),          descriptors[0].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__sagView"),   descriptors[1].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("sagittal"),       descriptors[1].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__corView"),   descriptors[2].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("coronal"),        descriptors[2].viewDirection.toStdString());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__originalV"), descriptors[3].id.toStdString());
+    CPPUNIT_ASSERT_EQUAL(std::string("original"),       descriptors[3].viewDirection.toStdString());
+
+    for (const auto& d : descriptors)
+      CPPUNIT_ASSERT_EQUAL(std::string("main"), d.selectionGroup.toStdString());
+  }
+
+  // ====================================================================
+  // Optional display 'name' round-trips through Apply -> Serialize.
+  // ====================================================================
+  void WindowName_OptionalDisplay_RoundTrips()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto roundTrip = editor->SerializeLayout();
+    const auto& child = roundTrip.at("root").at("children").at(0);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"),  child.at("name").get<std::string>());
+  }
+
+  // ====================================================================
+  // Display 'name' omitted on input -> not emitted on output (no empty
+  // string lands on disk).
+  // ====================================================================
+  void WindowName_DisplayOmitted_RoundTrips()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto roundTrip = editor->SerializeLayout();
+    const auto& child = roundTrip.at("root").at("children").at(0);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), child.at("id").get<std::string>());
+    CPPUNIT_ASSERT_MESSAGE(
+      "Cells without a display label must NOT emit a 'name' key on serialize",
+      !child.contains("name"));
+  }
+
+  // ====================================================================
+  // Display 'name' is not subject to uniqueness; two cells may share the
+  // same display label as long as their 'id' differs.
+  // ====================================================================
+  void WindowName_DisplayDuplicates_OK()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": "View", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1", "name": "View", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+  }
+
+  // ====================================================================
+  // Display 'name' is free-form: spaces, punctuation, and non-ASCII are
+  // accepted.
+  // ====================================================================
+  void WindowName_DisplayFreeForm_OK()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": "Brain - axial (T1, FLAIR)", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_NO_THROW(editor->ApplyLayout(fixture));
+
+    const auto roundTrip = editor->SerializeLayout();
+    CPPUNIT_ASSERT_EQUAL(std::string("Brain - axial (T1, FLAIR)"),
+                         roundTrip.at("root").at("children").at(0).at("name").get<std::string>());
+  }
+
+  // ====================================================================
+  // Empty 'name' is rejected. Tools must omit the field instead.
+  // ====================================================================
+  void WindowName_DisplayEmptyString_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": "", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on empty display 'name'");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending cell id",
+                             msg.find("widget0") != std::string::npos);
+    }
+  }
+
+  // ====================================================================
+  // Non-string 'name' is rejected.
+  // ====================================================================
+  void WindowName_DisplayNotString_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": 42, "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(fixture), mitk::Exception);
+  }
+
+  // ====================================================================
+  // ListWindowDescriptors surfaces the optional display label via
+  // WindowDescriptor::displayName; cells without one carry an empty
+  // string.
+  // ====================================================================
+  void ListWindowDescriptors_CarriesDisplayName()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__widget1",                          "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+
+    const auto descriptors = editor->ListWindowDescriptors();
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), descriptors.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"), descriptors[0].displayName.toStdString());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Cells without a display label must surface an empty displayName",
+      std::string{}, descriptors[1].displayName.toStdString());
+  }
+
+  void ApplyLayout_UnprefixedId_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on an unprefixed window id");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending id",
+                             msg.find("widget0") != std::string::npos);
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the required prefix",
+                             msg.find("mxn__") != std::string::npos);
+    }
+    // The pre-mutation throw must leave MakeEditor's single default cell intact.
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  void ApplyLayout_WrongEditorPrefix_Throws()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "stdmulti__widget0", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    try
+    {
+      editor->ApplyLayout(fixture);
+      CPPUNIT_FAIL("ApplyLayout must throw on a wrong-editor prefix");
+    }
+    catch (const mitk::Exception& e)
+    {
+      const std::string msg = e.GetDescription();
+      CPPUNIT_ASSERT_MESSAGE("Exception message must name the offending id",
+                             msg.find("stdmulti__widget0") != std::string::npos);
+    }
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  // ====================================================================
+  // Optional top-level 'name' survives load -> save round-trips.
+  // ====================================================================
+  void LayoutName_PreservedAcrossRoundTrip()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "My Preset",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+    const auto roundTrip = editor->SerializeLayout();
+
+    CPPUNIT_ASSERT_MESSAGE("Round-trip must emit the optional top-level 'name' field",
+                           roundTrip.contains("name"));
+    CPPUNIT_ASSERT_EQUAL(fixture.at("name"), roundTrip.at("name"));
+  }
+
+  // ====================================================================
+  // A document without 'name' round-trips without an empty 'name' key.
+  // ====================================================================
+  void LayoutName_AbsentStaysAbsentAcrossRoundTrip()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+    const auto roundTrip = editor->SerializeLayout();
+
+    CPPUNIT_ASSERT_MESSAGE("Serialize must not emit a 'name' field when the input had none",
+                           !roundTrip.contains("name"));
+  }
+
+  // ====================================================================
+  // After a failed apply the rolled-back state emits no 'name'.
+  // ====================================================================
+  void LayoutName_ClearedAfterRollback()
+  {
+    // First, install a named layout so m_LayoutName is non-empty.
+    const auto named = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "Stashed Name",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    // A schema-valid-but-engine-rejected fixture that fails mid-construction.
+    const auto bad = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "Should Not Stick",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(named);
+    CPPUNIT_ASSERT_MESSAGE("Pre-condition: named layout must serialise with its name",
+                           editor->SerializeLayout().contains("name"));
+
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(bad), mitk::Exception);
+
+    const auto afterRollback = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("Rollback must clear m_LayoutName so no 'name' field is emitted",
+                           !afterRollback.contains("name"));
+  }
+
+  void Construct_BadMultiWidgetName_Throws()
+  {
+    for (const auto& bad : { QString("bad__name"),
+                             QString("bad_name"),
+                             QString(""),
+                             QString("1abc"),
+                             QString(".abc"),
+                             QString("ab cd") })
+    {
+      try
+      {
+        QmitkMxNMultiWidget invalid(/*parent=*/nullptr, /*flags=*/{}, bad);
+        CPPUNIT_FAIL((std::string("Constructor must throw on multiWidgetName '")
+                      + bad.toStdString() + "'").c_str());
+      }
+      catch (const mitk::Exception&)
+      {
+        // expected
+      }
+    }
   }
 };
 

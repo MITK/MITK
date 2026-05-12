@@ -85,6 +85,16 @@ QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget()
   return nullptr;
 }
 
+const QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget() const
+{
+  if (m_Layout == nullptr)
+    return nullptr;
+  auto* const item = m_Layout->itemAt(0);
+  if (item == nullptr)
+    return nullptr;
+  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(item->widget());
+}
+
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
 {
   vtkRenderer* vtkRenderer = m_RenderWindow->GetRenderer()->GetVtkRenderer();

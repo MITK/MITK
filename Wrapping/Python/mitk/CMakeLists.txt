@@ -52,6 +52,61 @@ configure_file(
   COPYONLY
 )
 
+# ---------------------------------------------------------------------------
+# Stage the pure-Python `mitk.mxn.layout` DSL package.
+#
+# Per-file `add_custom_command` so that editing a `.py` source file
+# triggers a copy_if_different on the next `cmake --build`, without a
+# CMake re-configure pass. Adding or removing a `.py` file from
+# _mitk_layout_py still requires re-configure (CMake needs to learn the
+# new dependency).
+# ---------------------------------------------------------------------------
+
+set(_mitk_layout_py
+  __init__.py
+  _vocabulary.py
+  _model.py
+  _builders.py
+  _presets.py
+  _selector.py
+  _io.py
+  _repr.py
+  _validation.py
+)
+
+file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}/mxn/layout")
+
+set(_mitk_layout_staged_files)
+foreach(_py IN LISTS _mitk_layout_py)
+  set(_src "${CMAKE_CURRENT_SOURCE_DIR}/mxn/layout/${_py}")
+  set(_dst "${mitk_PACKAGE_DIR}/mxn/layout/${_py}")
+  add_custom_command(
+    OUTPUT  "${_dst}"
+    DEPENDS "${_src}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_src}" "${_dst}"
+    COMMENT "Staging mitk.mxn.layout/${_py}"
+    VERBATIM
+  )
+  list(APPEND _mitk_layout_staged_files "${_dst}")
+endforeach()
+
+# `mitk/mxn/__init__.py` is the namespace marker for the parent package.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/mxn/__init__.py"
+  "${mitk_PACKAGE_DIR}/mxn/__init__.py"
+  COPYONLY
+)
+
+add_custom_target(mitk_mxn_layout_staged
+                  DEPENDS ${_mitk_layout_staged_files})
+add_dependencies(mitk_python_bindings mitk_mxn_layout_staged)
+
+# The DSL examples are smoke-tested as part of the `mitkPythonBindingsTest`
+# pytest suite (see `Modules/Python/test/pytest/test_layout/
+# test_examples_smoke.py`). That suite runs inside the C++ test driver, which
+# embeds Python in a process that has already loaded MITK's runtime DLLs --
+# the only environment where `import mitk` is reliably resolvable on Windows.
+
 
 if(MSVC)
   set_target_properties(mitk_python_bindings PROPERTIES
@@ -127,6 +182,17 @@ install(FILES
   DESTINATION mitk
   COMPONENT wheel
   EXCLUDE_FROM_ALL
+)
+
+# Wheel install for the mxn DSL subpackage. `examples/` is excluded —
+# example files are pedagogy, not part of the redistributable surface.
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/mxn/"
+  DESTINATION mitk/mxn
+  COMPONENT wheel
+  EXCLUDE_FROM_ALL
+  FILES_MATCHING
+    PATTERN "*.py"
+    PATTERN "examples" EXCLUDE
 )
 
   # Install auto-load modules into their expected subdirectories.

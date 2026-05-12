@@ -295,7 +295,7 @@ bool RestServer::Start()
       m_RunningConfig = std::nullopt;
       m_StartTime = std::nullopt;
 
-      // The server thread is exiting — join it before returning.
+      // The server thread is exiting -- join it before returning.
       if (m_ServerThread && m_ServerThread->joinable())
       {
         auto failedThread = std::move(m_ServerThread);
@@ -966,7 +966,7 @@ void RestServer::RegisterRoutes()
     });
 
   // Register the list path before the parameterised path so the list isn't
-  // captured as a window name.
+  // captured as a window id.
   m_Server->Get(apiBase + "/rendering/editors",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_editors(req, res);
@@ -985,31 +985,31 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name",
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:id",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_stdmultiWindow(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:id/camera",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_stdmultiCamera(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/camera",
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:id/camera",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandlePUT_stdmultiCamera(req, res);
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:id/selected-slice",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:name/selected-slice",
+  m_Server->Put(apiBase + "/rendering/editors/stdmulti/windows/:id/selected-slice",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
       this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
@@ -1021,9 +1021,91 @@ void RestServer::RegisterRoutes()
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 
-  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:name/screenshot",
+  m_Server->Get(apiBase + "/rendering/editors/stdmulti/windows/:id/screenshot",
     [this](const httplib::Request& req, httplib::Response& res) {
       m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  // ---- MxN editor ----
+  // List endpoints register before their `:name` siblings so the more
+  // specific route is not shadowed by the path-parameter route.
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnInfo(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnWindows(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows/:id",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnWindow(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/layout",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnLayout(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/mxn/layout",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_mxnLayout(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows/:id/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnCamera(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/mxn/windows/:id/camera",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_mxnCamera(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows/:id/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnSelectedSlice(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/mxn/windows/:id/selected-slice",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_mxnSelectedSlice(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows/:id/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnSelectedPosition(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Put(apiBase + "/rendering/editors/mxn/windows/:id/selected-position",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandlePUT_mxnSelectedPosition(req, res);
+      this->RecordRequest(req.path, "PUT", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnScreenshot(req, res);
+      this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
+    });
+
+  m_Server->Get(apiBase + "/rendering/editors/mxn/windows/:id/screenshot",
+    [this](const httplib::Request& req, httplib::Response& res) {
+      m_RenderingController->HandleGET_mxnWindowScreenshot(req, res);
       this->RecordRequest(req.path, "GET", res.status, req.remote_addr);
     });
 

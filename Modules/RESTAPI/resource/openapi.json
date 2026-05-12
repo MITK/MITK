@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "MITK Workbench REST API",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 7807 Problem Details format.\n",
     "license": {
       "name": "BSD-3-Clause",
@@ -50,50 +50,6 @@
     }
   ],
   "paths": {
-    "/": {
-      "get": {
-        "tags": [
-          "Discovery"
-        ],
-        "summary": "Get API information",
-        "description": "Returns server info including version, capabilities, and DataStorage availability. Alias for GET /info.",
-        "operationId": "getApiRoot",
-        "responses": {
-          "200": {
-            "description": "API information",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ApiInfo"
-                    }
-                  }
-                },
-                "example": {
-                  "data": {
-                    "name": "MITK Workbench REST API",
-                    "api_version": "v1",
-                    "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
-                    "capabilities": {
-                      "transfer_modes": [
-                        "direct",
-                        "file-reference"
-                      ],
-                      "authentication": [
-                        "api-token"
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/health": {
       "get": {
         "tags": [
@@ -102,6 +58,7 @@
         "summary": "Health check",
         "description": "Returns health status of the REST API server and its dependencies.",
         "operationId": "getHealth",
+        "security": [],
         "responses": {
           "200": {
             "description": "Health status",
@@ -138,6 +95,7 @@
         "summary": "Get API information",
         "description": "Returns server info including version, capabilities, and DataStorage availability.",
         "operationId": "getInfo",
+        "security": [],
         "responses": {
           "200": {
             "description": "API information",
@@ -223,6 +181,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -233,7 +200,7 @@
           "Nodes"
         ],
         "summary": "List nodes",
-        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n\nIn addition to the declared parameters, any query parameter of the form `filter.{property}=value` is interpreted as a property-value filter on the node. The `{property}` part is the MITK property name. Supported operators on the value: exact match (`filter.visible=true`), inequality (`filter.visible!=true`), wildcard `*` (zero or more characters, e.g. `filter.name=CT*`), and wildcard `?` (exactly one character, e.g. `filter.name=Node_0?`). The optional `context` and `property_scope` parameters control how the property is looked up. See the user manual §5.3 \"Query Parameters\" for the full filter contract — the OpenAPI schema cannot model the dynamic `filter.{property}` family directly.\n",
+        "description": "Returns a paginated list of nodes from the DataStorage.\nSupports filtering by hierarchy, path, data type, parent UID, and property values.\nSupports sorting and field selection.\n\nIn addition to the declared parameters, any query parameter of the form `filter.{property}=value` is interpreted as a property-value filter on the node. The `{property}` part is the MITK property name. Supported operators on the value: exact match (`filter.visible=true`), inequality (`filter.visible!=true`), wildcard `*` (zero or more characters, e.g. `filter.name=CT*`), and wildcard `?` (exactly one character, e.g. `filter.name=Node_0?`). The optional `context` and `property_scope` parameters control how the property is looked up. See the user manual section 5.3 \"Query Parameters\" for the full filter contract -- the OpenAPI schema cannot model the dynamic `filter.{property}` family directly.\n",
         "operationId": "listNodes",
         "parameters": [
           {
@@ -258,7 +225,7 @@
           {
             "name": "path",
             "in": "query",
-            "description": "Path-based lookup (e.g., \"/CT_Scan\" or \"/Parent/Child\").",
+            "description": "Path-based lookup (e.g., \"/CT_Scan\" or \"/Parent/Child\"). May match multiple nodes when the path is ambiguous; the response is always an array (zero, one, or many entries) -- clients must not treat the single-match case specially.",
             "schema": {
               "type": "string"
             }
@@ -345,6 +312,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -448,6 +424,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -521,6 +506,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -603,6 +597,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -688,6 +691,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -698,7 +710,7 @@
           "Children"
         ],
         "summary": "List child nodes",
-        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /datastorage/nodes, including the dynamic `filter.{property}=value` family with `*`/`?` wildcards and `!=` negation. See GET /datastorage/nodes (and user manual §5.3) for the full filter contract.",
+        "description": "Returns a paginated list of child nodes for the given parent node. Supports the same filtering and pagination as GET /datastorage/nodes, including the dynamic `filter.{property}=value` family with `*`/`?` wildcards and `!=` negation. See GET /datastorage/nodes (and user manual section 5.3) for the full filter contract.",
         "operationId": "listChildren",
         "parameters": [
           {
@@ -713,7 +725,7 @@
           {
             "name": "path",
             "in": "query",
-            "description": "Path-based lookup within children.",
+            "description": "Path-based lookup within children. May match multiple nodes when the path is ambiguous; the response is always an array (zero, one, or many entries).",
             "schema": {
               "type": "string"
             }
@@ -789,6 +801,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -890,6 +911,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -1033,6 +1063,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -1175,6 +1214,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -1313,6 +1361,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -1432,6 +1489,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -1543,6 +1609,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -1665,6 +1740,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -1766,6 +1850,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       },
@@ -1816,12 +1909,36 @@
                           "description": "Key of the deleted property"
                         }
                       }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "node_uid": {
+                          "type": "string"
+                        },
+                        "property_key": {
+                          "type": "string"
+                        },
+                        "property_scope": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
                     }
                   }
                 },
                 "example": {
                   "data": {
                     "deleted": "custom_property"
+                  },
+                  "meta": {
+                    "node_uid": "node_1",
+                    "property_key": "custom_property",
+                    "property_scope": "node",
+                    "context": null
                   }
                 }
               }
@@ -1855,6 +1972,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -1914,6 +2040,15 @@
                 }
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -1923,8 +2058,8 @@
         "tags": [
           "Rendering"
         ],
-        "summary": "Reinit — fit all views to visible data or specific nodes",
-        "description": "Three operating modes: (1) No body — global reinit, fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID — single-node reinit, fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs — multi-node reinit, fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
+        "summary": "Reinit -- fit all views to visible data or specific nodes",
+        "description": "Three operating modes: (1) No body -- global reinit, fits all render windows to the bounding box of all currently visible data nodes via `RenderingManager::InitializeViewsByBoundingObjects()`. (2) Body with `uids` containing one UID -- single-node reinit, fits render windows to the geometry of that node. (3) Body with `uids` containing multiple UIDs -- multi-node reinit, fits render windows to the combined bounding geometry of all listed nodes. Both node cases use `RenderingManager::InitializeViews()`. Equivalent to clicking the global reinit button in the Workbench.",
         "operationId": "postRenderingReinit",
         "requestBody": {
           "required": false,
@@ -2026,6 +2161,15 @@
           },
           "503": {
             "$ref": "#/components/responses/DataStorageNotAvailable"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
           }
         }
       }
@@ -2034,7 +2178,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "Get crosshair position and scene bounds",
-        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min and bounds.max are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
+        "description": "Returns the current crosshair position in world coordinates via IRenderWindowPart::GetSelectedPosition() on the StdMultiWidgetEditor, and the world-space AABB from the reinit geometry (TimeNavigationController input world time geometry). If no input geometry is available, bounds.min_position and bounds.max_position are null. Requires the Qt workbench plugin to be running (503 RENDER_WINDOW_NOT_AVAILABLE otherwise) and the StdMultiWidgetEditor to be open (503 EDITOR_NOT_ACTIVE otherwise).",
         "operationId": "getRenderingSelectedPosition",
         "responses": {
           "200": {
@@ -2055,16 +2199,16 @@
                     },
                     "bounds": {
                       "type": "object",
-                      "required": ["min", "max"],
+                      "required": ["min_position", "max_position"],
                       "properties": {
-                        "min": {
+                        "min_position": {
                           "oneOf": [
                             { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
                             { "type": "null" }
                           ],
                           "description": "World-space minimum corner of the scene AABB, or null if no geometry"
                         },
-                        "max": {
+                        "max_position": {
                           "oneOf": [
                             { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
                             { "type": "null" }
@@ -2077,13 +2221,22 @@
                 },
                 "example": {
                   "position": [10.0, 20.0, 30.0],
-                  "bounds": { "min": [-50.0, -50.0, -50.0], "max": [50.0, 50.0, 50.0] }
+                  "bounds": { "min_position": [-50.0, -50.0, -50.0], "max_position": [50.0, 50.0, 50.0] }
                 }
               }
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       },
       "put": {
@@ -2116,7 +2269,16 @@
           "204": { "description": "Crosshair position updated" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2124,7 +2286,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "List known editors",
-        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors. The `mxn` alias is reported with `active: false` until the MxN multi-widget editor is implemented; clients treating this endpoint as the source of truth for editor availability will future-proof.",
+        "description": "Returns all known editor aliases with their current activity state. The alias list is always complete, even when no editor is open, so clients can discover available editors. Both the `stdmulti` and `mxn` aliases are probed live; `active` is `true` only when an editor instance is currently open in the workbench.",
         "operationId": "getRenderingEditors",
         "responses": {
           "200": {
@@ -2143,7 +2305,16 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2169,7 +2340,16 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2177,7 +2357,7 @@
       "get": {
         "tags": ["Rendering"],
         "summary": "List StdMultiWidget render windows",
-        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window name (URL segment for sub-resources) and its kind (2D or 3D). No `plane` field is reported — under swivel mode the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
+        "description": "Returns the StdMultiWidget editor's render windows. Each item carries the window id (URL segment for sub-resources), its kind (2D or 3D), and (for 2D windows) the persisted `view_direction`. No `plane` field is reported -- under swivel mode the live plane is not guaranteed to match an anatomical one; read orientation from the window's /camera if needed.",
         "operationId": "getRenderingStdmultiWindows",
         "responses": {
           "200": {
@@ -2189,27 +2369,36 @@
                   "items": { "$ref": "#/components/schemas/WindowListItem" }
                 },
                 "example": [
-                  { "name": "axial",    "kind": "2d" },
-                  { "name": "sagittal", "kind": "2d" },
-                  { "name": "coronal",  "kind": "2d" },
-                  { "name": "3d",       "kind": "3d" }
+                  { "id": "axial",    "kind": "2d", "view_direction": "axial" },
+                  { "id": "sagittal", "kind": "2d", "view_direction": "sagittal" },
+                  { "id": "coronal",  "kind": "2d", "view_direction": "coronal" },
+                  { "id": "3d",       "kind": "3d" }
                 ]
               }
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
-    "/rendering/editors/stdmulti/windows/{name}": {
+    "/rendering/editors/stdmulti/windows/{id}": {
       "get": {
         "tags": ["Rendering"],
         "summary": "Get StdMultiWidget window summary",
         "description": "Per-window summary. `kind` drives which sub-resources apply. `has_selected_slice` is false for the 3D window.",
         "operationId": "getRenderingStdmultiWindow",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" }
+          { "$ref": "#/components/parameters/StdMultiWindowId" }
         ],
         "responses": {
           "200": {
@@ -2220,11 +2409,11 @@
                 "examples": {
                   "axial": {
                     "summary": "2D window",
-                    "value": { "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+                    "value": { "id": "axial", "kind": "2d", "view_direction": "axial", "has_camera": true, "has_selected_slice": true }
                   },
                   "threeD": {
                     "summary": "3D window",
-                    "value": { "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+                    "value": { "id": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
                   }
                 }
               }
@@ -2232,18 +2421,27 @@
           },
           "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
-    "/rendering/editors/stdmulti/windows/{name}/camera": {
+    "/rendering/editors/stdmulti/windows/{id}/camera": {
       "get": {
         "tags": ["Rendering"],
         "summary": "Get camera state of a StdMultiWidget window",
         "description": "Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.",
         "operationId": "getRenderingStdmultiCamera",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" }
+          { "$ref": "#/components/parameters/StdMultiWindowId" }
         ],
         "responses": {
           "200": {
@@ -2276,16 +2474,25 @@
           },
           "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       },
       "put": {
         "tags": ["Rendering"],
         "summary": "Update camera state of a StdMultiWidget window",
-        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying CameraController; explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw vtkCamera, so combining the two would leave the controller's internal state inconsistent — this combination is rejected with 400. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`, which only adjust scale/angle. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked. Only the addressed window is refreshed; coupled crosshair/slice updates on sibling 2D windows happen through their own UI events.",
+        "description": "Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying CameraController; explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw vtkCamera, so combining the two would leave the controller's internal state inconsistent -- this combination is rejected with 400. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`, which only adjust scale/angle. Unknown fields, 2D-only fields on the 3D window, 3D-only fields on 2D windows, unknown `standard_view` values, non-positive `parallel_scale`, and `perspective_angle` outside (0, 180) are rejected with 400. World coordinates are not range-checked. Only the addressed window is refreshed; coupled crosshair/slice updates on sibling 2D windows happen through their own UI events.",
         "operationId": "putRenderingStdmultiCamera",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" }
+          { "$ref": "#/components/parameters/StdMultiWindowId" }
         ],
         "requestBody": {
           "required": true,
@@ -2293,8 +2500,8 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/CameraPatch" },
               "examples": {
-                "twoD": { "summary": "2D window — standard view + scale", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
-                "twoDPose": { "summary": "2D window — explicit pose", "value": { "position": [127.5, 83.2, 45.0], "focal_point": [127.5, 83.2, 0.0], "view_up": [0.0, 1.0, 0.0] } },
+                "twoD": { "summary": "2D window -- standard view + scale", "value": { "standard_view": "anterior", "parallel_scale": 120.0 } },
+                "twoDPose": { "summary": "2D window -- explicit pose", "value": { "position": [127.5, 83.2, 45.0], "focal_point": [127.5, 83.2, 0.0], "view_up": [0.0, 1.0, 0.0] } },
                 "threeD": { "summary": "3D window", "value": { "perspective_angle": 45.0 } }
               }
             }
@@ -2322,18 +2529,27 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
-    "/rendering/editors/stdmulti/windows/{name}/selected-slice": {
+    "/rendering/editors/stdmulti/windows/{id}/selected-slice": {
       "get": {
         "tags": ["Rendering"],
         "summary": "Get selected slice of a StdMultiWidget 2D window",
-        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
+        "description": "Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). No `plane` field is reported -- under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane; read orientation from the window's /camera if needed. When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null`.",
         "operationId": "getRenderingStdmultiSelectedSlice",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" }
+          { "$ref": "#/components/parameters/StdMultiWindowId" }
         ],
         "responses": {
           "200": {
@@ -2355,16 +2571,25 @@
           },
           "404": { "$ref": "#/components/responses/WindowNotFoundOrUnsupported" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       },
       "put": {
         "tags": ["Rendering"],
         "summary": "Set selected slice of a StdMultiWidget 2D window",
-        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked — out-of-range values are clamped/snapped by MITK.",
+        "description": "Accepts only `{\"step\": N}`. To move by world coordinates, use PUT /rendering/selected-position (StdMulti slices are coupled). Sending a `position` field returns 400 with a hint. Not applicable to the 3D window (returns 404 UNSUPPORTED_OPERATION). `step` is not range-checked -- out-of-range values are clamped/snapped by MITK.",
         "operationId": "putRenderingStdmultiSelectedSlice",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" }
+          { "$ref": "#/components/parameters/StdMultiWindowId" }
         ],
         "requestBody": {
           "required": true,
@@ -2385,7 +2610,7 @@
         "responses": {
           "204": { "description": "Slice updated" },
           "400": {
-            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti — use /rendering/selected-position).",
+            "description": "Invalid body, missing/negative/non-integer step, unknown field, or a `position` field was supplied (not accepted for StdMulti -- use /rendering/selected-position).",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
@@ -2420,7 +2645,16 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2467,7 +2701,16 @@
             }
           },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       },
       "put": {
@@ -2510,7 +2753,7 @@
           "204": { "description": "Time navigation state updated" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "422": {
-            "description": "Unexpected error in the rendering framework",
+            "description": "Resolved time step is outside the available range [0, steps), or unexpected error in the rendering framework. Out-of-range inputs are rejected rather than silently clamped.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" }
@@ -2518,7 +2761,16 @@
             }
           },
           "500": { "$ref": "#/components/responses/TimeStepperNotAvailable" },
-          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" }
+          "503": { "$ref": "#/components/responses/TimeNavigationNotAvailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2537,7 +2789,16 @@
           "200": { "$ref": "#/components/responses/ScreenshotImage" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" }
+          "503": { "$ref": "#/components/responses/RenderWindowNotAvailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
@@ -2556,18 +2817,27 @@
           "200": { "$ref": "#/components/responses/ScreenshotImage" },
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     },
-    "/rendering/editors/stdmulti/windows/{name}/screenshot": {
+    "/rendering/editors/stdmulti/windows/{id}/screenshot": {
       "get": {
         "tags": ["Rendering"],
         "summary": "Capture a screenshot of a single StdMultiWidget render window",
-        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit) — pass dimensions matching the source ratio if a faithful aspect is needed. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "description": "Grabs a single render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit) -- pass dimensions matching the source ratio if a faithful aspect is needed. Query parameters and response contract are identical to `GET /rendering/screenshot`.",
         "operationId": "getRenderingStdmultiWindowScreenshot",
         "parameters": [
-          { "$ref": "#/components/parameters/StdMultiWindowName" },
+          { "$ref": "#/components/parameters/StdMultiWindowId" },
           { "$ref": "#/components/parameters/ScreenshotFormat" },
           { "$ref": "#/components/parameters/ScreenshotWidth" },
           { "$ref": "#/components/parameters/ScreenshotHeight" }
@@ -2577,7 +2847,529 @@
           "400": { "$ref": "#/components/responses/InvalidRequest" },
           "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
           "500": { "$ref": "#/components/responses/InternalError" },
-          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" }
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get MxN multi-widget editor info",
+        "description": "Returns metadata about the MxN multi-widget editor, including its current cell ids when the editor is open. Cell ids are in the canonical fully-qualified form `<editor_name>__<bare>` (e.g. `mxn__widget0`), match the `id` field of each `window` leaf in the v2 layout document, and are used verbatim as the URL segment for sub-resources; no prefix translation happens at any boundary.",
+        "operationId": "getRenderingMxnInfo",
+        "responses": {
+          "200": {
+            "description": "MxN editor info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/EditorInfo" },
+                "example": {
+                  "alias": "mxn",
+                  "plugin_id": "org.mitk.editors.mxnmultiwidget",
+                  "active": true,
+                  "windows": ["mxn__widget0", "mxn__widget1", "mxn__widget2"]
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "List MxN render windows",
+        "description": "Returns the MxN editor's cells in pre-order traversal of the current layout. Each entry carries the cell `id` in the canonical fully-qualified form `<editor_name>__<bare>` (the same string used as the URL segment for sub-resources and as the layout document's `id` field), an optional human-readable `name` (display label, omitted when the cell has no display name set), the kind (always `2d` under v2; `3d` reserved for forward-compat), the persisted `view_direction` from the layout document, and the cell's `links` object. v2 has one link dimension (`selection`); v3 will add more dimension keys here additively without breaking v2 clients.",
+        "operationId": "getRenderingMxnWindows",
+        "responses": {
+          "200": {
+            "description": "List of MxN cells",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/MxNWindowListItem" }
+                },
+                "example": [
+                  { "id": "mxn__widget0", "name": "Tumor axial", "kind": "2d", "view_direction": "axial",    "links": { "selection": "main" } },
+                  { "id": "mxn__widget1", "kind": "2d", "view_direction": "sagittal", "links": { "selection": "main" } },
+                  { "id": "mxn__widget2", "kind": "2d", "view_direction": "coronal",  "links": { "selection": "row2" } }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of the MxN editor canvas",
+        "description": "Grabs the MxN multi-widget canvas (the cell tree only -- no toolbars, no side panels). Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingMxnScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows/{id}/screenshot": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Capture a screenshot of a single MxN cell",
+        "description": "Grabs a single MxN cell render window without resizing the live render surface. If a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit). Query parameters and response contract are identical to `GET /rendering/screenshot`.",
+        "operationId": "getRenderingMxnWindowScreenshot",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" },
+          { "$ref": "#/components/parameters/ScreenshotFormat" },
+          { "$ref": "#/components/parameters/ScreenshotWidth" },
+          { "$ref": "#/components/parameters/ScreenshotHeight" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/ScreenshotImage" },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/layout": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get the current MxN layout document",
+        "description": "Returns the v2.0 layout document the editor would persist if asked to save right now. Always strict-mode: every group referenced by a cell appears in the top-level `groups` dict. The response body is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file -- same schema, same shape (see `mxn-layout-v2.schema.json`).",
+        "operationId": "getRenderingMxnLayout",
+        "responses": {
+          "200": {
+            "description": "MxN layout document (v2.0).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "v2.0 layout document. Validated against `mxn-layout-v2.schema.json` (https://mitk.org/schemas/mxn-layout-2.0.json) -- see that file for the full field-level spec.",
+                  "type": "object",
+                  "required": ["version", "root"]
+                },
+                "example": {
+                  "version": "2.0",
+                  "name": "Three Views",
+                  "groups": { "main": { "select_all": true } },
+                  "root": {
+                    "type": "split",
+                    "orientation": "horizontal",
+                    "children": [
+                      { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+                      { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
+                      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Apply a v2.0 layout document to the MxN editor",
+        "description": "Applies the supplied v2.0 layout document. **All existing cells are torn down and rebuilt from the document** (no positional reuse) -- any cell id a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout (same shape as GET), so callers can refresh their cell list from the response without a follow-up GET. Schema and structural failures (version != 2.0, duplicate window ids, unknown view direction, missing group reference, type errors, ...) surface as `400 INVALID_REQUEST` with a precise `detail` message. The body is validated against `mxn-layout-v2.schema.json`.",
+        "operationId": "putRenderingMxnLayout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "v2.0 layout document. Validated against `mxn-layout-v2.schema.json` (https://mitk.org/schemas/mxn-layout-2.0.json).",
+                "type": "object",
+                "required": ["version", "root"]
+              },
+              "example": {
+                "version": "2.0",
+                "groups": { "main": { "select_all": true } },
+                "root": {
+                  "type": "split", "orientation": "horizontal",
+                  "children": [
+                    { "type": "window", "id": "mxn__widget0", "name": "Tumor axial", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+                    { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Layout applied. The body is the freshly serialized layout (same shape as GET).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["version", "root"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows/{id}/camera": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get camera state of an MxN cell",
+        "description": "Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape). When v3 introduces a 3D MxN cell type the response will switch to the 3D shape (`perspective_angle`); the schema is unchanged.",
+        "operationId": "getRenderingMxnCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Camera state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CameraState" },
+                "example": {
+                  "position":       [127.5,  83.2, 200.0],
+                  "focal_point":    [127.5,  83.2,  45.0],
+                  "view_up":        [0.0,    1.0,   0.0],
+                  "parallel_scale": 120.0
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Update camera state of an MxN cell",
+        "description": "Partial update -- at least one camera field must be present. `standard_view` is applied first; explicit pose fields override its effect (cannot combine `standard_view` with `position`/`focal_point`/`view_up`). Under v2 every MxN cell is 2D, so `perspective_angle` is rejected with 400; `parallel_scale` is accepted. Field validation, unknown-field rejection, and the rest of the contract mirror the StdMulti camera PUT.",
+        "operationId": "putRenderingMxnCamera",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CameraPatch" },
+              "example": { "parallel_scale": 120.0 }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Camera updated." },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "422": { "$ref": "#/components/responses/RenderingError" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows/{id}/selected-slice": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get the cell's currently selected slice",
+        "description": "Returns the cell's selected-slice state: integer step plus the live world position on the slice plane plus navigator bounds. `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded (mirrors the global selected-position bounds convention).",
+        "operationId": "getRenderingMxnSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Slice navigator state",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SliceState" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Step the cell's slice navigator to a target index",
+        "description": "Body: `{\"step\": N}` only. World-anchor moves on a single MxN cell live at the per-cell selected-position resource (`PUT .../selected-position`); global anchor moves at `PUT /rendering/selected-position`. Sending `position` here returns 400 with a hint pointing to both primitives. No range checking -- out-of-range step values are clamped/snapped by the navigator (D15).",
+        "operationId": "putRenderingMxnSelectedSlice",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["step"],
+                "properties": { "step": { "type": "integer", "minimum": 0 } }
+              },
+              "example": { "step": 42 }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Slice updated." },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "422": { "$ref": "#/components/responses/RenderingError" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows/{id}/selected-position": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get the per-cell 3D world anchor of an MxN cell",
+        "description": "Returns the cell's selected position (3D world anchor) plus scene bounds. Same shape as `GET /rendering/selected-position` but per-cell-scoped -- distinct resource from the global one (D8). An unsynced MxN cell may legitimately have a different anchor than the global one. `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded.",
+        "operationId": "getRenderingMxnSelectedPosition",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Per-cell selected position + scene bounds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["position", "bounds"],
+                  "properties": {
+                    "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                    "bounds": {
+                      "type": "object",
+                      "required": ["min_position", "max_position"],
+                      "properties": {
+                        "min_position": { "oneOf": [{ "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" }] },
+                        "max_position": { "oneOf": [{ "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }, { "type": "null" }] }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "position": [127.5, 83.2, 45.0],
+                  "bounds": { "min_position": [0.0, 0.0, 0.0], "max_position": [255.0, 255.0, 90.0] }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Rendering"],
+        "summary": "Set the per-cell 3D world anchor of an MxN cell",
+        "description": "Sets the cell's selected position. Distinct from the global `/rendering/selected-position` resource: this targets a single cell's anchor via `QmitkAbstractMultiWidget::SetSelectedPosition(point, widgetName)`. Whether the change visibly propagates to other cells (or to the global anchor) depends on the workbench's interactive coupling toolbar state -- that state is intentionally not exposed via REST. Clients that need a deterministic per-cell observation read each cell's `selected-position` after their PUT. No range checking -- out-of-range values are clamped/snapped by MITK (D15).",
+        "operationId": "putRenderingMxnSelectedPosition",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["position"],
+                "properties": {
+                  "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+                }
+              },
+              "example": { "position": [127.5, 83.2, 45.0] }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Per-cell anchor updated." },
+          "400": { "$ref": "#/components/responses/InvalidRequest" },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "422": { "$ref": "#/components/responses/RenderingError" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
+        }
+      }
+    },
+    "/rendering/editors/mxn/windows/{id}": {
+      "get": {
+        "tags": ["Rendering"],
+        "summary": "Get MxN window summary",
+        "description": "Per-cell summary. `view_direction` and `links` come from the layout document (persisted state, not live orientation). The optional `name` mirrors the layout document's display label and is omitted when the cell has no display name. Sub-resources: `/camera`, `/selected-slice` (2D cells), `/selected-position`, `/screenshot`. v2 has no 3D MxN cell type, so `has_selected_slice` is always `true`; the field is kept for forward-compat with future v3 cell types.",
+        "operationId": "getRenderingMxnWindow",
+        "parameters": [
+          { "$ref": "#/components/parameters/MxNWindowName" }
+        ],
+        "responses": {
+          "200": {
+            "description": "MxN cell summary",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MxNWindowInfo" },
+                "example": {
+                  "id": "mxn__widget0",
+                  "name": "Tumor axial",
+                  "kind": "2d",
+                  "view_direction": "axial",
+                  "links": { "selection": "main" },
+                  "has_camera": true,
+                  "has_selected_slice": true,
+                  "has_selected_position": true
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/RenderWindowNotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" },
+          "503": { "$ref": "#/components/responses/EditorOrBridgeUnavailable" },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/AccessDenied"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitExceeded"
+          }
         }
       }
     }
@@ -2767,7 +3559,8 @@
               "code",
               "title",
               "message",
-              "status"
+              "status",
+              "instance"
             ],
             "properties": {
               "type": {
@@ -3043,27 +3836,67 @@
           "alias":     { "type": "string", "example": "stdmulti" },
           "plugin_id": { "type": "string", "example": "org.mitk.editors.stdmultiwidget" },
           "active":    { "type": "boolean" },
-          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window names" }
+          "windows":   { "type": "array", "items": { "type": "string" }, "description": "Current window identifiers (URL segments for sub-resources). For the MxN editor each entry matches the `id` field of the corresponding `window` leaf in the v2 layout document verbatim, i.e. the canonical fully-qualified form `<editor_name>__<bare>`. For StdMulti, the engine-fixed names (`axial`, `sagittal`, `coronal`, `3d`)." }
         }
       },
       "WindowListItem": {
         "type": "object",
-        "description": "Window list entry returned by GET /rendering/editors/stdmulti/windows.",
-        "required": ["name", "kind"],
+        "description": "Window list entry returned by GET /rendering/editors/stdmulti/windows. Convention: `view_direction` is present iff `kind == \"2d\"`; the StdMulti `3d` window omits it.",
+        "required": ["id", "kind"],
         "properties": {
-          "name": { "type": "string", "description": "Render window name (URL segment for sub-resources)" },
-          "kind": { "type": "string", "enum": ["2d", "3d"], "description": "Window kind — drives which sub-resources apply" }
+          "id":             { "type": "string", "description": "Render window id (engine-fixed slot token; URL segment for sub-resources). One of `axial`, `sagittal`, `coronal`, `3d`." },
+          "kind":           { "type": "string", "enum": ["2d", "3d"], "description": "Window kind -- drives which sub-resources apply" },
+          "view_direction": { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"], "description": "Anatomical plane this slot renders. Present only for 2D windows; omitted for the 3D window. For StdMulti the value matches `id` by construction; the field is provided so generic clients can read `view_direction` uniformly across editor types." }
         }
       },
       "WindowInfo": {
         "type": "object",
-        "description": "Per-window summary returned by GET /rendering/editors/stdmulti/windows/{name}.",
-        "required": ["name", "kind", "has_camera", "has_selected_slice"],
+        "description": "Per-window summary returned by GET /rendering/editors/stdmulti/windows/{id}. Convention: `view_direction` is present iff `kind == \"2d\"`; the StdMulti `3d` window omits it.",
+        "required": ["id", "kind", "has_camera", "has_selected_slice"],
         "properties": {
-          "name": { "type": "string" },
-          "kind": { "type": "string", "enum": ["2d", "3d"] },
+          "id":                 { "type": "string" },
+          "kind":               { "type": "string", "enum": ["2d", "3d"] },
+          "view_direction":     { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"], "description": "Anatomical plane the slot renders. Present only for 2D windows; omitted for the 3D window." },
           "has_camera":         { "type": "boolean" },
           "has_selected_slice": { "type": "boolean", "description": "True for 2D windows, false for the 3D window" }
+        }
+      },
+      "MxNLinks": {
+        "type": "object",
+        "description": "Per-cell synchronisation links from the layout document. v2.0 knows only the `selection` dimension; v3 will add more dimensions here additively (zoom, time, crosshair, ...). Tooling that reads the v2 shape continues to work in v3 unchanged.",
+        "required": ["selection"],
+        "properties": {
+          "selection": {
+            "type": "string",
+            "description": "Group label for the selection bundle (selection list / stack order / visibility / select-all mode). Cells with the same value share the bundle at runtime."
+          }
+        }
+      },
+      "MxNWindowListItem": {
+        "type": "object",
+        "description": "Window list entry returned by GET /rendering/editors/mxn/windows. Carries the per-cell layout-document fields so REST clients don't need to fetch the full layout to know which cells exist. Convention: `view_direction` is present iff `kind == \"2d\"`. Under v2 only 2D cells exist, so `view_direction` is required; v3 will relax this when 3D cells are introduced.",
+        "required": ["id", "kind", "view_direction", "links"],
+        "properties": {
+          "id":             { "type": "string", "description": "Canonical fully-qualified MxN cell id (URL segment for sub-resources). Matches the `id` field of the corresponding `window` leaf in the layout document. URL-segment-safe and unique within the layout." },
+          "name":           { "type": "string", "minLength": 1, "description": "Optional human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf in the layout document. Free-form, not unique. Omitted when the cell has no display name set." },
+          "kind":           { "type": "string", "enum": ["2d", "3d"], "description": "Cell kind; always `2d` under v2 (the schema's `view_direction` enum has no `3d` value). `3d` is reserved for v3 forward-compat." },
+          "view_direction": { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"], "description": "Persisted view direction from the layout document. Authoring intent, not live orientation -- read live orientation from /camera if needed." },
+          "links":          { "$ref": "#/components/schemas/MxNLinks" }
+        }
+      },
+      "MxNWindowInfo": {
+        "type": "object",
+        "description": "Per-cell summary returned by GET /rendering/editors/mxn/windows/{id}. Adds capability flags (`has_camera`, `has_selected_slice`, `has_selected_position`) on top of the list-entry fields. Convention: `view_direction` is present iff `kind == \"2d\"`. Under v2 only 2D cells exist, so `view_direction` is required; v3 will relax this when 3D cells are introduced.",
+        "required": ["id", "kind", "view_direction", "links", "has_camera", "has_selected_slice", "has_selected_position"],
+        "properties": {
+          "id":             { "type": "string", "description": "Canonical fully-qualified MxN cell id. Matches the `id` field of the corresponding `window` leaf in the layout document." },
+          "name":           { "type": "string", "minLength": 1, "description": "Optional human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf in the layout document. Omitted when absent." },
+          "kind":           { "type": "string", "enum": ["2d", "3d"] },
+          "view_direction": { "type": "string", "enum": ["axial", "sagittal", "coronal", "original"] },
+          "links":          { "$ref": "#/components/schemas/MxNLinks" },
+          "has_camera":            { "type": "boolean" },
+          "has_selected_slice":    { "type": "boolean", "description": "True for 2D cells; reserved for v3 3D cells." },
+          "has_selected_position": { "type": "boolean", "description": "True for every MxN cell -- per-cell selected position is a v2 capability (distinct from the global /rendering/selected-position resource)." }
         }
       },
       "CameraState": {
@@ -3135,16 +3968,27 @@
         "schema": { "type": "integer", "minimum": 1, "maximum": 8192 },
         "description": "Output height in pixels. Must be provided together with 'width'."
       },
-      "StdMultiWindowName": {
-        "name": "name",
+      "StdMultiWindowId": {
+        "name": "id",
         "in": "path",
         "required": true,
-        "description": "StdMultiWidget render window name.",
+        "description": "StdMultiWidget render window id (the engine-fixed slot token).",
         "schema": {
           "type": "string",
           "enum": ["axial", "sagittal", "coronal", "3d"]
         },
         "example": "axial"
+      },
+      "MxNWindowName": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Canonical fully-qualified MxN cell id from the current layout document (`<editor_name>__<bare>`, unique within the layout). Matches the `id` field of the corresponding `window` leaf verbatim; the engine, the layout document, and the URL share one form, with no prefix translation at any boundary.",
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$"
+        },
+        "example": "mxn__widget0"
       },
       "NodeUid": {
         "name": "uid",
@@ -3544,7 +4388,7 @@
         }
       },
       "EditorOrBridgeUnavailable": {
-        "description": "Either the render window bridge is not connected (RENDER_WINDOW_NOT_AVAILABLE) or the addressed editor is not currently open (EDITOR_NOT_ACTIVE).",
+        "description": "The addressed editor surface is unavailable. Returned in three cases: (1) RENDER_WINDOW_NOT_AVAILABLE — no bridge callback is registered (headless / Qt plugin not loaded); (2) RENDER_WINDOW_NOT_AVAILABLE — the editor list provider is registered but does not expose the addressed editor alias (e.g. `mxn`) in this workbench build; (3) EDITOR_NOT_ACTIVE — the editor is known but not currently open.",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/Error" },
@@ -3559,6 +4403,19 @@
                     "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
                     "status": 503,
                     "instance": "/api/v1/rendering/editors/stdmulti/screenshot"
+                  }
+                }
+              },
+              "editorAliasNotExposed": {
+                "summary": "Editor alias not exposed by this workbench",
+                "value": {
+                  "error": {
+                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "code": "RENDER_WINDOW_NOT_AVAILABLE",
+                    "title": "Render Window Not Available",
+                    "message": "Editor alias 'mxn' is not exposed by the workbench's editor list provider.",
+                    "status": 503,
+                    "instance": "/api/v1/rendering/editors/mxn"
                   }
                 }
               },
@@ -3589,7 +4446,7 @@
                 "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
                 "code": "RENDER_WINDOW_NOT_FOUND",
                 "title": "Render Window Not Found",
-                "message": "No render window named 'bogus' in the addressed editor",
+                "message": "No render window with id 'bogus' in the addressed editor",
                 "status": 404,
                 "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus"
               }
@@ -3605,7 +4462,7 @@
         }
       },
       "WindowNotFoundOrUnsupported": {
-        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window — e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
+        "description": "Either the window name is unknown (RENDER_WINDOW_NOT_FOUND) or the sub-resource does not apply to the addressed window -- e.g. selected-slice on the 3D window (UNSUPPORTED_OPERATION).",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/Error" },
@@ -3617,7 +4474,7 @@
                     "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
                     "code": "RENDER_WINDOW_NOT_FOUND",
                     "title": "Render Window Not Found",
-                    "message": "No render window named 'bogus' in the addressed editor",
+                    "message": "No render window with id 'bogus' in the addressed editor",
                     "status": 404,
                     "instance": "/api/v1/rendering/editors/stdmulti/windows/bogus/camera"
                   }

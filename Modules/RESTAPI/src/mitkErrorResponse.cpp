@@ -101,16 +101,6 @@ namespace mitk
       instance);
   }
 
-  ErrorResponse::Json ErrorResponse::NotImplemented(const std::string& feature, const std::string& instance)
-  {
-    return Create(
-      CODE_NOT_IMPLEMENTED,
-      "Not Implemented",
-      "Feature '" + feature + "' is not yet implemented",
-      501,
-      instance);
-  }
-
   ErrorResponse::Json ErrorResponse::NodeHasChildren(int childrenCount, const std::string& instance)
   {
     Json response = Create(
@@ -311,12 +301,12 @@ namespace mitk
       instance);
   }
 
-  ErrorResponse::Json ErrorResponse::RenderWindowNotFound(const std::string& windowName, const std::string& instance)
+  ErrorResponse::Json ErrorResponse::RenderWindowNotFound(const std::string& windowId, const std::string& instance)
   {
     return Create(
       CODE_RENDER_WINDOW_NOT_FOUND,
       "Render Window Not Found",
-      "No render window named '" + windowName + "' in the addressed editor",
+      "No render window with id '" + windowId + "' in the addressed editor",
       404,
       instance);
   }
@@ -328,6 +318,16 @@ namespace mitk
       "Unsupported Operation",
       detail,
       404,
+      instance);
+  }
+
+  ErrorResponse::Json ErrorResponse::RendererUnavailable(const std::string& windowId, const std::string& instance)
+  {
+    return Create(
+      CODE_RENDERER_UNAVAILABLE,
+      "Renderer Unavailable",
+      "Render window '" + windowId + "' exists but its renderer is currently unavailable",
+      500,
       instance);
   }
 }

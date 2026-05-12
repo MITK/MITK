@@ -72,6 +72,34 @@ namespace
   constexpr const char* HEADER_CONTENT_TYPE = "Content-Type";
   constexpr const char* HEADER_CONTENT_DISPOSITION = "Content-Disposition";
 
+  /**
+   * \brief Thrown by query-parameter parsers when a closed-enum value
+   * (e.g. `hierarchy`, `property_scope`) does not match the OAS schema.
+   *
+   * Caught at handler boundaries and converted to **400 INVALID_REQUEST**.
+   * Mirrors the `InvalidScreenshotRequest` pattern used by the rendering
+   * controller -- keeps closed-set validation strict at the earliest boundary
+   * (see project memory `feedback_closed_set_enum_class.md`).
+   */
+  struct InvalidQueryParam
+  {
+    std::string detail;
+  };
+
+  /**
+   * \brief Thrown by `DetermineTransferMode` when the `X-MITK-Transfer-Mode`
+   * header carries a value outside the OAS `TransferMode` enum.
+   *
+   * Caught at handler boundaries and converted to **406
+   * TRANSFER_MODE_NOT_AVAILABLE**. Distinct from `InvalidQueryParam` because
+   * the protocol-level remedy is "negotiate a different mode" (406), not
+   * "fix your request shape" (400).
+   */
+  struct InvalidTransferModeHeader
+  {
+    std::string mode;
+  };
+
 
   /**
    * @brief Parse a comma-separated string into a vector of trimmed values.
@@ -347,7 +375,7 @@ void DataStorageController::ReleaseRequestTempDir(const std::string& clientIp, c
 
 std::string DataStorageController::DetermineTransferMode(const httplib::Request& req) const
 {
-  // Check X-MITK-Transfer-Mode header first
+  // Check X-MITK-Transfer-Mode header first (closed enum: direct, file-reference -- strict)
   if (req.has_header(HEADER_TRANSFER_MODE))
   {
     const std::string mode = req.get_header_value(HEADER_TRANSFER_MODE);
@@ -355,6 +383,7 @@ std::string DataStorageController::DetermineTransferMode(const httplib::Request&
     {
       return mode;
     }
+    throw InvalidTransferModeHeader{mode};
   }
 
   // Fall back to Accept header
@@ -496,15 +525,23 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
     catch (const std::exception&) {}
   }
 
-  // Hierarchy (per API spec: "all" or "toplevel")
+  // Hierarchy (per API spec: "all" or "toplevel" -- closed enum, strict)
   if (req.has_param("hierarchy"))
   {
-    std::string hierarchyStr = req.get_param_value("hierarchy");
-    if (hierarchyStr == "toplevel")
+    const std::string hierarchyStr = req.get_param_value("hierarchy");
+    if (hierarchyStr == "all")
+    {
+      params.hierarchy = Hierarchy::All;
+    }
+    else if (hierarchyStr == "toplevel")
     {
       params.hierarchy = Hierarchy::Toplevel;
     }
-    // Default is "all"
+    else
+    {
+      throw InvalidQueryParam{
+        "Invalid hierarchy '" + hierarchyStr + "'. Must be 'all' or 'toplevel'."};
+    }
   }
 
   // Path filter
@@ -525,11 +562,15 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
     params.parentUid = req.get_param_value("parent_uid");
   }
 
-  // Property scope for filtering (per API spec: "all", "node", "data")
+  // Property scope for filtering (per API spec: "all", "node", "data" -- closed enum, strict)
   if (req.has_param("property_scope"))
   {
-    std::string scopeStr = req.get_param_value("property_scope");
-    if (scopeStr == "node")
+    const std::string scopeStr = req.get_param_value("property_scope");
+    if (scopeStr == "all")
+    {
+      params.propertyScope = PropertyScope::All;
+    }
+    else if (scopeStr == "node")
     {
       params.propertyScope = PropertyScope::Node;
     }
@@ -537,7 +578,11 @@ NodeQueryParams DataStorageController::ParseNodeQueryParams(const httplib::Reque
     {
       params.propertyScope = PropertyScope::Data;
     }
-    // Default is "all"
+    else
+    {
+      throw InvalidQueryParam{
+        "Invalid property_scope '" + scopeStr + "'. Must be 'all', 'node', or 'data'."};
+    }
   }
 
   // Context (for renderer-specific properties)
@@ -616,10 +661,10 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
   PropertyQueryParams params;
   params.scope = defaultScope;
 
-  // Property scope
+  // Property scope (closed enum: "all", "node", "data" -- strict)
   if (req.has_param("property_scope"))
   {
-    std::string scopeStr = req.get_param_value("property_scope");
+    const std::string scopeStr = req.get_param_value("property_scope");
     if (scopeStr == "node")
     {
       params.scope = PropertyScope::Node;
@@ -632,7 +677,11 @@ PropertyQueryParams DataStorageController::ParsePropertyQueryParams(const httpli
     {
       params.scope = PropertyScope::All;
     }
-    // If invalid value, keep the default
+    else
+    {
+      throw InvalidQueryParam{
+        "Invalid property_scope '" + scopeStr + "'. Must be 'all', 'node', or 'data'."};
+    }
   }
 
   // Context (for renderer-specific properties)
@@ -866,7 +915,16 @@ void DataStorageController::HandleGET_nodes(const httplib::Request& req, httplib
   }
 
   // Parse query parameters
-  auto params = this->ParseNodeQueryParams(req);
+  NodeQueryParams params;
+  try
+  {
+    params = this->ParseNodeQueryParams(req);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   auto queryResult = m_Bridge.GetNodes(params);
 
@@ -1347,7 +1405,16 @@ void DataStorageController::HandleGET_nodes_uid_children(const httplib::Request&
   }
 
   // Parse query parameters and set parent filter
-  auto params = this->ParseNodeQueryParams(req);
+  NodeQueryParams params;
+  try
+  {
+    params = this->ParseNodeQueryParams(req);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
   params.parentUid = parentUid;
 
   // Use GetNodes with parent filter - eliminates need for separate GetChildren method
@@ -1421,6 +1488,21 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
     return;
   }
 
+  // Determine transfer mode (header is a closed enum -- strict). Validate the
+  // request shape before any resource lookup so a malformed header is rejected
+  // without first cloning the node's data only to discard it.
+  std::string transferMode;
+  try
+  {
+    transferMode = this->DetermineTransferMode(req);
+  }
+  catch (const InvalidTransferModeHeader& e)
+  {
+    this->SendErrorResponse(res, 406, ErrorResponse::TransferModeNotAvailable(
+      e.mode, {TRANSFER_MODE_FILE_REFERENCE, TRANSFER_MODE_DIRECT}, req.path));
+    return;
+  }
+
   // Get a clone of the node's data for thread-safe serialization
   // The result distinguishes between "node not found" and "node has no data"
   const auto dataResult = m_Bridge.GetNodeData(uid);
@@ -1442,9 +1524,6 @@ void DataStorageController::HandleGET_nodes_uid_data(const httplib::Request& req
 
   // Get node info for the filename hint (we know node exists at this point)
   const auto nodeJson = m_Bridge.GetNode(uid);
-
-  // Determine transfer mode
-  const std::string transferMode = this->DetermineTransferMode(req);
 
   // Find appropriate serializer using ITK ObjectFactory
   const std::string serializerName = std::string(baseData->GetNameOfClass()) + "Serializer";
@@ -1716,7 +1795,16 @@ void DataStorageController::HandleGET_nodes_uid_properties(const httplib::Reques
   }
 
   // Parse property query parameters
-  auto params = this->ParsePropertyQueryParams(req);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   auto properties = m_Bridge.GetNodeProperties(uid, params);
   if (!properties.has_value())
@@ -1783,7 +1871,16 @@ void DataStorageController::HandleGET_nodes_uid_properties_key(const httplib::Re
   }
 
   // Parse property query parameters for context and scope
-  auto params = this->ParsePropertyQueryParams(req);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   auto property = m_Bridge.GetNodeProperty(uid, key, params);
   if (!property.has_value())
@@ -1845,7 +1942,16 @@ void DataStorageController::HandlePUT_nodes_uid_properties_key(const httplib::Re
 
   // Parse property query parameters for context and scope
   // Per API spec: PUT /properties/{name} defaults to "node" scope
-  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   // Mutation endpoints do not support scope "all"
   if (params.scope == PropertyScope::All)
@@ -1934,7 +2040,16 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
 
   // Parse property query parameters for context and scope
   // Per API spec: DELETE /properties/{name} defaults to "node" scope
-  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   // Mutation endpoints do not support scope "all"
   if (params.scope == PropertyScope::All)
@@ -1968,8 +2083,20 @@ void DataStorageController::HandleDELETE_nodes_uid_properties_key(const httplib:
     return;
   }
 
+  // Build scope string for response (mirrors PUT/PATCH meta shape so clients
+  // can read the resolved scope uniformly across mutation endpoints).
+  std::string scopeStr = "node";
+  if (params.scope == PropertyScope::Data)
+  {
+    scopeStr = "data";
+  }
+
   nlohmann::json response;
   response["data"]["deleted"] = key;
+  response["meta"]["node_uid"] = uid;
+  response["meta"]["property_key"] = key;
+  response["meta"]["property_scope"] = scopeStr;
+  response["meta"]["context"] = params.context.has_value() ? nlohmann::json(params.context.value()) : nlohmann::json(nullptr);
 
   this->SendJsonResponse(res, 200, response);
 }
@@ -1999,7 +2126,16 @@ void DataStorageController::HandlePUT_nodes_uid_properties(const httplib::Reques
 
   // Parse property query parameters for context and scope
   // Per API spec: PUT /properties defaults to "node" scope
-  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   // Mutation endpoints do not support scope "all"
   if (params.scope == PropertyScope::All)
@@ -2100,7 +2236,16 @@ void DataStorageController::HandlePATCH_nodes_uid_properties(const httplib::Requ
 
   // Parse property query parameters for context and scope
   // Per API spec: PATCH /properties defaults to "node" scope
-  auto params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  PropertyQueryParams params;
+  try
+  {
+    params = this->ParsePropertyQueryParams(req, PropertyScope::Node);
+  }
+  catch (const InvalidQueryParam& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
 
   // Mutation endpoints do not support scope "all"
   if (params.scope == PropertyScope::All)

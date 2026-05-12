@@ -78,6 +78,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   // Editor discovery tests
   MITK_TEST(GetEditorsWithoutProviderReturns503);
   MITK_TEST(GetEditorsReturns200WithAliases);
+  MITK_TEST(GetEditorsReportsMxnActiveWhenEditorOpen);
   MITK_TEST(GetStdmultiInfoWithEditorActiveReturns200);
   MITK_TEST(GetStdmultiInfoWhenEditorInactiveReturns503EditorNotActive);
   MITK_TEST(GetStdmultiWindowsWithoutProviderReturns503);
@@ -86,6 +87,67 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetStdmultiWindowForUnknownNameReturns404);
   MITK_TEST(GetStdmultiWindowForAxialReturns200With2d);
   MITK_TEST(GetStdmultiWindowFor3dReturns200NoSelectedSlice);
+
+  // MxN editor discovery
+  MITK_TEST(GetMxnInfoWithoutProviderReturns503);
+  MITK_TEST(GetMxnInfoWhenEditorInactiveReturns503EditorNotActive);
+  MITK_TEST(GetMxnInfoWithEditorActiveReturns200WithWindows);
+  MITK_TEST(GetMxnWindowsWithoutProviderReturns503);
+  MITK_TEST(GetMxnWindowsEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetMxnWindowsReturns200WithViewDirectionAndLinks);
+  MITK_TEST(GetMxnWindowForMalformedNameReturns400);
+  MITK_TEST(GetMxnWindowForUnknownNameReturns404);
+  MITK_TEST(GetMxnWindowForKnownCellReturns200WithFullSummary);
+
+  // MxN layout
+  MITK_TEST(GetMxnLayoutWithoutGetterReturns503);
+  MITK_TEST(GetMxnLayoutEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetMxnLayoutReturns200WithDocument);
+  MITK_TEST(PutMxnLayoutEmptyBodyReturns400);
+  MITK_TEST(PutMxnLayoutInvalidJsonReturns400);
+  MITK_TEST(PutMxnLayoutSchemaViolationReturns400);
+  MITK_TEST(PutMxnLayoutWithoutSetterReturns503);
+  MITK_TEST(PutMxnLayoutEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(PutMxnLayoutReturns200WithEchoedBody);
+
+  // MxN camera
+  MITK_TEST(GetMxnCameraMalformedNameReturns400);
+  MITK_TEST(GetMxnCameraWithoutGetterReturns503);
+  MITK_TEST(GetMxnCameraUnknownCellReturns404);
+  MITK_TEST(GetMxnCameraReturns200With2dFields);
+  MITK_TEST(PutMxnCameraEmptyBodyReturns400);
+  MITK_TEST(PutMxnCameraRejects3dOnlyFieldUnderV2);
+  MITK_TEST(PutMxnCameraAcceptsParallelScale);
+  MITK_TEST(PutMxnCameraEditorNotOpenReturns503EditorNotActive);
+
+  // MxN selected-slice
+  MITK_TEST(GetMxnSelectedSliceWithoutGetterReturns503);
+  MITK_TEST(GetMxnSelectedSliceReturns200WithStepAndBounds);
+  MITK_TEST(PutMxnSelectedSliceWithStepReturns204);
+  MITK_TEST(PutMxnSelectedSliceWithPositionReturns400WithHint);
+  MITK_TEST(PutMxnSelectedSliceWithUnknownFieldReturns400);
+  MITK_TEST(PutMxnSelectedSliceMissingStepReturns400);
+
+  // MxN per-cell selected-position
+  MITK_TEST(GetMxnSelectedPositionWithoutGetterReturns503);
+  MITK_TEST(GetMxnSelectedPositionReturns200WithPositionAndBounds);
+  MITK_TEST(GetMxnSelectedPositionNoGeometryReturnsNullBounds);
+  MITK_TEST(PutMxnSelectedPositionForwardsToCell);
+  MITK_TEST(PutMxnSelectedPositionMissingFieldReturns400);
+  MITK_TEST(PutMxnSelectedPositionWrongShapeReturns400);
+  MITK_TEST(PerCellPositionDoesNotInvolveGlobalGetter);
+
+  // MxN screenshots
+  MITK_TEST(GetMxnEditorScreenshotWithoutProviderReturns503);
+  MITK_TEST(GetMxnEditorScreenshotEditorNotOpenReturns503EditorNotActive);
+  MITK_TEST(GetMxnEditorScreenshotReturns200Png);
+  MITK_TEST(GetMxnEditorScreenshotWithJpegAndSizeReturns200);
+  MITK_TEST(GetMxnEditorScreenshotInvalidFormatReturns400);
+  MITK_TEST(GetMxnEditorScreenshotExcessiveDimensionsReturns400);
+  MITK_TEST(GetMxnWindowScreenshotMalformedNameReturns400);
+  MITK_TEST(GetMxnWindowScreenshotUnknownNameReturns404);
+  MITK_TEST(GetMxnWindowScreenshotReturns200Png);
+  MITK_TEST(GetMxnWindowScreenshotForwardsName);
 
   // Camera tests
   MITK_TEST(GetCameraUnknownWindowReturns404);
@@ -179,7 +241,7 @@ public:
     m_RenderWindowBridge = std::make_unique<mitk::RenderWindowBridge>();
     m_Controller = std::make_unique<mitk::RenderingController>(*m_Bridge);
     m_Controller->SetRenderWindowBridge(m_RenderWindowBridge.get());
-    // No dispatcher: headless mode — tasks execute directly on the calling thread.
+    // No dispatcher: headless mode -- tasks execute directly on the calling thread.
   }
 
   void tearDown() override
@@ -471,8 +533,8 @@ public:
     CPPUNIT_ASSERT(json["position"].is_array());
     CPPUNIT_ASSERT_EQUAL(std::size_t(3), json["position"].size());
     CPPUNIT_ASSERT(json.contains("bounds"));
-    CPPUNIT_ASSERT(json["bounds"].contains("min"));
-    CPPUNIT_ASSERT(json["bounds"].contains("max"));
+    CPPUNIT_ASSERT(json["bounds"].contains("min_position"));
+    CPPUNIT_ASSERT(json["bounds"].contains("max_position"));
   }
 
   void GetSelectedPositionEditorNotOpenReturns503EditorNotActive()
@@ -481,7 +543,7 @@ public:
       []() -> mitk::SelectedPositionInfo
       {
         throw mitk::RenderWindowBridgeNoEditorException(
-          "StdMultiWidgetEditor is not open — cannot read crosshair position");
+          "StdMultiWidgetEditor is not open -- cannot read crosshair position");
       });
 
     const auto req = this->MakeRequest("/api/v1/rendering/selected-position");
@@ -536,7 +598,7 @@ public:
       [](const mitk::Point3D&)
       {
         throw mitk::RenderWindowBridgeNoEditorException(
-          "StdMultiWidgetEditor is not open — cannot set crosshair position");
+          "StdMultiWidgetEditor is not open -- cannot set crosshair position");
       });
 
     const auto req = this->MakeRequest("/api/v1/rendering/selected-position",
@@ -671,7 +733,7 @@ public:
 
   void GetScreenshotWithoutProviderReturns503()
   {
-    // No provider is set in setUp — bridge has no provider.
+    // No provider is set in setUp -- bridge has no provider.
     const auto req = this->MakeRequest("/api/v1/rendering/screenshot");
     httplib::Response res;
 
@@ -744,19 +806,22 @@ public:
 
   // ===== Editor discovery =====
 
-  static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive)
+  static std::vector<mitk::EditorInfo> FakeEditors(bool stdmultiActive,
+                                                   bool mxnActive = false)
   {
     mitk::EditorInfo stdmulti;
     stdmulti.alias = "stdmulti";
     stdmulti.pluginId = "org.mitk.editors.stdmultiwidget";
     stdmulti.active = stdmultiActive;
     if (stdmultiActive)
-      stdmulti.windowNames = {"axial", "sagittal", "coronal", "3d"};
+      stdmulti.windowIds = {"axial", "sagittal", "coronal", "3d"};
 
     mitk::EditorInfo mxn;
     mxn.alias = "mxn";
     mxn.pluginId = "org.mitk.editors.mxnmultiwidget";
-    mxn.active = false;
+    mxn.active = mxnActive;
+    if (mxnActive)
+      mxn.windowIds = {"mxn__widget0", "mxn__widget1"};
 
     return {stdmulti, mxn};
   }
@@ -792,6 +857,24 @@ public:
     CPPUNIT_ASSERT(!json[1]["active"].get<bool>());
     // E1 never reports the windows list (that is an E2-only field).
     CPPUNIT_ASSERT(!json[0].contains("windows"));
+  }
+
+  void GetEditorsReportsMxnActiveWhenEditorOpen()
+  {
+    // The MxN entry reports `active: true` when the editor is open.
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/false, /*mxnActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors");
+    httplib::Response res;
+    m_Controller->HandleGET_editors(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), json.size());
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn"), json[1]["alias"].get<std::string>());
+    CPPUNIT_ASSERT(json[1]["active"].get<bool>());
+    CPPUNIT_ASSERT(!json[0]["active"].get<bool>());
   }
 
   void GetStdmultiInfoWithEditorActiveReturns200()
@@ -862,10 +945,10 @@ public:
     m_RenderWindowBridge->SetStdMultiWindowListProvider(
       []() {
         return std::vector<mitk::WindowInfo>{
-          {"axial",    mitk::WindowKind::TwoD},
-          {"sagittal", mitk::WindowKind::TwoD},
-          {"coronal",  mitk::WindowKind::TwoD},
-          {"3d",       mitk::WindowKind::ThreeD}
+          {"axial",    mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Axial},
+          {"sagittal", mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Sagittal},
+          {"coronal",  mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Coronal},
+          {"3d",       mitk::WindowKind::ThreeD, std::nullopt}
         };
       });
 
@@ -877,20 +960,23 @@ public:
     const auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT(json.is_array());
     CPPUNIT_ASSERT_EQUAL(std::size_t(4), json.size());
-    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json[0]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json[0]["id"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("2d"), json[0]["kind"].get<std::string>());
-    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json[0]["view_direction"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["id"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("3d"), json[3]["kind"].get<std::string>());
-    // No `plane` field on window list items — orientation is read from the camera.
+    // 3D window has no anatomical plane.
+    CPPUNIT_ASSERT(!json[3].contains("view_direction"));
+    // No `plane` field on window list items -- orientation is read from the camera.
     CPPUNIT_ASSERT(!json[0].contains("plane"));
   }
 
   void GetStdmultiWindowForUnknownNameReturns404()
   {
-    // No providers set — unknown name must still be rejected controller-side.
+    // No providers set -- unknown name must still be rejected controller-side.
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus", "",
-      {{"name", "bogus"}});
+      {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindow(req, res);
 
@@ -905,23 +991,24 @@ public:
     m_RenderWindowBridge->SetStdMultiWindowListProvider(
       []() {
         return std::vector<mitk::WindowInfo>{
-          {"axial",    mitk::WindowKind::TwoD},
-          {"sagittal", mitk::WindowKind::TwoD},
-          {"coronal",  mitk::WindowKind::TwoD},
-          {"3d",       mitk::WindowKind::ThreeD}
+          {"axial",    mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Axial},
+          {"sagittal", mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Sagittal},
+          {"coronal",  mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Coronal},
+          {"3d",       mitk::WindowKind::ThreeD, std::nullopt}
         };
       });
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindow(req, res);
 
     CPPUNIT_ASSERT_EQUAL(200, res.status);
     const auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json["id"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("2d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"), json["view_direction"].get<std::string>());
     CPPUNIT_ASSERT(json["has_camera"].get<bool>());
     CPPUNIT_ASSERT(json["has_selected_slice"].get<bool>());
     CPPUNIT_ASSERT(!json.contains("plane"));
@@ -932,26 +1019,945 @@ public:
     m_RenderWindowBridge->SetStdMultiWindowListProvider(
       []() {
         return std::vector<mitk::WindowInfo>{
-          {"axial",    mitk::WindowKind::TwoD},
-          {"sagittal", mitk::WindowKind::TwoD},
-          {"coronal",  mitk::WindowKind::TwoD},
-          {"3d",       mitk::WindowKind::ThreeD}
+          {"axial",    mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Axial},
+          {"sagittal", mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Sagittal},
+          {"coronal",  mitk::WindowKind::TwoD,   mitk::AnatomicalPlane::Coronal},
+          {"3d",       mitk::WindowKind::ThreeD, std::nullopt}
         };
       });
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d", "",
-      {{"name", "3d"}});
+      {{"id", "3d"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindow(req, res);
 
     CPPUNIT_ASSERT_EQUAL(200, res.status);
     const auto json = nlohmann::json::parse(res.body);
-    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["id"].get<std::string>());
     CPPUNIT_ASSERT_EQUAL(std::string("3d"), json["kind"].get<std::string>());
+    CPPUNIT_ASSERT(!json.contains("view_direction"));
     CPPUNIT_ASSERT(json["has_camera"].get<bool>());
     CPPUNIT_ASSERT(!json["has_selected_slice"].get<bool>());
   }
+  // ===== MxN editor discovery =====
+
+  /** Two-cell MxN window list for tests: mxn__widget0 axial/main (with display
+   *  name), mxn__widget1 sagittal/row2 (no display name).
+   *  Field order: id, displayName, kind, viewDirection, selectionGroup. */
+  static std::vector<mitk::MxNWindowInfo> FakeMxNWindows()
+  {
+    return {
+      {"mxn__widget0", std::string("Tumor axial"), mitk::WindowKind::TwoD, mitk::AnatomicalPlane::Axial,    "main"},
+      {"mxn__widget1", std::nullopt,               mitk::WindowKind::TwoD, mitk::AnatomicalPlane::Sagittal, "row2"}
+    };
+  }
+
+  void GetMxnInfoWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnInfoWhenEditorInactiveReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/true, /*mxnActive=*/false); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnInfoWithEditorActiveReturns200WithWindows()
+  {
+    m_RenderWindowBridge->SetEditorListProvider(
+      []() { return FakeEditors(/*stdmultiActive=*/false, /*mxnActive=*/true); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnInfo(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn"), json["alias"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("org.mitk.editors.mxnmultiwidget"),
+                         json["plugin_id"].get<std::string>());
+    CPPUNIT_ASSERT(json["active"].get<bool>());
+    CPPUNIT_ASSERT(json["windows"].is_array());
+    // FakeEditors mxnActive populates two canonical qualified ids.
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), json["windows"].size());
+  }
+
+  void GetMxnWindowsWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnWindowsEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetMxNWindowListProvider(
+      []() -> std::vector<mitk::MxNWindowInfo> {
+        throw mitk::RenderWindowBridgeNoEditorException("mxn editor not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnWindowsReturns200WithViewDirectionAndLinks()
+  {
+    m_RenderWindowBridge->SetMxNWindowListProvider([]() { return FakeMxNWindows(); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/windows");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindows(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.is_array());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), json.size());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), json[0]["id"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"),
+                         json[0]["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"),      json[0]["kind"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"),   json[0]["view_direction"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"),
+                         json[0]["links"]["selection"].get<std::string>());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget1"),  json[1]["id"].get<std::string>());
+    CPPUNIT_ASSERT_MESSAGE("Cells without a display label must NOT emit a 'name' key",
+                           !json[1].contains("name"));
+    CPPUNIT_ASSERT_EQUAL(std::string("sagittal"), json[1]["view_direction"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("row2"),
+                         json[1]["links"]["selection"].get<std::string>());
+  }
+
+  void GetMxnWindowForMalformedNameReturns400()
+  {
+    // Names that don't match the OAS MxNWindowName pattern are rejected at
+    // the controller boundary with 400 INVALID_REQUEST, before any bridge
+    // round-trip.
+    m_RenderWindowBridge->SetMxNWindowListProvider([]() { return FakeMxNWindows(); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/foo%20bar", "",
+      {{"id", "foo bar"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnWindowForUnknownNameReturns404()
+  {
+    // Well-formed id (matches the OAS pattern) but not present in the layout
+    // -- must fall through to the bridge and surface as 404.
+    m_RenderWindowBridge->SetMxNWindowListProvider([]() { return FakeMxNWindows(); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__bogus", "",
+      {{"id", "mxn__bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnWindowForKnownCellReturns200WithFullSummary()
+  {
+    m_RenderWindowBridge->SetMxNWindowListProvider([]() { return FakeMxNWindows(); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindow(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), json["id"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Tumor axial"),
+                         json["name"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("2d"),      json["kind"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("axial"),   json["view_direction"].get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"),
+                         json["links"]["selection"].get<std::string>());
+    CPPUNIT_ASSERT(json["has_camera"].get<bool>());
+    CPPUNIT_ASSERT(json["has_selected_slice"].get<bool>());     // 2D cell -> has slice
+    CPPUNIT_ASSERT(json["has_selected_position"].get<bool>());
+  }
+
+  // ===== MxN layout =====
+
+  static constexpr const char* kFakeMxNLayout = R"({
+    "version": "2.0",
+    "name": "Fake",
+    "groups": { "main": { "select_all": true } },
+    "root": {
+      "type": "split", "orientation": "horizontal",
+      "children": [
+        { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+        { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+      ]
+    }
+  })";
+
+  void GetMxnLayoutWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/layout");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnLayoutEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetMxNLayoutGetter(
+      []() -> std::string {
+        throw mitk::RenderWindowBridgeNoEditorException("mxn editor not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/layout");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnLayoutReturns200WithDocument()
+  {
+    m_RenderWindowBridge->SetMxNLayoutGetter(
+      []() { return std::string(kFakeMxNLayout); });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/layout");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    // The body is the bridge string verbatim -- application/json content type.
+    CPPUNIT_ASSERT(res.body.find("\"version\"") != std::string::npos);
+    const auto parsed = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("2.0"), parsed["version"].get<std::string>());
+  }
+
+  void PutMxnLayoutEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/layout", "");
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnLayoutInvalidJsonReturns400()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/layout", "not-json");
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnLayoutSchemaViolationReturns400()
+  {
+    // The bridge setter throws mitk::Exception (engine's native shape) for
+    // every schema/structural failure (version, missing field, duplicate
+    // names, unknown view direction, ...). The controller maps it to 400
+    // INVALID_REQUEST locally.
+    m_RenderWindowBridge->SetMxNLayoutSetter(
+      [](const std::string&) -> std::string {
+        mitkThrow() << "duplicate window name 'mxn__widget0'";
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/layout", kFakeMxNLayout);
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+    CPPUNIT_ASSERT(json["error"]["message"].get<std::string>().find("duplicate window name") != std::string::npos);
+  }
+
+  void PutMxnLayoutWithoutSetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/layout", kFakeMxNLayout);
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnLayoutEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetMxNLayoutSetter(
+      [](const std::string&) -> std::string {
+        throw mitk::RenderWindowBridgeNoEditorException("mxn editor not open");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/layout", kFakeMxNLayout);
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnLayoutReturns200WithEchoedBody()
+  {
+    // The setter contract: receive a layout JSON, return the freshly serialized
+    // result so callers can refresh cached cell names without an extra GET.
+    std::string captured;
+    m_RenderWindowBridge->SetMxNLayoutSetter(
+      [&captured](const std::string& body) {
+        captured = body;
+        // Echo a minimal document with a marker so the test asserts it came
+        // from the setter, not the request body.
+        return std::string(R"({"version":"2.0","name":"echoed-by-setter"})");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/layout", kFakeMxNLayout);
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnLayout(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT(captured.find("mxn__widget0") != std::string::npos);
+    const auto parsed = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("echoed-by-setter"), parsed["name"].get<std::string>());
+  }
+
+  // ===== MxN camera =====
+
+  void GetMxnCameraMalformedNameReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/foo%20bar/camera", "",
+      {{"id", "foo bar"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnCameraWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnCameraUnknownCellReturns404()
+  {
+    m_RenderWindowBridge->SetMxNCameraGetter(
+      [](const std::string& n) -> mitk::CameraState {
+        throw mitk::RenderWindowBridgeUnknownWindowException(n);
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__bogus/camera", "",
+      {{"id", "mxn__bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_FOUND"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnCameraReturns200With2dFields()
+  {
+    m_RenderWindowBridge->SetMxNCameraGetter(
+      [](const std::string&) { return MakeFakeCameraState(/*is3d=*/false); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json.contains("position"));
+    CPPUNIT_ASSERT(json.contains("focal_point"));
+    CPPUNIT_ASSERT(json.contains("view_up"));
+    // 2D MxN cells under v2 always carry parallel_scale, never perspective_angle.
+    CPPUNIT_ASSERT(json.contains("parallel_scale"));
+    CPPUNIT_ASSERT(!json.contains("perspective_angle"));
+  }
+
+  void PutMxnCameraEmptyBodyReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnCameraRejects3dOnlyFieldUnderV2()
+  {
+    // is3d=false hard-coded under v2; perspective_angle is rejected.
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera",
+      R"({"perspective_angle": 30.0})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnCameraAcceptsParallelScale()
+  {
+    std::string capturedName;
+    std::optional<double> capturedScale;
+    m_RenderWindowBridge->SetMxNCameraSetter(
+      [&capturedName, &capturedScale](const std::string& n, const mitk::CameraPatch& p) {
+        capturedName = n;
+        capturedScale = p.parallelScale;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera",
+      R"({"parallel_scale": 120.5})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), capturedName);
+    CPPUNIT_ASSERT(capturedScale.has_value());
+    CPPUNIT_ASSERT_EQUAL(120.5, *capturedScale);
+  }
+
+  void PutMxnCameraEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetMxNCameraSetter(
+      [](const std::string&, const mitk::CameraPatch&) {
+        throw mitk::RenderWindowBridgeNoEditorException("mxn editor not open");
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/camera",
+      R"({"parallel_scale": 100.0})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnCamera(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  // ===== MxN selected-slice =====
+
+  static mitk::SliceState MakeFakeSliceState()
+  {
+    mitk::SliceState s;
+    s.step = 7;
+    s.position[0] = 1.0; s.position[1] = 2.0; s.position[2] = 3.0;
+    s.bounds.steps = 100;
+    s.bounds.minPosition[0] = -10.0; s.bounds.minPosition[1] = -10.0; s.bounds.minPosition[2] = -10.0;
+    s.bounds.maxPosition[0] =  10.0; s.bounds.maxPosition[1] =  10.0; s.bounds.maxPosition[2] =  10.0;
+    s.bounds.hasPositions = true;
+    return s;
+  }
+
+  void GetMxnSelectedSliceWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnSelectedSliceReturns200WithStepAndBounds()
+  {
+    m_RenderWindowBridge->SetMxNSelectedSliceGetter(
+      [](const std::string&) { return MakeFakeSliceState(); });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(7, json["step"].get<int>());
+    CPPUNIT_ASSERT(json["position"].is_array());
+    CPPUNIT_ASSERT_EQUAL(100, json["bounds"]["steps"].get<int>());
+  }
+
+  void PutMxnSelectedSliceWithStepReturns204()
+  {
+    std::string capturedName;
+    unsigned int capturedStep = 0;
+    m_RenderWindowBridge->SetMxNSelectedSliceStepSetter(
+      [&capturedName, &capturedStep](const std::string& n, unsigned int s) {
+        capturedName = n;
+        capturedStep = s;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice",
+      R"({"step": 42})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget0"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(42u, capturedStep);
+  }
+
+  void PutMxnSelectedSliceWithPositionReturns400WithHint()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice",
+      R"({"position": [1.0, 2.0, 3.0]})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+    // Hint must point at both the per-cell and global selected-position
+    // resources so clients are routed to the right primitive without confusion.
+    const auto msg = json["error"]["message"].get<std::string>();
+    CPPUNIT_ASSERT(msg.find("selected-position") != std::string::npos);
+  }
+
+  void PutMxnSelectedSliceWithUnknownFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice",
+      R"({"step": 1, "bogus": 2})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void PutMxnSelectedSliceMissingStepReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-slice",
+      R"({})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedSlice(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  // ===== MxN per-cell selected-position =====
+
+  void GetMxnSelectedPositionWithoutGetterReturns503()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-position", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnSelectedPositionReturns200WithPositionAndBounds()
+  {
+    m_RenderWindowBridge->SetMxNSelectedPositionGetter(
+      [](const std::string&) {
+        mitk::SelectedPositionInfo info;
+        info.position[0] = 1.5; info.position[1] = 2.5; info.position[2] = 3.5;
+        mitk::WorldBounds b;
+        b.minPosition[0] = -10.0; b.minPosition[1] = -20.0; b.minPosition[2] = -30.0;
+        b.maxPosition[0] =  10.0; b.maxPosition[1] =  20.0; b.maxPosition[2] =  30.0;
+        info.bounds = b;
+        return info;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-position", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(1.5, json["position"][0].get<double>());
+    CPPUNIT_ASSERT_EQUAL(3.5, json["position"][2].get<double>());
+    CPPUNIT_ASSERT_EQUAL(-10.0, json["bounds"]["min_position"][0].get<double>());
+    CPPUNIT_ASSERT_EQUAL( 30.0, json["bounds"]["max_position"][2].get<double>());
+  }
+
+  void GetMxnSelectedPositionNoGeometryReturnsNullBounds()
+  {
+    m_RenderWindowBridge->SetMxNSelectedPositionGetter(
+      [](const std::string&) {
+        mitk::SelectedPositionInfo info;
+        info.position.Fill(0.0);
+        // bounds intentionally not set
+        return info;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-position", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT(json["bounds"]["min_position"].is_null());
+    CPPUNIT_ASSERT(json["bounds"]["max_position"].is_null());
+  }
+
+  void PutMxnSelectedPositionForwardsToCell()
+  {
+    std::string capturedName;
+    mitk::Point3D capturedPos;
+    capturedPos.Fill(0.0);
+    m_RenderWindowBridge->SetMxNSelectedPositionSetter(
+      [&capturedName, &capturedPos](const std::string& n, const mitk::Point3D& p) {
+        capturedName = n;
+        capturedPos = p;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget7/selected-position",
+      R"({"position": [4.0, 5.0, 6.0]})",
+      {{"id", "mxn__widget7"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget7"), capturedName);
+    CPPUNIT_ASSERT_EQUAL(4.0, capturedPos[0]);
+    CPPUNIT_ASSERT_EQUAL(5.0, capturedPos[1]);
+    CPPUNIT_ASSERT_EQUAL(6.0, capturedPos[2]);
+  }
+
+  void PutMxnSelectedPositionMissingFieldReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-position",
+      R"({})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void PutMxnSelectedPositionWrongShapeReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/selected-position",
+      R"({"position": [1.0, 2.0]})",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  /**
+   * Cell-independence smoke test: a per-cell PUT must not invoke the global
+   * crosshair setter. Whether the per-cell change visibly propagates to
+   * other cells / the global anchor is workbench-UI state (observed but
+   * not contracted by REST). This test pins the contract bit: REST does
+   * not bake the propagation in itself.
+   */
+  void PerCellPositionDoesNotInvolveGlobalGetter()
+  {
+    bool globalSetterCalled = false;
+    bool perCellSetterCalled = false;
+
+    m_RenderWindowBridge->SetPositionSetter(
+      [&globalSetterCalled](const mitk::Point3D&) { globalSetterCalled = true; });
+    m_RenderWindowBridge->SetMxNSelectedPositionSetter(
+      [&perCellSetterCalled](const std::string&, const mitk::Point3D&) {
+        perCellSetterCalled = true;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widgetA/selected-position",
+      R"({"position": [1.0, 2.0, 3.0]})",
+      {{"id", "mxn__widgetA"}});
+    httplib::Response res;
+    m_Controller->HandlePUT_mxnSelectedPosition(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(204, res.status);
+    CPPUNIT_ASSERT(perCellSetterCalled);
+    CPPUNIT_ASSERT(!globalSetterCalled);
+  }
+
+  // ===== MxN screenshots =====
+
+  void GetMxnEditorScreenshotWithoutProviderReturns503()
+  {
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("RENDER_WINDOW_NOT_AVAILABLE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnEditorScreenshotEditorNotOpenReturns503EditorNotActive()
+  {
+    m_RenderWindowBridge->SetMxNEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) -> std::vector<unsigned char>
+      {
+        throw mitk::RenderWindowBridgeNoEditorException("editor not open");
+      });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(503, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("EDITOR_NOT_ACTIVE"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnEditorScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    m_RenderWindowBridge->SetMxNEditorScreenshotProvider(
+      [fakeBytes](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return fakeBytes; });
+
+    const auto req = this->MakeRequest("/api/v1/rendering/editors/mxn/screenshot");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
+  }
+
+  void GetMxnEditorScreenshotWithJpegAndSizeReturns200()
+  {
+    mitk::ScreenshotFormat capturedFormat = mitk::ScreenshotFormat::Png;
+    std::optional<std::pair<int, int>> capturedSize;
+    m_RenderWindowBridge->SetMxNEditorScreenshotProvider(
+      [&](std::optional<std::pair<int, int>> s, mitk::ScreenshotFormat f) {
+        capturedSize = s; capturedFormat = f;
+        return std::vector<unsigned char>{0xFF, 0xD8};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/mxn/screenshot";
+    req.params.emplace("format", "jpeg");
+    req.params.emplace("width", "640");
+    req.params.emplace("height", "480");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT(capturedFormat == mitk::ScreenshotFormat::Jpeg);
+    CPPUNIT_ASSERT(capturedSize.has_value());
+    CPPUNIT_ASSERT_EQUAL(640, capturedSize->first);
+    CPPUNIT_ASSERT_EQUAL(480, capturedSize->second);
+  }
+
+  void GetMxnEditorScreenshotInvalidFormatReturns400()
+  {
+    m_RenderWindowBridge->SetMxNEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/mxn/screenshot";
+    req.params.emplace("format", "bmp");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetMxnEditorScreenshotExcessiveDimensionsReturns400()
+  {
+    m_RenderWindowBridge->SetMxNEditorScreenshotProvider(
+      [](std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) { return std::vector<unsigned char>{}; });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/mxn/screenshot";
+    req.params.emplace("width", "9000");
+    req.params.emplace("height", "9000");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+  }
+
+  void GetMxnWindowScreenshotMalformedNameReturns400()
+  {
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/foo%20bar/screenshot", "",
+      {{"id", "foo bar"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    const auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+                         json["error"]["code"].get<std::string>());
+  }
+
+  void GetMxnWindowScreenshotUnknownNameReturns404()
+  {
+    m_RenderWindowBridge->SetMxNWindowScreenshotProvider(
+      [](const std::string& n, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) -> std::vector<unsigned char>
+      {
+        throw mitk::RenderWindowBridgeUnknownWindowException(n);
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__bogus/screenshot", "",
+      {{"id", "mxn__bogus"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(404, res.status);
+  }
+
+  void GetMxnWindowScreenshotReturns200Png()
+  {
+    const std::vector<unsigned char> fakeBytes{0x89, 0x50, 0x4E, 0x47};
+    m_RenderWindowBridge->SetMxNWindowScreenshotProvider(
+      [fakeBytes](const std::string&, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat) {
+        return fakeBytes;
+      });
+
+    const auto req = this->MakeRequest(
+      "/api/v1/rendering/editors/mxn/windows/mxn__widget0/screenshot", "",
+      {{"id", "mxn__widget0"}});
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT_EQUAL(fakeBytes.size(), res.body.size());
+  }
+
+  void GetMxnWindowScreenshotForwardsName()
+  {
+    std::string capturedName;
+    mitk::ScreenshotFormat capturedFormat = mitk::ScreenshotFormat::Png;
+    m_RenderWindowBridge->SetMxNWindowScreenshotProvider(
+      [&capturedName, &capturedFormat](
+        const std::string& n, std::optional<std::pair<int, int>>, mitk::ScreenshotFormat f) {
+        capturedName = n; capturedFormat = f;
+        return std::vector<unsigned char>{0xFF, 0xD8};
+      });
+
+    httplib::Request req;
+    req.path = "/api/v1/rendering/editors/mxn/windows/mxn__widget7/screenshot";
+    req.path_params["id"] = "mxn__widget7";
+    req.params.emplace("format", "jpeg");
+    httplib::Response res;
+    m_Controller->HandleGET_mxnWindowScreenshot(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    CPPUNIT_ASSERT_EQUAL(std::string("mxn__widget7"), capturedName);
+    CPPUNIT_ASSERT(capturedFormat == mitk::ScreenshotFormat::Jpeg);
+  }
+
   // ===== Camera =====
 
   static mitk::CameraState MakeFakeCameraState(bool is3d)
@@ -969,7 +1975,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/camera", "",
-      {{"name", "bogus"}});
+      {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiCamera(req, res);
 
@@ -983,7 +1989,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiCamera(req, res);
 
@@ -1000,7 +2006,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiCamera(req, res);
 
@@ -1020,7 +2026,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/camera", "",
-      {{"name", "3d"}});
+      {{"id", "3d"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiCamera(req, res);
 
@@ -1040,7 +2046,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiCamera(req, res);
 
@@ -1055,7 +2061,7 @@ public:
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/camera",
       R"({"parallel_scale": 120.0})",
-      {{"name", "bogus"}});
+      {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1066,7 +2072,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      "not-json", {{"name", "axial"}});
+      "not-json", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1077,7 +2083,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      "{}", {{"name", "axial"}});
+      "{}", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1091,7 +2097,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"mystery": 42})", {{"name", "axial"}});
+      R"({"mystery": 42})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1100,13 +2106,13 @@ public:
 
   // Helper: assert that a PUT camera body produces 400 INVALID_REQUEST and
   // that the error message contains the expected substring.
-  void AssertPutCameraReturns400(const std::string& windowName,
+  void AssertPutCameraReturns400(const std::string& windowId,
                                  const std::string& body,
                                  const std::string& expectedMessageSubstr)
   {
     const auto req = this->MakeRequest(
-      "/api/v1/rendering/editors/stdmulti/windows/" + windowName + "/camera",
-      body, {{"name", windowName}});
+      "/api/v1/rendering/editors/stdmulti/windows/" + windowId + "/camera",
+      body, {{"id", windowId}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1158,7 +2164,7 @@ public:
   {
     // Issue #1: combining standard_view with explicit pose fields would leave
     // the CameraController's internal "standard view" memo inconsistent with
-    // the actual camera pose — controller rejects the combination upfront.
+    // the actual camera pose -- controller rejects the combination upfront.
     this->AssertPutCameraReturns400(
       "axial",
       R"({"standard_view": "anterior", "position": [1.0, 2.0, 3.0]})",
@@ -1191,7 +2197,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
+      R"({"parallel_scale": 120.0})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1211,7 +2217,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"step": 0})", {{"name", "axial"}});
+      R"({"step": 0})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1225,7 +2231,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
-      R"({"parallel_scale": 120.0})", {{"name", "axial"}});
+      R"({"parallel_scale": 120.0})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1246,7 +2252,7 @@ public:
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
       R"({"position": [1.0, 2.0, 3.0], "parallel_scale": 150.0})",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1267,7 +2273,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/camera",
-      R"({"perspective_angle": 45.0})", {{"name", "3d"}});
+      R"({"perspective_angle": 45.0})", {{"id", "3d"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1285,7 +2291,7 @@ public:
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/camera",
       R"({"standard_view": "anterior", "parallel_scale": 120.0})",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiCamera(req, res);
 
@@ -1318,7 +2324,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice", "",
-      {{"name", "bogus"}});
+      {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
@@ -1332,7 +2338,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice", "",
-      {{"name", "3d"}});
+      {{"id", "3d"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
@@ -1346,7 +2352,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
@@ -1363,7 +2369,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
@@ -1374,7 +2380,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(90, json["bounds"]["steps"].get<int>());
     CPPUNIT_ASSERT(json["bounds"]["min_position"].is_array());
     CPPUNIT_ASSERT(json["bounds"]["max_position"].is_array());
-    // No `plane` field on slice response — orientation is read from the camera.
+    // No `plane` field on slice response -- orientation is read from the camera.
     CPPUNIT_ASSERT(!json.contains("plane"));
   }
 
@@ -1385,7 +2391,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiSelectedSlice(req, res);
 
@@ -1399,7 +2405,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/selected-slice",
-      R"({"step": 0})", {{"name", "bogus"}});
+      R"({"step": 0})", {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1410,7 +2416,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice",
-      R"({"step": 0})", {{"name", "3d"}});
+      R"({"step": 0})", {{"id", "3d"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1424,7 +2430,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      "not-json", {{"name", "axial"}});
+      "not-json", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1435,7 +2441,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      "", {{"name", "axial"}});
+      "", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1446,7 +2452,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      "{}", {{"name", "axial"}});
+      "{}", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1460,7 +2466,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"step": -1})", {{"name", "axial"}});
+      R"({"step": -1})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1471,7 +2477,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"step": 1.5})", {{"name", "axial"}});
+      R"({"step": 1.5})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1482,7 +2488,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"position": [1.0, 2.0, 3.0]})", {{"name", "axial"}});
+      R"({"position": [1.0, 2.0, 3.0]})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1496,7 +2502,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"mystery": 0})", {{"name", "axial"}});
+      R"({"mystery": 0})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1507,7 +2513,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"step": 5})", {{"name", "axial"}});
+      R"({"step": 5})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1523,7 +2529,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/selected-slice",
-      R"({"step": 42})", {{"name", "axial"}});
+      R"({"step": 42})", {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandlePUT_stdmultiSelectedSlice(req, res);
 
@@ -1639,7 +2645,7 @@ public:
     // provider is bound.
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/bogus/screenshot", "",
-      {{"name", "bogus"}});
+      {{"id", "bogus"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
 
@@ -1653,7 +2659,7 @@ public:
   {
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
 
@@ -1674,7 +2680,7 @@ public:
 
     const auto req = this->MakeRequest(
       "/api/v1/rendering/editors/stdmulti/windows/axial/screenshot", "",
-      {{"name", "axial"}});
+      {{"id", "axial"}});
     httplib::Response res;
     m_Controller->HandleGET_stdmultiWindowScreenshot(req, res);
 

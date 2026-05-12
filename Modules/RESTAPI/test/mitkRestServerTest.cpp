@@ -312,6 +312,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("PortOccupier must successfully bind port 18100", occupier.IsOccupied());
 
     mitk::RestServerConfig config;
+    // Bind on the same address family as PortOccupier (IPv4 loopback). The
+    // default "::" is IPv6 wildcard, which on macOS and Windows defaults to
+    // IPV6_V6ONLY=1 and therefore does not collide with an IPv4 listener.
+    config.host = "127.0.0.1";
     config.port = 18100;
     config.enabled = true;
     m_Server->SetConfig(config);
@@ -331,6 +335,9 @@ public:
       CPPUNIT_ASSERT_MESSAGE("PortOccupier must successfully bind port 18101", occupier.IsOccupied());
 
       mitk::RestServerConfig config;
+      // Bind on the same address family as PortOccupier (IPv4 loopback); see
+      // PortAlreadyInUseReturnsFalse for the IPV6_V6ONLY rationale.
+      config.host = "127.0.0.1";
       config.port = 18101;
       config.enabled = true;
       m_Server->SetConfig(config);
@@ -340,6 +347,7 @@ public:
 
     // Retry on a now-free port. Must not crash and must succeed.
     mitk::RestServerConfig config;
+    config.host = "127.0.0.1";
     config.port = 18102;
     config.enabled = true;
     m_Server->SetConfig(config);

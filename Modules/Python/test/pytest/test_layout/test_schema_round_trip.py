@@ -87,3 +87,41 @@ class TestInTreePreset:
             schema = json.load(f)
         doc = load_preset(two_rows_preset_path)
         jsonschema.validate(doc.to_json(), schema)
+
+
+class TestMitkDataFixtures:
+    """Validate the test-only v2 fixtures shipped in MITK-Data/MxNEditor.
+
+    Intentionally schema-invalid fixtures (the view-direction typo, the
+    v1.x migration-script inputs) are deliberately omitted -- they are
+    exercised at the C++ / migration-script layer.
+    """
+
+    @pytest.mark.parametrize(
+        "fixture_name",
+        [
+            "mxn_v2_lazy_mode.json",
+            "mxn_v2_strict_missing_reference.json",
+            "mxn_v2_duplicate_ids.json",
+            "mxn_v2_seed_widget0_first.json",
+            "mxn_v2_seed_widget1_first.json",
+        ],
+    )
+    def test_fixture_validates_against_schema(
+        self, data_dir, schema_path, fixture_name
+    ):
+        if schema_path is None:
+            pytest.skip("schema fixture not available; run from source tree")
+        if not _has_jsonschema():
+            pytest.skip("jsonschema is not importable in this environment")
+        import jsonschema
+
+        fixture_path = data_dir / "MxNEditor" / fixture_name
+        if not fixture_path.is_file():
+            pytest.skip(f"MITK-Data fixture not available: {fixture_path}")
+
+        with open(schema_path, encoding="utf-8") as f:
+            schema = json.load(f)
+        with open(fixture_path, encoding="utf-8") as f:
+            fixture = json.load(f)
+        jsonschema.validate(fixture, schema)

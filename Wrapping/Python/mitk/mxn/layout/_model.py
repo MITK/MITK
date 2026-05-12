@@ -135,7 +135,7 @@ def _normalise_link_value(value: LinkLike) -> str:
 
 
 _DEFAULT_LINKS: tuple[tuple[str, str], ...] = (
-    [LinkDimension.SELECTION.value, DEFAULT_GROUP_NAME],
+    (LinkDimension.SELECTION.value, DEFAULT_GROUP_NAME),
 )
 
 
@@ -724,11 +724,6 @@ class MxNLayoutDocument:
                         f"window {window.id!r} links {dim!r} to unknown group {target!r}; "
                         f"declare it in groups or rely on auto-materialisation"
                     )
-
-        # Defensive structural sanity (matches schema minItems: 1).
-        for split in self.root.splits():
-            if not split.children:
-                raise ValueError("interior split has no children (schema minItems: 1)")
 
     # ---- repr -----------------------------------------------------------
 

@@ -116,6 +116,11 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
 
+  // Category 7: Spec MD <-> openapi.json triangle
+  MITK_TEST(EveryOpenApiEndpointIsDocumentedInSpecMd);
+  MITK_TEST(SpecMdMajorVersionMatchesOpenApi);
+  MITK_TEST(EverySpecMdEndpointIsInOpenApi);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:

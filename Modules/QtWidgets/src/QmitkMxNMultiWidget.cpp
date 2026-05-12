@@ -1329,7 +1329,8 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
         mitkThrow() << "Layout document version is '" << version
                     << "'; only '2.0' is supported. If this is a v1.x layout "
                     << "from before the format change, see the MxN layout "
-                    << "developer documentation for the migration tool.";
+                    << "developer documentation for the migration tool "
+                    << "(Modules/QtWidgets/resource/migrate-mxn-layout-v1-to-v2.py).";
       }
       mitkThrow() << "Layout document version is '" << version
                   << "'; only '2.0' is supported.";

@@ -49,9 +49,9 @@ namespace
     const auto pythonExecutable = mitk::PythonHelper::GetExecutablePath();
     MITK_TEST_CONDITION_REQUIRED(!pythonExecutable.empty(), "Virtual environment Python executable is available")
 
-    if (RunPythonCommand(pythonExecutable, {"-m", "pytest", "--version"}) == 0)
+    if (RunPythonCommand(pythonExecutable, {"-c", "\"import pytest, jsonschema\""}) == 0)
     {
-      MITK_INFO << "pytest is already installed in the dedicated test virtual environment.";
+      MITK_INFO << "pytest and jsonschema are already present in the dedicated test virtual environment.";
       return;
     }
 
@@ -60,8 +60,8 @@ namespace
       "Bootstrapping pip in the dedicated test virtual environment")
 
     MITK_TEST_CONDITION_REQUIRED(
-      RunPythonCommand(pythonExecutable, {"-m", "pip", "install", "--disable-pip-version-check", "pytest"}) == 0,
-      "Installing pytest in the dedicated test virtual environment")
+      RunPythonCommand(pythonExecutable, {"-m", "pip", "install", "--disable-pip-version-check", "pytest", "jsonschema"}) == 0,
+      "Installing pytest and jsonschema in the dedicated test virtual environment")
   }
 }
 

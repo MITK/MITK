@@ -499,6 +499,9 @@ private:
   * \brief Recovery path when 'ApplyLayout' construction fails part-way.
   *        Drains whatever was partially built and re-runs the default
   *        single-cell initialisation so the editor stays in a usable state.
+  *        The rolled-back single-cell state has no preset name to claim,
+  *        so 'm_LayoutName' is cleared (via 'TearDownAllCells'); a
+  *        subsequent 'SerializeLayout' emits no top-level 'name' field.
   */
   void RollBackToSingleDefaultCell();
 

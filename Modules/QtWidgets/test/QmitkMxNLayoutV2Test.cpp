@@ -48,6 +48,9 @@ class QmitkMxNLayoutV2TestSuite : public mitk::TestFixture
   MITK_TEST(RoundTrip_Recursive_StrictModeFixture);
   MITK_TEST(RoundTrip_LazyModeFixture);
   MITK_TEST(MultiGroup_RoundTrip_PreservesSelectAll);
+  MITK_TEST(LayoutName_PreservedAcrossRoundTrip);
+  MITK_TEST(LayoutName_AbsentStaysAbsentAcrossRoundTrip);
+  MITK_TEST(LayoutName_ClearedAfterRollback);
 
   // --- Validation ---
   MITK_TEST(StrictMode_MissingGroupReference_Throws);
@@ -1401,6 +1404,100 @@ public:
                              msg.find("stdmulti__widget0") != std::string::npos);
     }
     CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  // ====================================================================
+  // Optional top-level 'name' survives load -> save round-trips.
+  // ====================================================================
+  void LayoutName_PreservedAcrossRoundTrip()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "My Preset",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+    const auto roundTrip = editor->SerializeLayout();
+
+    CPPUNIT_ASSERT_MESSAGE("Round-trip must emit the optional top-level 'name' field",
+                           roundTrip.contains("name"));
+    CPPUNIT_ASSERT_EQUAL(fixture.at("name"), roundTrip.at("name"));
+  }
+
+  // ====================================================================
+  // A document without 'name' round-trips without an empty 'name' key.
+  // ====================================================================
+  void LayoutName_AbsentStaysAbsentAcrossRoundTrip()
+  {
+    const auto fixture = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(fixture);
+    const auto roundTrip = editor->SerializeLayout();
+
+    CPPUNIT_ASSERT_MESSAGE("Serialize must not emit a 'name' field when the input had none",
+                           !roundTrip.contains("name"));
+  }
+
+  // ====================================================================
+  // After a failed apply the rolled-back state emits no 'name'.
+  // ====================================================================
+  void LayoutName_ClearedAfterRollback()
+  {
+    // First, install a named layout so m_LayoutName is non-empty.
+    const auto named = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "Stashed Name",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__a", "view_direction": "axial", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    // A schema-valid-but-engine-rejected fixture that fails mid-construction.
+    const auto bad = nlohmann::json::parse(R"json({
+      "version": "2.0",
+      "name": "Should Not Stick",
+      "groups": { "main": { "select_all": true } },
+      "root": {
+        "type": "split", "orientation": "horizontal",
+        "children": [
+          { "type": "window", "id": "mxn__ok",  "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+          { "type": "window", "id": "mxn__bad", "view_direction": "saggital", "links": { "selection": "main" }, "size": 1 }
+        ]
+      }
+    })json");
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(named);
+    CPPUNIT_ASSERT_MESSAGE("Pre-condition: named layout must serialise with its name",
+                           editor->SerializeLayout().contains("name"));
+
+    CPPUNIT_ASSERT_THROW(editor->ApplyLayout(bad), mitk::Exception);
+
+    const auto afterRollback = editor->SerializeLayout();
+    CPPUNIT_ASSERT_MESSAGE("Rollback must clear m_LayoutName so no 'name' field is emitted",
+                           !afterRollback.contains("name"));
   }
 
   void Construct_BadMultiWidgetName_Throws()

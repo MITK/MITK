@@ -48,13 +48,6 @@ def _qualify(editor_name: str, bare_id_stem: str, index: int) -> str:
     return f"{editor_name}{NAMESPACE_DELIMITER}{bare_id_stem}{index}"
 
 
-def _normalise_group_arg(group: str | Group) -> str | Group:
-    """Pass-through for now; ``LayoutWindow.create`` handles the LinkLike
-    coercion. Centralised so the builder API contract stays uniform.
-    """
-    return group
-
-
 def grid(
     rows: int,
     cols: int,
@@ -117,7 +110,7 @@ def grid(
             )
         names = list(display_names)
 
-    selection = _normalise_group_arg(group)
+    selection = group
     counter = count(start_index)
     cells_by_row: list[list[LayoutWindow]] = []
     for r in range(rows):
@@ -192,8 +185,7 @@ def two_rows_each_direction(
         ]
         return Split.horizontal(*cells)
 
-    return Split.vertical(row(_normalise_group_arg(group_top)),
-                          row(_normalise_group_arg(group_bottom)))
+    return Split.vertical(row(group_top), row(group_bottom))
 
 
 def single_window(
@@ -223,6 +215,6 @@ def single_window(
         id=id_qualified,
         view_direction=view_direction,
         name=display_name,
-        selection=_normalise_group_arg(group),
+        selection=group,
     )
     return Split.horizontal(window)

@@ -32,4 +32,17 @@ if _is_wheel:
 
 from .mitk import *
 
+
+def _rebind_module_names():
+    # Rewrite __module__ on exposed classes so tooling renders mitk.X
+    # rather than mitk.mitk.X (the inner "mitk" is the pybind11 extension).
+    from . import mitk as ext
+    for obj in vars(ext).values():
+        if isinstance(obj, type) and obj.__module__ == "mitk.mitk":
+            obj.__module__ = "mitk"
+
+
+_rebind_module_names()
+del _rebind_module_names
+
 __version__ = "@MITK_VERSION_STRING@"

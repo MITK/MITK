@@ -54,6 +54,6 @@ api/index
 
 ## See also
 
-- [docs.mitk.org/latest/](https://docs.mitk.org/latest/) — full MITK C++
-  reference and user manual.
-- [www.mitk.org](https://www.mitk.org) — project homepage.
+- [docs.mitk.org/latest/](https://docs.mitk.org/latest/): the full MITK
+  C++ reference and user manual.
+- [www.mitk.org](https://www.mitk.org): the project homepage.

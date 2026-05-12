@@ -194,10 +194,9 @@ Use the `PythonWheel` build configuration, which is a headless configuration (no
 ```bash
 cmake -S . -B ../MITK-superbuild -DMITK_BUILD_CONFIGURATION=PythonWheel
 cmake --build ../MITK-superbuild
-cmake --build ../MITK-superbuild/MITK-build
 ```
 
-The last command builds all MITK modules and then automatically produces the wheel in the `MITK-build/` directory via the `mitk_python_wheel` target, which is included in the default build.
+The SuperBuild build chains into the inner MITK build, which builds all MITK modules and then produces the wheel in `../MITK-superbuild/MITK-build/` via the `mitk_python_wheel` target (included in the default build for this configuration).
 
 The target:
 1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
@@ -244,9 +243,9 @@ It is also reachable from the "Python API" tab in the top navigation bar of this
 
 The Sphinx project sits next to the bindings, in `Wrapping/Python/docs/`:
 
-- `conf.py` — Sphinx configuration (autodoc + napoleon + autosummary + autodoc-typehints + myst-parser + sphinx-copybutton + `sphinx_book_theme`).
-- `requirements.txt` — Pinned toolchain.
-- `index.md`, `installation.md`, `getting_started.md`, `user_guide/*.md`, `api/index.md` — Narrative pages and the autosummary-driven API reference.
+- `conf.py`: Sphinx configuration (autodoc + napoleon + autosummary + autodoc-typehints + myst-parser + sphinx-copybutton + `sphinx_book_theme`).
+- `requirements.txt`: pinned toolchain.
+- `index.md`, `installation.md`, `getting_started.md`, `user_guide/*.md`, `api/index.md`: narrative pages and the autosummary-driven API reference.
 
 The auto-generated API reference is populated by importing the freshly-built `mitk` package and reading docstrings off the compiled pybind11 extension.
 Google-style docstrings (with `Args:` / `Returns:` / `Raises:` / `Examples:` sections) on each binding are the source of truth; keep them in sync when the bindings change.
@@ -259,11 +258,15 @@ There is a dedicated CMake target:
 cmake --build <build-dir> --target mitk_python_docs
 ```
 
-The target depends on `mitk_python_bindings` and on first invocation auto-installs the Sphinx toolchain from `requirements.txt` into the build Python (mirroring how `mitk_python_wheel` bootstraps `delvewheel`/`auditwheel`/`delocate`).
-The HTML lands in `<build-dir>/Documentation/PythonDocs/html/`.
+The target depends on `mitk_python_bindings`.
+On first invocation it creates a dedicated venv at `<build-dir>/mitk_python_docs_venv` (with `--system-site-packages` so the just-built `mitk` package is importable) and pip-installs the Sphinx toolchain from `requirements.txt` into that venv.
+The venv is reused on subsequent runs.
+This deliberately keeps the toolchain out of the embedded build Python, because on Windows the standalone Python's user-site directory is shared with the system Python and pollutes both.
 
-The `-W` flag (warnings-as-errors) is passed to `sphinx-build`, so broken cross-references or missing docstrings on the public surface fail the build.
-This is the same gate the CI publishing job uses.
+The HTML lands in `<build-dir>/Documentation/Python/html/`.
+
+The `-W` flag (warnings-as-errors) is passed to `sphinx-build`, so docstring syntax errors or duplicated definitions fail the build.
+Missing-target cross-references (e.g. a stale `:py:class:` pointing at a name that no longer exists) only fail the build when `nitpicky = True` is set in `conf.py`; the default is off, so silently-broken cross-refs need to be caught at review time.
 
 ### Publishing
 

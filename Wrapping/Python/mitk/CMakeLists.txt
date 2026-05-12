@@ -43,7 +43,25 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
+# Build-tree __init__.py for the mitk package.
+#
+# Re-exports the names from the compiled pybind11 extension (the inner
+# `mitk` module inside the `mitk` package) and rewrites their ``__module__``
+# attribute from ``"mitk.mitk"`` to ``"mitk"`` so that Sphinx, IDE tooling,
+# and ``repr()`` render ``mitk.Image`` rather than ``mitk.mitk.Image``.
+file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" [=[from .mitk import *
+
+
+def _rebind_module_names():
+    from . import mitk as ext
+    for obj in vars(ext).values():
+        if isinstance(obj, type) and obj.__module__ == "mitk.mitk":
+            obj.__module__ = "mitk"
+
+
+_rebind_module_names()
+del _rebind_module_names
+]=])
 
 # Copy the property_view.py file
 configure_file(

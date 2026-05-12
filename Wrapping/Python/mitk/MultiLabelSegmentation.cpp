@@ -390,9 +390,9 @@ metadata (algorithm type/name, tracking IDs), and structured DICOM
 descriptors (anatomic region, primary anatomic structure, segmented
 property category/type).
 
-Labels are also :py:class:`mitk.IPropertyOwner` instances, so the
-:py:meth:`get_property` / :py:meth:`set_property` / :py:attr:`properties`
-interface used on images works on labels too.
+Labels expose the same property-owner interface as :py:class:`Image`, so
+the :py:meth:`get_property` / :py:meth:`set_property` / :py:meth:`remove_property`
+methods used on images work on labels too.
 )");
   label_class
     .def(py::init([]() { return Label::New(); }),
@@ -946,7 +946,17 @@ Returns:
           return seg.GetLabelValuesByName(*group, name);
         return seg.GetLabelValuesByName(name);
       },
-      py::arg("name"), py::arg("group") = py::none())
+      py::arg("name"), py::arg("group") = py::none(),
+      R"(Return the label values whose name matches *name*.
+
+Args:
+    name: Label name to look up.
+    group: Optional group index to restrict the search to. If omitted,
+        labels across all groups are considered.
+
+Returns:
+    A list of integer label values. Empty if no label matches.
+)")
     .def("get_label_values_at",
       [](const MultiLabelSegmentation& seg, const std::array<double, 3>& coords,
          TimeStepType timeStep, std::optional<MultiLabelSegmentation::GroupIndexType> group) {
@@ -956,9 +966,25 @@ Returns:
         pt[2] = coords[2];
         return seg.GetLabelValuesByCoordinates(pt, timeStep, group);
       },
-      py::arg("coordinates"), py::arg("time_step") = 0, py::arg("group") = py::none())
+      py::arg("coordinates"), py::arg("time_step") = 0, py::arg("group") = py::none(),
+      R"(Return the label values present at the given world-space coordinates.
+
+For overlapping multi-group segmentations a single point can belong to
+several label values across groups.
+
+Args:
+    coordinates: 3-element sequence ``(x, y, z)`` in world coordinates.
+    time_step: Time-step index. Defaults to 0.
+    group: Optional group index to restrict the lookup to. If omitted,
+        all groups are queried.
+
+Returns:
+    A list of integer label values at the given point.
+)")
     .def_property_readonly("label_class_names",
-      &MultiLabelSegmentation::GetLabelClassNames)
+      &MultiLabelSegmentation::GetLabelClassNames,
+      "Sorted list of unique class names assigned to labels in this "
+      "segmentation.")
 
     .def_property_readonly("num_groups",
       &MultiLabelSegmentation::GetNumberOfGroups,
@@ -1395,7 +1421,9 @@ Args:
         omitted, all labels in the group are included.
 
 Returns:
-    Tuple ``(:py:class:`Image`, dict[int, str])``.
+    A 2-tuple ``(image, class_name_map)`` where *image* is an
+    :py:class:`Image` and *class_name_map* is a ``dict[int, str]``
+    mapping label value to class name.
 )")
 
     .def("split_labels_by_group",

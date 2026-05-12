@@ -366,8 +366,8 @@ Args:
 
 Raises:
     TypeError: If ``array`` is not array-like.
-    ValueError: If ``array.ndim`` is not in ``[2, 4]``, or if ``copy=False``
-        (not yet supported).
+    ValueError: If ``array.ndim`` is less than 2 or greater than 4, or if
+        ``copy=False`` (not yet supported).
 
 Examples:
     >>> import numpy as np
@@ -485,7 +485,7 @@ Returns:
     NumPy array sharing memory with the image buffer.
 
 Raises:
-    RuntimeError: If the image data cannot be accessed.
+    mitk.Exception: If the image data cannot be accessed.
 
 Examples:
     >>> arr = img.as_numpy()

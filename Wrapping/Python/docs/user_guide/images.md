@@ -45,7 +45,7 @@ Read-only NumPy-style introspection:
 
 | Attribute | Meaning |
 |---|---|
-| `img.ndim` | Number of spatial dimensions. |
+| `img.ndim` | Total number of dimensions (2, 3, or 4; 4D includes time). |
 | `img.shape` | Tuple of dimension sizes, in NumPy order. |
 | `img.dtype` | NumPy dtype matching the MITK pixel type. |
 | `img.array` | Read-only NumPy view (zero-copy). |

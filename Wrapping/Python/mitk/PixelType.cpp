@@ -90,7 +90,7 @@ Returns:
     A :py:class:`PixelType` matching the requested layout.
 
 Raises:
-    RuntimeError: If the dtype is not supported by MITK.
+    mitk.Exception: If the dtype is not supported by MITK.
 
 Examples:
     >>> pt = mitk.make_pixel_type("float32")

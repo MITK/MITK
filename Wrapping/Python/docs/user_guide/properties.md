@@ -58,10 +58,13 @@ snapshot = dict(img.properties.items())
 ## Property key paths
 
 For nested or namespaced keys, `mitk.PropertyKeyPath` and
-`mitk.DICOMTagPath` provide structured key representations:
+`mitk.DICOMTagPath` provide structured key representations.
+`PropertyKeyPath` takes a single element and is extended with `/` (like
+`pathlib.Path`), `[n]` for an indexed selection, or `["*"]` for a
+wildcard:
 
 ```python
-path = mitk.PropertyKeyPath("DICOM", "PatientName")
+path = mitk.PropertyKeyPath("DICOM") / "PatientName"
 img.set_property(str(path), "Doe^John")
 
 dicom_path = mitk.DICOMTagPath(0x0010, 0x0010)  # (group, element)

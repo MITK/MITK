@@ -67,11 +67,20 @@ del arr  # release the write accessor before re-acquiring
 
 ## File I/O
 
-The constructor accepts a path, but `mitk.IOUtil.load()` and
-`mitk.IOUtil.save()` are the explicit forms:
+The `mitk.Image` constructor and `mitk.Image.save()` cover the common
+case:
 
 ```python
-img = mitk.IOUtil.load("input.nrrd")
+img = mitk.Image("input.nrrd")
+img.save("output.nrrd")
+```
+
+The explicit forms route through `mitk.IOUtil`. `IOUtil.load()` returns
+a *list* of bound objects (a file may contain more than one, and DICOM
+series in particular often expand into several), so unpack the result:
+
+```python
+[img] = mitk.IOUtil.load("input.nrrd")
 mitk.IOUtil.save(img, "output.nrrd")
 ```
 

@@ -6,24 +6,33 @@ no further setup is needed beyond importing `mitk`.
 
 ## Read
 
+`mitk.Image` accepts a path directly and returns a single image, which is
+the convenient form for everyday use:
+
 ```python
 import mitk
 
-img = mitk.IOUtil.load("input.nrrd")
-# Equivalent shortcut:
 img = mitk.Image("input.nrrd")
 img = mitk.Image.load("input.nrrd")
 ```
 
-`IOUtil.load()` accepts `str`, `pathlib.Path`, and any object with a
+`mitk.IOUtil.load()` is the explicit form. It returns a *list* of bound
+objects because a file (especially a DICOM series) may produce more than
+one, so unpack the result:
+
+```python
+[img] = mitk.IOUtil.load("input.nrrd")
+```
+
+All three accept `str`, `pathlib.Path`, and any object with a
 `__fspath__` method.
 
 ## Write
 
 ```python
-mitk.IOUtil.save(img, "output.nrrd")
-# Equivalent shortcut:
 img.save("output.nrrd")
+# or
+mitk.IOUtil.save(img, "output.nrrd")
 ```
 
 The output format is inferred from the file extension. To control it

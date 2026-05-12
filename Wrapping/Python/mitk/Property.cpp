@@ -171,11 +171,12 @@ Returns:
     py::arg("d"),
     R"(Reconstruct a ``BaseProperty`` subclass from a dict.
 
-Inverse of a property's ``to_dict()``. Inspects the ``"type"`` key in the
-dict to pick the correct subclass.
+Consumes the dict layout used by :py:meth:`PropertyList.to_dict` (per-entry
+values) and by :py:meth:`TemporoSpatialStringProperty.to_dict`. Inspects
+the ``"type"`` key in the dict to pick the correct subclass.
 
 Args:
-    d: Dict produced by a property's ``to_dict()``.
+    d: Dict describing a single property's type and value.
 
 Returns:
     A new ``BaseProperty`` of the appropriate subclass.

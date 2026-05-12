@@ -158,7 +158,15 @@ _PRIVATE_SUBMODULE_RE = _re.compile(r"\b(mitk(?:\.[A-Za-z0-9_]+)*)\._[A-Za-z0-9_
 
 def _normalise(text):
     text = _PYBIND_NAMESPACE_RE.sub("mitk.", text)
-    text = _PRIVATE_SUBMODULE_RE.sub(r"\1.", text)
+    # Loop because each pass only collapses one ``._<priv>.`` segment; a
+    # hypothetical ``mitk._a.b._c.X`` path needs two passes to reach
+    # ``mitk.b.X``. Today only one private segment is in play, but keep
+    # the loop so we don't silently leak if that ever changes.
+    while True:
+        rewritten = _PRIVATE_SUBMODULE_RE.sub(r"\1.", text)
+        if rewritten == text:
+            break
+        text = rewritten
     return text
 
 

@@ -541,14 +541,15 @@ Returns:
 )")
 
     .def_static("load",
-      [](const std::string& path) { return LoadImage(path); },
+      [](const std::filesystem::path& path) { return LoadImage(path.string()); },
       py::arg("path"),
       R"(Load an image from a file path (explicit factory).
 
 Equivalent to ``mitk.Image(path)``.
 
 Args:
-    path: Path to an image file.
+    path: Path to an image file. Accepts ``str``, ``pathlib.Path``, or any
+        object with a ``__fspath__`` method.
 
 Returns:
     The loaded image.
@@ -557,7 +558,7 @@ Raises:
     ValueError: If the file cannot be loaded.
 )")
     .def("save",
-      [](const Image* img, const std::string& path) { SaveImage(img, path); },
+      [](const Image* img, const std::filesystem::path& path) { SaveImage(img, path.string()); },
       py::arg("path"),
       R"(Save the image to a file.
 
@@ -565,7 +566,8 @@ The output format is inferred from the file extension. Common formats:
 ``.nrrd``, ``.nii``, ``.nii.gz``, ``.mha``, ``.mhd``, ``.dcm``.
 
 Args:
-    path: Output file path.
+    path: Output file path. Accepts ``str``, ``pathlib.Path``, or any
+        object with a ``__fspath__`` method.
 
 Raises:
     ValueError: If the image is null or the format is not writable.

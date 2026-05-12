@@ -178,6 +178,7 @@ PyLabelVector MakeLabelVector(const LabelVector& src)
 
 Label::AlgorithmType ParseAlgorithmType(const std::string& s)
 {
+  if (s == "UNDEFINED") return Label::AlgorithmType::Undefined;
   if (s == "MANUAL") return Label::AlgorithmType::MANUAL;
   if (s == "SEMIAUTOMATIC") return Label::AlgorithmType::SEMIAUTOMATIC;
   if (s == "AUTOMATIC") return Label::AlgorithmType::AUTOMATIC;

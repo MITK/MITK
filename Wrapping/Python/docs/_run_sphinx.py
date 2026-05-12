@@ -10,11 +10,12 @@ This script accepts ``--dll-dir <path>`` flags (repeatable), registers
 each existing directory via ``os.add_dll_directory`` on Windows, then
 hands the remaining argv to ``sphinx.cmd.build.main`` in-process.
 
-The dev-time ``mitk/__init__.py`` writes a similar set of
-``os.add_dll_directory`` calls from the ``MITK_DLL_DIRECTORIES`` env var,
-but Sphinx imports happen inside autodoc which runs in this same Python
-process, so doing the setup here keeps the responsibility local to the
-docs build.
+The build-tree ``mitk/__init__.py`` does not handle DLL discovery, so the
+docs build cannot rely on ``import mitk`` succeeding from a stock Python
+process on Windows. Doing the directory registration here, before autodoc
+imports the extension in this same process, keeps the responsibility
+local to the docs build. Linux and macOS resolve dependencies through the
+extension's BUILD_RPATH and need no extra setup.
 """
 
 from __future__ import annotations

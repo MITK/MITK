@@ -7,6 +7,8 @@ _pkg_dir = _os.path.dirname(_os.path.abspath(__file__))
 # delvewheel (Windows) places them at mitk/.libs/ (inside the package),
 # delocate (macOS) places them at mitk/.dylibs/ (inside the package),
 # auditwheel (Linux) places them at mitk.libs/ (sibling of the package).
+# In a build-tree install none of these directories exist; the wheel-only
+# environment setup below is then skipped.
 _libs_dir = _os.path.join(_pkg_dir, ".libs")
 if not _os.path.isdir(_libs_dir):
     _libs_dir = _os.path.join(_pkg_dir, ".dylibs")
@@ -34,12 +36,17 @@ from .mitk import *
 
 
 def _rebind_module_names():
-    # Rewrite __module__ on exposed classes so tooling renders mitk.X
-    # rather than mitk.mitk.X (the inner "mitk" is the pybind11 extension).
+    # Rewrite __module__ on exposed names so tooling renders mitk.X rather
+    # than mitk.mitk.X (the inner "mitk" is the pybind11 extension). Covers
+    # classes and free functions; pybind11 enum values inherit __module__
+    # from their enum type, which is itself rebound here.
     from . import mitk as ext
     for obj in vars(ext).values():
-        if isinstance(obj, type) and obj.__module__ == "mitk.mitk":
-            obj.__module__ = "mitk"
+        if getattr(obj, "__module__", None) == "mitk.mitk":
+            try:
+                obj.__module__ = "mitk"
+            except (AttributeError, TypeError):
+                pass
 
 
 _rebind_module_names()

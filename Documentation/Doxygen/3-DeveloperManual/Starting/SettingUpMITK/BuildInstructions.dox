@@ -33,6 +33,12 @@ sudo apt install bison build-essential doxygen git graphviz \
   libxkbfile1 libxrandr2 libxtst6 libxt-dev mesa-common-dev
 \endcode
 
+When building the MITK Python wheel via <tt>MITK_BUILD_CONFIGURATION=PythonWheel</tt>, <tt>patchelf</tt> is an additional prerequisite:
+
+\code{.unparsed}
+sudo apt install patchelf
+\endcode
+
 \subsection Windows
 
 On Windows, install <b>Visual Studio 2022</b> with the <b>Desktop development with C++</b> workload.

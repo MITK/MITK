@@ -618,10 +618,12 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
   j["locked"] = label->GetLocked();
   j["opacity"] = label->GetOpacity();
   j["visible"] = label->GetVisible();
-  if (!label->GetTrackingID().empty())
-    j["tracking_id"] = label->GetTrackingID();
-  if (!label->GetTrackingUID().empty())
-    j["tracking_uid"] = label->GetTrackingUID();
+  // tracking_id and tracking_uid are always serialised, even when empty:
+  // mitk::DICOMSegmentationIO::DoRead deliberately sets empty strings to
+  // suppress mitk::Label's automatic UID generation, and dropping the keys
+  // on save would silently re-arm auto-generation on the next load.
+  j["tracking_id"] = label->GetTrackingID();
+  j["tracking_uid"] = label->GetTrackingUID();
   if (!label->GetDescription().empty())
     j["description"] = label->GetDescription();
 

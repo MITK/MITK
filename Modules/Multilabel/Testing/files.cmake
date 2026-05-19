@@ -11,3 +11,7 @@ set(MODULE_TESTS
     mitkTransferLabelTest.cpp
 )
 
+set(MODULE_CUSTOM_TESTS
+    mitkDICOMSegmentationIORegressionTest.cpp
+)
+

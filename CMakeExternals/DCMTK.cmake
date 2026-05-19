@@ -38,7 +38,7 @@ if(MITK_USE_DCMTK)
          -DDCMTK_ENABLE_CXX11:BOOL=ON
          -DDCMTK_ENABLE_STL:BOOL=ON
          -DDCMTK_WITH_DOXYGEN:BOOL=OFF
-         -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
+         -DDCMTK_WITH_ZLIB:BOOL=ON # aligned with dcmqi's DCMTK ExternalProject
          -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894

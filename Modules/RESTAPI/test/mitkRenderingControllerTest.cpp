@@ -149,7 +149,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(GetMxnWindowScreenshotReturns200Png);
   MITK_TEST(GetMxnWindowScreenshotForwardsName);
 
-  // Camera tests
+  // StdMulti camera tests
   MITK_TEST(GetCameraUnknownWindowReturns404);
   MITK_TEST(GetCameraWithoutGetterReturns503);
   MITK_TEST(GetCameraForAxialReturns200With2dFields);
@@ -174,7 +174,7 @@ class mitkRenderingControllerTestSuite : public mitk::TestFixture
   MITK_TEST(PutCameraStandardViewWithViewUpReturns400);
   MITK_TEST(PutCameraSetterThrowsMitkExceptionReturns422);
 
-  // Selected-slice tests
+  // StdMulti selected-slice tests
   MITK_TEST(GetSliceUnknownWindowReturns404);
   MITK_TEST(GetSliceOn3dReturns404UnsupportedOperation);
   MITK_TEST(GetSliceWithoutGetterReturns503);

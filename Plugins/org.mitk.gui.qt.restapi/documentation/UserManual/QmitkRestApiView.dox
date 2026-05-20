@@ -173,6 +173,10 @@ curl http://127.0.0.1:8080/api/v1/datastorage/nodes/{uid}
 - There is currently no authentication. Any process that can reach the server can read and modify your data.
 - For production or untrusted environments, consider using a firewall or VPN.
 
+\subsection org_mitk_views_restapi_security_upgrade Upgrade note: default host changed to <tt>::</tt>
+
+Prior versions bound to <tt>127.0.0.1</tt> by default. From this version onwards the default host is <tt>::</tt> (IPv6 dual-stack) to eliminate the ~2 s Windows <tt>localhost</tt> resolution latency that the IPv4-only default incurred. <b>Filtering of remote clients is now done by the client-access mode, not by the bind address.</b> If you change <tt>ClientAccessMode</tt> away from <tt>LocalhostOnly</tt> (for example to <tt>AllowAll</tt>), the server immediately becomes reachable from the network on the default host -- you no longer need to also flip the host to <tt>0.0.0.0</tt>. Review both the host and the access mode together before deploying.
+
 \section org_mitk_views_restapi_troubleshooting Troubleshooting
 
 \subsection org_mitk_views_restapi_trouble_notavailable "REST API service not available"
@@ -192,5 +196,11 @@ If the server fails to start, the status will show an error message. Common caus
 - Verify the server is running (green status indicator)
 - Check that you're using the correct URL (use the Copy button)
 - If connecting from another machine, ensure the host is set to <tt>0.0.0.0</tt> and no firewall is blocking the connection
+
+\subsection org_mitk_views_restapi_trouble_ipv4only IPv4-only clients see "connection refused" on Linux
+
+On Linux hosts with <tt>net.ipv6.bindv6only=1</tt> (a system-wide sysctl set by some distributions and security baselines), a socket bound to <tt>::</tt> accepts IPv6 connections only -- it will not accept IPv4 traffic, even on the loopback. Clients that connect to <tt>127.0.0.1</tt> or use an IPv4-only resolver will see "connection refused".
+
+If you cannot disable the kernel flag, change the configured host to <tt>0.0.0.0</tt> (IPv4 wildcard) or to a specific IPv4 address. The MITK server sets the per-socket <tt>IPV6_V6ONLY=false</tt> hint, but it cannot override the system-wide kernel default.
 
 */

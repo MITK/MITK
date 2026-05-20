@@ -221,15 +221,20 @@ namespace
    * Convenience over ResolveMxNRenderWindow for camera / slice handlers
    * that only need the renderer.
    *
-   * \throws same as ResolveMxNRenderWindow plus a runtime_error if the
-   *         render window has no associated renderer.
+   * \throws same as ResolveMxNRenderWindow plus
+   *         mitk::RenderWindowBridgeRendererUnavailableException if the
+   *         render window has no associated renderer (server-side
+   *         inconsistency). The typed exception is symmetric to
+   *         ResolveStdMultiRenderer below and maps to 500
+   *         RENDERER_UNAVAILABLE in the controller instead of being
+   *         lumped into the generic 500 INTERNAL_ERROR bucket.
    */
   mitk::BaseRenderer* ResolveMxNRenderer(const std::string& id)
   {
     const auto snap = ResolveMxNRenderWindow(id);
     auto* const renderer = snap.renderWindow->GetRenderer();
     if (renderer == nullptr)
-      throw std::runtime_error("MxN cell '" + id + "' has no associated renderer");
+      throw mitk::RenderWindowBridgeRendererUnavailableException(id);
     return renderer;
   }
 

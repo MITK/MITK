@@ -1557,6 +1557,19 @@ void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib
   {
     editors = m_RenderWindowBridge->ListEditors();
   }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an MxN cell that violates the
+    // v2 view_direction invariant when the editor info is materialised).
+    // Map to 422 RENDERING_ERROR -- the request shape was valid; the
+    // rendering backend reports an unrecoverable state. The generic
+    // MapBridgeException below would otherwise emit 500 INTERNAL_ERROR,
+    // which is the wrong status class for a downstream contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
+  }
   catch (const std::exception& e)
   {
     const auto [status, payload] = MapBridgeException(e, req.path);
@@ -1604,6 +1617,20 @@ void RenderingController::HandleGET_mxnWindows(const httplib::Request& req, http
   {
     windows = m_RenderWindowBridge->ListMxNWindows();
   }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an unparseable v2
+    // view_direction, or a 2D MxN cell with no plane set when
+    // MxNWindowInfoToWindowsListJson materialises the response). Map to
+    // 422 RENDERING_ERROR -- the request shape was valid; the rendering
+    // backend reports an unrecoverable state. The generic
+    // MapBridgeException below would otherwise emit 500 INTERNAL_ERROR,
+    // which is the wrong status class for a downstream contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
+  }
   catch (const std::exception& e)
   {
     const auto [status, payload] = MapBridgeException(e, req.path);
@@ -1640,6 +1667,19 @@ void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httpl
   try
   {
     windows = m_RenderWindowBridge->ListMxNWindows();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an unparseable v2
+    // view_direction). Map to 422 RENDERING_ERROR -- the request shape was
+    // valid; the rendering backend reports an unrecoverable state. The
+    // generic MapBridgeException below would otherwise emit 500
+    // INTERNAL_ERROR, which is the wrong status class for a downstream
+    // contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
   }
   catch (const std::exception& e)
   {

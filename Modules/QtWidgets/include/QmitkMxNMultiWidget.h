@@ -179,17 +179,17 @@ public:
   *   This is the canonical creation API; callers that need a deterministic
   *   id (e.g. the layout applier) should go through it. Internal positional
   *   creation (used by 'SetLayout(r, c)') uses a private nullary overload that
-  *   delegates here with a collision-free '<multiWidgetName>__widget<i>' id.
+  *   delegates here with a collision-free `<multiWidgetName>__widget<i>` id.
   *
   * \param id  The fully-qualified window id (e.g. "mxn__widget0",
   *            "mxn__alpha"). Must be non-empty, must start with
-  *            '<multiWidgetName>__', and must not collide with an existing
+  *            `<multiWidgetName>__`, and must not collide with an existing
   *            render-window in this editor.
   *
   * \return  Shared pointer to the newly constructed render-window widget.
   *
   * \pre  id is non-empty                                  (otherwise mitk::Exception)
-  * \pre  id starts with '<multiWidgetName>__'             (otherwise mitk::Exception)
+  * \pre  id starts with `<multiWidgetName>__`             (otherwise mitk::Exception)
   * \pre  no existing render-window uses the same id       (otherwise mitk::Exception)
   *
   * \throws mitk::Exception on precondition violation.
@@ -201,7 +201,7 @@ public:
   *        (always strict mode).
   *
   *   Group naming convention: engine-internal sync-group index 1 maps to the
-  *   bare label "main"; other indices map to "g_<i>" where <i> is a counter
+  *   bare label "main"; other indices map to `g_<i>` where `<i>` is a counter
   *   assigned by pre-order encounter order over the cell list. Same engine
   *   state in produces the same group names out (round-trip stable).
   *
@@ -292,7 +292,7 @@ public:
   * \pre  Must be called on the UI thread.
   *
   * \throws mitk::Exception on: version != "2.0"; structural shape violation;
-  *         id not starting with '<multiWidgetName>__'; duplicate window ids;
+  *         id not starting with `<multiWidgetName>__`; duplicate window ids;
   *         unknown view_direction; missing group reference in strict mode;
   *         nlohmann parse / type errors (rewrapped from
   *         'nlohmann::json::exception' subtypes).
@@ -318,7 +318,7 @@ public Q_SLOTS:
   *
   * \throws mitk::Exception (rethrown from 'ApplyLayout') on null pointer,
   *         JSON null value, version != "2.0", structural shape violation,
-  *         id not starting with '<multiWidgetName>__', duplicate window ids,
+  *         id not starting with `<multiWidgetName>__`, duplicate window ids,
   *         unknown view_direction, missing group reference in strict mode,
   *         or wrapped 'nlohmann::json::exception' subtypes.
   */
@@ -399,10 +399,10 @@ private:
   * \brief Positional convenience overload used by 'SetLayout(r, c)',
   *        'InitializeMultiWidget', and 'SetDataBasedLayout'.
   *
-  *   Picks the smallest non-negative 'i' such that
-  *   '<multiWidgetName>__widget<i>' is not already used as an id in this
+  *   Picks the smallest non-negative `i` such that
+  *   `<multiWidgetName>__widget<i>` is not already used as an id in this
   *   editor, then delegates to the explicit-id overload. This replaces the
-  *   old 'widget<count>' form, which silently collided when custom-id'd
+  *   old `widget<count>` form, which silently collided when custom-id'd
   *   cells already used the same index.
   */
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();

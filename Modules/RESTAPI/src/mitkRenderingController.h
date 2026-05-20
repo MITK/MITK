@@ -62,6 +62,16 @@ namespace mitk
      * \brief Set or clear the RenderWindowBridge for interactions with the rendering stack of
      * the application.
      *
+     * \note Lifecycle contract: this setter is intended to be called exactly
+     * once during \c RestServer::Start(), before the server thread starts
+     * accepting connections. The bridge pointer is not re-bound at runtime
+     * once request handlers are reachable. Because of this set-once-at-startup
+     * contract, the read sites in \c HandleGET_* / \c HandlePUT_* deliberately
+     * access \c m_RenderWindowBridge without holding \c m_DispatcherMutex --
+     * which would otherwise add a lock to every request without protecting
+     * against a race that does not exist in normal operation. Do not relax
+     * this contract without also serialising the read sites.
+     *
      * \param bridge The bridge, or nullptr to clear (screenshot endpoint returns 503).
      */
     void SetRenderWindowBridge(RenderWindowBridge* bridge);

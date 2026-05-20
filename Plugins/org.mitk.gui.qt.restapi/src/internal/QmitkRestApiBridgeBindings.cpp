@@ -65,6 +65,12 @@ namespace
    *      (mitkRenderingController.cpp) to derive `is3d` from the windows-list
    *      provider's kind before calling ParseCameraPatch.
    *   5. Update the OpenAPI schema and the layout v3 schema to expose 3D cells.
+   *   6. (Performance) Add per-cell descriptor getters
+   *      (e.g. \c GetMxNWindowDescriptor / \c GetStdMultiWindowDescriptor)
+   *      to the bridge surface so \c HandleGET_mxnWindow and
+   *      \c HandleGET_stdmultiWindow can resolve a single window without
+   *      materialising the full list and scanning it linearly. Negligible at
+   *      v1.2 scale; relevant once MxN cell counts grow.
    *
    * The static_assert below pins the invariant at compile time: changing the
    * constant without removing the reference sites will fail to build.

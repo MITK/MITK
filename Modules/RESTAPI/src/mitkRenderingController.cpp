@@ -562,15 +562,22 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
 
     bool tncNull = false;
     bool stepperNull = false;
-    // Filled by the dispatched lambda when the resolved step is outside
-    // [0, steps). Surface as 422 so clients can distinguish an out-of-range
-    // input from internal failure -- mirrors the Stepper's actual contract
-    // (it would silently clamp otherwise, hiding a likely client bug).
+    // Filled by the dispatched lambda when the resolved step is >= steps but
+    // a time geometry is otherwise present. Surface as 422 so clients can
+    // distinguish an out-of-range input from internal failure -- mirrors the
+    // Stepper's actual contract (it would silently clamp otherwise, hiding a
+    // likely client bug).
     bool stepOutOfRange = false;
+    // Distinct from stepOutOfRange: steps == 0 means the stepper has no
+    // resolved time geometry yet (e.g. the editor's data storage holds no
+    // timed input). Reporting this as a dedicated condition lets the error
+    // detail name the actual cause instead of producing the misleading
+    // "out of range [0, 0)" wording.
+    bool noTimeGeometry = false;
     TimeStepType resolvedStep = 0;
     unsigned int totalSteps = 0;
     this->Dispatch([&computeStep, &tncNull, &stepperNull,
-                    &stepOutOfRange, &resolvedStep, &totalSteps]()
+                    &stepOutOfRange, &noTimeGeometry, &resolvedStep, &totalSteps]()
     {
       auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
       if (tnc == nullptr)
@@ -586,7 +593,12 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
       }
       const auto step = computeStep(tnc);
       const auto steps = stepper->GetSteps();
-      if (steps == 0 || step >= static_cast<TimeStepType>(steps))
+      if (steps == 0)
+      {
+        noTimeGeometry = true;
+        return;
+      }
+      if (step >= static_cast<TimeStepType>(steps))
       {
         stepOutOfRange = true;
         resolvedStep = step;
@@ -607,6 +619,14 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
     {
       const auto error = ErrorResponse::TimeStepperNotAvailable(req.path);
       this->SendErrorResponse(res, 500, error);
+      return;
+    }
+    if (noTimeGeometry)
+    {
+      const auto error = ErrorResponse::RenderingError(
+        "No time geometry is currently resolved; the time stepper reports zero steps.",
+        req.path);
+      this->SendErrorResponse(res, 422, error);
       return;
     }
     if (stepOutOfRange)
@@ -1113,6 +1133,10 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
   // The controller-side id validation already accepts only canonical ids,
   // so an empty window list at this point means the editor reports no windows
   // -- that is an editor state we also surface as RENDER_WINDOW_NOT_FOUND.
+  // TODO(v3): replace the O(n) scan with a per-window descriptor query once
+  // the bridge surface exposes a GetStdMultiWindowDescriptor(id) callback.
+  // Tracked alongside the v3 migration checklist in
+  // QmitkRestApiBridgeBindings.cpp; acceptable at v1.2 scale (<=4 slots).
   const auto matched = std::find_if(windows.begin(), windows.end(),
     [&](const WindowInfo& w) { return w.id == id; });
   if (matched == windows.end())
@@ -1479,6 +1503,14 @@ void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Requ
 
 namespace
 {
+  // Canonical MxN window-id pattern from openapi.json's `MxNWindowName`
+  // parameter. Defined at namespace scope so the regex is constructed once
+  // at module load rather than guarded by a function-local static, which
+  // adds an observable check on every call on MSVC (the pattern is
+  // referenced from many MxN handlers, several of them on per-request hot
+  // paths).
+  const std::regex kMxNWindowIdPattern(R"(^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$)");
+
   /**
    * \brief True if `id` matches the canonical MxN window-id pattern from the
    *        OpenAPI spec (`^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$`).
@@ -1490,8 +1522,7 @@ namespace
    */
   bool IsValidMxNWindowId(const std::string& id)
   {
-    static const std::regex kPattern(R"(^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$)");
-    return std::regex_match(id, kPattern);
+    return std::regex_match(id, kMxNWindowIdPattern);
   }
 
   nlohmann::json MxNWindowInfoToWindowsListJson(const std::vector<mitk::MxNWindowInfo>& windows)
@@ -1688,6 +1719,11 @@ void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httpl
     return;
   }
 
+  // TODO(v3): replace the O(n) scan with a per-window descriptor query once
+  // the bridge surface exposes a GetMxNWindowDescriptor(id) callback.
+  // Tracked alongside the v3 migration checklist in
+  // QmitkRestApiBridgeBindings.cpp; acceptable at v1.2 scale (dozens of
+  // cells at most).
   const auto it = std::find_if(windows.begin(), windows.end(),
     [&](const MxNWindowInfo& w) { return w.id == id; });
   if (it == windows.end())

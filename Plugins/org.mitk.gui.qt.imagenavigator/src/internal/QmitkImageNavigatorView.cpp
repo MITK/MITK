@@ -233,7 +233,25 @@ void QmitkImageNavigatorView::OnRefetch()
     return;
 
   auto activeRenderWindow = m_RenderWindowPart->GetActiveQmitkRenderWindow();
+
+  // A render window part can legitimately exist without an active render
+  // window while its layout is being swapped: the previous active window has
+  // already been destroyed and a new one has not been designated yet.
+  // Stepper Refetch signals may still fire during that gap and reach us here.
+  // This is not just theoretical -- the MITK REST API's MxN layout endpoint
+  // (PUT /rendering/mxn/layout, see Modules/RESTAPI) replaces the entire
+  // window grid in one call and reliably exposes this window. Treat a missing
+  // active window / slice navigation controller as "nothing to refetch yet"
+  // rather than a programming error, mirroring the per-direction null check
+  // further down (see T22122).
+  if (activeRenderWindow == nullptr)
+    return;
+
   auto sliceNavController = activeRenderWindow->GetSliceNavigationController();
+
+  if (sliceNavController == nullptr)
+    return;
+
   auto timeGeometry = sliceNavController->GetInputWorldTimeGeometry();
 
   if (timeGeometry == nullptr)

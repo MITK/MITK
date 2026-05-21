@@ -37,11 +37,11 @@ A colored indicator shows the server state at a glance:
 
 \subsection org_mitk_views_restapi_serverurl Server URL
 
-When the server is running, the full URL is displayed (e.g., <tt>http://127.0.0.1:8080</tt>). Click the <b>Copy</b> button to copy this URL to the clipboard for use in external applications.
+When the server is running, the full URL is displayed (e.g., <tt>http://localhost:8080</tt>). Click the <b>Copy</b> button to copy this URL to the clipboard for use in external applications.
 
 \subsection org_mitk_views_restapi_configuration Configuration
 
-Shows the current host and port configuration (e.g., <tt>127.0.0.1:8080</tt>). This can be changed in the preferences.
+Shows the current host and port configuration (e.g., <tt>:::8080</tt> for the default dual-stack bind). This can be changed in the preferences.
 
 \subsection org_mitk_views_restapi_startstop Start/Stop Server
 
@@ -95,9 +95,10 @@ The REST API preferences can be accessed via <b>Window > Preferences > REST API<
 
 \subsection org_mitk_views_restapi_prefs_network Network Settings
 
-- <b>Host</b>: The network interface to bind to (default: <tt>127.0.0.1</tt> for localhost only)
-  - Use <tt>127.0.0.1</tt> to only allow connections from the local machine
-  - Use <tt>0.0.0.0</tt> to allow connections from any network interface (use with caution)
+- <b>Host</b>: The network interface to bind to (default: <tt>::</tt>, the IPv6 wildcard, which also accepts IPv4 connections via 4-mapped addresses on Linux/macOS/Windows)
+  - The default <tt>::</tt> avoids the ~2 s IPv6-first / IPv4-fallback latency that Windows clients otherwise pay when resolving <tt>localhost</tt>
+  - Use <tt>127.0.0.1</tt> to pin the server to IPv4 loopback only
+  - Use <tt>0.0.0.0</tt> to allow connections from any IPv4 network interface (use with caution)
 - <b>Port</b>: The port number to listen on (default: <tt>8080</tt>)
 
 \subsection org_mitk_views_restapi_prefs_performance Performance Settings
@@ -167,10 +168,14 @@ curl http://127.0.0.1:8080/api/v1/datastorage/nodes/{uid}
 
 <b>Important:</b> The REST API is intended for local development and trusted network environments.
 
-- By default, the server only listens on <tt>127.0.0.1</tt> (localhost), meaning only processes on the same machine can connect.
+- By default, the server binds to <tt>::</tt> (the IPv6 wildcard, dual-stack). The default client-access mode (<tt>LocalhostOnly</tt>) still rejects requests whose remote address is not <tt>127.0.0.1</tt>, <tt>::1</tt>, or <tt>%::ffff:127.0.0.1</tt>, so even though the socket itself can accept off-host connections, only loopback clients are served.
 - If you change the host to <tt>0.0.0.0</tt>, the server becomes accessible from other machines on your network. Only do this in trusted environments.
 - There is currently no authentication. Any process that can reach the server can read and modify your data.
 - For production or untrusted environments, consider using a firewall or VPN.
+
+\subsection org_mitk_views_restapi_security_upgrade Upgrade note: default host changed to <tt>::</tt>
+
+Prior versions bound to <tt>127.0.0.1</tt> by default. From this version onwards the default host is <tt>::</tt> (IPv6 dual-stack) to eliminate the ~2 s Windows <tt>localhost</tt> resolution latency that the IPv4-only default incurred. <b>Filtering of remote clients is now done by the client-access mode, not by the bind address.</b> If you change <tt>ClientAccessMode</tt> away from <tt>LocalhostOnly</tt> (for example to <tt>AllowAll</tt>), the server immediately becomes reachable from the network on the default host -- you no longer need to also flip the host to <tt>0.0.0.0</tt>. Review both the host and the access mode together before deploying.
 
 \section org_mitk_views_restapi_troubleshooting Troubleshooting
 
@@ -191,5 +196,11 @@ If the server fails to start, the status will show an error message. Common caus
 - Verify the server is running (green status indicator)
 - Check that you're using the correct URL (use the Copy button)
 - If connecting from another machine, ensure the host is set to <tt>0.0.0.0</tt> and no firewall is blocking the connection
+
+\subsection org_mitk_views_restapi_trouble_ipv4only IPv4-only clients see "connection refused" on Linux
+
+On Linux hosts with <tt>net.ipv6.bindv6only=1</tt> (a system-wide sysctl set by some distributions and security baselines), a socket bound to <tt>::</tt> accepts IPv6 connections only -- it will not accept IPv4 traffic, even on the loopback. Clients that connect to <tt>127.0.0.1</tt> or use an IPv4-only resolver will see "connection refused".
+
+If you cannot disable the kernel flag, change the configured host to <tt>0.0.0.0</tt> (IPv4 wildcard) or to a specific IPv4 address. The MITK server sets the per-socket <tt>IPV6_V6ONLY=false</tt> hint, but it cannot override the system-wide kernel default.
 
 */

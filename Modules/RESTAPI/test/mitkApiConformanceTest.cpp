@@ -31,6 +31,7 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <cctype>
 #include <fstream>
 #include <functional>
 #include <map>
@@ -92,6 +93,9 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(SortAscending);
   MITK_TEST(SortDescending);
   MITK_TEST(PropertyScopeDefaultForGet);
+  MITK_TEST(PropertyScopeDefaultForPut);
+  MITK_TEST(PropertyScopeDefaultForPatch);
+  MITK_TEST(PropertyScopeDefaultForDelete);
 
   // Category 4: Status Code Conformance
   MITK_TEST(ListNodesReturns200);
@@ -103,6 +107,10 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(PropertyNotFoundReturns404);
   MITK_TEST(NodeHasChildrenReturns409);
   MITK_TEST(UnsupportedContentTypeReturns415);
+  MITK_TEST(SharedMemoryTransferModeReturns406);
+  MITK_TEST(HierarchyInvalidValueReturns400);
+  MITK_TEST(PropertyScopeInvalidValueReturns400);
+  MITK_TEST(TransferModeInvalidHeaderValueReturns406);
   MITK_TEST(NoDataStorageReturns503);
 
   // Category 5: Content-Type Conformance
@@ -116,10 +124,12 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
 
-  // Category 7: Spec MD <-> openapi.json triangle
+  // Category 7: Spec MD <-> openapi.json <-> handler triangle.
+  // The spec MD is the user-facing reference; if openapi.json adds an endpoint
+  // and the spec MD does not document it (or vice versa), this catches it.
   MITK_TEST(EveryOpenApiEndpointIsDocumentedInSpecMd);
-  MITK_TEST(SpecMdMajorVersionMatchesOpenApi);
   MITK_TEST(EverySpecMdEndpointIsInOpenApi);
+  MITK_TEST(SpecMdMajorVersionMatchesOpenApi);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -155,7 +165,7 @@ private:
     return req;
   }
 
-  /// Create a node via the controller and return its UID.
+  /** Create a node via the controller and return its UID. */
   std::string CreateTestNode(const std::string& name)
   {
     auto req = this->CreateRequest(
@@ -173,7 +183,7 @@ private:
     return json["data"]["uid"].get<std::string>();
   }
 
-  /// Create a child node under parentUid and return its UID.
+  /** Create a child node under parentUid and return its UID. */
   std::string CreateTestChildNode(const std::string& name, const std::string& parentUid)
   {
     auto req = this->CreateRequest(
@@ -191,15 +201,12 @@ private:
     return json["data"]["uid"].get<std::string>();
   }
 
-  /// Build the endpoint registry mapping (OpenAPI path, HTTP method) -> handler function.
+  /** Build the endpoint registry mapping (OpenAPI path, HTTP method) -> handler function. */
   void BuildEndpointRegistry()
   {
     m_EndpointRegistry.clear();
 
     // Discovery
-    m_EndpointRegistry[{"/", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
-      m_HealthController->HandleGET_info(req, res);
-    };
     m_EndpointRegistry[{"/health", "get"}] = [this](const httplib::Request& req, httplib::Response& res) {
       m_HealthController->HandleGET_health(req, res);
     };
@@ -317,23 +324,23 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiWindows(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}", "get"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}", "get"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiWindow(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "get"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}/camera", "get"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiCamera(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/camera", "put"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}/camera", "put"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandlePUT_stdmultiCamera(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "get"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}/selected-slice", "get"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiSelectedSlice(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/selected-slice", "put"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}/selected-slice", "put"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandlePUT_stdmultiSelectedSlice(req, res);
       };
@@ -341,13 +348,67 @@ private:
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiScreenshot(req, res);
       };
-    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{name}/screenshot", "get"}] =
+    m_EndpointRegistry[{"/rendering/editors/stdmulti/windows/{id}/screenshot", "get"}] =
       [this](const httplib::Request& req, httplib::Response& res) {
         m_RenderingController->HandleGET_stdmultiWindowScreenshot(req, res);
       };
+
+    // ---- MxN editor ----
+    m_EndpointRegistry[{"/rendering/editors/mxn", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnInfo(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnWindows(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnWindow(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/layout", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnLayout(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/layout", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_mxnLayout(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/camera", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnCamera(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/camera", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_mxnCamera(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/selected-slice", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnSelectedSlice(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/selected-slice", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_mxnSelectedSlice(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/selected-position", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnSelectedPosition(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/selected-position", "put"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandlePUT_mxnSelectedPosition(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnScreenshot(req, res);
+      };
+    m_EndpointRegistry[{"/rendering/editors/mxn/windows/{id}/screenshot", "get"}] =
+      [this](const httplib::Request& req, httplib::Response& res) {
+        m_RenderingController->HandleGET_mxnWindowScreenshot(req, res);
+      };
   }
 
-  /// Read required fields from components.schemas.<schemaName>.required.
+  /** Read required fields from components.schemas.<schemaName>.required. */
   std::vector<std::string> GetRequiredFields(const std::string& schemaName) const
   {
     const auto& schema = m_Spec["components"]["schemas"][schemaName];
@@ -358,7 +419,7 @@ private:
     return schema["required"].get<std::vector<std::string>>();
   }
 
-  /// Read field type from components.schemas.<schemaName>.properties.<field>.type.
+  /** Read field type from components.schemas.<schemaName>.properties.<field>.type. */
   std::string GetFieldType(const std::string& schemaName, const std::string& field) const
   {
     const auto& props = m_Spec["components"]["schemas"][schemaName]["properties"];
@@ -369,7 +430,7 @@ private:
     return "";
   }
 
-  /// Check if field is nullable from components.schemas.<schemaName>.properties.<field>.nullable.
+  /** Check if field is nullable from components.schemas.<schemaName>.properties.<field>.nullable. */
   bool IsFieldNullable(const std::string& schemaName, const std::string& field) const
   {
     const auto& props = m_Spec["components"]["schemas"][schemaName]["properties"];
@@ -380,21 +441,21 @@ private:
     return false;
   }
 
-  /// Read default value for a component parameter.
+  /** Read default value for a component parameter. */
   template <typename T>
   T GetParameterDefault(const std::string& paramName) const
   {
     return m_Spec["components"]["parameters"][paramName]["schema"]["default"].get<T>();
   }
 
-  /// Read maximum value for a component parameter.
+  /** Read maximum value for a component parameter. */
   template <typename T>
   T GetParameterMaximum(const std::string& paramName) const
   {
     return m_Spec["components"]["parameters"][paramName]["schema"]["maximum"].get<T>();
   }
 
-  /// Collect all error codes from response examples throughout the spec.
+  /** Collect all error codes from response examples throughout the spec. */
   std::set<std::string> CollectSpecErrorCodes() const
   {
     std::set<std::string> codes;
@@ -480,7 +541,7 @@ private:
     return codes;
   }
 
-  /// Get all error code constants defined in ErrorResponse.
+  /** Get all error code constants defined in ErrorResponse. */
   static std::set<std::string> GetAllCodeErrorCodes()
   {
     return {
@@ -490,7 +551,6 @@ private:
       mitk::ErrorResponse::CODE_DATASTORAGE_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_INTERNAL_ERROR,
       mitk::ErrorResponse::CODE_PROPERTY_PROTECTED,
-      mitk::ErrorResponse::CODE_NOT_IMPLEMENTED,
       mitk::ErrorResponse::CODE_NODE_HAS_CHILDREN,
       mitk::ErrorResponse::CODE_NO_DATA,
       mitk::ErrorResponse::CODE_NO_GEOMETRY,
@@ -848,10 +908,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(404, error["status"].get<int>());
     CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), error["code"].get<std::string>());
 
-    // Type URI should follow pattern
+    // Type URI must follow the canonical prefix `https://docs.mitk.org/api/errors/<CODE>`.
+    // A loose "contains code" check would silently accept e.g. `https://example.com/NODE_NOT_FOUND`
+    // after a refactor -- assert the full prefix verbatim so prefix drift is caught.
     const std::string typeUri = error["type"].get<std::string>();
-    CPPUNIT_ASSERT_MESSAGE("type URI must contain error code",
-      typeUri.find("NODE_NOT_FOUND") != std::string::npos);
+    const std::string expectedPrefix = "https://docs.mitk.org/api/errors/";
+    CPPUNIT_ASSERT_MESSAGE(
+      "type URI must start with '" + expectedPrefix + "' but was '" + typeUri + "'",
+      typeUri.rfind(expectedPrefix, 0) == 0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "type URI suffix must equal error.code",
+      std::string("NODE_NOT_FOUND"),
+      typeUri.substr(expectedPrefix.size()));
   }
 
   void PaginationResponseHasRequiredFields()
@@ -1195,6 +1263,63 @@ public:
       json["meta"]["property_scope"].get<std::string>());
   }
 
+  void PropertyScopeDefaultForPut()
+  {
+    // Per OpenAPI spec: PUT /properties defaults to property_scope=node.
+    // Asymmetric default vs. GET -- guards against drift under refactor.
+    const std::string uid = this->CreateTestNode("ScopeTestNodePut");
+
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+      "{}", {{"uid", uid}}, {}, "application/json");
+    httplib::Response res;
+    m_Controller->HandlePUT_nodes_uid_properties(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("node"),
+      json["meta"]["property_scope"].get<std::string>());
+  }
+
+  void PropertyScopeDefaultForPatch()
+  {
+    // Per OpenAPI spec: PATCH /properties defaults to property_scope=node.
+    const std::string uid = this->CreateTestNode("ScopeTestNodePatch");
+
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+      R"({"customScopeFlag": true})", {{"uid", uid}}, {}, "application/json");
+    httplib::Response res;
+    m_Controller->HandlePATCH_nodes_uid_properties(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("node"),
+      json["meta"]["property_scope"].get<std::string>());
+  }
+
+  void PropertyScopeDefaultForDelete()
+  {
+    // Per OpenAPI spec: DELETE /properties/{name} defaults to property_scope=node.
+    const std::string uid = this->CreateTestNode("ScopeTestNodeDelete");
+
+    // Seed a property in node scope so the DELETE has something to remove.
+    auto patchReq = this->CreateRequest("/api/v1/datastorage/nodes/" + uid + "/properties",
+      R"({"customScopeFlag": true})", {{"uid", uid}}, {}, "application/json");
+    httplib::Response patchRes;
+    m_Controller->HandlePATCH_nodes_uid_properties(patchReq, patchRes);
+    CPPUNIT_ASSERT_EQUAL(200, patchRes.status);
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + uid + "/properties/customScopeFlag", "",
+      {{"uid", uid}, {"property_key", "customScopeFlag"}});
+    httplib::Response res;
+    m_Controller->HandleDELETE_nodes_uid_properties_key(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(200, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("node"),
+      json["meta"]["property_scope"].get<std::string>());
+  }
+
   // ==========================================
   // Category 4: Status Code Conformance
   // ==========================================
@@ -1339,6 +1464,77 @@ public:
       json["error"]["code"].get<std::string>());
   }
 
+  void HierarchyInvalidValueReturns400()
+  {
+    // OAS declares hierarchy as a closed enum {"all", "toplevel"}.
+    // Values outside the enum (typos, casing variants, garbage) must be rejected
+    // with 400 INVALID_REQUEST, not silently mapped to the default.
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes", "",
+      {}, {{"hierarchy", "Toplevel"}});
+    httplib::Response res;
+    m_Controller->HandleGET_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+      json["error"]["code"].get<std::string>());
+  }
+
+  void PropertyScopeInvalidValueReturns400()
+  {
+    // OAS declares property_scope as a closed enum {"all", "node", "data"}.
+    // Values outside the enum must be rejected with 400 INVALID_REQUEST.
+    auto req = this->CreateRequest("/api/v1/datastorage/nodes", "",
+      {}, {{"property_scope", "everything"}});
+    httplib::Response res;
+    m_Controller->HandleGET_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(400, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("INVALID_REQUEST"),
+      json["error"]["code"].get<std::string>());
+  }
+
+  void TransferModeInvalidHeaderValueReturns406()
+  {
+    // OAS declares X-MITK-Transfer-Mode as a closed enum {"direct", "file-reference"}.
+    // Header values outside the enum must surface as 406
+    // TRANSFER_MODE_NOT_AVAILABLE on GET /data, not silently fall through to
+    // the default direct mode.
+    const std::string uid = this->CreateTestNode("TransferModeTest");
+
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes/" + uid + "/data", "",
+      {{"uid", uid}});
+    req.set_header("X-MITK-Transfer-Mode", "shared-memory");
+    httplib::Response res;
+    m_Controller->HandleGET_nodes_uid_data(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(406, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("TRANSFER_MODE_NOT_AVAILABLE"),
+      json["error"]["code"].get<std::string>());
+  }
+
+  void SharedMemoryTransferModeReturns406()
+  {
+    // POST /datastorage/nodes with body specifying transfer.mode = "shared-memory"
+    // must be rejected with 406 TRANSFER_MODE_NOT_AVAILABLE -- only "direct" and
+    // "file-reference" are supported. Guards against silent acceptance of
+    // values outside the OAS TransferMode enum.
+    auto req = this->CreateRequest(
+      "/api/v1/datastorage/nodes",
+      R"({"name":"Test","transfer":{"mode":"shared-memory","file_path":"/tmp/x.nrrd"}})",
+      {}, {}, "application/json");
+    httplib::Response res;
+    m_Controller->HandlePOST_nodes(req, res);
+
+    CPPUNIT_ASSERT_EQUAL(406, res.status);
+    auto json = nlohmann::json::parse(res.body);
+    CPPUNIT_ASSERT_EQUAL(std::string("TRANSFER_MODE_NOT_AVAILABLE"),
+      json["error"]["code"].get<std::string>());
+  }
+
   // ==========================================
   // Category 5: Content-Type Conformance
   // ==========================================
@@ -1397,20 +1593,11 @@ public:
   void AllCodeErrorCodesExistInSpec()
   {
     // Every error code constant in ErrorResponse must appear in at least one spec example.
-    // Exception: NOT_IMPLEMENTED is implementation-only (no endpoint triggers it in normal flow).
     const auto specCodes = this->CollectSpecErrorCodes();
     const auto codeCodes = GetAllCodeErrorCodes();
 
-    // NOT_IMPLEMENTED is an internal sentinel code used for unimplemented features;
-    // no endpoint exposes it as a normal response, so it has no spec example.
-    const std::set<std::string> exemptions = {"NOT_IMPLEMENTED"};
-
     for (const auto& code : codeCodes)
     {
-      if (exemptions.count(code) > 0)
-      {
-        continue;
-      }
       CPPUNIT_ASSERT_MESSAGE(
         "ErrorResponse code '" + code + "' has no spec example",
         specCodes.count(code) > 0);
@@ -1493,12 +1680,11 @@ public:
       for (const auto& [method, operation] : pathItem.items())
       {
         // Spec MD does not (yet) document a few openapi entries that are
-        // discovery / aliases, not first-class user-facing API:
-        //   /              -- alias for /info
+        // discovery resources, not first-class user-facing API:
         //   /docs          -- Swagger UI redirect
         //   /openapi.json  -- the OpenAPI spec itself
         // If you add user-facing detail for any of these later, drop the skip.
-        if (path == "/" || path == "/docs" || path == "/openapi.json")
+        if (path == "/docs" || path == "/openapi.json")
           continue;
 
         const EndpointKey key{path, method};

@@ -22,11 +22,74 @@ found in the LICENSE file.
 #include <algorithm>
 #include <functional>
 #include <optional>
+#include <regex>
 #include <set>
+#include <sstream>
+#include <string_view>
 #include <vector>
 
 namespace mitk
 {
+
+namespace
+{
+  /**
+   * \brief JSON shape of GET /rendering/selected-position (and the per-cell
+   *        MxN selected-position resource).
+   *
+   * Bounds: when no geometry is loaded, `bounds.min_position` /
+   * `bounds.max_position` serialize as `null` rather than being omitted, so
+   * clients can rely on the keys always being present. Field names mirror
+   * the slice navigator's `bounds.min_position` / `bounds.max_position`
+   * convention.
+   */
+  nlohmann::json SerializeSelectedPositionInfoToJson(const mitk::SelectedPositionInfo& info)
+  {
+    nlohmann::json j;
+    j["position"] = {info.position[0], info.position[1], info.position[2]};
+
+    if (info.bounds.has_value())
+    {
+      const auto& b = info.bounds.value();
+      j["bounds"]["min_position"] = {b.minPosition[0], b.minPosition[1], b.minPosition[2]};
+      j["bounds"]["max_position"] = {b.maxPosition[0], b.maxPosition[1], b.maxPosition[2]};
+    }
+    else
+    {
+      j["bounds"]["min_position"] = nullptr;
+      j["bounds"]["max_position"] = nullptr;
+    }
+    return j;
+  }
+
+  /**
+   * \brief Parse `{"position": [x,y,z]}` from a PUT body.
+   *
+   * Shared between PUT /rendering/selected-position and PUT
+   * /rendering/editors/mxn/windows/{id}/selected-position: same field
+   * name, same shape, same validation rules.
+   *
+   * \returns nullopt on success; an error fragment otherwise.
+   */
+  std::optional<std::string> ParsePositionFromBody(const nlohmann::json& body, mitk::Point3D& out)
+  {
+    if (!body.contains("position"))
+      return "'position' field is required.";
+
+    const auto& posJson = body["position"];
+    if (!posJson.is_array() || posJson.size() != 3)
+      return "'position' must be an array of exactly 3 numbers.";
+
+    for (const auto& v : posJson)
+      if (!v.is_number())
+        return "'position' must be an array of exactly 3 numbers.";
+
+    out[0] = posJson[0].get<double>();
+    out[1] = posJson[1].get<double>();
+    out[2] = posJson[2].get<double>();
+    return std::nullopt;
+  }
+}
 
 RenderingController::RenderingController(DataStorageBridge& bridge)
   : m_Bridge(bridge)
@@ -286,23 +349,8 @@ void RenderingController::HandleGET_selectedPosition(const httplib::Request& req
     return;
   }
 
-  nlohmann::json response;
-  response["position"] = {posInfo.position[0], posInfo.position[1], posInfo.position[2]};
-
-  if (posInfo.bounds.has_value())
-  {
-    const auto& b = posInfo.bounds.value();
-    response["bounds"]["min"] = {b.min[0], b.min[1], b.min[2]};
-    response["bounds"]["max"] = {b.max[0], b.max[1], b.max[2]};
-  }
-  else
-  {
-    response["bounds"]["min"] = nullptr;
-    response["bounds"]["max"] = nullptr;
-  }
-
   res.status = 200;
-  res.set_content(response.dump(), "application/json");
+  res.set_content(SerializeSelectedPositionInfoToJson(posInfo).dump(), "application/json");
 }
 
 void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req, httplib::Response& res) const
@@ -326,31 +374,12 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
     return;
   }
 
-  if (!body.contains("position"))
+  Point3D newPos;
+  if (const auto err = ParsePositionFromBody(body, newPos))
   {
-    const auto error = ErrorResponse::InvalidRequest("'position' field is required.", req.path);
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
     this->SendErrorResponse(res, 400, error);
     return;
-  }
-
-  const auto& posJson = body["position"];
-  if (!posJson.is_array() || posJson.size() != 3)
-  {
-    const auto error = ErrorResponse::InvalidRequest(
-      "'position' must be an array of exactly 3 numbers.", req.path);
-    this->SendErrorResponse(res, 400, error);
-    return;
-  }
-
-  for (const auto& v : posJson)
-  {
-    if (!v.is_number())
-    {
-      const auto error = ErrorResponse::InvalidRequest(
-        "'position' must be an array of exactly 3 numbers.", req.path);
-      this->SendErrorResponse(res, 400, error);
-      return;
-    }
   }
 
   if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasPositionSetter())
@@ -359,11 +388,6 @@ void RenderingController::HandlePUT_selectedPosition(const httplib::Request& req
     this->SendErrorResponse(res, 503, error);
     return;
   }
-
-  Point3D newPos;
-  newPos[0] = posJson[0].get<double>();
-  newPos[1] = posJson[1].get<double>();
-  newPos[2] = posJson[2].get<double>();
 
   try
   {
@@ -538,7 +562,22 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
 
     bool tncNull = false;
     bool stepperNull = false;
-    this->Dispatch([&computeStep, &tncNull, &stepperNull]()
+    // Filled by the dispatched lambda when the resolved step is >= steps but
+    // a time geometry is otherwise present. Surface as 422 so clients can
+    // distinguish an out-of-range input from internal failure -- mirrors the
+    // Stepper's actual contract (it would silently clamp otherwise, hiding a
+    // likely client bug).
+    bool stepOutOfRange = false;
+    // Distinct from stepOutOfRange: steps == 0 means the stepper has no
+    // resolved time geometry yet (e.g. the editor's data storage holds no
+    // timed input). Reporting this as a dedicated condition lets the error
+    // detail name the actual cause instead of producing the misleading
+    // "out of range [0, 0)" wording.
+    bool noTimeGeometry = false;
+    TimeStepType resolvedStep = 0;
+    unsigned int totalSteps = 0;
+    this->Dispatch([&computeStep, &tncNull, &stepperNull,
+                    &stepOutOfRange, &noTimeGeometry, &resolvedStep, &totalSteps]()
     {
       auto* const tnc = RenderingManager::GetInstance()->GetTimeNavigationController();
       if (tnc == nullptr)
@@ -552,7 +591,21 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
         stepperNull = true;
         return;
       }
-      stepper->SetPos(static_cast<unsigned int>(computeStep(tnc)));
+      const auto step = computeStep(tnc);
+      const auto steps = stepper->GetSteps();
+      if (steps == 0)
+      {
+        noTimeGeometry = true;
+        return;
+      }
+      if (step >= static_cast<TimeStepType>(steps))
+      {
+        stepOutOfRange = true;
+        resolvedStep = step;
+        totalSteps = steps;
+        return;
+      }
+      stepper->SetPos(static_cast<unsigned int>(step));
       tnc->SendTime();
     });
 
@@ -566,6 +619,23 @@ void RenderingController::HandlePUT_selectedTime(const httplib::Request& req, ht
     {
       const auto error = ErrorResponse::TimeStepperNotAvailable(req.path);
       this->SendErrorResponse(res, 500, error);
+      return;
+    }
+    if (noTimeGeometry)
+    {
+      const auto error = ErrorResponse::RenderingError(
+        "No time geometry is currently resolved; the time stepper reports zero steps.",
+        req.path);
+      this->SendErrorResponse(res, 422, error);
+      return;
+    }
+    if (stepOutOfRange)
+    {
+      std::ostringstream oss;
+      oss << "Resolved time step " << resolvedStep << " is out of range [0, "
+          << totalSteps << ").";
+      const auto error = ErrorResponse::RenderingError(oss.str(), req.path);
+      this->SendErrorResponse(res, 422, error);
       return;
     }
 
@@ -596,8 +666,8 @@ namespace
     if (includeWindowList)
     {
       j["windows"] = nlohmann::json::array();
-      for (const auto& n : info.windowNames)
-        j["windows"].push_back(n);
+      for (const auto& id : info.windowIds)
+        j["windows"].push_back(id);
     }
     return j;
   }
@@ -649,12 +719,12 @@ namespace
    * HTTP 400 error payload (the caller already knows the status).
    *
    * Rules:
-   * - Unknown top-level fields → 400.
+   * - Unknown top-level fields -> 400.
    * - position/focal_point/view_up: array of 3 numbers if present.
    * - parallel_scale: number > 0, only for 2D windows.
    * - perspective_angle: number in (0, 180), only for 3D windows.
    * - standard_view: one of anterior/posterior/left/right/cranial/caudal.
-   * - Empty body (no recognised field) → 400.
+   * - Empty body (no recognised field) -> 400.
    */
   std::optional<std::string> ParseCameraPatch(
     const nlohmann::json& body, bool is3d, mitk::CameraPatch& patch)
@@ -757,7 +827,7 @@ namespace
    * \brief Resolved query parameters for the screenshot endpoints.
    *
    * Shared between /rendering/screenshot, /rendering/editors/stdmulti/screenshot,
-   * and /rendering/editors/stdmulti/windows/{name}/screenshot — the contract
+   * and /rendering/editors/stdmulti/windows/{id}/screenshot -- the contract
    * is intentionally identical.
    */
   struct ScreenshotQueryParams
@@ -833,6 +903,11 @@ namespace
     return p;
   }
 
+  // SerializeSelectedPositionInfoToJson and ParsePositionFromBody live in the
+  // earlier anonymous namespace (top of this file) so they are visible to the
+  // global selected-position handlers (HandleGET_selectedPosition /
+  // HandlePUT_selectedPosition).
+
   nlohmann::json SliceStateToJson(const mitk::SliceState& s)
   {
     nlohmann::json j;
@@ -853,22 +928,32 @@ namespace
   }
 
   /**
-   * \brief Parse a selected-slice PUT body. Only `{"step": N}` is accepted
-   *        for StdMulti. Presence of `position` → hint to use selected-position.
+   * \brief Parse `{"step": N}` from a slice-PUT body.
    *
-   * On success, fills `step`. On failure, returns the 400 error detail string.
+   * \param body            Pre-parsed JSON body.
+   * \param resourceContext Resource label embedded into the rejection when
+   *                        `position` is present (e.g. "StdMulti
+   *                        selected-slice", "MxN selected-slice"). Identifies
+   *                        which slice resource produced the error.
+   * \param positionHint    Message appended to the rejection when `position`
+   *                        is present in the body. Differs between StdMulti
+   *                        (always coupled; redirects to the global
+   *                        selected-position resource) and MxN (has its own
+   *                        per-cell selected-position resource).
+   * \param step            Out-parameter for the parsed step.
+   * \returns nullopt on success; an error fragment otherwise.
    */
-  std::optional<std::string> ParseSliceStepBody(const nlohmann::json& body, unsigned int& step)
+  std::optional<std::string> ParseSliceStepBody(const nlohmann::json& body,
+                                                std::string_view resourceContext,
+                                                const std::string& positionHint,
+                                                unsigned int& step)
   {
     if (!body.is_object())
       return "Request body must be a JSON object.";
 
-    // `position` is reserved for /rendering/selected-position — explicit hint.
     if (body.contains("position"))
-    {
-      return "'position' is not accepted on StdMulti selected-slice. "
-             "Use PUT /rendering/selected-position to move by world coordinates.";
-    }
+      return std::string("'position' is not accepted on ") + std::string(resourceContext)
+        + ". " + positionHint;
 
     for (auto it = body.begin(); it != body.end(); ++it)
     {
@@ -1002,8 +1087,10 @@ void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req,
   for (const auto& w : windows)
   {
     nlohmann::json wj;
-    wj["name"] = w.name;
+    wj["id"] = w.id;
     wj["kind"] = WindowKindToString(w.kind);
+    if (w.viewDirection.has_value())
+      wj["view_direction"] = AnatomicalPlaneToV2String(*w.viewDirection);
     arr.push_back(wj);
   }
 
@@ -1013,11 +1100,11 @@ void RenderingController::HandleGET_stdmultiWindows(const httplib::Request& req,
 
 void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
@@ -1043,23 +1130,29 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
     return;
   }
 
-  // The controller-side name validation already accepts only canonical names,
+  // The controller-side id validation already accepts only canonical ids,
   // so an empty window list at this point means the editor reports no windows
-  // — that is an editor state we also surface as RENDER_WINDOW_NOT_FOUND.
-  const bool present = std::any_of(windows.begin(), windows.end(),
-    [&](const WindowInfo& w) { return w.name == name; });
-  if (!present)
+  // -- that is an editor state we also surface as RENDER_WINDOW_NOT_FOUND.
+  // TODO(v3): replace the O(n) scan with a per-window descriptor query once
+  // the bridge surface exposes a GetStdMultiWindowDescriptor(id) callback.
+  // Tracked alongside the v3 migration checklist in
+  // QmitkRestApiBridgeBindings.cpp; acceptable at v1.2 scale (<=4 slots).
+  const auto matched = std::find_if(windows.begin(), windows.end(),
+    [&](const WindowInfo& w) { return w.id == id; });
+  if (matched == windows.end())
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
 
-  const bool is3d = IsStdMulti3dWindow(name);
+  const bool is3d = IsStdMulti3dWindow(id);
 
   nlohmann::json j;
-  j["name"] = name;
+  j["id"] = id;
   j["kind"] = is3d ? "3d" : "2d";
+  if (matched->viewDirection.has_value())
+    j["view_direction"] = AnatomicalPlaneToV2String(*matched->viewDirection);
   j["has_camera"] = true;
   j["has_selected_slice"] = !is3d;
 
@@ -1069,11 +1162,11 @@ void RenderingController::HandleGET_stdmultiWindow(const httplib::Request& req, 
 
 void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
@@ -1088,7 +1181,7 @@ void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, 
   CameraState state;
   try
   {
-    state = m_RenderWindowBridge->GetStdMultiCamera(name);
+    state = m_RenderWindowBridge->GetStdMultiCamera(id);
   }
   catch (const std::exception& e)
   {
@@ -1104,11 +1197,11 @@ void RenderingController::HandleGET_stdmultiCamera(const httplib::Request& req, 
 
 void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
@@ -1133,7 +1226,7 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
   }
 
   CameraPatch patch;
-  if (const auto err = ParseCameraPatch(body, IsStdMulti3dWindow(name), patch))
+  if (const auto err = ParseCameraPatch(body, IsStdMulti3dWindow(id), patch))
   {
     const auto error = ErrorResponse::InvalidRequest(*err, req.path);
     this->SendErrorResponse(res, 400, error);
@@ -1149,7 +1242,7 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
 
   try
   {
-    m_RenderWindowBridge->SetStdMultiCamera(name, patch);
+    m_RenderWindowBridge->SetStdMultiCamera(id, patch);
     res.status = 204;
   }
   catch (const mitk::Exception& e)
@@ -1167,16 +1260,16 @@ void RenderingController::HandlePUT_stdmultiCamera(const httplib::Request& req, 
 
 void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
 
-  if (IsStdMulti3dWindow(name))
+  if (IsStdMulti3dWindow(id))
   {
     const auto error = ErrorResponse::UnsupportedOperation(
       "selected-slice is not applicable to the 3D window.", req.path);
@@ -1194,7 +1287,7 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
   SliceState state;
   try
   {
-    state = m_RenderWindowBridge->GetStdMultiSelectedSlice(name);
+    state = m_RenderWindowBridge->GetStdMultiSelectedSlice(id);
   }
   catch (const std::exception& e)
   {
@@ -1210,16 +1303,16 @@ void RenderingController::HandleGET_stdmultiSelectedSlice(const httplib::Request
 
 void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
 
-  if (IsStdMulti3dWindow(name))
+  if (IsStdMulti3dWindow(id))
   {
     const auto error = ErrorResponse::UnsupportedOperation(
       "selected-slice is not applicable to the 3D window.", req.path);
@@ -1247,7 +1340,10 @@ void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request
   }
 
   unsigned int step = 0;
-  if (const auto err = ParseSliceStepBody(body, step))
+  if (const auto err = ParseSliceStepBody(body,
+        "StdMulti selected-slice",
+        "Use PUT /rendering/selected-position to move the global crosshair by world coordinates.",
+        step))
   {
     const auto error = ErrorResponse::InvalidRequest(*err, req.path);
     this->SendErrorResponse(res, 400, error);
@@ -1263,7 +1359,7 @@ void RenderingController::HandlePUT_stdmultiSelectedSlice(const httplib::Request
 
   try
   {
-    m_RenderWindowBridge->SetStdMultiSelectedSliceStep(name, step);
+    m_RenderWindowBridge->SetStdMultiSelectedSliceStep(id, step);
     res.status = 204;
   }
   catch (const mitk::Exception& e)
@@ -1353,11 +1449,11 @@ void RenderingController::HandleGET_stdmultiScreenshot(const httplib::Request& r
 
 void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const
 {
-  const auto name = ReadRequiredPathParam(req, "name");
+  const auto id = ReadRequiredPathParam(req, "id");
 
-  if (!IsValidStdMultiWindowName(name))
+  if (!IsValidStdMultiWindowId(id))
   {
-    const auto error = ErrorResponse::RenderWindowNotFound(name, req.path);
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
     this->SendErrorResponse(res, 404, error);
     return;
   }
@@ -1382,7 +1478,796 @@ void RenderingController::HandleGET_stdmultiWindowScreenshot(const httplib::Requ
 
   try
   {
-    const auto imageData = m_RenderWindowBridge->TakeStdMultiWindowScreenshot(name, params.size, params.format);
+    const auto imageData = m_RenderWindowBridge->TakeStdMultiWindowScreenshot(id, params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+// ============================================================================
+// MxN editor handlers
+//
+// The valid set of window ids is the current layout's cell list, which
+// changes after every PUT layout. The controller therefore stays at
+// shape-validation only and lets the bridge be the authority on
+// membership - unknown ids surface there as 404 RENDER_WINDOW_NOT_FOUND.
+// ============================================================================
+
+namespace
+{
+  // Canonical MxN window-id pattern from openapi.json's `MxNWindowName`
+  // parameter. Defined at namespace scope so the regex is constructed once
+  // at module load rather than guarded by a function-local static, which
+  // adds an observable check on every call on MSVC (the pattern is
+  // referenced from many MxN handlers, several of them on per-request hot
+  // paths).
+  const std::regex kMxNWindowIdPattern(R"(^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$)");
+
+  /**
+   * \brief True if `id` matches the canonical MxN window-id pattern from the
+   *        OpenAPI spec (`^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$`).
+   *
+   * Mirrors the `MxNWindowName` parameter pattern in `openapi.json` so that
+   * malformed ids are rejected at the controller boundary with 400
+   * INVALID_REQUEST, before any UI-thread dispatch. Well-formed but unknown
+   * ids fall through and surface from the bridge as 404 RENDER_WINDOW_NOT_FOUND.
+   */
+  bool IsValidMxNWindowId(const std::string& id)
+  {
+    return std::regex_match(id, kMxNWindowIdPattern);
+  }
+
+  nlohmann::json MxNWindowInfoToWindowsListJson(const std::vector<mitk::MxNWindowInfo>& windows)
+  {
+    auto arr = nlohmann::json::array();
+    for (const auto& w : windows)
+    {
+      nlohmann::json wj;
+      wj["id"] = w.id;
+      // Optional display label: emit only when set, mirroring the layout
+      // schema's `name` field semantics (see mxn-layout-v2.schema.json).
+      if (w.displayName.has_value())
+      {
+        wj["name"] = *w.displayName;
+      }
+      wj["kind"] = WindowKindToString(w.kind);
+      // Under v2 the layout schema's view_direction enum is closed
+      // {axial, sagittal, coronal, original} and required for every window
+      // leaf, so every 2D MxN cell carries a value. The std::optional wrapper
+      // exists purely for v3 forward-compat (3D cells with no plane). For 2D
+      // cells we emit unconditionally; an unset optional under v2 indicates a
+      // bridge-layer bug (loud failure beats silently dropping a required
+      // field and producing a response that violates the OpenAPI schema).
+      if (w.kind == WindowKind::TwoD)
+      {
+        if (!w.viewDirection.has_value())
+        {
+          mitkThrow() << "MxN window list: 2D cell '" << w.id
+                      << "' has no view_direction set; expected an "
+                         "AnatomicalPlane value under v2.";
+        }
+        wj["view_direction"] = AnatomicalPlaneToV2String(*w.viewDirection);
+      }
+      else if (w.viewDirection.has_value())
+      {
+        // v3 (3D cells): omit view_direction unless the descriptor still
+        // carries one.
+        wj["view_direction"] = AnatomicalPlaneToV2String(*w.viewDirection);
+      }
+      // links is always emitted; v2 has just one dimension (selection), v3
+      // will add more keys here additively without breaking v2 clients.
+      wj["links"] = { { "selection", w.selectionGroup } };
+      arr.push_back(wj);
+    }
+    return arr;
+  }
+}
+
+void RenderingController::HandleGET_mxnInfo(const httplib::Request& req, httplib::Response& res) const
+{
+  // Mirrors the stdmulti editor-info handler: walk the editor list, locate
+  // the mxn entry, 503 EDITOR_NOT_ACTIVE if the editor is not open, 200 with
+  // the windows list otherwise.
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasEditorListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<EditorInfo> editors;
+  try
+  {
+    editors = m_RenderWindowBridge->ListEditors();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an MxN cell that violates the
+    // v2 view_direction invariant when the editor info is materialised).
+    // Map to 422 RENDERING_ERROR -- the request shape was valid; the
+    // rendering backend reports an unrecoverable state. The generic
+    // MapBridgeException below would otherwise emit 500 INTERNAL_ERROR,
+    // which is the wrong status class for a downstream contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  for (const auto& ed : editors)
+  {
+    if (ed.alias == "mxn")
+    {
+      if (!ed.active)
+      {
+        const auto error = ErrorResponse::EditorNotActive(
+          "MxNMultiWidgetEditor is not open", req.path);
+        this->SendErrorResponse(res, 503, error);
+        return;
+      }
+      const auto j = EditorInfoToJson(ed, /*includeWindowList=*/true);
+      res.status = 200;
+      res.set_content(j.dump(), "application/json");
+      return;
+    }
+  }
+
+  // Provider returned a list that omits the "mxn" alias: the MxN editor
+  // surface is unavailable from this workbench. Surface as 503 so clients
+  // treat it the same as "no provider registered" (feature unavailable),
+  // not as an internal crash.
+  const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+  this->SendErrorResponse(res, 503, error);
+}
+
+void RenderingController::HandleGET_mxnWindows(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<MxNWindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListMxNWindows();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an unparseable v2
+    // view_direction, or a 2D MxN cell with no plane set when
+    // MxNWindowInfoToWindowsListJson materialises the response). Map to
+    // 422 RENDERING_ERROR -- the request shape was valid; the rendering
+    // backend reports an unrecoverable state. The generic
+    // MapBridgeException below would otherwise emit 500 INTERNAL_ERROR,
+    // which is the wrong status class for a downstream contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  res.status = 200;
+  res.set_content(MxNWindowInfoToWindowsListJson(windows).dump(), "application/json");
+}
+
+void RenderingController::HandleGET_mxnWindow(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  // Shape-only check: malformed ids never reach the bridge dispatch.
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNWindowListProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::vector<MxNWindowInfo> windows;
+  try
+  {
+    windows = m_RenderWindowBridge->ListMxNWindows();
+  }
+  catch (const mitk::Exception& e)
+  {
+    // mitk::Exception from the bridge layer signals a binding-contract
+    // violation surfaced via mitkThrow (e.g. an unparseable v2
+    // view_direction). Map to 422 RENDERING_ERROR -- the request shape was
+    // valid; the rendering backend reports an unrecoverable state. The
+    // generic MapBridgeException below would otherwise emit 500
+    // INTERNAL_ERROR, which is the wrong status class for a downstream
+    // contract failure.
+    const auto error = ErrorResponse::RenderingError(e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+    return;
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  // TODO(v3): replace the O(n) scan with a per-window descriptor query once
+  // the bridge surface exposes a GetMxNWindowDescriptor(id) callback.
+  // Tracked alongside the v3 migration checklist in
+  // QmitkRestApiBridgeBindings.cpp; acceptable at v1.2 scale (dozens of
+  // cells at most).
+  const auto it = std::find_if(windows.begin(), windows.end(),
+    [&](const MxNWindowInfo& w) { return w.id == id; });
+  if (it == windows.end())
+  {
+    const auto error = ErrorResponse::RenderWindowNotFound(id, req.path);
+    this->SendErrorResponse(res, 404, error);
+    return;
+  }
+
+  const bool is3d = (it->kind == WindowKind::ThreeD);
+
+  nlohmann::json j;
+  j["id"] = it->id;
+  if (it->displayName.has_value())
+  {
+    j["name"] = *it->displayName;
+  }
+  j["kind"] = WindowKindToString(it->kind);
+  // Mirrors the windows-list emission policy: under v2 every 2D cell has a
+  // canonical AnatomicalPlane (Axial/Sagittal/Coronal/Original) and the
+  // OpenAPI schema requires it. Throw if a 2D cell is missing one (bridge
+  // contract violation). 3D cells (v3) omit the field.
+  if (it->kind == WindowKind::TwoD)
+  {
+    if (!it->viewDirection.has_value())
+    {
+      mitkThrow() << "MxN window '" << it->id
+                  << "' is 2D but has no view_direction set; expected an "
+                     "AnatomicalPlane value under v2.";
+    }
+    j["view_direction"] = AnatomicalPlaneToV2String(*it->viewDirection);
+  }
+  else if (it->viewDirection.has_value())
+  {
+    j["view_direction"] = AnatomicalPlaneToV2String(*it->viewDirection);
+  }
+  j["links"] = { { "selection", it->selectionGroup } };
+  j["has_camera"] = true;
+  j["has_selected_slice"] = !is3d;
+  j["has_selected_position"] = true;
+
+  res.status = 200;
+  res.set_content(j.dump(), "application/json");
+}
+
+// ----------------------------------------------------------------------
+// Layout get/set
+// ----------------------------------------------------------------------
+
+void RenderingController::HandleGET_mxnLayout(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNLayoutGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::string layoutJson;
+  try
+  {
+    layoutJson = m_RenderWindowBridge->GetMxNLayout();
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  res.status = 200;
+  res.set_content(layoutJson, "application/json");
+}
+
+void RenderingController::HandlePUT_mxnLayout(const httplib::Request& req, httplib::Response& res) const
+{
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Request body must be a v2.0 layout document.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  // Pre-parse the body for syntax validation. Schema / structural validation
+  // is done by the engine's ApplyLayout via the bridge; duplicating it here
+  // would drift. nlohmann::parse failures surface as 400.
+  try
+  {
+    [[maybe_unused]] const auto parsed = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception& e)
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      std::string("Invalid JSON body: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNLayoutSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  std::string serialized;
+  try
+  {
+    serialized = m_RenderWindowBridge->SetMxNLayout(req.body);
+  }
+  // Layout-specific catch: every mitk::Exception from ApplyLayout is treated
+  // as a document-shape failure. Caught BEFORE the generic std::exception so
+  // we don't fall through to MapBridgeException, which would map it to 422.
+  // If the engine broadens ApplyLayout's failure model in the future, narrow
+  // this catch.
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      std::string("Layout document rejected: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  // 200 + body (not 204): clients can refresh their cell name list from the
+  // response without an additional GET.
+  res.status = 200;
+  res.set_content(serialized, "application/json");
+}
+
+// ----------------------------------------------------------------------
+// Camera
+// ----------------------------------------------------------------------
+
+void RenderingController::HandleGET_mxnCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNCameraGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  CameraState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetMxNCamera(id);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  res.status = 200;
+  res.set_content(CameraStateToJson(state).dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_mxnCamera(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  // is3d hard-coded false for v2: the schema's view_direction enum has no
+  // "3d" value, so by construction every MxN cell is 2D. The plugin's
+  // V2_MXN_WINDOW_KIND constant pins this invariant at compile time and
+  // its v3 migration checklist (QmitkRestApiBridgeBindings.cpp) lists this
+  // handler as a required update site -- when a 3D MxN cell type is
+  // introduced, derive `is3d` from the windows list provider's `kind`
+  // for the addressed cell here before calling ParseCameraPatch.
+  CameraPatch patch;
+  if (const auto err = ParseCameraPatch(body, /*is3d=*/false, patch))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNCameraSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetMxNCamera(id, patch);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Camera update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+// ----------------------------------------------------------------------
+// Selected-slice
+// ----------------------------------------------------------------------
+
+void RenderingController::HandleGET_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNSelectedSliceGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  SliceState state;
+  try
+  {
+    state = m_RenderWindowBridge->GetMxNSelectedSlice(id);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  res.status = 200;
+  res.set_content(SliceStateToJson(state).dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  // MxN slice PUT is step-only. World-anchor moves on a single cell live at
+  // the per-cell selected-position resource; global anchor moves at
+  // /rendering/selected-position.
+  unsigned int step = 0;
+  if (const auto err = ParseSliceStepBody(body,
+        "MxN selected-slice",
+        "Use PUT /rendering/editors/mxn/windows/{id}/selected-position for a per-cell "
+        "world anchor, or PUT /rendering/selected-position for the global anchor.",
+        step))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNSelectedSliceStepSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetMxNSelectedSliceStep(id, step);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Slice update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+// ----------------------------------------------------------------------
+// Per-cell selected-position
+//
+// Distinct from the global /rendering/selected-position resource, which
+// targets the StdMulti anchor. Per-cell anchors may legitimately diverge;
+// the response/body shape is identical to the global resource's, just
+// window-id-keyed.
+// ----------------------------------------------------------------------
+
+void RenderingController::HandleGET_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNSelectedPositionGetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  SelectedPositionInfo info;
+  try
+  {
+    info = m_RenderWindowBridge->GetMxNSelectedPosition(id);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+    return;
+  }
+
+  res.status = 200;
+  res.set_content(SerializeSelectedPositionInfoToJson(info).dump(), "application/json");
+}
+
+void RenderingController::HandlePUT_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (req.body.empty())
+  {
+    const auto error = ErrorResponse::InvalidRequest("Request body is required.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  nlohmann::json body;
+  try
+  {
+    body = nlohmann::json::parse(req.body);
+  }
+  catch (const nlohmann::json::exception&)
+  {
+    const auto error = ErrorResponse::InvalidRequest("Invalid JSON body.", req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  Point3D newPos;
+  if (const auto err = ParsePositionFromBody(body, newPos))
+  {
+    const auto error = ErrorResponse::InvalidRequest(*err, req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNSelectedPositionSetter())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  try
+  {
+    m_RenderWindowBridge->SetMxNSelectedPosition(id, newPos);
+    res.status = 204;
+  }
+  catch (const mitk::Exception& e)
+  {
+    const auto error = ErrorResponse::RenderingError(
+      std::string("Position update failed: ") + e.what(), req.path);
+    this->SendErrorResponse(res, 422, error);
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+// ----------------------------------------------------------------------
+// Screenshots
+// ----------------------------------------------------------------------
+
+void RenderingController::HandleGET_mxnScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNEditorScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeMxNEditorScreenshot(params.size, params.format);
+    res.status = 200;
+    res.set_content(
+      reinterpret_cast<const char*>(imageData.data()),
+      imageData.size(),
+      ContentTypeFor(params.format));
+  }
+  catch (const std::exception& e)
+  {
+    const auto [status, payload] = MapBridgeException(e, req.path);
+    this->SendErrorResponse(res, status, payload);
+  }
+}
+
+void RenderingController::HandleGET_mxnWindowScreenshot(const httplib::Request& req, httplib::Response& res) const
+{
+  const auto id = ReadRequiredPathParam(req, "id");
+
+  if (!IsValidMxNWindowId(id))
+  {
+    const auto error = ErrorResponse::InvalidRequest(
+      "Malformed MxN window id '" + id + "'. Expected pattern: <prefix>__<bare> with URL-segment-safe characters.",
+      req.path);
+    this->SendErrorResponse(res, 400, error);
+    return;
+  }
+
+  if (m_RenderWindowBridge == nullptr || !m_RenderWindowBridge->HasMxNWindowScreenshotProvider())
+  {
+    const auto error = ErrorResponse::RenderWindowNotAvailable(req.path);
+    this->SendErrorResponse(res, 503, error);
+    return;
+  }
+
+  ScreenshotQueryParams params;
+  try
+  {
+    params = ParseScreenshotQueryParams(req);
+  }
+  catch (const InvalidScreenshotRequest& e)
+  {
+    this->SendErrorResponse(res, 400, ErrorResponse::InvalidRequest(e.detail, req.path));
+    return;
+  }
+
+  try
+  {
+    const auto imageData = m_RenderWindowBridge->TakeMxNWindowScreenshot(id, params.size, params.format);
     res.status = 200;
     res.set_content(
       reinterpret_cast<const char*>(imageData.data()),
@@ -1419,14 +2304,14 @@ void RenderingController::SendErrorResponse(httplib::Response& res, int status, 
   res.set_content(error.dump(), "application/json");
 }
 
-bool RenderingController::IsValidStdMultiWindowName(const std::string& name)
+bool RenderingController::IsValidStdMultiWindowId(const std::string& id)
 {
-  return name == "axial" || name == "sagittal" || name == "coronal" || name == "3d";
+  return id == "axial" || id == "sagittal" || id == "coronal" || id == "3d";
 }
 
-bool RenderingController::IsStdMulti3dWindow(const std::string& name)
+bool RenderingController::IsStdMulti3dWindow(const std::string& id)
 {
-  return name == "3d";
+  return id == "3d";
 }
 
 std::string RenderingController::ReadRequiredPathParam(const httplib::Request& req,
@@ -1447,6 +2332,9 @@ std::pair<int, nlohmann::json> RenderingController::MapBridgeException(
 
   if (const auto* us = dynamic_cast<const RenderWindowBridgeUnsupportedOperationException*>(&e))
     return {404, ErrorResponse::UnsupportedOperation(us->what(), instance)};
+
+  if (const auto* ru = dynamic_cast<const RenderWindowBridgeRendererUnavailableException*>(&e))
+    return {500, ErrorResponse::RendererUnavailable(ru->what(), instance)};
 
   return {500, ErrorResponse::InternalError(e.what(), instance)};
 }

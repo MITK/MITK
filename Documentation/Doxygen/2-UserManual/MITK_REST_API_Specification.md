@@ -28,7 +28,7 @@
 
 ---
 
-## 1. Overview
+## 1. Overview {#1-overview}
 
 This document specifies the REST API for MITK Workbench external process integration. The API enables:
 
@@ -55,7 +55,7 @@ This specification covers the **Data Storage API** (nodes, data, properties) and
 
 ---
 
-## 2. Design Principles
+## 2. Design Principles {#2-design-principles}
 
 ### 2.1 RESTful Conventions
 
@@ -87,7 +87,7 @@ Based on Architecture Document Appendix B:
 
 ---
 
-## 3. Base URL and Versioning
+## 3. Base URL and Versioning {#3-base-url-and-versioning}
 
 ### Base URL Structure
 
@@ -114,7 +114,7 @@ Returns API metadata including supported versions and deprecation notices.
 
 ---
 
-## 4. Authentication
+## 4. Authentication {#4-authentication}
 
 ### Phase 1: API Token Authentication
 
@@ -142,7 +142,7 @@ security:
 
 ---
 
-## 5. Common Patterns
+## 5. Common Patterns {#5-common-patterns}
 
 ### 5.1 Request Headers
 
@@ -151,7 +151,7 @@ security:
 | `Content-Type` | For POST/PUT/PATCH | `application/json` for metadata |
 | `Accept` | Optional | Desired response format |
 | `Authorization` | When auth enabled | `Bearer {token}` — see §4 |
-| `X-MITK-Transfer-Mode` | For data endpoints | `direct`, `file-reference` (`shared-memory` is planned, not yet accepted by the server) |
+| `X-MITK-Transfer-Mode` | `GET /data` responses | `direct`, `file-reference`. For uploads (POST/PUT/PATCH), the transfer mode is inferred from `Content-Type` (`application/json` = file-reference; `application/octet-stream` = direct). |
 
 ### 5.2 Standard Response Envelope
 
@@ -163,8 +163,6 @@ All successful responses use a consistent structure:
   "meta": {  }
 }
 ```
-
-> **Note:** The `timestamp` field contains the DataStorage modification time (an ITK timestamp obtained via `GetMTime()`). This is an ever-increasing integer valid within the current session that indicates when the data storage was last modified.
 
 Collection responses include pagination:
 
@@ -250,9 +248,17 @@ GET /api/v1/datastorage/nodes?filter.visible=true&context=stdmulti.widget0&prope
 ?fields=uid,name,data_type    # Return only specified fields
 ```
 
+### 5.4 REST Conventions and Deviations
+
+The API follows standard REST conventions with the following deliberate deviations:
+
+**404 for "operation not applicable" on a valid resource.** When a sub-resource path is well-formed and the addressed resource exists, but the requested operation does not apply to that particular resource variant, the API returns **404 `UNSUPPORTED_OPERATION`** rather than 405 / 409 / 422. Example: `GET /rendering/editors/stdmulti/windows/3d/selected-slice` returns 404 `UNSUPPORTED_OPERATION` because slice navigation is meaningless on the 3D window. Rationale: the conceptual sub-resource (`selected-slice` of the `3d` window) does not exist for that variant, so 404 communicates absence consistently with `RENDER_WINDOW_NOT_FOUND`. Clients should treat any 404 from a per-window sub-resource as "this variant does not expose this operation" and inspect `error.code` to disambiguate from genuine "window not found".
+
+**DELETE returns 200 with body, not 204 No Content.** `DELETE /datastorage/nodes/{uid}` and `DELETE /datastorage/nodes/{uid}/properties/{name}` return **200** with a JSON body rather than the conventional 204. Rationale: the response body carries client-useful information (node deletes return `deleted_uid` and `deleted_children`; property deletes echo the resolved `meta.property_scope`) that lets the client confirm what was actually removed without an extra round-trip. Clients should not assume any DELETE in this API returns 204.
+
 ---
 
-## 6. Node Identification Strategy
+## 6. Node Identification Strategy {#6-node-identification-strategy}
 
 ### 6.1 Dual Identification Approach
 
@@ -379,7 +385,7 @@ Node responses contain **system information only**. The `name` property is inclu
 
 ---
 
-## 7. Data Transfer Modes
+## 7. Data Transfer Modes {#7-data-transfer-modes}
 
 Large data (images, meshes, segmentations) can be transferred via three modes, supporting different performance requirements.
 
@@ -388,7 +394,7 @@ Large data (images, meshes, segmentations) can be transferred via three modes, s
 Clients indicate preferred mode via header:
 
 ```http
-X-MITK-Transfer-Mode: direct | file-reference | shared-memory
+X-MITK-Transfer-Mode: direct | file-reference
 ```
 
 If omitted, server chooses based on data size and client location.
@@ -427,7 +433,7 @@ Response body contains the raw binary data.
 
 **Use case:** Small to medium data, remote clients, simplicity.
 
-### 7.3 Mode: File Reference
+### 7.3 Mode: File Reference {#73-mode-file-reference}
 
 Server writes data to file, returns path and metadata.
 
@@ -468,45 +474,7 @@ X-MITK-Transfer-Mode: file-reference
 
 > **Note:** Checksum support (`checksum` field in `transfer` section) is planned for a future version.
 
-### 7.4 Mode: Shared Memory (Future)
-
-Zero-copy transfer via shared memory.
-
-**Request:**
-```http
-GET /api/v1/datastorage/nodes/{uid}/data
-Accept: application/json
-X-MITK-Transfer-Mode: shared-memory
-```
-
-**Response:**
-```json
-{
-  "transfer": {
-    "mode": "shared-memory",
-    "format": "arrow",
-    "size_bytes": 125829120,
-    "shm_name": "/mitk-shm-abc123",
-    "dtype": "int16",
-    "shape": [512, 512, 256],
-    "strides": [2, 1024, 524288]
-  },
-  "data_metadata": {
-    "dimensions": [512, 512, 256],
-    "spacing": [0.5, 0.5, 1.0],
-    "origin": [0.0, 0.0, 0.0],
-    "pixel_type": "int16"
-  }
-}
-```
-
-**Use case:** Maximum performance, co-located processes, real-time applications.
-
-**Shared memory lifetime:** References are valid for the lifetime of the MITK Workbench process. Clients must handle access failures gracefully.
-
-> **Note:** The `data_metadata` section is consistent across all transfer modes and provides informative metadata about the data content.
-
-### 7.5 Response Structure
+### 7.4 Response Structure
 
 All JSON data transfer responses follow the same structure with two clearly separated sections:
 
@@ -521,7 +489,7 @@ The `transfer` section varies by mode. The `data_metadata` section is consistent
 - **Surfaces**: `points_count`, `cells_count`, `bounds`
 - **Point Sets**: `points_count`, `bounds`
 
-### 7.6 Mode Negotiation
+### 7.5 Mode Negotiation
 
 If server cannot fulfill requested mode:
 
@@ -537,7 +505,7 @@ HTTP/1.1 406 Not Acceptable
 }
 ```
 
-### 7.7 Upload Data Transfer
+### 7.6 Upload Data Transfer
 
 For `POST` and `PUT` operations, same modes apply:
 
@@ -571,9 +539,9 @@ The server accepts any file format supported by MITK I/O. Format detection is ba
 
 ---
 
-## 8. API Endpoints
+## 8. API Endpoints {#8-api-endpoints}
 
-### 8.1 Discovery and Health
+### 8.1 Discovery and Health {#81-discovery-and-health}
 
 #### GET /api/v1/info
 
@@ -601,7 +569,7 @@ The `documentation_url` is constructed from the running MITK version as `https:/
 
 #### Interactive Documentation
 
-The server also exposes the OpenAPI document and a Swagger UI for live exploration. These resources are not part of the versioned contract:
+The server also exposes the OpenAPI document and a Swagger UI for live exploration. These resources are not part of the versioned contract — they are discovery/tooling routes that the conformance test deliberately skips when cross-checking spec coverage:
 
 - `GET /api/v1/openapi.json` — raw OpenAPI 3 document
 - `GET /api/v1/docs/` — interactive Swagger UI (with associated CSS/JS assets under `/api/v1/docs/`)
@@ -663,8 +631,8 @@ Returns the current file access configuration. Clients can use this to discover 
 
 ---
 
-### 8.2 Data Storage
-#### 8.2.1 Nodes
+### 8.2 Data Storage {#82-data-storage---nodes}
+#### 8.2.1 Nodes {#821-data-storage---nodes}
 
 ##### GET /api/v1/datastorage/nodes
 
@@ -836,7 +804,19 @@ If some properties in the request could not be deserialized, the node is still c
 | `failed_properties` | array | (Optional) Property keys that failed to deserialize. Logged as warnings server-side. |
 | `warning` | string | (Optional) Warning message if the loaded file contained multiple data objects. Only the first data object is assigned to the node; additional objects are discarded. |
 
-> **Content-Type:** Use `application/json` for file-reference mode (JSON body with optional `transfer.file_path`) or `application/octet-stream` for direct transfer mode (binary body). Requests with unsupported Content-Type values will receive a 415 Unsupported Media Type response. Omitting Content-Type entirely creates a node with default values only (no data, auto-generated name).
+> **Content-Type:** Use `application/json` for file-reference mode (JSON body with optional `transfer.file_path`) or `application/octet-stream` for direct transfer mode (binary body). Omitting Content-Type entirely creates a node with default values only (no data, auto-generated name).
+
+**Status codes:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 201 | — | Node created |
+| 400 | `INVALID_REQUEST` | Malformed JSON body or invalid parameters |
+| 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
+| 415 | `UNSUPPORTED_FORMAT` | Content-Type or data format not supported |
+| 422 | `FILE_NOT_FOUND` / `FILE_READ_ERROR` | Referenced file path could not be loaded |
+| 500 | `SERIALIZATION_ERROR` / `INTERNAL_ERROR` | Server error while creating the node |
+| 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected |
 
 ---
 
@@ -957,7 +937,7 @@ DELETE /api/v1/datastorage/nodes/node-001?recursive=true
 
 ---
 
-#### 8.2.2 Node Data Payload
+#### 8.2.2 Node Data Payload {#822-node-data-payload}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/data
 
@@ -968,7 +948,7 @@ Retrieve the actual data (image, mesh, etc.) of a node.
 | Header | Values | Description |
 |--------|--------|-------------|
 | `Accept` | `application/octet-stream`, `application/json` | Response format |
-| `X-MITK-Transfer-Mode` | `direct`, `file-reference`, `shared-memory` | Transfer mode |
+| `X-MITK-Transfer-Mode` | `direct`, `file-reference` | Transfer mode |
 
 **Example (direct download):**
 ```http
@@ -1074,7 +1054,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
 
 ---
 
-#### 8.2.3 Node Children
+#### 8.2.3 Node Children {#823-node-children}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/children
 
@@ -1174,7 +1154,7 @@ Content-Type: application/json
 
 ---
 
-#### 8.2.4 Node Properties
+#### 8.2.4 Node Properties {#824-node-properties}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/properties
 
@@ -1575,13 +1555,13 @@ Remove a property from a node.
 
 ---
 
-### 8.3 Rendering
+### 8.3 Rendering {#83-rendering}
 
 Rendering endpoints control how MITK Workbench render windows refresh and orient themselves. They are deliberately separate from data and property endpoints: callers can batch multiple mutations (upload data, set properties) and then trigger a single render update, avoiding per-change flicker.
 
 All rendering calls are dispatched to the main/UI thread by the server — callers do not need to account for threading.
 
-The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). The `mxn` editor alias is also exposed by `GET /rendering/editors` for forward compatibility — its `active` flag is currently always `false`, and a symmetric `/rendering/editors/mxn/...` hierarchy is reserved but not yet implemented.
+The `/rendering/editors/stdmulti/...` hierarchy addresses the StdMultiWidget editor and its render windows (axial / sagittal / coronal / 3d). The `mxn` editor alias is also reported by `GET /rendering/editors` — its `active` flag reflects whether an MxN multi-widget editor instance is currently open in the workbench. The symmetric `/rendering/editors/mxn/...` hierarchy adds layout management, per-cell camera, per-cell selected slice, per-cell selected position, and editor- / per-window screenshots. See §8.3.1 below for an orientation on how the MxN REST surface is structured.
 
 #### POST /api/v1/rendering/update
 
@@ -1672,7 +1652,7 @@ Content-Type: application/json
 
 Returns the current crosshair position via `IRenderWindowPart::GetSelectedPosition()` on the StdMultiWidgetEditor, and the world-space axis-aligned bounding box (AABB) from the reinit geometry (TimeNavigationController input world time geometry).
 
-Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min` and `bounds.max` are `null`.
+Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE` otherwise) and the StdMultiWidgetEditor to be open (503 `EDITOR_NOT_ACTIVE` otherwise). If no input geometry is available, `bounds.min_position` and `bounds.max_position` are `null`.
 
 **Response 200 (`application/json`):**
 
@@ -1680,8 +1660,8 @@ Requires the Qt workbench plugin to be running (503 `RENDER_WINDOW_NOT_AVAILABLE
 {
   "position": [10.0, 20.0, 30.0],
   "bounds": {
-    "min": [-50.0, -50.0, -50.0],
-    "max": [50.0, 50.0, 50.0]
+    "min_position": [-50.0, -50.0, -50.0],
+    "max_position": [50.0, 50.0, 50.0]
   }
 }
 ```
@@ -1792,9 +1772,14 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Body missing, not valid JSON, both fields present, neither field present, wrong type, or negative timestep |
-| 422 | `RENDERING_ERROR` | Unexpected rendering framework error |
+| 422 | `RENDERING_ERROR` | Resolved time step is outside the available range `[0, steps)`, or unexpected rendering framework error |
 | 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
+
+Out-of-range inputs (a `timestep` greater than or equal to `steps`, or a
+`timepoint_ms` outside the available time bounds resolving to such a step)
+are rejected with **422** rather than silently clamped, so clients can
+distinguish a user/programming error from a successful set.
 
 ---
 
@@ -1864,7 +1849,7 @@ Lists all known editor aliases with their current activity state. The alias list
 
 #### GET /api/v1/rendering/editors/stdmulti
 
-Returns metadata about the StdMultiWidget editor, including its current window names. `alias` is the sole editor discriminator — no separate `type` field is reported.
+Returns metadata about the StdMultiWidget editor, including its current window ids. `alias` is the sole editor discriminator — no separate `type` field is reported.
 
 **Response 200 (`application/json`):**
 
@@ -1903,23 +1888,24 @@ Query parameters, request body, response content-types and shared error shapes a
 
 #### GET /api/v1/rendering/editors/stdmulti/windows
 
-Lists the StdMultiWidget render windows. No `plane` field is reported — under swivel mode or node-initialised geometry the live plane is not guaranteed to match an anatomical plane. Live orientation, when needed, is derivable from the window's `/camera`.
+Lists the StdMultiWidget render windows. `view_direction` is the persisted slot mapping (axial / sagittal / coronal); it is omitted for the 3D window and is *not* a live-orientation read. Under swivel mode or node-initialised geometry the live plane is not guaranteed to match `view_direction` — live orientation, when needed, is derivable from the window's `/camera`.
 
 **Response 200 (`application/json`):**
 
 ```json
 [
-  { "name": "axial",    "kind": "2d" },
-  { "name": "sagittal", "kind": "2d" },
-  { "name": "coronal",  "kind": "2d" },
-  { "name": "3d",       "kind": "3d" }
+  { "id": "axial",    "kind": "2d", "view_direction": "axial" },
+  { "id": "sagittal", "kind": "2d", "view_direction": "sagittal" },
+  { "id": "coronal",  "kind": "2d", "view_direction": "coronal" },
+  { "id": "3d",       "kind": "3d" }
 ]
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | string | Render window name (URL segment for sub-resources) |
+| `id` | string | Render window id (engine-fixed slot token; URL segment for sub-resources) |
 | `kind` | string | `"2d"` or `"3d"` — drives which sub-resources apply |
+| `view_direction` | string \| absent | Anatomical plane the slot renders. Present for 2D windows; omitted for the 3D window. For StdMulti the value matches `id` by construction; the field is provided so generic clients can read `view_direction` uniformly across editor types. |
 
 **Error responses:**
 
@@ -1931,7 +1917,7 @@ Lists the StdMultiWidget render windows. No `plane` field is reported — under 
 
 ---
 
-#### GET /api/v1/rendering/editors/stdmulti/windows/{name}
+#### GET /api/v1/rendering/editors/stdmulti/windows/{id}
 
 Per-window summary.
 
@@ -1940,19 +1926,20 @@ Per-window summary.
 **Response 200 (`application/json`) — 2D window:**
 
 ```json
-{ "name": "axial", "kind": "2d", "has_camera": true, "has_selected_slice": true }
+{ "id": "axial", "kind": "2d", "view_direction": "axial", "has_camera": true, "has_selected_slice": true }
 ```
 
 **Response 200 — 3D window:**
 
 ```json
-{ "name": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
+{ "id": "3d", "kind": "3d", "has_camera": true, "has_selected_slice": false }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | string | Echo of the path parameter |
+| `id` | string | Echo of the path parameter |
 | `kind` | string | `"2d"` or `"3d"` |
+| `view_direction` | string \| absent | Anatomical plane the slot renders. Present for 2D windows; omitted for the 3D window. |
 | `has_camera` | boolean | Always `true` in StdMulti |
 | `has_selected_slice` | boolean | `true` for 2D, `false` for `3d` |
 
@@ -1960,14 +1947,14 @@ Per-window summary.
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 404 | `RENDER_WINDOW_NOT_FOUND` | `{name}` is not a known StdMulti window |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | `{id}` is not a known StdMulti window |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
 ---
 
-#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+#### GET /api/v1/rendering/editors/stdmulti/windows/{id}/camera
 
 Returns the camera state of the addressed render window. 2D windows (axial/sagittal/coronal) include `parallel_scale` and omit `perspective_angle`; the 3D window does the inverse.
 
@@ -1999,14 +1986,14 @@ Returns the camera state of the addressed render window. 2D windows (axial/sagit
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered (headless / plugin not loaded) |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
 ---
 
-#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/camera
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{id}/camera
 
 Partial update. Any subset of the applicable fields may be sent; unspecified fields are left unchanged. `standard_view` programs the underlying `mitk::CameraController`, while explicit pose fields (`position`, `focal_point`, `view_up`) bypass it and write the raw `vtkCamera`. Combining the two would leave the controller's internal "standard view" memo inconsistent with the actual pose, so the combination is rejected with 400 `INVALID_REQUEST`. `standard_view` may still be combined with `parallel_scale` or `perspective_angle`. Only the addressed window is refreshed; coupled crosshair/slice updates on the sibling 2D windows happen through their own UI events. World coordinates are not range-checked.
 
@@ -2044,7 +2031,7 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Invalid JSON; empty body; unknown field; wrong type or length; 2D-only field on 3D (or vice versa); unknown `standard_view`; `standard_view` combined with `position`/`focal_point`/`view_up`; non-positive `parallel_scale`; `perspective_angle` out of range |
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
 | 422 | `RENDERING_ERROR` | MITK rendering framework raised an error while applying the patch |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
@@ -2052,7 +2039,7 @@ Content-Type: application/json
 
 ---
 
-#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+#### GET /api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice
 
 Returns the currently selected step, the world position of the slice center, and the scene navigation bounds. Not applicable to the 3D window.
 
@@ -2072,21 +2059,21 @@ Returns the currently selected step, the world position of the slice center, and
 }
 ```
 
-When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window name identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
+When no geometry is loaded, `bounds.min_position` and `bounds.max_position` serialize as `null` (mirroring the `selected-position` convention). No `plane` field is reported — the window id identifies the navigator and the live orientation is not guaranteed to match an anatomical plane under swivel mode; read orientation from the window's `/camera` if needed.
 
 **Error responses:**
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
 | 500 | `INTERNAL_ERROR` | Unexpected error |
 
 ---
 
-#### PUT /api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice
+#### PUT /api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice
 
 For StdMulti only `{"step": N}` is accepted — the three 2D slices are coupled, so moving by world coordinate is done via `PUT /rendering/selected-position`. Sending a `position` field returns 400 with a hint. `step` is not range-checked; out-of-range values are clamped/snapped by MITK.
 
@@ -2114,8 +2101,8 @@ Content-Type: application/json
 | Status | Code | Description |
 |--------|------|-------------|
 | 400 | `INVALID_REQUEST` | Invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to use `/rendering/selected-position`); unknown field |
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
-| 404 | `UNSUPPORTED_OPERATION` | `{name}` is `3d` |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
+| 404 | `UNSUPPORTED_OPERATION` | `{id}` is `3d` |
 | 422 | `RENDERING_ERROR` | MITK raised an error while applying the step |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No callback registered |
@@ -2123,7 +2110,7 @@ Content-Type: application/json
 
 ---
 
-#### GET /api/v1/rendering/editors/stdmulti/windows/{name}/screenshot
+#### GET /api/v1/rendering/editors/stdmulti/windows/{id}/screenshot
 
 Captures a single StdMultiWidget render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit the requested dimensions). Pass dimensions matching the source ratio if a faithful aspect is needed.
 
@@ -2135,12 +2122,446 @@ Query parameters, request body, response content-types and shared error shapes a
 
 | Status | Code | Description |
 |--------|------|-------------|
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{name}` |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` |
 | 503 | `EDITOR_NOT_ACTIVE` | StdMultiWidgetEditor is not currently open |
 
 ---
 
-## 9. Error Handling
+#### GET /api/v1/rendering/editors/mxn
+
+Returns metadata about the MxN multi-widget editor, including the current cell ids when the editor is open. Cell ids are in the canonical fully-qualified form `<editor_name>__<bare>` (e.g. `mxn__widget0`).
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "alias": "mxn",
+  "plugin_id": "org.mitk.editors.mxnmultiwidget",
+  "active": true,
+  "windows": ["mxn__widget0", "mxn__widget1", "mxn__widget2"]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `alias` | string | Always `"mxn"` |
+| `plugin_id` | string | Always `"org.mitk.editors.mxnmultiwidget"` |
+| `active` | boolean | `true` if an MxN editor instance is currently open |
+| `windows` | string[] | Cell ids from the current layout. Canonical fully-qualified form (`<editor_name>__<bare>`); the same string as the `id` field of each `window` leaf in the v2 layout document, used verbatim as `{id}` in sub-resource URLs and for the `context` query parameter on the node-properties API. |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No editor list provider registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows
+
+Returns the MxN editor's cells in pre-order traversal of the current layout. Each entry carries the cell `id` in canonical fully-qualified form (the URL segment for sub-resources, identical to the layout document's `id` field), an optional human-readable `name` (display label, omitted when the cell has no display name set), the cell `kind`, the persisted `view_direction` from the layout document, and the cell's `links` object.
+
+**Response 200 (`application/json`):**
+
+```json
+[
+  { "id": "mxn__widget0", "name": "Tumor axial", "kind": "2d", "view_direction": "axial",    "links": { "selection": "main" } },
+  { "id": "mxn__widget1", "kind": "2d", "view_direction": "sagittal", "links": { "selection": "main" } },
+  { "id": "mxn__widget2", "kind": "2d", "view_direction": "coronal",  "links": { "selection": "row2" } }
+]
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Cell id (identity), in the canonical fully-qualified form `<editor_name>__<bare>`. Matches the `id` field of the corresponding `window` leaf in the layout document verbatim, used as-is for the URL path segment for sub-resources; no prefix translation. |
+| `name` | string | *Optional.* Human-readable display label. Mirrors the optional `name` field of the corresponding `window` leaf. Free-form, not unique. Omitted when the cell has no display name set. |
+| `kind` | string | `"2d"` (only value under v2; `"3d"` reserved for forward-compat) |
+| `view_direction` | string | One of `"axial"`, `"sagittal"`, `"coronal"`, `"original"`. Persisted state from the layout document — *authoring intent*, not live orientation. Read live orientation from `/camera` if needed. |
+| `links` | object | Per-cell synchronisation links from the layout document. v2 has only the `selection` dimension; v3 will add more dimension keys here additively without breaking v2 clients. |
+
+Distinct from the StdMulti window list: MxN cells carry the persisted `view_direction` and `links` because they are part of the on-disk layout document; StdMulti has fixed window ids whose live anatomical mapping is dynamic (under swivel mode) and intentionally not asserted by `view_direction`.
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+### 8.3.1 MxN Editor REST Surface — Orientation
+
+The MxN multi-widget editor exposes a REST surface that mirrors the StdMulti editor for camera and slice navigation, plus three MxN-specific resources: layout, per-cell selected position, and per-cell screenshots. This section captures the structural decisions a client author or maintainer needs in one place; per-endpoint detail follows in §8.3.2 onwards.
+
+**One canonical cell id everywhere.** MxN cells carry an `id` in the fully-qualified form `<editor_name>__<bare>` (e.g. `mxn__widget0`, `mxn__axView`) inside the layout document. The same string is what every surface accepts, emits, and stores: URL path segments (`/rendering/editors/mxn/windows/{id}/...`), the `context` query parameter on the node-properties API, the cell list emitted by the windows endpoint, the engine-side render-window registration in the rendering manager, the per-renderer DataNode property context keys, and persisted-session state. No prefix translation happens at any boundary; what you see in the layout JSON is what you put in the URL.
+
+Ids must match `^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$` and be unique within a layout document. The `<editor_name>` segment is the loading editor's `multiWidgetName` (default `mxn`); the C++ loader rejects documents whose ids do not start with the loading editor's `<editor_name>__` prefix. The recommended default form for tool-generated layouts is `mxn__widget<i>` (pre-order traversal index of the leaf, 0-based, no gaps); custom bare-id segments are accepted for hand-authored presets and clients that prefer semantic identifiers.
+
+**Display label (`name`) is separate from identity.** Each window leaf may also carry an optional `name` field — a free-form human-readable display label (no pattern constraint, not required to be unique). The display label is pure metadata: REST URLs, the `context` query parameter, the per-renderer DataNode property keys, and persisted-session references all use `id`, never `name`. Renaming the display label therefore never invalidates a cached client reference. Cells with no display label simply omit the field; the windows endpoint and the layout document both omit `name` for those cells rather than emitting an empty string.
+
+**Layout document is the single source of truth for MxN structure and selection sync.** `GET /api/v1/rendering/editors/mxn/layout` returns a v2.0 document that is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file: same schema (`mxn-layout-v2.schema.json`), same shape. The same document is what `PUT .../layout` accepts. Consequences:
+
+- A user can dump the current layout, save the response to disk, and drop it into the preset directory unchanged.
+- Hand-authored presets are first-class REST citizens: PUT a preset directly, no translation needed.
+- Per-cell `view_direction` and `links.selection` are part of the layout document — they are *persisted authoring intent*, not live state. The MxN windows list (`GET .../windows`) reports them so REST clients don't need to fetch the full layout for a quick overview.
+
+**No `/sync` endpoint.** The MxN editor's "Synchronize" toolbar bool (a workbench UX setting that controls how interactive mouse/keyboard input on one cell propagates to others) is intentionally **not** exposed via REST. REST clients always operate on per-cell primitives. The Python `mitk-workbench-remote` client adds ergonomic helpers (e.g. iterate cells to apply a change to all) on top of these primitives. v3 of the layout schema will add per-cell synchronisation links for further dimensions; the layout document remains the only REST surface for sync state across v2 and v3.
+
+**Per-cell selected position vs. global selected position.** Two distinct resources, two distinct concepts:
+
+| Resource | Scope | Engine path |
+|---|---|---|
+| `GET/PUT /api/v1/rendering/selected-position` | Global anchor; drives the StdMulti editor's coupled views | `IRenderWindowPart::Get/SetSelectedPosition()` on the StdMulti editor part |
+| `GET/PUT /api/v1/rendering/editors/mxn/windows/{id}/selected-position` | Single MxN cell's anchor | `QmitkAbstractMultiWidget::Get/SetSelectedPosition(point, widgetName)` on the MxN multi-widget |
+
+Their values may legitimately diverge — an unsynced MxN cell can have a different anchor than the global one. Whether changes to one resource visibly affect the other depends on the workbench coupling state described above; clients that need a deterministic per-cell observation read each cell's `selected-position` after their PUT.
+
+**Selected slice on MxN cells is step-only.** `PUT .../selected-slice` accepts only `{"step": N}`. World-anchor moves on a single cell live at the per-cell `selected-position` resource; global anchor moves at `/rendering/selected-position`. Sending `position` to slice returns 400 with a hint pointing to both primitives.
+
+**Layout PUT tears down all cells.** Applying a layout via PUT destroys the existing cell tree and rebuilds from the document. Any cached cell `id` a client held before the PUT is invalid afterwards. The PUT response body is the freshly serialized layout (same shape as GET), so clients can refresh their cell list from the response without an additional GET round-trip.
+
+**Camera under v2 is always 2D for MxN cells.** The v2 layout schema's `view_direction` enum has no `3d` value. The camera GET response carries `parallel_scale`; PUT rejects `perspective_angle`. A v3 cell type for 3D rendering may arrive later — at that point the per-window summary's `kind` flips to `"3d"` for those cells and the camera shape switches accordingly. The per-window summary already reports `kind` so clients can be forwards-compatible today.
+
+**Concept-level errors that can surface on every MxN endpoint:**
+
+| Status | Code | When |
+|--------|------|------|
+| 503 | `EDITOR_NOT_ACTIVE` | The MxN editor is not currently open in the workbench |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | The bridge callback is not registered (headless / Qt plugin not loaded), or the registered editor list does not expose the `mxn` alias |
+| 400 | `INVALID_REQUEST` | The cell `{id}` is malformed — does not match the canonical fully-qualified form `<prefix>__<bare>` with URL-segment-safe characters. Rejected controller-side before any bridge dispatch |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | The cell `id` is well-formed but unknown to the editor |
+| 404 | `UNSUPPORTED_OPERATION` | The sub-resource does not apply to this cell (reserved for future 3D MxN cells on `/selected-slice`) |
+
+Per-endpoint error tables list any additional codes (400 for bad bodies, 422 for engine-side rendering failures, etc.).
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/screenshot
+
+Captures a screenshot of the MxN multi-widget canvas (the cell tree only — no toolbars, no side panels).
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`.
+
+**Editor-specific errors (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows/{id}/screenshot
+
+Captures a single MxN cell render window. The live render surface is **not** resized; if a different `width`/`height` is requested, the captured image is scaled after the fact, ignoring the source aspect ratio (i.e. stretched to fit). Pass dimensions matching the source ratio if a faithful aspect is needed.
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+Query parameters, request body, response content-types and shared error shapes are **identical** to `GET /api/v1/rendering/screenshot`.
+
+**Window-specific errors (in addition to the inherited set):**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/layout
+
+Returns the current MxN layout as a v2.0 document. Strict mode: every group referenced by a cell appears in the top-level `groups` dict. The body is byte-equivalent (modulo whitespace) to an in-tree `mxnLayout_*.json` preset file; the same schema (`mxn-layout-v2.schema.json`) validates both.
+
+**Response 200 (`application/json`):** v2.0 layout document. See `mxn-layout-v2.schema.json` for the full field-level spec.
+
+```json
+{
+  "version": "2.0",
+  "name": "Three Views",
+  "groups": { "main": { "select_all": true } },
+  "root": {
+    "type": "split",
+    "orientation": "horizontal",
+    "children": [
+      { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 100 },
+      { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 100 },
+      { "type": "window", "id": "mxn__widget2", "view_direction": "coronal",  "links": { "selection": "main" }, "size": 100 }
+    ]
+  }
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout getter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/mxn/layout
+
+Applies a v2.0 layout document. **All existing cells are torn down and rebuilt from the document** (no positional reuse) — any cell `id` a client cached prior to the PUT is invalid afterwards. The 200 response body is the freshly serialized layout, so callers can refresh their cell list from the response without an extra GET.
+
+**Request body (required, `application/json`):** v2.0 layout document, validated against `mxn-layout-v2.schema.json`.
+
+```json
+{
+  "version": "2.0",
+  "groups": { "main": { "select_all": true } },
+  "root": {
+    "type": "split", "orientation": "horizontal",
+    "children": [
+      { "type": "window", "id": "mxn__widget0", "view_direction": "axial",    "links": { "selection": "main" }, "size": 1 },
+      { "type": "window", "id": "mxn__widget1", "view_direction": "sagittal", "links": { "selection": "main" }, "size": 1 }
+    ]
+  }
+}
+```
+
+**Response 200 (`application/json`):** the freshly serialized layout (same shape as GET).
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; schema / structural failure (version != 2.0, duplicate window ids, unknown view direction, missing group reference in strict mode, type errors). The `detail` field carries the engine's diagnostic message. |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No layout setter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+> **Note (mitk::Exception → 400 mapping is local to this endpoint).** Other rendering endpoints map `mitk::Exception` to 422 `RENDERING_ERROR`. Layout PUT is the one site that maps it to 400 `INVALID_REQUEST` because every `mitk::Exception` thrown out of `QmitkMxNMultiWidget::ApplyLayout` is a document-shape failure. If the engine ever broadens that contract to runtime issues, the catch must be narrowed.
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows/{id}/camera
+
+Returns the camera state of the addressed MxN cell. Under v2 every MxN cell is 2D, so the response carries `parallel_scale` and omits `perspective_angle` (mirrors the StdMulti 2D-window shape).
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "position":       [127.5,  83.2, 200.0],
+  "focal_point":    [127.5,  83.2,  45.0],
+  "view_up":        [0.0,    1.0,   0.0],
+  "parallel_scale": 120.0
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera getter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/mxn/windows/{id}/camera
+
+Partial update. At least one camera field must be present. `standard_view` is applied first and cannot be combined with explicit pose fields. Under v2 every MxN cell is 2D, so `perspective_angle` is rejected with 400 (matches the StdMulti rule for non-3D windows).
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Request body (`application/json`):**
+
+```json
+{ "parallel_scale": 120.0 }
+```
+
+**Response 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; unknown field; wrong type / shape; non-positive `parallel_scale`; `perspective_angle` (3D-only under v2); unknown `standard_view`; combination of `standard_view` with explicit pose fields |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 422 | `RENDERING_ERROR` | MITK rendering framework raised `mitk::Exception` while applying the patch |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No camera setter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows/{id}/selected-slice
+
+Returns the cell's selected-slice state: integer step, the live world position on the slice plane, and navigator bounds (`steps`, `min_position`, `max_position`). `bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded.
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "step": 42,
+  "position": [127.5, 83.2, 45.0],
+  "bounds": {
+    "steps": 90,
+    "min_position": [0.0, 0.0, 0.0],
+    "max_position": [255.0, 255.0, 90.0]
+  }
+}
+```
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice getter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/mxn/windows/{id}/selected-slice
+
+**Body shape: `{"step": N}` only.** World-anchor moves on a single MxN cell live at the per-cell `selected-position` resource (below); global anchor moves at `PUT /rendering/selected-position`. Sending `position` here returns 400 with a hint pointing at both. No range checking — out-of-range step values are clamped/snapped by the navigator.
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Request body (`application/json`):**
+
+```json
+{ "step": 42 }
+```
+
+**Response 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; missing `step`; non-integer or negative `step`; `position` field present (with hint to per-cell selected-position and global selected-position); unknown field |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 422 | `RENDERING_ERROR` | MITK navigator raised `mitk::Exception` |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-slice step setter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows/{id}/selected-position
+
+Returns the cell's selected position (3D world anchor) plus scene bounds.
+
+This is **distinct** from the global `/rendering/selected-position` resource: that one targets the StdMulti anchor; this one targets a single MxN cell's anchor via `QmitkAbstractMultiWidget::Get/SetSelectedPosition(point, widgetName)`. An unsynced MxN cell may legitimately have a different anchor than the global one — that's meaningful state, exposed accordingly.
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "position": [127.5, 83.2, 45.0],
+  "bounds": { "min_position": [0.0, 0.0, 0.0], "max_position": [255.0, 255.0, 90.0] }
+}
+```
+
+`bounds.min_position` / `bounds.max_position` are `null` when no geometry is loaded (mirrors the global selected-position bounds convention).
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position getter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### PUT /api/v1/rendering/editors/mxn/windows/{id}/selected-position
+
+Sets the cell's per-cell 3D anchor.
+
+**Propagation note (observed but not contracted).** Whether the change visibly propagates to other cells (or to the global `/rendering/selected-position` anchor) depends on the workbench's interactive coupling toolbar state — that state is intentionally not exposed via REST. Clients that need a deterministic per-cell observation read each cell's `selected-position` after their PUT.
+
+No range checking — out-of-range values are clamped/snapped by MITK.
+
+**Path parameter:** canonical fully-qualified MxN cell `id` from the layout document.
+
+**Request body (`application/json`):**
+
+```json
+{ "position": [127.5, 83.2, 45.0] }
+```
+
+**Response 204 No Content.**
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | Empty body; invalid JSON; missing `position`; wrong shape (not an array of 3 numbers) |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Unknown `{id}` (malformed `{id}` returns 400 `INVALID_REQUEST`; see §8.3.1) |
+| 422 | `RENDERING_ERROR` | MITK engine raised `mitk::Exception` (e.g., geometry validation failure) |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No selected-position setter registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+#### GET /api/v1/rendering/editors/mxn/windows/{id}
+
+Per-cell summary plus capability flags.
+
+**Path parameter:**
+
+| Parameter | Description |
+|-----------|-------------|
+| `id` | Cell `id` from the current layout in canonical fully-qualified form (`<editor_name>__<bare>`, matching `^[A-Za-z][A-Za-z0-9.-]*__[A-Za-z0-9_.-]+$`, unique within the layout). Matches the `id` field of the corresponding `window` leaf verbatim, used as-is with no prefix translation. |
+
+**Response 200 (`application/json`):**
+
+```json
+{
+  "id": "mxn__widget0",
+  "name": "Tumor axial",
+  "kind": "2d",
+  "view_direction": "axial",
+  "links": { "selection": "main" },
+  "has_camera": true,
+  "has_selected_slice": true,
+  "has_selected_position": true
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Echo of the path parameter |
+| `name` | string | *Optional.* Display label of the cell, mirroring the optional `name` field of the corresponding `window` leaf. Omitted when the cell has no display name set. |
+| `kind` | string | `"2d"` under v2 |
+| `view_direction` | string | Persisted view direction (see windows list note above) |
+| `links` | object | Per-cell synchronisation links from the layout document |
+| `has_camera` | boolean | Always `true` in v2 |
+| `has_selected_slice` | boolean | `true` for 2D cells; reserved `false` for v3 3D cells |
+| `has_selected_position` | boolean | Always `true` — per-cell selected position is a v2 capability, distinct from the global `/rendering/selected-position` resource |
+
+**Error responses:**
+
+| Status | Code | Description |
+|--------|------|-------------|
+| 400 | `INVALID_REQUEST` | `{id}` is malformed (rejected controller-side before bridge dispatch) |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | `{id}` is well-formed but not a known MxN cell |
+| 503 | `EDITOR_NOT_ACTIVE` | MxN multi-widget editor is not currently open |
+| 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No window list provider registered |
+| 500 | `INTERNAL_ERROR` | Unexpected error |
+
+---
+
+## 9. Error Handling {#9-error-handling}
 
 ### 9.1 Error Response Format
 
@@ -2167,7 +2588,6 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | HTTP Status | Code | Description |
 |-------------|------|-------------|
 | 400 | `INVALID_REQUEST` | Malformed request body or parameters |
-| 400 | `INVALID_PROPERTY_VALUE` | Property value validation failed |
 | 400 | `PROPERTY_PROTECTED` | Cannot modify/delete protected property |
 | 401 | `UNAUTHORIZED` | Missing or invalid authentication |
 | 403 | `ACCESS_DENIED` | Client IP not permitted to access the server |
@@ -2175,13 +2595,11 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 404 | `NODE_NOT_FOUND` | Node with given UID does not exist |
 | 404 | `PROPERTY_NOT_FOUND` | Property does not exist on node |
 | 404 | `NO_DATA` | Node exists but has no data attached (422 in `/rendering` endpoints) |
-| 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window name is not known to the editor |
+| 404 | `RENDER_WINDOW_NOT_FOUND` | Addressed render window id is not known to the editor |
 | 404 | `UNSUPPORTED_OPERATION` | Sub-resource does not apply to the addressed window (e.g. `selected-slice` on `3d`) |
 | 406 | `TRANSFER_MODE_NOT_AVAILABLE` | Requested transfer mode not supported |
 | 409 | `CIRCULAR_HIERARCHY_REFERENCE` | Target parent is a descendant of the node being reparented |
 | 409 | `NODE_HAS_CHILDREN` | Cannot delete node with children |
-| 409 | `NAME_CONFLICT` | Node name conflict in same parent |
-| 413 | `PAYLOAD_TOO_LARGE` | Request body exceeds size limit |
 | 415 | `UNSUPPORTED_FORMAT` | Data format not supported |
 | 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
@@ -2194,7 +2612,6 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
 | 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |
 | 503 | `TIME_NAVIGATION_NOT_AVAILABLE` | TimeNavigationController is not available |
-| 503 | `SERVICE_UNAVAILABLE` | Server temporarily unavailable |
 
 ### 9.3 Validation Errors
 
@@ -2222,7 +2639,7 @@ For validation failures, include field-level details:
 
 ---
 
-## 10. Examples
+## 10. Examples {#10-examples}
 
 ### 10.1 Load Image and Set Properties
 
@@ -2394,7 +2811,7 @@ requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uids": [ui
 
 ---
 
-## 11. Future Extensions
+## 11. Future Extensions {#11-future-extensions}
 
 ### 11.1 Planned for Future Versions
 
@@ -2453,12 +2870,25 @@ The API is designed for extension:
 | `GET` | `/api/v1/rendering/editors/stdmulti` | StdMultiWidgetEditor metadata |
 | `GET` | `/api/v1/rendering/editors/stdmulti/screenshot` | Composite screenshot of the StdMultiWidget editor |
 | `GET` | `/api/v1/rendering/editors/stdmulti/windows` | List render windows of the StdMultiWidget editor |
-| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}` | Metadata of a single StdMultiWidget render window |
-| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/screenshot` | Screenshot of a single StdMultiWidget render window |
-| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Get camera state of a StdMultiWidget render window |
-| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/camera` | Update camera state of a StdMultiWidget render window |
-| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Get selected slice index of a 2D StdMultiWidget render window |
-| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{name}/selected-slice` | Set selected slice index of a 2D StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{id}` | Metadata of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{id}/screenshot` | Screenshot of a single StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{id}/camera` | Get camera state of a StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{id}/camera` | Update camera state of a StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice` | Get selected slice index of a 2D StdMultiWidget render window |
+| `PUT` | `/api/v1/rendering/editors/stdmulti/windows/{id}/selected-slice` | Set selected slice index of a 2D StdMultiWidget render window |
+| `GET` | `/api/v1/rendering/editors/mxn` | MxN multi-widget editor metadata |
+| `GET` | `/api/v1/rendering/editors/mxn/screenshot` | Composite screenshot of the MxN editor canvas |
+| `GET` | `/api/v1/rendering/editors/mxn/layout` | Get the current MxN layout (v2.0 document) |
+| `PUT` | `/api/v1/rendering/editors/mxn/layout` | Apply a v2.0 layout document to the MxN editor (response body = freshly serialized layout) |
+| `GET` | `/api/v1/rendering/editors/mxn/windows` | List MxN cells (`id`, optional display `name`, `kind`, `view_direction`, `links`) |
+| `GET` | `/api/v1/rendering/editors/mxn/windows/{id}` | Metadata of a single MxN cell |
+| `GET` | `/api/v1/rendering/editors/mxn/windows/{id}/screenshot` | Screenshot of a single MxN cell |
+| `GET` | `/api/v1/rendering/editors/mxn/windows/{id}/camera` | Get camera state of an MxN cell |
+| `PUT` | `/api/v1/rendering/editors/mxn/windows/{id}/camera` | Update camera state of an MxN cell |
+| `GET` | `/api/v1/rendering/editors/mxn/windows/{id}/selected-slice` | Get selected slice index of a 2D MxN cell |
+| `PUT` | `/api/v1/rendering/editors/mxn/windows/{id}/selected-slice` | Set selected slice index of a 2D MxN cell (`step` only) |
+| `GET` | `/api/v1/rendering/editors/mxn/windows/{id}/selected-position` | Get the per-cell 3D world anchor of an MxN cell |
+| `PUT` | `/api/v1/rendering/editors/mxn/windows/{id}/selected-position` | Set the per-cell 3D world anchor of an MxN cell |
 
 ### Query Parameters Summary
 
@@ -2486,7 +2916,7 @@ The API is designed for extension:
 | `Content-Type` | POST/PUT/PATCH | `application/json`, `application/octet-stream` | Request body format |
 | `Accept` | GET | `application/json`, `application/octet-stream` | Desired response format |
 | `Authorization` | All | `Bearer {token}` | Authentication (when enabled) |
-| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference` (`shared-memory` planned) | Data transfer mode |
+| `X-MITK-Transfer-Mode` | `/data` endpoints | `direct`, `file-reference` | Data transfer mode |
 
 ### HTTP Methods by Endpoint
 
@@ -2512,10 +2942,19 @@ All endpoints are relative to the base URL `/api/v1`.
 | `/rendering/editors/stdmulti` | ✓ Metadata | — | — | — | — |
 | `/rendering/editors/stdmulti/screenshot` | ✓ Composite | — | — | — | — |
 | `/rendering/editors/stdmulti/windows` | ✓ List | — | — | — | — |
-| `/rendering/editors/stdmulti/windows/{name}` | ✓ Read | — | — | — | — |
-| `/rendering/editors/stdmulti/windows/{name}/screenshot` | ✓ Screenshot | — | — | — | — |
-| `/rendering/editors/stdmulti/windows/{name}/camera` | ✓ Read | — | ✓ Update | — | — |
-| `/rendering/editors/stdmulti/windows/{name}/selected-slice` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/editors/stdmulti/windows/{id}` | ✓ Read | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{id}/screenshot` | ✓ Screenshot | — | — | — | — |
+| `/rendering/editors/stdmulti/windows/{id}/camera` | ✓ Read | — | ✓ Update | — | — |
+| `/rendering/editors/stdmulti/windows/{id}/selected-slice` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/editors/mxn` | ✓ Metadata | — | — | — | — |
+| `/rendering/editors/mxn/screenshot` | ✓ Composite | — | — | — | — |
+| `/rendering/editors/mxn/layout` | ✓ Read | — | ✓ Apply | — | — |
+| `/rendering/editors/mxn/windows` | ✓ List | — | — | — | — |
+| `/rendering/editors/mxn/windows/{id}` | ✓ Read | — | — | — | — |
+| `/rendering/editors/mxn/windows/{id}/screenshot` | ✓ Screenshot | — | — | — | — |
+| `/rendering/editors/mxn/windows/{id}/camera` | ✓ Read | — | ✓ Update | — | — |
+| `/rendering/editors/mxn/windows/{id}/selected-slice` | ✓ Read | — | ✓ Set | — | — |
+| `/rendering/editors/mxn/windows/{id}/selected-position` | ✓ Read | — | ✓ Set | — | — |
 
 ---
 

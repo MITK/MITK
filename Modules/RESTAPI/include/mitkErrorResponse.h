@@ -39,7 +39,6 @@ namespace mitk
     static constexpr const char* CODE_DATASTORAGE_NOT_AVAILABLE = "DATASTORAGE_NOT_AVAILABLE";
     static constexpr const char* CODE_INTERNAL_ERROR = "INTERNAL_ERROR";
     static constexpr const char* CODE_PROPERTY_PROTECTED = "PROPERTY_PROTECTED";
-    static constexpr const char* CODE_NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
     static constexpr const char* CODE_NODE_HAS_CHILDREN = "NODE_HAS_CHILDREN";
     static constexpr const char* CODE_NO_DATA = "NO_DATA";
     static constexpr const char* CODE_NO_GEOMETRY = "NO_GEOMETRY";
@@ -60,6 +59,7 @@ namespace mitk
     static constexpr const char* CODE_EDITOR_NOT_ACTIVE = "EDITOR_NOT_ACTIVE";
     static constexpr const char* CODE_RENDER_WINDOW_NOT_FOUND = "RENDER_WINDOW_NOT_FOUND";
     static constexpr const char* CODE_UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION";
+    static constexpr const char* CODE_RENDERER_UNAVAILABLE = "RENDERER_UNAVAILABLE";
 
     /**
      * \brief Create an RFC 7807 error response.
@@ -134,15 +134,6 @@ namespace mitk
      * \return JSON error response with status 400
      */
     static Json PropertyProtected(const std::string& propertyKey, const std::string& instance = "");
-
-    /**
-     * \brief Create a "Not implemented" error response.
-     *
-     * \param feature The feature that is not implemented
-     * \param instance Request path
-     * \return JSON error response with status 501
-     */
-    static Json NotImplemented(const std::string& feature, const std::string& instance = "");
 
     /**
      * \brief Create a "Node has children" error response.
@@ -332,11 +323,11 @@ namespace mitk
      * Used when a per-window URL segment does not name a known render window
      * of the targeted editor.
      *
-     * \param windowName The window name from the URL
+     * \param windowId The window id from the URL
      * \param instance Request path
      * \return JSON error response with status 404
      */
-    static Json RenderWindowNotFound(const std::string& windowName, const std::string& instance = "");
+    static Json RenderWindowNotFound(const std::string& windowId, const std::string& instance = "");
 
     /**
      * \brief Create an "Unsupported operation" error response.
@@ -349,6 +340,18 @@ namespace mitk
      * \return JSON error response with status 404
      */
     static Json UnsupportedOperation(const std::string& detail, const std::string& instance = "");
+
+    /**
+     * \brief Create a "Renderer unavailable" error response.
+     *
+     * Used when a window exists but its renderer is currently null, indicating
+     * a server-side state inconsistency rather than a missing window.
+     *
+     * \param windowId The window id whose renderer is unavailable
+     * \param instance Request path
+     * \return JSON error response with status 500
+     */
+    static Json RendererUnavailable(const std::string& windowId, const std::string& instance = "");
   };
 }
 

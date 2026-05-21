@@ -62,6 +62,16 @@ namespace mitk
      * \brief Set or clear the RenderWindowBridge for interactions with the rendering stack of
      * the application.
      *
+     * \note Lifecycle contract: this setter is intended to be called exactly
+     * once during \c RestServer::Start(), before the server thread starts
+     * accepting connections. The bridge pointer is not re-bound at runtime
+     * once request handlers are reachable. Because of this set-once-at-startup
+     * contract, the read sites in \c HandleGET_* / \c HandlePUT_* deliberately
+     * access \c m_RenderWindowBridge without holding \c m_DispatcherMutex --
+     * which would otherwise add a lock to every request without protecting
+     * against a race that does not exist in normal operation. Do not relax
+     * this contract without also serialising the read sites.
+     *
      * \param bridge The bridge, or nullptr to clear (screenshot endpoint returns 503).
      */
     void SetRenderWindowBridge(RenderWindowBridge* bridge);
@@ -81,12 +91,12 @@ namespace mitk
      * \brief Handle POST /rendering/reinit request.
      *
      * Three operating modes:
-     * - No body (or body without "uids"): global reinit — fits all render windows to the
+     * - No body (or body without "uids"): global reinit -- fits all render windows to the
      *   bounding box of all currently visible data. Calls
      *   RenderingManager::InitializeViewsByBoundingObjects(dataStorage).
-     * - Body with "uids" containing one UID: single-node reinit — fits render windows to
+     * - Body with "uids" containing one UID: single-node reinit -- fits render windows to
      *   the bounding geometry of that node.
-     * - Body with "uids" containing multiple UIDs: multi-node reinit — fits render windows
+     * - Body with "uids" containing multiple UIDs: multi-node reinit -- fits render windows
      *   to the combined bounding geometry of all listed nodes.
      *   Both node cases call RenderingManager::InitializeViews(geometry, REQUEST_UPDATE_ALL, true).
      *
@@ -105,11 +115,11 @@ namespace mitk
      *
      * Returns the current crosshair position and the world-space AABB
      * (i.e. the reinit geometry). If no input geometry is available,
-     * bounds.min and bounds.max are null.
+     * bounds.min_position and bounds.max_position are null.
      *
      * Returns 503 if no render window bridge or position getter is connected.
      *
-     * Response 200: {"position": [x, y, z], "bounds": {"min": [...], "max": [...]}}
+     * Response 200: {"position": [x, y, z], "bounds": {"min_position": [...], "max_position": [...]}}
      *
      * \param req The HTTP request.
      * \param res The HTTP response to populate.
@@ -120,9 +130,9 @@ namespace mitk
      * \brief Handle PUT /rendering/selected-position request.
      *
      * Moves the global application crosshair to the given 3D world position.
-     * No bounds checking is performed. Out of bounds values will be ignored.
+     * No bounds checking is performed; out-of-range values are clamped/snapped by MITK.
      *
-     * Required body: {"position": [x, y, z]} — exactly 3 numbers.
+     * Required body: {"position": [x, y, z]} -- exactly 3 numbers.
      *
      * Response 204 on success. Returns 503 if no render window bridge or
      * position setter is connected.
@@ -151,7 +161,8 @@ namespace mitk
      * Sets the active time step or time point in the global TimeNavigationController.
      * Exactly one of "timepoint_ms" (number) or "timestep" (non-negative integer)
      * must be present in the body.
-     * No bounds checking is performed. Out of bounds values will be ignored.
+     * No bounds checking is performed; out-of-range values may be clamped by the
+     * time navigation controller.
      *
      * Response 204 on success.
      *
@@ -185,21 +196,21 @@ namespace mitk
     void HandleGET_stdmultiWindows(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name} request.
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{id} request.
      *
-     * Per-window summary. Controller-side validates {name} before bridge dispatch.
+     * Per-window summary. Controller-side validates {id} before bridge dispatch.
      */
     void HandleGET_stdmultiWindow(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/camera.
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{id}/camera.
      *
      * 2D windows return `parallel_scale`, the 3D window returns `perspective_angle`.
      */
     void HandleGET_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/camera.
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{id}/camera.
      *
      * Partial update. Rejects: unknown fields, 2D-only field on 3D and vice
      * versa, unknown `standard_view` values, non-positive `parallel_scale`,
@@ -208,14 +219,14 @@ namespace mitk
     void HandlePUT_stdmultiCamera(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/selected-slice.
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{id}/selected-slice.
      *
      * Returns {step, position, bounds}. Returns 404 UNSUPPORTED_OPERATION for the 3D window.
      */
     void HandleGET_stdmultiSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle PUT /rendering/editors/stdmulti/windows/{name}/selected-slice.
+     * \brief Handle PUT /rendering/editors/stdmulti/windows/{id}/selected-slice.
      *
      * Body accepts only `{"step": N}`. A `position` field triggers 400 with a
      * hint pointing at /rendering/selected-position (StdMulti slices are coupled).
@@ -231,11 +242,106 @@ namespace mitk
     void HandleGET_stdmultiScreenshot(const httplib::Request& req, httplib::Response& res) const;
 
     /**
-     * \brief Handle GET /rendering/editors/stdmulti/windows/{name}/screenshot.
+     * \brief Handle GET /rendering/editors/stdmulti/windows/{id}/screenshot.
      *
      * Single-window offscreen grab. Query contract identical to /rendering/screenshot.
      */
     void HandleGET_stdmultiWindowScreenshot(const httplib::Request& req, httplib::Response& res) const;
+
+    // ---- MxN editor handlers ----
+
+    /** Handle GET /rendering/editors/mxn. */
+    void HandleGET_mxnInfo(const httplib::Request& req, httplib::Response& res) const;
+
+    /** Handle GET /rendering/editors/mxn/windows. */
+    void HandleGET_mxnWindows(const httplib::Request& req, httplib::Response& res) const;
+
+    /** Handle GET /rendering/editors/mxn/windows/{id}. */
+    void HandleGET_mxnWindow(const httplib::Request& req, httplib::Response& res) const;
+
+    /** Handle GET /rendering/editors/mxn/layout. */
+    void HandleGET_mxnLayout(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/mxn/layout.
+     *
+     * Applies a v2.0 layout document. Response 200 echoes the freshly
+     * serialized layout (so callers don't need a follow-up GET to refresh
+     * cached cell ids after a tear-down).
+     *
+     * Maps `mitk::Exception` thrown by the engine's ApplyLayout to 400
+     * INVALID_REQUEST. This is the one site under the MxN handlers where
+     * mitk::Exception does not fall through to 422 RENDERING_ERROR; the
+     * assumption is that every mitk::Exception out of ApplyLayout is a
+     * document-shape failure (version, schema, duplicate id, unknown view
+     * direction, missing group reference, type error). If the engine ever
+     * broadens ApplyLayout's failure model to runtime issues, narrow the
+     * catch.
+     */
+    void HandlePUT_mxnLayout(const httplib::Request& req, httplib::Response& res) const;
+
+    /** Handle GET /rendering/editors/mxn/windows/{id}/camera. */
+    void HandleGET_mxnCamera(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/mxn/windows/{id}/camera.
+     *
+     * Partial update; reuses the StdMulti ParseCameraPatch validation. Under
+     * v2 the MxN cell `is3d` is hard-coded to `false`: the schema's
+     * `view_direction` enum has no `3d` value. When v3 introduces a 3D MxN
+     * cell type, derive `is3d` from the cell's MxNWindowInfo::kind.
+     */
+    void HandlePUT_mxnCamera(const httplib::Request& req, httplib::Response& res) const;
+
+    /** Handle GET /rendering/editors/mxn/windows/{id}/selected-slice. */
+    void HandleGET_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/mxn/windows/{id}/selected-slice.
+     *
+     * Step-only. Body containing `position` returns 400 with a hint pointing
+     * at the per-cell selected-position resource for cell-local world anchor
+     * moves and at /rendering/selected-position for global moves.
+     */
+    void HandlePUT_mxnSelectedSlice(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/mxn/windows/{id}/selected-position.
+     *
+     * Returns the per-cell 3D world anchor + scene bounds. Distinct from the
+     * global /rendering/selected-position, which targets the StdMulti
+     * anchor. Per-cell anchors may legitimately diverge from the global one.
+     */
+    void HandleGET_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle PUT /rendering/editors/mxn/windows/{id}/selected-position.
+     *
+     * Sets the per-cell 3D anchor via
+     * QmitkAbstractMultiWidget::SetSelectedPosition(point, widgetName). Whether
+     * the change propagates to other cells / the global anchor depends on the
+     * workbench's interactive coupling toggle, which is not exposed via REST.
+     * No range checking; out-of-range values are clamped/snapped by MITK.
+     */
+    void HandlePUT_mxnSelectedPosition(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/mxn/screenshot.
+     *
+     * Captures the MxN multi-widget editor canvas (multi-widget area only -
+     * no toolbars, no side panels). Query and response contract identical to
+     * GET /rendering/screenshot.
+     */
+    void HandleGET_mxnScreenshot(const httplib::Request& req, httplib::Response& res) const;
+
+    /**
+     * \brief Handle GET /rendering/editors/mxn/windows/{id}/screenshot.
+     *
+     * Single MxN cell viewport capture without resizing the live render
+     * surface. Query and response contract identical to
+     * GET /rendering/screenshot.
+     */
+    void HandleGET_mxnWindowScreenshot(const httplib::Request& req, httplib::Response& res) const;
 
     /**
      * \brief Handle GET /rendering/screenshot request.
@@ -269,10 +375,11 @@ namespace mitk
      * \brief Map a bridge exception thrown by a RenderWindowBridge callback to
      *        a matching HTTP status and RFC 7807 error payload.
      *
-     * Recognises the three typed bridge exceptions:
-     * - RenderWindowBridgeNoEditorException           -> 503 EDITOR_NOT_ACTIVE
-     * - RenderWindowBridgeUnknownWindowException      -> 404 RENDER_WINDOW_NOT_FOUND
-     * - RenderWindowBridgeUnsupportedOperationException -> 404 UNSUPPORTED_OPERATION
+     * Recognises the four typed bridge exceptions:
+     * - RenderWindowBridgeNoEditorException              -> 503 EDITOR_NOT_ACTIVE
+     * - RenderWindowBridgeUnknownWindowException         -> 404 RENDER_WINDOW_NOT_FOUND
+     * - RenderWindowBridgeUnsupportedOperationException  -> 404 UNSUPPORTED_OPERATION
+     * - RenderWindowBridgeRendererUnavailableException   -> 500 RENDERER_UNAVAILABLE
      *
      * Any other std::exception is reported as 500 INTERNAL_ERROR.
      *
@@ -284,23 +391,23 @@ namespace mitk
       const std::exception& e, const std::string& instance);
 
     /**
-     * \brief True if the given window name is a known StdMultiWidget window.
+     * \brief True if the given window id is a known StdMultiWidget window.
      *
      * The set is {"axial", "sagittal", "coronal", "3d"}. Used by handlers to
-     * reject unknown window names at the controller layer with 404
+     * reject unknown window ids at the controller layer with 404
      * RENDER_WINDOW_NOT_FOUND (before any bridge dispatch).
      */
-    static bool IsValidStdMultiWindowName(const std::string& name);
+    static bool IsValidStdMultiWindowId(const std::string& id);
 
     /** True if the given StdMulti window is the 3D window. */
-    static bool IsStdMulti3dWindow(const std::string& name);
+    static bool IsStdMulti3dWindow(const std::string& id);
 
     /**
-     * \brief Read the {name} path parameter, defaulting to the empty string.
+     * \brief Read a required path parameter, defaulting to the empty string.
      *
-     * The httplib route pattern marks {name} as mandatory, so an absent entry
-     * cannot reach a handler in normal operation; the empty fallback exists
-     * solely to keep the call sites total.
+     * The httplib route pattern marks the parameter as mandatory, so an
+     * absent entry cannot reach a handler in normal operation; the empty
+     * fallback exists solely to keep the call sites total.
      */
     static std::string ReadRequiredPathParam(const httplib::Request& req,
                                              const std::string& key);

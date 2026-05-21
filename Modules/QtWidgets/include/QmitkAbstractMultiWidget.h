@@ -220,7 +220,7 @@ public:
    *   including v2 layouts with custom names.
    *
    *   For 'index' == current cell count: returns the legacy positional name
-   *   '<multiWidgetName>.widget<index>'. The call does not register or create
+   *   `<multiWidgetName>.widget<index>`. The call does not register or create
    *   anything. This look-ahead is what the configuration toolbar uses to
    *   predict the next cell's name.
    *
@@ -355,7 +355,7 @@ protected:
    *   The map is keyed by qualified name (sorted lexicographically), so
    *   "removes the last" here means the lexicographically last name. This
    *   keeps the call point-free with respect to positional naming, which
-   *   is what makes it safe for layouts that mix custom and 'widget<i>'
+   *   is what makes it safe for layouts that mix custom and `widget<i>`
    *   names.
    */
   virtual void RemoveRenderWindowWidget();

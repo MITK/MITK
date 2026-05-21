@@ -48,6 +48,7 @@ tramp
 .vs/
 .vscode/
 out/
+build/
 CMakeSettings.json
 
 ########## OS specific
@@ -94,4 +95,3 @@ __pycache__/
 
 ## Claude Code
 .claude/
-CLAUDE.md

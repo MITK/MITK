@@ -176,6 +176,16 @@ namespace mitk
     std::string GetTrackingID() const;
 
     /**
+     * \brief Returns whether a tracking ID property is set on the label.
+     *
+     * Distinguishes "property absent" from "property present but empty"
+     * (the DICOM SEG reader deliberately stamps an empty tracking ID to
+     * suppress automatic UID generation). GetTrackingID returns "" in
+     * both cases.
+     */
+    bool HasTrackingID() const;
+
+    /**
      * \brief Sets the DICOM tracking unique identifier (UID) of the label.
      * \param[in] trackingUID The tracking UID string.
      */
@@ -186,6 +196,14 @@ namespace mitk
      * \return The tracking UID string.
      */
     std::string GetTrackingUID() const;
+
+    /**
+     * \brief Returns whether a tracking UID property is set on the label.
+     *
+     * Distinguishes "property absent" from "property present but empty"
+     * (see HasTrackingID).
+     */
+    bool HasTrackingUID() const;
 
     /**
      * \brief Sets a textual description for the label.

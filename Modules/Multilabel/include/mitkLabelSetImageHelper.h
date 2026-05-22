@@ -53,6 +53,27 @@ namespace mitk
       const DataStorage* dataStorage = nullptr);
 
     /**
+     * \brief Apply the typical defaults for a segmentation derived from a
+     *        source image: establish the source-image relation and inherit
+     *        the source's patient, study, and frame-of-reference identity.
+     *
+     * Single source of truth for "what makes a freshly-created seg behave
+     * as a typical derived seg" so the C++ factory (CreateNewSegmentationNode)
+     * and the Python `MultiLabelSegmentation(image)` constructor stay in
+     * lockstep. A future change to the default setup edits one location.
+     *
+     * Each step is best-effort; failures are logged via MITK_WARN and
+     * swallowed. Callers that want explicit control over the individual
+     * steps should call SegSourceImageRelationRule::Connect and the
+     * DICOMSegmentationPropertyHelper::InheritXxxFromSource functions
+     * directly instead.
+     *
+     * \pre seg and source must be valid pointers.
+     */
+    MITKMULTILABEL_EXPORT void SetupDerivedSegmentation(MultiLabelSegmentation* seg,
+                                                        const Image* source);
+
+    /**
      * \brief This function creates and returns a new label. The label is automatically assigned an
      *        unused generic label name, depending on existing label names in all label sets of the
      *        given label set image.

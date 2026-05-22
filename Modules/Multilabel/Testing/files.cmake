@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+    mitkDICOMSegmentationPropertyHelperTest.cpp
     mitkLabelTest.cpp
     mitkLabelSetImageTest.cpp
     mitkLabelSuggestionHelperTest.cpp
@@ -8,6 +9,7 @@ set(MODULE_TESTS
     mitkMultiLabelSegmentationStackReaderTest.cpp
     mitkMultiLabelSegmentationStackWriterTest.cpp
     mitkMultiLabelSurfaceNetsExtractorTest.cpp
+    mitkSegSourceImageRelationRuleTest.cpp
     mitkTransferLabelTest.cpp
 )
 

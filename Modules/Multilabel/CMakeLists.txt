@@ -2,7 +2,7 @@ mitk_create_module(
   PCH
     mitkBaseData.h
   DEPENDS MitkCore MitkAlgorithmsExt MitkSceneSerializationBase MitkDICOMQI
-  PACKAGE_DEPENDS ITK|Smoothing+LabelMap
+  PACKAGE_DEPENDS ITK|Smoothing+LabelMap PRIVATE DCMTK|dcmdata
 )
 
 add_subdirectory(autoload/IO)

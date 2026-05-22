@@ -28,6 +28,8 @@ pybind11_add_module(mitk_python_bindings
   TemporoSpatialStringProperty.cpp
   PropertyKeyPath.cpp
   DICOMTagPath.cpp
+  Dicom.cpp
+  Relations.cpp
   TemporoSpatialStringSerialization.h
 )
 

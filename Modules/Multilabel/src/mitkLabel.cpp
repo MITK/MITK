@@ -218,6 +218,12 @@ std::string mitk::Label::GetTrackingID() const
   return trackingID;
 }
 
+bool mitk::Label::HasTrackingID() const
+{
+  const auto* propertyMap = this->GetMap();
+  return propertyMap != nullptr && propertyMap->find("tracking_id") != propertyMap->end();
+}
+
 void mitk::Label::SetTrackingID(const std::string& trackingID)
 {
   mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(GetProperty("tracking_id"));
@@ -234,6 +240,12 @@ std::string mitk::Label::GetTrackingUID() const
   std::string trackingUID = "";
   GetStringProperty("tracking_uid", trackingUID);
   return trackingUID;
+}
+
+bool mitk::Label::HasTrackingUID() const
+{
+  const auto* propertyMap = this->GetMap();
+  return propertyMap != nullptr && propertyMap->find("tracking_uid") != propertyMap->end();
 }
 
 void mitk::Label::SetTrackingUID(const std::string& trackingUID)

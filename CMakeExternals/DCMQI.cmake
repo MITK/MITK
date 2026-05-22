@@ -20,8 +20,8 @@ if(MITK_USE_DCMQI)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/QIICR/dcmqi.git
-      GIT_TAG afa4912fb05817fb8632ca0141618d52ac219510 # latest (2025-07-17)
+      GIT_REPOSITORY https://github.com/MITK/dcmqi.git
+      GIT_TAG 68c41622fefd1a89369cae5c4824f154becc987d # mitk/handler-overload, carries the in-memory metadata overload of Itk2DicomConverter::itkimage2dcmSegmentation
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

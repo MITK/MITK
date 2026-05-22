@@ -29,7 +29,7 @@ found in the LICENSE file.
 
 // dcmqi
 #include <dcmqi/Itk2DicomConverter.h>
-#include <dcmqi/Dicom2ItkConverter.h>
+#include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
 
 // us
@@ -275,22 +275,43 @@ namespace mitk
       }
 
       //=============================== dcmqi part ====================================
-      // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
-      auto converter = std::make_unique<dcmqi::Dicom2ItkConverter>();
+      // dcmqi exposes a SOP-Class-specific factory: getConverter() dispatches
+      // UID_SegmentationStorage to the binary converter and
+      // UID_LabelMapSegmentationStorage (Sup 243) to the labelmap converter.
+      // Iteration moves from begin()/next() to begin16Bit()/next16Bit() for
+      // the 16-bit binary code path. Labelmap-format SEG is rejected
+      // explicitly until real support lands (issue #793).
+      std::unique_ptr<dcmqi::Dicom2ItkConverterBase> converter(
+        dcmqi::Dicom2ItkConverter::getConverter(dataSet));
+      if (converter == nullptr)
+        mitkThrow() << "Unsupported DICOM SEG SOP Class; cannot read.";
+
+      // #793 - replaced by labelmap branch in Phase 2.
+      if (converter->isLabelmap())
+      {
+        mitkThrow() << "Reading labelmap-format DICOM SEG "
+                    << "(SOP Class UID_LabelMapSegmentationStorage, Sup 243) "
+                    << "is not yet supported in this MITK release. "
+                    << "Tracked in issue #793.";
+      }
+
       std::string metaInfoString;
-      auto convert_condition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
+      auto convertCondition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
+      if (convertCondition.bad())
+        mitkThrow() << "dcmqi failed to convert DICOM SEG: "
+                    << convertCondition.text();
 
       std::vector<itkInternalImageType::Pointer> segItkImages;
-
-      if (convert_condition.good())
+      auto image = converter->begin16Bit();
+      while (image.IsNotNull())
       {
-        auto image = converter->begin();
-        while (image.IsNotNull())
-        {
-          segItkImages.emplace_back(image);
-          image = converter->next();
-        }
+        segItkImages.emplace_back(image);
+        image = converter->next16Bit();
       }
+
+      if (segItkImages.empty())
+        mitkThrow() << "DICOM SEG converted successfully but yielded no "
+                    << "segment images; cannot construct a MultiLabelSegmentation.";
 
       dcmqi::JSONSegmentationMetaInformationHandler metaInfo(metaInfoString.c_str());
       metaInfo.read();

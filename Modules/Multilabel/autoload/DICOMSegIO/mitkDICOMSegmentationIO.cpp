@@ -32,6 +32,49 @@ found in the LICENSE file.
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
 
+namespace
+{
+  // Read SegmentsOverlap (0062,0013) and decide if the reader must assume
+  // overlapping segments. Used only by the binary read branch: each segment
+  // image arrives separately and the reader has to choose between one shared
+  // MITK group (non-overlap) and one group per segment (overlap). The labelmap
+  // (Sup 243) branch ignores the flag because labelmap encoding already
+  // forbids overlap within a single SEG file.
+  bool ShouldAssumeOverlappingSegments(DcmDataset &dataSet)
+  {
+    OFString overlapValue;
+    if (dataSet.findAndGetOFString(DCM_SegmentsOverlap, overlapValue).bad())
+      return true;
+    // DCM permits NO, YES, UNDEFINED; lower/mixed case forms are tolerated
+    // here to stay robust against non-compliant producers.
+    return "NO" != overlapValue && "no" != overlapValue && "No" != overlapValue;
+  }
+
+  // Resolve a display name for a DICOM SEG segment. Mirrors the historical
+  // fallback chain: SegmentLabel -> SegmentedPropertyType code meaning (with
+  // optional modifier) -> string form of the numeric segment id.
+  OFString DeriveLabelName(dcmqi::SegmentAttributes &segmentAttribute)
+  {
+    OFString labelName = segmentAttribute.getSegmentLabel();
+    if (!labelName.empty())
+      return labelName;
+
+    if (segmentAttribute.getSegmentedPropertyTypeCodeSequence() != nullptr)
+    {
+      segmentAttribute.getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
+      if (segmentAttribute.getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+      {
+        OFString modifier;
+        segmentAttribute.getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
+        labelName.append(" (").append(modifier).append(")");
+      }
+      return labelName;
+    }
+
+    return OFString(std::to_string(segmentAttribute.getLabelID()).c_str());
+  }
+}
+
 // us
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -263,37 +306,17 @@ namespace mitk
       if (dataSet == nullptr)
         mitkThrow() << "Can't read data from input file!";
 
-      //Get the value of SegmentsOverlap Tag (0062,0013) for this dataset
-      OFString overlapValue;
-      bool assumeOverlappingSegments = true;
-      status = dataSet->findAndGetOFString(DCM_SegmentsOverlap, overlapValue);
-      if (status.good())
-      {
-        assumeOverlappingSegments = "NO" != overlapValue     //DCM allows only NO, YES and UNDEFINED
-                                    && "no" != overlapValue  //never the less we add lower and mixed case
-                                    && "No" != overlapValue; //version to be more robust with non-compliant DCM files
-      }
-
       //=============================== dcmqi part ====================================
-      // dcmqi exposes a SOP-Class-specific factory: getConverter() dispatches
-      // UID_SegmentationStorage to the binary converter and
-      // UID_LabelMapSegmentationStorage (Sup 243) to the labelmap converter.
-      // Iteration moves from begin()/next() to begin16Bit()/next16Bit() for
-      // the 16-bit binary code path. Labelmap-format SEG is rejected
-      // explicitly until real support lands (issue #793).
+      // getConverter() is a SOP-Class-specific factory: UID_SegmentationStorage
+      // returns the binary converter, UID_LabelMapSegmentationStorage (Sup 243)
+      // returns the labelmap converter. The two paths build the
+      // MultiLabelSegmentation differently (per-segment vs single labelmap
+      // image), so dispatch happens once here and the helpers diverge from
+      // there.
       std::unique_ptr<dcmqi::Dicom2ItkConverterBase> converter(
         dcmqi::Dicom2ItkConverter::getConverter(dataSet));
       if (converter == nullptr)
         mitkThrow() << "Unsupported DICOM SEG SOP Class; cannot read.";
-
-      // #793 - replaced by labelmap branch in Phase 2.
-      if (converter->isLabelmap())
-      {
-        mitkThrow() << "Reading labelmap-format DICOM SEG "
-                    << "(SOP Class UID_LabelMapSegmentationStorage, Sup 243) "
-                    << "is not yet supported in this MITK release. "
-                    << "Tracked in issue #793.";
-      }
 
       std::string metaInfoString;
       auto convertCondition = converter->dcmSegmentation2itkimage(dataSet, metaInfoString, false);
@@ -301,143 +324,20 @@ namespace mitk
         mitkThrow() << "dcmqi failed to convert DICOM SEG: "
                     << convertCondition.text();
 
-      std::vector<itkInternalImageType::Pointer> segItkImages;
-      auto image = converter->begin16Bit();
-      while (image.IsNotNull())
-      {
-        segItkImages.emplace_back(image);
-        image = converter->next16Bit();
-      }
-
-      if (segItkImages.empty())
-        mitkThrow() << "DICOM SEG converted successfully but yielded no "
-                    << "segment images; cannot construct a MultiLabelSegmentation.";
-
       dcmqi::JSONSegmentationMetaInformationHandler metaInfo(metaInfoString.c_str());
       metaInfo.read();
 
       MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
       //===============================================================================
 
-      // Get the label information from segment attributes for each itk image
-      vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
-        metaInfo.segmentsAttributesMappingList.begin();
-
-      // For each itk image add a layer to the MultiLabelSegmentation output
-      for (auto &segItkImage : segItkImages)
+      if (converter->isLabelmap())
       {
-        // Get the labeled image and cast it to mitkImage
-        typedef itk::CastImageFilter<itkInternalImageType, itkInputImageType> castItkImageFilterType;
-        castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
-        castFilter->SetInput(segItkImage);
-        castFilter->Update();
-
-        Image::Pointer segmentImage;
-        CastToMitkImage(castFilter->GetOutput(), segmentImage);
-
-        // Get pixel value of the label
-        itkInternalImageType::ValueType segValue = 1;
-        typedef itk::ImageRegionIterator<const itkInternalImageType> IteratorType;
-        // Iterate over the image to find the pixel value of the label
-        IteratorType iter(segItkImage, segItkImage->GetLargestPossibleRegion());
-        iter.GoToBegin();
-        while (!iter.IsAtEnd())
-        {
-          itkInputImageType::PixelType value = iter.Get();
-          if (value != MultiLabelSegmentation::UNLABELED_VALUE)
-          {
-            segValue = value;
-            break;
-          }
-          ++iter;
-        }
-        // Get Segment information map
-        if (segmentIter == metaInfo.segmentsAttributesMappingList.end())
-          mitkThrow() << "Segment metadata list has fewer entries than segment images.";
-
-        const auto &segmentMap = (*segmentIter);
-        if (segmentMap.empty())
-          mitkThrow() << "Segment metadata entry is empty for segment image.";
-
-        dcmqi::SegmentAttributes *segmentAttribute = segmentMap.begin()->second;
-        if (segmentAttribute == nullptr)
-          mitkThrow() << "Segment attributes are null for segment image.";
-
-        OFString labelName = segmentAttribute->getSegmentLabel();
-
-        if (labelName.empty())
-        {
-          if (segmentAttribute->getSegmentedPropertyTypeCodeSequence() != nullptr)
-          {
-            segmentAttribute->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
-            if (segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
-            {
-              OFString modifier;
-              segmentAttribute->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
-              labelName.append(" (").append(modifier).append(")");
-            }
-          }
-          else
-          {
-            labelName = std::to_string(segmentAttribute->getLabelID()).c_str();
-            if (labelName.empty())
-              labelName = "Unnamed";
-          }
-        }
-
-        float tmp[3] = { 0.0, 0.0, 0.0 };
-        if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
-        {
-          tmp[0] = segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0;
-          tmp[1] = segmentAttribute->getRecommendedDisplayRGBValue()[1] / 255.0;
-          tmp[2] = segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0;
-        }
-
-        Label::Pointer newLabel = nullptr;
-        // If labelSetImage do not exists (first image)
-        if (labelSetImage.IsNull())
-        {
-          // Initialize the labelSetImage with the read image
-          labelSetImage = MultiLabelSegmentation::New();
-          labelSetImage->InitializeByLabeledImage(segmentImage);
-          // Check if the segment image contained labeled pixels. At this point it either contains no (when no labeled pixels where in the image)
-          // or one label (as DCMSeg segments only represent one labels). So either generate a new label or used the only existing one.
-          newLabel = labelSetImage->GetTotalNumberOfLabels() > 0 ? labelSetImage->GetLabels().front() : Label::New();
-          newLabel->SetName(labelName.c_str());
-          newLabel->SetColor(Color(tmp));
-          newLabel->SetValue(segValue);
-        }
-        else
-        {
-          MultiLabelSegmentation::GroupIndexType groupID = 0;
-          if (assumeOverlappingSegments)
-          {
-            // Add a new group because we have to expect every label to be overlapping
-            // the label content is directly transferred here.
-            groupID = labelSetImage->AddGroup(segmentImage);
-          }
-
-          // Add the new label
-          newLabel = Label::New();
-          newLabel->SetName(labelName.c_str());
-          newLabel->SetColor(Color(tmp));
-          newLabel->SetValue(segValue);
-          labelSetImage->AddLabel(newLabel, groupID, true, true);
-
-          if (!assumeOverlappingSegments)
-          {
-            //if we know the labels are non overlapping we can put everything in one image
-            //the label content has to be transferred, as no new group was added.
-            mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
-              labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
-              mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
-          }
-
-        }
-
-        // Add some more label properties
-        this->SetLabelProperties(newLabel, segmentAttribute);
-        ++segmentIter;
+        labelSetImage = this->ReadLabelmapSegmentation(*converter, metaInfo);
+      }
+      else
+      {
+        labelSetImage = this->ReadBinarySegmentation(
+          *converter, metaInfo, ShouldAssumeOverlappingSegments(*dataSet));
       }
 
       if (labelSetImage.IsNull())
@@ -490,6 +390,257 @@ namespace mitk
 
     result.push_back(labelSetImage.GetPointer());
     return result;
+  }
+
+  mitk::MultiLabelSegmentation::Pointer DICOMSegmentationIO::ReadBinarySegmentation(
+    dcmqi::Dicom2ItkConverterBase &converter,
+    dcmqi::JSONSegmentationMetaInformationHandler &metaInfo,
+    bool assumeOverlappingSegments)
+  {
+    std::vector<itkInternalImageType::Pointer> segItkImages;
+    auto image = converter.begin16Bit();
+    while (image.IsNotNull())
+    {
+      segItkImages.emplace_back(image);
+      image = converter.next16Bit();
+    }
+
+    if (segItkImages.empty())
+      mitkThrow() << "DICOM SEG converted successfully but yielded no "
+                  << "segment images; cannot construct a MultiLabelSegmentation.";
+
+    MultiLabelSegmentation::Pointer labelSetImage;
+
+    // Get the label information from segment attributes for each itk image
+    vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
+      metaInfo.segmentsAttributesMappingList.begin();
+
+    // For each itk image add a layer to the MultiLabelSegmentation output
+    for (auto &segItkImage : segItkImages)
+    {
+      // Get the labeled image and cast it to mitkImage
+      typedef itk::CastImageFilter<itkInternalImageType, itkInputImageType> castItkImageFilterType;
+      castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
+      castFilter->SetInput(segItkImage);
+      castFilter->Update();
+
+      Image::Pointer segmentImage;
+      CastToMitkImage(castFilter->GetOutput(), segmentImage);
+
+      // Get pixel value of the label
+      itkInternalImageType::ValueType segValue = 1;
+      typedef itk::ImageRegionIterator<const itkInternalImageType> IteratorType;
+      // Iterate over the image to find the pixel value of the label
+      IteratorType iter(segItkImage, segItkImage->GetLargestPossibleRegion());
+      iter.GoToBegin();
+      while (!iter.IsAtEnd())
+      {
+        itkInputImageType::PixelType value = iter.Get();
+        if (value != MultiLabelSegmentation::UNLABELED_VALUE)
+        {
+          segValue = value;
+          break;
+        }
+        ++iter;
+      }
+      // Get Segment information map
+      if (segmentIter == metaInfo.segmentsAttributesMappingList.end())
+        mitkThrow() << "Segment metadata list has fewer entries than segment images.";
+
+      const auto &segmentMap = (*segmentIter);
+      if (segmentMap.empty())
+        mitkThrow() << "Segment metadata entry is empty for segment image.";
+
+      dcmqi::SegmentAttributes *segmentAttribute = segmentMap.begin()->second;
+      if (segmentAttribute == nullptr)
+        mitkThrow() << "Segment attributes are null for segment image.";
+
+      const OFString labelName = DeriveLabelName(*segmentAttribute);
+
+      float tmp[3] = { 0.0, 0.0, 0.0 };
+      if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
+      {
+        tmp[0] = segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0;
+        tmp[1] = segmentAttribute->getRecommendedDisplayRGBValue()[1] / 255.0;
+        tmp[2] = segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0;
+      }
+
+      Label::Pointer newLabel = nullptr;
+      // If labelSetImage do not exists (first image)
+      if (labelSetImage.IsNull())
+      {
+        // Initialize the labelSetImage with the read image
+        labelSetImage = MultiLabelSegmentation::New();
+        labelSetImage->InitializeByLabeledImage(segmentImage);
+        // Check if the segment image contained labeled pixels. At this point it either contains no (when no labeled pixels where in the image)
+        // or one label (as DCMSeg segments only represent one labels). So either generate a new label or used the only existing one.
+        newLabel = labelSetImage->GetTotalNumberOfLabels() > 0 ? labelSetImage->GetLabels().front() : Label::New();
+        newLabel->SetName(labelName.c_str());
+        newLabel->SetColor(Color(tmp));
+        newLabel->SetValue(segValue);
+      }
+      else
+      {
+        MultiLabelSegmentation::GroupIndexType groupID = 0;
+        if (assumeOverlappingSegments)
+        {
+          // Add a new group because we have to expect every label to be overlapping
+          // the label content is directly transferred here.
+          groupID = labelSetImage->AddGroup(segmentImage);
+        }
+
+        // Add the new label
+        newLabel = Label::New();
+        newLabel->SetName(labelName.c_str());
+        newLabel->SetColor(Color(tmp));
+        newLabel->SetValue(segValue);
+        labelSetImage->AddLabel(newLabel, groupID, true, true);
+
+        if (!assumeOverlappingSegments)
+        {
+          //if we know the labels are non overlapping we can put everything in one image
+          //the label content has to be transferred, as no new group was added.
+          mitk::TransferLabelContent(segmentImage, labelSetImage->GetGroupImage(groupID),
+            labelSetImage->GetConstLabelsByValue(labelSetImage->GetLabelValuesByGroup(groupID)),
+            mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, {{segValue,newLabel->GetValue()}});
+        }
+      }
+
+      // Add some more label properties
+      this->SetLabelProperties(newLabel, segmentAttribute);
+      ++segmentIter;
+    }
+
+    return labelSetImage;
+  }
+
+  mitk::MultiLabelSegmentation::Pointer DICOMSegmentationIO::ReadLabelmapSegmentation(
+    dcmqi::Dicom2ItkConverterBase &converter,
+    dcmqi::JSONSegmentationMetaInformationHandler &metaInfo)
+  {
+    const Uint8 bytesPerPixel = converter.bytesPerPixel();
+    if (bytesPerPixel != 1 && bytesPerPixel != 2)
+      mitkThrow() << "Unsupported labelmap pixel size: bytesPerPixel="
+                  << static_cast<unsigned>(bytesPerPixel)
+                  << " (expected 1 or 2 per dcmqi's Sup 243 converter).";
+
+    // dcmqi's labelmap converter emits exactly one image carrying every
+    // segment number as its pixel values. The multi-image guard surfaces
+    // a future dcmqi change explicitly instead of silently dropping all
+    // but the first image.
+    Image::Pointer mitkSegImage;
+    int imageCount = 0;
+    if (bytesPerPixel == 2)
+    {
+      auto image = converter.begin16Bit();
+      while (image.IsNotNull())
+      {
+        if (++imageCount > 1)
+          mitkThrow() << "Labelmap DICOM SEG converter yielded more than one "
+                      << "image; Sup 243 expects exactly one per SEG.";
+        typedef itk::CastImageFilter<itkInternalImageType, itkInputImageType> CastFilter;
+        auto castFilter = CastFilter::New();
+        castFilter->SetInput(image);
+        castFilter->Update();
+        CastToMitkImage(castFilter->GetOutput(), mitkSegImage);
+        image = converter.next16Bit();
+      }
+    }
+    else // bytesPerPixel == 1
+    {
+      typedef itk::Image<unsigned char, 3> Uint8ImageType;
+      auto image = converter.begin8Bit();
+      while (image.IsNotNull())
+      {
+        if (++imageCount > 1)
+          mitkThrow() << "Labelmap DICOM SEG converter yielded more than one "
+                      << "image; Sup 243 expects exactly one per SEG.";
+        typedef itk::CastImageFilter<Uint8ImageType, itkInputImageType> CastFilter;
+        auto castFilter = CastFilter::New();
+        castFilter->SetInput(image);
+        castFilter->Update();
+        CastToMitkImage(castFilter->GetOutput(), mitkSegImage);
+        image = converter.next8Bit();
+      }
+    }
+
+    if (imageCount == 0)
+      mitkThrow() << "Labelmap DICOM SEG converted successfully but yielded "
+                  << "no image; cannot construct a MultiLabelSegmentation.";
+
+    if (metaInfo.segmentsAttributesMappingList.empty())
+      mitkThrow() << "Labelmap DICOM SEG yielded no segment attribute entries.";
+
+    // The SEG's Segment Sequence is authoritative for what labels exist;
+    // pixel values are content. Sup 243 may declare a Background segment
+    // (number 0); MITK treats pixel value 0 as UNLABELED, so background
+    // entries are dropped here to avoid colliding with foreground handling.
+    const auto &segmentMap = metaInfo.segmentsAttributesMappingList.front();
+    std::map<MultiLabelSegmentation::LabelValueType, dcmqi::SegmentAttributes *> attributesByLabelValue;
+    for (const auto &segmentEntry : segmentMap)
+    {
+      dcmqi::SegmentAttributes *segmentAttribute = segmentEntry.second;
+      if (segmentAttribute == nullptr)
+        continue;
+      const auto labelValue =
+        static_cast<MultiLabelSegmentation::LabelValueType>(segmentAttribute->getLabelID());
+      if (labelValue == MultiLabelSegmentation::UNLABELED_VALUE)
+        continue;
+      attributesByLabelValue.emplace(labelValue, segmentAttribute);
+    }
+
+    // The labelmap image's pixel values are the segment numbers, so
+    // InitializeByLabeledImage builds one MITK group with one auto-created
+    // Label per distinct value. The labels are then re-driven from metadata
+    // below; auto-creation is only used to bind label values to pixel-grid
+    // content.
+    auto labelSetImage = MultiLabelSegmentation::New();
+    labelSetImage->InitializeByLabeledImage(mitkSegImage);
+
+    // Sup 243 requires every non-zero pixel value to be described by a
+    // Segment Sequence entry. Mismatch in either direction is a
+    // non-conformant SEG and throws, matching the binary branch's
+    // hard-failure contract (no silent drops).
+    for (const auto labelValue : labelSetImage->GetAllLabelValues())
+    {
+      if (labelValue == MultiLabelSegmentation::UNLABELED_VALUE)
+        continue;
+      if (attributesByLabelValue.find(labelValue) == attributesByLabelValue.end())
+        mitkThrow() << "Labelmap DICOM SEG contains pixel value "
+                    << static_cast<unsigned>(labelValue)
+                    << " but no matching Segment Sequence entry; SEG is non-conformant.";
+    }
+
+    // Drive label naming, colour and DICOM property metadata from
+    // segmentsAttributesMappingList. SetLabelProperties also stamps the
+    // empty tracking-ID/UID sentinel that suppresses MITK's auto-UID
+    // generation, so running it on every metadata-described label keeps
+    // round-trip integrity.
+    for (const auto &[labelValue, segmentAttribute] : attributesByLabelValue)
+    {
+      Label *label = labelSetImage->GetLabel(labelValue);
+      if (label == nullptr)
+        mitkThrow() << "Labelmap DICOM SEG metadata declares segment "
+                    << static_cast<unsigned>(labelValue)
+                    << " but no pixel with that value is present; SEG is non-conformant.";
+
+      const OFString labelName = DeriveLabelName(*segmentAttribute);
+      label->SetName(labelName.c_str());
+
+      if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
+      {
+        const float rgb[3] = {
+          segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0f,
+          segmentAttribute->getRecommendedDisplayRGBValue()[1] / 255.0f,
+          segmentAttribute->getRecommendedDisplayRGBValue()[2] / 255.0f
+        };
+        label->SetColor(Color(rgb));
+      }
+
+      this->SetLabelProperties(label, segmentAttribute);
+    }
+
+    return labelSetImage;
   }
 
   const std::string mitk::DICOMSegmentationIO::CreateMetaDataJsonFile(int layer)

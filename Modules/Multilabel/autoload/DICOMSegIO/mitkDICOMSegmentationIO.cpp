@@ -21,7 +21,10 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
+#include <mitkSegSourceImageRelationRule.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 
 // itk
@@ -31,6 +34,10 @@ found in the LICENSE file.
 #include <dcmqi/Itk2DicomConverter.h>
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
+#include <dcmtk/dcmfg/fgderimg.h>
+#include <dcmtk/dcmfg/fginterface.h>
+#include <dcmtk/dcmfg/fgtypes.h>
+#include <dcmtk/dcmseg/segdoc.h>
 
 namespace
 {
@@ -72,6 +79,202 @@ namespace
     }
 
     return OFString(std::to_string(segmentAttribute.getLabelID()).c_str());
+  }
+
+  // One source-image reference seen on one SEG frame. Frame index is the
+  // SEG's own frame numbering (0-based) and is later used as the slice
+  // index in the TemporoSpatialStringProperty handed to the relation rule.
+  struct SegSourceFrameRef
+  {
+    Uint32 frameIndex;
+    std::string sopInstanceUID;
+    std::string sopClassUID;
+  };
+
+  // A set of per-frame source references that share one source series.
+  // The DICOM SEG IOD's top-level ReferencedSeriesSequence has exactly one
+  // item per source series, so this 1:1 corresponds to one connect call on
+  // the relation rule.
+  struct SegSourceSeriesGroup
+  {
+    std::string seriesInstanceUID;
+    std::vector<SegSourceFrameRef> frames;
+  };
+
+  // Frames that carry no derivation reference are silently skipped: the
+  // SEG IOD makes the Derivation Image FG type 1C, so absence is DICOM-legal
+  // and simply means "no source image is recorded for that frame."
+  // Parameter is non-const because DCMTK's getFunctionalGroups and
+  // getNumberOfFrames have no const overload.
+  std::vector<SegSourceFrameRef> CollectPerFrameSourceRefs(DcmSegmentation& segDoc)
+  {
+    std::vector<SegSourceFrameRef> result;
+    FGInterface& fgInterface = segDoc.getFunctionalGroups();
+    const size_t numFrames = segDoc.getNumberOfFrames();
+
+    for (size_t f = 0; f < numFrames; ++f)
+    {
+      OFBool isPerFrame = OFFalse;
+      auto* fg = fgInterface.get(static_cast<Uint32>(f), DcmFGTypes::EFG_DERIVATIONIMAGE, isPerFrame);
+      auto* derImg = OFstatic_cast(FGDerivationImage*, fg);
+      if (derImg == nullptr)
+        continue;
+
+      OFVector<DerivationImageItem*>& derItems = derImg->getDerivationImageItems();
+      for (auto* derItem : derItems)
+      {
+        if (derItem == nullptr)
+          continue;
+        OFVector<SourceImageItem*>& srcItems = derItem->getSourceImageItems();
+        for (auto* srcItem : srcItems)
+        {
+          if (srcItem == nullptr)
+            continue;
+          OFString sopInstance;
+          OFString sopClass;
+          // ImageSOPInstanceReferenceMacro inherits the two getters from
+          // SOPInstanceReferenceMacro; the macro is held by value on the
+          // SourceImageItem.
+          srcItem->getImageSOPInstanceReference().getReferencedSOPInstanceUID(sopInstance);
+          srcItem->getImageSOPInstanceReference().getReferencedSOPClassUID(sopClass);
+          if (sopInstance.empty())
+            continue;
+          result.push_back({static_cast<Uint32>(f), sopInstance.c_str(), sopClass.c_str()});
+        }
+      }
+    }
+
+    return result;
+  }
+
+  // An empty result means the SEG has no top-level series references at
+  // all (DICOM-legal type 1C absence) and the per-series grouping below
+  // degenerates to "no relations." Parameter is non-const because DCMTK's
+  // findAndGet* are not const-overloaded.
+  std::map<std::string, std::set<std::string>>
+    CollectSourceInstancesBySeries(DcmDataset& dataset)
+  {
+    std::map<std::string, std::set<std::string>> result;
+    DcmSequenceOfItems* refSeriesSeq = nullptr;
+    if (dataset.findAndGetSequence(DCM_ReferencedSeriesSequence, refSeriesSeq).bad()
+        || refSeriesSeq == nullptr)
+      return result;
+
+    for (unsigned long i = 0; i < refSeriesSeq->card(); ++i)
+    {
+      DcmItem* item = refSeriesSeq->getItem(i);
+      if (item == nullptr)
+        continue;
+
+      OFString seriesUID;
+      if (item->findAndGetOFString(DCM_SeriesInstanceUID, seriesUID).bad() || seriesUID.empty())
+        continue;
+
+      auto& instanceSet = result[seriesUID.c_str()];
+
+      DcmSequenceOfItems* refInstSeq = nullptr;
+      if (item->findAndGetSequence(DCM_ReferencedInstanceSequence, refInstSeq).bad()
+          || refInstSeq == nullptr)
+        continue;
+
+      for (unsigned long j = 0; j < refInstSeq->card(); ++j)
+      {
+        DcmItem* instItem = refInstSeq->getItem(j);
+        if (instItem == nullptr)
+          continue;
+        OFString sopInstance;
+        if (instItem->findAndGetOFString(DCM_ReferencedSOPInstanceUID, sopInstance).good()
+            && !sopInstance.empty())
+        {
+          instanceSet.insert(sopInstance.c_str());
+        }
+      }
+    }
+
+    return result;
+  }
+
+  // Invert the per-frame refs against the series map. Frames whose source
+  // SOPInstanceUID matches no known series are warned about and dropped
+  // from any group: this indicates a malformed SEG, not a reader-side
+  // failure mode, so the seg still loads but the unresolved frame is not
+  // attributed to a relation.
+  std::vector<SegSourceSeriesGroup> GroupPerFrameRefsBySeries(
+    const std::vector<SegSourceFrameRef>& frameRefs,
+    const std::map<std::string, std::set<std::string>>& seriesToInstances)
+  {
+    std::vector<SegSourceSeriesGroup> groups;
+    if (seriesToInstances.empty())
+      return groups;
+
+    std::map<std::string, size_t> seriesToGroupIndex;
+    for (const auto& frameRef : frameRefs)
+    {
+      const std::string* matchedSeries = nullptr;
+      for (const auto& [seriesUID, instanceSet] : seriesToInstances)
+      {
+        if (instanceSet.count(frameRef.sopInstanceUID) > 0)
+        {
+          matchedSeries = &seriesUID;
+          break;
+        }
+      }
+
+      if (matchedSeries == nullptr)
+      {
+        MITK_WARN << "DICOM SEG references source SOP Instance " << frameRef.sopInstanceUID
+                  << " on frame " << frameRef.frameIndex
+                  << " but the SEG's ReferencedSeriesSequence does not declare it; "
+                  << "skipping frame from source-image relation population.";
+        continue;
+      }
+
+      auto [it, inserted] = seriesToGroupIndex.try_emplace(*matchedSeries, groups.size());
+      if (inserted)
+      {
+        SegSourceSeriesGroup g;
+        g.seriesInstanceUID = *matchedSeries;
+        groups.push_back(std::move(g));
+      }
+      groups[it->second].frames.push_back(frameRef);
+    }
+
+    return groups;
+  }
+
+  // The PropertyList is an ad-hoc IPropertyProvider built only to feed
+  // the rule's instance Connect overload; it has no lifetime beyond this
+  // scope.
+  void PopulateSourceImageRelations(mitk::MultiLabelSegmentation& seg,
+                                    const std::vector<SegSourceSeriesGroup>& groups)
+  {
+    if (groups.empty())
+      return;
+
+    auto rule = mitk::SegSourceImageRelationRule::New();
+
+    for (const auto& group : groups)
+    {
+      auto perSliceInstance = mitk::TemporoSpatialStringProperty::New();
+      auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
+      for (const auto& frameRef : group.frames)
+      {
+        // Single time step in the SEG IOD; frame -> slice index 1:1 as
+        // described on SegSourceFrameRef.
+        perSliceInstance->SetValue(0, frameRef.frameIndex, frameRef.sopInstanceUID);
+        perSliceClass->SetValue(0, frameRef.frameIndex, frameRef.sopClassUID);
+      }
+
+      auto provider = mitk::PropertyList::New();
+      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0018).c_str(),
+                            perSliceInstance);
+      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0016).c_str(),
+                            perSliceClass);
+      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str(),
+                            mitk::TemporoSpatialStringProperty::New(group.seriesInstanceUID));
+
+      rule->Connect(&seg, provider.GetPointer());
+    }
   }
 }
 
@@ -376,6 +579,24 @@ namespace mitk
 
       auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
       DICOMIOHelper::SetProperties(labelSetImage, findings);
+
+      // Populate after SetProperties so the per-slice TemporoSpatialString
+      // properties this writes (DICOM.0008.2112.[0].0008.1155 and friends)
+      // cannot be flattened by the tag-of-interest scanner. Parse from the
+      // already-loaded dataset rather than re-reading the file: dcmqi above
+      // does not take ownership of dcmFileFormat's dataset and dcmFileFormat
+      // outlives this block, so loadDataset avoids a second disk read.
+      DcmSegmentation* segDocRaw = nullptr;
+      OFCondition loadSegCond = DcmSegmentation::loadDataset(*dataSet, segDocRaw);
+      std::unique_ptr<DcmSegmentation> segDoc(segDocRaw);
+      if (loadSegCond.bad() || segDoc == nullptr)
+        mitkThrow() << "Failed to parse DICOM SEG via DcmSegmentation::loadDataset: "
+                    << loadSegCond.text();
+
+      const auto frameRefs = CollectPerFrameSourceRefs(*segDoc);
+      const auto seriesToInstances = CollectSourceInstancesBySeries(*dataSet);
+      const auto sourceSeriesGroups = GroupPerFrameRefsBySeries(frameRefs, seriesToInstances);
+      PopulateSourceImageRelations(*labelSetImage, sourceSeriesGroups);
     }
     catch (const std::exception &e)
     {

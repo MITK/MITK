@@ -53,3 +53,12 @@ if(EXISTS "${_dicomSegLabelmapMetadata}"
     ${_dicomSegLabelmapSourceDicoms}
     ${_dicomSegLabelmapReference})
 endif()
+
+# End-to-end coverage for the legacy referenceFiles -> SegSourceImageRelationRule
+# migration helper. Uses the same three dcmqi-checked-in source DICOMs as the
+# labelmap regression so the test only registers when those files exist.
+if(_dicomSegLabelmapAllInputsExist)
+  mitkAddCustomModuleTest(mitkDICOMSegmentationLegacyMigrationTest
+    mitkDICOMSegmentationLegacyMigrationTest
+    ${_dicomSegLabelmapSourceDicomList})
+endif()

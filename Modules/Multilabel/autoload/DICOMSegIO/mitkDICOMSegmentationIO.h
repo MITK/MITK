@@ -21,7 +21,10 @@ found in the LICENSE file.
 #include <dcmqi/Dicom2ItkConverterBase.h>
 #include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 
+#include <dcmtk/dcmdata/dcitem.h>
+
 #include <memory>
+#include <vector>
 
 namespace mitk
 {
@@ -66,7 +69,23 @@ namespace mitk
     DICOMSegmentationIO *IOClone() const override;
 
     // -------------- DICOMSegmentationIO specific functions -------------
-    const std::string CreateMetaDataJsonFile(int layer);
+
+    /**
+     * \brief Populate a DCMQI metadata handler in memory for one group.
+     *
+     * Out-parameter (rather than return-by-value) because
+     * dcmqi::JSONSegmentationMetaInformationHandler owns raw
+     * SegmentAttributes pointers and its destructor deletes them. A copy
+     * or move (which the compiler is free to materialise on return) would
+     * double-free those pointers; constructing the handler at the call
+     * site and populating it in place removes the question.
+     *
+     * \pre input must be a valid (non-null) MultiLabelSegmentation pointer.
+     * \pre layer must be a valid group index of input.
+     */
+    void BuildMetaInfoHandler(const MultiLabelSegmentation *input,
+                              int layer,
+                              dcmqi::JSONSegmentationMetaInformationHandler &handler) const;
     void SetLabelProperties(Label *label, dcmqi::SegmentAttributes *segmentAttribute);
 
     /**

@@ -10,11 +10,18 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "mitkDICOMSegPropertyTestHelpers.h"
+
+#include <mitkBaseProperty.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
+#include <mitkPropertyKeyPath.h>
+#include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestingMacros.h>
+
+#include <filesystem>
 
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcfilefo.h>
@@ -234,6 +241,90 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
   }
   MITK_TEST_CONDITION(seenSeriesUIDs == expectedSeriesUIDs,
     "Source series UIDs on the relations match the SEG's ReferencedSeriesSequence");
+
+  // Round-trip assertion (closes #321): the seg loaded from a real DICOM
+  // SEG file must be re-writable via the new property-driven writer and
+  // re-loadable as a MultiLabelSegmentation. Uses synthetic mode because
+  // DICOMIOHelper::SetProperties does not surface every Validate-required
+  // tag on the loaded seg (FrameOfReferenceUID in particular); synthetic
+  // mode is the realistic default for "save anywhere" of an arbitrary
+  // loaded SEG. The on-the-wire SOP class shifts to Sup 243 labelmap on
+  // output (the writer's default), which is the documented behaviour
+  // change in the user-facing changelog. Voxel-level equivalence is
+  // pinned by the per-segment hash baseline above; this assertion only
+  // adds the write+reload survivability that was impossible before this
+  // stage.
+  const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegRegressionRoundTrip";
+  std::filesystem::create_directories(tempDir);
+  const auto roundTripPath = (tempDir / "roundtrip.dcm").string();
+  mitk::IFileWriter::Options roundTripOptions;
+  roundTripOptions["Strict / synthetic mode"] = std::string("synthetic");
+  try
+  {
+    mitk::IOUtil::Save(loadedSeg, roundTripPath, roundTripOptions);
+  }
+  catch (const std::exception &e)
+  {
+    MITK_TEST_FAILED_MSG(<< "Round-trip write of loaded SEG threw: " << e.what());
+  }
+  const auto reloaded = mitk::IOUtil::Load(roundTripPath);
+  MITK_TEST_CONDITION_REQUIRED(reloaded.size() == 1,
+    "Round-trip reload produced exactly one BaseData");
+  auto* reloadedSeg = dynamic_cast<mitk::MultiLabelSegmentation *>(reloaded[0].GetPointer());
+  MITK_TEST_CONDITION_REQUIRED(reloadedSeg != nullptr,
+    "Round-trip reload produced a MultiLabelSegmentation");
+
+  // Beyond "reload yielded a MultiLabelSegmentation": the rule connection
+  // must survive the write+read with non-degenerate per-slice content.
+  // A previous shape of this assertion only checked the type and let any
+  // collapse of the per-slice TemporoSpatialStringProperty slip through.
+  const auto reloadedRelations =
+    mitk::SegSourceImageRelationRule::GetSourceImageRelations(reloadedSeg);
+  MITK_TEST_CONDITION_REQUIRED(!reloadedRelations.empty(),
+    "Round-trip reload preserves at least one source-image relation");
+  for (const auto &relation : reloadedRelations)
+  {
+    MITK_TEST_CONDITION(!relation.relationUID.empty(),
+      "Reloaded relation carries a non-empty relation UID");
+    MITK_TEST_CONDITION_REQUIRED(relation.instanceUIDsPerSlice.IsNotNull(),
+      "Reloaded relation carries a per-slice instance UID property");
+    MITK_TEST_CONDITION(!relation.instanceUIDsPerSlice->GetAvailableSlices(0).empty(),
+      "Reloaded relation's per-slice property carries at least one slice entry "
+      "(guards against TemporoSpatialString collapse on serialize)");
+  }
+
+  // Purpose-of-Reference Code Sequence Code Meaning must survive the
+  // round-trip with the canonical seg-source purpose tag as its value.
+  // The DICOM tags-of-interest registration renames the property's key
+  // on load (see mitkSegSourceImageRelationRoundTripTest for the long
+  // form of this caveat) — the rule writes under
+  //   DICOM.0008.2112.[i].0040.a170.[0].0008.0104
+  // but the persistence registration normalises it to
+  //   DICOM.0008.2112.[i].0040.A170.[a170].0008.0104
+  // What matters for round-trip integrity is that the value is preserved
+  // somewhere on the seg under the Source Image Sequence / Purpose code
+  // path, not the exact key form.
+  bool purposeTagFound = false;
+  for (const auto &[name, prop] : *(reloadedSeg->GetPropertyList()->GetMap()))
+  {
+    if (prop.IsNull())
+      continue;
+    if (name.find("2112") == std::string::npos
+        || (name.find("a170") == std::string::npos
+            && name.find("A170") == std::string::npos)
+        || name.find("0104") == std::string::npos)
+      continue;
+    if (mitk::test::PropertyScalarValueEquals(
+          prop.GetPointer(),
+          mitk::SegSourceImageRelationRule::CanonicalPurposeTag()))
+    {
+      purposeTagFound = true;
+      break;
+    }
+  }
+  MITK_TEST_CONDITION(purposeTagFound,
+    "Reloaded seg carries the Purpose-of-Reference Code Meaning with the "
+    "canonical seg-source tag value");
 
   MITK_TEST_END();
 }

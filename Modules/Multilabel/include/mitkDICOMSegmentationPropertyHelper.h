@@ -182,6 +182,55 @@ namespace mitk
                                                   const IPropertyProvider* source,
                                                   bool overwrite = true);
 
+    /**
+     * \brief Migrate a legacy "referenceFiles" StringLookupTable property
+     *        on seg into SegSourceImageRelationRule connections.
+     *
+     * Used by the multi-label seg native-format reader as a one-way
+     * upgrade for segs saved before the property-driven DICOM SEG
+     * rework: their source-image provenance lived in a list of DICOM
+     * file paths and was consumed by the writer directly. The new
+     * writer expects rule-managed properties on the seg, so the reader
+     * loads each file via DCMTK, extracts the identifying SOP / Class /
+     * Series UIDs, groups by source series, and feeds each group to
+     * SegSourceImageRelationRule::Connect.
+     *
+     * Files that cannot be opened are logged via MITK_WARN and skipped
+     * (a missing source file is not a hard failure: the seg still loads;
+     * subsequent DICOM SEG writes either synthesise the missing identity
+     * or emit a standalone SEG). The referenceFiles property is removed
+     * from seg only when at least one file was successfully translated
+     * AND every referenced file was resolved (zero unresolved); otherwise
+     * it is preserved so callers can retry the migration (e.g. after a
+     * network share is remounted).
+     *
+     * No-op when seg carries no referenceFiles property, when the
+     * property's value is empty, or when seg already carries any
+     * SegSourceImageRelationRule connection.
+     *
+     * \pre seg must be a valid pointer.
+     * \return The number of rule connections established.
+     */
+    static std::size_t MigrateLegacyReferenceFilesToRelation(MultiLabelSegmentation* seg);
+
+    /**
+     * \brief Mint a globally unique DICOM-valid UID for a synthetic identifier.
+     *
+     * Single chokepoint for synthesis-time UID minting so a future switch to
+     * an MITK-registered organisation root (with a dedicated "synthetic /
+     * unknown data" subnamespace) is a one-line change in the implementation
+     * without touching call sites.
+     *
+     * Today: routes through DCMTK's `dcmGenerateUniqueIdentifier` under
+     * `SITE_INSTANCE_UID_ROOT` (OFFIS). DICOM-compliant and globally unique,
+     * but not visually identifiable as an MITK placeholder.
+     *
+     * \param kind A short tag describing what the UID is for (e.g. "study",
+     *             "series", "for", "source-instance"). Currently informational
+     *             only; reserved for a future hash-derived subspace.
+     */
+    static std::string MintSyntheticUID(const std::string& kind);
+
     // Placeholder constants used by Complete's synthesis path. Exposed so
     // tests, downstream tooling, and consumers reading a MITK-written SEG
     // can distinguish placeholders from real-world data by string match

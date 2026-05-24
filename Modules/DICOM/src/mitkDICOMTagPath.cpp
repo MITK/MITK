@@ -29,9 +29,13 @@ namespace
     std::regex reg_character("([a-f]+)"); // so only check for lowercase characters here
     if (std::regex_search(hexNumber.str(), reg_character))
     {
-      // hexNumber contains a characters from a-f
-      // needs to be generated with lowercase and uppercase characters
-      resultRegEx << "("
+      // hexNumber contains a-f characters; emit both cases via a
+      // non-capturing alternation. Plain "(...|...)" would silently
+      // introduce an extra capture group that the persistence name /
+      // key templates do not count when they assign $N placeholders,
+      // causing the templates' selection slots to receive the element
+      // id instead of the numeric index they were meant to capture.
+      resultRegEx << "(?:"
         << std::setw(4) << std::setfill('0') << std::hex << tagNumber
         << "|"
         << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << tagNumber << std::nouppercase

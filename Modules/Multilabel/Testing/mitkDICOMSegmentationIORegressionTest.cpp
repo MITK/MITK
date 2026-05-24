@@ -295,36 +295,27 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
 
   // Purpose-of-Reference Code Sequence Code Meaning must survive the
   // round-trip with the canonical seg-source purpose tag as its value.
-  // The DICOM tags-of-interest registration renames the property's key
-  // on load (see mitkSegSourceImageRelationRoundTripTest for the long
-  // form of this caveat) — the rule writes under
-  //   DICOM.0008.2112.[i].0040.a170.[0].0008.0104
-  // but the persistence registration normalises it to
-  //   DICOM.0008.2112.[i].0040.A170.[a170].0008.0104
-  // What matters for round-trip integrity is that the value is preserved
-  // somewhere on the seg under the Source Image Sequence / Purpose code
-  // path, not the exact key form.
-  bool purposeTagFound = false;
-  for (const auto &[name, prop] : *(reloadedSeg->GetPropertyList()->GetMap()))
+  // The DICOM SEG IO path goes through DCMTK-backed read + write; the
+  // rule's Connect_datalayer (re-)stamps the property under the rule's
+  // own lowercase key form on read, and the .mitk-format persistence
+  // template uppercases the element id on reload. Both case forms are
+  // valid post-roundtrip states depending on the IO path; the look-up
+  // below accepts either.
+  const std::string upperKey = "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
+  const std::string lowerKey = "DICOM.0008.2112.[0].0040.a170.[0].0008.0104";
+  auto purposeProp = reloadedSeg->GetConstProperty(upperKey);
+  if (purposeProp.IsNull())
+    purposeProp = reloadedSeg->GetConstProperty(lowerKey);
+  MITK_TEST_CONDITION(purposeProp.IsNotNull(),
+    "Reloaded seg carries the Purpose-of-Reference Code Meaning property "
+    "for the first source-image relation");
+  if (purposeProp.IsNotNull())
   {
-    if (prop.IsNull())
-      continue;
-    if (name.find("2112") == std::string::npos
-        || (name.find("a170") == std::string::npos
-            && name.find("A170") == std::string::npos)
-        || name.find("0104") == std::string::npos)
-      continue;
-    if (mitk::test::PropertyScalarValueEquals(
-          prop.GetPointer(),
-          mitk::SegSourceImageRelationRule::CanonicalPurposeTag()))
-    {
-      purposeTagFound = true;
-      break;
-    }
+    MITK_TEST_CONDITION(mitk::test::PropertyScalarValueEquals(
+        purposeProp.GetPointer(),
+        mitk::SegSourceImageRelationRule::CanonicalPurposeTag()),
+      "Reloaded Purpose-of-Reference Code Meaning matches the canonical seg-source tag");
   }
-  MITK_TEST_CONDITION(purposeTagFound,
-    "Reloaded seg carries the Purpose-of-Reference Code Meaning with the "
-    "canonical seg-source tag value");
 
   MITK_TEST_END();
 }

@@ -149,56 +149,27 @@ namespace
     }
 
     // Purpose-of-Reference Code Sequence Code Meaning is written by the
-    // base SourceImageRelationRule::Connect_datalayer. A serializer that
-    // drops it (e.g. routes DICOM.* properties through a serializer that
-    // requires TemporoSpatialStringProperty) leaves the relation usable
-    // by GetSourceImageRelations but breaks any downstream DICOM-tree
-    // walker.
-    //
-    // Key-name caveat: the property is written by the rule under
-    //   DICOM.0008.2112.[0].0040.a170.[0].0008.0104
-    // but the DICOM tags-of-interest registration in
-    // mitkDICOMTagsOfInterestHelper.cpp registers it via
-    // AddAnySelection(0x0040, 0xa170), which renames the property on the
-    // first round-trip to
-    //   DICOM.0008.2112.[0].0040.A170.[a170].0008.0104
-    // (uppercase element id, element-id wildcard in place of the numeric
-    // selection index). The value survives untouched; only the key form
-    // changes. The rename is a pre-existing inconsistency between the
-    // rule's write path and the persistence registration, out of scope
-    // for the DICOM SEG IO rework. The assertion below tolerates both
-    // key forms — what matters for round-trip is "the property value is
-    // preserved somewhere on the seg," not the exact key under which it
-    // lives.
-    mitk::BaseProperty::ConstPointer purposeProp;
-    for (const auto& [name, prop] : *(loaded->GetPropertyList()->GetMap()))
-    {
-      if (prop.IsNull())
-        continue;
-      if (name.find("2112") == std::string::npos
-          || (name.find("a170") == std::string::npos
-              && name.find("A170") == std::string::npos)
-          || name.find("0104") == std::string::npos)
-        continue;
-      if (mitk::test::PropertyScalarValueEquals(prop.GetPointer(), Rule::CanonicalPurposeTag()))
-      {
-        purposeProp = prop.GetPointer();
-        break;
-      }
-    }
+    // base SourceImageRelationRule::Connect_datalayer under the rule's
+    // own lowercase key "0040.a170". The .mitk persistence path
+    // normalises the element id to uppercase via
+    // DICOMTagPathToPersistenceNameTemplate (std::uppercase), landing
+    // at "0040.A170". The stack format serializes property names
+    // verbatim through JSON, so it preserves the rule's original
+    // lowercase form. Both forms are valid round-trip outputs from
+    // their respective IO paths; the test accepts either.
+    const std::string upperKey = "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
+    const std::string lowerKey = "DICOM.0008.2112.[0].0040.a170.[0].0008.0104";
+    auto purposeProp = loaded->GetConstProperty(upperKey);
     if (purposeProp.IsNull())
-    {
-      std::ostringstream diag;
-      diag << "Purpose-of-Reference Code Meaning (value \""
-           << Rule::CanonicalPurposeTag() << "\") not found anywhere on the "
-           << "reloaded seg. Property keys containing \"2112\" (with raw value):";
-      for (const auto& [name, prop] : *(loaded->GetPropertyList()->GetMap()))
-      {
-        if (name.find("2112") != std::string::npos && prop.IsNotNull())
-          diag << "\n  - \"" << name << "\" = " << prop->GetValueAsString();
-      }
-      CPPUNIT_FAIL(diag.str());
-    }
+      purposeProp = loaded->GetConstProperty(lowerKey);
+    CPPUNIT_ASSERT_MESSAGE("Purpose-of-Reference Code Meaning property "
+                           "must round-trip non-null at either case form",
+                           purposeProp.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Purpose-of-Reference Code Meaning must carry the "
+                           "canonical seg-source purpose tag",
+                           mitk::test::PropertyScalarValueEquals(
+                             purposeProp.GetPointer(),
+                             Rule::CanonicalPurposeTag()));
   }
 }
 

@@ -221,7 +221,7 @@ std::vector<std::pair<size_t,std::string> > mitk::SourceImageRelationRule::GetRe
         if (finding == ignoreItemIndices.end())
         {
           PropertyKeyPath purposePath;
-          purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+          purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", currentKeyPathSelection).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
           auto purposeProp = source->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
           std::string currentPurpose = "";
           if (purposeProp.IsNotNull())
@@ -332,7 +332,15 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
       source->SetProperty(PropertyKeyPathToPropertyName(refClassUIDPath), destClassUIDProp->Clone());
 
       PropertyKeyPath purposePath;
-      purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", newSelectionIndex).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+      // Uppercase "A170" (not "a170"): the .mitk persistence template
+      // emits hex element ids with std::uppercase, so a lowercase write
+      // here diverges from the post-load canonical form and the
+      // property's key drifts across IO paths. The stack-format JSON
+      // writer preserves the in-memory string verbatim, which would
+      // otherwise leave the two paths inconsistent. Tracked in the
+      // follow-up to #798 for the architectural cleanup (move this
+      // rule out of MitkCore so it can construct paths via DICOMTagPath).
+      purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", newSelectionIndex).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
       // TemporoSpatialStringProperty (not plain StringProperty): MITK's
       // .mitk property persistence routes every DICOM.* path through the
       // TemporoSpatialString JSON serializer, which throws on any other

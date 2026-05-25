@@ -295,17 +295,12 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
 
   // Purpose-of-Reference Code Sequence Code Meaning must survive the
   // round-trip with the canonical seg-source purpose tag as its value.
-  // The DICOM SEG IO path goes through DCMTK-backed read + write; the
-  // rule's Connect_datalayer (re-)stamps the property under the rule's
-  // own lowercase key form on read, and the .mitk-format persistence
-  // template uppercases the element id on reload. Both case forms are
-  // valid post-roundtrip states depending on the IO path; the look-up
-  // below accepts either.
-  const std::string upperKey = "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
-  const std::string lowerKey = "DICOM.0008.2112.[0].0040.a170.[0].0008.0104";
-  auto purposeProp = reloadedSeg->GetConstProperty(upperKey);
-  if (purposeProp.IsNull())
-    purposeProp = reloadedSeg->GetConstProperty(lowerKey);
+  // SourceImageRelationRule::Connect_datalayer writes the property at
+  // the canonical uppercase DICOM hex form, so all IO paths converge
+  // on a single key after round-trip.
+  const std::string purposeKey =
+    "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
+  const auto purposeProp = reloadedSeg->GetConstProperty(purposeKey);
   MITK_TEST_CONDITION(purposeProp.IsNotNull(),
     "Reloaded seg carries the Purpose-of-Reference Code Meaning property "
     "for the first source-image relation");

@@ -148,22 +148,15 @@ namespace
                                    expectedClassUID, value);
     }
 
-    // Purpose-of-Reference Code Sequence Code Meaning is written by the
-    // base SourceImageRelationRule::Connect_datalayer under the rule's
-    // own lowercase key "0040.a170". The .mitk persistence path
-    // normalises the element id to uppercase via
-    // DICOMTagPathToPersistenceNameTemplate (std::uppercase), landing
-    // at "0040.A170". The stack format serializes property names
-    // verbatim through JSON, so it preserves the rule's original
-    // lowercase form. Both forms are valid round-trip outputs from
-    // their respective IO paths; the test accepts either.
-    const std::string upperKey = "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
-    const std::string lowerKey = "DICOM.0008.2112.[0].0040.a170.[0].0008.0104";
-    auto purposeProp = loaded->GetConstProperty(upperKey);
-    if (purposeProp.IsNull())
-      purposeProp = loaded->GetConstProperty(lowerKey);
-    CPPUNIT_ASSERT_MESSAGE("Purpose-of-Reference Code Meaning property "
-                           "must round-trip non-null at either case form",
+    // Purpose-of-Reference Code Sequence Code Meaning is written by
+    // SourceImageRelationRule::Connect_datalayer at the canonical
+    // uppercase DICOM hex form so both IO paths (stack JSON and .mitk
+    // persistence template) agree on the property key after round-trip.
+    const std::string purposeKey =
+      "DICOM.0008.2112.[0].0040.A170.[0].0008.0104";
+    const auto purposeProp = loaded->GetConstProperty(purposeKey);
+    CPPUNIT_ASSERT_MESSAGE("Purpose-of-Reference Code Meaning property ("
+                           + purposeKey + ") must round-trip non-null",
                            purposeProp.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE("Purpose-of-Reference Code Meaning must carry the "
                            "canonical seg-source purpose tag",

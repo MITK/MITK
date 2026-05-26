@@ -5,6 +5,6 @@ MITK_CREATE_MODULE(PET
   DEPENDS
     PUBLIC MitkCore MitkDICOM
   PACKAGE_DEPENDS
-    PRIVATE Boost DCMTK|ofstd+dcmdata
+    PRIVATE DCMTK|ofstd+dcmdata
 )
 

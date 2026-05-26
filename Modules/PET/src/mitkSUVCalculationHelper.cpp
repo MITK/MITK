@@ -24,17 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkDICOMTagPath.h>
 #include <mitkDICOMProperty.h>
+#include <mitkDICOMTimeUtil.h>
 #include <mitkLog.h>
-
-#define BOOST_DATE_TIME_NO_LIB
-//Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild
-//It is necessary because BOOST_ALL_DYN_LINK overwrites BOOST_DATE_TIME_NO_LIB
-#if defined(BOOST_ALL_DYN_LINK)
-#undef BOOST_ALL_DYN_LINK
-#endif
-
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-
 
 std::vector<double> mitk::GetRadionuclideHalfLife(mitk::BaseData* data)
 {
@@ -131,34 +122,6 @@ bool ConvertDICOMDateTimeString(const std::string& dateString,
   return result.good();
 }
 
-boost::posix_time::ptime ConvertOFDateTimeToPTime(const OFDateTime& time)
-{
-  const boost::gregorian::date boostDate(
-    time.getDate().getYear(), time.getDate().getMonth(), time.getDate().getDay());
-
-  const boost::posix_time::time_duration boostTime =
-    boost::posix_time::hours(time.getTime().getHour())
-    + boost::posix_time::minutes(time.getTime().getMinute())
-    + boost::posix_time::seconds(time.getTime().getIntSecond())
-    + boost::posix_time::milliseconds(time.getTime().getMilliSecond());
-
-  boost::posix_time::ptime result(boostDate, boostTime);
-
-  return result;
-}
-
-double ComputeMiliSecDuration(const OFDateTime& start, const OFDateTime& stop)
-{
-  const boost::posix_time::ptime startTime = ConvertOFDateTimeToPTime(start);
-  const boost::posix_time::ptime stopTime = ConvertOFDateTimeToPTime(stop);
-
-  ::boost::posix_time::time_duration duration = stopTime - startTime;
-
-  double result = duration.total_milliseconds();
-
-  return result;
-}
-
 mitk::DecayTimeMapType mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(mitk::BaseData* data)
 {
 
@@ -236,7 +199,7 @@ mitk::DecayTimeMapType mitk::DeduceDecayTime_AcquisitionMinusStartSliceResolved(
         }
 
 
-        result[timestep][sliceIndex] = ComputeMiliSecDuration(startTime, acqTime)/1000.0;
+        result[timestep][sliceIndex] = mitk::ComputeMiliSecDuration(startTime, acqTime)/1000.0;
       }
     }
   }

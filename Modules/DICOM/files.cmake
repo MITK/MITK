@@ -39,6 +39,7 @@ set(CPP_FILES
   mitkIDICOMTagsOfInterest.cpp
   mitkDICOMTagsOfInterestAddHelper.cpp
   mitkDICOMTagPath.cpp
+  mitkDICOMTimeUtil.cpp
   mitkDICOMProperty.cpp
   mitkDICOMFilesHelper.cpp
   mitkDICOMIOMetaInformationPropertyConstants.cpp

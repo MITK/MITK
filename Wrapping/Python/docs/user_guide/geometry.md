@@ -13,8 +13,8 @@ time step 0:
 ```python
 print(img.spacing)            # (sx, sy, sz)
 print(img.origin)             # (ox, oy, oz)
-print(img.direction)          # 3x3 direction cosine matrix
-print(img.direction_cosines)  # same as direction
+print(img.direction)          # 3x3 direction cosine matrix (NumPy array)
+print(img.direction_cosines)  # same values, flat 9-element tuple (row-major)
 
 img.spacing = (0.8, 0.8, 1.5)
 img.origin  = (0.0, 0.0, -100.0)

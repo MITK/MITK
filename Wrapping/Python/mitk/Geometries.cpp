@@ -41,8 +41,6 @@ image or data object to a continuous world coordinate system. It carries:
 :py:class:`Geometry3D`, :py:class:`PlaneGeometry`, and
 :py:class:`SlicedGeometry3D`.
 )")
-    .def_static("new", &BaseGeometry::New,
-      "Construct a new identity-initialized geometry.")
     .def_property("image_geometry", &BaseGeometry::GetImageGeometry, &BaseGeometry::SetImageGeometry,
       R"(Whether this geometry is interpreted as an image geometry.
 

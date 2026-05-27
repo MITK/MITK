@@ -178,7 +178,6 @@ Returns:
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);
     },
-    py::return_value_policy::reference,
     R"(Live, mutable view of the list's properties.
 
 Returns a :py:class:`mitk.property_view.PropertyView`, a ``MutableMapping``

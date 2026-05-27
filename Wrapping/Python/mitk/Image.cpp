@@ -245,14 +245,22 @@ Image::Pointer ImageFromNumpy(py::array array,
       img->SetVolume(base + static_cast<size_t>(t) * bytesPerVolume, static_cast<int>(t));
   }
 
-  if (spacing.has_value())
-    SetSpacing(img->GetTimeGeometry(), *spacing, 0);
+  // Apply geometry overrides to every time step so a 4D image is not left
+  // with inconsistent per-time-step geometries.
+  auto* tg = img->GetTimeGeometry();
+  const auto numSteps = tg->CountTimeSteps();
 
-  if (origin.has_value())
-    SetOrigin(img->GetTimeGeometry(), *origin, 0);
+  for (mitk::TimeStepType t = 0; t < numSteps; ++t)
+  {
+    if (spacing.has_value())
+      SetSpacing(tg, *spacing, t);
 
-  if (direction.has_value())
-    SetDirection(img->GetTimeGeometry(), *direction, 0);
+    if (origin.has_value())
+      SetOrigin(tg, *origin, t);
+
+    if (direction.has_value())
+      SetDirection(tg, *direction, t);
+  }
 
   return img;
 }
@@ -304,8 +312,8 @@ Construction is overloaded by argument type:
 - ``mitk.Image()`` constructs an empty image; call :py:meth:`initialize`
   before reading or writing pixel data.
 - ``mitk.Image(path)`` loads from disk (accepts ``str`` or ``pathlib.Path``).
-- ``mitk.Image(array, spacing=..., origin=..., direction=...)`` wraps a
-  NumPy array.
+- ``mitk.Image(array, spacing=..., origin=..., direction=...)`` constructs
+  an image from a copy of a NumPy array (the image owns its buffer).
 
 Equivalent factory methods :py:meth:`from_numpy` and :py:meth:`load` are
 also available.
@@ -453,7 +461,13 @@ Equivalent to ``img.as_numpy(writeable=False, time_step=0)``.
     .def("as_numpy",
       [](Image& img, bool use_accessor, bool writeable, mitk::TimeStepType time_step) {
         if (use_accessor)
+        {
+          if (time_step != 0)
+            throw py::value_error(
+              "as_numpy: time_step != 0 is not supported with use_accessor=True; "
+              "use use_accessor=False to select a specific time step");
           return AsNumpyAccessor(img, writeable);
+        }
         return AsNumpyDirect(img, writeable, time_step);
       },
       py::arg("use_accessor") = false,
@@ -478,14 +492,16 @@ Args:
         Defaults to False (direct, unlocked).
     writeable: If True, return a writable view; otherwise read-only.
         Defaults to True.
-    time_step: Time-step index for 4D images. Ignored when
-        ``use_accessor=True``. Defaults to 0.
+    time_step: Time-step index for 4D images. Must be 0 when
+        ``use_accessor=True``; for time-step-specific access, use
+        ``use_accessor=False``. Defaults to 0.
 
 Returns:
     NumPy array sharing memory with the image buffer.
 
 Raises:
     mitk.Exception: If the image data cannot be accessed.
+    ValueError: If ``use_accessor=True`` and ``time_step != 0``.
 
 Examples:
     >>> arr = img.as_numpy()
@@ -589,7 +605,6 @@ Raises:
       py::object PropertyView = propertyViewModule.attr("PropertyView");
       return PropertyView(self);
     },
-    py::return_value_policy::reference,
     R"(Live, mutable view of the image's properties.
 
 Returns a :py:class:`mitk.property_view.PropertyView`, a ``MutableMapping``

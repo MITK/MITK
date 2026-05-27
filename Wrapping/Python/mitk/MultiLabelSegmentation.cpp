@@ -1097,14 +1097,19 @@ Args:
       py::arg("label"), py::arg("group") = 0,
       R"(Add an existing :py:class:`Label` to the segmentation.
 
+The input *label* is **cloned**; the segmentation stores the copy. Edits
+applied to the original *label* after this call do not affect the
+segmentation. To modify the in-segmentation label, work with the returned
+:py:class:`Label` instance instead.
+
 Args:
-    label: The label to add. If its pixel value collides with an existing
-        label, a new value is assigned.
+    label: The label to clone and add. If its pixel value collides with
+        an existing label, a new value is assigned to the clone.
     group: Target group index (default 0).
 
 Returns:
-    The added label (its assigned pixel value may differ from the
-    original).
+    The cloned label as stored in the segmentation (its assigned pixel
+    value may differ from the input). Use this object for further edits.
 )")
     .def("add_label",
       [](MultiLabelSegmentation& seg, const std::string& name,
@@ -1412,9 +1417,10 @@ Returns:
       R"(Build a class-name map for one group.
 
 Returns a tuple ``(image, id_to_class_name)`` where *image* is a remapped
-image whose pixel values are dense IDs (0, 1, 2, ...), and
-*id_to_class_name* is a dict mapping each new ID to the corresponding
-label class name.
+image whose pixel values are dense IDs (``1, 2, 3, ...``), and
+*id_to_class_name* is a dict keyed by those new IDs mapping to the
+corresponding label class name. Pixel value ``0`` is reserved for
+unlabeled (background) voxels and is not present in the returned map.
 
 Args:
     group: Group index.
@@ -1424,7 +1430,8 @@ Args:
 Returns:
     A 2-tuple ``(image, class_name_map)`` where *image* is an
     :py:class:`Image` and *class_name_map* is a ``dict[int, str]``
-    mapping label value to class name.
+    mapping the remapped dense ID to its class name (background ID ``0``
+    is omitted).
 )")
 
     .def("split_labels_by_group",

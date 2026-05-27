@@ -55,8 +55,8 @@ namespace mitk
     //====== General study ======
     // Add DICOM Tag (0020,000D) Study Instance UID; no default --> MANDATORY!
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0020, 0x000D));
-    // Add DICOM Tag (0080,0020) Study Date; no default (think about "today")
-    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0080, 0x0020));
+    // Add DICOM Tag (0008,0020) Study Date; no default (think about "today")
+    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x0020));
     // Add DICOM Tag (0008,0050) Accession Number; no default
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x0050));
     // Add DICOM Tag (0008,1030) Study Description; no default

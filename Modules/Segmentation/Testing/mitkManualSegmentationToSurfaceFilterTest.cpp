@@ -80,7 +80,12 @@ public:
     m_Filter->Update();
     mitk::Surface::Pointer computedOutput = m_Filter->GetOutput();
 
-    MITK_ASSERT_EQUAL(computedOutput, m_ReferenceSurface, "Computed equals the reference?");
+    // The smoothing/marching-cubes/decimation/smoothing pipeline accumulates
+    // FP rounding differences across architectures (e.g. FMA on ARM64).
+    // Use a looser tolerance than mitk::eps; the check compares squared
+    // distance, so 1e-10 corresponds to ~1e-5 in linear vertex distance.
+    CPPUNIT_ASSERT_MESSAGE("Computed equals the reference?",
+                           mitk::Equal(*(computedOutput), *(m_ReferenceSurface), 1e-10, true));
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkManualSegmentationToSurfaceFilter)

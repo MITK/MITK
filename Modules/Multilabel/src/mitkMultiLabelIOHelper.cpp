@@ -618,17 +618,14 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label
   j["locked"] = label->GetLocked();
   j["opacity"] = label->GetOpacity();
   j["visible"] = label->GetVisible();
-  // tracking_id and tracking_uid are serialised whenever the property is
-  // present, even when its value is the empty string:
-  // mitk::DICOMSegmentationIO::DoRead deliberately sets empty strings to
-  // suppress mitk::Label's automatic UID generation, and dropping the keys
-  // on save would silently re-arm auto-generation on the next load. Labels
-  // that were never told they have tracking info keep the keys out of the
-  // JSON so the property map round-trips faithfully.
-  const auto* propertyMap = label->GetMap();
-  if (propertyMap->find("tracking_id") != propertyMap->end())
+  // Only emit tracking keys when the value is non-empty. Has*() on the
+  // loaded label then reflects "source carried a real value", uniformly
+  // across DICOM SEG and native JSON. mitk::Label has no UID auto-
+  // generation; the older empty-string-stamp pattern guarded against a
+  // behaviour that does not exist.
+  if (!label->GetTrackingID().empty())
     j["tracking_id"] = label->GetTrackingID();
-  if (propertyMap->find("tracking_uid") != propertyMap->end())
+  if (!label->GetTrackingUID().empty())
     j["tracking_uid"] = label->GetTrackingUID();
   if (!label->GetDescription().empty())
     j["description"] = label->GetDescription();
@@ -778,13 +775,17 @@ mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nl
     else if (internalKey == "tracking_uid")
     {
       std::string tracking_uid;
-      if (GetValueFromJson(labelJson, "tracking_uid", tracking_uid))
+      // Skip the setter on empty values: legacy native JSON files stamped
+      // empty strings to suppress a non-existent UID auto-generation. After
+      // alignment with the DICOM SEG reader, HasTrackingUID() == true means
+      // a real value was carried.
+      if (GetValueFromJson(labelJson, "tracking_uid", tracking_uid) && !tracking_uid.empty())
         resultLabel->SetTrackingUID(tracking_uid);
     }
     else if (internalKey == "tracking_id")
     {
       std::string tracking_id;
-      if (GetValueFromJson(labelJson, "tracking_id", tracking_id))
+      if (GetValueFromJson(labelJson, "tracking_id", tracking_id) && !tracking_id.empty())
         resultLabel->SetTrackingID(tracking_id);
     }
     else if (internalKey == "description")

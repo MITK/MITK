@@ -89,8 +89,13 @@ namespace
   // so dcmqi sees non-empty frames, and optionally the strict-mode
   // identity-tag set. No source-image relation is attached here; callers
   // layer that on top per the case they exercise.
+  //
+  // withTracking / withSegProperty toggle the per-label DICOM Type 3 / Type 1
+  // metadata so individual tests can exercise the writer's absence paths.
   mitk::MultiLabelSegmentation::Pointer BuildBaseSeg(bool stampIdentity = true,
-                                                     unsigned char labelValue = 1)
+                                                     unsigned char labelValue = 1,
+                                                     bool withTracking = true,
+                                                     bool withSegProperty = true)
   {
     auto geometryImage = mitk::Image::New();
     unsigned int dim[3] = {4u, 4u, 3u};
@@ -104,10 +109,16 @@ namespace
     label->SetValue(labelValue);
     label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
     label->SetAlgorithmName("WriterTest");
-    label->SetSegmentedPropertyCategory(mitk::DICOMCodeSequence("T-D0050", "SRT", "Tissue"));
-    label->SetSegmentedPropertyType(mitk::DICOMCodeSequenceWithModifiers("T-D0050", "SRT", "Tissue"));
-    label->SetTrackingID("track-id");
-    label->SetTrackingUID("track-uid");
+    if (withSegProperty)
+    {
+      label->SetSegmentedPropertyCategory(mitk::DICOMCodeSequence("T-D0050", "SRT", "Tissue"));
+      label->SetSegmentedPropertyType(mitk::DICOMCodeSequenceWithModifiers("T-D0050", "SRT", "Tissue"));
+    }
+    if (withTracking)
+    {
+      label->SetTrackingID("track-id");
+      label->SetTrackingUID("track-uid");
+    }
     seg->AddLabel(label, 0, true, true);
 
     // dcmqi skips empty slices and produces no DICOM SEG if every slice is
@@ -163,9 +174,11 @@ namespace
   // exactly onto the seg's three slices.
   mitk::MultiLabelSegmentation::Pointer BuildSegWithRule(bool stampIdentity = true,
                                                           const std::string& seriesUID = "1.2.826.0.1.3680043.10.999.2.1",
-                                                          unsigned char labelValue = 1)
+                                                          unsigned char labelValue = 1,
+                                                          bool withTracking = true,
+                                                          bool withSegProperty = true)
   {
-    auto seg = BuildBaseSeg(stampIdentity, labelValue);
+    auto seg = BuildBaseSeg(stampIdentity, labelValue, withTracking, withSegProperty);
     AttachDicomSourceRelation(seg, seriesUID);
     return seg;
   }
@@ -222,6 +235,92 @@ namespace
     mitk::IOUtil::Save(seg, path, options);
     return path;
   }
+
+  // Snapshot of one SegmentSequence item as read directly via DCMTK. Code-
+  // triple fields are empty strings when the surrounding sequence is absent;
+  // hasTrackingID / hasTrackingUID separate "absent" from "present but empty".
+  struct SegmentItemView
+  {
+    bool hasTrackingID = false;
+    std::string trackingID;
+    bool hasTrackingUID = false;
+    std::string trackingUID;
+    std::string categoryCodeValue, categoryCodeScheme, categoryCodeMeaning;
+    std::string typeCodeValue, typeCodeScheme, typeCodeMeaning;
+    std::string typeModifierCodeValue, typeModifierCodeScheme, typeModifierCodeMeaning;
+  };
+
+  void ReadCodeTriple(DcmItem* parent, const DcmTagKey& seqTag,
+                      std::string& outValue, std::string& outScheme, std::string& outMeaning)
+  {
+    DcmSequenceOfItems* seq = nullptr;
+    if (parent->findAndGetSequence(seqTag, seq).bad() || seq == nullptr)
+      return;
+    DcmItem* item = seq->getItem(0);
+    if (item == nullptr)
+      return;
+    OFString tmp;
+    if (item->findAndGetOFString(DCM_CodeValue, tmp).good())
+      outValue = tmp.c_str();
+    if (item->findAndGetOFString(DCM_CodingSchemeDesignator, tmp).good())
+      outScheme = tmp.c_str();
+    if (item->findAndGetOFString(DCM_CodeMeaning, tmp).good())
+      outMeaning = tmp.c_str();
+  }
+
+  // Navigate (0062,0002) SegmentSequence -> item[segmentNumber-1] and read
+  // the per-segment code triples + Tracking ID/UID presence. The plan's
+  // assertions about DICOM-level absence (Tracking ID/UID omitted) and the
+  // unknown-code fallback cannot be made through dcmqi without descending
+  // into the file, so this helper does that walk directly.
+  SegmentItemView ReadSegmentItem(const std::string& segPath, unsigned int segmentNumber)
+  {
+    SegmentItemView view;
+    DcmFileFormat ff;
+    if (ff.loadFile(segPath.c_str()).bad())
+      return view;
+    auto* dataset = ff.getDataset();
+    DcmSequenceOfItems* segmentSeq = nullptr;
+    if (dataset->findAndGetSequence(DCM_SegmentSequence, segmentSeq).bad() || segmentSeq == nullptr)
+      return view;
+    DcmItem* item = segmentSeq->getItem(segmentNumber - 1);
+    if (item == nullptr)
+      return view;
+
+    OFString tmp;
+    if (item->findAndGetOFString(DCM_TrackingID, tmp).good())
+    {
+      view.hasTrackingID = true;
+      view.trackingID = tmp.c_str();
+    }
+    if (item->findAndGetOFString(DCM_TrackingUID, tmp).good())
+    {
+      view.hasTrackingUID = true;
+      view.trackingUID = tmp.c_str();
+    }
+
+    ReadCodeTriple(item, DCM_SegmentedPropertyCategoryCodeSequence,
+                   view.categoryCodeValue, view.categoryCodeScheme, view.categoryCodeMeaning);
+    ReadCodeTriple(item, DCM_SegmentedPropertyTypeCodeSequence,
+                   view.typeCodeValue, view.typeCodeScheme, view.typeCodeMeaning);
+
+    // SegmentedPropertyTypeModifierCodeSequence nests inside the Type code
+    // sequence's item per PS3.3 Segment Description Macro, not at the
+    // segment-item level.
+    DcmSequenceOfItems* typeSeq = nullptr;
+    if (item->findAndGetSequence(DCM_SegmentedPropertyTypeCodeSequence, typeSeq).good()
+        && typeSeq != nullptr)
+    {
+      if (DcmItem* typeItem = typeSeq->getItem(0); typeItem != nullptr)
+      {
+        ReadCodeTriple(typeItem, DCM_SegmentedPropertyTypeModifierCodeSequence,
+                       view.typeModifierCodeValue,
+                       view.typeModifierCodeScheme,
+                       view.typeModifierCodeMeaning);
+      }
+    }
+    return view;
+  }
 }
 
 class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
@@ -240,6 +339,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(MultiSourceSegRoundTripPreservesAtLeastOneRelation);
   MITK_TEST(MigrateLegacyReferenceFilesIsNoOpWithoutProperty);
   MITK_TEST(MigrateLegacyReferenceFilesSkipsWhenRuleAlreadyPresent);
+  MITK_TEST(WriteSucceedsWithoutTrackingFields);
+  MITK_TEST(WriteSucceedsWithoutSegPropertyCategoryAndType);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -530,6 +631,83 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "Existing referenceFiles property survives the early-out (no destructive cleanup on skip)",
       seg->GetProperty("referenceFiles").IsNotNull());
+  }
+
+  // Tracking ID/UID are DICOM Type 3. A label with no tracking properties
+  // must write successfully in strict mode and the resulting SEG must not
+  // carry (0062,0020)/(0062,0021) for that segment; reloading the SEG must
+  // leave HasTrackingID/UID false on the label.
+  //
+  // SegmentSequence item 1 is dcmqi's auto-inserted "Background" segment
+  // (labelValue 0); the user's label "L" lands at item 2.
+  void WriteSucceedsWithoutTrackingFields()
+  {
+    auto seg = BuildSegWithRule(/*stampIdentity=*/true,
+                                "1.2.826.0.1.3680043.10.999.5.1",
+                                /*labelValue=*/1,
+                                /*withTracking=*/false,
+                                /*withSegProperty=*/true);
+    CPPUNIT_ASSERT_MESSAGE("Strict-mode Validate accepts a seg without per-label tracking",
+                           Helper::Validate(seg).empty());
+
+    mitk::IFileWriter::Options options;
+    const auto path = WriteSegToTempFile(seg, options, "no-tracking");
+
+    const auto view = ReadSegmentItem(path, 2);
+    CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0020) when source label had no tracking",
+                           !view.hasTrackingID);
+    CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0021) when source label had no tracking",
+                           !view.hasTrackingUID);
+
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData",
+                           loaded.size() == 1);
+    const auto* loadedSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Round-trip load produced a MultiLabelSegmentation",
+                           loadedSeg != nullptr);
+    const auto loadedLabels = loadedSeg->GetConstLabelsByValue(loadedSeg->GetLabelValuesByGroup(0));
+    CPPUNIT_ASSERT_MESSAGE("Reloaded seg has one label", loadedLabels.size() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Reloaded label reports HasTrackingID() == false",
+                           !loadedLabels.front()->HasTrackingID());
+    CPPUNIT_ASSERT_MESSAGE("Reloaded label reports HasTrackingUID() == false",
+                           !loadedLabels.front()->HasTrackingUID());
+  }
+
+  // Segmented Property Category/Type are DICOM Type 1 but the writer's
+  // unknown-code fallback supplies an honest value when the label has none.
+  // Strict mode must accept the absence; the written SEG must carry the
+  // unknown SCT triple verbatim. Regression gate against re-introducing the
+  // historical M-01000 / M-03000 SRT defaults.
+  void WriteSucceedsWithoutSegPropertyCategoryAndType()
+  {
+    auto seg = BuildSegWithRule(/*stampIdentity=*/true,
+                                "1.2.826.0.1.3680043.10.999.5.2",
+                                /*labelValue=*/1,
+                                /*withTracking=*/true,
+                                /*withSegProperty=*/false);
+    CPPUNIT_ASSERT_MESSAGE("Strict-mode Validate accepts a seg without per-label Cat/Type",
+                           Helper::Validate(seg).empty());
+
+    mitk::IFileWriter::Options options;
+    const auto path = WriteSegToTempFile(seg, options, "no-segproperty");
+
+    // Item 1 is dcmqi's auto-inserted "Background" segment; the user's label
+    // "L" lands at item 2.
+    const auto view = ReadSegmentItem(path, 2);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code value", std::string("49755003"), view.categoryCodeValue);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category coding scheme", std::string("SCT"), view.categoryCodeScheme);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code meaning",
+                                 std::string("Morphologically altered structure"), view.categoryCodeMeaning);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type code value", std::string("49755003"), view.typeCodeValue);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type coding scheme", std::string("SCT"), view.typeCodeScheme);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type code meaning",
+                                 std::string("Morphologically altered structure"), view.typeCodeMeaning);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code value",
+                                 std::string("261665006"), view.typeModifierCodeValue);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier coding scheme",
+                                 std::string("SCT"), view.typeModifierCodeScheme);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Type modifier code meaning",
+                                 std::string("Unknown (qualifier value)"), view.typeModifierCodeMeaning);
   }
 };
 

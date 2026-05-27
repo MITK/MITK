@@ -46,6 +46,7 @@ class mitkMultiLabelIOHelperTestSuite : public mitk::TestFixture
   MITK_TEST(TestSaveAndLoadJSONPreset);
   MITK_TEST(TestLoadLegacyXMLPreset);
   MITK_TEST(TestLoadJSONPreset);
+  MITK_TEST(TestLabelJSONTrackingRoundTrip);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -227,6 +228,55 @@ public:
     labels = m_Segmentation->GetLabelValuesByName(1, "Label 4");
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong label values retrieved for \"Label 4\" in group 1",
       mitk::MultiLabelSegmentation::LabelValueVectorType({ 13 }), labels);
+  }
+
+  // tracking_id / tracking_uid round-trip: serialise omits the keys when
+  // the property is absent OR explicitly empty; deserialise sets the
+  // property only for non-empty values. Has*() therefore signals "a real
+  // tracking value was carried" uniformly across native JSON and DICOM SEG.
+  void TestLabelJSONTrackingRoundTrip()
+  {
+    auto absentLabel = mitk::Label::New();
+    absentLabel->SetName("absent");
+    auto absentJson = mitk::MultiLabelIOHelper::SerializeLabelToJSON(absentLabel);
+    CPPUNIT_ASSERT_MESSAGE("Absent tracking_id must not be emitted",
+                           !absentJson.contains("tracking_id"));
+    CPPUNIT_ASSERT_MESSAGE("Absent tracking_uid must not be emitted",
+                           !absentJson.contains("tracking_uid"));
+
+    auto emptyStampedLabel = mitk::Label::New();
+    emptyStampedLabel->SetName("legacy-empty");
+    emptyStampedLabel->SetTrackingID("");
+    emptyStampedLabel->SetTrackingUID("");
+    auto emptyJson = mitk::MultiLabelIOHelper::SerializeLabelToJSON(emptyStampedLabel);
+    CPPUNIT_ASSERT_MESSAGE("Empty-string tracking_id must not be emitted",
+                           !emptyJson.contains("tracking_id"));
+    CPPUNIT_ASSERT_MESSAGE("Empty-string tracking_uid must not be emitted",
+                           !emptyJson.contains("tracking_uid"));
+
+    nlohmann::json legacyJson;
+    legacyJson["name"] = "from-legacy";
+    legacyJson["value"] = 1;
+    legacyJson["tracking_id"] = "";
+    legacyJson["tracking_uid"] = "";
+    auto legacyLoaded = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(legacyJson);
+    CPPUNIT_ASSERT_MESSAGE("Empty-string tracking_id in legacy JSON must not set the property",
+                           !legacyLoaded->HasTrackingID());
+    CPPUNIT_ASSERT_MESSAGE("Empty-string tracking_uid in legacy JSON must not set the property",
+                           !legacyLoaded->HasTrackingUID());
+
+    nlohmann::json realJson;
+    realJson["name"] = "with-tracking";
+    realJson["value"] = 1;
+    realJson["tracking_id"] = "real-id";
+    realJson["tracking_uid"] = "real-uid";
+    auto realLoaded = mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(realJson);
+    CPPUNIT_ASSERT_MESSAGE("Non-empty tracking_id must round-trip into HasTrackingID()",
+                           realLoaded->HasTrackingID());
+    CPPUNIT_ASSERT_EQUAL(std::string("real-id"), realLoaded->GetTrackingID());
+    CPPUNIT_ASSERT_MESSAGE("Non-empty tracking_uid must round-trip into HasTrackingUID()",
+                           realLoaded->HasTrackingUID());
+    CPPUNIT_ASSERT_EQUAL(std::string("real-uid"), realLoaded->GetTrackingUID());
   }
 };
 

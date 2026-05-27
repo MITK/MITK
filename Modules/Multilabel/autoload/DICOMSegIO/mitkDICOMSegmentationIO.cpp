@@ -1355,12 +1355,6 @@ namespace mitk
                 anatomicRegion.GetScheme(), anatomicRegion.GetMeaning());
               handler.setBodyPartExamined(anatomicRegion.GetMeaning());
             }
-            else
-            {
-              // some default values
-              segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
-              handler.setBodyPartExamined("Mass");
-            }
 
             if (anatomicRegion.GetModifierCount() > 0)
             {
@@ -1387,9 +1381,12 @@ namespace mitk
             }
             else
             {
-              // some default values
+              // SEG IOD requires (0062,0003) (Type 1). Emit an honest "unknown"
+              // stand-in rather than blocking the write or claiming specific
+              // semantics. BodyPartExamined is deliberately not stamped here;
+              // an "Unknown" body part is worse than the field staying empty.
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
-                "M-01000", "SRT", "Morphologically Altered Structure");
+                "49755003", "SCT", "Morphologically altered structure");
             }
           }
 
@@ -1403,8 +1400,14 @@ namespace mitk
             }
             else
             {
-              // some default values
-              segmentAttribute->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
+              // SEG IOD requires (0062,000F) (Type 1). Pair the same SCT base
+              // as Category with an "Unknown" modifier so the output reads
+              // "morphological alteration of unspecified kind" rather than
+              // picking a specific morphology.
+              segmentAttribute->setSegmentedPropertyTypeCodeSequence(
+                "49755003", "SCT", "Morphologically altered structure");
+              segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
+                "261665006", "SCT", "Unknown (qualifier value)");
             }
 
             if (segType.has_value() && segType->GetModifierCount() > 0)
@@ -1509,10 +1512,14 @@ namespace mitk
       label->SetAnatomicRegion(code);
     }
 
-    //we always set the tracking information (even if it is an empty string),
-    //as MITK label would otherwise derive an tracking ID automatically
-    label->SetTrackingID(segmentAttribute->getTrackingIdentifier());
-    label->SetTrackingUID(segmentAttribute->getTrackingUniqueIdentifier());
+    // Only set the tracking property when the source DICOM carried a
+    // non-empty value, so HasTrackingID/UID reflects the source truthfully.
+    const auto readTrackingID = segmentAttribute->getTrackingIdentifier();
+    if (!readTrackingID.empty())
+      label->SetTrackingID(readTrackingID);
+    const auto readTrackingUID = segmentAttribute->getTrackingUniqueIdentifier();
+    if (!readTrackingUID.empty())
+      label->SetTrackingUID(readTrackingUID);
   }
 
   DICOMSegmentationIO *DICOMSegmentationIO::IOClone() const { return new DICOMSegmentationIO(*this); }

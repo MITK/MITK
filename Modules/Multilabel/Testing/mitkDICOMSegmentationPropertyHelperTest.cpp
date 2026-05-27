@@ -92,6 +92,7 @@ class mitkDICOMSegmentationPropertyHelperTestSuite : public mitk::TestFixture
   MITK_TEST(CompleteThrowsOnNullSeg);
   MITK_TEST(ValidateClearsAfterCompleteIdentity);
   MITK_TEST(CompleteFillIfMissingPreservesMitkBranding);
+  MITK_TEST(ValidateAcceptsAbsentLabelLevelOptionalTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -238,6 +239,35 @@ public:
     // placeholder. Fill-only-if-missing preserves the branding value.
     CPPUNIT_ASSERT_EQUAL(std::string("MITK"), ReadStringProp(seg, 0x0070, 0x0084));
     CPPUNIT_ASSERT_EQUAL(std::string("MITK Segmentation"), ReadStringProp(seg, 0x0008, 0x103E));
+  }
+
+  // Tracking ID/UID (Type 3) and Segmented Property Category/Type (Type 1
+  // with a writer-side unknown-code fallback) are no longer required by the
+  // per-label part of the Validate contract. Only Algorithm Type/Name remain.
+  void ValidateAcceptsAbsentLabelLevelOptionalTags()
+  {
+    const auto seg = MakeFreshSeg();
+    auto geometryImage = mitk::Image::New();
+    unsigned int dim[3] = {2u, 2u, 2u};
+    geometryImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
+    seg->Initialize(geometryImage);
+
+    Helper::CompletionOptions options;
+    options.synthesizeMissingIdentity = true;
+    options.deriveGeometryFromSegmentation = true;
+    Helper::Complete(seg, options);
+
+    auto label = mitk::Label::New();
+    label->SetName("L");
+    label->SetValue(1);
+    label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label->SetAlgorithmName("PropertyHelperTest");
+    seg->AddLabel(label, 0, true, true);
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "Validate must not report any missing items for a label with only "
+      "Algorithm Type and Algorithm Name set.",
+      Helper::Validate(seg).empty());
   }
 };
 

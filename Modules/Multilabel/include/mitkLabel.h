@@ -178,10 +178,10 @@ namespace mitk
     /**
      * \brief Returns whether a tracking ID property is set on the label.
      *
-     * Distinguishes "property absent" from "property present but empty"
-     * (the DICOM SEG reader deliberately stamps an empty tracking ID to
-     * suppress automatic UID generation). GetTrackingID returns "" in
-     * both cases.
+     * Distinguishes "property absent" from "property present but empty".
+     * GetTrackingID returns "" in both cases. Persistence readers set the
+     * property only when the source carried a non-empty value, so a true
+     * result indicates a real tracking identifier on the source.
      */
     bool HasTrackingID() const;
 
@@ -202,6 +202,9 @@ namespace mitk
      *
      * Distinguishes "property absent" from "property present but empty"
      * (see HasTrackingID).
+     * GetTrackingUID returns "" in both cases. Persistence readers set the
+     * property only when the source carried a non-empty value, so a true
+     * result indicates a real tracking UID on the source.
      */
     bool HasTrackingUID() const;
 

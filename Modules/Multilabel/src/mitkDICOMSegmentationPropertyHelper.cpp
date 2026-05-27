@@ -240,23 +240,11 @@ mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* se
     if (label->GetAlgorithmName().empty())
       AddLabelMissing(missing, label->GetValue(), "Algorithm Name (0062,0009)");
 
-    if (!label->GetSegmentedPropertyCategory().has_value())
-      AddLabelMissing(missing, label->GetValue(),
-        "Segmented Property Category (0062,0003)");
-
-    if (!label->GetSegmentedPropertyType().has_value())
-      AddLabelMissing(missing, label->GetValue(),
-        "Segmented Property Type (0062,000F)");
-
-    // Presence (not non-emptiness) is the check. The DICOM SEG reader
-    // deliberately stamps empty tracking ID/UID to suppress MITK's
-    // automatic UID generation; those labels carry the property in the
-    // map with an empty value and must be treated as "set, not missing".
-    if (!label->HasTrackingID())
-      AddLabelMissing(missing, label->GetValue(), "Tracking ID (0062,0020)");
-
-    if (!label->HasTrackingUID())
-      AddLabelMissing(missing, label->GetValue(), "Tracking UID (0062,0021)");
+    // Tracking ID/UID (0062,0020/0062,0021) are Type 3 in the SEG IOD's
+    // Segment Description Macro, so absence is DICOM-legal. Segmented
+    // Property Category/Type (0062,0003/0062,000F) are Type 1, but the
+    // writer fills them with an explicit "unknown" code when absent so
+    // strict mode does not need to demand a user-supplied value here.
   }
 
   return missing;

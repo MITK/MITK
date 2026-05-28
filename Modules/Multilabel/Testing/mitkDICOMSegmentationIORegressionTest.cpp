@@ -248,12 +248,12 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
   // DICOMIOHelper::SetProperties does not surface every Validate-required
   // tag on the loaded seg (FrameOfReferenceUID in particular); synthetic
   // mode is the realistic default for "save anywhere" of an arbitrary
-  // loaded SEG. The on-the-wire SOP class shifts to Sup 243 labelmap on
-  // output (the writer's default), which is the documented behaviour
-  // change in the user-facing changelog. Voxel-level equivalence is
-  // pinned by the per-segment hash baseline above; this assertion only
-  // adds the write+reload survivability that was impossible before this
-  // stage.
+  // loaded SEG. The on-the-wire SOP class on output is the writer's
+  // default (legacy binary Segmentation Storage, 1.2.840.10008.5.1.4.1.1.66.4);
+  // a dedicated writer-side test pins the SOP class value, so this round
+  // trip is encoding-agnostic. Voxel-level equivalence is pinned by the
+  // per-segment hash baseline above; this assertion only adds the
+  // write+reload survivability that was impossible before this stage.
   const auto tempDir = std::filesystem::temp_directory_path() / "mitkDICOMSegRegressionRoundTrip";
   std::filesystem::create_directories(tempDir);
   const auto roundTripPath = (tempDir / "roundtrip.dcm").string();

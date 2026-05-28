@@ -161,6 +161,27 @@ int mitkDICOMSegmentationIOLabelmapRegressionTest(int argc, char* argv[])
   MITK_TEST_CONDITION(loadedSeg->GetNumberOfGroups() == 1,
     "Labelmap SEG loaded as a single MITK group");
 
+  // dcmqi's labelmap writer inserts a Background segment (number 0) so the
+  // SEG carries 3 SegmentSequence items: Background + liver + spine. MITK
+  // must strip Background on read (pixel value 0 maps to UNLABELED), so
+  // the reloaded seg has exactly 2 labels and none of them is "Background".
+  MITK_TEST_CONDITION(loadedSeg->GetTotalNumberOfLabels() == 2u,
+    "Labelmap SEG read strips the Sup 243 Background segment (2 labels remain)");
+  bool hasBackgroundLabel = false;
+  bool hasZeroValueLabel = false;
+  for (const auto labelValue : loadedSeg->GetAllLabelValues())
+  {
+    if (labelValue == mitk::MultiLabelSegmentation::UNLABELED_VALUE)
+      hasZeroValueLabel = true;
+    const auto label = loadedSeg->GetLabel(labelValue);
+    if (label.IsNotNull() && std::string(label->GetName()) == "Background")
+      hasBackgroundLabel = true;
+  }
+  MITK_TEST_CONDITION(!hasZeroValueLabel,
+    "No reloaded label may carry the UNLABELED_VALUE (0)");
+  MITK_TEST_CONDITION(!hasBackgroundLabel,
+    "No reloaded label may be named 'Background'");
+
   const auto reference = mitk::IOUtil::Load(referencePath);
   MITK_TEST_CONDITION_REQUIRED(reference.size() == 1,
     "Reference segmentation loaded as exactly one result");

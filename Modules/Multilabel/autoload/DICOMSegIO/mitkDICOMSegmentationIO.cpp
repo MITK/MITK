@@ -645,14 +645,18 @@ namespace mitk
     AbstractFileReader::SetRanking(10);
 
     // The Options-as-vector-of-strings idiom encodes the available choices
-    // in declaration order; the first entry is the default. Strict /
-    // labelmap are placed first so the defaults are "synthesise nothing,
-    // emit Sup 243 labelmap SEG".
+    // in declaration order; the first entry is the default. Strict / binary
+    // are placed first so the defaults are "synthesise nothing, emit the
+    // legacy binary Segmentation Storage SEG (1.2.840.10008.5.1.4.1.1.66.4)".
+    // Binary is the default because the Sup 243 labelmap SOP class
+    // (1.2.840.10008.5.1.4.1.1.66.7) is too recent for much of the installed
+    // base of viewers, PACS, and validators; defaulting to labelmap would
+    // frequently be mis-reported as MITK producing invalid DICOM.
     Options writerOptions;
     writerOptions[OPTION_SYNTHESIS_MODE] = std::vector<std::string>{
       OPTION_SYNTHESIS_MODE_STRICT, OPTION_SYNTHESIS_MODE_SYNTHETIC};
     writerOptions[OPTION_ENCODING] = std::vector<std::string>{
-      OPTION_ENCODING_LABELMAP, OPTION_ENCODING_BINARY};
+      OPTION_ENCODING_BINARY, OPTION_ENCODING_LABELMAP};
     this->AbstractFileWriter::SetDefaultOptions(writerOptions);
 
     this->RegisterService();
@@ -707,7 +711,7 @@ namespace mitk
     const std::string synthesisMode = ResolveEnumOption(options, OPTION_SYNTHESIS_MODE,
                                                         OPTION_SYNTHESIS_MODE_STRICT);
     const std::string encoding = ResolveEnumOption(options, OPTION_ENCODING,
-                                                   OPTION_ENCODING_LABELMAP);
+                                                   OPTION_ENCODING_BINARY);
 
     const bool isSynthetic = (synthesisMode == OPTION_SYNTHESIS_MODE_SYNTHETIC);
 

@@ -376,6 +376,21 @@ namespace
     }
     return view;
   }
+
+  // Count the items in a written SEG's (0062,0002) SegmentSequence. Used to
+  // pin "labelmap encoding produces N+1 segments (Background + N user labels)"
+  // vs "binary encoding produces N segments (no auto-Background)".
+  unsigned int CountSegmentSequenceItems(const std::string& segPath)
+  {
+    DcmFileFormat ff;
+    if (ff.loadFile(segPath.c_str()).bad())
+      return 0u;
+    DcmSequenceOfItems* segmentSeq = nullptr;
+    if (ff.getDataset()->findAndGetSequence(DCM_SegmentSequence, segmentSeq).bad()
+        || segmentSeq == nullptr)
+      return 0u;
+    return static_cast<unsigned int>(segmentSeq->card());
+  }
 }
 
 class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
@@ -389,7 +404,9 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(SyntheticModeMintsStubSourceItemsWhenNoRelation);
   MITK_TEST(SyntheticModeMintsStubSourceItemsForIDLayerOnlyRelation);
   MITK_TEST(SyntheticWriteProducesVRValidOutput);
+  MITK_TEST(DefaultEncodingProducesLegacySOPClass);
   MITK_TEST(LabelmapEncodingProducesSup243SOPClass);
+  MITK_TEST(LabelmapRoundTripStripsAutoAddedBackgroundSegment);
   MITK_TEST(BinaryEncodingProducesLegacySOPClass);
   MITK_TEST(MultiSourceSegRoundTripPreservesAtLeastOneRelation);
   MITK_TEST(MigrateLegacyReferenceFilesIsNoOpWithoutProperty);
@@ -580,17 +597,84 @@ public:
       WriteSegToTempFile(seg, options, "vrcheck"));
   }
 
+  void DefaultEncodingProducesLegacySOPClass()
+  {
+    auto seg = BuildSegWithRule();
+
+    mitk::IFileWriter::Options options;  // no encoding option set
+    const auto path = WriteSegToTempFile(seg, options, "default");
+
+    // 1.2.840.10008.5.1.4.1.1.66.4 = Segmentation Storage (legacy binary).
+    // Binary is the writer's default because the Sup 243 labelmap SOP class
+    // is too recent for much of the installed base of DICOM tooling.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Default encoding must emit the legacy binary SEG SOP class",
+                                 std::string("1.2.840.10008.5.1.4.1.1.66.4"),
+                                 GetWrittenSEGSOPClassUID(path));
+  }
+
   void LabelmapEncodingProducesSup243SOPClass()
   {
     auto seg = BuildSegWithRule();
 
-    mitk::IFileWriter::Options options;  // labelmap by default
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
     const auto path = WriteSegToTempFile(seg, options, "labelmap");
 
     // 1.2.840.10008.5.1.4.1.1.66.7 = Label Map Segmentation Storage (Sup 243)
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Default encoding must emit Sup 243 labelmap SEG",
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Explicit labelmap opt-in must emit the Sup 243 SOP class",
                                  std::string("1.2.840.10008.5.1.4.1.1.66.7"),
                                  GetWrittenSEGSOPClassUID(path));
+  }
+
+  // Sup 243 makes the pixel value the segment number, so every pixel value
+  // present in the labelmap image must map to a declared SegmentSequence
+  // entry. dcmqi enforces this by auto-inserting a Background segment
+  // (number 0, DCM code 125040) when the image contains any zero pixels;
+  // MITK undoes the asymmetry on read because pixel value 0 is MITK's
+  // UNLABELED sentinel and a phantom "Background" label would pollute the
+  // reloaded seg. This test pins both halves of the contract so a future
+  // dcmqi or reader change cannot silently break either side.
+  void LabelmapRoundTripStripsAutoAddedBackgroundSegment()
+  {
+    auto seg = BuildSegWithRule();
+
+    mitk::IFileWriter::Options options;
+    options["Segmentation encoding"] = std::string("labelmap");
+    const auto path = WriteSegToTempFile(seg, options, "labelmap-bg-roundtrip");
+
+    // Write side: dcmqi must add Background as SegmentSequence item 1.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Labelmap SEG must carry the auto-added Background segment plus the user's one label",
+      2u, CountSegmentSequenceItems(path));
+    const auto bgItem = ReadSegmentItem(path, 1);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must carry DCM code value 125040",
+                                 std::string("125040"), bgItem.categoryCodeValue);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must use the DCM coding scheme",
+                                 std::string("DCM"), bgItem.categoryCodeScheme);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Auto-added Background segment must be named 'Background'",
+                                 std::string("Background"), bgItem.categoryCodeMeaning);
+
+    // Read side: MITK must strip the Background segment.
+    const auto loaded = mitk::IOUtil::Load(path);
+    CPPUNIT_ASSERT_MESSAGE("Labelmap SEG must reload as exactly one BaseData",
+                           loaded.size() == 1);
+    auto* loadedSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Labelmap SEG must reload as a MultiLabelSegmentation",
+                           loadedSeg != nullptr);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Reloaded seg must carry only the user's labels (Background dropped on read)",
+      1u, loadedSeg->GetTotalNumberOfLabels());
+    for (const auto labelValue : loadedSeg->GetAllLabelValues())
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "No reloaded label may carry the UNLABELED_VALUE (0)",
+        labelValue != mitk::MultiLabelSegmentation::UNLABELED_VALUE);
+      const auto label = loadedSeg->GetLabel(labelValue);
+      CPPUNIT_ASSERT_MESSAGE("Reloaded label must exist for its value", label.IsNotNull());
+      CPPUNIT_ASSERT_MESSAGE(
+        "No reloaded label may be named 'Background'",
+        std::string(label->GetName()) != "Background");
+    }
   }
 
   void BinaryEncodingProducesLegacySOPClass()
@@ -696,8 +780,9 @@ public:
   // carry (0062,0020)/(0062,0021) for that segment; reloading the SEG must
   // leave HasTrackingID/UID false on the label.
   //
-  // SegmentSequence item 1 is dcmqi's auto-inserted "Background" segment
-  // (labelValue 0); the user's label "L" lands at item 2.
+  // Default encoding is binary Segmentation Storage; SegmentSequence item 1
+  // is the user's label "L" (no auto-inserted Background segment, unlike
+  // dcmqi's labelmap path).
   void WriteSucceedsWithoutTrackingFields()
   {
     auto seg = BuildSegWithRule(/*stampIdentity=*/true,
@@ -711,7 +796,7 @@ public:
     mitk::IFileWriter::Options options;
     const auto path = WriteSegToTempFile(seg, options, "no-tracking");
 
-    const auto view = ReadSegmentItem(path, 2);
+    const auto view = ReadSegmentItem(path, 1);
     CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0020) when source label had no tracking",
                            !view.hasTrackingID);
     CPPUNIT_ASSERT_MESSAGE("Written SEG must omit (0062,0021) when source label had no tracking",
@@ -862,9 +947,9 @@ public:
     mitk::IFileWriter::Options options;
     const auto path = WriteSegToTempFile(seg, options, "no-segproperty");
 
-    // Item 1 is dcmqi's auto-inserted "Background" segment; the user's label
-    // "L" lands at item 2.
-    const auto view = ReadSegmentItem(path, 2);
+    // Default encoding is binary; the user's label "L" is segment item 1
+    // (binary has no auto-inserted Background segment).
+    const auto view = ReadSegmentItem(path, 1);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code value", std::string("49755003"), view.categoryCodeValue);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category coding scheme", std::string("SCT"), view.categoryCodeScheme);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Fallback Category code meaning",

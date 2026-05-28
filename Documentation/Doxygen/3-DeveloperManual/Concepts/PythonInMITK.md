@@ -194,10 +194,9 @@ Use the `PythonWheel` build configuration, which is a headless configuration (no
 ```bash
 cmake -S . -B ../MITK-superbuild -DMITK_BUILD_CONFIGURATION=PythonWheel
 cmake --build ../MITK-superbuild
-cmake --build ../MITK-superbuild/MITK-build
 ```
 
-The last command builds all MITK modules and then automatically produces the wheel in the `MITK-build/` directory via the `mitk_python_wheel` target, which is included in the default build.
+The SuperBuild build chains into the inner MITK build, which builds all MITK modules and then produces the wheel in `../MITK-superbuild/MITK-build/` via the `mitk_python_wheel` target (included in the default build for this configuration).
 
 The target:
 1. Installs pip packaging dependencies (`wheel` + platform delocator) into the build Python
@@ -231,6 +230,54 @@ python Wrapping/Python/wheel/build_wheel.py --build-dir <MITK-build>
 
 The wheel is written to the build directory by default.
 Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocator step for debugging.
+
+## API documentation (Sphinx)
+
+Doxygen does not handle Python well: it does not understand Google-style docstrings, dataclasses, or `typing.Literal`/union hints, and its native Python rendering undersells a typed binding surface.
+For that reason, the `mitk` Python package has its own Sphinx-based documentation site, built and published independently of this C++ Doxygen site.
+
+The Python documentation lives at <https://docs.mitk.org/python/latest/>.
+It is also reachable from the "Python API" tab in the top navigation bar of this Doxygen site.
+
+### Sources
+
+The Sphinx project sits next to the bindings, in `Wrapping/Python/docs/`:
+
+- `conf.py`: Sphinx configuration (autodoc + napoleon + autosummary + autodoc-typehints + myst-parser + sphinx-copybutton + `sphinx_book_theme`).
+- `requirements.txt`: pinned toolchain.
+- `index.md`, `installation.md`, `getting_started.md`, `user_guide/*.md`, `api/index.md`: narrative pages and the autosummary-driven API reference.
+
+The auto-generated API reference is populated by importing the freshly-built `mitk` package and reading docstrings off the compiled pybind11 extension.
+Google-style docstrings (with `Args:` / `Returns:` / `Raises:` / `Examples:` sections) on each binding are the source of truth; keep them in sync when the bindings change.
+
+### Building the docs locally
+
+There is a dedicated CMake target:
+
+```bash
+cmake --build <build-dir> --target mitk_python_docs
+```
+
+The target depends on `mitk_python_bindings`.
+On first invocation it creates a dedicated venv at `<build-dir>/mitk_python_docs_venv` (with `--system-site-packages` so the just-built `mitk` package is importable) and pip-installs the Sphinx toolchain from `requirements.txt` into that venv.
+The venv is reused on subsequent runs.
+This deliberately keeps the toolchain out of the embedded build Python, because on Windows the standalone Python's user-site directory is shared with the system Python and pollutes both.
+
+The HTML lands in `<build-dir>/Documentation/Python/html/`.
+
+The `-W` flag (warnings-as-errors) is passed to `sphinx-build`, so docstring syntax errors or duplicated definitions fail the build.
+Missing-target cross-references (e.g. a stale `:py:class:` pointing at a name that no longer exists) only fail the build when `nitpicky = True` is set in `conf.py`; the default is off, so silently-broken cross-refs need to be caught at review time.
+
+### Publishing
+
+The Jenkins job that already builds the wheel runs `sphinx-build` against the just-built wheel and publishes the resulting HTML tree alongside the C++ Doxygen output, under the `python/` subpath of `docs.mitk.org` (so the published site is `https://docs.mitk.org/python/latest/`).
+
+### What goes where
+
+- Consumer-facing (`pip install mitk`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
+- This Doxygen page (`PythonInMITK`) is the developer-facing reference: how the wheel is built, how the C++ side embeds Python, why Standalone Python Builds, platform quirks, and so on.
+
+The two are intentionally complementary, not duplicates.
 
 ## Quirks
 

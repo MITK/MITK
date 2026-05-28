@@ -20,10 +20,22 @@ namespace py = pybind11;
 
 void InitTemporoSpatialStringProperty(py::module_& m)
 {
-  // TemporoSpatialStringProperty binding
-  py::class_<mitk::TemporoSpatialStringProperty, mitk::BaseProperty, mitk::TemporoSpatialStringProperty::Pointer>(m, "TemporoSpatialStringProperty")
+  py::class_<mitk::TemporoSpatialStringProperty, mitk::BaseProperty, mitk::TemporoSpatialStringProperty::Pointer>(m, "TemporoSpatialStringProperty",
+    R"(:py:class:`BaseProperty` storing per-(time-step, z-slice) string values.
+
+Used by MITK to attach DICOM metadata to images, where individual slices
+or time steps may carry different values for the same tag (for example a
+per-slice instance UID). When the property is *uniform* (all stored
+values identical), it behaves like a regular :py:class:`StringProperty`.
+)")
     .def(py::init([](const std::string& value) { return mitk::TemporoSpatialStringProperty::New(value); }),
-         py::arg("value") = "")
+         py::arg("value") = "",
+         R"(Construct a uniform-valued property.
+
+Args:
+    value: Value shared by all (time-step, slice) entries (default
+        empty string).
+)")
     
     // Uniform value access
     .def_property_readonly("value", 

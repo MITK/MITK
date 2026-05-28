@@ -84,13 +84,15 @@ namespace
     const char* description;
   };
 
+  // Clinical Trial Series Module (carrying 0012,0071 / 0012,0050) and
+  // Clinical Trial Subject Module (carrying 0012,0060) are OPTIONAL in
+  // the SEG IOD. They are not listed here so Validate never demands a
+  // value for them; the writer emits the tags only when the user has
+  // explicitly populated the corresponding property.
   constexpr SegmentationLevelRequirement kSegmentationLevelTags[] = {
     {0x0008, 0x0060, "Modality (0008,0060)"},
     {0x0008, 0x103E, "Series Description (0008,103E)"},
     {0x0070, 0x0084, "Content Creator Name (0070,0084)"},
-    {0x0012, 0x0071, "Clinical Trial Series ID (0012,0071)"},
-    {0x0012, 0x0050, "Clinical Trial Time Point ID (0012,0050)"},
-    {0x0012, 0x0060, "Clinical Trial Coordinating Center Name (0012,0060)"},
     {0x0010, 0x0010, "PatientName (0010,0010)"},
     {0x0010, 0x0020, "PatientID (0010,0020)"},
     {0x0020, 0x0010, "StudyID (0020,0010)"},
@@ -129,21 +131,6 @@ const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownStudyID()
 const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownContentCreatorName()
 {
   static const std::string value = "UNKNOWN^UNKNOWN";
-  return value;
-}
-const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownClinicalTrialSeriesID()
-{
-  static const std::string value = "UNKNOWN";
-  return value;
-}
-const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownClinicalTrialTimePointID()
-{
-  static const std::string value = "UNKNOWN";
-  return value;
-}
-const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownClinicalTrialCoordinatingCenterName()
-{
-  static const std::string value = "UNKNOWN";
   return value;
 }
 const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownBodyPartExamined()
@@ -234,10 +221,17 @@ mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* se
     if (label->GetValue() == Label::UNLABELED_VALUE)
       continue;
 
-    if (label->GetAlgorithmType() == Label::AlgorithmType::Undefined)
+    const auto algoType = label->GetAlgorithmType();
+    if (algoType == Label::AlgorithmType::Undefined)
       AddLabelMissing(missing, label->GetValue(), "Algorithm Type (0062,0008)");
 
-    if (label->GetAlgorithmName().empty())
+    // SegmentAlgorithmName (0062,0009) is DICOM Type 1C: required only when
+    // SegmentAlgorithmType is AUTOMATIC or SEMIAUTOMATIC. dcmqi correctly
+    // omits the tag for MANUAL labels, so requiring a non-empty name
+    // unconditionally would block a legitimate round trip on Validate.
+    if ((algoType == Label::AlgorithmType::AUTOMATIC
+         || algoType == Label::AlgorithmType::SEMIAUTOMATIC)
+        && label->GetAlgorithmName().empty())
       AddLabelMissing(missing, label->GetValue(), "Algorithm Name (0062,0009)");
 
     // Tracking ID/UID (0062,0020/0062,0021) are Type 3 in the SEG IOD's
@@ -269,8 +263,16 @@ mitk::DICOMSegmentationPropertyHelper::Complete(MultiLabelSegmentation* seg,
                TemporoSpatialStringProperty::New("MITK Segmentation"));
   SetIfMissing(seg, DICOMTagKey(0x0070, 0x0084),
                TemporoSpatialStringProperty::New("MITK"));
-  SetIfMissing(seg, DICOMTagKey(0x0012, 0x0071),
-               TemporoSpatialStringProperty::New(UnknownClinicalTrialSeriesID()));
+
+  // SeriesInstanceUID is the seg's own identity, never inherited from a
+  // source image (the source's series UID belongs to the source). Mint
+  // at construction so every seg carries a stable (0020,000E) from New()
+  // onward, and strict-mode writes work without opting into synthetic
+  // mode. Stability across the copy ctor holds: BaseData's copy ctor
+  // clones the property list first, then Complete(this, {}) hits
+  // SetIfMissing and no-ops on the cloned property.
+  SetIfMissing(seg, DICOMTagKey(0x0020, 0x000E),
+               TemporoSpatialStringProperty::New(DICOMSegmentationPropertyHelper::MintSyntheticUID("series")));
 
   if (options.synthesizeMissingIdentity)
   {
@@ -282,15 +284,9 @@ mitk::DICOMSegmentationPropertyHelper::Complete(MultiLabelSegmentation* seg,
                  TemporoSpatialStringProperty::New(UnknownStudyID()));
     SetIfMissing(seg, DICOMTagKey(0x0070, 0x0084),
                  TemporoSpatialStringProperty::New(UnknownContentCreatorName()));
-    SetIfMissing(seg, DICOMTagKey(0x0012, 0x0050),
-                 TemporoSpatialStringProperty::New(UnknownClinicalTrialTimePointID()));
-    SetIfMissing(seg, DICOMTagKey(0x0012, 0x0060),
-                 TemporoSpatialStringProperty::New(UnknownClinicalTrialCoordinatingCenterName()));
 
     SetIfMissing(seg, DICOMTagKey(0x0020, 0x000D),
                  TemporoSpatialStringProperty::New(DICOMSegmentationPropertyHelper::MintSyntheticUID("study")));
-    SetIfMissing(seg, DICOMTagKey(0x0020, 0x000E),
-                 TemporoSpatialStringProperty::New(DICOMSegmentationPropertyHelper::MintSyntheticUID("series")));
     SetIfMissing(seg, DICOMTagKey(0x0020, 0x0052),
                  TemporoSpatialStringProperty::New(DICOMSegmentationPropertyHelper::MintSyntheticUID("for")));
   }

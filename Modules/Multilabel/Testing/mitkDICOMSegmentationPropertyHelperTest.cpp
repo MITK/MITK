@@ -93,22 +93,27 @@ class mitkDICOMSegmentationPropertyHelperTestSuite : public mitk::TestFixture
   MITK_TEST(ValidateClearsAfterCompleteIdentity);
   MITK_TEST(CompleteFillIfMissingPreservesMitkBranding);
   MITK_TEST(ValidateAcceptsAbsentLabelLevelOptionalTags);
+  MITK_TEST(ConstructorMintsOwnSeriesInstanceUID);
+  MITK_TEST(ValidateNoLongerRequiresClinicalTrialTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void ConstructorStampsMitkBrandingOnly()
   {
-    // The constructor routes through Complete(seg, {}) which stamps only
-    // class invariants and MITK branding. Identifying tags
-    // (PatientName, PatientID, StudyID, CT time point, CT center) are NOT
-    // stamped so a later Initialize(template) or InheritXxxFromSource can
-    // adopt the source's real values.
+    // The constructor routes through Complete(seg, {}) which stamps
+    // class invariants (Modality + branding) and mints the seg's own
+    // SeriesInstanceUID. Identifying tags (PatientName, PatientID,
+    // StudyID, ...) and the optional Clinical Trial module tags are
+    // NOT stamped so a later Initialize(template) or
+    // InheritXxxFromSource can adopt the source's real values.
     const auto seg = MakeFreshSeg();
     CPPUNIT_ASSERT_EQUAL(std::string("SEG"), ReadStringProp(seg, 0x0008, 0x0060));
     CPPUNIT_ASSERT_EQUAL(std::string("MITK Segmentation"), ReadStringProp(seg, 0x0008, 0x103E));
     CPPUNIT_ASSERT_EQUAL(std::string("MITK"), ReadStringProp(seg, 0x0070, 0x0084));
-    CPPUNIT_ASSERT_EQUAL(Helper::UnknownClinicalTrialSeriesID(),
-                         ReadStringProp(seg, 0x0012, 0x0071));
+    CPPUNIT_ASSERT_MESSAGE("SeriesInstanceUID must be minted at construction.",
+                           HasProp(seg, 0x0020, 0x000E));
+    CPPUNIT_ASSERT_MESSAGE("Minted SeriesInstanceUID must be non-empty.",
+                           !ReadStringProp(seg, 0x0020, 0x000E).empty());
 
     CPPUNIT_ASSERT_MESSAGE("PatientName must not be stamped at construction.",
                            !HasProp(seg, 0x0010, 0x0010));
@@ -116,6 +121,9 @@ public:
                            !HasProp(seg, 0x0010, 0x0020));
     CPPUNIT_ASSERT_MESSAGE("StudyID must not be stamped at construction.",
                            !HasProp(seg, 0x0020, 0x0010));
+    CPPUNIT_ASSERT_MESSAGE("ClinicalTrialSeriesID must not be stamped at construction "
+                           "(Clinical Trial Series Module is optional).",
+                           !HasProp(seg, 0x0012, 0x0071));
     CPPUNIT_ASSERT_MESSAGE("ClinicalTrialTimePointID must not be stamped at construction.",
                            !HasProp(seg, 0x0012, 0x0050));
     CPPUNIT_ASSERT_MESSAGE("ClinicalTrialCoordinatingCenterName must not be stamped at construction.",
@@ -185,17 +193,26 @@ public:
 
   void InheritFromSourceLeavesSeriesInstanceUIDUntouched()
   {
-    // The seg's SeriesInstanceUID is the SEG's own series identity, not the
-    // source's. None of the InheritXxxFromSource functions should copy it.
+    // The seg's SeriesInstanceUID is the seg's own series identity, minted
+    // at construction by Complete(seg, {}). None of the InheritXxxFromSource
+    // functions should overwrite it with the source's series UID.
     const auto seg = MakeFreshSeg();
-    const auto source = MakeFakeSourceImage();
+    const auto segMintedSeriesUID = ReadStringProp(seg, 0x0020, 0x000e);
+    CPPUNIT_ASSERT_MESSAGE("Precondition: seg starts with a minted SeriesInstanceUID.",
+                           !segMintedSeriesUID.empty());
+
+    auto source = MakeFakeSourceImage();
+    const std::string sourceSeriesUID = "1.2.3.4.source-series";
+    source->SetProperty(DICOMKey(0x0020, 0x000e).c_str(),
+                        mitk::TemporoSpatialStringProperty::New(sourceSeriesUID));
 
     Helper::InheritPatientFromSource(seg, source);
     Helper::InheritStudyFromSource(seg, source);
     Helper::InheritFrameOfReferenceFromSource(seg, source);
 
-    CPPUNIT_ASSERT_MESSAGE("Inherit must not transfer SeriesInstanceUID.",
-      seg->GetConstProperty(DICOMKey(0x0020, 0x000e)).IsNull());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Inherit must not transfer source's SeriesInstanceUID.",
+                                 segMintedSeriesUID,
+                                 ReadStringProp(seg, 0x0020, 0x000e));
   }
 
   void ValidateThrowsOnNullSeg()
@@ -267,6 +284,56 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "Validate must not report any missing items for a label with only "
       "Algorithm Type and Algorithm Name set.",
+      Helper::Validate(seg).empty());
+  }
+
+  // SeriesInstanceUID is the seg's own identity, minted unconditionally
+  // at construction by Complete(seg, {}). Every fresh seg carries a
+  // non-empty (0020,000E) from New() onward; strict-mode writes work
+  // without opting into synthetic mode.
+  void ConstructorMintsOwnSeriesInstanceUID()
+  {
+    const auto seg = MakeFreshSeg();
+    CPPUNIT_ASSERT_MESSAGE("SeriesInstanceUID must be present on a freshly constructed seg.",
+                           HasProp(seg, 0x0020, 0x000E));
+    CPPUNIT_ASSERT_MESSAGE("Minted SeriesInstanceUID must be non-empty.",
+                           !ReadStringProp(seg, 0x0020, 0x000E).empty());
+  }
+
+  // Clinical Trial Series and Subject Modules are optional in the SEG
+  // IOD. Validate must not demand any of (0012,0050), (0012,0060),
+  // (0012,0071) even when every other Validate-required tag is set.
+  void ValidateNoLongerRequiresClinicalTrialTags()
+  {
+    const auto seg = MakeFreshSeg();
+    auto geometryImage = mitk::Image::New();
+    unsigned int dim[3] = {2u, 2u, 2u};
+    geometryImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dim);
+    seg->Initialize(geometryImage);
+
+    Helper::CompletionOptions options;
+    options.synthesizeMissingIdentity = true;
+    options.deriveGeometryFromSegmentation = true;
+    Helper::Complete(seg, options);
+
+    // None of (0012,0050), (0012,0060), (0012,0071) is set on the seg;
+    // synthesis no longer stamps them either.
+    CPPUNIT_ASSERT_MESSAGE("Synthesis must NOT stamp Clinical Trial Series ID.",
+                           !HasProp(seg, 0x0012, 0x0071));
+    CPPUNIT_ASSERT_MESSAGE("Synthesis must NOT stamp Clinical Trial Time Point ID.",
+                           !HasProp(seg, 0x0012, 0x0050));
+    CPPUNIT_ASSERT_MESSAGE("Synthesis must NOT stamp Clinical Trial Coordinating Center Name.",
+                           !HasProp(seg, 0x0012, 0x0060));
+
+    auto label = mitk::Label::New();
+    label->SetName("L");
+    label->SetValue(1);
+    label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label->SetAlgorithmName("PropertyHelperTest");
+    seg->AddLabel(label, 0, true, true);
+
+    CPPUNIT_ASSERT_MESSAGE(
+      "Validate must report empty even with no Clinical Trial properties set.",
       Helper::Validate(seg).empty());
   }
 };

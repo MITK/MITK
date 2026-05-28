@@ -101,6 +101,13 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0012, 0x0060))); // Clinical Trial Coordinating Center Name
     result.insert(MakeEntry(DICOMTag(0x0012, 0x0071))); // Clinical Trial Series ID
 
+    // Frame of Reference module
+    // (0020,0052) is part of the IOD-mandated identity any data derived
+    // from a DICOM source must carry. Without it in the default ToI the
+    // property never lands on the loaded image, so re-saving a derived
+    // SEG would fail strict-mode Validate on a missing FoR.
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x0052))); // FrameOfReferenceUID
+
     // General Series module
     /*dicom.series.Modality*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x0060)));
     /*dicom.series.SeriesInstanceUID*/ result.insert(MakeEntry(DICOMTag(0x0020, 0x000e)));

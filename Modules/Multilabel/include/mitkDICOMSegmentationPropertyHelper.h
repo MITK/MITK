@@ -38,6 +38,31 @@ namespace mitk
    * constructors) coexist with later synthesis without being overwritten
    * by generic "UNKNOWN" placeholders.
    *
+   * \par Three-phase identity model
+   * SEG identity tags are populated across three lifecycle moments. Each
+   * moment uses a different function with different semantics; the
+   * fragmentation is intentional.
+   *
+   * - <b>Construction-time, automatic.</b> \c Complete(seg, {}) (run by
+   *   the MultiLabelSegmentation constructor) stamps class invariants
+   *   (Modality, MITK branding) and mints the seg's own SeriesInstanceUID
+   *   (0020,000E). \c Initialize(templateImage) then routes to
+   *   \c DICOMQIPropertyHelper::DeriveDICOMSourceProperties, which
+   *   copies Patient + Study UIDs + StudyID + FrameOfReferenceUID from
+   *   the source. This function is shared with parametric maps via
+   *   ModelFitResultHelper, which is why it lives in MitkDICOMQI.
+   * - <b>Setup-time, explicit.</b>
+   *   \c mitkLabelSetImageHelper::SetupDerivedSegmentation calls
+   *   \c SegSourceImageRelationRule::Connect plus the InheritXxxFromSource
+   *   helpers with overwrite semantics, so the GUI "New Segmentation"
+   *   flow can re-attach a seg to a different source than its template.
+   * - <b>Write-time, automatic.</b> \c DICOMSegmentationIO::Write calls
+   *   \c StampSegIdentityOnSourceItem to copy the seg's identity onto
+   *   dcmqi's synthetic source DcmItem so dcmqi can produce a valid SEG
+   *   file. The tag list mirrors what DeriveDICOMSourceProperties
+   *   produces, but the direction is opposite (seg -> source-item, not
+   *   source -> seg). Not a duplicated responsibility.
+   *
    * \sa SegSourceImageRelationRule
    * \sa MultiLabelSegmentation
    */
@@ -239,9 +264,6 @@ namespace mitk
     static const std::string& UnknownPatientID();
     static const std::string& UnknownStudyID();
     static const std::string& UnknownContentCreatorName();
-    static const std::string& UnknownClinicalTrialSeriesID();
-    static const std::string& UnknownClinicalTrialTimePointID();
-    static const std::string& UnknownClinicalTrialCoordinatingCenterName();
     static const std::string& UnknownBodyPartExamined();
   };
 }

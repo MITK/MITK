@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
+#include <mitkSegTestSourceImageFactory.h>
 #include <mitkTemporoSpatialStringProperty.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -236,6 +237,60 @@ namespace
     return path;
   }
 
+  // Read a DICOM-tag-keyed string property from the seg's property list.
+  // Returns empty when the property is absent.
+  std::string ReadStringProp(const mitk::MultiLabelSegmentation* seg,
+                             unsigned int group, unsigned int element)
+  {
+    const auto prop = seg->GetConstProperty(DICOMKey(group, element));
+    return prop.IsNotNull() ? prop->GetValueAsString() : std::string();
+  }
+
+  // Read a top-level (file-meta + dataset) string tag from a written SEG.
+  // Returns empty string when the file or tag is absent.
+  std::string ReadTopLevelString(const std::string& segPath, const DcmTagKey& tag)
+  {
+    DcmFileFormat ff;
+    if (ff.loadFile(segPath.c_str()).bad())
+      return {};
+    OFString tmp;
+    if (ff.getDataset()->findAndGetOFString(tag, tmp).bad())
+      return {};
+    return tmp.c_str();
+  }
+
+  // Build a seg derived from a DICOM-flavoured source image. Mirrors the
+  // user-facing workflow: New() -> Initialize(sourceImage) populates the
+  // seg's property list from the source's DICOM tags. The caller is
+  // responsible for adding labels, foreground voxels, and Rule::Connect.
+  mitk::MultiLabelSegmentation::Pointer InitializeSegFromSourceImage(
+    const mitk::Image* sourceImage,
+    unsigned char labelValue = 1)
+  {
+    auto seg = mitk::MultiLabelSegmentation::New();
+    seg->Initialize(sourceImage);
+
+    auto label = mitk::Label::New();
+    label->SetName("L");
+    label->SetValue(labelValue);
+    label->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label->SetAlgorithmName("WorkflowTest");
+    seg->AddLabel(label, 0, true, true);
+
+    auto groupImage = seg->GetGroupImage(0);
+    mitk::ImageWriteAccessor writeAccessor(groupImage);
+    auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
+    const auto dims = groupImage->GetDimensions();
+    const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+    for (unsigned int z = 0; z < dims[2]; ++z)
+    {
+      pixels[z * sliceSize + 0] = labelValue;
+      pixels[z * sliceSize + 1] = labelValue;
+    }
+
+    return seg;
+  }
+
   // Snapshot of one SegmentSequence item as read directly via DCMTK. Code-
   // triple fields are empty strings when the surrounding sequence is absent;
   // hasTrackingID / hasTrackingUID separate "absent" from "present but empty".
@@ -341,6 +396,9 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(MigrateLegacyReferenceFilesSkipsWhenRuleAlreadyPresent);
   MITK_TEST(WriteSucceedsWithoutTrackingFields);
   MITK_TEST(WriteSucceedsWithoutSegPropertyCategoryAndType);
+  MITK_TEST(StrictWriteSucceedsForInitializedFromDICOMSource);
+  MITK_TEST(SyntheticWriteSucceedsForInitializedFromDICOMSource);
+  MITK_TEST(StrictReSaveAfterDICOMSegRoundTripPreservesIdentity);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -671,6 +729,119 @@ public:
                            !loadedLabels.front()->HasTrackingID());
     CPPUNIT_ASSERT_MESSAGE("Reloaded label reports HasTrackingUID() == false",
                            !loadedLabels.front()->HasTrackingUID());
+  }
+
+  // Primary user-reported workflow: load a DICOM source image, build a
+  // seg via Initialize(sourceImage) (which routes through
+  // DICOMQIPropertyHelper::DeriveDICOMSourceProperties), Connect a source
+  // relation, save in strict mode. Asserts the IOD-mandated identity
+  // tags survive into the written file.
+  //
+  // Note on SeriesInstanceUID: the constructor mints a stable seg-own
+  // SeriesInstanceUID for in-memory use (lets strict-mode Validate
+  // succeed). However, dcmqi's segmentation writer mints its own
+  // SeriesInstanceUID for the output file - there is no dcmqi API to
+  // override it. So the on-disk SeriesInstanceUID does NOT match the
+  // seg's in-memory property; this is an upstream limitation, not a
+  // MITK-side workaround target.
+  void StrictWriteSucceedsForInitializedFromDICOMSource()
+  {
+    const std::string sourceSeriesUID = "1.2.826.0.1.3680043.10.999.6.2";
+    const std::string sourceStudyUID = "1.2.826.0.1.3680043.10.999.6.1";
+    const std::string sourceForUID = "1.2.826.0.1.3680043.10.999.6.3";
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity(
+      "Wf^Patient", "Wf-PID", "Wf-Study",
+      sourceStudyUID, sourceSeriesUID, sourceForUID);
+
+    auto seg = InitializeSegFromSourceImage(source);
+    Rule::Connect(seg, source.GetPointer());
+
+    CPPUNIT_ASSERT_MESSAGE("Validate must report nothing missing for a seg derived from a DICOM source",
+                           Helper::Validate(seg).empty());
+
+    const auto segSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
+    CPPUNIT_ASSERT_MESSAGE("Seg's own SeriesInstanceUID must be minted at construction",
+                           !segSeriesUID.empty());
+    CPPUNIT_ASSERT_MESSAGE("Seg's SeriesInstanceUID must differ from source's series UID",
+                           segSeriesUID != sourceSeriesUID);
+
+    mitk::IFileWriter::Options options;
+    const auto path = WriteSegToTempFile(seg, options, "wf-strict");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's PatientID survives into the written SEG",
+                                 std::string("Wf-PID"), ReadTopLevelString(path, DCM_PatientID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's StudyInstanceUID survives into the written SEG",
+                                 sourceStudyUID, ReadTopLevelString(path, DCM_StudyInstanceUID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's StudyID survives into the written SEG",
+                                 std::string("Wf-Study"), ReadTopLevelString(path, DCM_StudyID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Source's FrameOfReferenceUID survives into the written SEG",
+                                 sourceForUID, ReadTopLevelString(path, DCM_FrameOfReferenceUID));
+
+    const auto writtenSeriesUID = ReadTopLevelString(path, DCM_SeriesInstanceUID);
+    CPPUNIT_ASSERT_MESSAGE("Written SEG SeriesInstanceUID is non-empty", !writtenSeriesUID.empty());
+    CPPUNIT_ASSERT_MESSAGE("Written SEG SeriesInstanceUID differs from source's series UID "
+                           "(SEG is its own series, not a re-issue of the source's)",
+                           writtenSeriesUID != sourceSeriesUID);
+  }
+
+  // Synthetic-mode counterpart of the workflow case above. Even with a
+  // real DICOM source attached via Initialize, the user can opt into
+  // synthetic mode. The write must succeed and the written SEG must
+  // carry an own (non-source) SeriesInstanceUID.
+  void SyntheticWriteSucceedsForInitializedFromDICOMSource()
+  {
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    auto seg = InitializeSegFromSourceImage(source);
+    Rule::Connect(seg, source.GetPointer());
+
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    const auto path = WriteSegToTempFile(seg, options, "wf-synth");
+
+    const auto writtenSeriesUID = ReadTopLevelString(path, DCM_SeriesInstanceUID);
+    CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write produces a non-empty SeriesInstanceUID",
+                           !writtenSeriesUID.empty());
+    const auto sourceSeriesUID = source->GetConstProperty(DICOMKey(0x0020, 0x000e))->GetValueAsString();
+    CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write SeriesInstanceUID differs from source's series UID",
+                           writtenSeriesUID != sourceSeriesUID);
+  }
+
+  // Round-trip via the DICOM SEG reader: write a workflow seg in strict
+  // mode, load it back, save again in strict mode. The reloaded seg
+  // must carry every IOD-mandated identity tag - in particular
+  // FrameOfReferenceUID, which only lands on the loaded seg's property
+  // list when (0020,0052) is in the default DICOMTagsOfInterest.
+  // SeriesInstanceUID stability across persist -> reload -> re-persist
+  // is NOT asserted here: dcmqi mints a fresh UID for the output SEG on
+  // every write and has no API for MITK to override it.
+  void StrictReSaveAfterDICOMSegRoundTripPreservesIdentity()
+  {
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    auto seg = InitializeSegFromSourceImage(source);
+    Rule::Connect(seg, source.GetPointer());
+
+    mitk::IFileWriter::Options options;
+    const auto firstPath = WriteSegToTempFile(seg, options, "wf-roundtrip-1");
+
+    const auto loaded = mitk::IOUtil::Load(firstPath);
+    CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData", loaded.size() == 1);
+    auto* reloadedSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Reloaded data is a MultiLabelSegmentation", reloadedSeg != nullptr);
+
+    const auto reloadedMissing = Helper::Validate(reloadedSeg);
+    if (!reloadedMissing.empty())
+    {
+      std::ostringstream diag;
+      diag << "Reloaded seg must pass strict-mode Validate; missing items:";
+      for (const auto& item : reloadedMissing)
+        diag << "\n  - " << item.description << " (scope=" << static_cast<int>(item.scope)
+             << ", id=" << item.identifier << ")";
+      CPPUNIT_FAIL(diag.str());
+    }
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
+      "Re-saving the reloaded seg in strict mode must succeed",
+      WriteSegToTempFile(reloadedSeg, options, "wf-roundtrip-2"));
   }
 
   // Segmented Property Category/Type are DICOM Type 1 but the writer's

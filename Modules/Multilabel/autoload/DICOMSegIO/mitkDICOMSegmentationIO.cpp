@@ -1297,23 +1297,27 @@ namespace mitk
       contentCreatorName = "MITK";
     handler.setContentCreatorName(contentCreatorName);
 
+    // Clinical Trial Series Module (carrying 0012,0071 / 0012,0050) and
+    // Clinical Trial Subject Module (carrying 0012,0060) are optional in
+    // the SEG IOD. Emit each tag only when the user has explicitly
+    // populated the corresponding property. If dcmqi still emits the
+    // modules with internal defaults despite no setter being called,
+    // that is an upstream dcmqi bug to be fixed there - not patched
+    // around in MITK.
     std::string clinicalTrailSeriesId;
-    if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-      clinicalTrailSeriesId))
-      clinicalTrailSeriesId = "Session 1";
-    handler.setClinicalTrialSeriesID(clinicalTrailSeriesId);
+    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
+      clinicalTrailSeriesId) && !clinicalTrailSeriesId.empty())
+      handler.setClinicalTrialSeriesID(clinicalTrailSeriesId);
 
     std::string clinicalTrialTimePointID;
-    if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-      clinicalTrialTimePointID))
-      clinicalTrialTimePointID = "0";
-    handler.setClinicalTrialTimePointID(clinicalTrialTimePointID);
+    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
+      clinicalTrialTimePointID) && !clinicalTrialTimePointID.empty())
+      handler.setClinicalTrialTimePointID(clinicalTrialTimePointID);
 
-    std::string clinicalTrialCoordinatingCenterName = "";
-    if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-      clinicalTrialCoordinatingCenterName))
-      clinicalTrialCoordinatingCenterName = "Unknown";
-    handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
+    std::string clinicalTrialCoordinatingCenterName;
+    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
+      clinicalTrialCoordinatingCenterName) && !clinicalTrialCoordinatingCenterName.empty())
+      handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
     std::string seriesDescription;
     if (!image->GetPropertyList()->GetStringProperty("name", seriesDescription))

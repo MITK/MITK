@@ -62,12 +62,6 @@ namespace mitk
     // Add DICOM Tag (0008,1030) Study Description; no default
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x1030));
 
-
-    //====== Reference DICOM data ======
-    // Add reference file paths to referenced DICOM data
-    BaseProperty::Pointer dcmFilesProp = sourcePropertyList->GetProperty("files");
-    if (dcmFilesProp.IsNotNull())
-      propertyList->SetProperty("referenceFiles", dcmFilesProp);
   }
 
   void DICOMQIPropertyHelper::AdoptReferenceDICOMProperty(PropertyList *referencedPropertyList,

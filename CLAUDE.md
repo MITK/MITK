@@ -1,30 +1,47 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working in this repository. Specialised,
+file-type- or subtree-specific rules live in `.claude/rules/` and
+activate automatically when matching files are touched.
 
-## IMPORTANT General Rules
+## Working style
 
-- When working on complex tasks, think out loud, revisit earlier conclusions, step back when needed, and keep the broader context in mind.
-- Making educated guesses is fine once or twice, but if they do not hold up, verify them empirically instead: add temporary logging or instrumentation to observe what is actually happening during execution.
+- When asked for analysis, troubleshooting, design opinions, or
+  similar: do not start implementing. Propose options and a
+  recommendation, then wait for the go-ahead.
+- Favour simplicity. Do not overengineer, do not add abstractions
+  without a concrete need, work toward reducing technical debt.
+- Be critical and direct, but stay constructive. Surface
+  disagreements early rather than going along with a flawed plan.
+- Educated guesses are fine once or twice. When they do not hold
+  up empirically, switch to observation: add temporary logging or
+  instrumentation before guessing again.
+- Preserve the line-ending style of existing files. For files you
+  create from scratch, default to LF.
 
 ## What is MITK?
 
-MITK (Medical Imaging Interaction Toolkit) is an open-source C++ framework for developing interactive medical image processing software. It combines ITK (Insight Toolkit) and VTK (Visualization Toolkit) with an application framework built on Qt and BlueBerry plugins.
-
-## Build Commands
-
-MITK uses CMake with a superbuild pattern that downloads and builds all dependencies first.
+MITK (Medical Imaging Interaction Toolkit) is an open-source C++
+framework for developing interactive medical image processing
+software. It combines ITK (image processing) and VTK (visualization)
+with an application framework built on Qt and BlueBerry plugins.
+Maintained by the German Cancer Research Center (DKFZ);
+BSD-3-Clause licensed.
 
 ### Prerequisites
 
-- **CMake**: 3.31+ on Windows, 3.28+ on Linux/macOS
-- **C++ standard**: C++20
-- **Qt**: 6.10 minimum
-- **Debug + Python**: Debug builds are incompatible with `MITK_USE_Python3=ON`
+| | Required |
+| --- | --- |
+| CMake | 3.31+ (Windows) / 3.28+ (Linux, macOS) |
+| C++ | C++20 |
+| Qt | 6.10+ |
 
-### Initial Build (superbuild)
+Debug builds are incompatible with `MITK_USE_Python3=ON`.
 
-Note that the initial superbuild also includes the MITK build.
+## Build
+
+MITK uses a CMake superbuild that downloads and builds all
+dependencies, then builds MITK itself.
 
 **Windows (Visual Studio):**
 ```bash
@@ -32,240 +49,181 @@ cmake -S . -B ../MITK-superbuild -G "Visual Studio 17 2022"
 cmake --build ../MITK-superbuild --config Release -- -m
 ```
 
-**Linux/macOS (Ninja):**
+**Linux / macOS (Ninja):**
 ```bash
 cmake -S . -B ../MITK-superbuild -G "Ninja" -D CMAKE_BUILD_TYPE=Release
 cmake --build ../MITK-superbuild
 ```
 
-### Key CMake Variables on superbuild level
-
-- `MITK_BUILD_CONFIGURATION`: Selects a predefined feature set. Available values are listed in `CMake/BuildConfigurations/`. The most common configurations are:
-
-- `WorkbenchRelease` (default)
-- `WorkbenchReleaseNoPython` (without Python, enabling Debug build configuration)
-- `All` (build everything, used by our CI)
-
-Other commonly used options:
-
-| Option | Default | Purpose |
-| --- | --- | --- |
-| `MITK_EXTENSION_DIRS` | — | Additional dirs for downstream/extension projects |
-
-### Build After Initial Configuration
-
-Once the superbuild completes, the actual MITK build is in `MITK-superbuild/MITK-build/`:
+Subsequent rebuilds of just MITK happen in the inner build tree:
 ```bash
 cmake --build ../MITK-superbuild/MITK-build --config Release
 ```
 
-### Running Tests
+### Build configurations
+
+`MITK_BUILD_CONFIGURATION` selects a predefined feature set. The
+full list lives in `CMake/BuildConfigurations/`. Commonly used:
+
+| Value | Purpose |
+| --- | --- |
+| `WorkbenchRelease` | Default; full Workbench with Python |
+| `WorkbenchReleaseNoPython` | Required for Debug builds |
+| `All` | Everything, used by CI |
+| `PythonWheel` | Headless build, used by `Wrapping/Python/wheel/build_wheel.py`; not for general development |
+
+### Tests
+
+Always run tests through `ctest` from the inner build tree. Do not
+invoke the test-driver executables directly - they expect arguments
+that ctest knows how to supply.
 
 ```bash
 cd ../MITK-superbuild/MITK-build
-ctest -C Release                           # Run all tests
-ctest -C Release -R mitkImage              # Run tests matching pattern
-ctest -C Release -N                        # List tests without running
+ctest -C Release                 # all tests
+ctest -C Release -R mitkImage    # tests matching a pattern
+ctest -C Release -N              # list without running
 ```
 
-### Building Documentation
-
-Requires Doxygen at configure time (`DOXYGEN_FOUND`). Developer documentation source lives in `Documentation/Doxygen/3-DeveloperManual/` (`.dox` and `.md` files).
+### Documentation build
 
 ```bash
 cmake --build ../MITK-superbuild/MITK-build --target doc
 ```
 
-### Running Applications (Windows)
+### Running applications
 
-After building, launch via the generated start scripts which sets up `PATH`:
+On Windows, launch via the generated start script (it sets up
+`PATH`):
+`MITK-superbuild/MITK-build/bin/startMitkWorkbench_release.bat`.
+On Linux and macOS the binaries in the build tree run directly.
 
-- `MITK-superbuild/MITK-build/bin/startMitkWorkbench_release.bat`
+## Architecture
 
-On Linux and macOS, applications in the build tree do not need or use start scripts.
+Two-phase build: `SuperBuild.cmake` builds dependencies (ITK, VTK,
+CTK, DCMTK, Boost, Python3, pybind11, ...); the inner MITK build
+produces modules, plugins, Python bindings, and applications.
 
-## Architecture Overview
+- `Modules/` - 60+ functional modules; build order in
+  `Modules/ModuleList.cmake`.
+- `Plugins/` - BlueBerry / OSGi plugins that extend applications.
+- `Applications/` - standalone apps (MitkWorkbench, FlowBench).
+- `Wrapping/Python/` - pybind11 bindings.
+- `CMake/`, `CMakeExternals/` - build macros and external-dependency
+  definitions.
 
-### Two-Phase Build System
+### Data model
 
-1. **superbuild phase** (`SuperBuild.cmake`): Downloads and builds most external dependencies (ITK, VTK, CTK, DCMTK, Boost, Python3, pybind11, and more). External dependencies are managed in `CMakeExternals/` and listed in `CMakeExternals/ExternalProjectList.cmake`.
-2. **MITK build phase**: Builds MITK modules, plugins, Python bindings, and applications.
+All data inherits from `BaseData`: `Image` (multi-channel,
+multi-timepoint), `Surface` (VTK polydata), `PointSet`, with
+`BaseGeometry` (and its concrete subclasses) carrying spatial /
+temporal metadata.
 
-### Module System
+The runtime model adds:
 
-Modules are the core functional units in `Modules/`. They must be listed in dependency order in `Modules/ModuleList.cmake` (> 60 modules). Key tiers:
+- **DataStorage** - central tree holding `DataNode`s, each wrapping
+  a `BaseData` with properties.
+- **Mapper** - converts data to VTK rendering commands.
+- **CppMicroServices** - OSGi-style service registry used across
+  several modules.
 
-- **Foundation**: `Log`, `CppMicroServices`, `Core` (base data structures: Image, Surface, PointSet, BaseData, BaseGeometry)
-- **Intermediate**: `AlgorithmsExt`, `DICOM`, `Multilabel`, `Segmentation`
-- **UI**: `QtWidgets`, `SegmentationUI` (standalone applications live in `Applications/`, not here)
+## C++ coding conventions
 
-**Module structure:**
-```
-ModuleName/
-├── CMakeLists.txt       # calls mitk_create_module()
-├── files.cmake          # lists CPP_FILES, H_FILES, RESOURCE_FILES, UI_FILES
-├── include/             # public headers
-├── src/                 # implementation
-├── resource/            # embedded resources (XML, JSON, SVG) declared via RESOURCE_FILES
-├── autoload/<Subdir>/   # sub-modules that auto-load with a parent module
-├── cmdapps/             # command-line applications shipped with the module
-├── test/ or Testing/    # unit tests (both naming conventions exist in the codebase, prefer test/)
-└── TestingHelper/       # helper sub-module for downstream test use (rarely used)
-```
+- Const-correctness aggressively: const methods, const arguments,
+  const locals where it does not impair clarity.
+- Avoid `const_cast`. Ask before using it.
+- Use `this->` when calling member methods of the same class.
+- Do not assume defaults. Base layers throw on unresolvable input;
+  higher layers decide what to do.
+- `itk::SmartPointer<>` is for storage and ownership. In function
+  signatures, take the narrowest interface type that captures what
+  the function actually uses (e.g. `IPropertyProvider*` instead of
+  `BaseData*`); use raw pointers unless ownership transfers.
+- Closed value sets (sex M/F, decay strategy, ...) belong in an
+  `enum class` at the earliest interface boundary, never as
+  `char`/`string`.
+- Prefer current C++ idioms (`[[maybe_unused]]`, structured
+  bindings, ...) over older workarounds.
+- Reuse > reinvent. Default-private; promote to protected or public
+  only when needed. Static helpers that do not touch instance state
+  can live in an anonymous namespace inside the `.cpp`.
+- When a test fails because the assertion is wrong, fix the test -
+  do not patch productive code to make a flawed assertion pass.
+- No decorative unicode in code or doc comments.
+- Doxygen: block-style `/** ... */` comments only; never `///`.
+- Every new C++ or Python file must start with the project
+  copyright header from `Templates/copyright_header.txt`.
 
-**Creating a module** (`CMakeLists.txt`):
-```cmake
-mitk_create_module(
-  DEPENDS PUBLIC MitkCore
-  PACKAGE_DEPENDS PUBLIC ITK|IOImageBase VTK|RenderingOpenGL2
-)
-```
+File naming: core / algorithm files use the `mitk` prefix
+(`mitkImage.h`); Qt widget files use the `Qmitk` prefix
+(`QmitkRenderWindow.h`).
 
-### Plugin System (BlueBerry Framework)
+## Documentation and comments
 
-Plugins extend applications without modifying core code. Located in `Plugins/`, they use an Eclipse-based OSGi model.
-
-**Plugin structure:**
-```
-org.mitk.gui.qt.myview/
-├── CMakeLists.txt
-├── files.cmake           # SRC_CPP_FILES, INTERNAL_CPP_FILES, MOC_H_FILES, UI_FILES,
-│                         # CACHED_RESOURCE_FILES, QRC_FILES, MOC_H_FILES
-├── manifest_headers.cmake
-├── plugin.xml            # defines extension points
-├── target_libraries.cmake
-├── src/
-│   └── internal/         # non-exported internals; PluginActivator lives here
-├── resources/            # Qt resources and icons (plural, distinct from module's resource/)
-└── documentation/
-    └── UserManual/       # feeds Qt Help (.qch) generation
-```
-
-**Creating a plugin:**
-```cmake
-mitk_create_plugin(
-  EXPORT_DIRECTIVE MY_PLUGIN_EXPORT
-  MODULE_DEPENDS MitkQtWidgets
-)
-```
-
-### Data Model Hierarchy
-
-All data objects inherit from `BaseData`:
-- **Image** (via SlicedData): Multi-channel, multi-timepoint image data
-- **Surface**: VTK polydata wrapper
-- **PointSet**: Collection of points with properties
-- **BaseGeometry**: Spatial/temporal metadata
-
-### Python Bindings
-
-Located in `Wrapping/Python/mitk/`. Uses pybind11. Key files:
-- `Module.cpp`: Entry point with `PYBIND11_MODULE`
-- `Image.cpp`, `Geometries.cpp`, `Points.cpp`: Type bindings
-- `SmartPointer.h`: ITK smart pointer integration
-
-Python wheel builds require `MITK_BUILD_CONFIGURATION=PythonWheel` (headless, no Qt/BlueBerry) and use `Wrapping/Python/wheel/build_wheel.py` with a platform delocator.
-
-## Testing Patterns
-
-Tests use CppUnit with MITK macros:
-```cpp
-class mitkMyTestSuite : public mitk::TestFixture {
-  CPPUNIT_TEST_SUITE(mitkMyTestSuite);
-  MITK_TEST(MyTest_Success);
-  CPPUNIT_TEST_SUITE_END();
-
-  void MyTest_Success() {
-    CPPUNIT_ASSERT(condition);
-  }
-};
-MITK_TEST_SUITE_REGISTRATION(mitkMyTest)
-```
-
-In test `CMakeLists.txt`:
-```cmake
-mitk_create_module_tests()
-```
-
-**Additional test patterns:**
-
-- **Data-driven tests**: Use `mitkAddCustomModuleTest()` and pass file paths from `${MITK_DATA_DIR}` as argv. Most non-trivial tests use this. `MITK_DATA_DIR` points to the external `MITK-Data` repository cloned by the superbuild.
-- **Rendering tests**: `mitkAddCustomModuleRenderingTest()` — compares rendered output against reference PNGs in `MITK_DATA_DIR/RenderingTestData/ReferenceScreenshots/`. These run serially.
-- **Runtime skip**: Return exit code 77 (`SKIP_RETURN_CODE 77`) for tests that detect missing preconditions.
-
-## Key Dependencies
-
-- **ITK**: Image processing algorithms
-- **VTK**: 3D rendering and visualization
-- **Qt6**: GUI framework (not part of the superbuild)
-- **CTK**: Extended Qt widgets and plugin support
-- **Boost**: Utilities (try to use C++ Standard Library instead if possible)
-- **pybind11**: Python bindings
-- **MITK-Data**: External test data repository (cloned by superbuild, referenced as `${MITK_DATA_DIR}`)
-
-## Code Conventions
-
-- MITK classes deriving from ITK use `itk::SmartPointer<>` for memory management.
-- Use the appropriate class macro (defined in `Modules/Core/include/mitkCommon.h`):
-  - `mitkClassMacro(Class, Super)` — standard; parent already overrides `GetNameOfClass`
-  - `mitkClassMacroItkParent(Class, Super)` — parent is a raw ITK class
-  - `mitkClassMacroNoParent(Class)` — root classes with no superclass
-  - `mitkNewMacro1Param` .. `mitkNewMacro6Param` — `New()` factories for constructors with 1-6 arguments
-  - `mitkCloneMacro(Class)` — complements `itkCloneMacro(Class)` and implements `InternalClone()` for `BaseData::Clone()`
-- **Copyright header**: Every new C++ and Python file must begin with the project copyright header. Template: `Templates/copyright_header.txt`.
-- **File naming**: Core and algorithm files use the `mitk` prefix (e.g., `mitkImage.h`); Qt widget files use the `Qmitk` prefix (e.g., `QmitkRenderWindow.h`).
-- Follow the MITK Style Guide: `Documentation/Doxygen/3-DeveloperManual/Starting/GettingToKnow/StyleGuideAndNotes.dox`. See also `CONTRIBUTING.md` at the repo root for the contribution workflow. Signing off commits is only required for external contributors.
+- A comment earns its place by explaining *why*: the non-obvious
+  constraint, the subtle invariant, the trade-off the reader cannot
+  see from the code itself. Restating *what* the code already says
+  is noise. Default to writing no comment.
+- Doc comments on public APIs describe contract and intent (what
+  callers rely on), not an implementation walkthrough.
+- Do not reference artifacts that will not live in the repo - plans,
+  design docs, chat threads, "see chapter X of the proposal". Once
+  those artifacts move or disappear, the reference is dead noise.
+  If something is load-bearing, inline it here or in the relevant
+  source file.
+- The same rules apply to commit messages, PR descriptions, and
+  in-tree Markdown / `.dox` documentation: be helpful, on point,
+  and add insight the code does not already convey.
 
 ## Commit messages
 
-Great commit message are a priceless source for meta information about code, context and decisions that would be otherwise lost. Put effort into commit messages but keep them as short as possible and as long as necessary.
+Follow the seven rules at https://cbea.ms/git-commit/:
 
-Follow the seven rules of great commit messages (https://cbea.ms/git-commit/):
 - Separate subject from body with a blank line
 - Limit the subject line to 50 characters
-- Capitalize the subject line
-- Do not end the subject line with a period
-- Use the imperative mood in the subject line
+- Capitalize the subject; do not end it with a period
+- Use imperative mood in the subject
 - Wrap the body at 72 characters
-- Use the body to explain what and why vs. how
+- Use the body to explain what and why, not how
 
-This is an example commit message:
+Worked example:
 
 ```
 Summarize changes in around 50 characters or less
 
 More detailed explanatory text, if necessary. Wrap it to about 72
-characters or so. In some contexts, the first line is treated as the
-subject of the commit and the rest of the text as the body. The
-blank line separating the summary from the body is critical (unless
-you omit the body entirely); various tools like `log`, `shortlog`
-and `rebase` can get confused if you run the two together.
+characters. In some contexts the first line is treated as the
+subject and the rest as the body. The blank line separating them
+is critical; tools like `log`, `shortlog`, and `rebase` get
+confused without it.
 
-Explain the problem that this commit is solving. Focus on why you
-are making this change as opposed to how (the code explains that).
-Are there side effects or other unintuitive consequences of this
-change? Here's the place to explain them.
+Explain the problem this commit solves. Focus on why you are
+making this change as opposed to how - the code explains that.
+Are there side effects or unintuitive consequences? Here is the
+place to explain them.
 
-Further paragraphs come after blank lines.
+ - Bullet points are okay
+ - Use a hyphen or asterisk preceded by a single space
 
- - Bullet points are okay, too
-
- - Typically a hyphen or asterisk is used for the bullet, preceded
-   by a single space, with blank lines in between, but conventions
-   vary here
-
-If you use an issue tracker, put references to them at the bottom,
-like this:
+If you use an issue tracker, put references at the bottom:
 
 Resolves: #123
 See also: #456, #789
 ```
 
-## Important Directories
+Sign-off (`git commit -s`) is required only for external
+contributors. See `CONTRIBUTING.md`.
 
-- `CMake/`: Build macros and utilities
-- `CMakeExternals/`: External dependency definitions
-- `CMake/BuildConfigurations/`: Predefined build configuration sets
-- `Applications/`: Standalone apps (MitkWorkbench, FlowBench)
-- `Documentation/`: Doxygen configuration and developer manual (`.dox` files)
-- `Templates/`: File templates including the mandatory copyright header
+## Pointers
+
+- Style guide:
+  `Documentation/Doxygen/3-DeveloperManual/Starting/GettingToKnow/StyleGuideAndNotes.dox`
+- Contribution workflow: `CONTRIBUTING.md`
+- Copyright header: `Templates/copyright_header.txt`
+- Build configurations: `CMake/BuildConfigurations/`
+- External dependency definitions:
+  `CMakeExternals/ExternalProjectList.cmake`
+
+Specialised, file-type- or subtree-specific rules live in
+`.claude/rules/` - they activate automatically when you work on
+matching files.

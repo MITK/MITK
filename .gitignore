@@ -94,4 +94,5 @@ __pycache__/
 /Wrapping/Python/docs/_build/
 
 ## Claude Code
-.claude/
+.claude/*
+!.claude/rules/

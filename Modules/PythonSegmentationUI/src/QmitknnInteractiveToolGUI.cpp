@@ -533,7 +533,21 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->autoZoomCheckBox->setChecked(false);
     m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
 
-  #if !defined(__APPLE__)
+  #if defined(__APPLE__)
+    // On macOS nnInteractive has no GPU acceleration and always runs on the CPU,
+    // so the NVIDIA-specific guidance in the non-Apple branch does not apply.
+    // Point users at remote mode, which offloads inference to a server GPU.
+    const QString macCpuBackendMessage = QString(
+      "<h3 %1>Running on CPU</h3>"
+      "<p %1>nnInteractive has no GPU acceleration on macOS and runs on the CPU, "
+      "which is <em>significantly slower</em>.</p>"
+      "<p %1>For fast response times, run inference on a remote nnInteractive server "
+      "with a GPU. Enable it in the nnInteractive preferences under <em>Inference</em> "
+      "by selecting <em>Remote server</em>.</p>")
+      .arg(LINE_HEIGHT_STYLE);
+
+    QMessageBox::warning(nullptr, "nnInteractive", macCpuBackendMessage);
+  #else
     const QString cpuBackendMessage = QString(
       "<h3 %1>No compatible CUDA device detected</h3>"
       "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
@@ -544,7 +558,10 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
         "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
         "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>"
       "</ul>"
-      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>")
+      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>"
+      "<p %1>Alternatively, you can run inference on a remote nnInteractive server with a GPU. "
+      "Enable it in the nnInteractive preferences under <em>Inference</em> by selecting "
+      "<em>Remote server</em>.</p>")
       .arg(LINE_HEIGHT_STYLE);
 
     QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);

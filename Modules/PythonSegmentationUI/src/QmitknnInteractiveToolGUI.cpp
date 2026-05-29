@@ -175,6 +175,9 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
     tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnSessionEnded);
 
+    tool->SessionExpiredEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionExpired);
+
     tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
 
@@ -226,6 +229,9 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->GetTool()->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
     this, &QmitknnInteractiveToolGUI::OnSessionEnded);
 
+  this->GetTool()->SessionExpiredEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionExpired);
+
   Superclass::InitializeUI(mainLayout);
 
   // TODO: Once we agree on a common shortcut concept, the confirm binding
@@ -258,6 +264,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
       this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
 
   this->ApplyShortcutLabels();
+  this->UpdateInitializeButtonText();
 }
 
 void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
@@ -469,13 +476,27 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     {
       messageBox->accept();
 
-      const std::string errorMessage = "nnInteractive reported an error during initialization (see details).";
-      MITK_ERROR << errorMessage << '\n' << e.GetDescription();
+      const QString description = QString::fromLocal8Bit(e.GetDescription());
+
+      // Errors thrown directly from C++ (a mapped remote connection failure or
+      // a missing configuration) carry a clean, user-facing message and are
+      // shown as-is. Errors bubbling up from the embedded Python interpreter
+      // carry a traceback, so we keep a generic headline and tuck the traceback
+      // into the (collapsed) details.
+      const bool isPythonError = description.contains("An error occurred while executing Python code:");
+
+      const QString headline = isPythonError
+        ? QStringLiteral("nnInteractive reported an error during initialization (see details).")
+        : description;
+
+      MITK_ERROR << "nnInteractive initialization failed:\n" << e.GetDescription();
 
       auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
-        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(QString::fromStdString(errorMessage)));
+        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline));
 
-      errorMsgBox->setDetailedText(QString::fromLocal8Bit(e.GetDescription()));
+      if (isPythonError)
+        errorMsgBox->setDetailedText(description);
+
       errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
       errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
       errorMsgBox->setModal(true);
@@ -496,6 +517,9 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->resetButton->setEnabled(true);
     m_Ui->promptTypeGroupBox->setEnabled(true);
     m_Ui->interactionToolsGroupBox->setEnabled(true);
+
+    // Disable interaction buttons the loaded checkpoint does not support.
+    this->ApplyCapabilityGating();
 
     auto backend = this->GetTool()->GetBackend();
 
@@ -757,6 +781,47 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   m_Ui->settingsButton->setEnabled(true);
 }
 
+void QmitknnInteractiveToolGUI::OnSessionExpired()
+{
+  // A remote session was lost mid-use. Tear it down on the next event-loop tick
+  // rather than now: this fires from within an interactor's event handling,
+  // where disabling/resetting interactors is unsafe. AbortSession() ends the
+  // session, clears all prompts and the preview, and -- via SessionEndedEvent
+  // -> OnSessionEnded -- reverts the widget to its pre-init state, so the user
+  // just clicks Initialize to reconnect.
+  QTimer::singleShot(0, this, [this]() {
+    if (QCoreApplication::closingDown())
+      return;
+
+    if (auto* tool = this->GetTool())
+      tool->AbortSession();
+
+    const auto message = QString(
+      "<h3 %1>Remote session ended</h3>"
+      "<p %1>The connection to the nnInteractive server was lost or the session "
+      "expired (idle timeout, server restart, or the server is at capacity).</p>"
+      "<p %1>Your interactions were cleared. Click <em>Initialize</em> to start a "
+      "new session.</p>").arg(LINE_HEIGHT_STYLE);
+
+    QMessageBox::warning(nullptr, "nnInteractive", message);
+  });
+}
+
+void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
+{
+  auto* tool = this->GetTool();
+  if (tool == nullptr)
+    return;
+
+  const auto caps = tool->GetSupportedInteractions();
+
+  m_Ui->pointButton->setEnabled(caps.Point);
+  m_Ui->boxButton->setEnabled(caps.Box);
+  m_Ui->scribbleButton->setEnabled(caps.Scribble);
+  m_Ui->lassoButton->setEnabled(caps.Lasso);
+  m_Ui->maskButton->setEnabled(caps.Mask);
+}
+
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()
 {
   if (m_AutoConfirmInProgress)
@@ -813,6 +878,14 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 {
   if (event.GetProperty() == "nnInteractive/showShortcutsInLabels")
     this->ApplyShortcutLabels();
+  else if (event.GetProperty() == "nnInteractive/inferenceMode")
+    this->UpdateInitializeButtonText();
+}
+
+void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
+{
+  const bool remote = m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
+  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize (local)");
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

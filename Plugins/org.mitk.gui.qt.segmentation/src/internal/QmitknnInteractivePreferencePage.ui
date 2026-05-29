@@ -158,6 +158,124 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="inferenceGroupBox">
+         <property name="title">
+          <string>Inference</string>
+         </property>
+         <layout class="QVBoxLayout" name="inferenceLayout">
+          <item>
+           <widget class="QRadioButton" name="localModeRadioButton">
+            <property name="toolTip">
+             <string>Run inference locally in this application's Python environment.</string>
+            </property>
+            <property name="text">
+             <string>Local</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="remoteModeRadioButton">
+            <property name="toolTip">
+             <string>Run inference on a remote nninteractive-server, which provides the model and GPU.</string>
+            </property>
+            <property name="text">
+             <string>Remote server</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="remoteServerLayout">
+            <property name="leftMargin">
+             <number>20</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="serverUrlLabel">
+              <property name="text">
+               <string>Server URL:</string>
+              </property>
+              <property name="buddy">
+               <cstring>serverUrlLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="serverUrlLineEdit">
+              <property name="placeholderText">
+               <string>http://127.0.0.1:1527</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="apiKeyLabel">
+              <property name="text">
+               <string>API key:</string>
+              </property>
+              <property name="buddy">
+               <cstring>apiKeyLineEdit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="apiKeyLineEdit">
+              <property name="echoMode">
+               <enum>QLineEdit::EchoMode::Password</enum>
+              </property>
+              <property name="placeholderText">
+               <string>optional</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="remoteHelpLabel">
+              <property name="font">
+               <font>
+                <italic>true</italic>
+               </font>
+              </property>
+              <property name="text">
+               <string>&lt;small&gt;The API key is stored in plain text in the application preferences. If left empty, the NN_INTERACTIVE_API_KEY environment variable is used instead.&lt;/small&gt;</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="inferenceRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="modelGroupBox">
          <property name="title">
           <string>Model</string>
@@ -393,6 +511,10 @@
   <tabstop>autoCreateNextLabelCheckBox</tabstop>
   <tabstop>skipNamingPromptCheckBox</tabstop>
   <tabstop>autoConfirmCheckBox</tabstop>
+  <tabstop>localModeRadioButton</tabstop>
+  <tabstop>remoteModeRadioButton</tabstop>
+  <tabstop>serverUrlLineEdit</tabstop>
+  <tabstop>apiKeyLineEdit</tabstop>
   <tabstop>showShortcutsInLabelsCheckBox</tabstop>
   <tabstop>autoBackendRadioButton</tabstop>
   <tabstop>cpuBackendRadioButton</tabstop>

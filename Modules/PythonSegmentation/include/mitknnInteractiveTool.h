@@ -63,6 +63,26 @@ namespace mitk
       int TotalMemoryMB;    /**< \brief Total device memory in megabytes. */
     };
 
+    /** \brief Which interaction types the running session's model checkpoint
+     *         supports.
+     *
+     * Populated from the session's capability metadata
+     * (\c supported_interactions and \c supports_initial_label). Used by the
+     * GUI to enable or disable the interaction buttons. Applies to both local
+     * and remote sessions; a remote server may host a checkpoint with
+     * different capabilities than the local default.
+     *
+     * \sa GetSupportedInteractions()
+     */
+    struct SupportedInteractions
+    {
+      bool Point = true;    /**< \brief Point ("points") interaction supported. */
+      bool Box = true;      /**< \brief Box ("bbox2d"/"bbox3d") interaction supported. */
+      bool Scribble = true; /**< \brief Scribble ("scribble") interaction supported. */
+      bool Lasso = true;    /**< \brief Lasso ("lasso") interaction supported. */
+      bool Mask = true;     /**< \brief Initial-segmentation mask ("initial_label") supported. */
+    };
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
     itkFactorylessNewMacro(Self)
 
@@ -292,12 +312,49 @@ namespace mitk
      */
     void EndSession();
 
+    /** \brief Tears down a remote session whose connection was lost.
+     *
+     * Disables the active interactor, ends the (now dead) Python session,
+     * clears all interactions/prompts and the preview, and refreshes the
+     * render windows. SessionEndedEvent (emitted by the internal EndSession)
+     * lets the GUI revert its session-dependent controls so the user only has
+     * to click Initialize to reconnect.
+     *
+     * \warning Must be called from a clean call stack (e.g. deferred from the
+     *          GUI), never from within an interactor's event handling, because
+     *          it disables and resets the interactors.
+     *
+     * \sa SessionExpiredEvent, EndSession()
+     */
+    void AbortSession();
+
     /** \brief Checks whether an nnInteractive session is currently running.
      *
      * \return \c true if a Python context exists and contains a valid
      *         session variable, \c false otherwise.
      */
     bool IsSessionRunning() const;
+
+    /** \brief Returns whether the running session is a remote (server) session.
+     *
+     * \return \c true if the current session was started in remote mode (i.e.
+     *         it talks to an nninteractive-server), \c false for a local
+     *         in-process session or when no session is running.
+     *
+     * \sa StartSession()
+     */
+    bool IsRemoteSession() const;
+
+    /** \brief Returns which interaction types the running session supports.
+     *
+     * Reads the session's capability metadata. If no session is running, all
+     * interactions are reported as supported (the defaults).
+     *
+     * \return A SupportedInteractions struct.
+     *
+     * \sa SupportedInteractions
+     */
+    SupportedInteractions GetSupportedInteractions() const;
 
     /** \brief Initializes or reinitializes the session with an existing mask.
      *
@@ -351,6 +408,17 @@ namespace mitk
      * state.
      */
     Message<> SessionEndedEvent;
+
+    /** \brief Event triggered when a remote session was lost server-side.
+     *
+     * Emitted after EndSession() (so SessionEndedEvent has already reverted the
+     * session-dependent UI) when a remote operation failed because the lease
+     * expired or the server is at capacity / unreachable. GUI code can
+     * subscribe to inform the user that they need to re-initialize.
+     *
+     * \sa SessionEndedEvent
+     */
+    Message<> SessionExpiredEvent;
 
   protected:
     /** \brief Default constructor. Initializes interactors and connects events.
@@ -421,6 +489,61 @@ namespace mitk
     void SetPreviewLabel(MultiLabelSegmentation::LabelValueType value, const Color& color);
 
   private:
+    /** \brief Constructs a local in-process inference session.
+     *
+     * Detects the backend (CUDA/CPU), resolves the model checkpoint, and
+     * instantiates the local nnInteractiveInferenceSession. Called by
+     * StartSession() when inference mode is "local".
+     */
+    void ConstructLocalSession();
+
+    /** \brief Constructs a remote inference session against an nninteractive-server.
+     *
+     * Reads the server URL and API key from the preferences and instantiates
+     * nnInteractiveRemoteInferenceSession (which claims a session on the
+     * server). Called by StartSession() when inference mode is "remote".
+     *
+     * \throw mitk::Exception if no server URL is configured or the server
+     *        cannot be reached / is at capacity.
+     */
+    void ConstructRemoteSession();
+
+    /** \brief Allocates the target buffer, binds the reference image and target
+     *         buffer to the Python session, and pins the session to the current
+     *         time step.
+     *
+     * Shared by ConstructLocalSession() and ConstructRemoteSession(). For
+     * remote sessions the numpy target buffer is handed to the session
+     * directly (the server mirrors prediction diffs into it in place); for
+     * local sessions it is wrapped in a torch tensor as before.
+     */
+    void BindSessionImageAndTargetBuffer();
+
+    /** \brief Does this error indicate a lost or failed remote connection?
+     *
+     * Remote session calls are wrapped so that httpx transport and status
+     * errors (httpx.HTTPError, the base of all of them) and the typed lease
+     * errors are caught by type and re-raised as a single stable sentinel.
+     * This checks for that sentinel, so detection does not depend on httpx or
+     * OS error wording. Always \c false for local sessions.
+     *
+     * \param[in] message The description of a caught mitk::Exception.
+     */
+    bool IsRemoteConnectionError(const std::string& message) const;
+
+    /** \brief If an error indicates a lost remote connection, request teardown
+     *         and report it as handled.
+     *
+     * Emits SessionExpiredEvent (the GUI then tears the session down on the
+     * next event-loop tick via AbortSession(), since teardown must not run
+     * while an interactor is mid-event) and returns \c true so the caller can
+     * swallow the error. Returns \c false for any other error, which the
+     * caller should rethrow.
+     *
+     * \param[in] errorMessage The description of a caught mitk::Exception.
+     */
+    bool HandleSessionError(const std::string& errorMessage);
+
     class Impl;
     std::unique_ptr<Impl> m_Impl;
   };

@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveScribbleInteractor.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPythonContext.h>
+#include <mitkRenderingManager.h>
 #include <mitkToolManager.h>
 
 #include <usGetModuleContext.h>
@@ -66,6 +67,28 @@ namespace
     }
     result.push_back('\'');
     return result;
+  }
+
+  // Stable sentinel used to recognize a lost remote connection. We raise it
+  // ourselves (see WrapInRemoteGuard) after a type-based catch, so detection
+  // never depends on httpx or OS error wording.
+  constexpr auto REMOTE_CONNECTION_LOST_SENTINEL = "NNI_REMOTE_CONNECTION_LOST";
+
+  // Wrap generated Python that talks to the remote session so that any httpx
+  // error (httpx.HTTPError is the base of every transport and status error) or
+  // lease error is caught by type and re-raised as our own sentinel. The
+  // session-error imports (httpx, ServerAtCapacityError, SessionExpiredError)
+  // are made by ConstructRemoteSession() before any session call runs.
+  std::string WrapInRemoteGuard(const std::string& code)
+  {
+    std::ostringstream out;
+    out << "try:\n";
+    std::istringstream in(code);
+    for (std::string line; std::getline(in, line);)
+      out << "    " << line << '\n';
+    out << "except (httpx.HTTPError, ServerAtCapacityError, SessionExpiredError) as _nni_e:\n"
+        << "    raise RuntimeError('" << REMOTE_CONNECTION_LOST_SENTINEL << ": ' + repr(_nni_e))\n";
+    return out.str();
   }
 }
 
@@ -134,6 +157,14 @@ namespace mitk
       m_PythonContext = nullptr;
     }
 
+    // Executes Python that drives the inference session. For remote sessions the
+    // code is wrapped (see WrapInRemoteGuard) so httpx/lease failures surface as
+    // our own stable sentinel; for local sessions it runs verbatim.
+    void ExecuteSession(const std::string& code) const
+    {
+      m_PythonContext->Execute(this->Remote ? WrapInRemoteGuard(code) : code);
+    }
+
     // Methods that execute Python code are defined at the bottom of this file.
     void SetAutoZoom() const;
     void AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const;
@@ -149,6 +180,7 @@ namespace mitk
     Image::Pointer InitialSeg;
     bool AutoZoom;
     bool AutoRefine;
+    bool Remote = false;
     TimeStepType SessionReferenceDataTimeStep = 0;
     TimeStepType SessionWorkingDataTimeStep = 0;
 
@@ -262,7 +294,22 @@ void mitk::nnInteractiveTool::ResetInteractions()
   m_Impl->InitialSeg = nullptr;
 
   if (this->IsSessionRunning())
-    m_Impl->ResetInteractions();
+  {
+    try
+    {
+      m_Impl->ResetInteractions();
+    }
+    catch (const Exception& e)
+    {
+      // The local prompts are already cleared above. If the remote reset failed
+      // because the connection is gone, there is nothing left to reset on the
+      // server; the loss surfaces with full teardown on the next interaction.
+      if (!this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+        throw;
+
+      MITK_WARN << "nnInteractive: could not reset interactions on the remote server (connection lost).";
+    }
+  }
 
   this->UpdatePreview();
 }
@@ -290,7 +337,21 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
   m_Impl->AutoZoom = autoZoom;
 
   if (this->IsSessionRunning())
-    m_Impl->SetAutoZoom();
+  {
+    try
+    {
+      m_Impl->SetAutoZoom();
+    }
+    catch (const Exception& e)
+    {
+      // Non-critical: if the connection dropped, the loss surfaces with full
+      // teardown on the next interaction.
+      if (!this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+        throw;
+
+      MITK_WARN << "nnInteractive: could not update auto-zoom on the remote server (connection lost).";
+    }
+  }
 }
 
 bool mitk::nnInteractiveTool::GetAutoRefine() const
@@ -360,62 +421,75 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
   const auto* interactor = m_Impl->GetEnabledInteractor();
 
-  if (interactor != nullptr)
+  try
   {
-    switch (interactor->GetType())
+    if (interactor != nullptr)
     {
-      case InteractionType::Point:
+      switch (interactor->GetType())
       {
-        auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
-        m_Impl->AddPointInteraction(point.value(), inputAtTimeStep);
-        break;
-      }
-      case InteractionType::Box:
-      {
-        auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
-        m_Impl->AddBoxInteraction(box, inputAtTimeStep);
-        break;
-      }
-      case InteractionType::Scribble:
-      {
-        auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
-        auto mask = scribbleInteractor->GetLastScribbleMask();
-        if (mask.IsNull())
+        case InteractionType::Point:
         {
-          MITK_WARN << "Skipping scribble preview update: no mask available.";
-          return;
+          auto point = static_cast<const PointInteractor*>(interactor)->GetLastPoint();
+          m_Impl->AddPointInteraction(point.value(), inputAtTimeStep);
+          break;
         }
-        m_Impl->AddScribbleInteraction(mask.GetPointer(), scribbleInteractor->GetLastScribbleBoundingBox());
-        break;
-      }
-      case InteractionType::Lasso:
-      {
-        auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
-        auto mask = lassoInteractor->GetLastLassoMask();
-        if (mask.IsNull())
+        case InteractionType::Box:
         {
-          MITK_WARN << "Skipping lasso preview update: no mask available.";
-          return;
+          auto box = static_cast<const BoxInteractor*>(interactor)->GetLastBox();
+          m_Impl->AddBoxInteraction(box, inputAtTimeStep);
+          break;
         }
-        m_Impl->AddLassoInteraction(mask.GetPointer(), lassoInteractor->GetLastLassoBoundingBox());
-        break;
+        case InteractionType::Scribble:
+        {
+          auto scribbleInteractor = static_cast<const ScribbleInteractor*>(interactor);
+          auto mask = scribbleInteractor->GetLastScribbleMask();
+          if (mask.IsNull())
+          {
+            MITK_WARN << "Skipping scribble preview update: no mask available.";
+            return;
+          }
+          m_Impl->AddScribbleInteraction(mask.GetPointer(), scribbleInteractor->GetLastScribbleBoundingBox());
+          break;
+        }
+        case InteractionType::Lasso:
+        {
+          auto lassoInteractor = static_cast<const LassoInteractor*>(interactor);
+          auto mask = lassoInteractor->GetLastLassoMask();
+          if (mask.IsNull())
+          {
+            MITK_WARN << "Skipping lasso preview update: no mask available.";
+            return;
+          }
+          m_Impl->AddLassoInteraction(mask.GetPointer(), lassoInteractor->GetLastLassoBoundingBox());
+          break;
+        }
+        default:
+          MITK_ERROR << "Cannot update preview because of unknown interaction type!";
+          return;
       }
-      default:
-        MITK_ERROR << "Cannot update preview because of unknown interaction type!";
-        return;
+
+      previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
+
+      this->PreviewUpdatedEvent.Send();
     }
-
-    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
-
-    this->PreviewUpdatedEvent.Send();
+    else if (m_Impl->InitialSeg.IsNotNull())
+    {
+      m_Impl->AddInitialSegInteraction(previewImage, timeStep);
+    }
+    else
+    {
+      this->ResetPreviewContentAtTimeStep(timeStep);
+    }
   }
-  else if (m_Impl->InitialSeg.IsNotNull())
+  catch (const Exception& e)
   {
-    m_Impl->AddInitialSegInteraction(previewImage, timeStep);
-  }
-  else
-  {
-    this->ResetPreviewContentAtTimeStep(timeStep);
+    // A remote session can fail mid-interaction (lease expired, server gone, or
+    // at capacity). Tear it down and notify the GUI; otherwise propagate the
+    // error as before so local failures keep their existing behavior.
+    if (this->HandleSessionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+      return;
+
+    throw;
   }
 }
 
@@ -533,6 +607,93 @@ void mitk::nnInteractiveTool::StartSession()
   if (this->IsSessionRunning())
     this->EndSession();
 
+  auto prefs = GetPreferences();
+  m_Impl->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
+
+  if (m_Impl->Remote)
+    this->ConstructRemoteSession();
+  else
+    this->ConstructLocalSession();
+}
+
+void mitk::nnInteractiveTool::ConstructRemoteSession()
+{
+  auto prefs = GetPreferences();
+  const auto serverUrl = prefs->Get("nnInteractive/serverUrl", "");
+  const auto apiKey = prefs->Get("nnInteractive/apiKey", "");
+
+  if (serverUrl.empty())
+    mitkThrow() << "Remote mode is selected but no server URL is configured. "
+                   "Set it in Preferences -> Segmentation -> nnInteractive.";
+
+  m_Impl->ResetBackend();
+
+  auto pythonContext = m_Impl->GetPythonContext();
+
+  // Claim a session on the server. Map the expected failure modes to short,
+  // user-facing messages (reported via the nni_connect_error variable) instead
+  // of letting an httpx/Python traceback bubble up to the GUI.
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "from nnInteractive.inference.remote import (\n"
+      << "    nnInteractiveRemoteInferenceSession, ServerAtCapacityError, SessionExpiredError)\n"
+      << "import httpx\n"
+      << "nni_server_url = " << PyQuote(serverUrl) << "\n"
+      << "nni_connect_error = ''\n"
+      << "try:\n"
+      << "    session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key="
+        << (apiKey.empty() ? std::string("None") : PyQuote(apiKey)) << ")\n"
+      << "except ServerAtCapacityError:\n"
+      << "    nni_connect_error = 'The nnInteractive server is at capacity. Please try again later.'\n"
+      << "except SessionExpiredError:\n"
+      << "    nni_connect_error = 'The nnInteractive server rejected the session request. Please try again.'\n"
+      << "except httpx.HTTPStatusError as _e:\n"
+      << "    if _e.response.status_code == 401:\n"
+      << "        nni_connect_error = 'The nnInteractive server rejected the API key. Check the API key in the nnInteractive preferences.'\n"
+      << "    elif 'text/html' in _e.response.headers.get('content-type', ''):\n"
+      << "        nni_connect_error = (f'The server at {nni_server_url} returned an HTML page instead of a response. '\n"
+      << "                             'An HTTP proxy may be intercepting the request; try adding the host to NO_PROXY.')\n"
+      << "    else:\n"
+      << "        nni_connect_error = f'The nnInteractive server returned an error (HTTP {_e.response.status_code}).'\n"
+      << "except (httpx.ConnectError, httpx.ConnectTimeout):\n"
+      << "    nni_connect_error = f'Could not reach the nnInteractive server at {nni_server_url}. Check the server URL and make sure the server is running.'\n"
+      << "except httpx.HTTPError as _e:\n"
+      << "    nni_connect_error = f'Could not connect to the nnInteractive server at {nni_server_url}: {_e}'\n";
+    pythonContext->Execute(pyCommands.str());
+  }
+
+  const auto connectError = pythonContext->GetVariableAsString("nni_connect_error").value_or("");
+
+  pythonContext->Execute("del nni_server_url, nni_connect_error\n");
+
+  if (!connectError.empty())
+    mitkThrow() << connectError;
+
+  // The lease is claimed. If configuring the session or uploading the image
+  // fails because the connection dropped mid-flight, release the half-open
+  // lease and surface a short message instead of a raw traceback.
+  try
+  {
+    m_Impl->ExecuteSession(
+      std::string("session.set_do_autozoom(") + (m_Impl->AutoZoom ? "True" : "False") + ")\n");
+
+    this->BindSessionImageAndTargetBuffer();
+  }
+  catch (const Exception& e)
+  {
+    if (this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+    {
+      this->EndSession();
+      mitkThrow() << "Lost the connection to the nnInteractive server while starting the session. "
+                     "Check the server and try again.";
+    }
+
+    throw;
+  }
+}
+
+void mitk::nnInteractiveTool::ConstructLocalSession()
+{
   auto pythonContext = m_Impl->GetPythonContext();
   bool useCUDADevice = false;
 
@@ -677,6 +838,13 @@ void mitk::nnInteractiveTool::StartSession()
     ? Backend::CUDA
     : Backend::CPU);
 
+  this->BindSessionImageAndTargetBuffer();
+}
+
+void mitk::nnInteractiveTool::BindSessionImageAndTargetBuffer()
+{
+  auto pythonContext = m_Impl->GetPythonContext();
+
   auto image = this->GetToolManager()->GetReferenceData(0)->GetDataAs<Image>();
 
   const auto timePoint = this->GetToolManager()->GetCurrentTimePoint();
@@ -691,13 +859,29 @@ void mitk::nnInteractiveTool::StartSession()
   pythonContext->BindImage(imageAtTimeStep, "mitk_image");
   pythonContext->BindImage(m_Impl->TargetBuffer.GetPointer(), "mitk_target_buffer");
 
-  pythonContext->Execute(
-    "image = mitk_image.as_numpy(writeable=True)\n"
-    "spacing = list(reversed(mitk_image.spacing))\n"
-    "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n"
-    "torch_target_buffer = torch.from_numpy(target_buffer)\n"
-    "session.set_image(image[None], {'spacing': spacing})\n"
-    "session.set_target_buffer(torch_target_buffer)\n");
+  std::ostringstream pyCommands; pyCommands
+    << "image = mitk_image.as_numpy(writeable=True)\n"
+    << "spacing = list(reversed(mitk_image.spacing))\n"
+    << "target_buffer = mitk_target_buffer.as_numpy(writeable=True)\n";
+
+  if (m_Impl->Remote)
+  {
+    // The remote session writes prediction diffs straight into the numpy view
+    // of our C++ target buffer, so hand it the numpy array directly (no torch
+    // wrapper -> no torch dependency on this path).
+    pyCommands
+      << "session.set_image(image[None], {'spacing': spacing})\n"
+      << "session.set_target_buffer(target_buffer)\n";
+  }
+  else
+  {
+    pyCommands
+      << "torch_target_buffer = torch.from_numpy(target_buffer)\n"
+      << "session.set_image(image[None], {'spacing': spacing})\n"
+      << "session.set_target_buffer(torch_target_buffer)\n";
+  }
+
+  m_Impl->ExecuteSession(pyCommands.str());
 
   // Pin the session to the time steps that were active when it was started.
   // OnTimePointChanged() ends the session if either changes, since the Python
@@ -715,21 +899,121 @@ void mitk::nnInteractiveTool::EndSession()
   if (!this->IsSessionRunning())
     return;
 
-  std::ostringstream pyCommands; pyCommands
-    << "session._reset_session()\n"
-    << "del session.network\n"
-    << "del session\n";
+  if (m_Impl->Remote)
+  {
+    // Release the server lease right away so the slot frees up for other users
+    // instead of waiting for the idle reaper. close() is best-effort and
+    // idempotent server-side; swallow errors so teardown always completes.
+    try
+    {
+      m_Impl->GetPythonContext()->Execute(
+        "session.close()\n"
+        "del session\n");
+    }
+    catch (const Exception& e)
+    {
+      MITK_WARN << "nnInteractive: error while releasing the remote session (ignored): "
+                << e.GetDescription();
+    }
+  }
+  else
+  {
+    std::ostringstream pyCommands; pyCommands
+      << "session._reset_session()\n"
+      << "del session.network\n"
+      << "del session\n";
 
-  if (m_Impl->GetBackend() == Backend::CUDA)
-    pyCommands << "torch.cuda.empty_cache()\n";
+    if (m_Impl->GetBackend() == Backend::CUDA)
+      pyCommands << "torch.cuda.empty_cache()\n";
 
-  m_Impl->GetPythonContext()->Execute(pyCommands.str());
+    m_Impl->GetPythonContext()->Execute(pyCommands.str());
+  }
+
   m_Impl->DestroyPythonContext();
 
+  m_Impl->Remote = false;
   m_Impl->SessionReferenceDataTimeStep = 0;
   m_Impl->SessionWorkingDataTimeStep = 0;
 
   this->SessionEndedEvent.Send();
+}
+
+bool mitk::nnInteractiveTool::IsRemoteSession() const
+{
+  return m_Impl->Remote;
+}
+
+mitk::nnInteractiveTool::SupportedInteractions mitk::nnInteractiveTool::GetSupportedInteractions() const
+{
+  SupportedInteractions caps;
+
+  if (!this->IsSessionRunning())
+    return caps;
+
+  try
+  {
+    auto pythonContext = m_Impl->GetPythonContext();
+
+    pythonContext->Execute(
+      "_nni_caps = session.supported_interactions\n"
+      "support_points = bool(_nni_caps.get('points', False))\n"
+      "support_box = bool(_nni_caps.get('bbox2d', False) or _nni_caps.get('bbox3d', False))\n"
+      "support_scribble = bool(_nni_caps.get('scribble', False))\n"
+      "support_lasso = bool(_nni_caps.get('lasso', False))\n"
+      "support_mask = bool(session.supports_initial_label)\n");
+
+    caps.Point = pythonContext->GetVariableAsBool("support_points").value_or(true);
+    caps.Box = pythonContext->GetVariableAsBool("support_box").value_or(true);
+    caps.Scribble = pythonContext->GetVariableAsBool("support_scribble").value_or(true);
+    caps.Lasso = pythonContext->GetVariableAsBool("support_lasso").value_or(true);
+    caps.Mask = pythonContext->GetVariableAsBool("support_mask").value_or(true);
+
+    pythonContext->Execute(
+      "del _nni_caps, support_points, support_box, support_scribble, support_lasso, support_mask\n");
+  }
+  catch (const Exception& e)
+  {
+    MITK_WARN << "nnInteractive: could not read session capabilities: " << e.GetDescription();
+  }
+
+  return caps;
+}
+
+bool mitk::nnInteractiveTool::IsRemoteConnectionError(const std::string& message) const
+{
+  // ExecuteSession() wraps remote session calls in a Python try/except that
+  // catches httpx.HTTPError (the base of every httpx transport/status error)
+  // and the typed lease errors, then re-raises our own stable sentinel. So a
+  // robust check is just for that sentinel -- no guessing at httpx or OS error
+  // wording.
+  return m_Impl->Remote && message.find(REMOTE_CONNECTION_LOST_SENTINEL) != std::string::npos;
+}
+
+bool mitk::nnInteractiveTool::HandleSessionError(const std::string& errorMessage)
+{
+  if (!this->IsRemoteConnectionError(errorMessage))
+    return false;
+
+  // Do not tear down here: this runs while an interactor is mid-event, where
+  // disabling/resetting interactors is unsafe. Signal the GUI, which calls
+  // AbortSession() on the next event-loop tick.
+  this->SessionExpiredEvent.Send();
+
+  return true;
+}
+
+void mitk::nnInteractiveTool::AbortSession()
+{
+  this->DisableInteractor();
+
+  // End the dead session first so ResetInteractions() below skips the remote
+  // session.reset_interactions() call (guarded by IsSessionRunning()).
+  this->EndSession();
+
+  this->ResetInteractions();
+  this->ResetPreviewContent();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::nnInteractiveTool::OnTimePointChanged()
@@ -785,7 +1069,7 @@ void mitk::nnInteractiveTool::Impl::SetAutoZoom() const
   std::ostringstream pyCommands; pyCommands
     << "session.set_do_autozoom(" << (this->AutoZoom ? "True" : "False") << ")\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, const Image* inputAtTimeStep) const
@@ -799,7 +1083,7 @@ void mitk::nnInteractiveTool::Impl::AddPointInteraction(const Point3D& point, co
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, const Image* inputAtTimeStep) const
@@ -830,7 +1114,7 @@ void mitk::nnInteractiveTool::Impl::AddBoxInteraction(const PlanarFigure* box, c
     << "    include_interaction=" << (this->PromptType == PromptType::Positive ? "True" : "False") << '\n'
     << ")\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const
@@ -856,7 +1140,7 @@ void mitk::nnInteractiveTool::Impl::AddScribbleInteraction(const Image* mask, co
     << ")\n"
     << "del scribble_mask\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const
@@ -882,7 +1166,7 @@ void mitk::nnInteractiveTool::Impl::AddLassoInteraction(const Image* mask, const
     << ")\n"
     << "del lasso_mask\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 }
 
 void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const
@@ -897,12 +1181,12 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
     << ")\n"
     << "del initial_seg\n";
 
-  m_PythonContext->Execute(pyCommands.str());
+  this->ExecuteSession(pyCommands.str());
 
   previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), this->TargetBuffer, timeStep, 0, ImageAccessorBase::IgnoreLock);
 }
 
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const
 {
-  m_PythonContext->Execute("session.reset_interactions()\n");
+  this->ExecuteSession("session.reset_interactions()\n");
 }

@@ -78,6 +78,11 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Ui->localModelPathBrowseButton, &QToolButton::clicked,
     this, &QmitknnInteractivePreferencePage::OnBrowseLocalModelPath);
 
+  connect(m_Ui->localModeRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnInferenceModeToggled);
+  connect(m_Ui->remoteModeRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnInferenceModeToggled);
+
   this->Update();
 }
 
@@ -127,6 +132,12 @@ bool QmitknnInteractivePreferencePage::PerformOk()
   prefs->Put("nnInteractive/localModelPath",
     m_Ui->localModelPathLineEdit->text().trimmed().toStdString());
 
+  prefs->Put("nnInteractive/inferenceMode",
+    m_Ui->remoteModeRadioButton->isChecked() ? "remote" : "local");
+  prefs->Put("nnInteractive/serverUrl",
+    m_Ui->serverUrlLineEdit->text().trimmed().toStdString());
+  prefs->Put("nnInteractive/apiKey", m_Ui->apiKeyLineEdit->text().toStdString());
+
   return true;
 }
 
@@ -146,6 +157,9 @@ void QmitknnInteractivePreferencePage::Update()
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
   const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
   const auto localModelPath = prefs->Get("nnInteractive/localModelPath", "");
+  const auto inferenceMode = prefs->Get("nnInteractive/inferenceMode", "local");
+  const auto serverUrl = prefs->Get("nnInteractive/serverUrl", "");
+  const auto apiKey = prefs->Get("nnInteractive/apiKey", "");
 
   m_Ui->autoCreateNextLabelCheckBox->setChecked(autoCreateNextLabel);
   m_Ui->skipNamingPromptCheckBox->setChecked(skipNamingPrompt);
@@ -178,7 +192,16 @@ void QmitknnInteractivePreferencePage::Update()
 
   m_Ui->localModelPathLineEdit->setText(QString::fromStdString(localModelPath));
 
-  this->OnModelSourceToggled();
+  if (inferenceMode == "remote")
+    m_Ui->remoteModeRadioButton->setChecked(true);
+  else
+    m_Ui->localModeRadioButton->setChecked(true);
+
+  m_Ui->serverUrlLineEdit->setText(QString::fromStdString(serverUrl));
+  m_Ui->apiKeyLineEdit->setText(QString::fromStdString(apiKey));
+
+  // Calls OnModelSourceToggled() itself when local mode is active.
+  this->OnInferenceModeToggled();
 
   this->UpdateUninstallButton();
 }
@@ -193,6 +216,26 @@ void QmitknnInteractivePreferencePage::OnModelSourceToggled()
   m_Ui->localModelPathLabel->setEnabled(local);
   m_Ui->localModelPathLineEdit->setEnabled(local);
   m_Ui->localModelPathBrowseButton->setEnabled(local);
+}
+
+void QmitknnInteractivePreferencePage::OnInferenceModeToggled()
+{
+  const bool remote = m_Ui->remoteModeRadioButton->isChecked();
+
+  // The server connection controls only apply to remote inference.
+  m_Ui->serverUrlLabel->setEnabled(remote);
+  m_Ui->serverUrlLineEdit->setEnabled(remote);
+  m_Ui->apiKeyLabel->setEnabled(remote);
+  m_Ui->apiKeyLineEdit->setEnabled(remote);
+  m_Ui->remoteHelpLabel->setEnabled(remote);
+
+  // Model and backend selection only apply to local inference; a remote server
+  // provides its own model and compute device.
+  m_Ui->modelGroupBox->setEnabled(!remote);
+  m_Ui->backendGroupBox->setEnabled(!remote);
+
+  if (!remote)
+    this->OnModelSourceToggled();
 }
 
 void QmitknnInteractivePreferencePage::OnBrowseLocalModelPath()

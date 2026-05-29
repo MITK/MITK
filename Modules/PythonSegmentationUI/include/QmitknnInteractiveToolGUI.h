@@ -194,6 +194,16 @@ protected:
    */
   void OnSessionEnded();
 
+  /** \brief Handles the tool's SessionExpiredEvent.
+   *
+   * A remote session was lost server-side (idle timeout, server restart, or
+   * the server is at capacity / unreachable). The tool has already ended the
+   * session, so this only informs the user that they need to re-initialize.
+   * The message box is shown deferred to avoid re-entrancy when the event
+   * fires from within an interaction.
+   */
+  void OnSessionExpired();
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.
@@ -269,6 +279,23 @@ private:
 
   /** \brief Re-checks the last-active interactor button, if any. */
   void ReEnableLastInteractor();
+
+  /** \brief Enables or disables the interaction buttons based on the running
+   *         session's reported capabilities.
+   *
+   * Applies to both local and remote sessions. A remote server may host a
+   * checkpoint that supports a different set of interactions than the local
+   * default, so unsupported interactions are disabled in the GUI.
+   */
+  void ApplyCapabilityGating();
+
+  /** \brief Updates the Initialize button label to reflect the configured
+   *         inference mode, e.g. "Initialize (local)" or
+   *         "Initialize (remote server)", so the active mode is visible in the
+   *         tool panel. Reads the preference fresh; called on init and whenever
+   *         the inference-mode preference changes.
+   */
+  void UpdateInitializeButtonText();
 
   struct ShortcutLabel
   {

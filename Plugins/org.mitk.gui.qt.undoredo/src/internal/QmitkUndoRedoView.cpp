@@ -158,10 +158,12 @@ void QmitkUndoRedoView::OnCheckLimitChanged(bool)
     if (m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() == 0)
     {
       undoModel->SetUndoLimit(100);
+      SetUndoLimitPreference(100);
     }
-    else if (!m_Controls->checkLimit->isChecked())
+    else if (!m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() != 0)
     {
       undoModel->SetUndoLimit(0);
+      SetUndoLimitPreference(0);
     }
   }
   this->UpdateButtonStatus();

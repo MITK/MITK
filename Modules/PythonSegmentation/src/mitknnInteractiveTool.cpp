@@ -639,10 +639,10 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
       << "    nnInteractiveRemoteInferenceSession, ServerAtCapacityError, SessionExpiredError)\n"
       << "import httpx\n"
       << "nni_server_url = " << PyQuote(serverUrl) << "\n"
+      << "nni_api_key = " << (apiKey.empty() ? std::string("None") : PyQuote(apiKey)) << "\n"
       << "nni_connect_error = ''\n"
       << "try:\n"
-      << "    session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key="
-        << (apiKey.empty() ? std::string("None") : PyQuote(apiKey)) << ")\n"
+      << "    session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key=nni_api_key)\n"
       << "except ServerAtCapacityError:\n"
       << "    nni_connect_error = 'The nnInteractive server is at capacity. Please try again later.'\n"
       << "except SessionExpiredError:\n"
@@ -664,7 +664,7 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
 
   const auto connectError = pythonContext->GetVariableAsString("nni_connect_error").value_or("");
 
-  pythonContext->Execute("del nni_server_url, nni_connect_error\n");
+  pythonContext->Execute("del nni_server_url, nni_api_key, nni_connect_error\n");
 
   if (!connectError.empty())
     mitkThrow() << connectError;
@@ -681,12 +681,17 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
   }
   catch (const Exception& e)
   {
-    if (this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
-    {
-      this->EndSession();
+    // The lease is already claimed, so any failure here must release it;
+    // otherwise the server slot is held until the idle reaper expires it.
+    // Classify before EndSession() clears the remote flag.
+    const bool connectionLost =
+      this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : "");
+
+    this->EndSession();
+
+    if (connectionLost)
       mitkThrow() << "Lost the connection to the nnInteractive server while starting the session. "
                      "Check the server and try again.";
-    }
 
     throw;
   }

@@ -136,7 +136,7 @@ bool QmitknnInteractivePreferencePage::PerformOk()
     m_Ui->remoteModeRadioButton->isChecked() ? "remote" : "local");
   prefs->Put("nnInteractive/serverUrl",
     m_Ui->serverUrlLineEdit->text().trimmed().toStdString());
-  prefs->Put("nnInteractive/apiKey", m_Ui->apiKeyLineEdit->text().toStdString());
+  prefs->Put("nnInteractive/apiKey", m_Ui->apiKeyLineEdit->text().trimmed().toStdString());
 
   return true;
 }

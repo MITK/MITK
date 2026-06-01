@@ -244,11 +244,13 @@ int mitkDICOMSegmentationIORegressionTest(int argc, char* argv[])
 
   // Round-trip assertion (closes #321): the seg loaded from a real DICOM
   // SEG file must be re-writable via the new property-driven writer and
-  // re-loadable as a MultiLabelSegmentation. Uses synthetic mode because
-  // DICOMIOHelper::SetProperties does not surface every Validate-required
-  // tag on the loaded seg (FrameOfReferenceUID in particular); synthetic
-  // mode is the realistic default for "save anywhere" of an arbitrary
-  // loaded SEG. The on-the-wire SOP class on output is the writer's
+  // re-loadable as a MultiLabelSegmentation. Uses synthetic mode so the
+  // round trip does not depend on the loaded baseline carrying every
+  // strict-mode Validate tag - this is a "save anywhere of an arbitrary
+  // loaded SEG" survivability check, not a strict-mode contract check.
+  // (FrameOfReferenceUID is now surfaced on load via the default tags of
+  // interest, so a strict-mode round trip may also be feasible; left as a
+  // possible follow-up.) The on-the-wire SOP class on output is the writer's
   // default (legacy binary Segmentation Storage, 1.2.840.10008.5.1.4.1.1.66.4);
   // a dedicated writer-side test pins the SOP class value, so this round
   // trip is encoding-agnostic. Voxel-level equivalence is pinned by the

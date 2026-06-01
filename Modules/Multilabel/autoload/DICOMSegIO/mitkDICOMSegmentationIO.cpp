@@ -110,10 +110,14 @@ namespace
   // Decide whether the writer can apply dcmqi's useLabelIDAsSegmentNumber.
   // dcmqi requires the label values within one group to be a monotonic
   // 1..N with no gaps; the writer mirrors that precondition rather than
-  // letting dcmqi fail late. When the labels do not satisfy it the writer
-  // falls back to dcmqi's default 1..N-in-encounter-order numbering and
-  // the per-segment labelID in the metainfo handler is what carries the
-  // MITK label value across a round trip.
+  // letting dcmqi fail late. When the labels satisfy it, the labelmap pixel
+  // values (= MITK label values) are written as the DICOM segment numbers,
+  // so the values survive a round trip. Otherwise the writer falls back to
+  // dcmqi's default 1..N-in-encounter-order segment numbering: on read dcmqi
+  // sets each segment's labelID to its DICOM segment number, so MITK label
+  // values are renumbered to 1..N and the original values are NOT preserved.
+  // Segment name, tracking ID/UID and the property codes do round-trip; the
+  // numeric label value does not.
   bool LabelsAreMonotonicOneToN(const mitk::MultiLabelSegmentation *seg, unsigned int layer)
   {
     const auto labelValues = seg->GetLabelValuesByGroup(layer);
@@ -458,15 +462,7 @@ namespace
           perSliceClass->SetValue(0, frameRef.frameIndex, frameRef.sopClassUID);
       }
 
-      auto provider = mitk::PropertyList::New();
-      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0018).c_str(),
-                            perSliceInstance);
-      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0016).c_str(),
-                            perSliceClass);
-      provider->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str(),
-                            mitk::TemporoSpatialStringProperty::New(group.seriesInstanceUID));
-
-      rule->Connect(&seg, provider.GetPointer());
+      rule->Connect(&seg, perSliceInstance, perSliceClass, group.seriesInstanceUID);
     }
   }
 
@@ -700,8 +696,16 @@ namespace mitk
     // mutates the seg's property list (Complete fills missing identity
     // tags in place) so the writer needs a non-const handle on the
     // caller's seg. const_cast is the standard workaround for this
-    // framework limitation; the mutation is documented and confined to
-    // Complete(). Reviewed exception to the CLAUDE.md const_cast rule.
+    // framework limitation; the mutation is confined to Complete().
+    // Reviewed exception to the CLAUDE.md const_cast rule.
+    //
+    // This mutation is PERSISTENT and intended: a synthetic-mode write
+    // stamps the minted identity (placeholder Patient/Study tags, minted
+    // Study/FoR UIDs, MANUAL algorithm type) onto the caller's live seg,
+    // mirroring the mint-at-construction model where the seg owns its
+    // identity. It keeps a subsequent save stable (same UIDs) and is the
+    // accepted contract; callers that need the in-memory seg left untouched
+    // must synthesise on a copy themselves.
     const auto *constInput = dynamic_cast<const MultiLabelSegmentation *>(this->GetInput());
     if (constInput == nullptr)
       mitkThrow() << "Cannot write non-MultiLabelSegmentation data via DICOM SEG.";
@@ -738,7 +742,7 @@ namespace mitk
           << "Missing items:";
       for (const auto &m : missing)
         msg << "\n  - " << FormatMissingItem(m);
-      mitkThrow() << msg.str();
+      mitkThrowException(DICOMSegStrictModeException) << msg.str();
     }
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
@@ -837,12 +841,20 @@ namespace mitk
         // doDicomValueChecks left at the dcmqi default (true): synthesis is
         // required to produce VR-valid values, enforced by a dedicated unit
         // test. There is no MITK-side dial for this.
+        //
+        // skipEmptySlices is kept at false (the historic MITK default) so the
+        // written SEG encodes every source slice. Letting dcmqi drop empty
+        // slices silently changes the on-disk frame layout - in the binary
+        // path it trims the written range to the label bounding box, in the
+        // labelmap path it drops every empty frame - which is a behavioral
+        // change outside the scope of the IO rework. Pinned by a dedicated
+        // writer-output regression test.
         auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
         std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(
           rawSourceItems,
           segmentations,
           handler,
-          /*skipEmptySlices=*/true,
+          /*skipEmptySlices=*/false,
           /*useLabelIDAsSegmentNumber=*/useLabelIDAsSegmentNumber,
           /*referencesGeometryCheck=*/true,
           /*doDicomValueChecks=*/true,
@@ -1291,6 +1303,9 @@ namespace mitk
   {
     if (input == nullptr)
       mitkThrow() << "BuildMetaInfoHandler: input must not be nullptr.";
+    if (layer < 0 || static_cast<unsigned int>(layer) >= input->GetNumberOfGroups())
+      mitkThrow() << "BuildMetaInfoHandler: layer " << layer << " is out of range; the "
+                  << "segmentation has " << input->GetNumberOfGroups() << " group(s).";
 
     const mitk::MultiLabelSegmentation *image = input;
 
@@ -1411,7 +1426,11 @@ namespace mitk
               // SEG IOD requires (0062,000F) (Type 1). Pair the same SCT base
               // as Category with an "Unknown" modifier so the output reads
               // "morphological alteration of unspecified kind" rather than
-              // picking a specific morphology.
+              // picking a specific morphology. Note: when the label also
+              // carries an explicit type modifier, the block below overwrites
+              // this "Unknown" stand-in with that user modifier (the user's
+              // intent wins), so the fallback modifier here is only the final
+              // value when the label has no modifier of its own.
               segmentAttribute->setSegmentedPropertyTypeCodeSequence(
                 "49755003", "SCT", "Morphologically altered structure");
               segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkDICOMSegmentationPropertyHelper_h
 
 #include <mitkDICOMTag.h>
+#include <mitkExceptionMacro.h>
 #include <mitkLabel.h>
 #include <mitkLabelSetImage.h>
 
@@ -25,6 +26,20 @@ found in the LICENSE file.
 namespace mitk
 {
   class IPropertyProvider;
+
+  /**
+   * \brief Thrown when a DICOM SEG write is rejected in strict mode because the
+   *        segmentation is missing contract items required for a valid SEG.
+   *
+   * A dedicated type so callers can catch this specific case by type - e.g. to
+   * offer the user a synthetic-mode retry - without parsing the message and
+   * without also catching terminal dcmqi or file-I/O failures.
+   */
+  class MITKMULTILABEL_EXPORT DICOMSegStrictModeException : public mitk::Exception
+  {
+  public:
+    mitkExceptionClassMacro(DICOMSegStrictModeException, mitk::Exception);
+  };
 
   /**
    * \brief Helpers around the DICOM SEG property contract on MultiLabelSegmentation.
@@ -91,8 +106,9 @@ namespace mitk
       /**
        * \brief Fill missing patient- and study-level identifying tags from
        *        the placeholder constants below and mint UIDs for
-       *        StudyInstanceUID / SeriesInstanceUID / FrameOfReferenceUID
-       *        under the MITK synth namespace.
+       *        StudyInstanceUID / FrameOfReferenceUID under the MITK synth
+       *        namespace. SeriesInstanceUID is minted unconditionally at
+       *        construction, independent of this flag.
        *
        * Reserved for explicit write-time synthesis, not for ambient mutation:
        * minting UIDs is one-way (the seg's identity is fixed afterwards).
@@ -131,8 +147,8 @@ namespace mitk
      *
      * Called from MultiLabelSegmentation's constructors with default
      * options to stamp the class invariants (Modality="SEG" and
-     * MITK-branded series description / content creator / clinical
-     * trial series ID). Identifying tags (PatientName, PatientID,
+     * MITK-branded series description and content creator). Identifying
+     * tags (PatientName, PatientID,
      * StudyID, FrameOfReferenceUID, ...) are NOT stamped unless
      * synthesizeMissingIdentity is set, so a later Initialize(template)
      * or InheritXxxFromSource can still adopt source values.

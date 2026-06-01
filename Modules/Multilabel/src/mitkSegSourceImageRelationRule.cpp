@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkLabelSetImage.h>
 #include <mitkPropertyKeyPath.h>
+#include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 
 namespace
@@ -79,6 +80,33 @@ mitk::SegSourceImageRelationRule::Connect(MultiLabelSegmentation* seg,
   // typed Connect is the only reachable entry. The Image*-typed wrapper adds
   // no behaviour of its own, only a type constraint.
   return PropertyRelationRuleBase::Connect(seg, sourceProvider);
+}
+
+mitk::SegSourceImageRelationRule::RelationUIDType
+mitk::SegSourceImageRelationRule::Connect(MultiLabelSegmentation* seg,
+                                          TemporoSpatialStringProperty* instanceUIDsPerSlice,
+                                          TemporoSpatialStringProperty* classUIDsPerSlice,
+                                          const std::string& sourceSeriesInstanceUID) const
+{
+  if (seg == nullptr)
+    mitkThrow() << "SegSourceImageRelationRule::Connect: seg must not be nullptr.";
+  if (instanceUIDsPerSlice == nullptr || classUIDsPerSlice == nullptr)
+    mitkThrow() << "SegSourceImageRelationRule::Connect: per-slice UID properties must not be nullptr.";
+
+  // Assemble the DICOM-tag-keyed provider the data layer expects: SOPInstance
+  // (0008,0018) and SOPClass (0008,0016) per slice, plus the source
+  // SeriesInstanceUID (0020,000e) when known. Centralised here so the reader
+  // and the legacy-migration paths share one definition of this shape.
+  auto provider = PropertyList::New();
+  provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0018).c_str(), instanceUIDsPerSlice);
+  provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0016).c_str(), classUIDsPerSlice);
+  if (!sourceSeriesInstanceUID.empty())
+  {
+    provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str(),
+                          TemporoSpatialStringProperty::New(sourceSeriesInstanceUID));
+  }
+
+  return this->Connect(seg, provider.GetPointer());
 }
 
 void mitk::SegSourceImageRelationRule::Connect_datalayer(IPropertyOwner* source,

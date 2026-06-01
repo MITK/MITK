@@ -211,6 +211,20 @@ namespace
     return tmp.c_str();
   }
 
+  // Open a SEG written by the writer and return its NumberOfFrames
+  // (0028,0008), or -1 on read failure / missing tag so the caller can
+  // assert on the exact expected count.
+  long GetWrittenSEGNumberOfFrames(const std::string& path)
+  {
+    DcmFileFormat ff;
+    if (ff.loadFile(path.c_str()).bad())
+      return -1;
+    long frames = 0;
+    if (ff.getDataset()->findAndGetLongInt(DCM_NumberOfFrames, frames).bad())
+      return -1;
+    return frames;
+  }
+
   // Find DICOM Code Value "UNKNOWN" placeholders in the SEG's identity
   // tags after a synthetic write. Used to assert that synthesis stamps
   // exactly what the helper claims it does.
@@ -408,6 +422,7 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(LabelmapEncodingProducesSup243SOPClass);
   MITK_TEST(LabelmapRoundTripStripsAutoAddedBackgroundSegment);
   MITK_TEST(BinaryEncodingProducesLegacySOPClass);
+  MITK_TEST(WriterPreservesEmptySlicesInOutput);
   MITK_TEST(MultiSourceSegRoundTripPreservesAtLeastOneRelation);
   MITK_TEST(MigrateLegacyReferenceFilesIsNoOpWithoutProperty);
   MITK_TEST(MigrateLegacyReferenceFilesSkipsWhenRuleAlreadyPresent);
@@ -434,6 +449,47 @@ public:
     const auto loadedSeg = dynamic_cast<mitk::MultiLabelSegmentation*>(loaded[0].GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Round-trip load produced a MultiLabelSegmentation",
                            loadedSeg != nullptr);
+  }
+
+  // Regression guard for the dcmqi writer's skipEmptySlices flag, which the
+  // writer must keep at false so every source slice is encoded. Build a
+  // 3-slice seg whose single label occupies only the middle slice, leaving
+  // slices 0 and 2 empty. With skipEmptySlices=true the binary path would
+  // trim the written range to the label bounding box (1 frame) and the
+  // labelmap path would drop the empty frames; with false every slice is
+  // encoded (3 frames). A voxel-level round trip cannot catch the
+  // difference - a dropped empty slice reconstructs as empty - so assert
+  // directly on the written NumberOfFrames.
+  void WriterPreservesEmptySlicesInOutput()
+  {
+    auto seg = BuildBaseSeg(/*stampIdentity=*/true);
+
+    // Replace the all-slices foreground from BuildBaseSeg with a single
+    // labelled block on the middle slice only.
+    {
+      auto groupImage = seg->GetGroupImage(0);
+      mitk::ImageWriteAccessor writeAccessor(groupImage);
+      auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
+      const auto dims = groupImage->GetDimensions();
+      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+      for (std::size_t i = 0; i < sliceSize * dims[2]; ++i)
+        pixels[i] = 0;
+      const unsigned int middleSlice = dims[2] / 2;  // z == 1 for the 3-slice fixture
+      pixels[middleSlice * sliceSize + 0] = 1;
+      pixels[middleSlice * sliceSize + 1] = 1;
+    }
+
+    // Synthetic mode so the write does not depend on a source relation;
+    // default (binary) encoding so the historic skipEmptySlices=false
+    // behavior is what is exercised.
+    mitk::IFileWriter::Options options;
+    options["Strict / synthetic mode"] = std::string("synthetic");
+    const auto path = WriteSegToTempFile(seg, options, "empty-slice-preservation");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Writer must encode every source slice (skipEmptySlices=false): all 3 slices, not just the "
+      "label bounding box",
+      3L, GetWrittenSEGNumberOfFrames(path));
   }
 
   void StrictModeRefusesIncompleteSegmentation()

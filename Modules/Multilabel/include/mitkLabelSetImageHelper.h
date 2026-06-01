@@ -62,8 +62,9 @@ namespace mitk
      * and the Python `MultiLabelSegmentation(image)` constructor stay in
      * lockstep. A future change to the default setup edits one location.
      *
-     * Each step is best-effort; failures are logged via MITK_WARN and
-     * swallowed. Callers that want explicit control over the individual
+     * Each step is best-effort: a mitk::Exception from any step is logged via
+     * MITK_WARN and swallowed (a non-mitk std::exception still propagates).
+     * Callers that want explicit control over the individual
      * steps should call SegSourceImageRelationRule::Connect and the
      * DICOMSegmentationPropertyHelper::InheritXxxFromSource functions
      * directly instead.

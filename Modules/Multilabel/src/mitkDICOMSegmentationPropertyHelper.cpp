@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkPropertyNameHelper.h>
 #include <mitkSegSourceImageRelationRule.h>
-#include <mitkStringProperty.h>
 #include <mitkTemporoSpatialStringProperty.h>
 
 #include <dcmtk/dcmdata/dcdeftag.h>
@@ -426,21 +425,10 @@ std::size_t mitk::DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesTo
       }
     }
 
-    auto provider = PropertyList::New();
-    provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0018).c_str(),
-                          perSliceInstance);
-    provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x0016).c_str(),
-                          perSliceClass);
-    if (!seriesUID.empty())
-    {
-      provider->SetProperty(GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str(),
-                            TemporoSpatialStringProperty::New(seriesUID));
-    }
-
     auto rule = SegSourceImageRelationRule::New();
     try
     {
-      rule->Connect(seg, provider.GetPointer());
+      rule->Connect(seg, perSliceInstance, perSliceClass, seriesUID);
       ++connectionsEstablished;
     }
     catch (const std::exception& e)
@@ -450,10 +438,17 @@ std::size_t mitk::DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesTo
     }
   }
 
-  // Drop referenceFiles only when the migration produced at least one
-  // relation. Otherwise the user keeps a chance to recover the legacy
-  // record (e.g. after re-mounting a network share) without us having
-  // discarded it.
+  // Drop referenceFiles only when the migration fully succeeded: at least one
+  // relation was established AND every entry resolved (unresolved == 0). If any
+  // entry failed to resolve (e.g. an offline network share), keep the property
+  // so the legacy record survives for a potential later recovery.
+  //
+  // Known limitation: once any relation exists on the seg, the early-out at the
+  // top of this function suppresses re-migration, so a partially-resolved seg is
+  // not retried on a later load even if the missing files become available - the
+  // still-unresolved entries keep their referenceFiles record but are never
+  // converted to relations. Accepted for now (partial source availability is
+  // rare); revisit if it proves a problem in practice.
   if (connectionsEstablished > 0 && unresolved == 0)
   {
     seg->GetPropertyList()->RemoveProperty("referenceFiles");

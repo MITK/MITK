@@ -34,10 +34,10 @@ namespace mitk
    * In addition, the rule uses the data-layer to deduce/define relations. For this layer
    * it uses properties compliant to DICOM. In addition to the DICOM data used by
    * SourceImageRelationRule this class also adds the source SeriesInstanceUID (0020,000e)
-   * to the data captured by the base SourceImageRelationRule. The series UID is stored on
-   * the rule itself rather than as a top-level seg property so a single SEG can
-   * cleanly reference multiple source series, mirroring DICOM's
-   * ReferencedSeriesSequence (0008,1115) one item per series shape.
+   * to the data captured by the base SourceImageRelationRule. The series UID is stored
+   * per-relation on the segmentation (scoped to the relation instance) rather than as a
+   * single top-level seg property so a single SEG can cleanly reference multiple source
+   * series, mirroring DICOM's ReferencedSeriesSequence (0008,1115) one item per series shape.
    *
    * The canonical DICOM-SEG-source purpose tag is type-bound: callers
    * acquire an instance via New() and the rule applies the tag itself.
@@ -114,6 +114,25 @@ namespace mitk
      */
     RelationUIDType Connect(MultiLabelSegmentation* seg,
                             const IPropertyProvider* sourceProvider) const;
+
+    /**
+     * \brief Connects seg to a source described by its per-slice DICOM UID
+     *        properties, assembling the intermediate provider PropertyList.
+     *
+     * Convenience over Connect(seg, IPropertyProvider*) for the common case
+     * where a caller already holds the per-slice SOPInstance (0008,0018) and
+     * SOPClass (0008,0016) UID maps (and optionally the source
+     * SeriesInstanceUID) and would otherwise have to assemble the
+     * DICOM-tag-keyed PropertyList by hand. The series UID is captured only
+     * when it is non-empty.
+     *
+     * \pre seg must be a valid pointer.
+     * \pre instanceUIDsPerSlice and classUIDsPerSlice must be valid pointers.
+     */
+    RelationUIDType Connect(MultiLabelSegmentation* seg,
+                            TemporoSpatialStringProperty* instanceUIDsPerSlice,
+                            TemporoSpatialStringProperty* classUIDsPerSlice,
+                            const std::string& sourceSeriesInstanceUID) const;
 
     /**
      * \brief Static convenience that constructs an instance of this rule

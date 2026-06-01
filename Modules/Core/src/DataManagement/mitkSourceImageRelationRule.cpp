@@ -341,12 +341,6 @@ void mitk::SourceImageRelationRule::Connect_datalayer(IPropertyOwner * source,
       // follow-up to #798 for the architectural cleanup (move this
       // rule out of MitkCore so it can construct paths via DICOMTagPath).
       purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", newSelectionIndex).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
-      // TemporoSpatialStringProperty (not plain StringProperty): MITK's
-      // .mitk property persistence routes every DICOM.* path through the
-      // TemporoSpatialString JSON serializer, which throws on any other
-      // BaseProperty type. A plain StringProperty here was silently
-      // dropped on .mitk write and the purpose-tag side of the relation
-      // failed to round-trip through scene/native saves.
       source->SetProperty(PropertyKeyPathToPropertyName(purposePath),
                           TemporoSpatialStringProperty::New(m_PurposeTag));
 

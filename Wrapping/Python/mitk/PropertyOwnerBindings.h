@@ -44,27 +44,42 @@ void bind_property_owner(PyClass &cls)
       auto prop = obj.GetConstProperty(key);
       if (!prop)
         return py::none();
-      // raw=True preserves the old behaviour and returns the mitk.BaseProperty object.
       if (raw)
         return py::cast(prop, py::return_value_policy::reference);
       return mitk::python::propertyToPythonValue(*prop);
     },
     py::arg("key"),
     py::arg("raw") = false,
-    "Return the property value for *key*, or None if not set.\n\n"
-    "By default returns a coerced Python-native value: ``bool``, ``int``, ``float``,\n"
-    "``str``, or an ``(r, g, b)`` tuple for ColorProperty. For types without a known\n"
-    "Python equivalent the raw ``mitk.BaseProperty`` object is returned.\n\n"
-    "Pass ``raw=True`` to always get the underlying ``mitk.BaseProperty`` object\n"
-    "(e.g. to access metadata or pass it to a C++ function that expects one).");
+    R"(Return the property value for *key*, or ``None`` if not set.
+
+By default returns a coerced Python-native value: ``bool``, ``int``,
+``float``, ``str``, or an ``(r, g, b)`` tuple for ``ColorProperty``. For
+types without a known Python equivalent the raw ``mitk.BaseProperty``
+object is returned.
+
+Args:
+    key: Property name.
+    raw: If True, always return the underlying ``mitk.BaseProperty`` object
+        (useful to access metadata or to pass to a C++ function that
+        expects one). Defaults to False.
+
+Returns:
+    The property value, or ``None`` if the property is not set.
+)");
 
   cls.def(
     "property_is_owned",
     [](const CppClass &obj, const std::string &key) -> bool { return obj.PropertyIsOwned(key); },
     py::arg("key"),
-    "Return True if the property *key* is owned (writable) by this object.\n\n"
-    "Returns False if the property does not exist or is provided read-only\n"
-    "(e.g., routed from an internal component like a Label).");
+    R"(Return True if the property *key* is owned (writable) by this object.
+
+Returns False if the property does not exist or is provided read-only
+(for example, routed from an internal component like a Label inside a
+MultiLabelSegmentation).
+
+Args:
+    key: Property name.
+)");
 
   cls.def(
     "set_property",
@@ -82,7 +97,23 @@ void bind_property_owner(PyClass &cls)
       obj.SetProperty(key, resolvePropertyValue(obj, key, value));
     },
     py::arg("key"),
-    py::arg("value"));
+    py::arg("value"),
+    R"(Set the property *key* to *value*.
+
+The value is auto-wrapped into the appropriate ``BaseProperty`` subtype
+based on its Python type: ``bool`` -> ``BoolProperty``, ``int`` ->
+``IntProperty``, ``float`` -> ``DoubleProperty``, ``str`` ->
+``StringProperty``, 3-tuple -> ``ColorProperty``, or an existing
+``mitk.BaseProperty`` instance is used as-is.
+
+Args:
+    key: Property name.
+    value: Property value (auto-wrapped to a ``BaseProperty`` subtype).
+
+Raises:
+    PropertyNotOwnedError: If the property is provided read-only (not
+        owned) by this object.
+)");
 
   cls.def(
     "remove_property",
@@ -97,14 +128,24 @@ void bind_property_owner(PyClass &cls)
       }
       obj.RemoveProperty(key);
     },
-    py::arg("key"));
+    py::arg("key"),
+    R"(Remove the property *key* if it exists.
+
+Args:
+    key: Property name.
+
+Raises:
+    PropertyNotOwnedError: If the property is provided read-only and
+        cannot be removed.
+)");
 
   cls.def_property_readonly("property_keys",
                             [](const CppClass &obj)
                             {
                               auto keys = obj.GetPropertyKeys();
                               return std::vector<std::string>(keys.begin(), keys.end());
-                            });
+                            },
+                            "List of all property keys currently set on this object.");
 }
 
 #endif

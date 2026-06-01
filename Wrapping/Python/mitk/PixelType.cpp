@@ -42,7 +42,17 @@ namespace mitk
 
 void InitPixelType(py::module_& m)
 {
-  py::class_<PixelType>(m, "PixelType")
+  py::class_<PixelType>(m, "PixelType",
+    R"(Describes the per-pixel layout of an :py:class:`Image`.
+
+A ``PixelType`` combines a component scalar type (``uint8``, ``int8``,
+``uint16``, ``int16``, ``uint32``, ``int32``, ``float32``, ``float64``)
+with a component count (1 for scalar pixels, 3 for RGB, 4 for RGBA, etc.).
+
+``PixelType`` instances are usually constructed indirectly via
+:py:func:`make_pixel_type` or by passing a NumPy dtype to
+:py:meth:`Image.initialize`.
+)")
     .def("__repr__", [](const PixelType& pt) {
       std::string repr = "<PixelType: ";
 
@@ -67,5 +77,23 @@ void InitPixelType(py::module_& m)
   m.def("make_pixel_type",
     [](const py::object& dtype, size_t components) { return MakePixelType(dtype, components); },
     py::arg("dtype"),
-    py::arg("components") = 1);
+    py::arg("components") = 1,
+    R"(Construct a :py:class:`PixelType` from a NumPy dtype.
+
+Args:
+    dtype: NumPy dtype or any value accepted by ``numpy.dtype()``
+        (string names like ``"float32"``, scalar types like
+        ``numpy.float32``, or an existing dtype object).
+    components: Number of components per pixel. Defaults to 1.
+
+Returns:
+    A :py:class:`PixelType` matching the requested layout.
+
+Raises:
+    mitk.Exception: If the dtype is not supported by MITK.
+
+Examples:
+    >>> pt = mitk.make_pixel_type("float32")
+    >>> rgba = mitk.make_pixel_type("uint8", components=4)
+)");
 }

@@ -18,5 +18,12 @@ using namespace mitk;
 
 void InitException(py::module_& m)
 {
-  py::register_exception<mitk::Exception>(m, "Exception");
+  auto exc = py::register_exception<mitk::Exception>(m, "Exception");
+  exc.attr("__doc__") =
+    R"(Exception raised by MITK C++ code.
+
+Subclass of Python's built-in :py:class:`Exception`. Mirrors the C++
+``mitk::Exception`` type and carries the message produced by the
+underlying MITK macro (e.g. ``mitkThrow()``).
+)";
 }

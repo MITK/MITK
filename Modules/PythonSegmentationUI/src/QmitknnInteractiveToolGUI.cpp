@@ -404,7 +404,7 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.groups.push_back(std::move(torchGroup));
 
   mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive>=1.1.2,<2.0.0" };
+  nnInteractiveGroup.requirements = { "nninteractive>=2.0.0,<3.0.0" };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
   if (modelSource != "local")

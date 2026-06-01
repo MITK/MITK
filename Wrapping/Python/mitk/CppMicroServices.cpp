@@ -25,5 +25,18 @@ void InitCppMicroServices(py::module_& m)
     for (auto* module : us::ModuleRegistry::GetLoadedModules())
       names.push_back(module->GetName());
     return names;
-  }, "Return the names of all currently loaded CppMicroServices modules.");
+  },
+  R"(Return the names of all currently loaded CppMicroServices modules.
+
+In the standalone wheel, this is the list of MITK modules whose auto-load
+shared libraries have been loaded by the CppMicroServices runtime
+(typically IO readers/writers and similar plug-in services).
+
+Returns:
+    A list of module name strings.
+
+Examples:
+    >>> for name in mitk.get_loaded_modules():
+    ...     print(name)
+)");
 }

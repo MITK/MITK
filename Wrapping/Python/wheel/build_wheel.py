@@ -179,6 +179,7 @@ def write_dist_info(staging_dir, package_name, version):
         f"Requires-Python: >={sys.version_info.major}.{sys.version_info.minor}\n"
         f"Requires-Dist: numpy>=2.0\n"
         f"Project-URL: Homepage, https://www.mitk.org\n"
+        f"Project-URL: Documentation, https://docs.mitk.org/python/latest/\n"
         f"Project-URL: Repository, https://github.com/MITK/MITK\n"
     )
 

@@ -45,7 +45,20 @@ set_target_properties(mitk_python_bindings PROPERTIES
 set(mitk_PACKAGE_DIR "${Python3_SITEARCH}/mitk")
 file(MAKE_DIRECTORY "${mitk_PACKAGE_DIR}")
 
-file(WRITE "${mitk_PACKAGE_DIR}/__init__.py" "from .mitk import *\n")
+# Build-tree __init__.py for the mitk package, configured from the shared
+# `__init__.py.in` template used for both the build tree and the wheel.
+# Re-exports the names from the compiled pybind11 extension (the inner
+# `mitk` module inside the `mitk` package), rewrites their ``__module__``
+# attribute from ``"mitk.mitk"`` to ``"mitk"`` so that Sphinx, IDE tooling,
+# and ``repr()`` render ``mitk.Image`` rather than ``mitk.mitk.Image``, and
+# exposes ``__version__``. The wheel-detection branch in the template is a
+# no-op in the build tree because none of the .libs / .dylibs directories
+# the platform delocators create are present here.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
+  "${mitk_PACKAGE_DIR}/__init__.py"
+  @ONLY
+)
 
 # Copy the property_view.py file
 configure_file(
@@ -102,6 +115,10 @@ configure_file(
 add_custom_target(mitk_mxn_layout_staged
                   DEPENDS ${_mitk_layout_staged_files})
 add_dependencies(mitk_python_bindings mitk_mxn_layout_staged)
+
+set_target_properties(mitk_mxn_layout_staged PROPERTIES
+  FOLDER "${MITK_ROOT_FOLDER}/Wrapping"
+)
 
 # The DSL examples are smoke-tested as part of the `mitkPythonBindingsTest`
 # pytest suite (see `Modules/Python/test/pytest/test_layout/
@@ -167,13 +184,10 @@ if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
     LIBRARY DESTINATION mitk
   )
 
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/../wheel/__init__.py.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
-    @ONLY
-  )
-
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/wheel_init/__init__.py"
+  # Reuse the same template the build-tree __init__.py is configured from;
+  # the wheel-detection branch in the template activates at runtime when the
+  # bundled .libs / .dylibs directory is present alongside the package.
+  install(FILES "${mitk_PACKAGE_DIR}/__init__.py"
     DESTINATION mitk
     COMPONENT wheel
     EXCLUDE_FROM_ALL

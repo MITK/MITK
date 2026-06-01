@@ -34,7 +34,19 @@ void InitDicom(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
-  m.doc() = "MITK Python bindings";
+  m.doc() = R"(Python bindings for the Medical Imaging Interaction Toolkit (MITK).
+
+The ``mitk`` package exposes the data structures and core utilities of MITK
+to Python. The central type is :py:class:`Image`, with full NumPy interop,
+file I/O via :py:class:`IOUtil`, geometry classes (:py:class:`BaseGeometry`,
+:py:class:`TimeGeometry`, ...), points and vectors, typed properties, and
+:py:class:`MultiLabelSegmentation` for label-set data.
+
+Full user documentation, including a Getting Started guide and an
+auto-generated API reference, lives at https://docs.mitk.org/python/latest/.
+
+The wider MITK C++ stack is documented at https://docs.mitk.org/latest/.
+)";
 
   py::module_ os = py::module_::import("os");
   os.attr("environ")["PYMITK"] = "1";

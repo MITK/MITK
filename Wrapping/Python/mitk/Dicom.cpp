@@ -61,7 +61,7 @@ void InitDicom(py::module_& m)
     .def_readonly("scope", &DICOMSegmentationPropertyHelper::MissingItem::scope,
                   "Scope of the missing item (:py:class:`Scope`).")
     .def_readonly("identifier", &DICOMSegmentationPropertyHelper::MissingItem::identifier,
-                  "Group index, label value, or relation UID depending on scope.")
+                  "Group index or label value, depending on scope.")
     .def_readonly("description", &DICOMSegmentationPropertyHelper::MissingItem::description,
                   "Human-readable description of what is missing.");
 
@@ -76,9 +76,10 @@ void InitDicom(py::module_& m)
     .def_readwrite("synthesize_missing_identity",
                    &DICOMSegmentationPropertyHelper::CompletionOptions::synthesizeMissingIdentity,
                    "Fill missing patient/study identifying tags from placeholder\n"
-                   "constants and mint UIDs for ``StudyInstanceUID``,\n"
-                   "``SeriesInstanceUID``, and ``FrameOfReferenceUID`` under the\n"
-                   "MITK synthesis namespace.")
+                   "constants and mint UIDs for ``StudyInstanceUID`` and\n"
+                   "``FrameOfReferenceUID`` under the MITK synthesis namespace.\n"
+                   "``SeriesInstanceUID`` is minted unconditionally at\n"
+                   "construction, independent of this flag.")
     .def_readwrite("derive_geometry_from_segmentation",
                    &DICOMSegmentationPropertyHelper::CompletionOptions::deriveGeometryFromSegmentation,
                    "Mint a ``FrameOfReferenceUID`` for sourceless segmentations.");

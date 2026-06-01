@@ -17,19 +17,97 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkProperties.h>
 
+#include <vtkMath.h>
+
 #include <array>
+#include <cmath>
+#include <limits>
 #include <regex>
 #include <vector>
 
 namespace
 {
-  template <typename T>
-  std::array<int, 3> QuantizeColor(const T* color)
+  // Convert an RGB triple in [0,1] to CIE Lab via VTK. L is in [0, 100];
+  // a and b are roughly in [-110, 110].
+  std::array<double, 3> RGBToLab(const double* rgb)
   {
-    return {
-      static_cast<int>(std::round(color[0] * 255)),
-      static_cast<int>(std::round(color[1] * 255)),
-      static_cast<int>(std::round(color[2] * 255)) };
+    std::array<double, 3> lab{};
+    vtkMath::RGBToLab(rgb, lab.data());
+    return lab;
+  }
+
+  std::array<double, 3> RGBToLab(const mitk::Color& color)
+  {
+    const double rgb[3] = {
+      static_cast<double>(color.GetRed()),
+      static_cast<double>(color.GetGreen()),
+      static_cast<double>(color.GetBlue()) };
+    return RGBToLab(rgb);
+  }
+
+  // Squared Euclidean distance in Lab (ΔE76 squared). We only compare
+  // distances, so we never need the sqrt.
+  double DeltaE76Squared(const std::array<double, 3>& a, const std::array<double, 3>& b)
+  {
+    const double dL = a[0] - b[0];
+    const double da = a[1] - b[1];
+    const double db = a[2] - b[2];
+    return dL * dL + da * da + db * db;
+  }
+
+  // Standard 6-sector HSV->RGB. Kept local so we don't pull in
+  // MitkDataTypesExt for fifteen lines of math.
+  std::array<double, 3> HSVToRGB(double h, double s, double v)
+  {
+    h = h - std::floor(h);
+
+    const double sector      = h * 6.0;
+    const int    sectorIndex = static_cast<int>(std::floor(sector)) % 6;
+    const double fractional  = sector - std::floor(sector);
+
+    const double p = v * (1.0 - s);
+    const double q = v * (1.0 - s * fractional);
+    const double t = v * (1.0 - s * (1.0 - fractional));
+
+    switch (sectorIndex)
+    {
+      case 0:  return { v, t, p };
+      case 1:  return { q, v, p };
+      case 2:  return { p, v, t };
+      case 3:  return { p, q, v };
+      case 4:  return { t, p, v };
+      default: return { v, p, q };
+    }
+  }
+
+  // Number of algorithmically generated extra candidates evaluated when
+  // the palette is exhausted. Sized to comfortably cover any realistic
+  // segmentation: with all 25 palette colors used and N extras, the
+  // pool stays distinct up to ~(25 + N) labels before the maximin can
+  // no longer find a non-duplicate. The golden-angle hue sequence
+  // produces a distinct hue at every index, so this can be cranked up
+  // freely; the only cost is one Lab distance computation per extra
+  // per used color, which is sub-millisecond even at N = 1000.
+  constexpr int EXTRA_CANDIDATE_COUNT = 1000;
+
+  // Golden-ratio conjugate: hue step that yields a low-discrepancy
+  // sequence on the unit circle. Any prefix stays maximally even.
+  constexpr double GOLDEN_HUE_STEP = 0.6180339887498949;
+
+  // i-th extra candidate (0-indexed), cycling through three saturation/
+  // value tiers and advancing hue by the golden angle each step.
+  std::array<double, 3> GenerateExtraCandidate(int i)
+  {
+    struct Tier { double saturation; double value; };
+    constexpr std::array<Tier, 3> tiers = { {
+      { 0.85, 0.95 },
+      { 0.55, 0.95 },
+      { 0.85, 0.60 }
+    } };
+
+    const Tier& tier = tiers[i % tiers.size()];
+    const double hue = std::fmod(i * GOLDEN_HUE_STEP, 1.0);
+    return HSVToRGB(hue, tier.saturation, tier.value);
   }
 
   mitk::Color FromLookupTableColor(const double* lookupTableColor)
@@ -111,7 +189,10 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
   int maxGenericLabelNumber = 0;
 
-  std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
+  // Every color already in use, expressed in CIE Lab. Black (the
+  // background) is always reserved.
+  const double blackRGB[3] = { 0.0, 0.0, 0.0 };
+  std::vector<std::array<double, 3>> usedLabColors = { RGBToLab(blackRGB) };
 
   for (auto & label : labelSetImage->GetLabels())
   {
@@ -121,10 +202,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     if (std::regex_match(labelName, match, genericLabelNameRegEx))
       maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
 
-    const auto quantizedLabelColor = QuantizeColor(label->GetColor().data());
-
-    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLabelColor) == std::end(colorsInUse))
-      colorsInUse.push_back(quantizedLabelColor);
+    usedLabColors.push_back(RGBToLab(label->GetColor()));
   }
 
   auto newLabel = mitk::Label::New();
@@ -142,29 +220,66 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
 
-  std::array<double, 3> lookupTableColor;
-  const int maxTries = 25;
-  bool newColorFound = false;
-
-  for (int i = 0; i < maxTries; ++i)
+  // Preserve the historical convention: the first label in an empty
+  // segmentation is palette[0] (lookup-table slot 1, the deep red-pink).
+  if (1 == usedLabColors.size())
   {
-    lookupTable->GetColor(i, lookupTableColor.data());
+    std::array<double, 3> firstColor{};
+    lookupTable->GetColor(1, firstColor.data());
+    newLabel->SetColor(FromLookupTableColor(firstColor.data()));
+    return newLabel;
+  }
 
-    auto quantizedLookupTableColor = QuantizeColor(lookupTableColor.data());
+  // Maximin selection: pick the candidate whose nearest used-color
+  // distance is the largest.
+  std::array<double, 3> bestRGB{};
+  double                bestMinDistanceSquared = -1.0;
 
-    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLookupTableColor) == std::end(colorsInUse))
+  auto evaluateCandidate = [&](const std::array<double, 3>& candidateRGB)
+  {
+    const auto candidateLab = RGBToLab(candidateRGB.data());
+
+    double minDistanceSquared = std::numeric_limits<double>::infinity();
+    for (const auto& usedLab : usedLabColors)
     {
-      newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
-      newColorFound = true;
-      break;
+      const double d2 = DeltaE76Squared(candidateLab, usedLab);
+      if (d2 < minDistanceSquared)
+        minDistanceSquared = d2;
+    }
+
+    if (minDistanceSquared > bestMinDistanceSquared)
+    {
+      bestMinDistanceSquared = minDistanceSquared;
+      bestRGB = candidateRGB;
+    }
+  };
+
+  // Group A: the 25 preferred palette colors (lookup-table slots 1..25).
+  // Always part of the candidate pool. Evaluated first so exact ties
+  // favor the curated palette.
+  std::array<double, 3> palettePick{};
+  for (int i = 1; i <= 25; ++i)
+  {
+    lookupTable->GetColor(i, palettePick.data());
+    evaluateCandidate(palettePick);
+  }
+
+  // Group B: algorithmically generated extras. Only contributes when the
+  // palette has no candidate left at a meaningful Lab distance from the
+  // colors in use. The threshold is set just below the smallest pairwise
+  // ΔE76 within the 25-color palette (gold palette[1] vs golden-yellow
+  // palette[24], ΔE76 ≈ 15.90, squared ≈ 252.94), so every palette color
+  // can still win on its own merits before we extend with extras.
+  constexpr double PALETTE_EXHAUSTED_THRESHOLD_SQUARED = 250.0;
+  if (bestMinDistanceSquared < PALETTE_EXHAUSTED_THRESHOLD_SQUARED)
+  {
+    for (int i = 0; i < EXTRA_CANDIDATE_COUNT; ++i)
+    {
+      evaluateCandidate(GenerateExtraCandidate(i));
     }
   }
 
-  if (!newColorFound)
-  {
-    lookupTable->GetColor(labelSetImage->GetTotalNumberOfLabels(), lookupTableColor.data());
-    newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
-  }
+  newLabel->SetColor(FromLookupTableColor(bestRGB.data()));
 
   return newLabel;
 }

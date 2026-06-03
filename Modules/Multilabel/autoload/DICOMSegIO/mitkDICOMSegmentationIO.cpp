@@ -747,6 +747,14 @@ namespace mitk
 
     const bool wantLabelmap = (encoding == OPTION_ENCODING_LABELMAP);
 
+    // The first written group's SeriesDate/SeriesTime are reused for the
+    // remaining groups (see the per-group write below): dcmqi stamps these
+    // Series-level tags from the wall clock on every call, which would make
+    // the per-group files of one multi-group seg disagree under their shared
+    // SeriesInstanceUID.
+    std::string sharedSeriesDate;
+    std::string sharedSeriesTime;
+
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       std::vector<itkInternalImageType::ConstPointer> segmentations;
@@ -867,7 +875,56 @@ namespace mitk
         // so the SEG-level SegmentsOverlap tag is "NO" regardless of
         // encoding (labelmap also forbids overlap by Sup 243).
         if (result->putAndInsertString(DCM_SegmentsOverlap, "NO").bad())
-          MITK_DEBUG << "Unable to set SegmentsOverlap tag.";
+          MITK_WARN << "Unable to set SegmentsOverlap tag.";
+
+        // Override the dataset's SeriesInstanceUID with the seg's own
+        // (0020,000E) so the written file matches the in-memory identity.
+        // dcmqi mints its own and offers no setter; patching the produced
+        // DcmDataset is the upstream-endorsed pattern (mirrors the
+        // SegmentsOverlap patch above). All per-group files of a multi-group
+        // seg share this UID -> one DICOM series (with the aligned
+        // SeriesNumber and per-group InstanceNumber set in
+        // BuildMetaInfoHandler). Reader-side reassembly of per-group files is
+        // tracked separately.
+        // GetDICOMPropertyValue reads via GetValueAsString, so it resolves the
+        // TemporoSpatialStringProperty that DICOM-tag properties use (plain
+        // GetStringProperty would silently miss it). Returns true only for a
+        // non-empty value.
+        std::string segSeriesUID;
+        if (GetDICOMPropertyValue(0x0020, 0x000E, input->GetPropertyList(), segSeriesUID))
+        {
+          if (result->putAndInsertString(DCM_SeriesInstanceUID, segSeriesUID.c_str()).bad())
+            mitkThrow() << "Failed to stamp the segmentation's SeriesInstanceUID onto the "
+                        << "written DICOM SEG for group " << layer << ".";
+
+          // The per-group files now share one SeriesInstanceUID, so they must
+          // also agree on the Series-level SeriesDate/SeriesTime. dcmqi sets
+          // them from the wall clock per call, so capture the first group's
+          // values and reuse them for the rest. ContentDate/ContentTime are
+          // instance-level and may differ, so they are left untouched.
+          if (layer == 0)
+          {
+            OFString ofSeriesDate;
+            OFString ofSeriesTime;
+            result->findAndGetOFString(DCM_SeriesDate, ofSeriesDate);
+            result->findAndGetOFString(DCM_SeriesTime, ofSeriesTime);
+            sharedSeriesDate = ofSeriesDate.c_str();
+            sharedSeriesTime = ofSeriesTime.c_str();
+          }
+          else
+          {
+            // SeriesDate/SeriesTime are Type 3 (optional), so a failure here
+            // leaves a valid file (only the cross-group Series-level timing
+            // would be inconsistent); warn rather than abort the write. The
+            // identity-critical SeriesInstanceUID put above throws instead.
+            if (!sharedSeriesDate.empty() &&
+                result->putAndInsertString(DCM_SeriesDate, sharedSeriesDate.c_str()).bad())
+              MITK_WARN << "Could not align SeriesDate across DICOM SEG group " << layer << ".";
+            if (!sharedSeriesTime.empty() &&
+                result->putAndInsertString(DCM_SeriesTime, sharedSeriesTime.c_str()).bad())
+              MITK_WARN << "Could not align SeriesTime across DICOM SEG group " << layer << ".";
+          }
+        }
 
         DcmFileFormat dcmFileFormat(result.get());
 
@@ -1311,31 +1368,28 @@ namespace mitk
 
     // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
-    if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
-      contentCreatorName))
+    if (!GetDICOMPropertyValue(0x0070, 0x0084, image->GetPropertyList(), contentCreatorName))
       contentCreatorName = "MITK";
     handler.setContentCreatorName(contentCreatorName);
 
     // Clinical Trial Series Module (carrying 0012,0071 / 0012,0050) and
     // Clinical Trial Subject Module (carrying 0012,0060) are optional in
-    // the SEG IOD. Emit each tag only when the user has explicitly
-    // populated the corresponding property. If dcmqi still emits the
-    // modules with internal defaults despite no setter being called,
-    // that is an upstream dcmqi bug to be fixed there - not patched
-    // around in MITK.
+    // the SEG IOD. Emit each tag only when the corresponding property is
+    // present and non-empty. Read via GetDICOMPropertyValue so the
+    // TemporoSpatialStringProperty that DICOM-tag properties use is resolved
+    // (plain GetStringProperty would silently miss it). If dcmqi still emits
+    // the modules with internal defaults despite no setter being called, that
+    // is an upstream dcmqi bug to be fixed there - not patched around in MITK.
     std::string clinicalTrailSeriesId;
-    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-      clinicalTrailSeriesId) && !clinicalTrailSeriesId.empty())
+    if (GetDICOMPropertyValue(0x0012, 0x0071, image->GetPropertyList(), clinicalTrailSeriesId))
       handler.setClinicalTrialSeriesID(clinicalTrailSeriesId);
 
     std::string clinicalTrialTimePointID;
-    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-      clinicalTrialTimePointID) && !clinicalTrialTimePointID.empty())
+    if (GetDICOMPropertyValue(0x0012, 0x0050, image->GetPropertyList(), clinicalTrialTimePointID))
       handler.setClinicalTrialTimePointID(clinicalTrialTimePointID);
 
     std::string clinicalTrialCoordinatingCenterName;
-    if (image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-      clinicalTrialCoordinatingCenterName) && !clinicalTrialCoordinatingCenterName.empty())
+    if (GetDICOMPropertyValue(0x0012, 0x0060, image->GetPropertyList(), clinicalTrialCoordinatingCenterName))
       handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
     std::string seriesDescription;
@@ -1343,8 +1397,13 @@ namespace mitk
       seriesDescription = "MITK Segmentation";
     handler.setSeriesDescription(seriesDescription);
 
-    handler.setSeriesNumber("0" + std::to_string(layer));
-    handler.setInstanceNumber("1");
+    // All per-group SEG files of one seg form a single DICOM series (shared
+    // SeriesInstanceUID stamped at the write loop), so SeriesNumber is
+    // constant across groups and InstanceNumber (= group index + 1)
+    // distinguishes the instances. The prior "0"+layer / fixed "1" made each
+    // group its own series with a colliding InstanceNumber.
+    handler.setSeriesNumber("1");
+    handler.setInstanceNumber(std::to_string(layer + 1));
     handler.setBodyPartExamined("");
 
     auto labelSet = image->GetConstLabelsByValue(image->GetLabelValuesByGroup(layer));

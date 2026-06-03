@@ -431,6 +431,8 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   MITK_TEST(StrictWriteSucceedsForInitializedFromDICOMSource);
   MITK_TEST(SyntheticWriteSucceedsForInitializedFromDICOMSource);
   MITK_TEST(StrictReSaveAfterDICOMSegRoundTripPreservesIdentity);
+  MITK_TEST(MultiGroupWriteFormsOneCoherentSeries);
+  MITK_TEST(WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -878,13 +880,10 @@ public:
   // relation, save in strict mode. Asserts the IOD-mandated identity
   // tags survive into the written file.
   //
-  // Note on SeriesInstanceUID: the constructor mints a stable seg-own
-  // SeriesInstanceUID for in-memory use (lets strict-mode Validate
-  // succeed). However, dcmqi's segmentation writer mints its own
-  // SeriesInstanceUID for the output file - there is no dcmqi API to
-  // override it. So the on-disk SeriesInstanceUID does NOT match the
-  // seg's in-memory property; this is an upstream limitation, not a
-  // MITK-side workaround target.
+  // The constructor mints a stable seg-own SeriesInstanceUID, and the writer
+  // copies that (0020,000E) onto the output file (overriding dcmqi's
+  // internally-minted UID). So the on-disk SeriesInstanceUID matches the
+  // seg's in-memory property and is reproduced verbatim on every write.
   void StrictWriteSucceedsForInitializedFromDICOMSource()
   {
     const std::string sourceSeriesUID = "1.2.826.0.1.3680043.10.999.6.2";
@@ -923,12 +922,33 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Written SEG SeriesInstanceUID differs from source's series UID "
                            "(SEG is its own series, not a re-issue of the source's)",
                            writtenSeriesUID != sourceSeriesUID);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Written SEG SeriesInstanceUID matches the seg's in-memory (0020,000E)",
+                                 segSeriesUID, writtenSeriesUID);
+
+    // Single-group output is one series, one instance: SeriesNumber "1",
+    // InstanceNumber "1" (the multi-group case varies InstanceNumber by
+    // group). IS VR even-length space padding is stripped by
+    // findAndGetOFString, so the exact-string compare is robust.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Single-group written SeriesNumber is the aligned constant",
+                                 std::string("1"), ReadTopLevelString(path, DCM_SeriesNumber));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Single-group written InstanceNumber is 1",
+                                 std::string("1"), ReadTopLevelString(path, DCM_InstanceNumber));
+
+    // Writing the same in-memory seg again reproduces the identical
+    // SeriesInstanceUID: the writer copies (0020,000E) verbatim, it is not
+    // re-minted per write. Pins the construction-time mint; it is not an
+    // endorsement of re-writing into the same series as a workflow.
+    const auto secondPath = WriteSegToTempFile(seg, options, "wf-strict-2");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Re-writing the same in-memory seg reproduces the SeriesInstanceUID",
+                                 writtenSeriesUID, ReadTopLevelString(secondPath, DCM_SeriesInstanceUID));
   }
 
   // Synthetic-mode counterpart of the workflow case above. Even with a
   // real DICOM source attached via Initialize, the user can opt into
-  // synthetic mode. The write must succeed and the written SEG must
-  // carry an own (non-source) SeriesInstanceUID.
+  // synthetic mode. The write must succeed and the written SEG must carry
+  // the seg's own (0020,000E): propagation applies in synthetic mode too,
+  // and the synthetic source-series UID minted internally is a separate
+  // value that does not leak into the SEG's own series identity.
   void SyntheticWriteSucceedsForInitializedFromDICOMSource()
   {
     auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
@@ -945,6 +965,10 @@ public:
     const auto sourceSeriesUID = source->GetConstProperty(DICOMKey(0x0020, 0x000e))->GetValueAsString();
     CPPUNIT_ASSERT_MESSAGE("Synthetic-mode write SeriesInstanceUID differs from source's series UID",
                            writtenSeriesUID != sourceSeriesUID);
+
+    const auto segSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Synthetic-mode written SeriesInstanceUID matches the seg's in-memory (0020,000E)",
+                                 segSeriesUID, writtenSeriesUID);
   }
 
   // Round-trip via the DICOM SEG reader: write a workflow seg in strict
@@ -952,9 +976,9 @@ public:
   // must carry every IOD-mandated identity tag - in particular
   // FrameOfReferenceUID, which only lands on the loaded seg's property
   // list when (0020,0052) is in the default DICOMTagsOfInterest.
-  // SeriesInstanceUID stability across persist -> reload -> re-persist
-  // is NOT asserted here: dcmqi mints a fresh UID for the output SEG on
-  // every write and has no API for MITK to override it.
+  // SeriesInstanceUID is preserved across persist -> reload -> re-persist:
+  // the writer copies the seg's (0020,000E) onto the file, the reader
+  // repopulates it on load, and the re-save copies it back unchanged.
   void StrictReSaveAfterDICOMSegRoundTripPreservesIdentity()
   {
     auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
@@ -963,6 +987,7 @@ public:
 
     mitk::IFileWriter::Options options;
     const auto firstPath = WriteSegToTempFile(seg, options, "wf-roundtrip-1");
+    const auto firstSeriesUID = ReadTopLevelString(firstPath, DCM_SeriesInstanceUID);
 
     const auto loaded = mitk::IOUtil::Load(firstPath);
     CPPUNIT_ASSERT_MESSAGE("Round-trip load produced exactly one BaseData", loaded.size() == 1);
@@ -980,9 +1005,135 @@ public:
       CPPUNIT_FAIL(diag.str());
     }
 
-    CPPUNIT_ASSERT_NO_THROW_MESSAGE(
-      "Re-saving the reloaded seg in strict mode must succeed",
-      WriteSegToTempFile(reloadedSeg, options, "wf-roundtrip-2"));
+    // The reader repopulates (0020,000E) from the file (it is in the default
+    // DICOMTagsOfInterest), so the reloaded seg carries the first file's
+    // series UID, and re-saving copies it back unchanged.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Reloaded seg carries the first file's SeriesInstanceUID",
+                                 firstSeriesUID, ReadStringProp(reloadedSeg, 0x0020, 0x000E));
+
+    const auto secondPath = WriteSegToTempFile(reloadedSeg, options, "wf-roundtrip-2");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("SeriesInstanceUID stable across persist -> reload -> re-persist",
+                                 firstSeriesUID, ReadTopLevelString(secondPath, DCM_SeriesInstanceUID));
+  }
+
+  // A multi-group seg's per-group SEG files must form ONE DICOM series:
+  // shared SeriesInstanceUID (== the seg's own (0020,000E)), identical
+  // SeriesNumber, distinct per-group InstanceNumber. This pins the
+  // writer-side groundwork for representing a multi-group seg on the wire.
+  // Reader-side reassembly into one MultiLabelSegmentation is NOT asserted
+  // (tracked separately); we read the two files back as DcmDatasets and
+  // compare tags directly.
+  void MultiGroupWriteFormsOneCoherentSeries()
+  {
+    auto source = mitk::test::BuildSourceImageWithDICOMIdentity();
+    auto seg = InitializeSegFromSourceImage(source); // group 0, label 1, voxels
+    const auto g1 = seg->AddGroup();
+    auto label2 = mitk::Label::New();
+    label2->SetName("L2");
+    label2->SetValue(2);
+    label2->SetAlgorithmType(mitk::Label::AlgorithmType::MANUAL);
+    label2->SetAlgorithmName("WorkflowTest");
+    seg->AddLabel(label2, g1, true, true);
+
+    // Group 1 needs foreground voxels: the writer runs with
+    // skipEmptySlices=false and an all-empty group risks a degenerate SEG.
+    // Mirror the voxel write InitializeSegFromSourceImage uses for group 0.
+    {
+      auto *g1Image = seg->GetGroupImage(g1);
+      mitk::ImageWriteAccessor writeAccessor(g1Image);
+      auto *pixels = static_cast<mitk::Label::PixelType *>(writeAccessor.GetData());
+      const auto dims = g1Image->GetDimensions();
+      const auto sliceSize = static_cast<std::size_t>(dims[0]) * dims[1];
+      for (unsigned int z = 0; z < dims[2]; ++z)
+      {
+        pixels[z * sliceSize + 0] = 2;
+        pixels[z * sliceSize + 1] = 2;
+      }
+    }
+
+    Rule::Connect(seg, source.GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("Seg is multi-group for this test", seg->GetNumberOfGroups() == 2);
+
+    const auto segSeriesUID = ReadStringProp(seg, 0x0020, 0x000E);
+
+    mitk::IFileWriter::Options options;
+    const auto basePath = WriteSegToTempFile(seg, options, "wf-multigroup");
+
+    // WriteSegToTempFile returns "<tempDir>/wf-multigroup.dcm", but because
+    // the seg is multi-group the writer strips the extension and appends
+    // "<groupIndex>.dcm". The files that actually exist are therefore
+    // "...wf-multigroup0.dcm" and "...1.dcm"; basePath itself is not written.
+    // Assert existence before reading: ReadTopLevelString returns "" for a
+    // missing file, which would otherwise mask a wrong-path bug as a
+    // propagation bug.
+    const auto stem = basePath.substr(0, basePath.find_last_of('.'));
+    const auto file0 = stem + "0.dcm";
+    const auto file1 = stem + "1.dcm";
+    CPPUNIT_ASSERT_MESSAGE("Both per-group SEG files exist",
+                           std::filesystem::exists(file0) && std::filesystem::exists(file1));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 0 file SeriesInstanceUID == seg's own",
+                                 segSeriesUID, ReadTopLevelString(file0, DCM_SeriesInstanceUID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 1 file SeriesInstanceUID == seg's own",
+                                 segSeriesUID, ReadTopLevelString(file1, DCM_SeriesInstanceUID));
+    // One series: identical, aligned SeriesNumber across the per-group files.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 0 SeriesNumber is the aligned constant",
+                                 std::string("1"), ReadTopLevelString(file0, DCM_SeriesNumber));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 1 SeriesNumber is the aligned constant",
+                                 std::string("1"), ReadTopLevelString(file1, DCM_SeriesNumber));
+    // Distinct, 1-based InstanceNumbers (= group index + 1) so the two
+    // instances are individually addressable within the shared series. IS VR
+    // even-length space padding is stripped by findAndGetOFString.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 0 InstanceNumber is 1",
+                                 std::string("1"), ReadTopLevelString(file0, DCM_InstanceNumber));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Group 1 InstanceNumber is 2",
+                                 std::string("2"), ReadTopLevelString(file1, DCM_InstanceNumber));
+    // Series-level date/time must also agree across the files: dcmqi stamps
+    // them per call from the wall clock, so the writer reuses the first
+    // group's values for the rest.
+    // Capture group 0's values and assert they are present before comparing:
+    // ReadTopLevelString returns "" for a missing tag, so without this guard a
+    // "" == "" equality would pass vacuously if dcmqi stopped emitting these
+    // tags or the writer's alignment block were removed.
+    const auto seriesDate0 = ReadTopLevelString(file0, DCM_SeriesDate);
+    const auto seriesTime0 = ReadTopLevelString(file0, DCM_SeriesTime);
+    CPPUNIT_ASSERT_MESSAGE("SeriesDate is present (guards the equality below from passing vacuously)",
+                           !seriesDate0.empty());
+    CPPUNIT_ASSERT_MESSAGE("SeriesTime is present (guards the equality below from passing vacuously)",
+                           !seriesTime0.empty());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Both group files share SeriesDate",
+                                 seriesDate0, ReadTopLevelString(file1, DCM_SeriesDate));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Both group files share SeriesTime",
+                                 seriesTime0, ReadTopLevelString(file1, DCM_SeriesTime));
+  }
+
+  // Regression pin for the GetStringProperty -> GetDICOMPropertyValue fix in
+  // BuildMetaInfoHandler. ContentCreatorName and the Clinical Trial tags are
+  // stored as TemporoSpatialStringProperty (the type the reader and
+  // StampIdentityTags produce). The old GetStringProperty read silently
+  // missed that type, so a real ContentCreatorName was overwritten with
+  // "MITK" and user-set Clinical Trial tags were dropped on write - and no
+  // test caught it. Here every one of them must round-trip into the file
+  // verbatim. ContentCreatorName deliberately uses a non-"MITK" value: the
+  // old fallback default was also "MITK", which masked the bug.
+  void WriteEmitsContentCreatorAndClinicalTrialTagsWhenSet()
+  {
+    auto seg = BuildSegWithRule(/*stampIdentity=*/true, "1.2.826.0.1.3680043.10.999.8.1");
+    seg->SetProperty(DICOMKey(0x0070, 0x0084).c_str(),
+                     mitk::TemporoSpatialStringProperty::New("Test^Creator"));
+
+    mitk::IFileWriter::Options options;
+    const auto path = WriteSegToTempFile(seg, options, "wf-clinicaltrial");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Non-default ContentCreatorName must survive into the written SEG",
+                                 std::string("Test^Creator"), ReadTopLevelString(path, DCM_ContentCreatorName));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("User-set ClinicalTrialSeriesID must be emitted",
+                                 std::string("Session A"), ReadTopLevelString(path, DCM_ClinicalTrialSeriesID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("User-set ClinicalTrialTimePointID must be emitted",
+                                 std::string("0"), ReadTopLevelString(path, DCM_ClinicalTrialTimePointID));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("User-set ClinicalTrialCoordinatingCenterName must be emitted",
+                                 std::string("CenterA"),
+                                 ReadTopLevelString(path, DCM_ClinicalTrialCoordinatingCenterName));
   }
 
   // Segmented Property Category/Type are DICOM Type 1 but the writer's

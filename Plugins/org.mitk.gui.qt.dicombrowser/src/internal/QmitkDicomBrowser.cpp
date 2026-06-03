@@ -86,7 +86,7 @@ namespace
       {
         std::string sopUID;
 
-        if (mitk::GetBackwardsCompatibleDICOMProperty(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
+        if (mitk::GetBackwardsCompatibleDICOMPropertyValue(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
           doseImageNode->SetName(sopUID);
 
         auto prefService = mitk::CoreServices::GetPreferencesService();

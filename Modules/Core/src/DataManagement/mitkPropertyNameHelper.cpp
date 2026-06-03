@@ -25,26 +25,36 @@ std::string mitk::GeneratePropertyNameForDICOMTag(unsigned int group, unsigned i
   return nameStream.str();
 };
 
-bool mitk::GetBackwardsCompatibleDICOMProperty(unsigned int group,
-                                               unsigned int element,
-                                               std::string const &backwardsCompatiblePropertyName,
-                                               mitk::PropertyList const *propertyList,
-                                               std::string &propertyValue)
+bool mitk::GetDICOMPropertyValue(unsigned int group,
+                                 unsigned int element,
+                                 mitk::PropertyList const *propertyList,
+                                 std::string &propertyValue)
 {
   propertyValue = "";
 
-  BaseProperty *prop = propertyList->GetProperty(mitk::GeneratePropertyNameForDICOMTag(group, element).c_str());
+  const BaseProperty *prop = propertyList->GetProperty(mitk::GeneratePropertyNameForDICOMTag(group, element).c_str());
 
-  if (prop)
-  { // may not be a string property so use the generic access.
+  if (prop != nullptr)
+  { // May not be a string property, so use the generic value access; this also
+    // resolves the TemporoSpatialStringProperty that DICOM-tag properties use,
+    // which PropertyList::GetStringProperty would silently miss.
     propertyValue = prop->GetValueAsString();
   }
 
-  if (!propertyValue.empty() || propertyList->GetStringProperty(backwardsCompatiblePropertyName.c_str(), propertyValue))
-  // 2nd part is for backwards compatibility with the old property naming style
+  return !propertyValue.empty();
+};
+
+bool mitk::GetBackwardsCompatibleDICOMPropertyValue(unsigned int group,
+                                                    unsigned int element,
+                                                    std::string const &backwardsCompatiblePropertyName,
+                                                    mitk::PropertyList const *propertyList,
+                                                    std::string &propertyValue)
+{
+  if (mitk::GetDICOMPropertyValue(group, element, propertyList, propertyValue))
   {
     return true;
   }
 
-  return false;
+  // Fall back to the old property naming style for backwards compatibility.
+  return propertyList->GetStringProperty(backwardsCompatiblePropertyName.c_str(), propertyValue);
 };

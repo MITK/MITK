@@ -2410,6 +2410,13 @@ PREDEFINED             = itkNotUsed(x)= \
                          "mitkSegmentationTaskListValueMacro(type, name)=bool Has##name(size_t index) const; type Get##name(size_t index) const; void SetDefault##name(const type& value);" \
                          @US_PLATFORM@
 
+# Doxygen 1.10+ misparses function declarations of the form
+# "ReturnType MITK<MODULE>_EXPORT FuncName(...)" because the export macro
+# expands to __attribute__((visibility("default"))) and the parser misattributes
+# the declaration to the macro expansion. Predefine all module export macros
+# to empty so the parser sees a clean signature.
+PREDEFINED            += @MITK_DOXYGEN_MODULE_EXPORT_MACROS@
+
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
 # macro definition that is found in the sources will be used. Use the PREDEFINED

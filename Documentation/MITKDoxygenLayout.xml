@@ -4,7 +4,16 @@
     <tab type="mainpage" visible="yes" title="Home"/>
     <tab type="pages" visible="yes" title="Manual" intro=""/>
     <tab type="usergroup" title="API Reference">
-      <tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
+      <!-- Doxygen 1.10 renamed the legacy "Modules" concept (the \defgroup tab) -->
+      <!-- to "Topics" and repurposed type="modules" for C++20 modules. Listing -->
+      <!-- both entries keeps the groups tab working across the full version    -->
+      <!-- range: Doxygen >= 1.9.8 honors the "topics" entry and silently drops -->
+      <!-- "modules" (no C++20 modules in MITK today); Doxygen <= 1.9.1 rejects -->
+      <!-- "topics" with a log message and falls back to the legacy "modules"   -->
+      <!-- entry. If MITK ever adopts C++20 modules, the distinct title on the  -->
+      <!-- second entry will let both tabs coexist cleanly.                     -->
+      <tab type="topics" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
+      <tab type="modules" visible="yes" title="Modules" intro="Here is a list of all C++20 modules:"/>
       <tab type="namespaces" visible="yes" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="yes" title="" intro=""/>

@@ -19,9 +19,6 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-
-constexpr unsigned int DEFAULT_UNDO_REDO_LIMIT = 50;
-
 namespace
 {
   mitk::IPreferences* GetPreferences()
@@ -36,8 +33,8 @@ namespace
     auto* prefs = GetPreferences();
 
     return prefs != nullptr
-      ? prefs->GetInt("UndoLimit", DEFAULT_UNDO_REDO_LIMIT)
-      : DEFAULT_UNDO_REDO_LIMIT; //no pref is available use the default limit
+      ? prefs->GetInt("UndoLimit", static_cast<int>(mitk::DEFAULT_UNDO_REDO_LIMIT))
+      : mitk::DEFAULT_UNDO_REDO_LIMIT; //no pref is available use the default limit
   }
 }
 

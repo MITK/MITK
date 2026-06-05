@@ -6,6 +6,7 @@ set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_undoredo_Activator.cpp
   QmitkUndoRedoView.cpp
   QmitkUndoRedoPreferencePage.cpp
+  QmitkUndoRedoPreferenceHelper.cpp
 )
 
 set(UI_FILES

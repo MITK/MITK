@@ -1,12 +1,10 @@
 #include "QmitkUndoRedoView.h"
+#include "QmitkUndoRedoPreferenceHelper.h"
 
 // MITK includes
 #include <mitkRenderingManager.h>
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 #include <QmitkRenderWindow.h>
 
@@ -18,26 +16,6 @@
 #include <QmitkStyleManager.h>
 
 #include <ui_QmitkUndoRedoView.h>
-
-namespace
-{
-  mitk::IPreferences* GetPreferences()
-  {
-    auto preferencesService = mitk::CoreServices::GetPreferencesService();
-    auto systemPref = preferencesService->GetSystemPreferences();
-    return nullptr != systemPref ? systemPref->Node("/General/UndoRedo") : nullptr;
-  }
-
-  void SetUndoLimitPreference(unsigned int limit)
-  {
-    auto* prefs = GetPreferences();
-
-    if (prefs != nullptr)
-    {
-      prefs->PutInt("UndoLimit", limit);
-    }
-  }
-}
 
 const std::string QmitkUndoRedoView::VIEW_ID = "org.mitk.views.undoredoview";
 
@@ -143,7 +121,7 @@ void QmitkUndoRedoView::OnChangeLimitClicked()
     if (ok)
     {
       undoModel->SetUndoLimit(newLimit);
-      SetUndoLimitPreference(newLimit);
+      QmitkUndoRedoPreferences::StoreLimit(newLimit);
       this->UpdateUndoRedoList();
       this->UpdateButtonStatus();
     }
@@ -157,13 +135,16 @@ void QmitkUndoRedoView::OnCheckLimitChanged(bool)
   {
     if (m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() == 0)
     {
-      undoModel->SetUndoLimit(100);
-      SetUndoLimitPreference(100);
+      // Re-enabling a limit: restore the user's last chosen value (or the shared
+      // default if none), instead of clobbering it with a hardcoded number.
+      const int limit = QmitkUndoRedoPreferences::GetLastPositiveLimit();
+      undoModel->SetUndoLimit(static_cast<std::size_t>(limit));
+      QmitkUndoRedoPreferences::StoreLimit(limit);
     }
     else if (!m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() != 0)
     {
       undoModel->SetUndoLimit(0);
-      SetUndoLimitPreference(0);
+      QmitkUndoRedoPreferences::StoreLimit(0);
     }
   }
   this->UpdateButtonStatus();

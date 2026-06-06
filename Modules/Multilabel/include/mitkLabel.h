@@ -323,10 +323,23 @@ namespace mitk
      */
     std::string GetAlgorithmName() const;
 
-    /** \brief Helper function to add the usage of multiple tools correctly to the label.
-     Mixture of types always lead to semiautomatic. If the algorithm name is empty, the name
-     will directly set. If it is not empty and algoName is not already a sub string of the
-     current algorithm name, the new algoName will be appended (separated by "|").
+    /** \brief Records that a tool/operation contributed to this label, updating algorithm type and name.
+     *
+     * Type: the first contribution to a still-Undefined label defines its type; any type already
+     * present (a genuine MANUAL loaded from a DICOM SEG, or a prior tool's type) is preserved, and a
+     * later tool of a different type mixes the result to SEMIAUTOMATIC.
+     * Name: for internally-created labels, algorithm_name starts with the "MITK Segmentation" prefix;
+     * the first dedicated tool is appended after ": " and further tools after "|"
+     * (e.g. "MITK Segmentation: nnUNet|Paint"). A name still equal to just the prefix means no
+     * dedicated tool has been recorded yet.
+     *
+     * \pre algoName must be non-empty and contain neither separator ("|" nor ": ") so the encoding stays
+     *      parseable; use plain spaces in op names (e.g. "Boolean Union", "Morphological Closing",
+     *      "Interpolation"). Violating this throws an mitk::Exception.
+     * \remark Idempotent for repeated identical use (type stable, name de-duplicated), so it is safe
+     *      under the many small writes a single interaction (e.g. a paint drag) produces.
+     * \note Externally-loaded provenance names that do not carry the MITK prefix are kept as-is; a later
+     *      in-MITK tool simply appends to them and mixes the type as usual.
      */
     void AddToolUse(AlgorithmType algoType, const std::string& algoName);
 

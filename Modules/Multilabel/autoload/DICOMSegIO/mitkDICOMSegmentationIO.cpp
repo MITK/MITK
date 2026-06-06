@@ -1524,8 +1524,18 @@ namespace mitk
   void mitk::DICOMSegmentationIO::SetLabelProperties(mitk::Label *label, dcmqi::SegmentAttributes *segmentAttribute)
   {
     // Segment Algorithm Type: Type of algorithm used to generate the segment.
-    label->SetAlgorithmTypeStr(segmentAttribute->getSegmentAlgorithmType());
-    label->SetAlgorithmName(segmentAttribute->getSegmentAlgorithmName());
+    // Only set these when the DICOM source actually carries a value. An absent SegmentAlgorithmType
+    // leaves the label Undefined (honest: the source declared no origin); the writer defaults a
+    // still-Undefined type to MANUAL at export for DICOM conformance. An absent SegmentAlgorithmName
+    // (legitimately so for MANUAL segments, DICOM type 1C) is left unset so GetAlgorithmName() keeps
+    // its "MITK Segmentation" fallback rather than storing an empty name.
+    const std::string dicomAlgorithmType = segmentAttribute->getSegmentAlgorithmType();
+    if (!dicomAlgorithmType.empty())
+      label->SetAlgorithmTypeStr(dicomAlgorithmType);
+
+    const std::string dicomAlgorithmName = segmentAttribute->getSegmentAlgorithmName();
+    if (!dicomAlgorithmName.empty())
+      label->SetAlgorithmName(dicomAlgorithmName);
 
     // Add Segmented Property Category Code Sequence tags
     auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();

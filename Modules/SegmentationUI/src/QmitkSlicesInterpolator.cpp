@@ -78,6 +78,10 @@ namespace
       ? dynamic_cast<T*>(dataNode->GetData())
       : nullptr;
   }
+
+  // Provenance op-name stamped on labels when an interpolation result is accepted (Label::AddToolUse).
+  // Defined once so the three accept paths cannot drift apart.
+  const std::string INTERPOLATION_PROVENANCE_NAME = "Interpolation";
 }
 
 float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
@@ -823,6 +827,9 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
   );
 
   mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep, "2D Interpolation");
+  // 2D accept uses the SegSliceOperation static (pixels-only undo), so this stamp is not undo-reverted
+  // (tracked as a follow-up); order relative to the writeback above is therefore irrelevant.
+  activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
   m_FeedbackNode->SetData(nullptr);
 }
 
@@ -969,7 +976,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       auto newDestinationLabel = activeLabel->GetValue();
       auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
 
-      mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
+      // noLabels=false (was true) so the "Interpolation" stamp below is captured by undo/redo.
+      mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
 
       TransferLabelContentAtTimeStep(
         diffImage,
@@ -982,6 +990,9 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         { {1, newDestinationLabel} },
         mitk::MultiLabelSegmentation::MergeStyle::Merge,
         mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+      // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
+      activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
 
       std::string name = "3D-interpolation - " + activeLabelName;
 
@@ -1057,7 +1068,8 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   auto timeStep = segmentationGeometry->TimePointToTimeStep(m_TimePoint);
   const mitk::Label::PixelType newDestinationLabel = activeLabel->GetValue();
 
-  mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, true, false, true);
+  // noLabels=false (was true) so the "Interpolation" stamp below is captured by undo/redo.
+  mitk::SegGroupModifyUndoRedoHelper undoHelper(segmentation, { segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
 
   TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
@@ -1070,6 +1082,9 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     {{1, newDestinationLabel}},
     mitk::MultiLabelSegmentation::MergeStyle::Merge,
     mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+  // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
+  activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
 
   this->Show3DInterpolationResult(false);
 

@@ -578,6 +578,20 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
 
   mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume, m_UndoEnabled, this->GetName());
 
+  if (writeSliceToVolume)
+  {
+    // Single choke point for all 2D/manual writebacks: the positionEvent and planeGeometry overloads
+    // delegate here, and EditableContourTool calls this directly. The active label is exactly the
+    // label the static above wrote into (it also resolves via GetActiveLabel()). Guarded by
+    // writeSliceToVolume so a surface-interpolation-only call (no pixel write) records no tool use.
+    // NOTE: the writeback above undoes via the pixel-only SegSliceOperation, which does not capture
+    // label properties, so this provenance stamp is NOT reverted on undo (the same sticky behavior the
+    // 2D interpolation accept in QmitkSlicesInterpolator documents; tracked as a follow-up).
+    if (auto* segmentation = this->GetWorkingData())
+      if (auto* activeLabel = segmentation->GetActiveLabel())
+        activeLabel->AddToolUse(this->GetAlgorithmType(), this->GetName());
+  }
+
 
   /* A cleaner solution would be to add a contour marker for each slice info. It currently
    does not work as the contour markers expect that the plane is always the plane of slice 0.

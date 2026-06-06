@@ -66,7 +66,15 @@ private slots:
 
 private:
   void ConfigureWidgets();
-  void SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const;
+  /**
+   * \brief Adds the operation result as a new label in a new group and records its provenance.
+   * \param[in] resultMask The binary mask produced by the boolean operation.
+   * \param[in] labelName Human-readable display name for the new label.
+   * \param[in] provenanceOpName Algorithm-provenance name recorded via Label::AddToolUse
+   *            (e.g. "Boolean Union"); must contain no "|" or ": " separator.
+   */
+  void SaveResultLabelMask(
+    const mitk::Image* resultMask, const std::string& labelName, const std::string& provenanceOpName) const;
 
 
   std::unique_ptr<Ui::QmitkBooleanOperationsWidgetControls> m_Controls;

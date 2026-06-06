@@ -82,7 +82,15 @@ protected:
 
 private:
   mitk::Image::Pointer GetSelectedLabelMask() const;
-  void SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const;
+  /**
+   * \brief Writes the operation result back (new label or in-place) and records its provenance.
+   * \param[in] resultMask The mask produced by the morphological operation.
+   * \param[in] labelName Human-readable display name for the (new) label.
+   * \param[in] provenanceOpName Algorithm-provenance name recorded via Label::AddToolUse
+   *            (e.g. "Morphological Closing"); must contain no "|" or ": " separator.
+   */
+  void SaveResultLabelMask(
+    const mitk::Image* resultMask, const std::string& labelName, const std::string& provenanceOpName) const;
 
   mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI() const;
 

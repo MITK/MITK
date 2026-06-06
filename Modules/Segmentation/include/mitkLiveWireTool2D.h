@@ -56,6 +56,11 @@ namespace mitk
     /** \brief Return the human-readable name of this tool ("Live Wire"). */
     const char *GetName() const override;
 
+    /** \brief Edge-snapping (least-cost path) determines the affected pixels, not the user's direct
+     * stroke, so Live Wire is SEMIAUTOMATIC. The override sits here, not on EditableContourTool, so
+     * its sibling LassoTool (straight-line polygon) stays MANUAL. */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
   protected:
     LiveWireTool2D();
     ~LiveWireTool2D() override;

@@ -42,6 +42,10 @@ namespace mitk
   public:
     mitkClassMacro(FillRegionBaseTool, SegTool2D);
 
+    /** \brief A single click triggers a connected-component flood/morphology that decides the
+     * affected region, so Fill/Erase/Close are SEMIAUTOMATIC (covers all derived tools). */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
   protected:
     FillRegionBaseTool();             // purposely hidden
     ~FillRegionBaseTool() override;

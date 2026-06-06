@@ -471,6 +471,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
 
       auto label = mitk::LabelSetImageHelper::CreateNewLabel(outputSeg, name, true);
       label->SetValue(correctedV);
+      // Pixels are derived algorithmically from the imported labeled image, not drawn by hand.
+      label->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "Image conversion");
 
       outputSeg->AddLabel(label, currentGroupIndex, false, false);
     }
@@ -498,6 +500,8 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
       mitk::ColorProperty::ConstPointer colorProp = dynamic_cast<const mitk::ColorProperty*>(node->GetConstProperty("color").GetPointer());
       if (colorProp.IsNotNull())
         label->SetColor(colorProp->GetColor());
+      // Pixels are derived algorithmically from the imported surface/contour, not drawn by hand.
+      label->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "Surface/contour conversion");
 
       outputSeg->AddLabel(label, currentGroupIndex, false, false);
     }

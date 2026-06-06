@@ -537,8 +537,12 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
   auto newLabel = m_Segmentation->AddLabel(templateLabel, groupID, true);
   //remove properties that where copied by the template but are instance specific
   newLabel->ResetCenterOfMass();
+  // Reset provenance to the fresh, undeclared construction state so first-use detection works on the
+  // duplicate: Undefined type (the algorithm_type key is removed) and NO algorithm_name property
+  // (GetAlgorithmName() then falls back to the "MITK Segmentation" prefix; an explicit "" would defeat
+  // that). This runs before RegisterUndoRedoOperationEvent below, so undo/redo capture the reset state.
   newLabel->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
-  newLabel->SetAlgorithmName("");
+  newLabel->RemoveProperty("algorithm_name");
 
   m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;

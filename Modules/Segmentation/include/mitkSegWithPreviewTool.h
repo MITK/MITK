@@ -44,6 +44,10 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    /** \brief Preview tools are SEMIAUTOMATIC by default (the user supplies seeds/parameters).
+     * Fully automatic preview tools (e.g. nnUNet) override this again to AUTOMATIC. */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
     /**
      * \brief Confirms the current preview segmentation and transfers it to the working image.
      *

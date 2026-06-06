@@ -127,6 +127,17 @@ namespace mitk
     virtual const char *GetName() const = 0;
 
     /**
+    \brief Returns the intrinsic algorithm type of this tool, used to stamp label provenance.
+
+    Base default is MANUAL: the user's direct input (stroke/polygon/click) is the result. Override to
+    SEMIAUTOMATIC when an algorithm determines the affected pixels beyond where the user directly
+    indicated (seeds/parameters/edge-snapping); override to AUTOMATIC when the tool runs with no
+    per-image human input. Read at the writeback choke points and passed to mitk::Label::AddToolUse
+    together with GetName().
+    */
+    virtual mitk::Label::AlgorithmType GetAlgorithmType() const;
+
+    /**
     \brief Name of a group.
 
     You can group several tools by assigning a group name. Graphical tool selectors might use this information to group

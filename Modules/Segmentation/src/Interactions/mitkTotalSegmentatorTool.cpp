@@ -96,6 +96,11 @@ const char *mitk::TotalSegmentatorTool::GetName() const
   return "TotalSegmentator";
 }
 
+mitk::Label::AlgorithmType mitk::TotalSegmentatorTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::AUTOMATIC;
+}
+
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  const Image * /*oldSegAtTimeStep*/,
                                                  MultiLabelSegmentation *previewImage,

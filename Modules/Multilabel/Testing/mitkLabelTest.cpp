@@ -153,6 +153,11 @@ public:
   {
     mitk::Label::Pointer label = mitk::Label::New();
 
+    // A freshly constructed label has an Undefined (undeclared) algorithm type; its name falls back
+    // to the prefix-only "MITK Segmentation" until a tool is recorded.
+    CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::Undefined);
+    CPPUNIT_ASSERT(label->GetAlgorithmName() == "MITK Segmentation");
+
     // --- Check all AlgorithmType values and their string representations ---
     struct AlgoPair { mitk::Label::AlgorithmType type; std::string str; };
     std::vector<AlgoPair> algoPairs = {
@@ -192,6 +197,27 @@ public:
     CPPUNIT_ASSERT(label->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
     name = label->GetAlgorithmName();
     CPPUNIT_ASSERT(name == "ToolA|ToolB|nnUNet");
+
+    // --- First-use-replaces on a fresh label: the first dedicated tool defines the type and is
+    //     appended to the prefix after ": " ---
+    auto freshLabel = mitk::Label::New();
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "X");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::AUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X");
+    // A second tool of a different type mixes to SEMIAUTOMATIC and is appended after "|"
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Y");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X|Y");
+    // Repeating an existing tool is idempotent (type stable, name de-duplicated)
+    freshLabel->AddToolUse(mitk::Label::AlgorithmType::AUTOMATIC, "X");
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmType() == mitk::Label::AlgorithmType::SEMIAUTOMATIC);
+    CPPUNIT_ASSERT(freshLabel->GetAlgorithmName() == "MITK Segmentation: X|Y");
+
+    // --- Externally-loaded names without the MITK prefix are kept as-is (no prefix injected) ---
+    auto externalLabel = mitk::Label::New();
+    externalLabel->SetAlgorithmName("AcmeNet");
+    externalLabel->AddToolUse(mitk::Label::AlgorithmType::MANUAL, "Paint");
+    CPPUNIT_ASSERT(externalLabel->GetAlgorithmName() == "AcmeNet|Paint");
   }
 
   void TestDICOMFunctions()

@@ -142,7 +142,8 @@ mitk::Image::Pointer QmitkMorphologicalOperationsWidget::GetSelectedLabelMask() 
   return mitk::CreateLabelMask(seg, labels.front(), true);
 }
 
-void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const
+void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(
+  const mitk::Image* resultMask, const std::string& labelName, const std::string& provenanceOpName) const
 {
   auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
   if (seg == nullptr) mitkThrow() << "Widget is in invalid state. Processing was triggered with no segmentation selected.";
@@ -156,6 +157,9 @@ void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(const mitk::Image* 
     mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(seg, { groupID });
 
     auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
+    // Stamp before AddLabelWithContent (clone carries it) and before RegisterUndoRedoOperationEvent
+    // so undo/redo capture the provenance.
+    newLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, provenanceOpName);
     seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
 
     undoRedoGenerator.RegisterUndoRedoOperationEvent("Add morphologic operation result \n" + labelName + "\" in new group");
@@ -169,6 +173,10 @@ void QmitkMorphologicalOperationsWidget::SaveResultLabelMask(const mitk::Image* 
     mitk::TransferLabelContent(resultMask, seg->GetGroupImage(groupID), seg->GetConstLabelsByValue(seg->GetLabelValuesByGroup(groupID)),
       mitk::MultiLabelSegmentation::UNLABELED_VALUE, mitk::MultiLabelSegmentation::UNLABELED_VALUE, false, { {1, labels.front()} },
       mitk::MultiLabelSegmentation::MergeStyle::Replace, mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+    // Stamp the in-place modified label before RegisterUndoRedoOperationEvent so undo/redo capture it.
+    if (auto affectedLabel = seg->GetLabel(labels.front()))
+      affectedLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, provenanceOpName);
 
     undoRedoGenerator.RegisterUndoRedoOperationEvent("Update \n" + labelName + "\" by morphologic operation result");
   }
@@ -213,7 +221,7 @@ void QmitkMorphologicalOperationsWidget::Processing(std::function<MorphFunctionT
   std::stringstream labelName;
   labelName << opsName << " " << " (r=" << factor << ") " << seg->GetLabel(labels.front())->GetName();
 
-  this->SaveResultLabelMask(image, labelName.str());
+  this->SaveResultLabelMask(image, labelName.str(), "Morphological " + opsName);
   mitk::ProgressBar::GetInstance()->Progress();
 
   QApplication::restoreOverrideCursor();

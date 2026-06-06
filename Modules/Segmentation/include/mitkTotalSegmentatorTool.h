@@ -41,6 +41,10 @@ namespace mitk
     itkCloneMacro(Self);
 
     const char *GetName() const override;
+
+    /** \brief TotalSegmentator runs with no per-image human input, so AUTOMATIC. */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
     us::ModuleResource GetIconResource() const override;
     void Activated() override;
 

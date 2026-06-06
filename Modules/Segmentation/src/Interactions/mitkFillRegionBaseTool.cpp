@@ -31,6 +31,11 @@ mitk::FillRegionBaseTool::~FillRegionBaseTool()
 {
 }
 
+mitk::Label::AlgorithmType mitk::FillRegionBaseTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
 void mitk::FillRegionBaseTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("Release", OnClick);

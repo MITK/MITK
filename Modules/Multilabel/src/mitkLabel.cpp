@@ -76,7 +76,42 @@ namespace mitk
   }
 } // namespace mitk
 
+namespace
+{
+  // Shared encoding of the algorithm_name provenance string. Defined once so the GetAlgorithmName()
+  // fallback and AddToolUse() cannot drift apart. The two separators are deliberately different so a
+  // human or parser can split the framework prefix from the tool chain unambiguously, e.g.
+  // "MITK Segmentation: nnUNet|Paint" -> prefix "MITK Segmentation", tools ["nnUNet", "Paint"].
+  const std::string DEFAULT_ALGORITHM_NAME = "MITK Segmentation"; // the standing prefix
+  const std::string PREFIX_SEPARATOR = ": ";                      // prefix <-> first tool (appears at most once)
+  const std::string TOOL_SEPARATOR = "|";                         // tool <-> tool
 
+  // True if toolName is already one of the recorded tools in an algorithm_name. The encoding is
+  // "[<prefix>: ]tool1|tool2|...", so we strip the framework prefix (when present) and compare against
+  // the "|"-separated tool tokens for an exact match. A plain substring search would wrongly treat a
+  // name that is a substring of the prefix or of another tool (e.g. "Net" inside "nnUNet") as present.
+  bool ToolAlreadyRecorded(const std::string& algorithmName, const std::string& toolName)
+  {
+    if (algorithmName == DEFAULT_ALGORITHM_NAME) // bare prefix: no tool recorded yet
+      return false;
+
+    const std::string internalPrefix = DEFAULT_ALGORITHM_NAME + PREFIX_SEPARATOR;
+    const std::string toolChain = algorithmName.starts_with(internalPrefix)
+                                    ? algorithmName.substr(internalPrefix.size())
+                                    : algorithmName;
+
+    std::string::size_type start = 0;
+    while (start != std::string::npos)
+    {
+      const auto sep = toolChain.find(TOOL_SEPARATOR, start);
+      const auto length = sep == std::string::npos ? std::string::npos : sep - start;
+      if (toolChain.compare(start, length, toolName) == 0)
+        return true;
+      start = sep == std::string::npos ? std::string::npos : sep + TOOL_SEPARATOR.size();
+    }
+    return false;
+  }
+}
 
 mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 {
@@ -99,6 +134,10 @@ mitk::Label::Label() : PropertyList(), m_Value(UNLABELED_VALUE)
 
   if (GetProperty("description") == nullptr)
     SetDescription("");
+
+  // Algorithm type is intentionally left Undefined: a freshly constructed label has no declared
+  // origin yet. The type is set at the point of contribution (Label::AddToolUse / explicit setters),
+  // and the DICOM SEG writer defaults a still-Undefined type to MANUAL at export for conformance.
 }
 
 mitk::Label::Label(PixelType value, const std::string& name) : Label()
@@ -466,29 +505,38 @@ void mitk::Label::SetAlgorithmName(const std::string& algoName)
 
 std::string mitk::Label::GetAlgorithmName() const
 {
-  std::string text = "MITK Segmentation";
+  std::string text = DEFAULT_ALGORITHM_NAME;
   GetStringProperty("algorithm_name", text);
   return text;
 }
 
 void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName)
 {
-  auto currentType = this->GetAlgorithmType();
-  auto currentName = this->GetAlgorithmName();
+  // Enforce the encoding precondition: a separator inside algoName would make the provenance string
+  // unparseable and could confuse the de-duplication below. Fail loudly rather than
+  // silently corrupt the record (mirrors SetAlgorithmTypeStr's input validation).
+  if (algoName.empty() || algoName.find(TOOL_SEPARATOR) != std::string::npos ||
+      algoName.find(PREFIX_SEPARATOR) != std::string::npos)
+    mitkThrow() << "Label::AddToolUse: algoName must be non-empty and must not contain the separators '"
+                << TOOL_SEPARATOR << "' or '" << PREFIX_SEPARATOR << "'. Invalid name: " << algoName;
 
+  const std::string currentName = this->GetAlgorithmName(); // MITK prefix only for internally-created names
+
+  // A name still equal to just the prefix means no dedicated tool has been recorded yet (the
+  // construction-default state), so the first tool's name is appended after the prefix separator.
+  const bool noToolRecorded = (currentName == DEFAULT_ALGORITHM_NAME);
+
+  // The first contribution to a still-Undefined label defines its type. Any type already present
+  // (a genuine MANUAL loaded from a DICOM SEG, or a prior tool's type) is real provenance: preserve
+  // it, and mix to SEMIAUTOMATIC when a later tool of a different type contributes.
+  const auto currentType = this->GetAlgorithmType();
   if (currentType == AlgorithmType::Undefined)
     this->SetAlgorithmType(algoType);
   else if (currentType != algoType)
-    this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC);
+    this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC); // mixed tool types
 
-  auto pos = currentName.find(algoName);
-  if (pos == std::string::npos)
-  {
-    if (!currentName.empty())
-      currentName += "|";
-    currentName += algoName;
-    this->SetAlgorithmName(currentName);
-  }
+  if (!ToolAlreadyRecorded(currentName, algoName)) // keep the prefix, append the dedicated tool
+    this->SetAlgorithmName(currentName + (noToolRecorded ? PREFIX_SEPARATOR : TOOL_SEPARATOR) + algoName);
 }
 
 

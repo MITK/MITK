@@ -982,6 +982,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
                          "@MITK_SOURCE_DIR@/Licenses" \
+                         "@MITK_SOURCE_DIR@/CLAUDE.md" \
                          "@MITK_SOURCE_DIR@/CODE_OF_CONDUCT.md" \
                          "@MITK_SOURCE_DIR@/CONTRIBUTING.md" \
                          "@MITK_SOURCE_DIR@/README.md" \

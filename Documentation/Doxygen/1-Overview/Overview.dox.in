@@ -15,7 +15,7 @@ usage scenarios:
 <li>  <b> You may want to develop your own software framework, and use some of MITK's data structures and algorithms</b>
 
 You may want to use MITK as a toolkit and probably benefit most from the \ref BuildInstructionsPage and <a
-href="modules.html">MITK API Documentation</a>.
+href="@MITK_DOXYGEN_GROUPS_PAGE@">MITK API Documentation</a>.
 
 <li> <b>You may want to use the MITK and BlueBerry software framework to develop your own software </b>
 

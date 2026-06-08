@@ -800,7 +800,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            = @MITK_SOURCE_DIR@/Documentation/MITKDoxygenLayout.xml
+LAYOUT_FILE            = @MITK_BINARY_DIR@/Documentation/MITKDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib

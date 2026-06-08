@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
+#include <algorithm>
 #include <regex>
 
 using namespace mitk::nnInteractive;
@@ -181,6 +182,7 @@ namespace mitk
     bool AutoZoom;
     bool AutoRefine;
     bool Remote = false;
+    int HeartbeatIntervalMs = 0;
     TimeStepType SessionReferenceDataTimeStep = 0;
     TimeStepType SessionWorkingDataTimeStep = 0;
 
@@ -678,6 +680,20 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
       std::string("session.set_do_autozoom(") + (m_Impl->AutoZoom ? "True" : "False") + ")\n");
 
     this->BindSessionImageAndTargetBuffer();
+
+    // The client's background heartbeat daemon is starved in our embedded
+    // interpreter (the GIL stays on the Qt main thread between Execute calls),
+    // so the GUI drives the heartbeat from a timer instead. Read the
+    // server-provided liveness timeout and beat at half of it, mirroring the
+    // library's own cadence. A zero/disabled liveness timeout means no
+    // heartbeat is needed.
+    pythonContext->Execute(
+      "nni_liveness = float(getattr(session, 'liveness_timeout_seconds', 0.0) or 0.0)\n");
+    const auto liveness = pythonContext->GetVariableAsDouble("nni_liveness").value_or(0.0);
+    pythonContext->Execute("del nni_liveness\n");
+    m_Impl->HeartbeatIntervalMs = liveness > 0.0
+      ? static_cast<int>(std::max(5.0, liveness / 2.0) * 1000.0)
+      : 0;
   }
   catch (const Exception& e)
   {
@@ -937,6 +953,7 @@ void mitk::nnInteractiveTool::EndSession()
   m_Impl->DestroyPythonContext();
 
   m_Impl->Remote = false;
+  m_Impl->HeartbeatIntervalMs = 0;
   m_Impl->SessionReferenceDataTimeStep = 0;
   m_Impl->SessionWorkingDataTimeStep = 0;
 
@@ -946,6 +963,58 @@ void mitk::nnInteractiveTool::EndSession()
 bool mitk::nnInteractiveTool::IsRemoteSession() const
 {
   return m_Impl->Remote;
+}
+
+int mitk::nnInteractiveTool::GetHeartbeatIntervalMs() const
+{
+  return m_Impl->HeartbeatIntervalMs;
+}
+
+void mitk::nnInteractiveTool::Heartbeat()
+{
+  if (!m_Impl->Remote || !this->IsSessionRunning())
+    return;
+
+  auto pythonContext = m_Impl->GetPythonContext();
+  bool expired = false;
+
+  try
+  {
+    // Mirror the library's own _heartbeat_loop tolerance: a SessionExpiredError
+    // (or any unexpected error) means the lease is gone, while a transient httpx
+    // error is ignored so the next beat can retry. We classify inside Python and
+    // read back a flag, so a transient blip never reaches the broad remote guard
+    // (WrapInRemoteGuard) that would tear the session down. httpx and
+    // SessionExpiredError were imported by ConstructRemoteSession() and persist
+    // in the shared dictionary for the session's lifetime.
+    pythonContext->Execute(
+      "try:\n"
+      "    session.heartbeat()\n"
+      "    nni_hb_expired = False\n"
+      "except SessionExpiredError:\n"
+      "    nni_hb_expired = True\n"
+      "except httpx.HTTPError:\n"
+      "    nni_hb_expired = False\n"
+      "except Exception:\n"
+      "    nni_hb_expired = True\n");
+
+    expired = pythonContext->GetVariableAsBool("nni_hb_expired").value_or(false);
+    pythonContext->Execute("del nni_hb_expired\n");
+  }
+  catch (const Exception& e)
+  {
+    // Heartbeat() runs from a Qt timer slot, so never let an exception escape.
+    MITK_WARN << "nnInteractive: heartbeat failed unexpectedly (ignored): " << e.GetDescription();
+    return;
+  }
+
+  if (expired)
+  {
+    // The lease is gone server-side. Signal the GUI, which tears the dead
+    // session down on the next event-loop tick (same deferred path used for a
+    // connection loss detected mid-interaction).
+    this->SessionExpiredEvent.Send();
+  }
 }
 
 mitk::nnInteractiveTool::SupportedInteractions mitk::nnInteractiveTool::GetSupportedInteractions() const

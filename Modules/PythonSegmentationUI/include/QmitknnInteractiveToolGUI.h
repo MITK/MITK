@@ -29,6 +29,7 @@ found in the LICENSE file.
 class QAbstractButton;
 class QButtonGroup;
 class QPushButton;
+class QTimer;
 
 namespace Ui
 {
@@ -204,6 +205,15 @@ protected:
    */
   void OnSessionExpired();
 
+  /** \brief Sends a keep-alive heartbeat to the remote nnInteractive server.
+   *
+   * Connected to the heartbeat timer's timeout while a remote session runs.
+   * Delegates to nnInteractiveTool::Heartbeat(), which keeps the server-side
+   * lease alive and, on a definitive expiry, triggers the SessionExpiredEvent
+   * teardown path. Has no effect for local sessions.
+   */
+  void OnHeartbeatTimeout();
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.
@@ -314,6 +324,8 @@ private:
   mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
+
+  QTimer* m_HeartbeatTimer = nullptr;
 
   mitk::IPreferences* m_Preferences = nullptr;
   std::vector<ShortcutLabel> m_ShortcutLabels;

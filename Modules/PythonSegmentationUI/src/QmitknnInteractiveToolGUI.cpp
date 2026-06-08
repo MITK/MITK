@@ -232,6 +232,12 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->GetTool()->SessionExpiredEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
     this, &QmitknnInteractiveToolGUI::OnSessionExpired);
 
+  // Drives the remote keep-alive heartbeat. Started on a successful remote
+  // initialization (see OnInitializeButtonToggled) and stopped on session end
+  // or expiry. Parented to this widget, so it is destroyed with the GUI.
+  m_HeartbeatTimer = new QTimer(this);
+  connect(m_HeartbeatTimer, &QTimer::timeout, this, &Self::OnHeartbeatTimeout);
+
   Superclass::InitializeUI(mainLayout);
 
   // TODO: Once we agree on a common shortcut concept, the confirm binding
@@ -411,7 +417,7 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.groups.push_back(std::move(torchGroup));
 
   mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive>=2.0.0,<3.0.0" };
+  nnInteractiveGroup.requirements = { "nninteractive>=2.3.2,<3.0.0" };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
   if (modelSource != "local")
@@ -520,6 +526,14 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
     // Disable interaction buttons the loaded checkpoint does not support.
     this->ApplyCapabilityGating();
+
+    // Keep a remote session alive: the client's own background heartbeat cannot
+    // run while MITK is idle (the embedded interpreter holds the GIL on this
+    // thread), so beat from the Qt event loop instead. Zero means a local
+    // session or a server with the liveness timeout disabled (no heartbeat).
+    const int heartbeatIntervalMs = this->GetTool()->GetHeartbeatIntervalMs();
+    if (heartbeatIntervalMs > 0)
+      m_HeartbeatTimer->start(heartbeatIntervalMs);
 
     auto backend = this->GetTool()->GetBackend();
 
@@ -779,6 +793,10 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
 
 void QmitknnInteractiveToolGUI::OnSessionEnded()
 {
+  // The session is gone; stop beating. Covers every teardown path (normal end,
+  // time-point change, AbortSession after an expiry).
+  m_HeartbeatTimer->stop();
+
   // Restore cursor and uncheck any active interactor button. The tool has
   // already disabled its interactor; this just keeps the GUI's check state in
   // sync.
@@ -798,14 +816,27 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   m_Ui->settingsButton->setEnabled(true);
 }
 
+void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()
+{
+  if (auto* tool = this->GetTool())
+    tool->Heartbeat();
+}
+
 void QmitknnInteractiveToolGUI::OnSessionExpired()
 {
-  // A remote session was lost mid-use. Tear it down on the next event-loop tick
-  // rather than now: this fires from within an interactor's event handling,
-  // where disabling/resetting interactors is unsafe. AbortSession() ends the
-  // session, clears all prompts and the preview, and -- via SessionEndedEvent
-  // -> OnSessionEnded -- reverts the widget to its pre-init state, so the user
-  // just clicks Initialize to reconnect.
+  // Stop beating immediately so a second timeout cannot queue another
+  // teardown/dialog before the deferred AbortSession below runs. (OnSessionEnded
+  // also stops the timer once the session is actually torn down.)
+  m_HeartbeatTimer->stop();
+
+  // A remote session was lost. Tear it down on the next event-loop tick rather
+  // than now: when this fires from within an interactor's event handling (a
+  // connection loss detected mid-interaction), disabling/resetting interactors
+  // inline is unsafe; deferring is also harmless when it fires from the
+  // heartbeat timer (a proactive expiry). AbortSession() ends the session,
+  // clears all prompts and the preview, and -- via SessionEndedEvent ->
+  // OnSessionEnded -- reverts the widget to its pre-init state, so the user just
+  // clicks Initialize to reconnect.
   QTimer::singleShot(0, this, [this]() {
     if (QCoreApplication::closingDown())
       return;

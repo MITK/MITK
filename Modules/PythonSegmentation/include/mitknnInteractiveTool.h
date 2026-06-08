@@ -345,6 +345,40 @@ namespace mitk
      */
     bool IsRemoteSession() const;
 
+    /** \brief Sends a single keep-alive heartbeat for a running remote session.
+     *
+     * Remote nnInteractive sessions are reaped server-side after a liveness
+     * timeout unless the client periodically proves it is alive. The client
+     * library ships its own background heartbeat daemon, but that Python thread
+     * cannot run while MITK is idle: the embedded interpreter holds the GIL on
+     * the Qt main thread between PythonContext::Execute() calls, so the daemon
+     * never gets to beat. This method drives the heartbeat from the Qt event
+     * loop instead and must be called periodically (see GetHeartbeatIntervalMs)
+     * by the GUI for as long as a remote session is running.
+     *
+     * A transient transport error is tolerated (the next beat retries), matching
+     * the library's own heartbeat loop. A definitive lease expiry emits
+     * SessionExpiredEvent so the GUI tears the dead session down. This is a no-op
+     * for local sessions or when no session is running, and never throws (it is
+     * invoked from a Qt timer slot).
+     *
+     * \sa GetHeartbeatIntervalMs(), SessionExpiredEvent
+     */
+    void Heartbeat();
+
+    /** \brief Returns the interval, in milliseconds, at which Heartbeat() should
+     *         be called for the running remote session.
+     *
+     * Derived from the server-provided liveness timeout (half of it, mirroring
+     * the client library's own cadence). Returns \c 0 for local sessions, when
+     * no session is running, or when the server has disabled the liveness
+     * timeout (no heartbeat needed). The GUI starts a timer only when this is
+     * greater than zero.
+     *
+     * \sa Heartbeat()
+     */
+    int GetHeartbeatIntervalMs() const;
+
     /** \brief Returns which interaction types the running session supports.
      *
      * Reads the session's capability metadata. If no session is running, all

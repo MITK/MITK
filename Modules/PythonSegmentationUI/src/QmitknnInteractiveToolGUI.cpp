@@ -535,6 +535,11 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     if (heartbeatIntervalMs > 0)
       m_HeartbeatTimer->start(heartbeatIntervalMs);
 
+    // Show the model checkpoint license (CC BY-NC-SA 4.0 for the official model)
+    // so users are aware of its non-commercial terms. Works for local and remote
+    // sessions alike (the remote license comes from the server's capabilities).
+    this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
+
     auto backend = this->GetTool()->GetBackend();
 
     if (!backend.has_value())
@@ -797,6 +802,9 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   // time-point change, AbortSession after an expiry).
   m_HeartbeatTimer->stop();
 
+  // Clear the model license now that no session is bound.
+  this->UpdateModelLicenseDisplay(std::nullopt);
+
   // Restore cursor and uncheck any active interactor button. The tool has
   // already disabled its interactor; this just keeps the GUI's check state in
   // sync.
@@ -820,6 +828,36 @@ void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()
 {
   if (auto* tool = this->GetTool())
     tool->Heartbeat();
+}
+
+void QmitknnInteractiveToolGUI::UpdateModelLicenseDisplay(const std::optional<std::string>& license)
+{
+  auto* label = m_Ui->modelLicenseLabel;
+
+  if (!license.has_value() || license->empty())
+  {
+    label->clear();
+    label->setStyleSheet(QString());
+    label->setVisible(false);
+    return;
+  }
+
+  const auto text = QString::fromStdString(*license).trimmed();
+
+  if (text == "!!MISSING!!")
+  {
+    // Mirror the napari plugin: an unknown license is a warning, not an error,
+    // but it must stand out so the user does not assume unrestricted use.
+    label->setText("Model license: UNKNOWN (warning!)");
+    label->setStyleSheet("color: #d9534f; font-weight: bold;");
+  }
+  else
+  {
+    label->setText(QString("Model license: %1").arg(text));
+    label->setStyleSheet(QString());
+  }
+
+  label->setVisible(true);
 }
 
 void QmitknnInteractiveToolGUI::OnSessionExpired()

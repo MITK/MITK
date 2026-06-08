@@ -1053,6 +1053,35 @@ mitk::nnInteractiveTool::SupportedInteractions mitk::nnInteractiveTool::GetSuppo
   return caps;
 }
 
+std::optional<std::string> mitk::nnInteractiveTool::GetModelLicense() const
+{
+  if (!this->IsSessionRunning())
+    return std::nullopt;
+
+  try
+  {
+    auto pythonContext = m_Impl->GetPythonContext();
+
+    // session.license is a cached attribute on both local and remote sessions
+    // (the remote one reads it from the server's /capabilities during
+    // construction), so this is a plain local attribute read: no network call
+    // and no remote guard needed.
+    pythonContext->Execute("nni_license = getattr(session, 'license', None) or ''\n");
+    const auto license = pythonContext->GetVariableAsString("nni_license").value_or("");
+    pythonContext->Execute("del nni_license\n");
+
+    if (license.empty())
+      return std::nullopt;
+
+    return license;
+  }
+  catch (const Exception& e)
+  {
+    MITK_WARN << "nnInteractive: could not read the model license: " << e.GetDescription();
+    return std::nullopt;
+  }
+}
+
 bool mitk::nnInteractiveTool::IsRemoteConnectionError(const std::string& message) const
 {
   // ExecuteSession() wraps remote session calls in a Python try/except that

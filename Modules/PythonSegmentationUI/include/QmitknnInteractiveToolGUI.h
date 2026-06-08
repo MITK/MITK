@@ -214,6 +214,17 @@ protected:
    */
   void OnHeartbeatTimeout();
 
+  /** \brief Shows the model checkpoint license below the Initialize button, or
+   *         clears it when passed \c std::nullopt.
+   *
+   * Mirrors the napari plugin: a normal license string is shown as
+   * "Model license: <value>", the "!!MISSING!!" sentinel is shown as a red
+   * "Model license: UNKNOWN (warning!)", and an empty/absent license hides the
+   * label. Driven by the session lifecycle, so it works for local and remote
+   * sessions alike.
+   */
+  void UpdateModelLicenseDisplay(const std::optional<std::string>& license);
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.

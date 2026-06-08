@@ -390,6 +390,20 @@ namespace mitk
      */
     SupportedInteractions GetSupportedInteractions() const;
 
+    /** \brief Returns the running session's model checkpoint license, if any.
+     *
+     * Reads the nnInteractive session's \c license attribute, populated
+     * identically for local sessions (first line of the checkpoint's LICENSE
+     * file, or a fallback for the official model) and remote sessions (mirrored
+     * from the server's /capabilities response). The special value
+     * "!!MISSING!!" means the license is unknown. Returns \c std::nullopt when
+     * no session is running or no license is reported. This is a cached local
+     * attribute read (no network call).
+     *
+     * \sa GetSupportedInteractions()
+     */
+    std::optional<std::string> GetModelLicense() const;
+
     /** \brief Initializes or reinitializes the session with an existing mask.
      *
      * Provides an existing segmentation mask as an initial segmentation to

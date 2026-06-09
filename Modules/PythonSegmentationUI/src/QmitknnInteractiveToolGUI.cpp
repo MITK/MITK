@@ -234,7 +234,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   // Drives the remote keep-alive heartbeat. Started on a successful remote
   // initialization (see OnInitializeButtonToggled) and stopped on session end
-  // or expiry. Parented to this widget, so it is destroyed with the GUI.
+  // or expiry.
   m_HeartbeatTimer = new QTimer(this);
   connect(m_HeartbeatTimer, &QTimer::timeout, this, &Self::OnHeartbeatTimeout);
 
@@ -527,20 +527,16 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->promptTypeGroupBox->setEnabled(true);
     m_Ui->interactionToolsGroupBox->setEnabled(true);
 
-    // Disable interaction buttons the loaded checkpoint does not support.
     this->ApplyCapabilityGating();
 
-    // Keep a remote session alive: the client's own background heartbeat cannot
-    // run while MITK is idle (the embedded interpreter holds the GIL on this
-    // thread), so beat from the Qt event loop instead. Zero means a local
-    // session or a server with the liveness timeout disabled (no heartbeat).
+    // Start the remote keep-alive heartbeat (see nnInteractiveTool::Heartbeat).
+    // A zero interval means none is needed: a local session, or a server with
+    // the liveness timeout disabled.
     const int heartbeatIntervalMs = this->GetTool()->GetHeartbeatIntervalMs();
     if (heartbeatIntervalMs > 0)
       m_HeartbeatTimer->start(heartbeatIntervalMs);
 
-    // Show the model checkpoint license (CC BY-NC-SA 4.0 for the official model)
-    // so users are aware of its non-commercial terms. Works for local and remote
-    // sessions alike (the remote license comes from the server's capabilities).
+    // Surface the model's license terms now that a session is bound.
     this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
 
     auto backend = this->GetTool()->GetBackend();

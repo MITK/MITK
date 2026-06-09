@@ -198,10 +198,13 @@ protected:
   /** \brief Handles the tool's SessionExpiredEvent.
    *
    * A remote session was lost server-side (idle timeout, server restart, or
-   * the server is at capacity / unreachable). The tool has already ended the
-   * session, so this only informs the user that they need to re-initialize.
-   * The message box is shown deferred to avoid re-entrancy when the event
-   * fires from within an interaction.
+   * the server is at capacity / unreachable). The session is still live when
+   * this fires: it stops the heartbeat timer and defers teardown to the next
+   * event-loop tick (AbortSession(), which ends the session and clears the
+   * interactions and preview), then informs the user that they need to
+   * re-initialize. Deferring both the teardown and the dialog avoids
+   * re-entrancy when the event fires from within an interaction. A guard
+   * ensures a second expiry event cannot stack a duplicate teardown or dialog.
    */
   void OnSessionExpired();
 

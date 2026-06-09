@@ -372,11 +372,12 @@ namespace mitk
     /** \brief Returns the interval, in milliseconds, at which Heartbeat() should
      *         be called for the running remote session.
      *
-     * Derived from the server-provided liveness timeout (half of it, mirroring
-     * the client library's own cadence). Returns \c 0 for local sessions, when
-     * no session is running, or when the server has disabled the liveness
-     * timeout (no heartbeat needed). The GUI starts a timer only when this is
-     * greater than zero.
+     * Derived from the server-provided liveness timeout: half of it, but never
+     * less often than every 5 seconds (max(5 s, liveness / 2)), mirroring the
+     * client library's own cadence. Returns \c 0 for local sessions, when no
+     * session is running, or when the server has disabled the liveness timeout
+     * (no heartbeat needed). The GUI starts a timer only when this is greater
+     * than zero.
      *
      * \sa Heartbeat()
      */

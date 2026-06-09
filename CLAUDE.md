@@ -163,7 +163,9 @@ File naming: core / algorithm files use the `mitk` prefix
 - A comment earns its place by explaining *why*: the non-obvious
   constraint, the subtle invariant, the trade-off the reader cannot
   see from the code itself. Restating *what* the code already says
-  is noise. Default to writing no comment.
+  is noise. Stating *why* in terms of "why was it changed" belongs
+  in the commit message, not in the code comment.
+  Default to writing no comment.
 - Doc comments on public APIs describe contract and intent (what
   callers rely on), not an implementation walkthrough.
 - Do not reference artifacts that will not live in the repo - plans,

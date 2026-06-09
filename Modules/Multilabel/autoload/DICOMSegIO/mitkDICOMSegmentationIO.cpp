@@ -759,8 +759,7 @@ namespace mitk
     // (per-group) would invite divergence across groups when the
     // synthesised top-level identity tags are minted with random UIDs.
     // Complete ends with `return Validate(seg)`, so in synthetic mode its
-    // return value already is the post-synthesis Validate result and a
-    // second Validate call would be redundant.
+    // return value already is the post-synthesis validation result.
     const auto missing = [&]() {
       if (isSynthetic)
       {
@@ -1142,11 +1141,12 @@ namespace mitk
       // does not take ownership of dcmFileFormat's dataset and dcmFileFormat
       // outlives this block, so loadDataset avoids a second disk read.
       //
-      // Source-image relations are optional provenance (SEG IOD type 1C).
-      // Isolate their population in its own try/catch so a failure here
-      // (e.g. DcmSegmentation::loadDataset rejecting a dataset dcmqi already
-      // decoded) degrades to a warning instead of discarding the fully
-      // decoded segmentation. Mirrors MigrateLegacyReferenceFilesToRelation.
+      // Source-image relations are optional provenance (SEG IOD type 1C), so
+      // failing to attach them must not fail an otherwise-complete load. The
+      // enclosing catch turns any throw into an empty result, hence the
+      // dedicated guard here (e.g. for DcmSegmentation::loadDataset rejecting
+      // a dataset dcmqi already decoded), which degrades to a warning. Mirrors
+      // MigrateLegacyReferenceFilesToRelation.
       try
       {
         DcmSegmentation* segDocRaw = nullptr;
@@ -1403,10 +1403,7 @@ namespace mitk
     }
 
     // Drive label naming, colour and DICOM property metadata from
-    // segmentsAttributesMappingList. SetLabelProperties copies the source
-    // tracking ID/UID onto the label only when the DICOM carried a
-    // non-empty value, so HasTrackingID/HasTrackingUID keep reflecting the
-    // source truthfully across a round trip.
+    // segmentsAttributesMappingList.
     for (const auto &[labelValue, segmentAttribute] : attributesByLabelValue)
     {
       Label *label = labelSetImage->GetLabel(labelValue);

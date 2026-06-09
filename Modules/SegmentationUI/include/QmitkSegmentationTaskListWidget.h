@@ -24,6 +24,7 @@ found in the LICENSE file.
 
 #include <optional>
 #include <memory>
+#include <filesystem>
 
 class QFileSystemWatcher;
 
@@ -120,5 +121,36 @@ private:
   std::optional<unsigned long> m_SegmentationModifiedObserverTag;
   bool m_UnsavedChanges;
 };
+
+namespace mitk
+{
+  /**
+   * \brief The scene file forms a Segmentation Task List accepts as a Scene.Path.
+   *
+   * \sa ClassifyTaskListSceneFile
+   */
+  enum class SceneFileForm
+  {
+    Zip,            /**< Packed MITK scene (*.mitk); load via SceneIO::LoadScene. */
+    JsonStandalone, /**< Standalone JSON scene (*.mitkscene.json); load via SceneIO::LoadScene. */
+    UnpackedIndex   /**< Unpacked scene index (*.mitksceneindex); load via SceneIO::LoadSceneUnzipped. */
+  };
+
+  /**
+   * \brief Classify a Segmentation Task List Scene.Path by its accepted file form.
+   *
+   * Accepts three forms: \c *.mitk (ZIP) and \c *.mitksceneindex (matched on the last
+   * extension, case-sensitive, preserving legacy behavior), and \c *.mitkscene.json
+   * (matched on the full filename suffix, case-insensitively). Note that
+   * std::filesystem::path::extension() returns only ".json" for "foo.mitkscene.json",
+   * which is why the JSON form is matched on the full filename rather than the extension.
+   *
+   * \param scenePath Path to the scene file referenced by the task.
+   * \return The classified scene file form.
+   * \throws mitk::Exception if the path matches none of the accepted forms. The message
+   *         lists all three accepted forms and the offending path.
+   */
+  MITKSEGMENTATIONUI_EXPORT SceneFileForm ClassifyTaskListSceneFile(const std::filesystem::path& scenePath);
+}
 
 #endif

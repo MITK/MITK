@@ -77,6 +77,8 @@ public:
     m_labelSet1.clear();
     m_labelSet2.clear();
     m_labelSet2_adapted.clear();
+    std::error_code ec;
+    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "mitkMultiLabelSegmentationIOTest", ec);
   }
   
   void TestReadEmptyMultiLabelSegmentation()
@@ -236,6 +238,11 @@ public:
       CPPUNIT_FAIL(diag.str());
     }
 
+    // The seg reloaded from native NRRD here carries its DICOM identity but no
+    // SegSourceImageRelationRule connection, so re-establish the source
+    // relation before the strict-mode DICOM SEG write (which needs a source to
+    // reference). This test does NOT assert rule survival across serialisation
+    // - that is covered by mitkSegSourceImageRelationRoundTripTest.
     mitk::SegSourceImageRelationRule::Connect(reloadedSeg, source.GetPointer());
 
     const auto dcmPath = (tempDir / "native-then-seg.dcm").string();

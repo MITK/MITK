@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include <mitkNodePredicateGeometry.h>
 #include <mitkIOUtil.h>
 
+#include <sstream>
+
 namespace CppUnit
 {
   namespace StringHelper

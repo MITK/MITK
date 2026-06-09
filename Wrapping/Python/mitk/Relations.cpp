@@ -38,10 +38,13 @@ void InitRelations(py::module_& m)
     "Relations a :py:class:`mitk.MultiLabelSegmentation` participates in.\n"
     "\n"
     "Currently only the DICOM-SEG source-image relation. Establishing a\n"
-    "relation captures the source's identification (per-instance SOP UIDs\n"
-    "and series UID) but does NOT transfer the source's patient/study/\n"
-    "frame-of-reference identity to the seg; that is a separate concern\n"
-    "handled by :py:mod:`mitk.dicom.segmentation`.\n");
+    "relation records the source's identification (per-instance SOP UIDs\n"
+    "internally, plus the series UID) but does NOT transfer the source's\n"
+    "patient/study/frame-of-reference identity to the seg; that is a\n"
+    "separate concern handled by :py:mod:`mitk.dicom.segmentation`. The\n"
+    "Python API surfaces the relation UID and source series UID (see\n"
+    ":py:class:`SourceImageRelation`); per-instance SOP UIDs are not\n"
+    "exposed here.\n");
 
   py::class_<SegSourceImageRelationRule::SourceImageRelation>(segmentation, "SourceImageRelation",
     "One established source-image relation.\n"

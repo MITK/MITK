@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
+#include <dcmtk/dcmfg/fgplanpo.h>
 #include <dcmtk/dcmfg/fgtypes.h>
 #include <dcmtk/dcmseg/segdoc.h>
 
@@ -237,14 +238,17 @@ namespace
     dst.putAndInsertString(DCM_ImageOrientationPatient, iop.c_str());
   }
 
-  // Format an IPP value for one slice of a group image. PlaneGeometry's
-  // origin is the patient-coordinate position of the slice (MITK uses a
-  // corner-of-first-voxel convention; DICOM's ImagePositionPatient is
-  // defined as the centre of the upper-left voxel). dcmqi parses the
-  // formatted IPP back into a Point3D and resolves the matching seg
-  // frame via PlaneGeometry's TransformPhysicalPointToIndex on the
-  // label image, so the requirement on this string is "round-trips
-  // through the seg's own geometry," not exact string equality.
+  // Format an IPP value for one slice of a group image from the slice plane's
+  // origin. The group geometry is an image geometry, whose plane origins are
+  // centre-based and therefore coincide with DICOM's ImagePositionPatient
+  // convention (the centre of the upper-left voxel). The -0.5 voxel adjustments
+  // in mitkBaseGeometry apply only to corner / bounding-box queries
+  // (GetCornerPoint), not to the plane origin or to WorldToIndex, so no
+  // half-voxel correction is applied here. dcmqi parses the formatted IPP back
+  // into a Point3D and resolves the matching slice via the seg's own geometry
+  // (TransformPhysicalPointToIndex on the ITK image it builds), so the
+  // requirement on this string is "round-trips through the seg's geometry," not
+  // exact string equality.
   std::string FormatIPPForSlice(const mitk::Image *groupImage,
                                 mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex)
   {
@@ -310,12 +314,19 @@ namespace
     return OFString(std::to_string(segmentAttribute.getLabelID()).c_str());
   }
 
-  // One source-image reference seen on one SEG frame. Frame index is the
-  // SEG's own frame numbering (0-based) and is later used as the slice
-  // index in the TemporoSpatialStringProperty handed to the relation rule.
+  // One source-image reference seen on one SEG frame.
+  //
+  // frameIndex is the SEG's own functional-group ordinal (0-based), kept only
+  // for diagnostics. sliceIndex is the geometry slice the frame's content
+  // actually occupies in the reconstructed MITK volume: dcmqi places each frame
+  // at the slice its ImagePositionPatient maps to (TransformPhysicalPointToIndex
+  // on the ITK image it builds), which equals frameIndex only for physically
+  // Z-ordered, gap-free SEGs. The per-slice relation property is therefore keyed
+  // by sliceIndex, not by the ordinal.
   struct SegSourceFrameRef
   {
     Uint32 frameIndex;
+    mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex;
     std::string sopInstanceUID;
     std::string sopClassUID;
   };
@@ -333,13 +344,41 @@ namespace
   // Frames that carry no derivation reference are silently skipped: the
   // SEG IOD makes the Derivation Image FG type 1C, so absence is DICOM-legal
   // and simply means "no source image is recorded for that frame."
-  // Parameter is non-const because DCMTK's getFunctionalGroups and
-  // getNumberOfFrames have no const overload.
-  std::vector<SegSourceFrameRef> CollectPerFrameSourceRefs(DcmSegmentation& segDoc)
+  //
+  // groupGeometry is the seg's reconstructed group-image geometry; it maps each
+  // frame's ImagePositionPatient back to the geometry slice dcmqi placed the
+  // frame at (see SegSourceFrameRef). All MITK groups of one SEG share one
+  // world geometry, so group 0's geometry is representative.
+  //
+  // A frame whose Plane Position (Patient) is unreadable, or whose resolved
+  // slice index falls outside [0, slice count), is warned about and dropped
+  // rather than keyed at its ordinal: keying at the ordinal could collide with
+  // a legitimately resolved slice and silently mis-attribute a source. dcmqi
+  // already requires a per-frame Plane Position to reconstruct the volume at all
+  // (computeVolumeExtent returns EXIT_FAILURE otherwise), so the unreadable-IPP
+  // path is defensive, not expected; dropping a frame loses only that frame's
+  // provenance and never mis-keys another slice. Mirrors the skip-and-warn
+  // idiom GroupPerFrameRefsBySeries uses for unresolved series.
+  //
+  // segDoc is non-const because DCMTK's getFunctionalGroups / getNumberOfFrames
+  // have no const overload.
+  //
+  // \pre groupGeometry must not be null. A slice index cannot be resolved
+  // without the geometry, so a null geometry is a caller error and throws
+  // rather than silently yielding no relations; DoRead's surrounding catch
+  // turns it into a warn-and-degrade because source relations are optional
+  // provenance.
+  std::vector<SegSourceFrameRef> CollectPerFrameSourceRefs(DcmSegmentation& segDoc,
+                                                           const mitk::SlicedGeometry3D* groupGeometry)
   {
+    if (groupGeometry == nullptr)
+      mitkThrow() << "CollectPerFrameSourceRefs requires the seg's group geometry to resolve "
+                     "per-frame slice indices.";
+
     std::vector<SegSourceFrameRef> result;
     FGInterface& fgInterface = segDoc.getFunctionalGroups();
     const size_t numFrames = segDoc.getNumberOfFrames();
+    const unsigned int sliceCount = groupGeometry->GetSlices();
 
     for (size_t f = 0; f < numFrames; ++f)
     {
@@ -348,6 +387,38 @@ namespace
       auto* derImg = OFstatic_cast(FGDerivationImage*, fg);
       if (derImg == nullptr)
         continue;
+
+      // Resolve this frame's geometry slice from its Plane Position (Patient).
+      // The Float64 triple-getter avoids per-component OFString parsing and any
+      // locale concern (DoRead already runs under LocaleSwitch("C")).
+      OFBool isPerFramePos = OFFalse;
+      auto* posFg = fgInterface.get(static_cast<Uint32>(f), DcmFGTypes::EFG_PLANEPOSPATIENT, isPerFramePos);
+      auto* planePos = OFstatic_cast(FGPlanePosPatient*, posFg);
+      Float64 x = 0.0;
+      Float64 y = 0.0;
+      Float64 z = 0.0;
+      if (planePos == nullptr || planePos->getImagePositionPatient(x, y, z).bad())
+      {
+        MITK_WARN << "DICOM SEG frame " << f << " has no usable Plane Position (Patient); "
+                  << "dropping its source-image reference (slice cannot be resolved).";
+        continue;
+      }
+      mitk::Point3D ipp;
+      ipp[0] = x;
+      ipp[1] = y;
+      ipp[2] = z;
+
+      itk::Index<3> index;
+      groupGeometry->WorldToIndex(ipp, index);
+      if (index[2] < 0 || static_cast<unsigned int>(index[2]) >= sliceCount)
+      {
+        MITK_WARN << "DICOM SEG frame " << f << " maps to out-of-range slice " << index[2]
+                  << " (volume has " << sliceCount << " slices); "
+                  << "dropping its source-image reference.";
+        continue;
+      }
+      const auto sliceIndex =
+        static_cast<mitk::TemporoSpatialStringProperty::IndexValueType>(index[2]);
 
       OFVector<DerivationImageItem*>& derItems = derImg->getDerivationImageItems();
       for (auto* derItem : derItems)
@@ -368,7 +439,7 @@ namespace
           srcItem->getImageSOPInstanceReference().getReferencedSOPClassUID(sopClass);
           if (sopInstance.empty())
             continue;
-          result.push_back({static_cast<Uint32>(f), sopInstance.c_str(), sopClass.c_str()});
+          result.push_back({static_cast<Uint32>(f), sliceIndex, sopInstance.c_str(), sopClass.c_str()});
         }
       }
     }
@@ -488,14 +559,30 @@ namespace
       auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
       for (const auto& frameRef : group.frames)
       {
-        // Single time step in the SEG IOD; frame -> slice index 1:1 as
-        // described on SegSourceFrameRef.
-        perSliceInstance->SetValue(0, frameRef.frameIndex, frameRef.sopInstanceUID);
+        // Single time step in the SEG IOD. Key by the geometry slice the
+        // frame's content occupies (resolved from the frame's IPP in
+        // CollectPerFrameSourceRefs), NOT the SEG frame ordinal, so the
+        // per-slice property aligns with the MITK volume even when the SEG's
+        // per-frame groups are not in physical-Z order.
+        //
+        // In an overlapping / multi-segment SEG several frames can resolve to
+        // the same slice. For a well-formed SEG they all reference the same
+        // source slice, so the value is identical and the re-write is a no-op.
+        // A genuinely different value at the same slice signals an inconsistent
+        // SEG; warn (last writer wins) so the otherwise-silent collapse is
+        // diagnosable. GetValue(0, slice) returns "" when nothing is stored.
+        const auto existing = perSliceInstance->GetValue(0, frameRef.sliceIndex);
+        if (!existing.empty() && existing != frameRef.sopInstanceUID)
+          MITK_WARN << "DICOM SEG slice " << frameRef.sliceIndex << " is referenced by two "
+                    << "different source instances (" << existing << " vs "
+                    << frameRef.sopInstanceUID << "); keeping the latter. The SEG's "
+                    << "per-frame source references are inconsistent for this slice.";
+        perSliceInstance->SetValue(0, frameRef.sliceIndex, frameRef.sopInstanceUID);
         // Mirror the migration helper's shape: only stamp SOPClass when
         // it is non-empty, so GetAvailableSlices(0) reports a consistent
         // cardinality across both upstream paths.
         if (!frameRef.sopClassUID.empty())
-          perSliceClass->SetValue(0, frameRef.frameIndex, frameRef.sopClassUID);
+          perSliceClass->SetValue(0, frameRef.sliceIndex, frameRef.sopClassUID);
       }
 
       rule->Connect(&seg, perSliceInstance, perSliceClass, group.seriesInstanceUID);
@@ -1156,7 +1243,10 @@ namespace mitk
           mitkThrow() << "Failed to parse DICOM SEG via DcmSegmentation::loadDataset: "
                       << loadSegCond.text();
 
-        const auto frameRefs = CollectPerFrameSourceRefs(*segDoc);
+        const mitk::Image* groupImage = labelSetImage->GetGroupImage(0);
+        const mitk::SlicedGeometry3D* groupGeometry =
+          groupImage != nullptr ? groupImage->GetSlicedGeometry() : nullptr;
+        const auto frameRefs = CollectPerFrameSourceRefs(*segDoc, groupGeometry);
         const auto seriesToInstances = CollectSourceInstancesBySeries(*dataSet);
         const auto sourceSeriesGroups = GroupPerFrameRefsBySeries(frameRefs, seriesToInstances);
         PopulateSourceImageRelations(*labelSetImage, sourceSeriesGroups);

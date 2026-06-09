@@ -13,8 +13,17 @@ if(EXISTS "${_dicomSegFixture}")
     mitkDICOMSegmentationIORegressionTest
     ${_dicomSegFixture}
     ${MITK_DATA_DIR}/Multilabel/DICOMSegmentationIO/liver-dcmqi-reference.nrrd)
+
+  # Non-Z-ordered per-frame source keying: permutes the same Z-ordered
+  # liver.dcm in-memory, so it shares the fixture gate above. Needs no
+  # reference NRRD - it reads the reversed file's own per-frame tags as the
+  # oracle.
+  mitkAddCustomModuleTest(mitkDICOMSegmentationIONonZOrderedTest_Liver
+    mitkDICOMSegmentationIONonZOrderedTest
+    ${_dicomSegFixture})
 else()
   message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationIORegressionTest_Liver "
+    "and mitkDICOMSegmentationIONonZOrderedTest_Liver "
     "(dcmqi fixture not found: ${_dicomSegFixture}).")
 endif()
 

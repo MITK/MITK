@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+    mitkDICOMSegPerFrameSliceKeyingTest.cpp
     mitkDICOMSegmentationIOWriterTest.cpp
     mitkDICOMSegmentationPropertyHelperTest.cpp
     mitkLabelTest.cpp
@@ -17,6 +18,7 @@ set(MODULE_TESTS
 
 set(MODULE_CUSTOM_TESTS
     mitkDICOMSegmentationIORegressionTest.cpp
+    mitkDICOMSegmentationIONonZOrderedTest.cpp
     mitkDICOMSegmentationIOLabelmapRegressionTest.cpp
     mitkDICOMSegmentationLegacyMigrationTest.cpp
 )

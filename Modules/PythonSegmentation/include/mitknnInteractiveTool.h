@@ -285,28 +285,31 @@ namespace mitk
      */
     bool GetCUDADeviceInfo(CUDADeviceInfo& info) const;
 
-    /** \brief Starts an nnInteractive inference session.
+    /** \brief Starts an nnInteractive inference session in the configured mode.
      *
-     * Downloads the model checkpoint (if necessary), initializes the
-     * inference session on the selected backend (CUDA or CPU), and binds
-     * the reference image to the session.
+     * In local mode it downloads/loads the model checkpoint and initializes the
+     * inference session on a CUDA or CPU backend (determined from CUDA device
+     * availability and user preferences). In remote mode it claims a session on
+     * the configured nninteractive-server, which provides the model and compute.
+     * In both modes the reference image is bound to the session.
      *
-     * If a session is already running, it is ended first. The backend is
-     * determined based on CUDA device availability and user preferences.
+     * If a session is already running, it is ended first.
      *
      * \pre A Python context must have been created via CreatePythonContext().
      * \pre A reference image must be available through the ToolManager.
      *
-     * \throw mitk::Exception if the Python session setup fails.
+     * \throw mitk::Exception if the session setup fails (local or remote).
      *
-     * \sa EndSession(), IsSessionRunning()
+     * \sa EndSession(), IsSessionRunning(), IsRemoteSession()
      */
     void StartSession();
 
     /** \brief Ends the current nnInteractive inference session.
      *
-     * Cleans up the Python session, releases model resources, and optionally
-     * empties the CUDA cache. This is a no-op if no session is running.
+     * For a local session it cleans up the Python session, releases model
+     * resources, and optionally empties the CUDA cache. For a remote session it
+     * releases the server lease (best-effort and idempotent) so the slot frees up
+     * for other users. This is a no-op if no session is running.
      *
      * \sa StartSession(), IsSessionRunning()
      */
@@ -459,12 +462,15 @@ namespace mitk
 
     /** \brief Event triggered when a remote session was lost server-side.
      *
-     * Emitted after EndSession() (so SessionEndedEvent has already reverted the
-     * session-dependent UI) when a remote operation failed because the lease
-     * expired or the server is at capacity / unreachable. GUI code can
-     * subscribe to inform the user that they need to re-initialize.
+     * Emitted while the (now dead) remote session is still nominally running,
+     * when a remote operation or the heartbeat failed because the lease expired
+     * or the server is at capacity / unreachable. Teardown has NOT happened yet:
+     * the GUI must defer it, calling AbortSession() on the next event-loop tick
+     * (teardown must not run inside an interactor's event handling), which then
+     * ends the session and fires SessionEndedEvent. Do not assume the session is
+     * already ended when this fires.
      *
-     * \sa SessionEndedEvent
+     * \sa SessionEndedEvent, AbortSession()
      */
     Message<> SessionExpiredEvent;
 

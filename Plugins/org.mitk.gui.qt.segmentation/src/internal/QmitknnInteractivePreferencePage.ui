@@ -515,16 +515,16 @@
   <tabstop>remoteModeRadioButton</tabstop>
   <tabstop>serverUrlLineEdit</tabstop>
   <tabstop>apiKeyLineEdit</tabstop>
-  <tabstop>showShortcutsInLabelsCheckBox</tabstop>
-  <tabstop>autoBackendRadioButton</tabstop>
-  <tabstop>cpuBackendRadioButton</tabstop>
-  <tabstop>gpuBackendRadioButton</tabstop>
-  <tabstop>gpuBackendLineEdit</tabstop>
   <tabstop>hfSourceRadioButton</tabstop>
   <tabstop>checkpointLineEdit</tabstop>
   <tabstop>localSourceRadioButton</tabstop>
   <tabstop>localModelPathLineEdit</tabstop>
   <tabstop>localModelPathBrowseButton</tabstop>
+  <tabstop>autoBackendRadioButton</tabstop>
+  <tabstop>cpuBackendRadioButton</tabstop>
+  <tabstop>gpuBackendRadioButton</tabstop>
+  <tabstop>gpuBackendLineEdit</tabstop>
+  <tabstop>showShortcutsInLabelsCheckBox</tabstop>
   <tabstop>uninstallButton</tabstop>
  </tabstops>
  <resources/>

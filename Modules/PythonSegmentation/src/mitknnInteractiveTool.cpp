@@ -70,6 +70,32 @@ namespace
     return result;
   }
 
+  // Strip credentials (a "user:pass@" userinfo) and any query/fragment from a URL
+  // so it can be safely shown in error messages and written to the log. The real
+  // URL is still used for the connection; this is purely for display. Best-effort
+  // string surgery, deliberately not a full URL parser.
+  std::string SanitizeUrlForDisplay(const std::string& url)
+  {
+    std::string result = url;
+
+    // Drop query and fragment (an API key is sometimes pasted as ?key=...).
+    if (const auto cut = result.find_first_of("?#"); cut != std::string::npos)
+      result.erase(cut);
+
+    // Drop userinfo: anything between "://" and the next "@" within the authority.
+    if (const auto schemeEnd = result.find("://"); schemeEnd != std::string::npos)
+    {
+      const auto authStart = schemeEnd + 3;
+      const auto authEnd = result.find('/', authStart);
+      const auto at = result.find('@', authStart);
+
+      if (at != std::string::npos && (authEnd == std::string::npos || at < authEnd))
+        result.erase(authStart, at - authStart + 1);
+    }
+
+    return result;
+  }
+
   // Stable sentinel used to recognize a lost remote connection. We raise it
   // ourselves (see WrapInRemoteGuard) after a type-based catch, so detection
   // never depends on httpx or OS error wording.
@@ -91,6 +117,20 @@ namespace
         << "    raise RuntimeError('" << REMOTE_CONNECTION_LOST_SENTINEL << ": ' + repr(_nni_e))\n";
     return out.str();
   }
+
+  // mitk::Exception::GetDescription() may return nullptr; treat that as an empty
+  // message so the remote-error helpers do not have to repeat the null-guard.
+  std::string Description(const mitk::Exception& e)
+  {
+    const char* description = e.GetDescription();
+    return description != nullptr ? description : "";
+  }
+
+  // Heartbeat cadence: beat at half the server's liveness timeout, but never less
+  // often than every 5 s. Mirrors the client library's own _heartbeat_loop so a
+  // single dropped beat still leaves margin before the lease is reaped.
+  constexpr double HEARTBEAT_FRACTION_OF_LIVENESS = 0.5;
+  constexpr double MIN_HEARTBEAT_INTERVAL_SEC = 5.0;
 }
 
 namespace mitk
@@ -305,8 +345,9 @@ void mitk::nnInteractiveTool::ResetInteractions()
     {
       // The local prompts are already cleared above. If the remote reset failed
       // because the connection is gone, there is nothing left to reset on the
-      // server; the loss surfaces with full teardown on the next interaction.
-      if (!this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+      // server; the loss is surfaced on the next interaction, or by the heartbeat
+      // timer if one is running.
+      if (!this->IsRemoteConnectionError(Description(e)))
         throw;
 
       MITK_WARN << "nnInteractive: could not reset interactions on the remote server (connection lost).";
@@ -346,9 +387,9 @@ void mitk::nnInteractiveTool::SetAutoZoom(bool autoZoom)
     }
     catch (const Exception& e)
     {
-      // Non-critical: if the connection dropped, the loss surfaces with full
-      // teardown on the next interaction.
-      if (!this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+      // Non-critical: if the connection dropped, the loss is surfaced on the
+      // next interaction, or by the heartbeat timer if one is running.
+      if (!this->IsRemoteConnectionError(Description(e)))
         throw;
 
       MITK_WARN << "nnInteractive: could not update auto-zoom on the remote server (connection lost).";
@@ -488,7 +529,7 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
     // A remote session can fail mid-interaction (lease expired, server gone, or
     // at capacity). Tear it down and notify the GUI; otherwise propagate the
     // error as before so local failures keep their existing behavior.
-    if (this->HandleSessionError(e.GetDescription() != nullptr ? e.GetDescription() : ""))
+    if (this->HandleSessionError(Description(e)))
       return;
 
     throw;
@@ -612,10 +653,23 @@ void mitk::nnInteractiveTool::StartSession()
   auto prefs = GetPreferences();
   m_Impl->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
 
-  if (m_Impl->Remote)
-    this->ConstructRemoteSession();
-  else
-    this->ConstructLocalSession();
+  try
+  {
+    if (m_Impl->Remote)
+      this->ConstructRemoteSession();
+    else
+      this->ConstructLocalSession();
+  }
+  catch (...)
+  {
+    // If construction failed before a session was established, do not leave the
+    // remote flag set: IsRemoteSession() must report false when nothing runs,
+    // and EndSession() (the usual reset path) is a no-op without a session.
+    if (!this->IsSessionRunning())
+      m_Impl->Remote = false;
+
+    throw;
+  }
 }
 
 void mitk::nnInteractiveTool::ConstructRemoteSession()
@@ -634,39 +688,53 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
 
   // Claim a session on the server. Map the expected failure modes to short,
   // user-facing messages (reported via the nni_connect_error variable) instead
-  // of letting an httpx/Python traceback bubble up to the GUI.
+  // of letting an httpx/Python traceback bubble up to the GUI. The server URL is
+  // shown credential-stripped (nni_server_display), and the API key is cleared in
+  // a finally so it never lingers in the shared dictionary even if a statement
+  // here throws.
   {
     std::ostringstream pyCommands; pyCommands
-      << "from nnInteractive.inference.remote import (\n"
-      << "    nnInteractiveRemoteInferenceSession, ServerAtCapacityError, SessionExpiredError)\n"
-      << "import httpx\n"
       << "nni_server_url = " << PyQuote(serverUrl) << "\n"
+      << "nni_server_display = " << PyQuote(SanitizeUrlForDisplay(serverUrl)) << "\n"
       << "nni_api_key = " << (apiKey.empty() ? std::string("None") : PyQuote(apiKey)) << "\n"
       << "nni_connect_error = ''\n"
       << "try:\n"
-      << "    session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key=nni_api_key)\n"
-      << "except ServerAtCapacityError:\n"
-      << "    nni_connect_error = 'The nnInteractive server is at capacity. Please try again later.'\n"
-      << "except SessionExpiredError:\n"
-      << "    nni_connect_error = 'The nnInteractive server rejected the session request. Please try again.'\n"
-      << "except httpx.HTTPStatusError as _e:\n"
-      << "    if _e.response.status_code == 401:\n"
-      << "        nni_connect_error = 'The nnInteractive server rejected the API key. Check the API key in the nnInteractive preferences.'\n"
-      << "    elif 'text/html' in _e.response.headers.get('content-type', ''):\n"
-      << "        nni_connect_error = (f'The server at {nni_server_url} returned an HTML page instead of a response. '\n"
-      << "                             'An HTTP proxy may be intercepting the request; try adding the host to NO_PROXY.')\n"
-      << "    else:\n"
-      << "        nni_connect_error = f'The nnInteractive server returned an error (HTTP {_e.response.status_code}).'\n"
-      << "except (httpx.ConnectError, httpx.ConnectTimeout):\n"
-      << "    nni_connect_error = f'Could not reach the nnInteractive server at {nni_server_url}. Check the server URL and make sure the server is running.'\n"
-      << "except httpx.HTTPError as _e:\n"
-      << "    nni_connect_error = f'Could not connect to the nnInteractive server at {nni_server_url}: {_e}'\n";
+      << "    from nnInteractive.inference.remote import (\n"
+      << "        nnInteractiveRemoteInferenceSession, ServerAtCapacityError, SessionExpiredError)\n"
+      << "    import httpx\n"
+      << "    try:\n"
+      << "        session = nnInteractiveRemoteInferenceSession(server_url=nni_server_url, api_key=nni_api_key)\n"
+      << "    except ServerAtCapacityError:\n"
+      << "        nni_connect_error = 'The nnInteractive server is at capacity. Please try again later.'\n"
+      << "    except SessionExpiredError:\n"
+      << "        nni_connect_error = 'The nnInteractive server rejected the session request. Please try again.'\n"
+      << "    except httpx.HTTPStatusError as _e:\n"
+      << "        if _e.response.status_code == 401:\n"
+      << "            nni_connect_error = 'The nnInteractive server rejected the API key. Check the API key in the nnInteractive preferences.'\n"
+      << "        elif 'text/html' in _e.response.headers.get('content-type', ''):\n"
+      << "            nni_connect_error = (f'The server at {nni_server_display} returned an HTML page instead of a response. '\n"
+      << "                                 'An HTTP proxy may be intercepting the request; try adding the host to NO_PROXY.')\n"
+      << "        else:\n"
+      << "            nni_connect_error = f'The nnInteractive server returned an error (HTTP {_e.response.status_code}).'\n"
+      << "    except (httpx.ConnectError, httpx.ConnectTimeout):\n"
+      << "        nni_connect_error = f'Could not reach the nnInteractive server at {nni_server_display}. Check the server URL and make sure the server is running.'\n"
+      << "    except httpx.HTTPError as _e:\n"
+      << "        nni_connect_error = f'Could not connect to the nnInteractive server at {nni_server_display}: {_e}'\n"
+      << "    except (ValueError, KeyError):\n"
+      << "        nni_connect_error = ('The nnInteractive server returned an unexpected response. '\n"
+      << "                             'An HTTP proxy or captive portal may be intercepting the request; '\n"
+      << "                             'check the server URL and NO_PROXY.')\n"
+      << "except ImportError:\n"
+      << "    nni_connect_error = ('The installed nnInteractive does not support remote mode. '\n"
+      << "                         'Reinstall or upgrade nnInteractive (remote mode requires v2.3.2 or newer).')\n"
+      << "finally:\n"
+      << "    del nni_api_key\n";
     pythonContext->Execute(pyCommands.str());
   }
 
   const auto connectError = pythonContext->GetVariableAsString("nni_connect_error").value_or("");
 
-  pythonContext->Execute("del nni_server_url, nni_api_key, nni_connect_error\n");
+  pythonContext->Execute("del nni_server_url, nni_server_display, nni_connect_error\n");
 
   if (!connectError.empty())
     mitkThrow() << connectError;
@@ -692,7 +760,7 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
     const auto liveness = pythonContext->GetVariableAsDouble("nni_liveness").value_or(0.0);
     pythonContext->Execute("del nni_liveness\n");
     m_Impl->HeartbeatIntervalMs = liveness > 0.0
-      ? static_cast<int>(std::max(5.0, liveness / 2.0) * 1000.0)
+      ? static_cast<int>(std::max(MIN_HEARTBEAT_INTERVAL_SEC, liveness * HEARTBEAT_FRACTION_OF_LIVENESS) * 1000.0)
       : 0;
   }
   catch (const Exception& e)
@@ -701,7 +769,7 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
     // otherwise the server slot is held until the idle reaper expires it.
     // Classify before EndSession() clears the remote flag.
     const bool connectionLost =
-      this->IsRemoteConnectionError(e.GetDescription() != nullptr ? e.GetDescription() : "");
+      this->IsRemoteConnectionError(Description(e));
 
     this->EndSession();
 
@@ -888,8 +956,8 @@ void mitk::nnInteractiveTool::BindSessionImageAndTargetBuffer()
   if (m_Impl->Remote)
   {
     // The remote session writes prediction diffs straight into the numpy view
-    // of our C++ target buffer, so hand it the numpy array directly (no torch
-    // wrapper -> no torch dependency on this path).
+    // of our C++ target buffer, so hand it the numpy array directly; unlike the
+    // local path it needs no torch tensor wrapper (the server holds the model).
     pyCommands
       << "session.set_image(image[None], {'spacing': spacing})\n"
       << "session.set_target_buffer(target_buffer)\n";
@@ -980,23 +1048,24 @@ void mitk::nnInteractiveTool::Heartbeat()
 
   try
   {
-    // Mirror the library's own _heartbeat_loop tolerance: a SessionExpiredError
-    // (or any unexpected error) means the lease is gone, while a transient httpx
-    // error is ignored so the next beat can retry. We classify inside Python and
-    // read back a flag, so a transient blip never reaches the broad remote guard
-    // (WrapInRemoteGuard) that would tear the session down. httpx and
-    // SessionExpiredError were imported by ConstructRemoteSession() and persist
-    // in the shared dictionary for the session's lifetime.
+    // Mirror the library's own _heartbeat_loop tolerance: only a definitive
+    // SessionExpiredError means the lease is gone. Everything else is non-fatal,
+    // matching the library, which keeps the session alive and surfaces a real
+    // expiry on the user's next action: a transient httpx error, a
+    // ServerAtCapacityError (a 503 on a beat), and a malformed response
+    // (json.JSONDecodeError) all just let the next beat retry. We classify inside
+    // Python and read back a flag, so a transient blip never reaches the broad
+    // remote guard (WrapInRemoteGuard) that would tear the session down.
+    // SessionExpiredError was imported by ConstructRemoteSession() and persists in
+    // the shared dictionary for the session's lifetime.
     pythonContext->Execute(
       "try:\n"
       "    session.heartbeat()\n"
       "    nni_hb_expired = False\n"
       "except SessionExpiredError:\n"
       "    nni_hb_expired = True\n"
-      "except httpx.HTTPError:\n"
-      "    nni_hb_expired = False\n"
       "except Exception:\n"
-      "    nni_hb_expired = True\n");
+      "    nni_hb_expired = False\n");
 
     expired = pythonContext->GetVariableAsBool("nni_hb_expired").value_or(false);
     pythonContext->Execute("del nni_hb_expired\n");
@@ -1036,6 +1105,10 @@ mitk::nnInteractiveTool::SupportedInteractions mitk::nnInteractiveTool::GetSuppo
       "support_lasso = bool(_nni_caps.get('lasso', False))\n"
       "support_mask = bool(session.supports_initial_label)\n");
 
+    // value_or(true) is only the read-failure fallback: a genuine "unsupported"
+    // answer already arrives as an explicit False from the bool(...) coercion
+    // above, so a broken read-back fails open (keeps the button usable) rather
+    // than silently disabling a supported interaction.
     caps.Point = pythonContext->GetVariableAsBool("support_points").value_or(true);
     caps.Box = pythonContext->GetVariableAsBool("support_box").value_or(true);
     caps.Scribble = pythonContext->GetVariableAsBool("support_scribble").value_or(true);

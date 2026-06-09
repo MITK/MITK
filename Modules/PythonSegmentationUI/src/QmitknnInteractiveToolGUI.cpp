@@ -497,8 +497,11 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
 
       MITK_ERROR << "nnInteractive initialization failed:\n" << e.GetDescription();
 
+      // Escape the headline: for a non-Python error it is the raw exception
+      // description, which can embed the server URL or other characters that
+      // would otherwise be interpreted as HTML by the message box.
       auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
-        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline));
+        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()));
 
       if (isPythonError)
         errorMsgBox->setDetailedText(description);
@@ -802,6 +805,9 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   // time-point change, AbortSession after an expiry).
   m_HeartbeatTimer->stop();
 
+  // Teardown is complete; re-arm the expiry handler for a future session.
+  m_SessionExpiredHandled = false;
+
   // Clear the model license now that no session is bound.
   this->UpdateModelLicenseDisplay(std::nullopt);
 
@@ -834,6 +840,11 @@ void QmitknnInteractiveToolGUI::UpdateModelLicenseDisplay(const std::optional<st
 {
   auto* label = m_Ui->modelLicenseLabel;
 
+  // Render as plain text: the license comes from the model checkpoint (for a
+  // remote session, mirrored from the server's capabilities), so it must never
+  // be interpreted as HTML markup that could hide or distort the terms.
+  label->setTextFormat(Qt::PlainText);
+
   if (!license.has_value() || license->empty())
   {
     label->clear();
@@ -862,6 +873,16 @@ void QmitknnInteractiveToolGUI::UpdateModelLicenseDisplay(const std::optional<st
 
 void QmitknnInteractiveToolGUI::OnSessionExpired()
 {
+  // The tool emits SessionExpiredEvent from two places (the heartbeat and a
+  // mid-interaction failure). Handle only the first one: otherwise a second
+  // event arriving before the deferred teardown below runs would stack a second
+  // identical dialog. The flag is cleared in OnSessionEnded, so a later genuine
+  // expiry of a new session still fires.
+  if (m_SessionExpiredHandled)
+    return;
+
+  m_SessionExpiredHandled = true;
+
   // Stop beating immediately so a second timeout cannot queue another
   // teardown/dialog before the deferred AbortSession below runs. (OnSessionEnded
   // also stops the timer once the session is actually torn down.)
@@ -906,6 +927,18 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
   m_Ui->scribbleButton->setEnabled(caps.Scribble);
   m_Ui->lassoButton->setEnabled(caps.Lasso);
   m_Ui->maskButton->setEnabled(caps.Mask);
+
+  // A checkpoint that advertises no interactions at all would leave the user with
+  // an initialized session and no usable controls. Say so, rather than presenting
+  // a silently dead panel.
+  if (!caps.Point && !caps.Box && !caps.Scribble && !caps.Lasso && !caps.Mask)
+  {
+    QMessageBox::warning(nullptr, "nnInteractive",
+      QString("<p %1>The connected nnInteractive model reports no supported "
+              "interactions, so there is nothing to interact with. This usually "
+              "indicates a misconfigured server or model checkpoint.</p>")
+        .arg(LINE_HEIGHT_STYLE));
+  }
 }
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()

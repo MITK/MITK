@@ -338,6 +338,12 @@ private:
 
   QTimer* m_HeartbeatTimer = nullptr;
 
+  // Set when a lost remote session is being torn down so a second
+  // SessionExpiredEvent (the tool emits it from both the heartbeat and a
+  // mid-interaction failure) cannot queue a duplicate teardown/dialog. Cleared
+  // in OnSessionEnded once teardown completes.
+  bool m_SessionExpiredHandled = false;
+
   mitk::IPreferences* m_Preferences = nullptr;
   std::vector<ShortcutLabel> m_ShortcutLabels;
   QString m_PromptTypeBaseTitle;

@@ -90,6 +90,10 @@ namespace
   // explicitly populated the corresponding property.
   constexpr SegmentationLevelRequirement kSegmentationLevelTags[] = {
     {0x0008, 0x0060, "Modality (0008,0060)"},
+    // Series Description is DICOM Type 3 (optional), not a SEG IOD
+    // obligation. It is required here as an MITK branding invariant:
+    // Complete always stamps "MITK Segmentation", so Validate never
+    // blocks on it in practice.
     {0x0008, 0x103E, "Series Description (0008,103E)"},
     {0x0070, 0x0084, "Content Creator Name (0070,0084)"},
     {0x0010, 0x0010, "PatientName (0010,0010)"},
@@ -130,11 +134,6 @@ const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownStudyID()
 const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownContentCreatorName()
 {
   static const std::string value = "UNKNOWN^UNKNOWN";
-  return value;
-}
-const std::string& mitk::DICOMSegmentationPropertyHelper::UnknownBodyPartExamined()
-{
-  static const std::string value;
   return value;
 }
 
@@ -332,7 +331,11 @@ namespace
   bool ReadIdentifyingTags(const std::string& path, LegacySourceFileTags& out)
   {
     DcmFileFormat ff;
-    if (ff.loadFile(path.c_str(), EXS_Unknown).bad())
+    // Only the identifying header UIDs are needed; stop parsing before
+    // PixelData so large CT/MR source files are not read in full during
+    // legacy migration.
+    if (ff.loadFileUntilTag(path.c_str(), EXS_Unknown, EGL_noChange,
+                            DCM_MaxReadLength, ERM_autoDetect, DCM_PixelData).bad())
       return false;
     DcmDataset* dataset = ff.getDataset();
     if (dataset == nullptr)
@@ -384,6 +387,12 @@ std::size_t mitk::DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesTo
   // corrupt the relation. Downstream writes that need per-frame source
   // association will fall back to the SEG IOD's type-1C absence path
   // if the property does not cover a given frame.
+  //
+  // Source files that carry no SeriesInstanceUID coalesce under the
+  // empty-string series key below, i.e. they collapse into a single
+  // relation with an empty source series. Rare (source files normally
+  // carry a Series UID) and degrades gracefully (the relation still
+  // loads); not special-cased here.
   std::map<std::string, std::map<int, LegacySourceFileTags>> bySeries;
   std::size_t resolved = 0;
   std::size_t unresolved = 0;

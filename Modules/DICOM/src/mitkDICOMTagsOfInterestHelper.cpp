@@ -231,7 +231,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1155))); //dicom.SourceImage.ReferenceSOPInstanceUID
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefRootTag).AddElement(0x0008, 0x1150))); //dicom.SourceImage.ReferenceSOPClassUID
     DICOMTagPath sourceImageRefPurposeRootTag(sourceImageRefRootTag);
-    sourceImageRefPurposeRootTag.AddAnySelection(0x0040, 0xa170);
+    sourceImageRefPurposeRootTag.AddAnySelection(0x0040, 0xA170);
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0104))); //dicom.SourceImage.Purpose.CodeMeaning
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0100))); //dicom.SourceImage.Purpose.CodeValue
     result.insert(MakeEntry(DICOMTagPath(sourceImageRefPurposeRootTag).AddElement(0x0008, 0x0102))); //dicom.SourceImage.Purpose.CodeSchemeDesignator

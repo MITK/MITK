@@ -39,6 +39,7 @@ public:
 
 private Q_SLOTS:
   void OnModelSourceToggled();
+  void OnInferenceModeToggled();
   void OnBrowseLocalModelPath();
 
 private:

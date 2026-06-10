@@ -175,6 +175,9 @@ QmitknnInteractiveToolGUI::~QmitknnInteractiveToolGUI()
     tool->SessionEndedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnSessionEnded);
 
+    tool->SessionExpiredEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+      this, &QmitknnInteractiveToolGUI::OnSessionExpired);
+
     tool->PreviewUpdatedEvent -= mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
       this, &QmitknnInteractiveToolGUI::OnPreviewUpdated);
 
@@ -226,6 +229,15 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->GetTool()->SessionEndedEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
     this, &QmitknnInteractiveToolGUI::OnSessionEnded);
 
+  this->GetTool()->SessionExpiredEvent += mitk::MessageDelegate<QmitknnInteractiveToolGUI>(
+    this, &QmitknnInteractiveToolGUI::OnSessionExpired);
+
+  // Drives the remote keep-alive heartbeat. Started on a successful remote
+  // initialization (see OnInitializeButtonToggled) and stopped on session end
+  // or expiry.
+  m_HeartbeatTimer = new QTimer(this);
+  connect(m_HeartbeatTimer, &QTimer::timeout, this, &Self::OnHeartbeatTimeout);
+
   Superclass::InitializeUI(mainLayout);
 
   // TODO: Once we agree on a common shortcut concept, the confirm binding
@@ -258,6 +270,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
       this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
 
   this->ApplyShortcutLabels();
+  this->UpdateInitializeButtonText();
 }
 
 void QmitknnInteractiveToolGUI::EnableInitializeButtons(bool enabled)
@@ -404,7 +417,7 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.groups.push_back(std::move(torchGroup));
 
   mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive>=2.0.0,<3.0.0" };
+  nnInteractiveGroup.requirements = { "nninteractive>=2.3.2,<3.0.0" };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
   if (modelSource != "local")
@@ -469,13 +482,30 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     {
       messageBox->accept();
 
-      const std::string errorMessage = "nnInteractive reported an error during initialization (see details).";
-      MITK_ERROR << errorMessage << '\n' << e.GetDescription();
+      const QString description = QString::fromLocal8Bit(e.GetDescription());
 
+      // Errors thrown directly from C++ (a mapped remote connection failure or
+      // a missing configuration) carry a clean, user-facing message and are
+      // shown as-is. Errors bubbling up from the embedded Python interpreter
+      // carry a traceback, so we keep a generic headline and tuck the traceback
+      // into the (collapsed) details.
+      const bool isPythonError = description.contains("An error occurred while executing Python code:");
+
+      const QString headline = isPythonError
+        ? QStringLiteral("nnInteractive reported an error during initialization (see details).")
+        : description;
+
+      MITK_ERROR << "nnInteractive initialization failed:\n" << e.GetDescription();
+
+      // Escape the headline: for a non-Python error it is the raw exception
+      // description, which can embed the server URL or other characters that
+      // would otherwise be interpreted as HTML by the message box.
       auto errorMsgBox = new QMessageBox(QMessageBox::Critical, nullptr,
-        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(QString::fromStdString(errorMessage)));
+        QString("<p %1>%2</p>").arg(LINE_HEIGHT_STYLE).arg(headline.toHtmlEscaped()));
 
-      errorMsgBox->setDetailedText(QString::fromLocal8Bit(e.GetDescription()));
+      if (isPythonError)
+        errorMsgBox->setDetailedText(description);
+
       errorMsgBox->setTextInteractionFlags(Qt::TextSelectableByMouse);
       errorMsgBox->setAttribute(Qt::WA_DeleteOnClose, true);
       errorMsgBox->setModal(true);
@@ -497,6 +527,18 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->promptTypeGroupBox->setEnabled(true);
     m_Ui->interactionToolsGroupBox->setEnabled(true);
 
+    this->ApplyCapabilityGating();
+
+    // Start the remote keep-alive heartbeat (see nnInteractiveTool::Heartbeat).
+    // A zero interval means none is needed: a local session, or a server with
+    // the liveness timeout disabled.
+    const int heartbeatIntervalMs = this->GetTool()->GetHeartbeatIntervalMs();
+    if (heartbeatIntervalMs > 0)
+      m_HeartbeatTimer->start(heartbeatIntervalMs);
+
+    // Surface the model's license terms now that a session is bound.
+    this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
+
     auto backend = this->GetTool()->GetBackend();
 
     if (!backend.has_value())
@@ -509,7 +551,21 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
     m_Ui->autoZoomCheckBox->setChecked(false);
     m_Ui->autoZoomCheckBox->setToolTip("Auto-zoom is not available with CPU backend.");
 
-  #if !defined(__APPLE__)
+  #if defined(__APPLE__)
+    // On macOS nnInteractive has no GPU acceleration and always runs on the CPU,
+    // so the NVIDIA-specific guidance in the non-Apple branch does not apply.
+    // Point users at remote mode, which offloads inference to a server GPU.
+    const QString macCpuBackendMessage = QString(
+      "<h3 %1>Running on CPU</h3>"
+      "<p %1>nnInteractive has no GPU acceleration on macOS and runs on the CPU, "
+      "which is <em>significantly slower</em>.</p>"
+      "<p %1>For fast response times, run inference on a remote nnInteractive server "
+      "with a GPU. Enable it in the nnInteractive preferences under <em>Inference</em> "
+      "by selecting <em>Remote server</em>.</p>")
+      .arg(LINE_HEIGHT_STYLE);
+
+    QMessageBox::warning(nullptr, "nnInteractive", macCpuBackendMessage);
+  #else
     const QString cpuBackendMessage = QString(
       "<h3 %1>No compatible CUDA device detected</h3>"
       "<p %1>Falling back to CPU processing, which is <em>significantly slower</em>.</p>"
@@ -520,7 +576,10 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
         "<li %1>Better: Turing architecture (e.g., GeForce RTX 2070)</li>"
         "<li %1>Best: Ampere or newer (e.g., GeForce RTX 3080)</li>"
       "</ul>"
-      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>")
+      "<p %1>6 GB VRAM is the absolute minimum; 12 GB or more is recommended for optimal results.</p>"
+      "<p %1>Alternatively, you can run inference on a remote nnInteractive server with a GPU. "
+      "Enable it in the nnInteractive preferences under <em>Inference</em> by selecting "
+      "<em>Remote server</em>.</p>")
       .arg(LINE_HEIGHT_STYLE);
 
     QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
@@ -738,6 +797,16 @@ void QmitknnInteractiveToolGUI::OnToolDeactivated()
 
 void QmitknnInteractiveToolGUI::OnSessionEnded()
 {
+  // The session is gone; stop beating. Covers every teardown path (normal end,
+  // time-point change, AbortSession after an expiry).
+  m_HeartbeatTimer->stop();
+
+  // Teardown is complete; re-arm the expiry handler for a future session.
+  m_SessionExpiredHandled = false;
+
+  // Clear the model license now that no session is bound.
+  this->UpdateModelLicenseDisplay(std::nullopt);
+
   // Restore cursor and uncheck any active interactor button. The tool has
   // already disabled its interactor; this just keeps the GUI's check state in
   // sync.
@@ -755,6 +824,117 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   }
   m_Ui->initializeButton->setEnabled(true);
   m_Ui->settingsButton->setEnabled(true);
+}
+
+void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()
+{
+  if (auto* tool = this->GetTool())
+    tool->Heartbeat();
+}
+
+void QmitknnInteractiveToolGUI::UpdateModelLicenseDisplay(const std::optional<std::string>& license)
+{
+  auto* label = m_Ui->modelLicenseLabel;
+
+  // Render as plain text: the license comes from the model checkpoint (for a
+  // remote session, mirrored from the server's capabilities), so it must never
+  // be interpreted as HTML markup that could hide or distort the terms.
+  label->setTextFormat(Qt::PlainText);
+
+  if (!license.has_value() || license->empty())
+  {
+    label->clear();
+    label->setStyleSheet(QString());
+    label->setVisible(false);
+    return;
+  }
+
+  const auto text = QString::fromStdString(*license).trimmed();
+
+  if (text == "!!MISSING!!")
+  {
+    // Mirror the napari plugin: an unknown license is a warning, not an error,
+    // but it must stand out so the user does not assume unrestricted use.
+    label->setText("Model license: UNKNOWN (warning!)");
+    label->setStyleSheet("color: #d9534f; font-weight: bold;");
+  }
+  else
+  {
+    label->setText(QString("Model license: %1").arg(text));
+    label->setStyleSheet(QString());
+  }
+
+  label->setVisible(true);
+}
+
+void QmitknnInteractiveToolGUI::OnSessionExpired()
+{
+  // The tool emits SessionExpiredEvent from two places (the heartbeat and a
+  // mid-interaction failure). Handle only the first one: otherwise a second
+  // event arriving before the deferred teardown below runs would stack a second
+  // identical dialog. The flag is cleared in OnSessionEnded, so a later genuine
+  // expiry of a new session still fires.
+  if (m_SessionExpiredHandled)
+    return;
+
+  m_SessionExpiredHandled = true;
+
+  // Stop beating immediately so a second timeout cannot queue another
+  // teardown/dialog before the deferred AbortSession below runs. (OnSessionEnded
+  // also stops the timer once the session is actually torn down.)
+  m_HeartbeatTimer->stop();
+
+  // A remote session was lost. Tear it down on the next event-loop tick rather
+  // than now: when this fires from within an interactor's event handling (a
+  // connection loss detected mid-interaction), disabling/resetting interactors
+  // inline is unsafe; deferring is also harmless when it fires from the
+  // heartbeat timer (a proactive expiry). AbortSession() ends the session,
+  // clears all prompts and the preview, and -- via SessionEndedEvent ->
+  // OnSessionEnded -- reverts the widget to its pre-init state, so the user just
+  // clicks Initialize to reconnect.
+  QTimer::singleShot(0, this, [this]() {
+    if (QCoreApplication::closingDown())
+      return;
+
+    if (auto* tool = this->GetTool())
+      tool->AbortSession();
+
+    const auto message = QString(
+      "<h3 %1>Remote session ended</h3>"
+      "<p %1>The connection to the nnInteractive server was lost or the session "
+      "expired (idle timeout, server restart, or the server is at capacity).</p>"
+      "<p %1>Your interactions were cleared. Click <em>Initialize</em> to start a "
+      "new session.</p>").arg(LINE_HEIGHT_STYLE);
+
+    QMessageBox::warning(nullptr, "nnInteractive", message);
+  });
+}
+
+void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
+{
+  auto* tool = this->GetTool();
+  if (tool == nullptr)
+    return;
+
+  const auto caps = tool->GetSupportedInteractions();
+
+  m_Ui->pointButton->setEnabled(caps.Point);
+  m_Ui->boxButton->setEnabled(caps.Box);
+  m_Ui->scribbleButton->setEnabled(caps.Scribble);
+  m_Ui->lassoButton->setEnabled(caps.Lasso);
+  m_Ui->maskButton->setEnabled(caps.Mask);
+
+  // A checkpoint that advertises no interactions at all would leave the user with
+  // an initialized session and no usable controls. Say so, rather than presenting
+  // a silently dead panel.
+  if (!caps.Point && !caps.Box && !caps.Scribble && !caps.Lasso && !caps.Mask)
+  {
+    QMessageBox::warning(nullptr, "nnInteractive",
+      QString("<p %1>The connected nnInteractive model reports no supported "
+              "interactions, so there is nothing to interact with. This usually "
+              "indicates a misconfigured server or model checkpoint.</p>")
+        .arg(LINE_HEIGHT_STYLE));
+  }
 }
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()
@@ -813,6 +993,14 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 {
   if (event.GetProperty() == "nnInteractive/showShortcutsInLabels")
     this->ApplyShortcutLabels();
+  else if (event.GetProperty() == "nnInteractive/inferenceMode")
+    this->UpdateInitializeButtonText();
+}
+
+void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
+{
+  const bool remote = m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
+  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize (local)");
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

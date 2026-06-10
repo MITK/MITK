@@ -29,18 +29,40 @@ namespace
 
 void InitColor(py::module_ &m)
 {
-  py::class_<mitk::Color>(m, "Color")
-    .def(py::init<>())
-    .def(py::init(&MakeColor), py::arg("r"), py::arg("g"), py::arg("b"))
+  py::class_<mitk::Color>(m, "Color",
+    R"(RGB color with three float components in the closed range ``[0, 1]``.
+
+Indexable and iterable (length 3), so it interoperates naturally with
+``tuple``, ``list``, and unpacking:
+
+Examples:
+    >>> c = mitk.Color(1.0, 0.5, 0.0)
+    >>> r, g, b = c
+    >>> tuple(c)
+    (1.0, 0.5, 0.0)
+)")
+    .def(py::init<>(),
+      "Construct a black color (0, 0, 0).")
+    .def(py::init(&MakeColor), py::arg("r"), py::arg("g"), py::arg("b"),
+      R"(Construct an RGB color.
+
+Args:
+    r: Red component in ``[0, 1]``.
+    g: Green component in ``[0, 1]``.
+    b: Blue component in ``[0, 1]``.
+)")
     .def_property(
       "r", [](const mitk::Color &c) { return c.GetRed(); },
-      [](mitk::Color &c, float v) { c.SetRed(v); })
+      [](mitk::Color &c, float v) { c.SetRed(v); },
+      "Red component in ``[0, 1]``.")
     .def_property(
       "g", [](const mitk::Color &c) { return c.GetGreen(); },
-      [](mitk::Color &c, float v) { c.SetGreen(v); })
+      [](mitk::Color &c, float v) { c.SetGreen(v); },
+      "Green component in ``[0, 1]``.")
     .def_property(
       "b", [](const mitk::Color &c) { return c.GetBlue(); },
-      [](mitk::Color &c, float v) { c.SetBlue(v); })
+      [](mitk::Color &c, float v) { c.SetBlue(v); },
+      "Blue component in ``[0, 1]``.")
     .def(
       "__getitem__",
       [](const mitk::Color &c, std::size_t i)
@@ -48,7 +70,8 @@ void InitColor(py::module_ &m)
         if (i >= 3)
           throw py::index_error();
         return c[i];
-      })
+      },
+      "Return the i-th component (0 = red, 1 = green, 2 = blue).")
     .def(
       "__setitem__",
       [](mitk::Color &c, std::size_t i, float v)
@@ -56,15 +79,16 @@ void InitColor(py::module_ &m)
         if (i >= 3)
           throw py::index_error();
         c[i] = v;
-      })
-    .def("__len__", [](const mitk::Color &) { return 3; })
-    // __iter__ completes the sequence protocol alongside __getitem__ and __len__.
-    // It enables tuple(color), list(color), and unpacking: r, g, b = color.
+      },
+      "Set the i-th component.")
+    .def("__len__", [](const mitk::Color &) { return 3; },
+      "Number of components (always 3).")
     .def("__iter__",
          [](const mitk::Color &c)
          {
            return py::iter(py::make_tuple(c[0], c[1], c[2]));
-         })
+         },
+      "Iterate over the (r, g, b) components.")
     .def("__eq__", [](const mitk::Color &a, const mitk::Color &b) { return a == b; })
     .def("__repr__",
          [](const mitk::Color &c)

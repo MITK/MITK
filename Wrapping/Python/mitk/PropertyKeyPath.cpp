@@ -20,9 +20,27 @@ namespace py = pybind11;
 
 void InitPropertyKeyPath(py::module_& m)
 {
-  // PropertyKeyPath binding
-  py::class_<mitk::PropertyKeyPath>(m, "PropertyKeyPath")
-    .def(py::init<>(), "Create an empty PropertyKeyPath.")
+  py::class_<mitk::PropertyKeyPath>(m, "PropertyKeyPath",
+    R"(Structured representation of a hierarchical property key.
+
+MITK property keys are dot-separated (e.g. ``"DICOM.PatientName"``,
+``"sequence.[2].label"``). ``PropertyKeyPath`` is the typed, manipulable
+form: nodes carry an element name and an optional selection (a specific
+index, ``[*]`` wildcard, or none).
+
+Supports ``pathlib.Path``-style ``/`` concatenation and ``[]`` indexing for
+selections. Convert to/from MITK property name strings via
+:py:meth:`from_string` and ``str(path)``.
+
+Examples:
+    >>> p = mitk.PropertyKeyPath("DICOM") / "PatientName"
+    >>> str(p)
+    'DICOM.PatientName'
+    >>> p = mitk.PropertyKeyPath("seq")[2]
+    >>> str(p)
+    'seq.[2]'
+)")
+    .def(py::init<>(), "Construct an empty path.")
     
     // Construction from string
     .def_static("from_string", 
@@ -214,7 +232,6 @@ void InitPropertyKeyPath(py::module_& m)
          "Get detailed information about all nodes in the path.")
     ;
 
-  // Module-level function for finding indexed properties
   m.def("find_indexed_properties",
         [](py::object provider, const mitk::PropertyKeyPath& path) -> py::dict
         {
@@ -273,5 +290,22 @@ void InitPropertyKeyPath(py::module_& m)
           return result;
         },
         py::arg("provider"), py::arg("path"),
-        "Find indexed property names matching a path with one [*] wildcard.");
+        R"(Find indexed property names matching a path with one ``[*]`` wildcard.
+
+The wildcard captures the integer selection index. The result maps each
+captured index to the matching property name on the provider.
+
+Args:
+    provider: Any object with a ``property_keys`` attribute (e.g. an
+        :py:class:`Image`, :py:class:`MultiLabelSegmentation`, or
+        :py:class:`PropertyList`).
+    path: A :py:class:`PropertyKeyPath` with exactly one ``[*]``
+        wildcard node.
+
+Returns:
+    A dict mapping captured indices (``int``) to property name strings.
+
+Raises:
+    ValueError: If *path* does not contain exactly one wildcard.
+)");
 }

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkUndoRedoPreferencePage.h"
-#include "QmitkUndoRedoPreferenceHelper.h"
+#include <mitkUndoRedoPreferenceHelper.h>
 #include <ui_QmitkUndoRedoPreferencePage.h>
 
 #include <mitkLog.h>
@@ -57,7 +57,7 @@ void QmitkUndoRedoPreferencePage::PerformCancel()
 // change takes effect immediately. The Undo/Redo Inspector picks it up via UndoStackEvent.
 bool QmitkUndoRedoPreferencePage::PerformOk()
 {
-  auto* prefs = QmitkUndoRedoPreferences::GetPreferences();
+  auto* prefs = mitk::UndoRedoPreferenceHelper::GetPreferences();
   if (prefs == nullptr)
   {
     MITK_WARN << "Could not access undo/redo preferences; the undo limit was not saved.";
@@ -68,7 +68,7 @@ bool QmitkUndoRedoPreferencePage::PerformOk()
     ? m_Ui->limitSpinBox->value()
     : 0;
 
-  QmitkUndoRedoPreferences::StoreLimit(limit);
+  mitk::UndoRedoPreferenceHelper::StoreLimit(limit);
 
   if (auto* model = mitk::UndoController::GetCurrentUndoModel())
     model->SetUndoLimit(static_cast<std::size_t>(limit));
@@ -81,11 +81,11 @@ bool QmitkUndoRedoPreferencePage::PerformOk()
 // limit is active, the (disabled) spin box pre-fills with the last positive limit the user chose.
 void QmitkUndoRedoPreferencePage::Update()
 {
-  const int activeLimit = QmitkUndoRedoPreferences::GetActiveLimit();
+  const int activeLimit = mitk::UndoRedoPreferenceHelper::GetActiveLimit();
   const bool limited = (activeLimit > 0);
 
   m_Ui->limitCheckBox->setChecked(limited);
   m_Ui->limitSpinBox->setEnabled(limited);
   m_Ui->limitSpinBox->setValue(limited ? activeLimit
-                                        : QmitkUndoRedoPreferences::GetLastPositiveLimit());
+                                        : mitk::UndoRedoPreferenceHelper::GetLastPositiveLimit());
 }

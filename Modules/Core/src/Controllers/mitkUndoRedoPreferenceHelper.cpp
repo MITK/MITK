@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkUndoRedoPreferenceHelper.h"
+#include <mitkUndoRedoPreferenceHelper.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferences.h>
@@ -26,14 +26,14 @@ namespace
   const std::string LAST_UNDO_LIMIT_KEY = "LastUndoLimit";
 }
 
-mitk::IPreferences* QmitkUndoRedoPreferences::GetPreferences()
+mitk::IPreferences* mitk::UndoRedoPreferenceHelper::GetPreferences()
 {
   auto* preferencesService = mitk::CoreServices::GetPreferencesService();
   auto* systemPref = preferencesService->GetSystemPreferences();
   return nullptr != systemPref ? systemPref->Node(NODE_PATH) : nullptr;
 }
 
-int QmitkUndoRedoPreferences::GetActiveLimit()
+int mitk::UndoRedoPreferenceHelper::GetActiveLimit()
 {
   auto* prefs = GetPreferences();
   return prefs != nullptr
@@ -41,7 +41,7 @@ int QmitkUndoRedoPreferences::GetActiveLimit()
     : static_cast<int>(mitk::DEFAULT_UNDO_REDO_LIMIT);
 }
 
-int QmitkUndoRedoPreferences::GetLastPositiveLimit()
+int mitk::UndoRedoPreferenceHelper::GetLastPositiveLimit()
 {
   auto* prefs = GetPreferences();
   return prefs != nullptr
@@ -49,7 +49,7 @@ int QmitkUndoRedoPreferences::GetLastPositiveLimit()
     : static_cast<int>(mitk::DEFAULT_UNDO_REDO_LIMIT);
 }
 
-void QmitkUndoRedoPreferences::StoreLimit(int limit)
+void mitk::UndoRedoPreferenceHelper::StoreLimit(int limit)
 {
   auto* prefs = GetPreferences();
   if (prefs == nullptr)

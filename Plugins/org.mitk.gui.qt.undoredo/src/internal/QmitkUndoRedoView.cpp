@@ -1,5 +1,5 @@
 #include "QmitkUndoRedoView.h"
-#include "QmitkUndoRedoPreferenceHelper.h"
+#include <mitkUndoRedoPreferenceHelper.h>
 
 // MITK includes
 #include <mitkRenderingManager.h>
@@ -121,7 +121,7 @@ void QmitkUndoRedoView::OnChangeLimitClicked()
     if (ok)
     {
       undoModel->SetUndoLimit(newLimit);
-      QmitkUndoRedoPreferences::StoreLimit(newLimit);
+      mitk::UndoRedoPreferenceHelper::StoreLimit(newLimit);
       this->UpdateUndoRedoList();
       this->UpdateButtonStatus();
     }
@@ -137,14 +137,14 @@ void QmitkUndoRedoView::OnCheckLimitChanged(bool)
     {
       // Re-enabling a limit: restore the user's last chosen value (or the shared
       // default if none), instead of clobbering it with a hardcoded number.
-      const int limit = QmitkUndoRedoPreferences::GetLastPositiveLimit();
+      const int limit = mitk::UndoRedoPreferenceHelper::GetLastPositiveLimit();
       undoModel->SetUndoLimit(static_cast<std::size_t>(limit));
-      QmitkUndoRedoPreferences::StoreLimit(limit);
+      mitk::UndoRedoPreferenceHelper::StoreLimit(limit);
     }
     else if (!m_Controls->checkLimit->isChecked() && undoModel->GetUndoLimit() != 0)
     {
       undoModel->SetUndoLimit(0);
-      QmitkUndoRedoPreferences::StoreLimit(0);
+      mitk::UndoRedoPreferenceHelper::StoreLimit(0);
     }
   }
   this->UpdateButtonStatus();

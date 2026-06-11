@@ -88,12 +88,6 @@ if(NOT DEFINED US_PLATFORM)
   endif()
 endif()
 
-# Auto-generate the PREDEFINED list of MITK module export macros so Doxygen
-# 1.10+ does not misparse function declarations that use them. See
-# mitkFunctionGenerateDoxygenExportMacros.cmake for background.
-include(${MITK_SOURCE_DIR}/CMake/mitkFunctionGenerateDoxygenExportMacros.cmake)
-mitkFunctionGenerateDoxygenExportMacros(MITK_DOXYGEN_MODULE_EXPORT_MACROS)
-
 # Doxygen 1.10 renamed the legacy "modules" navigation concept to "topics"
 # and repurposed type="modules" for C++20 modules. Pick the right tab type
 # based on the detected Doxygen version so the API Reference dropdown only

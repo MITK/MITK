@@ -2411,12 +2411,21 @@ PREDEFINED             = itkNotUsed(x)= \
                          "mitkSegmentationTaskListValueMacro(type, name)=bool Has##name(size_t index) const; type Get##name(size_t index) const; void SetDefault##name(const type& value);" \
                          @US_PLATFORM@
 
-# Doxygen 1.10+ misparses function declarations of the form
-# "ReturnType MITK<MODULE>_EXPORT FuncName(...)" because the export macro
-# expands to __attribute__((visibility("default"))) and the parser misattributes
-# the declaration to the macro expansion. Predefine all module export macros
-# to empty so the parser sees a clean signature.
-PREDEFINED            += @MITK_DOXYGEN_MODULE_EXPORT_MACROS@
+# Doxygen 1.11+ misparses function declarations that use the MITK module export
+# macros (e.g. "void MITKCORE_EXPORT Foo();"). With MACRO_EXPANSION=YES and
+# EXPAND_ONLY_PREDEF=NO (set above), Doxygen 1.11+ expands each MITK*_EXPORT to its
+# real definition -- __declspec(...) on MSVC, __attribute__((visibility(...))) on
+# GCC/Clang -- and then mistakes the resulting decoration for the function itself,
+# dropping or garbling the docs. (Doxygen 1.10 and earlier leave the macro as a
+# literal token and render correctly.) Stripping the two underlying decoration
+# macros to empty makes every export macro (all modules, current and future)
+# vanish, so the parser sees a clean signature. This is the Doxygen manual's
+# recommended approach.
+#
+# NOTE: depends on EXPAND_ONLY_PREDEF=NO above. If set to YES, the MITK*_EXPORT
+# wrappers stop expanding, this strip no longer matches them, and docs break again.
+PREDEFINED            += __declspec(x)=
+PREDEFINED            += __attribute__(x)=
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

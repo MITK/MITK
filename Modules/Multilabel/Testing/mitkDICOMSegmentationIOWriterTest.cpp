@@ -32,6 +32,7 @@ found in the LICENSE file.
 
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 // Tests for the property-driven DICOM SEG writer. There is no legacy
@@ -436,6 +437,14 @@ class mitkDICOMSegmentationIOWriterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  // The write helpers drop files under a shared temp directory; remove it
+  // after each test so the suite does not leave artefacts behind.
+  void tearDown() override
+  {
+    std::error_code ec;
+    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "mitkDICOMSegWriterTest", ec);
+  }
+
   void PropertyDrivenWriteSucceedsAndReloads()
   {
     auto seg = BuildSegWithRule();
@@ -1059,16 +1068,18 @@ public:
     mitk::IFileWriter::Options options;
     const auto basePath = WriteSegToTempFile(seg, options, "wf-multigroup");
 
-    // WriteSegToTempFile returns "<tempDir>/wf-multigroup.dcm", but because
-    // the seg is multi-group the writer strips the extension and appends
-    // "<groupIndex>.dcm". The files that actually exist are therefore
-    // "...wf-multigroup0.dcm" and "...1.dcm"; basePath itself is not written.
+    // WriteSegToTempFile returns "<tempDir>/wf-multigroup.dcm". The writer
+    // follows the MITK multi-output naming convention (see MitkFileConverter):
+    // the first group writes that requested path verbatim and each additional
+    // group appends "_<groupIndex>", so the files that exist are
+    // "...wf-multigroup.dcm" and "...wf-multigroup_1.dcm"; basePath itself is
+    // the first group's file.
     // Assert existence before reading: ReadTopLevelString returns "" for a
     // missing file, which would otherwise mask a wrong-path bug as a
     // propagation bug.
     const auto stem = basePath.substr(0, basePath.find_last_of('.'));
-    const auto file0 = stem + "0.dcm";
-    const auto file1 = stem + "1.dcm";
+    const auto file0 = stem + ".dcm";   // == basePath; first group keeps the requested name
+    const auto file1 = stem + "_1.dcm"; // additional groups get the "_<index>" suffix
     CPPUNIT_ASSERT_MESSAGE("Both per-group SEG files exist",
                            std::filesystem::exists(file0) && std::filesystem::exists(file1));
 

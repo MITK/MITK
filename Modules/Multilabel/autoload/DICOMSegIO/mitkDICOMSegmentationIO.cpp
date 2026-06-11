@@ -40,9 +40,11 @@ found in the LICENSE file.
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmfg/fgderimg.h>
 #include <dcmtk/dcmfg/fginterface.h>
+#include <dcmtk/dcmfg/fgplanpo.h>
 #include <dcmtk/dcmfg/fgtypes.h>
 #include <dcmtk/dcmseg/segdoc.h>
 
+#include <initializer_list>
 #include <iomanip>
 #include <limits>
 #include <sstream>
@@ -180,17 +182,44 @@ namespace
     CopyTopLevelDICOMTagToItem(seg, 0x0020, 0x1040, DCM_PositionReferenceIndicator, dst);
   }
 
-  // Format coordinates to the maximum precision a double round-trips at.
-  // DICOM DS VR allows up to 16 significant digits; the default
-  // std::ostream precision (6) loses sub-mm geometry information for
-  // images far from origin or with sub-mm spacing, and downstream
-  // tooling that round-trips through PlaneGeometry's metric arithmetic
-  // can land on an off-by-one slice index.
-  std::ostringstream MakeDicomDecimalStream()
+  // Format a double as a DICOM Decimal String (DS). DS is capped at 16
+  // bytes per value, but the default std::ostream precision (6) loses
+  // sub-mm geometry for images far from the origin or with sub-mm
+  // spacing, and downstream tooling that round-trips through
+  // PlaneGeometry's metric arithmetic can then land on an off-by-one
+  // slice index. Emit the most precise representation that still fits the
+  // 16-byte budget: start at the round-trip precision (max_digits10) and
+  // step the precision down until the formatted value fits.
+  std::string FormatDicomDS(double value)
   {
+    for (int precision = std::numeric_limits<double>::max_digits10; precision >= 1; --precision)
+    {
+      std::ostringstream out;
+      out << std::setprecision(precision) << value;
+      if (out.str().size() <= 16)
+        return out.str();
+    }
+    // Degenerate magnitudes cannot fit 16 bytes at any precision; hand
+    // back the shortest form rather than an over-long string the VR
+    // forbids.
     std::ostringstream out;
-    out << std::setprecision(std::numeric_limits<double>::max_digits10);
-    return out;
+    out << std::setprecision(1) << value;
+    return out.str();
+  }
+
+  // Join DICOM DS components with the DS value-multiplicity separator.
+  std::string JoinDicomDS(std::initializer_list<double> values)
+  {
+    std::string result;
+    bool first = true;
+    for (const double value : values)
+    {
+      if (!first)
+        result += "\\";
+      result += FormatDicomDS(value);
+      first = false;
+    }
+    return result;
   }
 
   // Stamp ImageOrientationPatient on dst from the seg's group geometry.
@@ -205,20 +234,21 @@ namespace
     auto col = groupImage->GetGeometry()->GetAxisVector(1);
     row.Normalize();
     col.Normalize();
-    auto iop = MakeDicomDecimalStream();
-    iop << row[0] << "\\" << row[1] << "\\" << row[2] << "\\"
-        << col[0] << "\\" << col[1] << "\\" << col[2];
-    dst.putAndInsertString(DCM_ImageOrientationPatient, iop.str().c_str());
+    const auto iop = JoinDicomDS({row[0], row[1], row[2], col[0], col[1], col[2]});
+    dst.putAndInsertString(DCM_ImageOrientationPatient, iop.c_str());
   }
 
-  // Format an IPP value for one slice of a group image. PlaneGeometry's
-  // origin is the patient-coordinate position of the slice (MITK uses a
-  // corner-of-first-voxel convention; DICOM's ImagePositionPatient is
-  // defined as the centre of the upper-left voxel). dcmqi parses the
-  // formatted IPP back into a Point3D and resolves the matching seg
-  // frame via PlaneGeometry's TransformPhysicalPointToIndex on the
-  // label image, so the requirement on this string is "round-trips
-  // through the seg's own geometry," not exact string equality.
+  // Format an IPP value for one slice of a group image from the slice plane's
+  // origin. The group geometry is an image geometry, whose plane origins are
+  // centre-based and therefore coincide with DICOM's ImagePositionPatient
+  // convention (the centre of the upper-left voxel). The -0.5 voxel adjustments
+  // in mitkBaseGeometry apply only to corner / bounding-box queries
+  // (GetCornerPoint), not to the plane origin or to WorldToIndex, so no
+  // half-voxel correction is applied here. dcmqi parses the formatted IPP back
+  // into a Point3D and resolves the matching slice via the seg's own geometry
+  // (TransformPhysicalPointToIndex on the ITK image it builds), so the
+  // requirement on this string is "round-trips through the seg's geometry," not
+  // exact string equality.
   std::string FormatIPPForSlice(const mitk::Image *groupImage,
                                 mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex)
   {
@@ -229,9 +259,7 @@ namespace
     if (plane == nullptr)
       return {};
     const auto origin = plane->GetOrigin();
-    auto out = MakeDicomDecimalStream();
-    out << origin[0] << "\\" << origin[1] << "\\" << origin[2];
-    return out.str();
+    return JoinDicomDS({origin[0], origin[1], origin[2]});
   }
 
   // Read SegmentsOverlap (0062,0013) and decide if the reader must assume
@@ -245,9 +273,21 @@ namespace
     OFString overlapValue;
     if (dataSet.findAndGetOFString(DCM_SegmentsOverlap, overlapValue).bad())
       return true;
-    // DCM permits NO, YES, UNDEFINED; lower/mixed case forms are tolerated
-    // here to stay robust against non-compliant producers.
-    return "NO" != overlapValue && "no" != overlapValue && "No" != overlapValue;
+    // DCM permits NO, YES, UNDEFINED. Normalise (trim + uppercase) before
+    // comparing so leading/trailing whitespace and lower/mixed case from
+    // non-compliant producers are tolerated. Only an explicit "NO" opts out
+    // of the overlap-safe path; "UNDEFINED" and absence keep the
+    // conservative assume-overlap default.
+    std::string normalized(overlapValue.c_str());
+    const auto firstNonSpace = normalized.find_first_not_of(" \t\r\n\f\v");
+    if (firstNonSpace == std::string::npos)
+      return true;
+    const auto lastNonSpace = normalized.find_last_not_of(" \t\r\n\f\v");
+    normalized = normalized.substr(firstNonSpace, lastNonSpace - firstNonSpace + 1);
+    for (auto &ch : normalized)
+      if (ch >= 'a' && ch <= 'z')
+        ch = static_cast<char>(ch - 'a' + 'A');
+    return normalized != "NO";
   }
 
   // Resolve a display name for a DICOM SEG segment. Mirrors the historical
@@ -274,12 +314,19 @@ namespace
     return OFString(std::to_string(segmentAttribute.getLabelID()).c_str());
   }
 
-  // One source-image reference seen on one SEG frame. Frame index is the
-  // SEG's own frame numbering (0-based) and is later used as the slice
-  // index in the TemporoSpatialStringProperty handed to the relation rule.
+  // One source-image reference seen on one SEG frame.
+  //
+  // frameIndex is the SEG's own functional-group ordinal (0-based), kept only
+  // for diagnostics. sliceIndex is the geometry slice the frame's content
+  // actually occupies in the reconstructed MITK volume: dcmqi places each frame
+  // at the slice its ImagePositionPatient maps to (TransformPhysicalPointToIndex
+  // on the ITK image it builds), which equals frameIndex only for physically
+  // Z-ordered, gap-free SEGs. The per-slice relation property is therefore keyed
+  // by sliceIndex, not by the ordinal.
   struct SegSourceFrameRef
   {
     Uint32 frameIndex;
+    mitk::TemporoSpatialStringProperty::IndexValueType sliceIndex;
     std::string sopInstanceUID;
     std::string sopClassUID;
   };
@@ -297,13 +344,41 @@ namespace
   // Frames that carry no derivation reference are silently skipped: the
   // SEG IOD makes the Derivation Image FG type 1C, so absence is DICOM-legal
   // and simply means "no source image is recorded for that frame."
-  // Parameter is non-const because DCMTK's getFunctionalGroups and
-  // getNumberOfFrames have no const overload.
-  std::vector<SegSourceFrameRef> CollectPerFrameSourceRefs(DcmSegmentation& segDoc)
+  //
+  // groupGeometry is the seg's reconstructed group-image geometry; it maps each
+  // frame's ImagePositionPatient back to the geometry slice dcmqi placed the
+  // frame at (see SegSourceFrameRef). All MITK groups of one SEG share one
+  // world geometry, so group 0's geometry is representative.
+  //
+  // A frame whose Plane Position (Patient) is unreadable, or whose resolved
+  // slice index falls outside [0, slice count), is warned about and dropped
+  // rather than keyed at its ordinal: keying at the ordinal could collide with
+  // a legitimately resolved slice and silently mis-attribute a source. dcmqi
+  // already requires a per-frame Plane Position to reconstruct the volume at all
+  // (computeVolumeExtent returns EXIT_FAILURE otherwise), so the unreadable-IPP
+  // path is defensive, not expected; dropping a frame loses only that frame's
+  // provenance and never mis-keys another slice. Mirrors the skip-and-warn
+  // idiom GroupPerFrameRefsBySeries uses for unresolved series.
+  //
+  // segDoc is non-const because DCMTK's getFunctionalGroups / getNumberOfFrames
+  // have no const overload.
+  //
+  // \pre groupGeometry must not be null. A slice index cannot be resolved
+  // without the geometry, so a null geometry is a caller error and throws
+  // rather than silently yielding no relations; DoRead's surrounding catch
+  // turns it into a warn-and-degrade because source relations are optional
+  // provenance.
+  std::vector<SegSourceFrameRef> CollectPerFrameSourceRefs(DcmSegmentation& segDoc,
+                                                           const mitk::SlicedGeometry3D* groupGeometry)
   {
+    if (groupGeometry == nullptr)
+      mitkThrow() << "CollectPerFrameSourceRefs requires the seg's group geometry to resolve "
+                     "per-frame slice indices.";
+
     std::vector<SegSourceFrameRef> result;
     FGInterface& fgInterface = segDoc.getFunctionalGroups();
     const size_t numFrames = segDoc.getNumberOfFrames();
+    const unsigned int sliceCount = groupGeometry->GetSlices();
 
     for (size_t f = 0; f < numFrames; ++f)
     {
@@ -312,6 +387,38 @@ namespace
       auto* derImg = OFstatic_cast(FGDerivationImage*, fg);
       if (derImg == nullptr)
         continue;
+
+      // Resolve this frame's geometry slice from its Plane Position (Patient).
+      // The Float64 triple-getter avoids per-component OFString parsing and any
+      // locale concern (DoRead already runs under LocaleSwitch("C")).
+      OFBool isPerFramePos = OFFalse;
+      auto* posFg = fgInterface.get(static_cast<Uint32>(f), DcmFGTypes::EFG_PLANEPOSPATIENT, isPerFramePos);
+      auto* planePos = OFstatic_cast(FGPlanePosPatient*, posFg);
+      Float64 x = 0.0;
+      Float64 y = 0.0;
+      Float64 z = 0.0;
+      if (planePos == nullptr || planePos->getImagePositionPatient(x, y, z).bad())
+      {
+        MITK_WARN << "DICOM SEG frame " << f << " has no usable Plane Position (Patient); "
+                  << "dropping its source-image reference (slice cannot be resolved).";
+        continue;
+      }
+      mitk::Point3D ipp;
+      ipp[0] = x;
+      ipp[1] = y;
+      ipp[2] = z;
+
+      itk::Index<3> index;
+      groupGeometry->WorldToIndex(ipp, index);
+      if (index[2] < 0 || static_cast<unsigned int>(index[2]) >= sliceCount)
+      {
+        MITK_WARN << "DICOM SEG frame " << f << " maps to out-of-range slice " << index[2]
+                  << " (volume has " << sliceCount << " slices); "
+                  << "dropping its source-image reference.";
+        continue;
+      }
+      const auto sliceIndex =
+        static_cast<mitk::TemporoSpatialStringProperty::IndexValueType>(index[2]);
 
       OFVector<DerivationImageItem*>& derItems = derImg->getDerivationImageItems();
       for (auto* derItem : derItems)
@@ -332,7 +439,7 @@ namespace
           srcItem->getImageSOPInstanceReference().getReferencedSOPClassUID(sopClass);
           if (sopInstance.empty())
             continue;
-          result.push_back({static_cast<Uint32>(f), sopInstance.c_str(), sopClass.c_str()});
+          result.push_back({static_cast<Uint32>(f), sliceIndex, sopInstance.c_str(), sopClass.c_str()});
         }
       }
     }
@@ -452,14 +559,30 @@ namespace
       auto perSliceClass = mitk::TemporoSpatialStringProperty::New();
       for (const auto& frameRef : group.frames)
       {
-        // Single time step in the SEG IOD; frame -> slice index 1:1 as
-        // described on SegSourceFrameRef.
-        perSliceInstance->SetValue(0, frameRef.frameIndex, frameRef.sopInstanceUID);
+        // Single time step in the SEG IOD. Key by the geometry slice the
+        // frame's content occupies (resolved from the frame's IPP in
+        // CollectPerFrameSourceRefs), NOT the SEG frame ordinal, so the
+        // per-slice property aligns with the MITK volume even when the SEG's
+        // per-frame groups are not in physical-Z order.
+        //
+        // In an overlapping / multi-segment SEG several frames can resolve to
+        // the same slice. For a well-formed SEG they all reference the same
+        // source slice, so the value is identical and the re-write is a no-op.
+        // A genuinely different value at the same slice signals an inconsistent
+        // SEG; warn (last writer wins) so the otherwise-silent collapse is
+        // diagnosable. GetValue(0, slice) returns "" when nothing is stored.
+        const auto existing = perSliceInstance->GetValue(0, frameRef.sliceIndex);
+        if (!existing.empty() && existing != frameRef.sopInstanceUID)
+          MITK_WARN << "DICOM SEG slice " << frameRef.sliceIndex << " is referenced by two "
+                    << "different source instances (" << existing << " vs "
+                    << frameRef.sopInstanceUID << "); keeping the latter. The SEG's "
+                    << "per-frame source references are inconsistent for this slice.";
+        perSliceInstance->SetValue(0, frameRef.sliceIndex, frameRef.sopInstanceUID);
         // Mirror the migration helper's shape: only stamp SOPClass when
         // it is non-empty, so GetAvailableSlices(0) reports a consistent
         // cardinality across both upstream paths.
         if (!frameRef.sopClassUID.empty())
-          perSliceClass->SetValue(0, frameRef.frameIndex, frameRef.sopClassUID);
+          perSliceClass->SetValue(0, frameRef.sliceIndex, frameRef.sopClassUID);
       }
 
       rule->Connect(&seg, perSliceInstance, perSliceClass, group.seriesInstanceUID);
@@ -722,15 +845,18 @@ namespace mitk
     // Synthesis runs once before the per-group loop. The alternative
     // (per-group) would invite divergence across groups when the
     // synthesised top-level identity tags are minted with random UIDs.
-    if (isSynthetic)
-    {
-      DICOMSegmentationPropertyHelper::CompletionOptions completionOptions;
-      completionOptions.synthesizeMissingIdentity = true;
-      completionOptions.deriveGeometryFromSegmentation = true;
-      DICOMSegmentationPropertyHelper::Complete(input, completionOptions);
-    }
-
-    const auto missing = DICOMSegmentationPropertyHelper::Validate(input);
+    // Complete ends with `return Validate(seg)`, so in synthetic mode its
+    // return value already is the post-synthesis validation result.
+    const auto missing = [&]() {
+      if (isSynthetic)
+      {
+        DICOMSegmentationPropertyHelper::CompletionOptions completionOptions;
+        completionOptions.synthesizeMissingIdentity = true;
+        completionOptions.deriveGeometryFromSegmentation = true;
+        return DICOMSegmentationPropertyHelper::Complete(input, completionOptions);
+      }
+      return DICOMSegmentationPropertyHelper::Validate(input);
+    }();
     if (!missing.empty())
     {
       std::ostringstream msg;
@@ -755,6 +881,13 @@ namespace mitk
     std::string sharedSeriesDate;
     std::string sharedSeriesTime;
 
+    // Multi-group segs are written one file per group below. There is no
+    // cross-group rollback: if a later group throws (e.g. no usable source
+    // image, or a dcmqi/DCMTK failure), files already written for earlier
+    // groups stay on disk. Confined to the multi-group case; a subsequent
+    // successful write overwrites them. Kept simple deliberately - a
+    // temp-then-rename or cleanup-on-failure scheme is not warranted for
+    // this rare path.
     for (unsigned int layer = 0; layer < input->GetNumberOfGroups(); ++layer)
     {
       std::vector<itkInternalImageType::ConstPointer> segmentations;
@@ -833,15 +966,33 @@ namespace mitk
       for (const auto &item : sourceItems)
         rawSourceItems.push_back(item.get());
 
-      const bool useLabelIDAsSegmentNumber = wantLabelmap && LabelsAreMonotonicOneToN(input, layer);
+      const bool labelsAreMonotonicOneToN = LabelsAreMonotonicOneToN(input, layer);
+      const bool useLabelIDAsSegmentNumber = wantLabelmap && labelsAreMonotonicOneToN;
+
+      // Warn when the written segment numbers will not preserve the MITK
+      // label values. dcmqi only keeps label values as segment numbers in
+      // the labelmap encoding with a monotonic 1..N label set; otherwise
+      // (the default binary encoding, or a non-1..N labelmap) it assigns
+      // segment numbers 1..N in encounter order and the values are lost on
+      // round trip. Suppressed when the labels already are 1..N (the
+      // renumbering is then a no-op).
+      if (!useLabelIDAsSegmentNumber && !labelsAreMonotonicOneToN)
+        MITK_WARN << "DICOM SEG group " << layer << ": label values will be "
+                  << "renumbered to 1..N in the written SEG and will not "
+                  << "survive a round trip. Use the \"" << OPTION_ENCODING
+                  << "\" option \"" << OPTION_ENCODING_LABELMAP << "\" with a "
+                  << "monotonic 1..N label set to preserve label values.";
 
       // Per-layer output path, also used by the log line so the message
-      // names the file actually being written.
-      std::string filePath = path.substr(0, path.find_last_of("."));
-      if (input->GetNumberOfGroups() != 1)
-        filePath = filePath + std::to_string(layer) + ".dcm";
-      else
-        filePath = filePath + ".dcm";
+      // names the file actually being written. Follows the MITK
+      // multi-output naming convention (see the MitkFileConverter app): the
+      // first group writes the requested "<stem>.dcm" so the caller's path
+      // always exists, and additional groups append "_<groupIndex>"
+      // ("<stem>_1.dcm", "<stem>_2.dcm", ...).
+      const std::string stem = path.substr(0, path.find_last_of("."));
+      std::string filePath = stem + ".dcm";
+      if (layer != 0)
+        filePath = stem + "_" + std::to_string(layer) + ".dcm";
 
       MITK_INFO << "Writing DICOM SEG group " << layer << " to " << filePath;
       try
@@ -857,8 +1008,8 @@ namespace mitk
         // labelmap path it drops every empty frame - which is a behavioral
         // change outside the scope of the IO rework. Pinned by a dedicated
         // writer-output regression test.
-        auto converter = std::make_unique<dcmqi::Itk2DicomConverter>();
-        std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(
+        dcmqi::Itk2DicomConverter converter;
+        std::unique_ptr<DcmDataset> result(converter.itkimage2dcmSegmentation(
           rawSourceItems,
           segmentations,
           handler,
@@ -1076,17 +1227,36 @@ namespace mitk
       // already-loaded dataset rather than re-reading the file: dcmqi above
       // does not take ownership of dcmFileFormat's dataset and dcmFileFormat
       // outlives this block, so loadDataset avoids a second disk read.
-      DcmSegmentation* segDocRaw = nullptr;
-      OFCondition loadSegCond = DcmSegmentation::loadDataset(*dataSet, segDocRaw);
-      std::unique_ptr<DcmSegmentation> segDoc(segDocRaw);
-      if (loadSegCond.bad() || segDoc == nullptr)
-        mitkThrow() << "Failed to parse DICOM SEG via DcmSegmentation::loadDataset: "
-                    << loadSegCond.text();
+      //
+      // Source-image relations are optional provenance (SEG IOD type 1C), so
+      // failing to attach them must not fail an otherwise-complete load. The
+      // enclosing catch turns any throw into an empty result, hence the
+      // dedicated guard here (e.g. for DcmSegmentation::loadDataset rejecting
+      // a dataset dcmqi already decoded), which degrades to a warning. Mirrors
+      // MigrateLegacyReferenceFilesToRelation.
+      try
+      {
+        DcmSegmentation* segDocRaw = nullptr;
+        OFCondition loadSegCond = DcmSegmentation::loadDataset(*dataSet, segDocRaw);
+        std::unique_ptr<DcmSegmentation> segDoc(segDocRaw);
+        if (loadSegCond.bad() || segDoc == nullptr)
+          mitkThrow() << "Failed to parse DICOM SEG via DcmSegmentation::loadDataset: "
+                      << loadSegCond.text();
 
-      const auto frameRefs = CollectPerFrameSourceRefs(*segDoc);
-      const auto seriesToInstances = CollectSourceInstancesBySeries(*dataSet);
-      const auto sourceSeriesGroups = GroupPerFrameRefsBySeries(frameRefs, seriesToInstances);
-      PopulateSourceImageRelations(*labelSetImage, sourceSeriesGroups);
+        const mitk::Image* groupImage = labelSetImage->GetGroupImage(0);
+        const mitk::SlicedGeometry3D* groupGeometry =
+          groupImage != nullptr ? groupImage->GetSlicedGeometry() : nullptr;
+        const auto frameRefs = CollectPerFrameSourceRefs(*segDoc, groupGeometry);
+        const auto seriesToInstances = CollectSourceInstancesBySeries(*dataSet);
+        const auto sourceSeriesGroups = GroupPerFrameRefsBySeries(frameRefs, seriesToInstances);
+        PopulateSourceImageRelations(*labelSetImage, sourceSeriesGroups);
+      }
+      catch (const std::exception &e)
+      {
+        MITK_WARN << "DICOM SEG loaded, but source-image relations could not "
+                  << "be populated: " << e.what() << " The segmentation is "
+                  << "returned without source-image provenance.";
+      }
     }
     catch (const std::exception &e)
     {
@@ -1323,10 +1493,7 @@ namespace mitk
     }
 
     // Drive label naming, colour and DICOM property metadata from
-    // segmentsAttributesMappingList. SetLabelProperties also stamps the
-    // empty tracking-ID/UID sentinel that suppresses MITK's auto-UID
-    // generation, so running it on every metadata-described label keeps
-    // round-trip integrity.
+    // segmentsAttributesMappingList.
     for (const auto &[labelValue, segmentAttribute] : attributesByLabelValue)
     {
       Label *label = labelSetImage->GetLabel(labelValue);
@@ -1465,8 +1632,12 @@ namespace mitk
             {
               // SEG IOD requires (0062,0003) (Type 1). Emit an honest "unknown"
               // stand-in rather than blocking the write or claiming specific
-              // semantics. BodyPartExamined is deliberately not stamped here;
-              // an "Unknown" body part is worse than the field staying empty.
+              // semantics. The same SCT base code is intentionally reused as
+              // the Type fallback below (paired there with an "Unknown"
+              // modifier); Category and Type sharing one base code is accepted
+              // for the no-real-semantics case. BodyPartExamined is
+              // deliberately not stamped here; an "Unknown" body part is worse
+              // than the field staying empty.
               segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
                 "49755003", "SCT", "Morphologically altered structure");
             }

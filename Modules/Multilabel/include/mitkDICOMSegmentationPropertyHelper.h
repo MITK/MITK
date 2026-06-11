@@ -280,7 +280,6 @@ namespace mitk
     static const std::string& UnknownPatientID();
     static const std::string& UnknownStudyID();
     static const std::string& UnknownContentCreatorName();
-    static const std::string& UnknownBodyPartExamined();
   };
 }
 

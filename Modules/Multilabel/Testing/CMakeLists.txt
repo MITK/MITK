@@ -13,6 +13,18 @@ if(EXISTS "${_dicomSegFixture}")
     mitkDICOMSegmentationIORegressionTest
     ${_dicomSegFixture}
     ${MITK_DATA_DIR}/Multilabel/DICOMSegmentationIO/liver-dcmqi-reference.nrrd)
+
+  # Non-Z-ordered per-frame source keying: permutes the same Z-ordered
+  # liver.dcm in-memory, so it shares the fixture gate above. Needs no
+  # reference NRRD - it reads the reversed file's own per-frame tags as the
+  # oracle.
+  mitkAddCustomModuleTest(mitkDICOMSegmentationIONonZOrderedTest_Liver
+    mitkDICOMSegmentationIONonZOrderedTest
+    ${_dicomSegFixture})
+else()
+  message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationIORegressionTest_Liver "
+    "and mitkDICOMSegmentationIONonZOrderedTest_Liver "
+    "(dcmqi fixture not found: ${_dicomSegFixture}).")
 endif()
 
 # Labelmap (Sup 243) regression test. The labelmap-format DICOM SEG is built
@@ -52,6 +64,9 @@ if(EXISTS "${_dicomSegLabelmapMetadata}"
     ${_dicomSegLabelmapSpineInput}
     ${_dicomSegLabelmapSourceDicoms}
     ${_dicomSegLabelmapReference})
+else()
+  message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationIOLabelmapRegressionTest_LiverSpine "
+    "(dcmqi labelmap fixtures not found under ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI).")
 endif()
 
 # End-to-end coverage for the legacy referenceFiles -> SegSourceImageRelationRule
@@ -61,4 +76,7 @@ if(_dicomSegLabelmapAllInputsExist)
   mitkAddCustomModuleTest(mitkDICOMSegmentationLegacyMigrationTest
     mitkDICOMSegmentationLegacyMigrationTest
     ${_dicomSegLabelmapSourceDicomList})
+else()
+  message(STATUS "MITK DICOM SEG: skipping mitkDICOMSegmentationLegacyMigrationTest "
+    "(dcmqi ct-3slice source DICOMs not found under ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI).")
 endif()

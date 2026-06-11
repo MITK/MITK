@@ -29,6 +29,7 @@ found in the LICENSE file.
 class QAbstractButton;
 class QButtonGroup;
 class QPushButton;
+class QTimer;
 
 namespace Ui
 {
@@ -194,6 +195,39 @@ protected:
    */
   void OnSessionEnded();
 
+  /** \brief Handles the tool's SessionExpiredEvent.
+   *
+   * A remote session was lost server-side (idle timeout, server restart, or
+   * the server is at capacity / unreachable). The session is still live when
+   * this fires: it stops the heartbeat timer and defers teardown to the next
+   * event-loop tick (AbortSession(), which ends the session and clears the
+   * interactions and preview), then informs the user that they need to
+   * re-initialize. Deferring both the teardown and the dialog avoids
+   * re-entrancy when the event fires from within an interaction. A guard
+   * ensures a second expiry event cannot stack a duplicate teardown or dialog.
+   */
+  void OnSessionExpired();
+
+  /** \brief Sends a keep-alive heartbeat to the remote nnInteractive server.
+   *
+   * Connected to the heartbeat timer's timeout while a remote session runs.
+   * Delegates to nnInteractiveTool::Heartbeat(), which keeps the server-side
+   * lease alive and, on a definitive expiry, triggers the SessionExpiredEvent
+   * teardown path. Has no effect for local sessions.
+   */
+  void OnHeartbeatTimeout();
+
+  /** \brief Shows the model checkpoint license below the Initialize button, or
+   *         clears it when passed \c std::nullopt.
+   *
+   * Mirrors the napari plugin: a normal license string is shown as
+   * "Model license: <value>", the "!!MISSING!!" sentinel is shown as a red
+   * "Model license: UNKNOWN (warning!)", and an empty/absent license hides the
+   * label. Driven by the session lifecycle, so it works for local and remote
+   * sessions alike.
+   */
+  void UpdateModelLicenseDisplay(const std::optional<std::string>& license);
+
   /** \brief Returns the connected nnInteractiveTool.
    *
    * \return Pointer to the connected nnInteractiveTool.
@@ -270,6 +304,23 @@ private:
   /** \brief Re-checks the last-active interactor button, if any. */
   void ReEnableLastInteractor();
 
+  /** \brief Enables or disables the interaction buttons based on the running
+   *         session's reported capabilities.
+   *
+   * Applies to both local and remote sessions. A remote server may host a
+   * checkpoint that supports a different set of interactions than the local
+   * default, so unsupported interactions are disabled in the GUI.
+   */
+  void ApplyCapabilityGating();
+
+  /** \brief Updates the Initialize button label to reflect the configured
+   *         inference mode, e.g. "Initialize (local)" or
+   *         "Initialize (remote server)", so the active mode is visible in the
+   *         tool panel. Reads the preference fresh; called on init and whenever
+   *         the inference-mode preference changes.
+   */
+  void UpdateInitializeButtonText();
+
   struct ShortcutLabel
   {
     QPushButton* button;
@@ -287,6 +338,14 @@ private:
   mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
+
+  QTimer* m_HeartbeatTimer = nullptr;
+
+  // Set when a lost remote session is being torn down so a second
+  // SessionExpiredEvent (the tool emits it from both the heartbeat and a
+  // mid-interaction failure) cannot queue a duplicate teardown/dialog. Cleared
+  // in OnSessionEnded once teardown completes.
+  bool m_SessionExpiredHandled = false;
 
   mitk::IPreferences* m_Preferences = nullptr;
   std::vector<ShortcutLabel> m_ShortcutLabels;

@@ -336,6 +336,7 @@ set(CPP_FILES
   IO/mitkProportionalTimeGeometryToXML.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
+  IO/mitkStringUtil.cpp
   IO/mitkSurfaceStlIO.cpp
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp

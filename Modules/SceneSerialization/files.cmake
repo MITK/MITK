@@ -5,7 +5,6 @@ set(CPP_FILES
   mitkPointSetSerializer.cpp
   mitkPropertyListDeserializer.cpp
   mitkPropertyListDeserializerV1.cpp
-  mitkSceneFileUtil.cpp
   mitkSceneIO.cpp
   mitkSceneJsonReader.cpp
   mitkSceneReader.cpp

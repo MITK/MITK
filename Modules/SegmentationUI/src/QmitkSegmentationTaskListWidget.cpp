@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkExceptionMacro.h>
-#include <mitkSceneFileUtil.h>
+#include <mitkStringUtil.h>
 
 #include "QmitkFindSegmentationTaskDialog.h"
 #include <QmitkStaticDynamicSegmentationDialog.h>
@@ -878,9 +878,6 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
         case mitk::SceneFileForm::UnpackedIndex:
           scene = sceneIO->LoadSceneUnzipped(scenePath.string());
           break;
-
-        default:
-          mitkThrow() << "Unhandled SceneFile form. Expected a \".mitk\", \".mitksceneindex\" or \".mitkscene.json\" file:\n" << scenePath.string();
       }
     }
     catch (const mitk::Exception& e)

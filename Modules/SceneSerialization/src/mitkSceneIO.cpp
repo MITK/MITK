@@ -18,7 +18,6 @@ found in the LICENSE file.
 
 #include <mitkBaseDataSerializer.h>
 #include <mitkPropertyListSerializer.h>
-#include <mitkSceneFileUtil.h>
 #include <mitkSceneIO.h>
 #include <mitkSceneJsonReader.h>
 #include <mitkSceneReader.h>
@@ -29,6 +28,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkStringUtil.h>
 #include <mitkUIDGenerator.h>
 
 #include <itkObjectFactoryBase.h>

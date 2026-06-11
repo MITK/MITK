@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkSceneFileUtil.h>
+#include <mitkStringUtil.h>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -21,9 +21,9 @@ found in the LICENSE file.
  * The predicate routes scene files by filename suffix in SceneIO and in the
  * Segmentation Task List scene loader, so its edge cases are pinned here.
  */
-class mitkSceneFileUtilTestSuite : public mitk::TestFixture
+class mitkStringUtilTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkSceneFileUtilTestSuite);
+  CPPUNIT_TEST_SUITE(mitkStringUtilTestSuite);
   MITK_TEST(MatchesExactSuffix);
   MITK_TEST(IgnoresStringCase);
   MITK_TEST(IgnoresSuffixCase);
@@ -87,4 +87,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkSceneFileUtil)
+MITK_TEST_SUITE_REGISTRATION(mitkStringUtil)

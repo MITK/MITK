@@ -1,5 +1,5 @@
 set(MODULE_TESTS
-  mitkSegmentationTaskListSceneFileFormTest.cpp
+  QmitkSegmentationTaskListWidgetTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

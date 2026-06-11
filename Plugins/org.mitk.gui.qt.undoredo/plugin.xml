@@ -10,4 +10,11 @@
 	</view>
   </extension>
 
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.UndoRedoPreferencePage"
+          name="Undo/Redo"
+          class="QmitkUndoRedoPreferencePage"
+          category="org.mitk.GeneralPreferencePage"/>
+  </extension>
+
 </plugin>

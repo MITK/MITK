@@ -27,7 +27,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  void DICOMPMPropertyHelper::DeriveDICOMPMProperties(BaseData *derivedDICOMImage)
+  void DICOMPMPropertyHelper::DeriveDICOMPMProperties(const BaseData *sourceDICOMImage,
+                                                     BaseData *derivedDICOMImage)
   {
     PropertyList::Pointer propertyList = derivedDICOMImage->GetPropertyList();
 
@@ -42,13 +43,20 @@ namespace mitk
     propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
                               TemporoSpatialStringProperty::New("MITK"));
 
-
-
-
+    // Copy the source image's "files" lookup table to the derived image
+    // as "referenceFiles". The PM writer (mitkDICOMPMIO) reads this to
+    // locate the source DICOM files at emission time. Lives here rather
+    // than in DICOMQIPropertyHelper::DeriveDICOMSourceProperties because
+    // the DICOM SEG writer no longer relies on referenceFiles
+    // (SegSourceImageRelationRule supersedes it), so the SEG path would
+    // only carry the property as dead weight.
+    if (sourceDICOMImage != nullptr)
+    {
+      BaseProperty::Pointer dcmFilesProp = sourceDICOMImage->GetPropertyList()->GetProperty("files");
+      if (dcmFilesProp.IsNotNull())
+        propertyList->SetProperty("referenceFiles", dcmFilesProp);
+    }
   }
-
-
-
 } // namespace mitk
 
 

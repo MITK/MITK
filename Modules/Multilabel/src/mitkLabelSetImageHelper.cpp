@@ -13,9 +13,12 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 
 #include <mitkDataStorage.h>
+#include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkLabelSetImage.h>
 #include <mitkExceptionMacro.h>
+#include <mitkLog.h>
 #include <mitkProperties.h>
+#include <mitkSegSourceImageRelationRule.h>
 
 #include <array>
 #include <regex>
@@ -99,7 +102,37 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
   auto newSegmentationNode = CreateEmptySegmentationNode(newSegmentationName);
   newSegmentationNode->SetData(newLabelSetImage);
 
+  if (referenceNode != nullptr)
+  {
+    if (auto referenceImage = dynamic_cast<const Image*>(referenceNode->GetData()))
+    {
+      SetupDerivedSegmentation(newLabelSetImage, referenceImage);
+    }
+  }
+
   return newSegmentationNode;
+}
+
+void mitk::LabelSetImageHelper::SetupDerivedSegmentation(MultiLabelSegmentation* seg,
+                                                         const Image* source)
+{
+  if (seg == nullptr)
+    mitkThrow() << "LabelSetImageHelper::SetupDerivedSegmentation: seg must not be nullptr.";
+  if (source == nullptr)
+    mitkThrow() << "LabelSetImageHelper::SetupDerivedSegmentation: source must not be nullptr.";
+
+  try
+  {
+    SegSourceImageRelationRule::Connect(seg, source);
+    DICOMSegmentationPropertyHelper::InheritPatientFromSource(seg, source);
+    DICOMSegmentationPropertyHelper::InheritStudyFromSource(seg, source);
+    DICOMSegmentationPropertyHelper::InheritFrameOfReferenceFromSource(seg, source);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_WARN << "LabelSetImageHelper::SetupDerivedSegmentation: setup failed: "
+              << e.what();
+  }
 }
 
 mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix, bool hideIDIfUnique)

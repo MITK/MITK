@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include <mitkDICOMQIPropertyHelper.h>
 #include <mitkFileSystem.h>
 #include <mitkIOUtil.h>
 #include <mitkMultiLabelIOHelper.h>
@@ -1074,9 +1073,6 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
     mitk::RenderingManager::GetInstance()->InitializeViews(segmentation->GetTimeGeometry());
   }
-
-  // Workaround for T29431. Remove when T26953 is fixed.
-  mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(image, segmentation);
 
   auto prefs = GetSegmentationPreferences();
 

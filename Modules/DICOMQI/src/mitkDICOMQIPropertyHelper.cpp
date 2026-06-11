@@ -55,19 +55,22 @@ namespace mitk
     //====== General study ======
     // Add DICOM Tag (0020,000D) Study Instance UID; no default --> MANDATORY!
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0020, 0x000D));
-    // Add DICOM Tag (0080,0020) Study Date; no default (think about "today")
-    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0080, 0x0020));
+    // Add DICOM Tag (0020,0010) Study ID; Type 2 in General Study Module.
+    // Required by derived-data IODs (SEG, Parametric Map); the strict-mode
+    // SEG writer demands its presence on the seg's property list.
+    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0020, 0x0010));
+    // Add DICOM Tag (0008,0020) Study Date; no default (think about "today")
+    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x0020));
     // Add DICOM Tag (0008,0050) Accession Number; no default
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x0050));
     // Add DICOM Tag (0008,1030) Study Description; no default
     AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0008, 0x1030));
 
-
-    //====== Reference DICOM data ======
-    // Add reference file paths to referenced DICOM data
-    BaseProperty::Pointer dcmFilesProp = sourcePropertyList->GetProperty("files");
-    if (dcmFilesProp.IsNotNull())
-      propertyList->SetProperty("referenceFiles", dcmFilesProp);
+    //====== Frame of Reference ======
+    // Add DICOM Tag (0020,0052) Frame of Reference UID. The derived data
+    // (SEG, parametric map) lives in the source's physical space; the
+    // SEG IOD requires this tag in the Frame of Reference Module.
+    AdoptReferenceDICOMProperty(sourcePropertyList, propertyList, DICOMTag(0x0020, 0x0052));
   }
 
   void DICOMQIPropertyHelper::AdoptReferenceDICOMProperty(PropertyList *referencedPropertyList,

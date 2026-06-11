@@ -361,12 +361,14 @@ void QmitkConvertToMultiLabelSegmentationWidget::ConvertNodes(const QmitkNodeSel
       refNode = inputNode;
       refImage = dynamic_cast<mitk::Image*>(inputNode->GetData());
       outputSeg->Initialize(refImage);
+      mitk::LabelSetImageHelper::SetupDerivedSegmentation(outputSeg, refImage);
     }
     else
     {
       refNode = m_Controls->refNodeSelector->GetSelectedNode();
       refImage = dynamic_cast<mitk::Image*>(refNode->GetData());
       outputSeg->Initialize(refImage);
+      mitk::LabelSetImageHelper::SetupDerivedSegmentation(outputSeg, refImage);
     }
   }
 

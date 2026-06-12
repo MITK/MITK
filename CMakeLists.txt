@@ -91,7 +91,6 @@ endforeach()
 
 # Standard CMake macros
 include(FeatureSummary)
-include(CMakeParseArguments)
 include(FindPackageHandleStandardArgs)
 
 # MITK macros

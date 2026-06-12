@@ -23,7 +23,6 @@ set(MITK_CMAKE_MODULE_PATH "@MITK_SOURCE_DIR@/CMake")
 list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH})
 
 # Standard CMake macros
-include(CMakeParseArguments)
 include(FeatureSummary)
 include(FindPackageHandleStandardArgs)
 include(GenerateExportHeader)

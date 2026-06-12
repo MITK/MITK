@@ -360,7 +360,9 @@ if(MITK_USE_Qt6)
       endif()
 
       if(_compilers MATCHES "[0-9]+")
-        if (CMAKE_MATCH_0 EQUAL 2022)
+        if(CMAKE_MATCH_0 EQUAL 2026)
+          list(APPEND _compilers "msvc2022" "msvc2019") # Binary compatible
+        elseif(CMAKE_MATCH_0 EQUAL 2022)
           list(APPEND _compilers "msvc2019") # Binary compatible
         endif()
       endif()

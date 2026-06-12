@@ -24,7 +24,12 @@ set(GDCM_DEPENDS ${proj})
 
 if(NOT DEFINED GDCM_DIR)
 
-  set(additional_args )
+  #[[ See CMakeExternals/lz4.cmake for the reasoning behind CMP0091.
+      GDCM caps its policy version at GDCM_MAX_VALIDATED_CMAKE_VERSION (3.13.4),
+      i.e. CMP0091 is unset despite the seemingly open version range. ]]
+  set(additional_args
+    -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+  )
 
   # On Mac some assertions fail that prevent reading certain DICOM files. Bug #19995
   if(APPLE)

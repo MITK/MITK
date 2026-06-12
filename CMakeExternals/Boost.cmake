@@ -23,7 +23,7 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   set(install_cmd "")
 
   set(Boost_ROOT ${ep_prefix})
-  set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.89.0")
+  set(Boost_DIR "${Boost_ROOT}/lib/cmake/Boost-1.91.0")
 
   if(WIN32)
     set(BOOST_LIBRARYDIR "${Boost_ROOT}/lib")
@@ -63,8 +63,8 @@ if(NOT DEFINED Boost_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_89_0.tar.gz")
-  set(md5 187b577ce9f485314fcf17bcba2fb542)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_91_0.tar.gz")
+  set(md5 e799ed3e5af9708739fb2e088c670ae1)
 
   if(MITK_USE_Boost_LIBRARIES)
 

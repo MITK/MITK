@@ -23,13 +23,16 @@ cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_C
 
 #[[ T28060
 
-    https://cmake.org/cmake/help/v3.18/policy/CMP0091.html
-    https://cmake.org/cmake/help/v3.18/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
+    https://cmake.org/cmake/help/latest/policy/CMP0091.html
+    https://cmake.org/cmake/help/latest/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
 
-    We pass CMP0091 to all external projects as command-line argument:
-      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=OLD
+    CMP0091 is set to NEW by our minimum required CMake version. The value
+    below equals the NEW default and is set explicitly only to document and
+    pin our choice of the dynamic MSVC runtime library. External projects
+    decide on their own, except for projects whose minimum required CMake
+    version predates CMP0091 (see CMakeExternals/lz4.cmake and ACVD.cmake).
  ]]
-cmake_policy(SET CMP0091 OLD)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 if(POLICY CMP0167)
   # https://cmake.org/cmake/help/v3.30/policy/CMP0167.html

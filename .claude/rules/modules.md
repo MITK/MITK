@@ -126,5 +126,6 @@ Every new C++ or Python file must start with the header at
 When a module adds a CLI app under `cmdapps/`:
 
 1. Ship `Modules/<Module>/documentation/Mitk<App>.md` describing it.
-2. `\subpage` it from `MITKCmdAppsPage.dox` so it appears in the
-   developer-manual index.
+2. `\subpage` it from
+   `Documentation/Doxygen/2-UserManual/MITKCmdAppsPage.dox` so it
+   appears in the user-manual index.

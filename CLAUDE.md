@@ -17,7 +17,11 @@ activate automatically when matching files are touched.
   up empirically, switch to observation: add temporary logging or
   instrumentation before guessing again.
 - Preserve the line-ending style of existing files. For files you
-  create from scratch, default to LF.
+  create from scratch, default to LF. Per `.gitattributes`, C++ and
+  CMake files must not use tabs for indentation and must end with
+  a newline.
+- Ask before committing anything.
+- Never push without an explicit go-ahead for that specific push.
 
 ## What is MITK?
 
@@ -85,6 +89,11 @@ ctest -C Release -R mitkImage    # tests matching a pattern
 ctest -C Release -N              # list without running
 ```
 
+Many tests read input from the MITK-Data repository, which the
+superbuild checks out automatically; `MITK_DATA_DIR` in the inner
+build tree points to it. When a test cannot find its input, check
+there first.
+
 ### Documentation build
 
 ```bash
@@ -111,6 +120,10 @@ produces modules, plugins, Python bindings, and applications.
 - `Wrapping/Python/` - pybind11 bindings.
 - `CMake/`, `CMakeExternals/` - build macros and external-dependency
   definitions.
+- `Examples/` - tutorial and example code (first steps, BlueBerry
+  examples).
+- `Utilities/` - bundled third-party code; MITK conventions
+  (copyright header, style) do not apply there.
 
 ### Data model
 
@@ -188,27 +201,9 @@ Follow the seven rules at https://cbea.ms/git-commit/:
 - Wrap the body at 72 characters
 - Use the body to explain what and why, not how
 
-Worked example:
+Put issue-tracker references at the bottom of the body:
 
 ```
-Summarize changes in around 50 characters or less
-
-More detailed explanatory text, if necessary. Wrap it to about 72
-characters. In some contexts the first line is treated as the
-subject and the rest as the body. The blank line separating them
-is critical; tools like `log`, `shortlog`, and `rebase` get
-confused without it.
-
-Explain the problem this commit solves. Focus on why you are
-making this change as opposed to how - the code explains that.
-Are there side effects or unintuitive consequences? Here is the
-place to explain them.
-
- - Bullet points are okay
- - Use a hyphen or asterisk preceded by a single space
-
-If you use an issue tracker, put references at the bottom:
-
 Resolves: #123
 See also: #456, #789
 ```
@@ -225,7 +220,3 @@ contributors. See `CONTRIBUTING.md`.
 - Build configurations: `CMake/BuildConfigurations/`
 - External dependency definitions:
   `CMakeExternals/ExternalProjectList.cmake`
-
-Specialised, file-type- or subtree-specific rules live in
-`.claude/rules/` - they activate automatically when you work on
-matching files.

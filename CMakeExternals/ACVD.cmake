@@ -14,7 +14,10 @@ if(MITK_USE_ACVD)
 
   if(NOT DEFINED ACVD_DIR)
 
-    set(additional_args )
+    # See CMakeExternals/lz4.cmake for the reasoning behind CMP0091.
+    set(additional_args
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+    )
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}

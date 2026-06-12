@@ -12,7 +12,10 @@ else()
   set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION_OTHER})
 endif()
 
-cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
+# Newer CMake versions are expected to work but are not regularly tested.
+set(MITK_CMAKE_MAXIMUM_TESTED_VERSION 4.3)
+
+cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION}...${MITK_CMAKE_MAXIMUM_TESTED_VERSION})
 
 #-----------------------------------------------------------------------------
 # Policies

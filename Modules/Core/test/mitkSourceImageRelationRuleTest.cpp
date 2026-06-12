@@ -147,7 +147,7 @@ private:
     owner->SetProperty(PropertyKeyPathToPropertyName(refClassUIDPath), mitk::TemporoSpatialStringProperty::New(classUID));
 
     mitk::PropertyKeyPath purposePath;
-    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
     owner->SetProperty(PropertyKeyPathToPropertyName(purposePath), mitk::TemporoSpatialStringProperty::New(purpose));
   }
 
@@ -170,7 +170,7 @@ private:
     }
 
     mitk::PropertyKeyPath purposePath;
-    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("a170", 0).AddElement("0008").AddElement("0104");
+    purposePath.AddElement("DICOM").AddElement("0008").AddSelection("2112", sequElement).AddElement("0040").AddSelection("A170", 0).AddElement("0008").AddElement("0104");
     prop = owner->GetConstProperty(PropertyKeyPathToPropertyName(purposePath));
     if (prop->GetValueAsString() != purpose)
     {

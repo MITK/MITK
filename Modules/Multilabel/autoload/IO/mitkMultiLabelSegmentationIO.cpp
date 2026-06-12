@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkMultiLabelSegmentationIO.h>
 #include <mitkBasePropertySerializer.h>
+#include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkMultilabelIOMimeTypes.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkMultiLabelIOHelper.h>
@@ -224,6 +225,14 @@ namespace mitk
         uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
       }
     }
+
+    // Translate a legacy "referenceFiles" property (segs saved before the
+    // property-driven DICOM SEG rework) into SegSourceImageRelationRule
+    // connections so the DICOM SEG writer has a single property-driven
+    // path regardless of the seg's origin. No-op when the seg is already
+    // post-rework.
+    DICOMSegmentationPropertyHelper::MigrateLegacyReferenceFilesToRelation(output);
+
     result.push_back(output.GetPointer());
 
     MITK_INFO << "...finished!";

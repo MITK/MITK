@@ -16,4 +16,5 @@ set(CPP_FILES
   mitkMultiLabelPredicateHelper.cpp
   mitkMultiLabelSegmentationVtkMapper3D.cpp
   mitkMultiLabelSurfaceNetsExtractor.cpp
+  mitkSegSourceImageRelationRule.cpp
 )

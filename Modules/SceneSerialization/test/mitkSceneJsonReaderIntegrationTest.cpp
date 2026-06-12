@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 #include <mitkMessage.h>
 #include <mitkPropertyList.h>
+#include <mitkSceneIO.h>
 #include <mitkSceneJsonReader.h>
 #include <mitkStandaloneDataStorage.h>
 
@@ -63,6 +64,7 @@ class mitkSceneJsonReaderIntegrationTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSceneJsonReaderIntegrationTestSuite);
   MITK_TEST(TestLoadRealImage);
+  MITK_TEST(TestSceneIORoutesStandaloneJson);
   MITK_TEST(TestDataPropertiesReplace);
   MITK_TEST(TestFileIndirection);
   MITK_TEST(TestRelativePathSubdir);
@@ -97,6 +99,26 @@ public:
     auto *image = dynamic_cast<mitk::Image *>(node->GetData());
     CPPUNIT_ASSERT_MESSAGE("Loaded BaseData is an mitk::Image", image != nullptr);
     CPPUNIT_ASSERT_MESSAGE("Image has at least two dimensions", image->GetDimension() >= 2);
+  }
+
+  /**
+   * \brief 1b. `SceneIO::LoadScene` routes a standalone `*.mitkscene.json` to the
+   *            JSON reader instead of attempting to unzip it.
+   *
+   * This is the entry point the Segmentation Task List scene loader calls, so it
+   * guards the suffix routing in `SceneIO::LoadScene` against future regressions.
+   * Fixture: `SceneSerialization/Json/basic.mitkscene.json`.
+   */
+  void TestSceneIORoutesStandaloneJson()
+  {
+    auto sceneIO = mitk::SceneIO::New();
+    auto storage = sceneIO->LoadScene(Fixture("basic.mitkscene.json"));
+
+    CPPUNIT_ASSERT_MESSAGE("SceneIO::LoadScene returns a storage for a standalone JSON scene",
+                           storage.IsNotNull());
+    auto node = storage->GetNamedNode("loaded");
+    CPPUNIT_ASSERT_MESSAGE("Named node resolved via SceneIO::LoadScene -> JSON reader",
+                           node != nullptr && dynamic_cast<mitk::Image *>(node->GetData()) != nullptr);
   }
 
   /**

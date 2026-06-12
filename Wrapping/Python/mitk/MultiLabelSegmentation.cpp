@@ -765,17 +765,30 @@ The same surface is reachable via :py:meth:`load` and
     .def(py::init([](const Image* ref) {
         auto s = MultiLabelSegmentation::New();
         s->Initialize(ref, true, true);
+        // Shared with CreateNewSegmentationNode so the constructor and the
+        // C++ factory cannot drift on what a "typical derived seg" means.
+        LabelSetImageHelper::SetupDerivedSegmentation(s, ref);
         return s;
       }),
       py::arg("reference_image"),
-      R"(Construct a segmentation initialized from a reference image.
-
-The segmentation adopts the spatial and time geometry of *reference_image*
-and starts with no labels and one (empty) group.
-
-Args:
-    reference_image: An :py:class:`Image` whose geometry to copy.
-)")
+      "Construct a segmentation from a reference image.\n"
+      "\n"
+      "The segmentation inherits its geometry from ``reference_image`` and\n"
+      "additionally:\n"
+      "\n"
+      "* establishes a source-image relation via\n"
+      "  :py:func:`mitk.relations.segmentation.connect_source_image`, and\n"
+      "* transfers the reference image's patient identity, study identity,\n"
+      "  and frame-of-reference UID via the corresponding\n"
+      "  :py:mod:`mitk.dicom.segmentation` ``inherit_*`` functions.\n"
+      "\n"
+      "These steps are the common-case expectation when creating a derived\n"
+      "seg. Failures are logged via MITK_WARN and swallowed; the\n"
+      "constructor always returns a usable seg. Callers that want explicit\n"
+      "control should use the underlying :py:mod:`mitk.relations.segmentation`\n"
+      "/ :py:mod:`mitk.dicom.segmentation` functions directly.\n"
+      "\n"
+      ":param reference_image: The image the segmentation derives from.\n")
     .def(py::init([](const TimeGeometry* g) {
         auto s = MultiLabelSegmentation::New();
         s->Initialize(g, true, true);

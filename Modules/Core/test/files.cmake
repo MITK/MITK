@@ -128,6 +128,7 @@ set(MODULE_TESTS
   mitkDataStorageReferenceTest.cpp
   mitkPropertyJsonSerializationTest.cpp
   mitkDataStorageServiceTest.cpp
+  mitkStringUtilTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

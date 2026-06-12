@@ -30,6 +30,8 @@ found in the LICENSE file.
 #include <mitkSceneIO.h>
 #include <mitkSegmentationHelper.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkExceptionMacro.h>
+#include <mitkStringUtil.h>
 
 #include "QmitkFindSegmentationTaskDialog.h"
 #include <QmitkStaticDynamicSegmentationDialog.h>
@@ -161,6 +163,29 @@ namespace
 
     TransferDataNodes(srcStorage, rootNodes, destStorage, destRoot);
   }
+}
+
+mitk::SceneFileForm mitk::ClassifyTaskListSceneFile(const std::filesystem::path& scenePath)
+{
+  const auto filename = scenePath.string();
+
+  // Match .mitkscene.json on the full filename, case-insensitively: extension()
+  // returns only ".json" for "foo.mitkscene.json". This is the same predicate
+  // SceneIO::LoadScene uses to route standalone JSON scenes.
+  if (EndsWithCaseInsensitive(filename, ".mitkscene.json"))
+    return SceneFileForm::JsonStandalone;
+
+  // .mitk and .mitksceneindex stay case-sensitive on the last extension, preserving
+  // the legacy widget behavior (e.g. ".MITK" was, and remains, rejected).
+  const auto extension = scenePath.extension();
+
+  if (extension == ".mitk")
+    return SceneFileForm::Zip;
+
+  if (extension == ".mitksceneindex")
+    return SceneFileForm::UnpackedIndex;
+
+  mitkThrow() << "Expected a .mitk, .mitksceneindex or .mitkscene.json file:\n" << filename;
 }
 
 /* This constructor has three objectives:
@@ -843,17 +868,16 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       const auto scenePath = m_TaskList->GetAbsolutePath(m_TaskList->GetScene(current).Path);
       auto sceneIO = mitk::SceneIO::New();
 
-      if (scenePath.extension() == ".mitk")
+      switch (mitk::ClassifyTaskListSceneFile(scenePath))
       {
-        scene = sceneIO->LoadScene(scenePath.string());
-      }
-      else if (scenePath.extension() == ".mitksceneindex")
-      {
-        scene = sceneIO->LoadSceneUnzipped(scenePath.string());
-      }
-      else
-      {
-        mitkThrow() << "Expected a .mitk or .mitksceneindex file:\n" << scenePath.string();
+        case mitk::SceneFileForm::Zip:
+        case mitk::SceneFileForm::JsonStandalone:
+          scene = sceneIO->LoadScene(scenePath.string());
+          break;
+
+        case mitk::SceneFileForm::UnpackedIndex:
+          scene = sceneIO->LoadSceneUnzipped(scenePath.string());
+          break;
       }
     }
     catch (const mitk::Exception& e)

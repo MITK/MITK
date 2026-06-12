@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkStringUtil.h>
 #include <mitkUIDGenerator.h>
 
 #include <itkObjectFactoryBase.h>
@@ -105,32 +106,26 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
 
   // Standalone JSON scene (not a ZIP archive): route directly to the
   // JSON reader without unpacking.
+  if (mitk::EndsWithCaseInsensitive(filename, ".mitkscene.json"))
   {
-    const std::string lower = itksys::SystemTools::LowerCase(filename);
-    if (lower.size() >= std::string(".mitkscene.json").size() &&
-        lower.compare(lower.size() - std::string(".mitkscene.json").size(),
-                      std::string(".mitkscene.json").size(),
-                      ".mitkscene.json") == 0)
+    // Clearing is delegated to the reader so it can be deferred until
+    // after the scene descriptor has been validated (a malformed JSON
+    // file must not wipe the caller's session).
+    try
     {
-      // Clearing is delegated to the reader so it can be deferred until
-      // after the scene descriptor has been validated (a malformed JSON
-      // file must not wipe the caller's session).
-      try
+      SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
+      if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
       {
-        SceneJsonReader::Pointer jsonReader = SceneJsonReader::New();
-        if (!jsonReader->LoadScene(filename, storage, clearStorageFirst))
-        {
-          MITK_ERROR << "There were errors while loading scene file " << filename
-                     << ". Your data may be corrupted";
-        }
+        MITK_ERROR << "There were errors while loading scene file " << filename
+                   << ". Your data may be corrupted";
       }
-      catch (const std::exception &e)
-      {
-        MITK_ERROR << "Failed to load JSON scene file '" << filename << "': " << e.what();
-      }
-
-      return storage;
     }
+    catch (const std::exception &e)
+    {
+      MITK_ERROR << "Failed to load JSON scene file '" << filename << "': " << e.what();
+    }
+
+    return storage;
   }
 
   // test if filename can be read
@@ -220,8 +215,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
   // Route JSON index files to the JSON reader. Clearing is delegated so it
   // can be deferred until the descriptor is validated; a malformed scene
   // file must not wipe the caller's session.
-  const std::string lowerIndex = itksys::SystemTools::LowerCase(indexfilename);
-  if (lowerIndex.size() >= 5 && lowerIndex.compare(lowerIndex.size() - 5, 5, ".json") == 0)
+  if (mitk::EndsWithCaseInsensitive(indexfilename, ".json"))
   {
     try
     {

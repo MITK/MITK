@@ -28,6 +28,14 @@ found in the LICENSE file.
 #include <Colortables/Turbo.h>
 #include <mitkLookupTableProperty.h>
 
+namespace
+{
+  // Single source of truth for the MULTILABEL palette size is the color
+  // table in Colortables/Multilabel.h; the lookup-table build and the
+  // label-color selection both derive their bounds from it.
+  constexpr int multilabelColorCount = static_cast<int>(sizeof(Multilabel) / sizeof(Multilabel[0]));
+}
+
 std::vector<std::string> mitk::LookupTable::typenameList = {
   "Grayscale",
   "Inverse Grayscale",
@@ -549,12 +557,12 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
 
   lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0); // background
 
-  for (int i = 0; i < 25; i++)
+  for (int i = 0; i < multilabelColorCount; i++)
   {
     lut->SetTableValue(i+1, Multilabel[i][0], Multilabel[i][1], Multilabel[i][2], 0.4);
   }
 
-  for (int i = 26; i < 65536; i++)
+  for (int i = multilabelColorCount + 1; i < 65536; i++)
   {
     if (i % 12 == 0)
       lut->SetTableValue(i, 1.0, 0.0, 0.0, 0.4);
@@ -584,6 +592,11 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
 
   m_LookupTable = lut;
   this->Modified();
+}
+
+int mitk::LookupTable::GetMultiLabelColorCount()
+{
+  return multilabelColorCount;
 }
 
 void mitk::LookupTable::BuildLegacyRainbowColorLookupTable()

@@ -254,11 +254,12 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     }
   };
 
-  // Group A: the 25 preferred palette colors (lookup-table slots 1..25).
+  // Group A: the curated palette colors (lookup-table slots 1..N).
   // Always part of the candidate pool. Evaluated first so exact ties
   // favor the curated palette.
+  const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
   std::array<double, 3> palettePick{};
-  for (int i = 1; i <= 25; ++i)
+  for (int i = 1; i <= paletteColorCount; ++i)
   {
     lookupTable->GetColor(i, palettePick.data());
     evaluateCandidate(palettePick);
@@ -267,10 +268,10 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   // Group B: algorithmically generated extras. Only contributes when the
   // palette has no candidate left at a meaningful Lab distance from the
   // colors in use. The threshold is set just below the smallest pairwise
-  // ΔE76 within the 25-color palette (gold palette[1] vs golden-yellow
-  // palette[24], ΔE76 ≈ 15.90, squared ≈ 252.94), so every palette color
-  // can still win on its own merits before we extend with extras.
-  constexpr double PALETTE_EXHAUSTED_THRESHOLD_SQUARED = 250.0;
+  // ΔE76 within the palette (palette[0] #BE0032 vs palette[16] #BF5D36,
+  // ΔE76 ≈ 32.4, squared ≈ 1051.7), so every palette color can still win
+  // on its own merits before we extend with extras.
+  constexpr double PALETTE_EXHAUSTED_THRESHOLD_SQUARED = 1040.0;
   if (bestMinDistanceSquared < PALETTE_EXHAUSTED_THRESHOLD_SQUARED)
   {
     for (int i = 0; i < EXTRA_CANDIDATE_COUNT; ++i)

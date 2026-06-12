@@ -33,7 +33,7 @@ int mitkPointSetReaderTest(int argc, char *argv[])
 
   // Get PointSet reader(s)
   std::vector<mitk::IFileReader *> readers =
-    readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("mps"));
+    readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("test.mps"));
   MITK_TEST_CONDITION_REQUIRED(!readers.empty(), "Testing for registered readers")
 
   for (std::vector<mitk::IFileReader *>::const_iterator iter = readers.begin(), end = readers.end(); iter != end;

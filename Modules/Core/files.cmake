@@ -61,6 +61,7 @@ set(H_FILES
   mitkStorageThreadDispatcherBase.h
   mitkTimeHelper.h
   mitkUndoModel.h
+  mitkUndoRedoPreferenceHelper.h
   mitkVector.h
   mitkWeakPointer.h
 )
@@ -118,6 +119,7 @@ set(CPP_FILES
   Controllers/mitkTestManager.cpp
   Controllers/mitkTimeNavigationController.cpp
   Controllers/mitkUndoController.cpp
+  Controllers/mitkUndoRedoPreferenceHelper.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
 
@@ -336,6 +338,7 @@ set(CPP_FILES
   IO/mitkProportionalTimeGeometryToXML.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
+  IO/mitkStringUtil.cpp
   IO/mitkSurfaceStlIO.cpp
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp

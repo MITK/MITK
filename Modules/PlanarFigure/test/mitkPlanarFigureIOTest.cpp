@@ -427,7 +427,7 @@ public:
 
     mitk::FileReaderRegistry readerRegistry;
     std::vector<mitk::IFileReader*> readers =
-      readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("pf"));
+      readerRegistry.GetReaders(mitk::FileReaderRegistry::GetMimeTypeForFile("test.pf"));
 
     for (const auto& pfStream : pfMemoryStreams)
     {

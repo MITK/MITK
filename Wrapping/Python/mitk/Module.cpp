@@ -29,6 +29,8 @@ void InitTemporoSpatialStringProperty(py::module_&);
 void InitPropertyKeyPath(py::module_&);
 void InitDICOMTagPath(py::module_&);
 void InitMultiLabelSegmentation(py::module_&);
+void InitRelations(py::module_&);
+void InitDicom(py::module_&);
 
 PYBIND11_MODULE(mitk, m)
 {
@@ -64,4 +66,8 @@ The wider MITK C++ stack is documented at https://docs.mitk.org/latest/.
   InitPropertyKeyPath(m);
   InitDICOMTagPath(m);
   InitMultiLabelSegmentation(m);
+  // mitk.relations and mitk.dicom are initialized after the data classes
+  // they reference so the type registrations they depend on exist.
+  InitRelations(m);
+  InitDicom(m);
 }

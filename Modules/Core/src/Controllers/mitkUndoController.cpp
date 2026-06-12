@@ -14,32 +14,8 @@ found in the LICENSE file.
 #include <mitkInteractionConst.h>
 #include <mitkLimitedLinearUndo.h>
 #include <mitkRenderingManager.h>
+#include <mitkUndoRedoPreferenceHelper.h>
 #include <mitkVerboseLimitedLinearUndo.h>
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
-
-
-constexpr unsigned int DEFAULT_UNDO_REDO_LIMIT = 50;
-
-namespace
-{
-  mitk::IPreferences* GetPreferences()
-  {
-    auto preferencesService = mitk::CoreServices::GetPreferencesService();
-    auto systemPref = preferencesService->GetSystemPreferences();
-    return nullptr != systemPref ? systemPref->Node("/General/UndoRedo") : nullptr;
-  }
-
-  unsigned int GetUndoLimit()
-  {
-    auto* prefs = GetPreferences();
-
-    return prefs != nullptr
-      ? prefs->GetInt("UndoLimit", DEFAULT_UNDO_REDO_LIMIT)
-      : DEFAULT_UNDO_REDO_LIMIT; //no pref is available use the default limit
-  }
-}
 
 // static member-variables init.
 mitk::UndoModel::Pointer mitk::UndoController::m_CurUndoModel;
@@ -73,7 +49,7 @@ mitk::UndoController::UndoController(UndoType undoType)
         m_CurUndoType = undoType;
         m_UndoModelList.insert(UndoModelMap::value_type(undoType, m_CurUndoModel));
     }
-    m_CurUndoModel->SetUndoLimit(GetUndoLimit());
+    m_CurUndoModel->SetUndoLimit(static_cast<std::size_t>(mitk::UndoRedoPreferenceHelper::GetActiveLimit()));
   }
 }
 
@@ -149,7 +125,7 @@ bool mitk::UndoController::SwitchUndoModel(UndoType undoType)
   // found-> switch to UndoModel
   m_CurUndoModel = (undoModelIter)->second;
   m_CurUndoType = (undoModelIter)->first;
-  m_CurUndoModel->SetUndoLimit(GetUndoLimit());
+  m_CurUndoModel->SetUndoLimit(static_cast<std::size_t>(mitk::UndoRedoPreferenceHelper::GetActiveLimit()));
   return true;
 }
 

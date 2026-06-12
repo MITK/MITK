@@ -20,6 +20,14 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief Default maximum number of operations kept on the undo/redo stack.
+   *
+   * Used by UndoController when no \c UndoLimit preference is stored, and by the
+   * Undo/Redo UI as the value to fall back to when (re-)enabling a limited stack.
+   * A value of 0 means "unlimited"; this default is a finite cap.
+   */
+  inline constexpr unsigned int DEFAULT_UNDO_REDO_LIMIT = 50;
+
   /**
    * \brief Controller that manages undo/redo operations by delegating to an UndoModel.
    *

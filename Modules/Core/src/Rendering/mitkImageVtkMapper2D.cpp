@@ -828,9 +828,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
 
       std::string sLevel = "";
       std::string sWindow = "";
-      if (GetBackwardsCompatibleDICOMProperty(
+      if (GetBackwardsCompatibleDICOMPropertyValue(
             0x0028, 0x1050, "dicom.voilut.WindowCenter", image->GetPropertyList(), sLevel) &&
-          GetBackwardsCompatibleDICOMProperty(
+          GetBackwardsCompatibleDICOMPropertyValue(
             0x0028, 0x1051, "dicom.voilut.WindowWidth", image->GetPropertyList(), sWindow))
       {
         float level = atof(sLevel.c_str());
@@ -839,12 +839,12 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
         std::string sSmallestPixelValueInSeries;
         std::string sLargestPixelValueInSeries;
 
-        if (GetBackwardsCompatibleDICOMProperty(0x0028,
+        if (GetBackwardsCompatibleDICOMPropertyValue(0x0028,
                                                 0x0108,
                                                 "dicom.series.SmallestPixelValueInSeries",
                                                 image->GetPropertyList(),
                                                 sSmallestPixelValueInSeries) &&
-            GetBackwardsCompatibleDICOMProperty(0x0028,
+            GetBackwardsCompatibleDICOMPropertyValue(0x0028,
                                                 0x0109,
                                                 "dicom.series.LargestPixelValueInSeries",
                                                 image->GetPropertyList(),

@@ -106,8 +106,8 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation()
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
 
-  // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::Complete(this,
+    DICOMSegmentationPropertyHelper::CompletionOptions{});
 }
 
 mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegmentation &other)
@@ -125,8 +125,8 @@ mitk::MultiLabelSegmentation::MultiLabelSegmentation(const mitk::MultiLabelSegme
   }
   m_Groups = other.m_Groups;
 
-  // Add some DICOM Tags as properties to segmentation image
-  DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
+  DICOMSegmentationPropertyHelper::Complete(this,
+    DICOMSegmentationPropertyHelper::CompletionOptions{});
 }
 
 mitk::Image::Pointer mitk::MultiLabelSegmentation::GenerateNewGroupImage() const

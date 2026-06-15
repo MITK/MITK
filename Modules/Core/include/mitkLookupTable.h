@@ -113,6 +113,8 @@ namespace mitk
      * higher indices are algorithmically generated. The MULTILABEL lookup
      * table and the label-color selection both draw their colors from here,
      * so callers do not have to round-trip through the table.
+     *
+     * \throws mitk::Exception if index is negative.
      */
     static void GetMultiLabelColor(int index, double rgb[3]);
 

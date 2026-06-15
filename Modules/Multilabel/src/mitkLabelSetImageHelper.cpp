@@ -56,6 +56,44 @@ namespace
     const double db = a[2] - b[2];
     return dL * dL + da * da + db * db;
   }
+
+  // Distance (squared ΔE76) at which the curated palette counts as
+  // exhausted: a candidate nearer than this to every in-use color can no
+  // longer be a distinct palette color, so generated extras take over. The
+  // bound is the palette's own minimum pairwise distance, so while any
+  // palette color is unused its best candidate still clears it; only once
+  // all sit too close to the in-use colors do we fall through to extras. It
+  // must be perceptual, not a tiny epsilon: a user can nudge a label close
+  // to (not exactly onto) a palette color, and we then want to pass that
+  // palette color over rather than reuse a near-duplicate. The palette is
+  // constant, so this is evaluated once.
+  double ComputePaletteExhaustedThresholdSquared()
+  {
+    const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
+
+    std::vector<std::array<double, 3>> paletteLab;
+    paletteLab.reserve(paletteColorCount);
+    for (int i = 0; i < paletteColorCount; ++i)
+    {
+      std::array<double, 3> rgb{};
+      mitk::LookupTable::GetMultiLabelColor(i, rgb.data());
+      paletteLab.push_back(RGBToLab(rgb.data()));
+    }
+
+    double minSquared = std::numeric_limits<double>::infinity();
+    for (size_t a = 0; a < paletteLab.size(); ++a)
+      for (size_t b = a + 1; b < paletteLab.size(); ++b)
+      {
+        const double d2 = DeltaE76Squared(paletteLab[a], paletteLab[b]);
+        if (d2 < minSquared)
+          minSquared = d2;
+      }
+
+    // A hair below the exact minimum: in-use label colors are stored as
+    // float while candidates are evaluated at double precision, and that
+    // rounding must not let a still-unused palette color read as exhausted.
+    return minSquared * 0.999;
+  }
 }
 
 mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateEmptySegmentationNode(const std::string& segmentationName)
@@ -225,44 +263,19 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   // part of the candidate pool. Evaluated first so exact ties favor the
   // curated palette.
   const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
-  std::vector<std::array<double, 3>> paletteLab;
-  paletteLab.reserve(paletteColorCount);
-
   std::array<double, 3> palettePick{};
   for (int i = 0; i < paletteColorCount; ++i)
   {
     mitk::LookupTable::GetMultiLabelColor(i, palettePick.data());
     evaluateCandidate(palettePick);
-    paletteLab.push_back(RGBToLab(palettePick.data()));
   }
 
-  // The palette counts as exhausted once its best remaining color sits
-  // closer to an in-use color than the palette colors sit to one another.
-  // Up to that point an unused palette color always wins; past it, the best
-  // remaining palette color would be picked even though a generated color
-  // could be more distinct, so we extend the pool instead. The threshold
-  // has to be perceptual, not a tiny epsilon: a user can nudge a label to a
-  // color close to (but not exactly) a palette color, and we then want to
-  // pass that palette color over rather than reuse a near-duplicate.
-  // Deriving the threshold from the palette's own spacing keeps this intact
-  // if the palette ever changes.
-  double paletteExhaustedThresholdSquared = std::numeric_limits<double>::infinity();
-  for (size_t a = 0; a < paletteLab.size(); ++a)
-    for (size_t b = a + 1; b < paletteLab.size(); ++b)
-    {
-      const double d2 = DeltaE76Squared(paletteLab[a], paletteLab[b]);
-      if (d2 < paletteExhaustedThresholdSquared)
-        paletteExhaustedThresholdSquared = d2;
-    }
-
-  // A hair below the exact minimum: in-use label colors are stored as
-  // float while candidates are evaluated at double precision, and that
-  // rounding must not let a still-unused palette color read as exhausted.
-  paletteExhaustedThresholdSquared *= 0.999;
-
   // Group B: generated colors past the curated palette (color indices
-  // paletteColorCount and up). Contributes only once the palette is
-  // exhausted (see above).
+  // paletteColorCount and up). They contribute only once the palette is
+  // exhausted, i.e. its best remaining color is no farther from the in-use
+  // colors than the palette colors are from one another (see
+  // ComputePaletteExhaustedThresholdSquared).
+  static const double paletteExhaustedThresholdSquared = ComputePaletteExhaustedThresholdSquared();
   if (bestMinDistanceSquared < paletteExhaustedThresholdSquared)
   {
     constexpr int extraCandidateCount = 1000;

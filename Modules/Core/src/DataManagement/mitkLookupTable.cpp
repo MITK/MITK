@@ -626,6 +626,9 @@ int mitk::LookupTable::GetMultiLabelColorCount()
 
 void mitk::LookupTable::GetMultiLabelColor(int index, double rgb[3])
 {
+  if (index < 0)
+    mitkThrow() << "Multi-label color index must not be negative, but is " << index << ".";
+
   if (index < multilabelColorCount)
   {
     rgb[0] = Multilabel[index][0];

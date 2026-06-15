@@ -123,8 +123,23 @@ namespace mitk
     \brief Returns the name of this tool. Make it short!
 
     This name has to fit into some kind of button in most applications, so take some time to think of a good name!
+
+    \note The name is also recorded as label provenance via mitk::Label::AddToolUse, which reserves the
+    separator characters "|" and ":". Avoid them in tool names (use plain spaces); names containing them
+    are sanitized (separators replaced with "#") and a warning is logged.
     */
     virtual const char *GetName() const = 0;
+
+    /**
+    \brief Returns the intrinsic algorithm type of this tool, used to stamp label provenance.
+
+    Base default is MANUAL: the user's direct input (stroke/polygon/click) is the result. Override to
+    SEMIAUTOMATIC when an algorithm determines the affected pixels beyond where the user directly
+    indicated (seeds/parameters/edge-snapping); override to AUTOMATIC when the tool runs with no
+    per-image human input. Read at the writeback choke points and passed to mitk::Label::AddToolUse
+    together with GetName().
+    */
+    virtual mitk::Label::AlgorithmType GetAlgorithmType() const;
 
     /**
     \brief Name of a group.

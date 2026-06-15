@@ -95,6 +95,11 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
   return true;
 }
 
+mitk::Label::AlgorithmType mitk::SegWithPreviewTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
 void mitk::SegWithPreviewTool::Activated()
 {
   Superclass::Activated();
@@ -507,6 +512,17 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       else
       {
         this->TransferSegmentationsAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
+      }
+
+      // Stamp provenance on every affected result label (the target values of the label mapping).
+      // Covers BOTH the 3D-volume and 2D-working-plane branches of TransferSegmentationsAtTimeStep,
+      // regardless of that branch re-entering the (provenance-free) static WriteBackSegmentationResult.
+      // Must run before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp.
+      // AddToolUse is idempotent, so iterating duplicate target values is safe.
+      for (const auto& mapping : labelMapping)
+      {
+        if (auto label = resultSegmentation->GetLabel(mapping.second)) // GetLabel returns mitk::Label::Pointer
+          label->AddToolUse(this->GetAlgorithmType(), this->GetName());
       }
 
       undoRedoGenerator.RegisterUndoRedoOperationEvent("Segmentation " + std::string(this->GetName()));

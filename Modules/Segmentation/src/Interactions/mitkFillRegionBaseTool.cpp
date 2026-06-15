@@ -31,6 +31,23 @@ mitk::FillRegionBaseTool::~FillRegionBaseTool()
 {
 }
 
+mitk::Label::AlgorithmType mitk::FillRegionBaseTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::FillRegionBaseTool::GetAffectedLabelValues() const
+{
+  // The fill value identifies the label whose content this tool creates/extends; when filling with
+  // UNLABELED (Erase) the modified label is the clicked seed label.
+  const auto affected = (m_FillLabelValue != MultiLabelSegmentation::UNLABELED_VALUE)
+                          ? m_FillLabelValue
+                          : m_SeedLabelValue;
+  if (affected == MultiLabelSegmentation::UNLABELED_VALUE)
+    return {};
+  return { affected };
+}
+
 void mitk::FillRegionBaseTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("Release", OnClick);

@@ -55,6 +55,11 @@ const char *mitk::LiveWireTool2D::GetName() const
   return "Live Wire";
 }
 
+mitk::Label::AlgorithmType mitk::LiveWireTool2D::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
 void mitk::LiveWireTool2D::UpdateLiveWireContour()
 {
   auto contour = this->GetContour();

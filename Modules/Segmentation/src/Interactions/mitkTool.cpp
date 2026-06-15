@@ -107,6 +107,11 @@ const char *mitk::Tool::GetGroup() const
   return "default";
 }
 
+mitk::Label::AlgorithmType mitk::Tool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::MANUAL;
+}
+
 void mitk::Tool::SetToolManager(ToolManager *manager)
 {
   m_ToolManager = manager;

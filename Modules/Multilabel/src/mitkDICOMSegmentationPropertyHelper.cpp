@@ -209,10 +209,11 @@ mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* se
   // fine for in-session use. The writer decides what to emit at export
   // time.
 
-  // Algorithm Type is reported as missing when Undefined even though
-  // Complete defaults it to MANUAL. The intent: a caller looking at
-  // Validate's output sees the field they did not set, even though it
-  // would be quietly auto-filled later.
+  // Algorithm Type (0062,0008) is reported as missing when the label is still Undefined, i.e. no
+  // creation path declared an origin. This is intentional: Validate surfaces the undeclared field to
+  // the caller. Complete() backfills such a label to MANUAL (only when its synthesizeMissingIdentity
+  // option is enabled), and the DICOM SEG writer defaults a still-Undefined type to MANUAL at export
+  // regardless.
   const auto labels = seg->GetLabels();
   for (const auto& label : labels)
   {
@@ -225,11 +226,13 @@ mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* se
 
     // SegmentAlgorithmName (0062,0009) is DICOM Type 1C: required only when
     // SegmentAlgorithmType is AUTOMATIC or SEMIAUTOMATIC. dcmqi correctly
-    // omits the tag for MANUAL labels, so requiring a non-empty name
-    // unconditionally would block a legitimate round trip on Validate.
+    // omits the tag for MANUAL labels, so requiring a name unconditionally
+    // would block a legitimate round trip on Validate. We test for the property
+    // being present (HasAlgorithmName), not GetAlgorithmName().empty(): the latter
+    // never reports empty because it falls back to the "MITK Segmentation" prefix.
     if ((algoType == Label::AlgorithmType::AUTOMATIC
          || algoType == Label::AlgorithmType::SEMIAUTOMATIC)
-        && label->GetAlgorithmName().empty())
+        && !label->HasAlgorithmName())
       AddLabelMissing(missing, label->GetValue(), "Algorithm Name (0062,0009)");
 
     // Tracking ID/UID (0062,0020/0062,0021) are Type 3 in the SEG IOD's

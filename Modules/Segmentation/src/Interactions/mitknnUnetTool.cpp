@@ -87,6 +87,11 @@ const char *mitk::nnUNetTool::GetName() const
   return "nnUNet";
 }
 
+mitk::Label::AlgorithmType mitk::nnUNetTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::AUTOMATIC;
+}
+
 mitk::DataStorage *mitk::nnUNetTool::GetDataStorage()
 {
   return this->GetToolManager()->GetDataStorage();

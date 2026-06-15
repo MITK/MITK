@@ -58,6 +58,9 @@ namespace mitk
 
     const char *GetName() const override;
 
+    /** \brief Intensity region-growing from a seed determines the affected pixels, so SEMIAUTOMATIC. */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
   protected:
     RegionGrowingTool(); // purposely hidden
     ~RegionGrowingTool() override;

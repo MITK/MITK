@@ -135,14 +135,15 @@ void QmitkBooleanOperationsWidget::OnDifferenceButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateDifference(seg, minuend, subtrahends, progressCallback);
 
+  const std::string opsName = "Difference";
   std::stringstream name;
-  name << "Difference " << seg->GetLabel(minuend)->GetName() << " -";
+  name << opsName << " " << seg->GetLabel(minuend)->GetName() << " -";
   for (auto label : subtrahends)
   {
     name << " " << seg->GetLabel(label)->GetName();
   }
 
-  this->SaveResultLabelMask(resultMask, name.str());
+  this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
   mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
@@ -171,13 +172,14 @@ void QmitkBooleanOperationsWidget::OnIntersectionButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateIntersection(seg, selectedLabelValues, progressCallback);
 
+  const std::string opsName = "Intersection";
   std::stringstream name;
-  name << "Intersection";
+  name << opsName;
   for (auto label : selectedLabelValues)
   {
     name << " " << seg->GetLabel(label)->GetName();
   }
-  this->SaveResultLabelMask(resultMask, name.str());
+  this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
   mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
@@ -206,20 +208,22 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
   auto resultMask = mitk::BooleanOperation::GenerateUnion(seg, selectedLabelValues, progressCallback);
 
+  const std::string opsName = "Union";
   std::stringstream name;
-  name << "Union";
+  name << opsName;
   for (auto label : selectedLabelValues)
   {
     name << " " << seg->GetLabel(label)->GetName();
   }
 
-  this->SaveResultLabelMask(resultMask, name.str());
+  this->SaveResultLabelMask(resultMask, name.str(), "Boolean " + opsName);
 
   mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
 }
 
-void QmitkBooleanOperationsWidget::SaveResultLabelMask(const mitk::Image* resultMask, const std::string& labelName) const
+void QmitkBooleanOperationsWidget::SaveResultLabelMask(
+  const mitk::Image* resultMask, const std::string& labelName, const std::string& provenanceOpName) const
 {
   auto seg = m_Controls->labelInspector->GetMultiLabelSegmentation();
   if (seg == nullptr) mitkThrow() << "Widget is in invalid state. Processing was triggered with no segmentation selected.";
@@ -232,6 +236,9 @@ void QmitkBooleanOperationsWidget::SaveResultLabelMask(const mitk::Image* result
   mitk::SegGroupInsertUndoRedoHelper undoRedoGenerator(seg, { groupID });
 
   auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(seg, labelName, true);
+  // Stamp before AddLabelWithContent: the default addAsClone copies these properties into the stored
+  // label, and the stamp lands before RegisterUndoRedoOperationEvent so undo/redo capture it.
+  newLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, provenanceOpName);
   seg->AddLabelWithContent(newLabel, resultMask, groupID, 1);
 
   undoRedoGenerator.RegisterUndoRedoOperationEvent("Add boolean operation result as new group \"" + std::to_string(groupID) + "\".");

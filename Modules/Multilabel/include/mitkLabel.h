@@ -323,12 +323,49 @@ namespace mitk
      */
     std::string GetAlgorithmName() const;
 
-    /** \brief Helper function to add the usage of multiple tools correctly to the label.
-     Mixture of types always lead to semiautomatic. If the algorithm name is empty, the name
-     will directly set. If it is not empty and algoName is not already a sub string of the
-     current algorithm name, the new algoName will be appended (separated by "|").
+    /**
+     * \brief Returns whether an algorithm name property is set on the label.
+     *
+     * Distinguishes "property absent" from "property present" (GetAlgorithmName returns the
+     * "MITK Segmentation" fallback in the absent case, so it cannot make this distinction).
+     * Persistence readers and AddToolUse only set the property when there is a real name to record,
+     * so a false result means no algorithm name was ever recorded for this label.
+     */
+    bool HasAlgorithmName() const;
+
+    /** \brief Records that a tool/operation contributed to this label, updating algorithm type and name.
+     *
+     * Type: the first contribution to a still-Undefined label defines its type; any type already
+     * present (a genuine MANUAL loaded from a DICOM SEG, or a prior tool's type) is preserved, and a
+     * later tool of a different type mixes the result to SEMIAUTOMATIC.
+     * Name: for internally-created labels, algorithm_name starts with the "MITK Segmentation" prefix;
+     * the first dedicated tool is appended after ": " and further tools after "|"
+     * (e.g. "MITK Segmentation: nnUNet|Paint"). A name still equal to just the prefix means no
+     * dedicated tool has been recorded yet.
+     *
+     * \remark The encoding reserves the separators "|" and ": ". To keep the provenance string
+     *      parseable, those characters are sanitized to "#" inside algoName (a warning is logged when
+     *      this happens) rather than rejected; an empty algoName is ignored. Tool names should use
+     *      plain spaces (e.g. "Boolean Union", "Morphological Closing", "Interpolation").
+     * \remark Idempotent for repeated identical use (type stable, name de-duplicated), so it is safe
+     *      under the many small writes a single interaction (e.g. a paint drag) produces.
+     * \note Externally-loaded provenance names that do not carry the MITK prefix are kept as-is; a later
+     *      in-MITK tool simply appends to them and mixes the type as usual.
      */
     void AddToolUse(AlgorithmType algoType, const std::string& algoName);
+
+    /** \brief Absorbs another label's recorded provenance (algorithm type and tool names) into this one.
+     *
+     * Intended for content-merging operations (e.g. merging labels): the target should reflect that it
+     * now contains the source's algorithmically-derived content. The source's type is mixed into this
+     * label's type with the same rule as AddToolUse (a differing defined type yields SEMIAUTOMATIC), and
+     * each tool name recorded on the source is appended (de-duplicated) to this label's tool chain.
+     *
+     * \param[in] other The source label whose provenance is absorbed. Must not be null.
+     * \remark A source with type but no recorded tool name (e.g. a vendor MANUAL label) contributes only
+     *      its type. A source with an Undefined type contributes nothing.
+     */
+    void MergeToolUses(const Label* other);
 
     /**
          * \brief Sets an anatomic region code at the specified index.

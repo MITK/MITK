@@ -285,6 +285,12 @@ namespace mitk
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/
     static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true, bool allowUndo = true, const std::string& toolName = "");
 
+    /** \brief Returns the label value(s) whose pixels this tool's writeback actually modifies, so the
+     * provenance stamp at the writeback choke point lands on the right label. The default is the active
+     * label; tools that write a label other than the active one (e.g. erase/close operate on the
+     * clicked label) override this. An empty result records no tool use.*/
+    virtual MultiLabelSegmentation::LabelValueVectorType GetAffectedLabelValues() const;
+
     /** Convenience overloaded version that can be called with a slice info.
     * Writes a provided slice into the passed working image. The content of working image that is covered
     * by the slice will be completely overwritten. If asked for it also generates the needed

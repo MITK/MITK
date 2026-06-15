@@ -82,6 +82,11 @@ const char *mitk::RegionGrowingTool::GetName() const
   return "Region Growing";
 }
 
+mitk::Label::AlgorithmType mitk::RegionGrowingTool::GetAlgorithmType() const
+{
+  return mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
 void mitk::RegionGrowingTool::Activated()
 {
   Superclass::Activated();

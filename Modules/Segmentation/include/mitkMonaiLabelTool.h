@@ -106,6 +106,10 @@ namespace mitk
     void Deactivated() override;
     void UpdatePrepare() override;
 
+    /** \brief AUTOMATIC for auto-segmentation models (no per-image human input, like nnUNet),
+     * SEMIAUTOMATIC for interactive deepgrow/deepedit models or when no model is selected. */
+    mitk::Label::AlgorithmType GetAlgorithmType() const override;
+
     /**
      * \brief Fetches MonaiLabel server metadata via GET REST call.
      */

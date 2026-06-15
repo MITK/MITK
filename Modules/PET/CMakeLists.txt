@@ -1,6 +1,5 @@
 MITK_CREATE_MODULE(PET
   INCLUDE_DIRS
-    PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src
   DEPENDS
     PUBLIC MitkCore MitkDICOM
@@ -8,6 +7,6 @@ MITK_CREATE_MODULE(PET
     PRIVATE DCMTK|ofstd+dcmdata
 )
 
-add_subdirectory(test)
 add_subdirectory(cmdapps)
+add_subdirectory(test)
 

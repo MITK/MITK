@@ -13,11 +13,16 @@
 # and skipped quietly when it is empty. Argument-parsing cases run
 # unconditionally.
 
-# The CLI executable target is declared in Modules/PET/cmdapps/, which is
-# processed after this directory. We rely on the generator expression
-# $<TARGET_FILE:MitkPETSUVCalculation> resolving at build / test time
-# rather than at configure time, so we must NOT short-circuit on
-# TARGET MitkPETSUVCalculation here.
+# The CLI executable is optional: Modules/PET/cmdapps/ creates the
+# MitkPETSUVCalculation target only when BUILD_PETCmdApps or
+# MITK_BUILD_ALL_APPS is set. cmdapps is processed before this directory
+# (see Modules/PET/CMakeLists.txt), so when the app is built the target
+# already exists here. When it is not, skip registering the smoke tests
+# rather than emit a $<TARGET_FILE:MitkPETSUVCalculation> that has no
+# target to resolve and fails at generate time.
+if(NOT TARGET MitkPETSUVCalculation)
+  return()
+endif()
 
 set(_assert_script "${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssertExitCode.cmake")
 set(_cli_exe       "$<TARGET_FILE:MitkPETSUVCalculation>")

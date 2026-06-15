@@ -255,7 +255,7 @@ std::string mitk::Label::GetTrackingID() const
 bool mitk::Label::HasTrackingID() const
 {
   const auto* propertyMap = this->GetMap();
-  return propertyMap != nullptr && propertyMap->find("tracking_id") != propertyMap->end();
+  return propertyMap->find("tracking_id") != propertyMap->end();
 }
 
 void mitk::Label::SetTrackingID(const std::string& trackingID)
@@ -279,7 +279,7 @@ std::string mitk::Label::GetTrackingUID() const
 bool mitk::Label::HasTrackingUID() const
 {
   const auto* propertyMap = this->GetMap();
-  return propertyMap != nullptr && propertyMap->find("tracking_uid") != propertyMap->end();
+  return propertyMap->find("tracking_uid") != propertyMap->end();
 }
 
 void mitk::Label::SetTrackingUID(const std::string& trackingUID)
@@ -517,7 +517,7 @@ std::string mitk::Label::GetAlgorithmName() const
 bool mitk::Label::HasAlgorithmName() const
 {
   const auto* propertyMap = this->GetMap();
-  return propertyMap != nullptr && propertyMap->find("algorithm_name") != propertyMap->end();
+  return propertyMap->find("algorithm_name") != propertyMap->end();
 }
 
 void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName)

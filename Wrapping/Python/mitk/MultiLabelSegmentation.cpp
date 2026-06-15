@@ -446,6 +446,13 @@ Args:
       py::arg("algorithm_type"), py::arg("algorithm_name"),
       "Record that a tool/operation contributed to this label. An empty algorithm_name is ignored; the "
       "reserved separator characters '|' and ':' are sanitized to '#' (a warning is logged).")
+    .def_property_readonly("has_algorithm_name", &Label::HasAlgorithmName)
+    .def("merge_tool_uses",
+      [](Label& l, const Label* other) { l.MergeToolUses(other); },
+      py::arg("other"),
+      "Absorb another label's recorded provenance (algorithm type and tool names) into this one. The "
+      "source's type is mixed in (a differing defined type yields SEMIAUTOMATIC) and each recorded tool "
+      "name is appended (de-duplicated) to this label's tool chain.")
 
     // --- center of mass ---
     .def_property_readonly("center_of_mass_index",

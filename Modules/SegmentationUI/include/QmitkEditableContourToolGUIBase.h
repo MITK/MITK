@@ -28,7 +28,6 @@ namespace Ui
 }
 
 /**
- * \ingroup org_mitk_gui_qt_interactivesegmentation_internal
  * \brief Base GUI class for editable contour-based segmentation tools.
  *
  * Provides common UI controls for contour tools including confirm/clear buttons,

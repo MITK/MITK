@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief A QSpinBox that edits numeric MITK properties (int, float, double).
- * \ingroup Widgets
  *
  * Provides a spinbox editor that bidirectionally synchronizes with an
  * mitk::IntProperty, mitk::FloatProperty, or mitk::DoubleProperty. Supports

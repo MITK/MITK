@@ -21,7 +21,6 @@ namespace mitk
 {
 
 /**
-   \ingroup DICOMReader
    \brief Extends DICOMITKSeriesGDCMReader by sorting/grouping into 3D+t image blocks.
 
    This class reuses the DICOMITKSeriesGDCMReader class and adds the option of

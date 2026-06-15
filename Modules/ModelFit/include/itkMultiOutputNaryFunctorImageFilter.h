@@ -33,9 +33,6 @@ namespace itk
  * function.\n
  *
  * All the input images must be of the same type.
- *
- * \ingroup IntensityImageFilters MultiThreaded
- * \ingroup ITKImageIntensity
  */
 
 template< class TInputImage, class TOutputImage, class TFunction, class TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >

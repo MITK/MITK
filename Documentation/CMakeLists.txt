@@ -88,6 +88,41 @@ if(NOT DEFINED US_PLATFORM)
   endif()
 endif()
 
+# Doxygen 1.10 renamed the legacy "modules" navigation concept to "topics"
+# and repurposed type="modules" for C++20 modules. Pick the right tab type
+# based on the detected Doxygen version so the API Reference dropdown only
+# contains entries that link to existing pages.
+if(DOXYGEN_VERSION VERSION_LESS 1.9.8)
+  set(MITK_DOXYGEN_GROUPS_TAB
+    [[<tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>]])
+else()
+  set(MITK_DOXYGEN_GROUPS_TAB
+    [[<tab type="topics" visible="yes" title="Groups" intro="Here is a list of all groups:"/>]])
+endif()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/MITKDoxygenLayout.xml.in
+               ${CMAKE_CURRENT_BINARY_DIR}/MITKDoxygenLayout.xml
+               @ONLY)
+
+# Doxygen renamed the "all groups" index page from modules.html to
+# topics.html starting with 1.9.8. Substitute the right name into the
+# generated Overview.dox so the inline link in the main page works on
+# every supported Doxygen version.
+if(DOXYGEN_VERSION VERSION_LESS 1.9.8)
+  set(MITK_DOXYGEN_GROUPS_PAGE "modules.html")
+else()
+  set(MITK_DOXYGEN_GROUPS_PAGE "topics.html")
+endif()
+
+# NOTE: Output path is OUTSIDE Documentation/Doxygen/ because that
+# subtree is in the Doxyfile EXCLUDE list (it is the OUTPUT_DIRECTORY
+# where Doxygen writes its own HTML). Placing the configured file
+# directly under Documentation/ keeps it in Doxygen's INPUT scope
+# while staying out of the exclude path.
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxygen/1-Overview/Overview.dox.in
+               ${MITK_BINARY_DIR}/Documentation/Overview.dox
+               @ONLY)
+
 configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 

@@ -24,8 +24,6 @@ namespace mitk
    * image rendering. The level defines the center of the window, and the
    * window defines its width.
    *
-   * \ingroup DataManagement
-   *
    * \note If you want to apply the mitk::LevelWindowProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which supports
    * level window (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR). Check the documentation of

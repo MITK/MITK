@@ -29,8 +29,6 @@ namespace mitk
    * Combines a text label string with a 3D point position, allowing annotations
    * to be placed at specific locations in world coordinates.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    */
   class MITKCORE_EXPORT AnnotationProperty : public BaseProperty

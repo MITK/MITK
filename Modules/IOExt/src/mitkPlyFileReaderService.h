@@ -24,8 +24,6 @@ namespace mitk
    * \brief Reader service for loading surfaces from PLY format files.
    *
    * This reader can read binary and ASCII versions of the format transparently.
-   *
-   * \ingroup IOExt
    */
   class PlyFileReaderService : public AbstractFileReader
   {

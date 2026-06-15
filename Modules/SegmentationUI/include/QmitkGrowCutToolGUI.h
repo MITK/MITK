@@ -24,7 +24,6 @@ namespace Ui
 }
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for the GrowCut segmentation tool.
 
   Provides controls for the GrowCut algorithm including a preview button, advanced settings

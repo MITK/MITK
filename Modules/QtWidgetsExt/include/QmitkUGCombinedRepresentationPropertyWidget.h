@@ -29,7 +29,6 @@ class _UGCombinedBoolPropEditor;
 
 /**
  * \brief Combined combo box editor for unstructured grid representation and volume mapper properties.
- * \ingroup Widgets
  *
  * Merges grid representation options (wireframe, surface, etc.) and volume
  * rendering mapper options into a single combo box. Volume mapper entries

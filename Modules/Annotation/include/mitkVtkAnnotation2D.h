@@ -29,7 +29,6 @@ namespace mitk
    * Subclasses must implement UpdateVtkAnnotation2D() and GetVtkActor2D().
    *
    * \sa VtkAnnotation, VtkAnnotation3D, TextAnnotation2D
-   * \ingroup Annotation
    */
   class MITKANNOTATION_EXPORT VtkAnnotation2D : public VtkAnnotation
   {

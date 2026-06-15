@@ -29,8 +29,6 @@ namespace mitk
    * \note This property does not support JSON serialization. ToJSON() and
    * FromJSON() return \c false.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    * \sa SmartPointerProperty
    */

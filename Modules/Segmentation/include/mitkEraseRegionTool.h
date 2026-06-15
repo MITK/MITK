@@ -28,8 +28,6 @@ namespace mitk
 
     \sa FillRegionBaseTool
 
-    \ingroup Interactions
-
     Finds the outer contour of a shape in 2D (possibly including single patches) and sets all
     the pixels inside to the background pixel value (erasing a segmentation).
     Clicking on an unlabeled (background) pixel has no effect.

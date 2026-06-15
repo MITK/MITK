@@ -36,7 +36,6 @@ namespace mitk
    *
    * This class provides different shapes for the point set rendering (unselected points).
    *
-   * \ingroup DataManagement
    * \sa EnumerationProperty
    * \sa PointSetDataInteractor
    */

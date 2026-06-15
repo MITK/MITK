@@ -55,8 +55,6 @@ namespace mitk
    * MITK.Relations.<InstanceID>.[relationUID|destinationUID|ruleID|<data-layer-specific>]
    * \endcode
    *
-   * \ingroup DataManagement
-   *
    * \sa GenericIDRelationRule
    * \sa SourceImageRelationRule
    * \sa IPropertyOwner

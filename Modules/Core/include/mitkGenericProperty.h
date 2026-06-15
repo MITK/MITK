@@ -38,8 +38,6 @@ namespace mitk
    *
    * \tparam T The value type stored by this property.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    * \sa mitkDeclareGenericProperty
    * \sa mitkDefineGenericProperty

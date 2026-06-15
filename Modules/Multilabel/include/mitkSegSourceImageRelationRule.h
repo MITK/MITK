@@ -89,7 +89,7 @@ namespace mitk
      * \brief Enumerates the seg-source relations established on seg.
      *
      * Hides the per-relation storage layout from the writer (which would
-     * otherwise have to know the rule's MITK.Relations.<instanceID>.*
+     * otherwise have to know the rule's MITK.Relations.\<instanceID\>.*
      * conventions to assemble the writer-side SourceImageRelation entries).
      *
      * \pre seg must be a valid pointer.

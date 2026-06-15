@@ -109,7 +109,6 @@ namespace itk
     * \sa HistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template<typename TImageType, typename THistogramFrequencyContainer =

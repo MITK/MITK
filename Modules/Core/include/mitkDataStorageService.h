@@ -46,8 +46,6 @@ namespace mitk
  *   m_ServiceReg = moduleContext->RegisterService<mitk::IDataStorageService>(m_DataStorageService.get());
  * }
  * \endcode
- *
- * \ingroup DataManagement
  */
 class MITKCORE_EXPORT DataStorageService : public IDataStorageService
 {

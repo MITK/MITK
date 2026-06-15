@@ -35,8 +35,6 @@ namespace berry {
 class QtStyleManager;
 
 /**
- * \ingroup org_blueberry_ui_internal
- *
  * This class represents the TOP of the workbench UI world
  * A plugin class is effectively an application wrapper
  * for a plugin & its classes. This class should be thought

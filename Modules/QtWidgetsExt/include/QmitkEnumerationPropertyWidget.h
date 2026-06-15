@@ -27,7 +27,6 @@ class _EnumPropEditorImpl;
 
 /**
  * \brief A QComboBox that edits a mitk::EnumerationProperty.
- * \ingroup Widgets
  *
  * Populates the combo box with the enumeration strings from the property
  * and bidirectionally synchronizes selection changes. When the property

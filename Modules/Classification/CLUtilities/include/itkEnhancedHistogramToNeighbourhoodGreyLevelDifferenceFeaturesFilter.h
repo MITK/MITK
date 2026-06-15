@@ -71,7 +71,6 @@ namespace itk {
     * \sa EnhancedHistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >

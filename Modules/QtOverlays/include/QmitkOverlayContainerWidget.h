@@ -28,7 +28,6 @@ found in the LICENSE file.
  *
  * \sa QmitkOverlayController
  * \sa QmitkOverlay
- * \ingroup Qmitk
  */
 
 class MITKQTOVERLAYS_EXPORT QmitkOverlayContainerWidget : public QWidget

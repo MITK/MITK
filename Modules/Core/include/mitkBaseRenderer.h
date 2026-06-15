@@ -62,7 +62,6 @@ namespace mitk
    * \sa RenderingManager
    * \sa SliceNavigationController
    * \sa Mapper
-   * \ingroup Rendering
    */
   class MITKCORE_EXPORT BaseRenderer : public itk::Object
   {

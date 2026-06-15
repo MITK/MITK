@@ -20,8 +20,6 @@ namespace mitk
 {
   /**
    * \brief Helper functions related to BaseRenderer geometry alignment.
-   *
-   * \ingroup Rendering
    */
   namespace BaseRendererHelper
   {

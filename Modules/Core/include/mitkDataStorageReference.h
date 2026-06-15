@@ -27,8 +27,6 @@ namespace mitk
    *
    * The IsDefault property is set at construction time and cannot be changed,
    * since default status is a property of how the storage was created.
-   *
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT DataStorageReference
   {

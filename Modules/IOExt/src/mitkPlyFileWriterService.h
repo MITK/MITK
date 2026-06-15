@@ -22,8 +22,6 @@ namespace mitk
    *
    * Currently, this writer uses the binary format as default. Should the ASCII
    * format be required, it is suggested to incorporate Options.
-   *
-   * \ingroup IOExt
    */
   class PlyFileWriterService : public AbstractFileWriter
   {

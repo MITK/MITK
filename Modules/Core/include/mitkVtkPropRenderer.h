@@ -46,9 +46,6 @@ namespace mitk
    * which is responsible for rendering the data tree nodes.
    *
    * VtkPropRenderer replaces the old OpenGLRenderer.
-   *
-   * \sa rendering
-   * \ingroup rendering
    */
   class MITKCORE_EXPORT VtkPropRenderer : public BaseRenderer
   {

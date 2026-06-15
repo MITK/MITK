@@ -17,7 +17,7 @@ https://www.mitk.org/download/tutorial-data/lungs.vtk (surface)
 
  The code for this example equals the code of Step 1 except for part II and part III which are changed as follows:
  \skipline Part II
- \until mitk::IOUtil::Load(argv[i],*storage);
+ \until mitk::IOUtil::Load(argv[i], *storage);
  \line }
 
 

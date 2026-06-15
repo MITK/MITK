@@ -109,7 +109,6 @@ namespace itk
     * \sa HistogramToSizeZoneFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template<typename TImageType, typename THistogramFrequencyContainer =

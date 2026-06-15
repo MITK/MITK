@@ -28,9 +28,6 @@ namespace berry {
  * A page layout defines the initial layout for a perspective within a page
  * in a workbench window.
  * <p>
- * This interface is not intended to be implemented by clients.
- * </p>
- * <p>
  * When a perspective is opened, it creates a new page layout with a single editor area.
  * This layout is then passed to the perspective factory (implementation of
  * {@link IPerspectiveFactory#CreateInitialLayout}) where
@@ -48,9 +45,9 @@ namespace berry {
  * </p>
  * <p>
  * Wildcards are permitted in placeholder ids (but not regular view ids).
- * '*' matches any substring, '?' matches any single character.
+ * '\*' matches any substring, '?' matches any single character.
  * Wildcards can be specified for the primary id, the secondary id, or both.
- * For example, the placeholder "someView:*" will match any occurrence of the view
+ * For example, the placeholder "someView:\*" will match any occurrence of the view
  * that has primary id "someView" and that also has some non-null secondary id.
  * Note that this placeholder will not match the view if it has no secondary id,
  * since the compound id in this case is simply "someView".

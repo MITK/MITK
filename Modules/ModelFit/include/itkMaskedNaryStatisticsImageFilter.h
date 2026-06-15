@@ -23,9 +23,6 @@ namespace itk
  * \brief Computes a masked statistic on N images and produces vectors of those statistic results.
  *
  * All the input images must be of the same type.
- *
- * \ingroup IntensityImageFilters
- * \ingroup ITKImageIntensity
  */
 
 template< class TInputImage, class TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >

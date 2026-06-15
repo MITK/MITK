@@ -29,9 +29,6 @@ namespace itk
   * \class AdaptiveThresholdIterator
   * \brief Iterates over an image using a variable image function,
   *  which threshold can be varied during the iteration process.
-  *
-  * \ingroup ImageIterators
-  *
   */
   template <class TImage, class TFunction>
   class ITK_EXPORT AdaptiveThresholdIterator : public ConditionalConstIterator<TImage>

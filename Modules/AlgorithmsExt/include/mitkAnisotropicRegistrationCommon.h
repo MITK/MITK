@@ -27,7 +27,6 @@ namespace mitk
   class PointSet;
 
   /**
-   * \ingroup AnisotropicRegistration
    * \brief A Class that provides common static functions used by all classes
    *  and tests in the anisotropic iterative closest point algorithm
    *  (AnisotropicIterativeClosestPointRegistration).

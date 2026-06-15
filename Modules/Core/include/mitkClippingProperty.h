@@ -34,8 +34,6 @@ namespace mitk
    * enabled. The default constructor creates a disabled clipping property
    * with origin and normal at (0, 0, 0).
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    */
   class MITKCORE_EXPORT ClippingProperty : public BaseProperty

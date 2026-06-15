@@ -50,7 +50,6 @@ found in the LICENSE file.
  * \sa QmitkTextOverlay
  * \sa QmitkScalarBarOverlay
  * \sa QmitkCustomWidgetOverlay
- * \ingroup Qmitk
  */
 class MITKQTOVERLAYS_EXPORT QmitkOverlay : public QObject
 {

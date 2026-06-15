@@ -40,7 +40,6 @@ namespace Ui
  * selected series. DICOM files are indexed into a temporary SQLite database.
  *
  * \sa QmitkDicomLocalStorageWidget
- * \ingroup MitkDICOMUIModule
  */
 class MITKDICOMUI_EXPORT QmitkDicomImportWidget : public QWidget
 {

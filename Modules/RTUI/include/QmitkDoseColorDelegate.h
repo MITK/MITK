@@ -29,7 +29,6 @@ found in the LICENSE file.
  * \sa QmitkIsoDoseLevelSetModel
  * \sa QmitkDoseValueDelegate
  * \sa QmitkDoseVisualStyleDelegate
- * \ingroup MitkRTUIModule
  */
 class MITKRTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
 {

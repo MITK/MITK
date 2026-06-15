@@ -41,7 +41,6 @@ namespace mitk
    * unsigned char images) to produce a correct binary image
    * representation of the surface in MakeOutputBinary mode.
    *
-   * \ingroup SurfaceFilters
    * \ingroup Process
    */
   class MITKSEGMENTATION_EXPORT SurfaceStampImageFilter : public ImageToImageFilter

@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define mitkDataNode_h
 
 #include <mitkBaseData.h>
-//#include "mitkMapper.h"
 #include <mitkDataInteractor.h>
 #include <mitkIdentifiable.h>
 #include <mitkIPropertyOwner.h>
@@ -25,7 +24,6 @@ found in the LICENSE file.
 #include <mitkColorProperty.h>
 #include <mitkPropertyList.h>
 #include <mitkStringProperty.h>
-//#include "mitkMapper.h"
 
 #include <mitkGeometry3D.h>
 #include <mitkLevelWindow.h>
@@ -60,8 +58,6 @@ namespace mitk
    *
    * DataNodes are managed by a DataStorage, which organizes them in a directed acyclic graph
    * with parent-child ("was created by") relationships.
-   *
-   * \ingroup DataManagement
    *
    * \sa DataStorage, BaseData, Mapper, PropertyList, BaseRenderer
    *

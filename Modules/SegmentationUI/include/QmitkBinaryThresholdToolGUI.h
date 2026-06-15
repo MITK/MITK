@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool providing a single-threshold slider.
 
   This GUI shows a slider to change the tool's threshold and an OK button to accept

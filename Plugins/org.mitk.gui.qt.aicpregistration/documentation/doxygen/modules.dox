@@ -1,5 +1,5 @@
 /**
-  \defgroup org_mitk_gui_qt_aicperegistration org.mitk.gui.qt.surfaceregistration
+  \defgroup org_mitk_gui_qt_aicpregistration org.mitk.gui.qt.surfaceregistration
   \ingroup MITKPlugins
 
   \brief Describe your plugin here.

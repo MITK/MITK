@@ -29,8 +29,6 @@ namespace itk
    * ImageToPathFilter is the base class for all process objects that output
    * path data and require image data as input. Specifically, this class
    * defines the SetInput() method for defining the input to a filter.
-   *
-   * \ingroup ImageFilters
    */
   template <class TInputImage, class TOutputPath>
   class ITK_EXPORT ImageToPathFilter : public PathSource<TOutputPath>

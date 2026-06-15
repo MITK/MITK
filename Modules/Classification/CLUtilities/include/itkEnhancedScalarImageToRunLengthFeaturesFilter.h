@@ -100,7 +100,6 @@ namespace itk
     * \sa HistogramToRunLengthFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename TImageType,

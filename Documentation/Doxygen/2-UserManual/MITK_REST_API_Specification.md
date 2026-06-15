@@ -7,28 +7,28 @@
 
 ## Table of Contents
 
-1. [Overview](#1-overview)
-2. [Design Principles](#2-design-principles)
-3. [Base URL and Versioning](#3-base-url-and-versioning)
-4. [Authentication](#4-authentication)
-5. [Common Patterns](#5-common-patterns)
-6. [Node Identification Strategy](#6-node-identification-strategy)
-7. [Data Transfer Modes](#7-data-transfer-modes)
-8. [API Endpoints](#8-api-endpoints)
-   - [Discovery and Health](#81-discovery-and-health)
-   - [Data Storage](#82-data-storage---nodes)
-     - [Nodes](#821-data-storage---nodes)
-     - [Node Data Payload](#822-node-data-payload)
-     - [Node Children](#823-node-children)
-     - [Node Properties](#824-node-properties)
-   - [Rendering](#83-rendering)
-9. [Error Handling](#9-error-handling)
-10. [Examples](#10-examples)
-11. [Future Extensions](#11-future-extensions)
+1. [Overview](#sec-1-overview)
+2. [Design Principles](#sec-2-design-principles)
+3. [Base URL and Versioning](#sec-3-base-url-and-versioning)
+4. [Authentication](#sec-4-authentication)
+5. [Common Patterns](#sec-5-common-patterns)
+6. [Node Identification Strategy](#sec-6-node-identification-strategy)
+7. [Data Transfer Modes](#sec-7-data-transfer-modes)
+8. [API Endpoints](#sec-8-api-endpoints)
+   - [Discovery and Health](#sec-81-discovery-and-health)
+   - [Data Storage](#sec-82-data-storage---nodes)
+     - [Nodes](#sec-821-data-storage---nodes)
+     - [Node Data Payload](#sec-822-node-data-payload)
+     - [Node Children](#sec-823-node-children)
+     - [Node Properties](#sec-824-node-properties)
+   - [Rendering](#sec-83-rendering)
+9. [Error Handling](#sec-9-error-handling)
+10. [Examples](#sec-10-examples)
+11. [Future Extensions](#sec-11-future-extensions)
 
 ---
 
-## 1. Overview {#1-overview}
+## 1. Overview {#sec-1-overview}
 
 This document specifies the REST API for MITK Workbench external process integration. The API enables:
 
@@ -55,7 +55,7 @@ This specification covers the **Data Storage API** (nodes, data, properties) and
 
 ---
 
-## 2. Design Principles {#2-design-principles}
+## 2. Design Principles {#sec-2-design-principles}
 
 ### 2.1 RESTful Conventions
 
@@ -87,7 +87,7 @@ Based on Architecture Document Appendix B:
 
 ---
 
-## 3. Base URL and Versioning {#3-base-url-and-versioning}
+## 3. Base URL and Versioning {#sec-3-base-url-and-versioning}
 
 ### Base URL Structure
 
@@ -114,7 +114,7 @@ Returns API metadata including supported versions and deprecation notices.
 
 ---
 
-## 4. Authentication {#4-authentication}
+## 4. Authentication {#sec-4-authentication}
 
 ### Phase 1: API Token Authentication
 
@@ -142,7 +142,7 @@ security:
 
 ---
 
-## 5. Common Patterns {#5-common-patterns}
+## 5. Common Patterns {#sec-5-common-patterns}
 
 ### 5.1 Request Headers
 
@@ -258,7 +258,7 @@ The API follows standard REST conventions with the following deliberate deviatio
 
 ---
 
-## 6. Node Identification Strategy {#6-node-identification-strategy}
+## 6. Node Identification Strategy {#sec-6-node-identification-strategy}
 
 ### 6.1 Dual Identification Approach
 
@@ -385,7 +385,7 @@ Node responses contain **system information only**. The `name` property is inclu
 
 ---
 
-## 7. Data Transfer Modes {#7-data-transfer-modes}
+## 7. Data Transfer Modes {#sec-7-data-transfer-modes}
 
 Large data (images, meshes, segmentations) can be transferred via three modes, supporting different performance requirements.
 
@@ -433,7 +433,7 @@ Response body contains the raw binary data.
 
 **Use case:** Small to medium data, remote clients, simplicity.
 
-### 7.3 Mode: File Reference {#73-mode-file-reference}
+### 7.3 Mode: File Reference {#sec-73-mode-file-reference}
 
 Server writes data to file, returns path and metadata.
 
@@ -539,9 +539,9 @@ The server accepts any file format supported by MITK I/O. Format detection is ba
 
 ---
 
-## 8. API Endpoints {#8-api-endpoints}
+## 8. API Endpoints {#sec-8-api-endpoints}
 
-### 8.1 Discovery and Health {#81-discovery-and-health}
+### 8.1 Discovery and Health {#sec-81-discovery-and-health}
 
 #### GET /api/v1/info
 
@@ -631,8 +631,8 @@ Returns the current file access configuration. Clients can use this to discover 
 
 ---
 
-### 8.2 Data Storage {#82-data-storage---nodes}
-#### 8.2.1 Nodes {#821-data-storage---nodes}
+### 8.2 Data Storage {#sec-82-data-storage---nodes}
+#### 8.2.1 Nodes {#sec-821-data-storage---nodes}
 
 ##### GET /api/v1/datastorage/nodes
 
@@ -937,7 +937,7 @@ DELETE /api/v1/datastorage/nodes/node-001?recursive=true
 
 ---
 
-#### 8.2.2 Node Data Payload {#822-node-data-payload}
+#### 8.2.2 Node Data Payload {#sec-822-node-data-payload}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/data
 
@@ -974,7 +974,7 @@ Accept: application/json
 X-MITK-Transfer-Mode: file-reference
 ```
 
-**Response:** See [Section 7.3](#73-mode-file-reference)
+**Response:** See [Section 7.3](#sec-73-mode-file-reference)
 
 ---
 
@@ -1054,7 +1054,7 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
 
 ---
 
-#### 8.2.3 Node Children {#823-node-children}
+#### 8.2.3 Node Children {#sec-823-node-children}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/children
 
@@ -1154,7 +1154,7 @@ Content-Type: application/json
 
 ---
 
-#### 8.2.4 Node Properties {#824-node-properties}
+#### 8.2.4 Node Properties {#sec-824-node-properties}
 
 ##### GET /api/v1/datastorage/nodes/{uid}/properties
 
@@ -1555,7 +1555,7 @@ Remove a property from a node.
 
 ---
 
-### 8.3 Rendering {#83-rendering}
+### 8.3 Rendering {#sec-83-rendering}
 
 Rendering endpoints control how MITK Workbench render windows refresh and orient themselves. They are deliberately separate from data and property endpoints: callers can batch multiple mutations (upload data, set properties) and then trigger a single render update, avoiding per-change flicker.
 
@@ -2561,7 +2561,7 @@ Per-cell summary plus capability flags.
 
 ---
 
-## 9. Error Handling {#9-error-handling}
+## 9. Error Handling {#sec-9-error-handling}
 
 ### 9.1 Error Response Format
 
@@ -2639,7 +2639,7 @@ For validation failures, include field-level details:
 
 ---
 
-## 10. Examples {#10-examples}
+## 10. Examples {#sec-10-examples}
 
 ### 10.1 Load Image and Set Properties
 
@@ -2811,7 +2811,7 @@ requests.post(f"{BASE_URL}/rendering/reinit", headers=HEADERS, json={"uids": [ui
 
 ---
 
-## 11. Future Extensions {#11-future-extensions}
+## 11. Future Extensions {#sec-11-future-extensions}
 
 ### 11.1 Planned for Future Versions
 

@@ -24,7 +24,6 @@ class QPushButton;
 class QBoxLayout;
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI base class for tools derived from mitk::SegWithPreviewTool.
 
   Provides the common UI elements shared by all preview-based segmentation tools,

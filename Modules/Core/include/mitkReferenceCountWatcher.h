@@ -25,8 +25,6 @@ namespace mitk
    * This utility class registers itself as an ITK observer for the DeleteEvent
    * of the watched object. After the object is destroyed, GetReferenceCount()
    * returns 0 instead of accessing invalid memory.
-   *
-   * \ingroup Testing
    */
   class ReferenceCountWatcher : public itk::Object
   {

@@ -42,7 +42,6 @@ namespace mitk
    Caution: time support currently not available. Filter will always work on the first
    timestep in its current implementation.
 
-   \ingroup ContourModelFilters
    \ingroup Process
   */
   class MITKSEGMENTATION_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource

@@ -38,7 +38,6 @@ found in the LICENSE file.
 /// \author Michael Mueller
 /// \version 4.0
 /// \date 2009-02-09
-/// \ingroup Widgets
 /// \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage.
 ///
 ///

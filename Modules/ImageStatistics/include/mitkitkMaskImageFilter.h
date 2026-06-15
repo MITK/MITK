@@ -27,7 +27,6 @@ namespace Functor
 /**
  * \class MaskInput2
  * \brief
- * \ingroup ITKImageIntensity
  */
 template< typename TInput, typename TMask, typename TOutput = TInput >
 class MaskInput2
@@ -129,9 +128,6 @@ private:
  *
  *
  * \sa MaskNegatedImageFilter
- * \ingroup IntensityImageFilters
- * \ingroup MultiThreaded
- * \ingroup ITKImageIntensity
  */
 template< typename TInputImage, typename TMaskImage, typename TOutputImage = TInputImage >
 class MITKIMAGESTATISTICS_EXPORT MaskImageFilter2:

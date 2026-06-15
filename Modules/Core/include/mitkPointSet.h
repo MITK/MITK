@@ -65,7 +65,6 @@ namespace mitk
    *     PointSetAddEvent <i>issued when a point is added to the PointSet</i>
    *     PointSetRemoveEvent <i>issued when a point is removed from the PointSet</i>
    * </tt>
-   * \ingroup PSIO
    * \ingroup Data
    */
   class MITKCORE_EXPORT PointSet : public BaseData

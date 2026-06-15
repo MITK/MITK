@@ -4,7 +4,13 @@
     <tab type="mainpage" visible="yes" title="Home"/>
     <tab type="pages" visible="yes" title="Manual" intro=""/>
     <tab type="usergroup" title="API Reference">
-      <tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
+      <!-- Doxygen 1.10 renamed the legacy "Modules" concept (the \defgroup -->
+      <!-- tab) to "Topics" and repurposed type="modules" for C++20 modules. -->
+      <!-- The next line is substituted at configure time with a single      -->
+      <!-- <tab type="topics"> (Doxygen >= 1.9.8) or <tab type="modules">    -->
+      <!-- (Doxygen <= 1.9.1) entry; see Documentation/CMakeLists.txt for    -->
+      <!-- the substitution logic.                                           -->
+      @MITK_DOXYGEN_GROUPS_TAB@
       <tab type="namespaces" visible="yes" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="yes" title="" intro=""/>

@@ -35,7 +35,6 @@ namespace Ui
  * Files can be imported into the local database via the OnImport() slot.
  *
  * \sa QmitkDicomImportWidget
- * \ingroup MitkDICOMUIModule
  */
 class MITKDICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
 {

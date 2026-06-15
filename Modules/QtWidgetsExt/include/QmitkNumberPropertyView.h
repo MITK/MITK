@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief Read-only QLabel that displays a numeric MITK property value.
- * \ingroup Widgets
  *
  * Observes an mitk::IntProperty, mitk::FloatProperty, or mitk::DoubleProperty
  * and displays its current value as text. Supports configurable decimal places,

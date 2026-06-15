@@ -32,7 +32,6 @@ class QmitkToolGUI;
 
   \sa mitk::ToolManager
 
-  \ingroup org_mitk_gui_qt_interactivesegmentation
   \ingroup ToolManagerEtAl
 
   This widget graphically displays the active tool of a mitk::ToolManager as a set

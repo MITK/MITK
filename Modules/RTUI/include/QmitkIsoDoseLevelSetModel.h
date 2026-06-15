@@ -37,7 +37,6 @@ found in the LICENSE file.
  * \sa QmitkDoseValueDelegate
  * \sa QmitkDoseVisualStyleDelegate
  * \sa mitk::IsoDoseLevelSet
- * \ingroup MitkRTUIModule
  */
 class MITKRTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
 {

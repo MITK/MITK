@@ -14,8 +14,6 @@ found in the LICENSE file.
  * \file mitkModelTestFixture.h
  * \brief Provides a reusable test fixture base class for validating MITK pharmacokinetic / model fit models
  *        against JSON-based reference data.
- *
- * \ingroup ModelFit
  */
 
 #ifndef mitkModelTestFixture_h

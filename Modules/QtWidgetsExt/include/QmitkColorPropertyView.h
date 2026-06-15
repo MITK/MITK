@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief Read-only QLabel that displays a mitk::ColorProperty as a colored swatch.
- * \ingroup Widgets
  *
  * Observes a mitk::ColorProperty and updates its background color whenever
  * the property changes. The widget auto-fills its background to show the color.

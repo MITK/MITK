@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief Read-only QLabel that displays a mitk::StringProperty value as text.
- * \ingroup Widgets
  *
  * Observes a mitk::StringProperty and updates the label text whenever the
  * property value changes. If the property is removed, "n/a" is displayed.

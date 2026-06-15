@@ -49,7 +49,7 @@ namespace mitk
         \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the
         slice
 
-        \a Parameter The slice`s geometry
+        \a Parameter The slice's geometry
       */
       itkSetMacro(SliceGeometry, BaseGeometry *);
 

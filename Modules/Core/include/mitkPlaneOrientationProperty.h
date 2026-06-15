@@ -30,7 +30,6 @@ namespace mitk
    * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing in positive normal direction)
    * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing in negative normal direction)
    *
-   * \ingroup DataManagement
    * \sa PlaneGeometryDataMapper2D::DrawOrientationArrow()
    * \sa EnumerationProperty
    */

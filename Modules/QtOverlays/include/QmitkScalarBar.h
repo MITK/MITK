@@ -28,7 +28,6 @@ found in the LICENSE file.
  * the given scale factor (mm-per-pixel). The bar is drawn using a configurable QPen.
  *
  * \sa QmitkScalarBarOverlay
- * \ingroup Qmitk
  */
 class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
 {

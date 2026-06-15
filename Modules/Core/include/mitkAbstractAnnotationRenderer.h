@@ -31,7 +31,6 @@ namespace mitk
    * objects by means of position and size within a specific BaseRenderer. It tracks
    * Annotation micro services and manages their lifecycle.
    *
-   * \ingroup Annotation
    * \sa Annotation
    * \sa BaseRenderer
    */

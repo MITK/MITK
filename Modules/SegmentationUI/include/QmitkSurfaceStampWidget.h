@@ -31,7 +31,6 @@ namespace mitk
   \brief GUI for surface-based interpolation.
 
   \ingroup ToolManagerEtAl
-  \ingroup Widgets
 */
 
 class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceStampWidget : public QWidget

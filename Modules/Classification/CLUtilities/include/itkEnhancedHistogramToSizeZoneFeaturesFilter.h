@@ -71,7 +71,6 @@ namespace itk {
     * \sa EnhancedHistogramToSizeZoneFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >

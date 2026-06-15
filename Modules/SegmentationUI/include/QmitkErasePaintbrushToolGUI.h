@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for the erasing mode of mitk::PaintbrushTool.
 
   Specialization of QmitkPaintbrushToolGUI that provides the user interface for

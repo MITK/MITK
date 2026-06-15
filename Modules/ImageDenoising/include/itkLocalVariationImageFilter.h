@@ -67,8 +67,6 @@ namespace itk
    * \sa Neighborhood
    * \sa NeighborhoodOperator
    * \sa NeighborhoodIterator
-   *
-   * \ingroup IntensityImageFilters
    */
   template <class TInputImage, class TOutputImage>
   class LocalVariationImageFilter : public ImageToImageFilter<TInputImage, TOutputImage>

@@ -20,7 +20,6 @@ class _BoolPropertyWidgetImpl;
 
 /**
  * \brief A QCheckBox that edits a mitk::BoolProperty.
- * \ingroup Widgets
  *
  * Bidirectionally synchronizes a checkbox with a mitk::BoolProperty. When
  * the property changes externally, the checkbox updates. When the user

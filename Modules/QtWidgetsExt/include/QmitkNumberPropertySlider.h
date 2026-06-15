@@ -27,7 +27,6 @@ namespace mitk
 
 /**
  * \brief A QSlider that edits numeric MITK properties (int, float, double).
- * \ingroup Widgets
  *
  * Provides a slider editor that bidirectionally synchronizes with an
  * mitk::IntProperty, mitk::FloatProperty, or mitk::DoubleProperty. Supports

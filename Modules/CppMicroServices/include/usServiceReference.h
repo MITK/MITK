@@ -139,9 +139,9 @@ public:
   /** \brief The service interface type (void for untyped references). */
   typedef void ServiceType;
 };
-/// \endcond
 
 /**
+ * \endcond
  * \ingroup MicroServices
  *
  * A service reference of unknown type, which is not bound to any

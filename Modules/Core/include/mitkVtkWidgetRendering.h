@@ -34,8 +34,6 @@ namespace mitk
    * \note This class only provides a basic mechanism for adding a widget; all widget
    * configuration such as placement, size, and en-/disabling of interaction
    * mechanisms need to be done in the vtkWidget object.
-   *
-   * \ingroup Rendering
    */
   class MITKCORE_EXPORT VtkWidgetRendering : public BaseData
   {

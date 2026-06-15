@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-\ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::LassoTool.
 \sa mitk::LassoTool
 \sa QmitkEditableContourToolGUIBase

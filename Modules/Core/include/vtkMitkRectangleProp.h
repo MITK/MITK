@@ -26,8 +26,6 @@ class vtkViewport;
  *
  * This class draws a rectangular frame (border) into the render window overlay.
  * The rectangle automatically adjusts its size to match the viewport dimensions.
- *
- * \ingroup Rendering
  */
 class MITKCORE_EXPORT vtkMitkRectangleProp : public vtkActor2D
 {

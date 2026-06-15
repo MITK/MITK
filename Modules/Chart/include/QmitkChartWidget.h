@@ -46,7 +46,6 @@ class QmitkChartxyData;
  * \sa https://plot.ly/javascript/ for the underlying JavaScript charting library.
  * \sa QmitkChartData
  * \sa QmitkChartxyData
- * \ingroup Modules/Chart
  */
 class MITKCHART_EXPORT QmitkChartWidget : public QWidget
 {

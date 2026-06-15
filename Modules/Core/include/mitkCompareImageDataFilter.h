@@ -64,7 +64,6 @@ namespace mitk
    * SetInput(1, image2). For multi-component images the
    * MultiComponentImageDataComparisonFilter is used instead.
    *
-   * \ingroup Algorithms
    * \sa CompareFilterResults ImageToImageFilter
    */
   class MITKCORE_EXPORT CompareImageDataFilter : public ImageToImageFilter

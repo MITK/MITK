@@ -36,8 +36,6 @@ namespace mitk
   class WeightedPointTransform;
 
   /**
-    * \ingroup AnisotropicRegistration
-    *
     * \brief Implementation of the anisotropic iterative closest point (A-ICP)
     * algorithm.
     *

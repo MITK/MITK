@@ -19,13 +19,13 @@ if(BUILD_TESTING)
 
   else()
 
-  # set(revision_tag a1e677b4) # first 8 characters of hash-tag
+  # set(revision_tag da5dd4ff) # first 8 characters of hash-tag
   #                  ^^^^^^^^  these are just to check correct length of hash part
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${proj}
       GIT_REPOSITORY https://codebase.helmholtz.cloud/mitk/mitk-data.git
-  #    GIT_TAG ${revision_tag}
+  #   GIT_TAG ${revision_tag}
   #   URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
   #   UPDATE_COMMAND ""
       CONFIGURE_COMMAND ""

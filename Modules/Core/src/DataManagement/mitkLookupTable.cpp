@@ -28,6 +28,65 @@ found in the LICENSE file.
 #include <Colortables/Turbo.h>
 #include <mitkLookupTableProperty.h>
 
+#include <array>
+#include <cmath>
+
+namespace
+{
+  // Single source of truth for the MULTILABEL palette size is the color
+  // table in Colortables/Multilabel.h; the lookup-table build and the
+  // label-color selection both derive their bounds from it.
+  constexpr int multilabelColorCount = static_cast<int>(std::size(Multilabel));
+
+  // Standard 6-sector HSV->RGB, all components in [0,1].
+  std::array<double, 3> HSVToRGB(double h, double s, double v)
+  {
+    h = h - std::floor(h);
+
+    const double sector      = h * 6.0;
+    const int    sectorIndex = static_cast<int>(std::floor(sector)) % 6;
+    const double fractional  = sector - std::floor(sector);
+
+    const double p = v * (1.0 - s);
+    const double q = v * (1.0 - s * fractional);
+    const double t = v * (1.0 - s * (1.0 - fractional));
+
+    switch (sectorIndex)
+    {
+      case 0:  return { v, t, p };
+      case 1:  return { q, v, p };
+      case 2:  return { p, v, t };
+      case 3:  return { p, q, v };
+      case 4:  return { t, p, v };
+      default: return { v, p, q };
+    }
+  }
+
+  // Color for the i-th MULTILABEL slot beyond the curated palette
+  // (0-based). A golden-angle hue sequence keeps any prefix maximally
+  // even on the color wheel; cycling through three saturation/value
+  // tiers keeps even same-hue neighbours distinguishable. This is the
+  // single source for label colors past the palette: both the lookup
+  // table and the label-color selection read these slots.
+  std::array<double, 3> GenerateMultiLabelExtraColor(int i)
+  {
+    // Golden-ratio conjugate: hue step yielding a low-discrepancy
+    // sequence on the unit circle.
+    constexpr double goldenHueStep = 0.6180339887498949;
+
+    struct Tier { double saturation; double value; };
+    constexpr std::array<Tier, 3> tiers = { {
+      { 0.85, 0.95 },
+      { 0.55, 0.95 },
+      { 0.85, 0.60 }
+    } };
+
+    const Tier& tier = tiers[i % tiers.size()];
+    const double hue = std::fmod(i * goldenHueStep, 1.0);
+    return HSVToRGB(hue, tier.saturation, tier.value);
+  }
+}
+
 std::vector<std::string> mitk::LookupTable::typenameList = {
   "Grayscale",
   "Inverse Grayscale",
@@ -549,41 +608,40 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
 
   lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0); // background
 
-  for (int i = 0; i < 25; i++)
+  for (int i = 1; i < 65536; ++i)
   {
-    lut->SetTableValue(i+1, Multilabel[i][0], Multilabel[i][1], Multilabel[i][2], 0.4);
-  }
-
-  for (int i = 26; i < 65536; i++)
-  {
-    if (i % 12 == 0)
-      lut->SetTableValue(i, 1.0, 0.0, 0.0, 0.4);
-    else if (i % 12 == 1)
-      lut->SetTableValue(i, 0.0, 1.0, 0.0, 0.4);
-    else if (i % 12 == 2)
-      lut->SetTableValue(i, 0.0, 0.0, 1.0, 0.4);
-    else if (i % 12 == 3)
-      lut->SetTableValue(i, 1.0, 1.0, 0.0, 0.4);
-    else if (i % 12 == 4)
-      lut->SetTableValue(i, 0.0, 1.0, 1.0, 0.4);
-    else if (i % 12 == 5)
-      lut->SetTableValue(i, 1.0, 0.0, 1.0, 0.4);
-    else if (i % 12 == 6)
-      lut->SetTableValue(i, 1.0, 0.5, 0.0, 0.4);
-    else if (i % 12 == 7)
-      lut->SetTableValue(i, 0.0, 1.0, 0.5, 0.4);
-    else if (i % 12 == 8)
-      lut->SetTableValue(i, 0.5, 0.0, 1.0, 0.4);
-    else if (i % 12 == 9)
-      lut->SetTableValue(i, 1.0, 1.0, 0.5, 0.4);
-    else if (i % 12 == 10)
-      lut->SetTableValue(i, 0.5, 1.0, 1.0, 0.4);
-    else if (i % 12 == 11)
-      lut->SetTableValue(i, 1.0, 0.5, 1.0, 0.4);
+    double rgb[3];
+    GetMultiLabelColor(i - 1, rgb);
+    lut->SetTableValue(i, rgb[0], rgb[1], rgb[2], 0.4);
   }
 
   m_LookupTable = lut;
   this->Modified();
+}
+
+int mitk::LookupTable::GetMultiLabelColorCount()
+{
+  return multilabelColorCount;
+}
+
+void mitk::LookupTable::GetMultiLabelColor(int index, double rgb[3])
+{
+  if (index < 0)
+    mitkThrow() << "Multi-label color index must not be negative, but is " << index << ".";
+
+  if (index < multilabelColorCount)
+  {
+    rgb[0] = Multilabel[index][0];
+    rgb[1] = Multilabel[index][1];
+    rgb[2] = Multilabel[index][2];
+  }
+  else
+  {
+    const auto extra = GenerateMultiLabelExtraColor(index - multilabelColorCount);
+    rgb[0] = extra[0];
+    rgb[1] = extra[1];
+    rgb[2] = extra[2];
+  }
 }
 
 void mitk::LookupTable::BuildLegacyRainbowColorLookupTable()

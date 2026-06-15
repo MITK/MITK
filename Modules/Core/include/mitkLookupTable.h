@@ -97,6 +97,27 @@ namespace mitk
     virtual void GetColor(double value, double rgb[3]);
 
     /**
+     * \brief Number of curated colors in the MULTILABEL palette.
+     *
+     * They occupy lookup-table slots 1..N (slot 0 is the transparent
+     * background); higher slots hold algorithmically generated colors.
+     * Derived from the color table, so callers never hardcode the count.
+     */
+    static int GetMultiLabelColorCount();
+
+    /**
+     * \brief RGB of the index-th MULTILABEL color, in [0,1].
+     *
+     * Indices 0..GetMultiLabelColorCount()-1 are the curated palette;
+     * higher indices are algorithmically generated. The MULTILABEL lookup
+     * table and the label-color selection both draw their colors from here,
+     * so callers do not have to round-trip through the table.
+     *
+     * \throws mitk::Exception if index is negative.
+     */
+    static void GetMultiLabelColor(int index, double rgb[3]);
+
+    /**
      * \brief Get the RGBA tuple at a specific table index.
      *
      * Wraps vtkLookupTable::GetTableValue().

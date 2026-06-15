@@ -20,29 +20,79 @@ found in the LICENSE file.
 #include <mitkProperties.h>
 #include <mitkSegSourceImageRelationRule.h>
 
+#include <vtkMath.h>
+
 #include <array>
+#include <limits>
 #include <regex>
 #include <vector>
 
 namespace
 {
-  template <typename T>
-  std::array<int, 3> QuantizeColor(const T* color)
+  // Convert an RGB triple in [0,1] to CIE Lab via VTK. L is in [0, 100];
+  // a and b are roughly in [-110, 110].
+  std::array<double, 3> RGBToLab(const double* rgb)
   {
-    return {
-      static_cast<int>(std::round(color[0] * 255)),
-      static_cast<int>(std::round(color[1] * 255)),
-      static_cast<int>(std::round(color[2] * 255)) };
+    std::array<double, 3> lab{};
+    vtkMath::RGBToLab(rgb, lab.data());
+    return lab;
   }
 
-  mitk::Color FromLookupTableColor(const double* lookupTableColor)
+  std::array<double, 3> RGBToLab(const mitk::Color& color)
   {
-    mitk::Color color;
-    color.Set(
-      static_cast<float>(lookupTableColor[0]),
-      static_cast<float>(lookupTableColor[1]),
-      static_cast<float>(lookupTableColor[2]));
-    return color;
+    const double rgb[3] = {
+      static_cast<double>(color.GetRed()),
+      static_cast<double>(color.GetGreen()),
+      static_cast<double>(color.GetBlue()) };
+    return RGBToLab(rgb);
+  }
+
+  // Squared Euclidean distance in Lab (ΔE76 squared). We only compare
+  // distances, so we never need the sqrt.
+  double DeltaE76Squared(const std::array<double, 3>& a, const std::array<double, 3>& b)
+  {
+    const double dL = a[0] - b[0];
+    const double da = a[1] - b[1];
+    const double db = a[2] - b[2];
+    return dL * dL + da * da + db * db;
+  }
+
+  // Distance (squared ΔE76) at which the curated palette counts as
+  // exhausted: a candidate nearer than this to every in-use color can no
+  // longer be a distinct palette color, so generated extras take over. The
+  // bound is the palette's own minimum pairwise distance, so while any
+  // palette color is unused its best candidate still clears it; only once
+  // all sit too close to the in-use colors do we fall through to extras. It
+  // must be perceptual, not a tiny epsilon: a user can nudge a label close
+  // to (not exactly onto) a palette color, and we then want to pass that
+  // palette color over rather than reuse a near-duplicate. The palette is
+  // constant, so this is evaluated once.
+  double ComputePaletteExhaustedThresholdSquared()
+  {
+    const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
+
+    std::vector<std::array<double, 3>> paletteLab;
+    paletteLab.reserve(paletteColorCount);
+    for (int i = 0; i < paletteColorCount; ++i)
+    {
+      std::array<double, 3> rgb{};
+      mitk::LookupTable::GetMultiLabelColor(i, rgb.data());
+      paletteLab.push_back(RGBToLab(rgb.data()));
+    }
+
+    double minSquared = std::numeric_limits<double>::infinity();
+    for (size_t a = 0; a < paletteLab.size(); ++a)
+      for (size_t b = a + 1; b < paletteLab.size(); ++b)
+      {
+        const double d2 = DeltaE76Squared(paletteLab[a], paletteLab[b]);
+        if (d2 < minSquared)
+          minSquared = d2;
+      }
+
+    // A hair below the exact minimum: in-use label colors are stored as
+    // float while candidates are evaluated at double precision, and that
+    // rounding must not let a still-unused palette color read as exhausted.
+    return minSquared * 0.999;
   }
 }
 
@@ -144,7 +194,10 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
   const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
   int maxGenericLabelNumber = 0;
 
-  std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
+  // Every color already in use, expressed in CIE Lab. Black (the
+  // background) is always reserved.
+  const double blackRGB[3] = { 0.0, 0.0, 0.0 };
+  std::vector<std::array<double, 3>> usedLabColors = { RGBToLab(blackRGB) };
 
   for (auto & label : labelSetImage->GetLabels())
   {
@@ -154,10 +207,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     if (std::regex_match(labelName, match, genericLabelNameRegEx))
       maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
 
-    const auto quantizedLabelColor = QuantizeColor(label->GetColor().data());
-
-    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLabelColor) == std::end(colorsInUse))
-      colorsInUse.push_back(quantizedLabelColor);
+    usedLabColors.push_back(RGBToLab(label->GetColor()));
   }
 
   auto newLabel = mitk::Label::New();
@@ -172,32 +222,75 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     newLabel->SetName(name.str().c_str());
   }
 
-  auto lookupTable = mitk::LookupTable::New();
-  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-
-  std::array<double, 3> lookupTableColor;
-  const int maxTries = 25;
-  bool newColorFound = false;
-
-  for (int i = 0; i < maxTries; ++i)
+  // Preserve the historical convention: the first label in an empty
+  // segmentation is palette[0] (the deep red-pink).
+  if (1 == usedLabColors.size())
   {
-    lookupTable->GetColor(i, lookupTableColor.data());
+    std::array<double, 3> firstColor{};
+    mitk::LookupTable::GetMultiLabelColor(0, firstColor.data());
+    newLabel->SetColor(mitk::MakeColor(
+      static_cast<float>(firstColor[0]),
+      static_cast<float>(firstColor[1]),
+      static_cast<float>(firstColor[2])));
+    return newLabel;
+  }
 
-    auto quantizedLookupTableColor = QuantizeColor(lookupTableColor.data());
+  // Maximin selection: pick the candidate whose nearest used-color
+  // distance is the largest.
+  std::array<double, 3> bestRGB{};
+  double                bestMinDistanceSquared = -1.0;
 
-    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLookupTableColor) == std::end(colorsInUse))
+  auto evaluateCandidate = [&](const std::array<double, 3>& candidateRGB)
+  {
+    const auto candidateLab = RGBToLab(candidateRGB.data());
+
+    double minDistanceSquared = std::numeric_limits<double>::infinity();
+    for (const auto& usedLab : usedLabColors)
     {
-      newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
-      newColorFound = true;
-      break;
+      const double d2 = DeltaE76Squared(candidateLab, usedLab);
+      if (d2 < minDistanceSquared)
+        minDistanceSquared = d2;
+    }
+
+    if (minDistanceSquared > bestMinDistanceSquared)
+    {
+      bestMinDistanceSquared = minDistanceSquared;
+      bestRGB = candidateRGB;
+    }
+  };
+
+  // Group A: the curated palette colors (color indices 0..N-1). Always
+  // part of the candidate pool. Evaluated first so exact ties favor the
+  // curated palette.
+  const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
+  std::array<double, 3> palettePick{};
+  for (int i = 0; i < paletteColorCount; ++i)
+  {
+    mitk::LookupTable::GetMultiLabelColor(i, palettePick.data());
+    evaluateCandidate(palettePick);
+  }
+
+  // Group B: generated colors past the curated palette (color indices
+  // paletteColorCount and up). They contribute only once the palette is
+  // exhausted, i.e. its best remaining color is no farther from the in-use
+  // colors than the palette colors are from one another (see
+  // ComputePaletteExhaustedThresholdSquared).
+  static const double paletteExhaustedThresholdSquared = ComputePaletteExhaustedThresholdSquared();
+  if (bestMinDistanceSquared < paletteExhaustedThresholdSquared)
+  {
+    constexpr int extraCandidateCount = 1000;
+    std::array<double, 3> extraPick{};
+    for (int i = 0; i < extraCandidateCount; ++i)
+    {
+      mitk::LookupTable::GetMultiLabelColor(paletteColorCount + i, extraPick.data());
+      evaluateCandidate(extraPick);
     }
   }
 
-  if (!newColorFound)
-  {
-    lookupTable->GetColor(labelSetImage->GetTotalNumberOfLabels(), lookupTableColor.data());
-    newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
-  }
+  newLabel->SetColor(mitk::MakeColor(
+    static_cast<float>(bestRGB[0]),
+    static_cast<float>(bestRGB[1]),
+    static_cast<float>(bestRGB[2])));
 
   return newLabel;
 }

@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include <vtkMath.h>
 
 #include <array>
-#include <cmath>
 #include <limits>
 #include <regex>
 #include <vector>
@@ -56,71 +55,6 @@ namespace
     const double da = a[1] - b[1];
     const double db = a[2] - b[2];
     return dL * dL + da * da + db * db;
-  }
-
-  // Standard 6-sector HSV->RGB. Kept local so we don't pull in
-  // MitkDataTypesExt for fifteen lines of math.
-  std::array<double, 3> HSVToRGB(double h, double s, double v)
-  {
-    h = h - std::floor(h);
-
-    const double sector      = h * 6.0;
-    const int    sectorIndex = static_cast<int>(std::floor(sector)) % 6;
-    const double fractional  = sector - std::floor(sector);
-
-    const double p = v * (1.0 - s);
-    const double q = v * (1.0 - s * fractional);
-    const double t = v * (1.0 - s * (1.0 - fractional));
-
-    switch (sectorIndex)
-    {
-      case 0:  return { v, t, p };
-      case 1:  return { q, v, p };
-      case 2:  return { p, v, t };
-      case 3:  return { p, q, v };
-      case 4:  return { t, p, v };
-      default: return { v, p, q };
-    }
-  }
-
-  // Number of algorithmically generated extra candidates evaluated when
-  // the palette is exhausted. Sized to comfortably cover any realistic
-  // segmentation: with all 25 palette colors used and N extras, the
-  // pool stays distinct up to ~(25 + N) labels before the maximin can
-  // no longer find a non-duplicate. The golden-angle hue sequence
-  // produces a distinct hue at every index, so this can be cranked up
-  // freely; the only cost is one Lab distance computation per extra
-  // per used color, which is sub-millisecond even at N = 1000.
-  constexpr int EXTRA_CANDIDATE_COUNT = 1000;
-
-  // Golden-ratio conjugate: hue step that yields a low-discrepancy
-  // sequence on the unit circle. Any prefix stays maximally even.
-  constexpr double GOLDEN_HUE_STEP = 0.6180339887498949;
-
-  // i-th extra candidate (0-indexed), cycling through three saturation/
-  // value tiers and advancing hue by the golden angle each step.
-  std::array<double, 3> GenerateExtraCandidate(int i)
-  {
-    struct Tier { double saturation; double value; };
-    constexpr std::array<Tier, 3> tiers = { {
-      { 0.85, 0.95 },
-      { 0.55, 0.95 },
-      { 0.85, 0.60 }
-    } };
-
-    const Tier& tier = tiers[i % tiers.size()];
-    const double hue = std::fmod(i * GOLDEN_HUE_STEP, 1.0);
-    return HSVToRGB(hue, tier.saturation, tier.value);
-  }
-
-  mitk::Color FromLookupTableColor(const double* lookupTableColor)
-  {
-    mitk::Color color;
-    color.Set(
-      static_cast<float>(lookupTableColor[0]),
-      static_cast<float>(lookupTableColor[1]),
-      static_cast<float>(lookupTableColor[2]));
-    return color;
   }
 }
 
@@ -250,16 +184,16 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     newLabel->SetName(name.str().c_str());
   }
 
-  auto lookupTable = mitk::LookupTable::New();
-  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-
   // Preserve the historical convention: the first label in an empty
-  // segmentation is palette[0] (lookup-table slot 1, the deep red-pink).
+  // segmentation is palette[0] (the deep red-pink).
   if (1 == usedLabColors.size())
   {
     std::array<double, 3> firstColor{};
-    lookupTable->GetColor(1, firstColor.data());
-    newLabel->SetColor(FromLookupTableColor(firstColor.data()));
+    mitk::LookupTable::GetMultiLabelColor(0, firstColor.data());
+    newLabel->SetColor(mitk::MakeColor(
+      static_cast<float>(firstColor[0]),
+      static_cast<float>(firstColor[1]),
+      static_cast<float>(firstColor[2])));
     return newLabel;
   }
 
@@ -287,33 +221,63 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     }
   };
 
-  // Group A: the curated palette colors (lookup-table slots 1..N).
-  // Always part of the candidate pool. Evaluated first so exact ties
-  // favor the curated palette.
+  // Group A: the curated palette colors (color indices 0..N-1). Always
+  // part of the candidate pool. Evaluated first so exact ties favor the
+  // curated palette.
   const int paletteColorCount = mitk::LookupTable::GetMultiLabelColorCount();
+  std::vector<std::array<double, 3>> paletteLab;
+  paletteLab.reserve(paletteColorCount);
+
   std::array<double, 3> palettePick{};
-  for (int i = 1; i <= paletteColorCount; ++i)
+  for (int i = 0; i < paletteColorCount; ++i)
   {
-    lookupTable->GetColor(i, palettePick.data());
+    mitk::LookupTable::GetMultiLabelColor(i, palettePick.data());
     evaluateCandidate(palettePick);
+    paletteLab.push_back(RGBToLab(palettePick.data()));
   }
 
-  // Group B: algorithmically generated extras. Only contributes when the
-  // palette has no candidate left at a meaningful Lab distance from the
-  // colors in use. The threshold is set just below the smallest pairwise
-  // ΔE76 within the palette (palette[0] #BE0032 vs palette[16] #BF5D36,
-  // ΔE76 ≈ 32.4, squared ≈ 1051.7), so every palette color can still win
-  // on its own merits before we extend with extras.
-  constexpr double PALETTE_EXHAUSTED_THRESHOLD_SQUARED = 1040.0;
-  if (bestMinDistanceSquared < PALETTE_EXHAUSTED_THRESHOLD_SQUARED)
-  {
-    for (int i = 0; i < EXTRA_CANDIDATE_COUNT; ++i)
+  // The palette counts as exhausted once its best remaining color sits
+  // closer to an in-use color than the palette colors sit to one another.
+  // Up to that point an unused palette color always wins; past it, the best
+  // remaining palette color would be picked even though a generated color
+  // could be more distinct, so we extend the pool instead. The threshold
+  // has to be perceptual, not a tiny epsilon: a user can nudge a label to a
+  // color close to (but not exactly) a palette color, and we then want to
+  // pass that palette color over rather than reuse a near-duplicate.
+  // Deriving the threshold from the palette's own spacing keeps this intact
+  // if the palette ever changes.
+  double paletteExhaustedThresholdSquared = std::numeric_limits<double>::infinity();
+  for (size_t a = 0; a < paletteLab.size(); ++a)
+    for (size_t b = a + 1; b < paletteLab.size(); ++b)
     {
-      evaluateCandidate(GenerateExtraCandidate(i));
+      const double d2 = DeltaE76Squared(paletteLab[a], paletteLab[b]);
+      if (d2 < paletteExhaustedThresholdSquared)
+        paletteExhaustedThresholdSquared = d2;
+    }
+
+  // A hair below the exact minimum: in-use label colors are stored as
+  // float while candidates are evaluated at double precision, and that
+  // rounding must not let a still-unused palette color read as exhausted.
+  paletteExhaustedThresholdSquared *= 0.999;
+
+  // Group B: generated colors past the curated palette (color indices
+  // paletteColorCount and up). Contributes only once the palette is
+  // exhausted (see above).
+  if (bestMinDistanceSquared < paletteExhaustedThresholdSquared)
+  {
+    constexpr int extraCandidateCount = 1000;
+    std::array<double, 3> extraPick{};
+    for (int i = 0; i < extraCandidateCount; ++i)
+    {
+      mitk::LookupTable::GetMultiLabelColor(paletteColorCount + i, extraPick.data());
+      evaluateCandidate(extraPick);
     }
   }
 
-  newLabel->SetColor(FromLookupTableColor(bestRGB.data()));
+  newLabel->SetColor(mitk::MakeColor(
+    static_cast<float>(bestRGB[0]),
+    static_cast<float>(bestRGB[1]),
+    static_cast<float>(bestRGB[2])));
 
   return newLabel;
 }

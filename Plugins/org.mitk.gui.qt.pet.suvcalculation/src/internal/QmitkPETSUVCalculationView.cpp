@@ -121,8 +121,6 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget *parent)
   m_ParentWidget = parent;
   m_Controls->setupUi(parent);
 
-  connect(m_Controls->btnCalculateSUV, SIGNAL(clicked()), this, SLOT(OnCalculateSUVButtonClicked()));
-  connect(m_Controls->btnNuclideLookup, SIGNAL(clicked()), this, SLOT(OnNuclideLookupClicked()));
   m_Controls->decayTimeView->setAlternatingRowColors(true);
   m_Controls->decayTimeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls->decayTimeView->setRootIsDecorated(true);

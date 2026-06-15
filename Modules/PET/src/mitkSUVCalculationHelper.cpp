@@ -93,28 +93,10 @@ namespace
     return result.good();
   }
 
-  auto ConvertOFDateTimeToTimePoint(const OFDateTime& time)
-  {
-    using namespace std::chrono;
-    const year_month_day ymd{
-      year{static_cast<int>(time.getDate().getYear())},
-      month{static_cast<unsigned>(time.getDate().getMonth())},
-      day{static_cast<unsigned>(time.getDate().getDay())}};
-
-    return sys_days{ymd}
-         + hours{time.getTime().getHour()}
-         + minutes{time.getTime().getMinute()}
-         + seconds{time.getTime().getIntSecond()}
-         + milliseconds{time.getTime().getMilliSecond()};
-  }
-
-  // Returns (reference - injection) in seconds.
+  // Returns (reference - injection) in seconds (the shared util reports ms).
   double DurationInSeconds(const OFDateTime& injection, const OFDateTime& reference)
   {
-    using namespace std::chrono;
-    const auto delta = ConvertOFDateTimeToTimePoint(reference)
-                     - ConvertOFDateTimeToTimePoint(injection);
-    return duration<double>(delta).count();
+    return mitk::ComputeMiliSecDuration(injection, reference) / 1000.0;
   }
 
   // Resolve the radiopharmaceutical injection time into an absolute OFDateTime.

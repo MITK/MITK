@@ -1592,7 +1592,26 @@ namespace mitk
           if (algorithmType.empty())
             algorithmType = "MANUAL"; //DICOM always needs a type. If undefined we default to "MANUAL"
           segmentAttribute->setSegmentAlgorithmType(algorithmType);
-          segmentAttribute->setSegmentAlgorithmName(label->GetAlgorithmName());
+
+          // Only emit (0062,0009) when the label actually carries a recorded name. GetAlgorithmName()
+          // would otherwise fall back to the bare "MITK Segmentation" prefix and fabricate a name for a
+          // segment MITK never generated (e.g. a vendor SEG loaded without an algorithm name).
+          if (label->HasAlgorithmName())
+          {
+            std::string algorithmName = label->GetAlgorithmName();
+            // Segment Algorithm Name has VR LO (max 64 chars). DCMTK does not enforce the limit on write,
+            // so bound it here; the growing provenance chain can exceed 64 in routine AI-then-correct
+            // sessions. The indicator marks that the recorded chain was longer than the exported value.
+            constexpr std::string::size_type maxLOLength = 64;
+            const std::string truncationIndicator = "[...]";
+            if (algorithmName.length() > maxLOLength)
+            {
+              MITK_WARN << "Segment Algorithm Name (0062,0009) exceeds the DICOM LO limit (" << maxLOLength
+                        << " chars) and is truncated for export. Full provenance: " << algorithmName;
+              algorithmName = algorithmName.substr(0, maxLOLength - truncationIndicator.length()) + truncationIndicator;
+            }
+            segmentAttribute->setSegmentAlgorithmName(algorithmName);
+          }
 
           if (label->GetAnatomicRegionCount()>0)
           { //Anatomic region

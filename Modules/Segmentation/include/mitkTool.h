@@ -123,6 +123,10 @@ namespace mitk
     \brief Returns the name of this tool. Make it short!
 
     This name has to fit into some kind of button in most applications, so take some time to think of a good name!
+
+    \note The name is also recorded as label provenance via mitk::Label::AddToolUse, which reserves the
+    separator characters "|" and ":". Avoid them in tool names (use plain spaces); names containing them
+    are sanitized (separators replaced with "#") and a warning is logged.
     */
     virtual const char *GetName() const = 0;
 

@@ -226,11 +226,13 @@ mitk::DICOMSegmentationPropertyHelper::Validate(const MultiLabelSegmentation* se
 
     // SegmentAlgorithmName (0062,0009) is DICOM Type 1C: required only when
     // SegmentAlgorithmType is AUTOMATIC or SEMIAUTOMATIC. dcmqi correctly
-    // omits the tag for MANUAL labels, so requiring a non-empty name
-    // unconditionally would block a legitimate round trip on Validate.
+    // omits the tag for MANUAL labels, so requiring a name unconditionally
+    // would block a legitimate round trip on Validate. We test for the property
+    // being present (HasAlgorithmName), not GetAlgorithmName().empty(): the latter
+    // never reports empty because it falls back to the "MITK Segmentation" prefix.
     if ((algoType == Label::AlgorithmType::AUTOMATIC
          || algoType == Label::AlgorithmType::SEMIAUTOMATIC)
-        && label->GetAlgorithmName().empty())
+        && !label->HasAlgorithmName())
       AddLabelMissing(missing, label->GetValue(), "Algorithm Name (0062,0009)");
 
     // Tracking ID/UID (0062,0020/0062,0021) are Type 3 in the SEG IOD's

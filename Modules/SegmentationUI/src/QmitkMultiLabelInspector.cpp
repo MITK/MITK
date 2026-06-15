@@ -538,11 +538,11 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstanceInternal(mitk::Label* 
   //remove properties that where copied by the template but are instance specific
   newLabel->ResetCenterOfMass();
   // Reset provenance to the fresh, undeclared construction state so first-use detection works on the
-  // duplicate: Undefined type (the algorithm_type key is removed) and NO algorithm_name property
-  // (GetAlgorithmName() then falls back to the "MITK Segmentation" prefix; an explicit "" would defeat
-  // that). This runs before RegisterUndoRedoOperationEvent below, so undo/redo capture the reset state.
+  // duplicate: Undefined type and no algorithm_name property (both setters remove the property on an
+  // empty/Undefined value, so GetAlgorithmName() falls back to the "MITK Segmentation" prefix). This
+  // runs before RegisterUndoRedoOperationEvent below, so undo/redo capture the reset state.
   newLabel->SetAlgorithmType(mitk::Label::AlgorithmType::Undefined);
-  newLabel->RemoveProperty("algorithm_name");
+  newLabel->SetAlgorithmName("");
 
   m_Segmentation->SetActiveLabel(newLabel->GetValue());
   m_ModelManipulationOngoing = false;
@@ -1415,6 +1415,17 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
     mitk::SegGroupModifyUndoRedoHelper undoRedoGenerator(m_Segmentation, { m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue()) }, true);
 
     m_Segmentation->MergeLabels(currentLabel->GetValue(), this->GetSelectedLabels());
+
+    // Propagate the source labels' provenance into the merge target so its algorithm type/name reflect
+    // the (possibly algorithmic) content it now contains. Done before RegisterUndoRedoOperationEvent so
+    // the property change is captured in the same undo group as the pixel merge.
+    for (const auto sourceValue : this->GetSelectedLabels())
+    {
+      if (sourceValue == currentLabel->GetValue())
+        continue;
+      if (const mitk::Label* sourceLabel = m_Segmentation->GetLabel(sourceValue))
+        currentLabel->MergeToolUses(sourceLabel);
+    }
 
     undoRedoGenerator.RegisterUndoRedoOperationEvent("Merge into label \"" + mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, currentLabel) + "\"");
 

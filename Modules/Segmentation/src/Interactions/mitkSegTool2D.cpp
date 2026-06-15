@@ -581,15 +581,17 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
   if (writeSliceToVolume)
   {
     // Single choke point for all 2D/manual writebacks: the positionEvent and planeGeometry overloads
-    // delegate here, and EditableContourTool calls this directly. The active label is exactly the
-    // label the static above wrote into (it also resolves via GetActiveLabel()). Guarded by
-    // writeSliceToVolume so a surface-interpolation-only call (no pixel write) records no tool use.
-    // NOTE: the writeback above undoes via the pixel-only SegSliceOperation, which does not capture
-    // label properties, so this provenance stamp is NOT reverted on undo (the same sticky behavior the
-    // 2D interpolation accept in QmitkSlicesInterpolator documents; tracked as a follow-up).
+    // delegate here, and EditableContourTool calls this directly. GetAffectedLabelValues() reports the
+    // label(s) whose pixels were actually written (the active label by default; erase/close override
+    // it with the clicked label). Guarded by writeSliceToVolume so a surface-interpolation-only call
+    // (no pixel write) records no tool use.
+    // The writeback above undoes via the pixel-only SegSliceOperation, which does not capture label
+    // properties, so this provenance stamp is not reverted on undo (same limitation as the 2D
+    // interpolation accept in QmitkSlicesInterpolator).
     if (auto* segmentation = this->GetWorkingData())
-      if (auto* activeLabel = segmentation->GetActiveLabel())
-        activeLabel->AddToolUse(this->GetAlgorithmType(), this->GetName());
+      for (const auto labelValue : this->GetAffectedLabelValues())
+        if (mitk::Label* label = segmentation->GetLabel(labelValue))
+          label->AddToolUse(this->GetAlgorithmType(), this->GetName());
   }
 
 
@@ -597,6 +599,14 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
    does not work as the contour markers expect that the plane is always the plane of slice 0.
    Had not the time to do it properly no. Should be solved by T28146*/
   this->AddContourmarker(plane3, slicePosition);
+}
+
+mitk::MultiLabelSegmentation::LabelValueVectorType mitk::SegTool2D::GetAffectedLabelValues() const
+{
+  if (auto* segmentation = this->GetWorkingData())
+    if (auto* activeLabel = segmentation->GetActiveLabel())
+      return { activeLabel->GetValue() };
+  return {};
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume, bool allowUndo, const std::string& toolName)

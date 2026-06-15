@@ -75,6 +75,11 @@ namespace mitk
     * preparation (e.g. change m_FillLabelValue, you can overwrite this function. */
     virtual void PrepareFilling(const Image* workingSlice, Point3D seedPoint) = 0;
 
+    /** \brief The modified label is the one written by the fill (e.g. the active label for Fill, the
+     * seed label for Close); when filling with UNLABELED (Erase) the modified label is the clicked
+     * seed label. This deviates from the active label, so the base default is overridden here. */
+    MultiLabelSegmentation::LabelValueVectorType GetAffectedLabelValues() const override;
+
     Label::PixelType m_FillLabelValue = 0;
     Label::PixelType m_SeedLabelValue = 0;
 

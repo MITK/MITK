@@ -443,7 +443,9 @@ Args:
           : ParseAlgorithmType(algoType.cast<std::string>());
         l.AddToolUse(t, algoName);
       },
-      py::arg("algorithm_type"), py::arg("algorithm_name"))
+      py::arg("algorithm_type"), py::arg("algorithm_name"),
+      "Record that a tool/operation contributed to this label. An empty algorithm_name is ignored; the "
+      "reserved separator characters '|' and ':' are sanitized to '#' (a warning is logged).")
 
     // --- center of mass ---
     .def_property_readonly("center_of_mass_index",

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkDICOMSegmentationConstants.h>
 #include <mitkStringProperty.h>
 
+#include <algorithm>
 #include <regex>
 
 const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
@@ -100,16 +101,10 @@ namespace
                                     ? algorithmName.substr(internalPrefix.size())
                                     : algorithmName;
 
-    std::string::size_type start = 0;
-    while (start != std::string::npos)
-    {
-      const auto sep = toolChain.find(TOOL_SEPARATOR, start);
-      const auto length = sep == std::string::npos ? std::string::npos : sep - start;
-      if (toolChain.compare(start, length, toolName) == 0)
-        return true;
-      start = sep == std::string::npos ? std::string::npos : sep + TOOL_SEPARATOR.size();
-    }
-    return false;
+    // Wrap both chain and needle in separators so the search only matches whole tokens (e.g. "Net"
+    // is not found inside "nnUNet"). Valid because AddToolUse rejects TOOL_SEPARATOR inside names.
+    return (TOOL_SEPARATOR + toolChain + TOOL_SEPARATOR)
+             .find(TOOL_SEPARATOR + toolName + TOOL_SEPARATOR) != std::string::npos;
   }
 }
 
@@ -494,6 +489,15 @@ std::string mitk::Label::GetAlgorithmTypeStr() const
 
 void mitk::Label::SetAlgorithmName(const std::string& algoName)
 {
+  if (algoName.empty())
+  {
+    // Mirror SetAlgorithmTypeStr: an empty name removes the property so GetAlgorithmName() falls back
+    // to the bare prefix. A stored empty StringProperty would shadow that fallback and make the first
+    // AddToolUse append "|<tool>" instead of ": <tool>".
+    this->RemoveProperty("algorithm_name");
+    return;
+  }
+
   mitk::StringProperty* property = dynamic_cast<mitk::StringProperty*>(this->GetProperty("algorithm_name"));
   if (property != nullptr)
     // Update Property
@@ -510,20 +514,38 @@ std::string mitk::Label::GetAlgorithmName() const
   return text;
 }
 
+bool mitk::Label::HasAlgorithmName() const
+{
+  const auto* propertyMap = this->GetMap();
+  return propertyMap != nullptr && propertyMap->find("algorithm_name") != propertyMap->end();
+}
+
 void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName)
 {
-  // Enforce the encoding precondition: a separator inside algoName would make the provenance string
-  // unparseable and could confuse the de-duplication below. Fail loudly rather than
-  // silently corrupt the record (mirrors SetAlgorithmTypeStr's input validation).
-  if (algoName.empty() || algoName.find(TOOL_SEPARATOR) != std::string::npos ||
-      algoName.find(PREFIX_SEPARATOR) != std::string::npos)
-    mitkThrow() << "Label::AddToolUse: algoName must be non-empty and must not contain the separators '"
-                << TOOL_SEPARATOR << "' or '" << PREFIX_SEPARATOR << "'. Invalid name: " << algoName;
+  if (algoName.empty()) // nothing to record; leave the existing provenance untouched
+    return;
 
-  const std::string currentName = this->GetAlgorithmName(); // MITK prefix only for internally-created names
+  // Keep the provenance string parseable: TOOL_SEPARATOR ("|") and PREFIX_SEPARATOR (": ") are
+  // reserved. Throwing here would be too late (this runs at the writeback choke point, after pixels
+  // are committed, and the throw would skip undo registration), so instead neutralize the separator
+  // characters and warn. Tool authors are pointed at this constraint in Tool::GetName().
+  std::string sanitized = algoName;
+  std::replace(sanitized.begin(), sanitized.end(), '|', '#');
+  std::replace(sanitized.begin(), sanitized.end(), ':', '#');
+  if (sanitized != algoName)
+    MITK_WARN << "Label::AddToolUse: tool name \"" << algoName << "\" contains reserved separator "
+                 "characters ('|' or ':'); recorded as \"" << sanitized << "\" to keep the provenance "
+                 "string parseable.";
 
-  // A name still equal to just the prefix means no dedicated tool has been recorded yet (the
-  // construction-default state), so the first tool's name is appended after the prefix separator.
+  std::string currentName = this->GetAlgorithmName(); // MITK prefix only for internally-created names
+  // An empty stored name (e.g. a legacy persisted empty algorithm_name property, which the native-JSON
+  // reader restores verbatim via SetProperty) is equivalent to "no name recorded": normalize it to the
+  // bare prefix so the first tool is appended as "MITK Segmentation: <tool>" rather than "|<tool>".
+  if (currentName.empty())
+    currentName = DEFAULT_ALGORITHM_NAME;
+
+  // A name equal to just the prefix means no dedicated tool has been recorded yet (the construction-
+  // default state), so the first tool's name is appended after the prefix separator.
   const bool noToolRecorded = (currentName == DEFAULT_ALGORITHM_NAME);
 
   // The first contribution to a still-Undefined label defines its type. Any type already present
@@ -535,8 +557,49 @@ void mitk::Label::AddToolUse(AlgorithmType algoType, const std::string& algoName
   else if (currentType != algoType)
     this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC); // mixed tool types
 
-  if (!ToolAlreadyRecorded(currentName, algoName)) // keep the prefix, append the dedicated tool
-    this->SetAlgorithmName(currentName + (noToolRecorded ? PREFIX_SEPARATOR : TOOL_SEPARATOR) + algoName);
+  if (!ToolAlreadyRecorded(currentName, sanitized)) // keep the prefix, append the dedicated tool
+    this->SetAlgorithmName(currentName + (noToolRecorded ? PREFIX_SEPARATOR : TOOL_SEPARATOR) + sanitized);
+}
+
+void mitk::Label::MergeToolUses(const Label* other)
+{
+  if (nullptr == other)
+    mitkThrow() << "Invalid call of Label::MergeToolUses. Passed label is null.";
+
+  const auto otherType = other->GetAlgorithmType();
+  if (otherType == AlgorithmType::Undefined)
+    return; // the source declared no origin: nothing meaningful to propagate
+
+  // Mix the algorithm type (same rule as AddToolUse), so even a source that carries a type but no
+  // named tool (e.g. a vendor MANUAL label) still influences the merged result.
+  const auto currentType = this->GetAlgorithmType();
+  if (currentType == AlgorithmType::Undefined)
+    this->SetAlgorithmType(otherType);
+  else if (currentType != otherType)
+    this->SetAlgorithmType(AlgorithmType::SEMIAUTOMATIC);
+
+  if (!other->HasAlgorithmName())
+    return;
+
+  const std::string otherName = other->GetAlgorithmName();
+  const std::string internalPrefix = DEFAULT_ALGORITHM_NAME + PREFIX_SEPARATOR;
+  const std::string toolChain = otherName.starts_with(internalPrefix)
+                                  ? otherName.substr(internalPrefix.size())
+                                  : otherName;
+  if (toolChain.empty() || toolChain == DEFAULT_ALGORITHM_NAME)
+    return; // bare prefix only: the type mix above is the whole story
+
+  // Replay each recorded tool name so the target's chain reflects the merged origin. AddToolUse
+  // de-duplicates against names already present and re-affirms the type mix harmlessly.
+  std::string::size_type start = 0;
+  while (start != std::string::npos)
+  {
+    const auto sep = toolChain.find(TOOL_SEPARATOR, start);
+    const auto token = toolChain.substr(start, sep == std::string::npos ? std::string::npos : sep - start);
+    if (!token.empty())
+      this->AddToolUse(otherType, token);
+    start = sep == std::string::npos ? std::string::npos : sep + TOOL_SEPARATOR.size();
+  }
 }
 
 

@@ -93,6 +93,16 @@ void mitk::MonaiLabelTool::UpdatePrepare()
   preview->RemoveLabels(preview->GetAllLabelValues());
 }
 
+mitk::Label::AlgorithmType mitk::MonaiLabelTool::GetAlgorithmType() const
+{
+  // The same tool instance runs both auto-segmentation and interactive (deepgrow/deepedit) models, so
+  // the type cannot be a static override: it depends on the currently selected model. Auto models run
+  // with no per-image human input (like nnUNet), hence AUTOMATIC; interactive models are SEMIAUTOMATIC.
+  return (m_RequestParameters && !m_RequestParameters->model.IsInteractive())
+           ? mitk::Label::AlgorithmType::AUTOMATIC
+           : mitk::Label::AlgorithmType::SEMIAUTOMATIC;
+}
+
 void mitk::MonaiLabelTool::OnAddPositivePoint(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (nullptr == m_RequestParameters || !m_RequestParameters->model.IsInteractive())

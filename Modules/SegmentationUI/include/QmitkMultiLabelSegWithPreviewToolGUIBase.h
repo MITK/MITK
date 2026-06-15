@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for tools based on mitk::AutoMLSegmentationWithPreviewTool.
 
   This GUI offers an additional list to select the label that should be confirmed.

@@ -29,7 +29,6 @@ namespace mitk
  *
  * \sa mitk::DataNode
  * \sa mitk::RTUIConstants
- * \ingroup MitkRTModule
  */
 struct MITKRT_EXPORT RTConstants
 

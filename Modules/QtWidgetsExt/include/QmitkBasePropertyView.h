@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief Read-only QLabel that displays any mitk::BaseProperty value as text.
- * \ingroup Widgets
  *
  * Observes a mitk::BaseProperty and updates the label text whenever the
  * property value changes, using BaseProperty::GetValueAsString(). If the

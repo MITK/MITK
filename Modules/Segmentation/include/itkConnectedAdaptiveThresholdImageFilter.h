@@ -23,8 +23,6 @@ namespace itk
     Uses itkAdaptiveThresholdIterator to perform connected region growing
     with an adaptively expanding threshold range. Supports leakage detection
     in both raw and fine modes (e.g. for bronchial tree segmentation).
-
-    \ingroup RegionGrowingSegmentation
   */
   template <class TInputImage, class TOutputImage>
   class ITK_EXPORT ConnectedAdaptiveThresholdImageFilter

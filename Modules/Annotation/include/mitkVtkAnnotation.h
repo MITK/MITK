@@ -28,7 +28,6 @@ namespace mitk
    * UpdateVtkAnnotation() to synchronize properties before rendering.
    *
    * \sa Annotation, VtkAnnotation2D, VtkAnnotation3D
-   * \ingroup Annotation
    */
   class MITKANNOTATION_EXPORT VtkAnnotation : public Annotation
   {

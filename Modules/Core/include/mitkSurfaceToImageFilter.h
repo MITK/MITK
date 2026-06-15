@@ -39,7 +39,6 @@ namespace mitk
    * unsigned char images, etc.) to produce a correct binary image
    * representation of the surface in MakeOutputBinary mode.
    *
-   * \ingroup SurfaceFilters
    * \ingroup Process
    */
   class MITKCORE_EXPORT SurfaceToImageFilter : public ImageSource

@@ -29,8 +29,6 @@ namespace mitk
   struct CovarianceMatrixCalculatorData;
 
   /**
-   * \ingroup AnisotropicRegistration
-   *
    * \brief Computes covariance matrices for every vertex of a Surface,
    * for use in the anisotropic ICP (A-ICP) algorithm.
    *

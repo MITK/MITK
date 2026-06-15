@@ -47,7 +47,6 @@ class QmitkRenderWindow;
 *
 * \sa QmitkOverlay
 * \sa QmitkRenderWindow
-* \ingroup Qmitk
 */
 
 class MITKQTOVERLAYS_EXPORT QmitkOverlayController : public QObject

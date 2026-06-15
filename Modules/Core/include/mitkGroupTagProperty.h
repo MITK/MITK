@@ -25,8 +25,6 @@ namespace mitk
    * without requiring a specific hierarchical order in the data tree. Its mere
    * presence on a node signals group membership.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    */
   class MITKCORE_EXPORT GroupTagProperty : public BaseProperty

@@ -25,8 +25,6 @@ namespace mitk
    * consists of scalar opacity, gradient opacity, and color transfer function
    * components.
    *
-   * \ingroup DataManagement
-   *
    * \note If you want to use this property for an mitk::Image, make sure
    * to set the mitk::RenderingModeProperty to a mode which supports transfer
    * functions (e.g. COLORTRANSFERFUNCTION_COLOR). See the documentation of

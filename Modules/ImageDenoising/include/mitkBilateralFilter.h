@@ -39,8 +39,6 @@ namespace mitk
    *
    * \sa itk::BilateralImageFilter
    * \sa ImageToImageFilter
-   *
-   * \ingroup ImageFilters
    */
   class MITKIMAGEDENOISING_EXPORT BilateralFilter : public ImageToImageFilter
   {

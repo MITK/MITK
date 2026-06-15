@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool with upper and lower threshold range.
 
   This GUI shows a range slider to change both upper and lower threshold values and

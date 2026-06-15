@@ -31,7 +31,6 @@ namespace mitk
    * are configurable.
    *
    * \sa VtkAnnotation, ScaleLegendAnnotation
-   * \ingroup Annotation
    */
   class MITKANNOTATION_EXPORT ColorBarAnnotation : public mitk::VtkAnnotation
   {

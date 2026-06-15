@@ -19,8 +19,6 @@ namespace mitk
    * \brief Enumeration of standard anatomical image planes.
    *
    * Used to specify the orientation of 2D image slices in medical imaging.
-   *
-   * \ingroup DataManagement
    */
   enum class AnatomicalPlane
   {

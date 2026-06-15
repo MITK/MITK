@@ -32,8 +32,6 @@ namespace mitk
    * which should be stored by value (not by reference). Subclasses must implement the
    * pure virtual methods IsEqual() and Assign() for comparison and assignment support.
    *
-   * \ingroup DataManagement
-   *
    * \sa PropertyList
    * \sa GenericProperty
    * \sa StringProperty

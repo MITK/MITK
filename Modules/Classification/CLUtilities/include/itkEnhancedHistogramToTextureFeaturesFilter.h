@@ -96,7 +96,6 @@ namespace itk
     * \sa ScalarImageToTextureFeaturesFilter
     *
     * Author: Zachary Pincus
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >

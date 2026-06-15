@@ -26,8 +26,6 @@ namespace mitk
    * (e.g., CT, MR, US, XA, etc.) in its constructor. Can be initialized
    * by modality name or by id.
    *
-   * \ingroup DataManagement
-   *
    * \sa EnumerationProperty
    * \sa BaseProperty
    */

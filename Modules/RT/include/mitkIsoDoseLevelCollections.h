@@ -31,7 +31,6 @@ namespace mitk
    * \sa IsoDoseLevel
    * \sa IsoDoseLevelSet
    * \sa IsoDoseLevelVectorProperty
-   * \ingroup MitkRTModule
    */
   typedef ::itk::VectorContainer<unsigned int, mitk::IsoDoseLevel::Pointer> IsoDoseLevelVector;
 
@@ -49,7 +48,6 @@ namespace mitk
    * \sa IsoDoseLevel
    * \sa IsoDoseLevelVector
    * \sa IsoDoseLevelSetProperty
-   * \ingroup MitkRTModule
    */
 class MITKRT_EXPORT IsoDoseLevelSet:
   public itk::Object

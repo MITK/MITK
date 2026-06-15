@@ -22,8 +22,6 @@ namespace mitk
 
   /**
    * \brief Reader service for loading surfaces from Wavefront OBJ files.
-   *
-   * \ingroup IOExt
    */
   class ObjFileReaderService : public AbstractFileReader
   {

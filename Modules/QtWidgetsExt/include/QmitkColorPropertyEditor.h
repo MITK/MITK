@@ -21,7 +21,6 @@ class QListBox;
 
 /**
  * \brief A frameless popup widget for choosing colors from an HSV gradient.
- * \ingroup Widgets
  *
  * Displays a rectangular HSV color gradient that the user can click to select
  * a color. The widget grabs mouse and keyboard input when shown, and closes
@@ -101,7 +100,6 @@ private:
 
 /**
  * \brief Editable color swatch for a mitk::ColorProperty.
- * \ingroup Widgets
  *
  * Extends QmitkColorPropertyView with editing capability. On mouse press,
  * a QmitkPopupColorChooser appears allowing the user to pick a new color.

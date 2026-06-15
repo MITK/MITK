@@ -48,7 +48,6 @@ namespace mitk
    *      in the cell data.
    *
    * \sa ComputeContourSetNormalsFilter, ReduceContourSetFilter, SurfaceInterpolationController
-   * \ingroup MitkSurfaceInterpolationModule
    */
   class MITKSURFACEINTERPOLATION_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {

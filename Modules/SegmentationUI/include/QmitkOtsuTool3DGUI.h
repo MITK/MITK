@@ -24,7 +24,6 @@ namespace Ui
 }
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::OtsuTool3D providing controls for Otsu multi-threshold segmentation.
 
   Provides a spin box for the number of regions, a preview button, and advanced settings

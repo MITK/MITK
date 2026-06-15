@@ -32,7 +32,6 @@ namespace mitk {
  *
  * \sa mitk::CustomMimeType
  * \sa mitk::IOMimeTypes
- * \ingroup MitkRTModule
  */
 class MITKRT_EXPORT DICOMRTMimeTypes
 {

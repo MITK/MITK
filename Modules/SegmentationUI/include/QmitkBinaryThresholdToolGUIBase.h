@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <MitkSegmentationUIExports.h>
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief Base GUI class for threshold-based segmentation tools.
 
   Provides the common UI elements for both single-threshold and upper/lower threshold

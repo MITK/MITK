@@ -29,7 +29,6 @@ namespace mitk
  *
  * \sa mitk::RTConstants
  * \sa mitk::RTCTKEventConstants
- * \ingroup MitkRTUIModule
  */
 struct MITKRTUI_EXPORT RTUIConstants
 {
@@ -83,7 +82,6 @@ struct MITKRTUI_EXPORT RTUIConstants
  * to changes in reference dose, iso dose level presets, and global visibility settings.
  *
  * \sa mitk::RTUIConstants
- * \ingroup MitkRTUIModule
  */
 struct MITKRTUI_EXPORT RTCTKEventConstants
 {

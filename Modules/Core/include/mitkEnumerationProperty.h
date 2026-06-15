@@ -31,8 +31,6 @@ namespace mitk
    * values in its constructor. You should override AddEnum() as protected so
    * that users cannot add invalid enumeration values.
    *
-   * \ingroup DataManagement
-   *
    * \sa VtkRepresentationProperty
    * \sa VtkInterpolationProperty
    * \sa BaseProperty

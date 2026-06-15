@@ -40,8 +40,6 @@ namespace itk
  * output[index] = functor(input[index], index);
  * \endcode
  *
- * \ingroup IntensityImageFilters MultiThreaded
- * \ingroup ITKImageIntensity
  * \sa itk::UnaryFunctorImageFilter, SUVbwFunctorPolicy
  */
 

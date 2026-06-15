@@ -26,8 +26,6 @@ namespace mitk
    * \brief Standard RGB color typedef using float components.
    *
    * Each color component (red, green, blue) ranges from 0.0f to 1.0f.
-   *
-   * \ingroup Property
    */
   typedef itk::RGBPixel<float> Color;
 
@@ -51,8 +49,6 @@ namespace mitk
    *
    * Stores an RGB color with float precision (each component 0.0f to 1.0f).
    * Used to associate a rendering color with a DataNode.
-   *
-   * \ingroup DataManagement
    *
    * \note If you want to apply the mitk::ColorProperty to an mitk::Image,
    * make sure to set the mitk::RenderingModeProperty to a mode which

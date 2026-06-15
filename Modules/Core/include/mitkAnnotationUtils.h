@@ -29,8 +29,6 @@ namespace mitk
   /**
    * \brief Provides static utility functions for accessing registered AnnotationRenderers
    *        and Annotations.
-   *
-   * \ingroup Rendering
    */
   class MITKCORE_EXPORT AnnotationUtils
   {

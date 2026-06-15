@@ -25,7 +25,6 @@ namespace Ui
 }
 
 /**
-\ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::MedSAMTool.
 \sa mitk::MedSAMTool
 */

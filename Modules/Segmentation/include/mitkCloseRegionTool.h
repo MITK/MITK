@@ -28,8 +28,6 @@ namespace mitk
 
     \sa FillRegionBaseTool
 
-    \ingroup Interactions
-
     Finds the outer contour of a shape in 2D (possibly including holes) and sets all
     the pixels inside to the foreground pixel value (filling holes in a segmentation).
     If clicked on the background, the outer contour might contain the whole image and thus

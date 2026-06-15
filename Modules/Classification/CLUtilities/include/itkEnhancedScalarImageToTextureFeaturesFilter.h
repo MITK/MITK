@@ -110,7 +110,6 @@ namespace itk
     * \sa HistogramToTextureFeaturesFilter
     *
     * Author: Zachary Pincus
-    * \ingroup ITKStatistics
     */
 
     template< typename TImageType,

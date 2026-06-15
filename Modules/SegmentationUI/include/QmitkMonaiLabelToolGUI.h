@@ -30,7 +30,6 @@ namespace Ui
 }
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief Base GUI class for MONAI Label segmentation tools.
 
   Provides common controls for fetching available models from a MONAI Label server,

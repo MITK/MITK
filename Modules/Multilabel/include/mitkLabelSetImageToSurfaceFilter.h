@@ -36,7 +36,6 @@ namespace mitk
    * To extract surfaces for all available labels, call GenerateAllLabelsOn().
    *
    * \sa MultiLabelSegmentation, SurfaceSource, LabelSetImageToSurfaceThreadedFilter
-   * \ingroup SurfaceFilters
    */
   class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
   {

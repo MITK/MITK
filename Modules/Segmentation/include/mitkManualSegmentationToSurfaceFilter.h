@@ -33,7 +33,6 @@ namespace mitk
    * resulting isotropic image has 1mm isotropic voxels by default, but
    * can be varied freely.
    *
-   * \ingroup ImageFilters
    * \ingroup Process
    */
 

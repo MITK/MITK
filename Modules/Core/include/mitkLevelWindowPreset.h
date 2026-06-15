@@ -25,8 +25,6 @@ namespace mitk
    *
    * Reads named level/window presets from an XML resource file
    * (mitkLevelWindowPresets.xml) and provides access to the stored values.
-   *
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT LevelWindowPreset : public vtkXMLParser
   {

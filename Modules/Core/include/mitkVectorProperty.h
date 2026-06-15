@@ -54,8 +54,6 @@ namespace mitk
    *
    * \tparam DATATYPE The element type of the stored vector.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    * \sa VectorPropertyDataType
    */

@@ -32,8 +32,6 @@ namespace mitk
    * or time points (e.g., per-slice acquisition parameters). When constructed with a
    * single string, the value is stored at time step 0, slice 0.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    * \sa StringProperty
    */

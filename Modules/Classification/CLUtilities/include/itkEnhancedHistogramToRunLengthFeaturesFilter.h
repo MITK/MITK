@@ -71,7 +71,6 @@ namespace itk {
     * \sa EnhancedHistogramToRunLengthFeaturesFilter
     *
     * \author: Nick Tustison
-    * \ingroup ITKStatistics
     */
 
     template< typename THistogram >

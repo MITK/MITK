@@ -42,7 +42,6 @@ namespace mitk
    * \pre The output geometry must be set and must be an image geometry.
    *
    * \sa ExtractSliceFilter
-   * \ingroup Algorithms
    */
   class MITKCORE_EXPORT ExtractSliceFilter2 final : public ImageToImageFilter
   {

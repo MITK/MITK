@@ -28,7 +28,6 @@ namespace mitk
    * factories can be registered via RegisterExtraFactory() to extend the set
    * of supported mappers and default properties.
    *
-   * \ingroup DataManagement
    * \sa CoreObjectFactoryBase
    */
   class MITKCORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase

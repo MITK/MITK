@@ -36,7 +36,6 @@ found in the LICENSE file.
  * \sa QmitkScalarBar
  * \sa QmitkOverlay
  * \sa QmitkTextOverlay
- * \ingroup Qmitk
  */
 
 class MITKQTOVERLAYS_EXPORT QmitkScalarBarOverlay : public QmitkOverlay

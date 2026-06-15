@@ -46,7 +46,6 @@ public:
 /**
  * \brief An on-demand string property editor that shows the value as a label
  *        with a "..." button to open an input dialog.
- * \ingroup Widgets
  *
  * Displays the current string property value as a QLabel. Clicking the "..."
  * button opens a QInputDialog to edit the text. The property is updated only

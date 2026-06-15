@@ -33,8 +33,6 @@ namespace mitk
   *
   * See documentation of SetAuto for information on how the level window is initialized from an image.
   *
-  * @ingroup DataManagement
-  *
   * @note If you want to apply the mitk::LevelWindow to an mitk::Image, make sure
   * to use the mitk::LevelWindowProperty and set the mitk::RenderingModeProperty
   * to a mode which supports level window (e.g. LOOKUPTABLE_LEVELWINDOW_COLOR).

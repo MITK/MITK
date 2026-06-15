@@ -34,8 +34,6 @@ namespace mitk
    * - Source role: "source of <ruleIDTag> relation"
    * - Destination role: "destination of <ruleIDTag> relation"
    *
-   * \ingroup DataManagement
-   *
    * \sa PropertyRelationRuleBase
    * \sa SourceImageRelationRule
    */

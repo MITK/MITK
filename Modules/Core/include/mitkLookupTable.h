@@ -40,7 +40,6 @@ namespace mitk
    *       mitkImageVtkMapper2DLookupTableTest.cpp for examples.
    *
    * \sa LookupTableProperty, RenderingModeProperty, TransferFunction
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT LookupTable : public itk::DataObject
   {

@@ -36,7 +36,6 @@ namespace Ui
  *
  * \sa mitk::IsoDoseLevel
  * \sa QmitkIsoDoseLevelSetModel
- * \ingroup MitkRTUIModule
  */
 class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget
 {

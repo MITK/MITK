@@ -25,8 +25,6 @@ class QmitkMultiLabelInspector;
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
 
-  \ingroup org_mitk_gui_qt_interactivesegmentation
-
   Created through ITK object factory.
 */
 

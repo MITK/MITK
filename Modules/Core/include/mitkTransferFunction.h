@@ -45,7 +45,6 @@ namespace mitk
    *       See the test mitkImageVtkMapper2DTransferFunctionTest.cpp for an example.
    *
    * \sa TransferFunctionProperty, RenderingModeProperty, LookupTable
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT TransferFunction : public itk::Object
   {

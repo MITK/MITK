@@ -30,7 +30,6 @@ namespace mitk
    *
    * \sa CrosshairManager
    * \sa CrosshairVtkMapper2D
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT CrosshairData : public BaseData
   {

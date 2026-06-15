@@ -29,7 +29,6 @@ namespace mitk
    * - "mean" (5)
    *
    * \sa EnumerationProperty
-   * \ingroup DataManagement
    */
   class MITKCORE_EXPORT ResliceMethodProperty : public EnumerationProperty
   {

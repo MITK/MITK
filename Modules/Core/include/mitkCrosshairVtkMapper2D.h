@@ -39,7 +39,6 @@ namespace mitk
    *
    * \sa CrosshairData
    * \sa CrosshairManager
-   * \ingroup Rendering
    */
   class MITKCORE_EXPORT CrosshairVtkMapper2D : public VtkMapper
   {

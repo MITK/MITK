@@ -19,7 +19,6 @@ found in the LICENSE file.
  * of named scalar lists (e.g. static model parameters) as node or data properties.
  *
  * \sa mitk::ScalarListLookupTable, mitk::GenericProperty
- * \ingroup ModelFit
  */
 
 #ifndef mitkScalarListLookupTableProperty_h

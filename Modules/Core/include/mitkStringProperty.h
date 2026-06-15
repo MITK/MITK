@@ -29,8 +29,6 @@ namespace mitk
    * property types in MITK, for example to store names, labels, or other textual
    * metadata associated with data objects.
    *
-   * \ingroup DataManagement
-   *
    * \sa BaseProperty
    * \sa GenericProperty
    * \sa TemporoSpatialStringProperty

@@ -44,8 +44,8 @@ Then create a 2D view for slicing sagittally.
 
 The toplevelWidget is now the new main widget:
 
-\skipline qtapplication
 \skipline toplevelWidget.show
+\skipline qtapplication
 
 \section Step4bSection Step 4b - Display slice positions
 

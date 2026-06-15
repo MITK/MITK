@@ -30,7 +30,6 @@ namespace Ui
 class QmitkFloatingTextPopup;
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::LabelSelectionTool.
   \sa mitk::LabelSelectionTool
 */

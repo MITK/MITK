@@ -40,10 +40,6 @@ namespace itk
   * \remark This filter differs from itk::StatisticsImageFilter by the fact that you can
   * specify an mask image. If set, only pixels within the mask (mask value > 0) are taken
   * into account for the statistics.
-  *
-  * \ingroup MathematicalStatisticsImageFilters
-  * \ingroup ITKImageStatistics
-  *
   */
   template< typename TInputImage , typename TMaskImage = ::itk::Image<unsigned char, TInputImage::ImageDimension> >
   class MaskedStatisticsImageFilter:

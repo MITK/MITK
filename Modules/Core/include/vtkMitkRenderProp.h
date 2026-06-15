@@ -25,7 +25,6 @@ found in the LICENSE file.
  * to mitk::VtkPropRenderer, which is responsible for rendering of mitk::DataNodes.
  *
  * \sa mitk::VtkPropRenderer
- * \ingroup Rendering
  */
 class MITKCORE_EXPORT vtkMitkRenderProp : public vtkProp
 {

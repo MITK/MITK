@@ -33,7 +33,6 @@ found in the LICENSE file.
  *
  * \sa QmitkOverlay
  * \sa QmitkOverlayController
- * \ingroup Overlays
  */
 
 class MITKQTOVERLAYS_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay

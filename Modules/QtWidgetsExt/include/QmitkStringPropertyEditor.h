@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 /**
  * \brief A QLineEdit that edits a mitk::StringProperty.
- * \ingroup Widgets
  *
  * Bidirectionally synchronizes the line edit text with a mitk::StringProperty.
  * When the user types, the property is updated. When the property changes

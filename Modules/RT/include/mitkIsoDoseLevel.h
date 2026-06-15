@@ -36,7 +36,6 @@ namespace mitk
    * \sa IsoDoseLevelSet
    * \sa IsoDoseLevelVector
    * \sa IsoDoseLevelSetProperty
-   * \ingroup MitkRTModule
    */
   class MITKRT_EXPORT IsoDoseLevel: public itk::Object
   {

@@ -35,7 +35,6 @@ namespace mitk
    * or extend the data tree deserialization mechanism. Module-specific factories
    * deriving from this class can be registered with CoreObjectFactory.
    *
-   * \ingroup Algorithms
    * \sa CoreObjectFactory Mapper DataNode
    */
   class MITKCORE_EXPORT CoreObjectFactoryBase : public itk::Object

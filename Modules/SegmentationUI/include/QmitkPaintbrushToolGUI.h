@@ -22,7 +22,6 @@ class QLabel;
 class QFrame;
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::PaintbrushTool.
   \sa mitk::PaintbrushTool
 

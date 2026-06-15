@@ -24,8 +24,6 @@ namespace mitk
    * Stores a smart pointer to a LookupTable, which defines a color mapping
    * for rendering images with discrete or continuous color scales.
    *
-   * \ingroup DataManagement
-   *
    * \note If you want to use this property to colorize an mitk::Image, make sure
    * to set the mitk::RenderingModeProperty to a mode which supports lookup tables
    * (e.g. LOOKUPTABLE_COLOR). See the documentation of mitk::RenderingModeProperty.

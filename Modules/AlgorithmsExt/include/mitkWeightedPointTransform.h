@@ -31,8 +31,6 @@ class vtkLandmarkTransform;
 namespace mitk
 {
   /**
-   * \ingroup AnisotropicRegistration
-   *
    * \brief This class implements an extension of the
    * weighted point based registration algorithm
    * from A. Danilchenko, R. Balachandran and J. M. Fitzpatrick.

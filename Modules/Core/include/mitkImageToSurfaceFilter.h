@@ -42,7 +42,6 @@ namespace mitk
    * and vtkSmoothPolyDataFilter to relax the mesh. It is also possible
    * to create time-sliced surfaces.
    *
-   * \ingroup ImageFilters
    * \ingroup Process
    * \sa SurfaceSource
    * \sa Surface

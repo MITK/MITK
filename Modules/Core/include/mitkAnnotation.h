@@ -32,7 +32,6 @@ namespace mitk
    * accessed via convenience methods for common types (bool, int, float,
    * double, string, color, opacity, visibility).
    *
-   * \ingroup Annotation
    * \sa AbstractAnnotationRenderer
    * \sa PropertyList
    */

@@ -52,7 +52,6 @@ public:
 };
 
 /**
-  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::nnUNetTool providing nnU-Net inference controls.
 
   Provides controls for selecting nnU-Net models, configurations, trainers, planners,

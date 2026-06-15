@@ -44,7 +44,6 @@ namespace mitk
    * the segmented region.
    *
    * \sa ReduceContourSetFilter, CreateDistanceImageFromSurfaceFilter, SurfaceInterpolationController
-   * \ingroup MitkSurfaceInterpolationModule
    */
   class MITKSURFACEINTERPOLATION_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
   {

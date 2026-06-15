@@ -26,7 +26,6 @@ namespace mitk
    * Subclasses must implement UpdateVtkAnnotation().
    *
    * \sa VtkAnnotation, VtkAnnotation2D, TextAnnotation3D, LabelAnnotation3D
-   * \ingroup Annotation
    */
   class MITKANNOTATION_EXPORT VtkAnnotation3D : public VtkAnnotation
   {

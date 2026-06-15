@@ -52,7 +52,6 @@ class QmitkRenderWindow;
   \brief GUI for slices interpolation.
 
   \ingroup ToolManagerEtAl
-  \ingroup Widgets
 
   \sa QmitkInteractiveSegmentation
   \sa mitk::SegmentationInterpolation

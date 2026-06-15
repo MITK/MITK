@@ -50,8 +50,6 @@ namespace mitk
    *
    * Please also regard, that the key of a property must be a none empty string.
    * This is a precondition. Setting properties with empty keys will raise an exception.
-   *
-   * @ingroup DataManagement
    */
   class MITKCORE_EXPORT PropertyList : public itk::Object, public IPropertyOwner
   {

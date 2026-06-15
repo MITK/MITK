@@ -14,7 +14,13 @@ if(MITK_USE_lz4)
 
   if(NOT DEFINED lz4_DIR)
 
-    set(additional_args )
+    #[[ lz4 only requires CMake 3.5, i.e. CMP0091 is unset and the MSVC
+        runtime library would resolve to the statically linked /MT default.
+        Force the NEW behavior to use the dynamic runtime library, consistent
+        with all other dependencies. ]]
+    set(additional_args
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=NEW
+    )
 
     if(NOT CMAKE_DEBUG_POSTFIX)
       list(APPEND additional_args "-DCMAKE_DEBUG_POSTFIX:STRING=d")

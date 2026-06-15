@@ -23,7 +23,6 @@ set(MITK_CMAKE_MODULE_PATH "@MITK_SOURCE_DIR@/CMake")
 list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH})
 
 # Standard CMake macros
-include(CMakeParseArguments)
 include(FeatureSummary)
 include(FindPackageHandleStandardArgs)
 include(GenerateExportHeader)
@@ -144,7 +143,7 @@ set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(Boost_ROOT "@Boost_ROOT@" CACHE PATH "")
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
-set(Boost_ADDITIONAL_VERSIONS 1.74 1.74.0)
+set(Boost_ADDITIONAL_VERSIONS 1.91 1.91.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig "@DCMTK_DIR@")

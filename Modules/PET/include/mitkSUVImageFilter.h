@@ -98,7 +98,10 @@ namespace mitk
 
     // ---- Override fields ---------------------------------------------------
     //
-    // Set / Get use itk macros. Clear and GetEffective are hand-written.
+    // Set / Get use itk macros, except SetDecayTimeOverrideInSec,
+    // SetDecayTimeOverrideMap, and GetDecayTimeOverrideMap, which are
+    // hand-written to enforce the override mutual-exclusion. Clear and
+    // GetEffective are hand-written.
 
     /** \brief Override DICOM (0010,1030) Patient Weight, in [g]. */
     itkSetMacro(PatientWeightInGram, double);
@@ -131,15 +134,49 @@ namespace mitk
     double GetEffectiveHalfLifeInSec() const;
 
     /**
-     * \brief Override the per-(timestep, slice) decay duration, in [s].
+     * \brief Override the decay duration uniformly across every voxel,
+     *        in [s].
      *
      * Mirrors the existing CLI \c --decay-time semantic: if set, the
      * value is applied uniformly to every voxel and the
      * DICOM-decay-correction pipeline is bypassed entirely.
+     *
+     * \pre \c GetDecayTimeOverrideMap() is empty. The uniform and the
+     *      per-(timestep, slice) decay-time overrides are mutually
+     *      exclusive; the caller must \c ClearDecayTimeOverrideMap()
+     *      before engaging the uniform override.
+     *
+     * \throw ConflictingDecayTimeOverrideException if the precondition is
+     *        violated.
      */
-    itkSetMacro(DecayTimeOverrideInSec, double);
+    void SetDecayTimeOverrideInSec(double value);
     itkGetConstMacro(DecayTimeOverrideInSec, std::optional<double>);
     void ClearDecayTimeOverrideInSec();
+
+    /**
+     * \brief Override the decay duration on a per-(timestep, slice) basis,
+     *        in [s].
+     *
+     * The map must be a complete and well-formed match for the input
+     * image: exactly one entry per (timestep, slice) the input owns, no
+     * out-of-range coordinates. Sparse or out-of-range maps are rejected
+     * at \c ConfigureFromProperties time with
+     * \c InvalidDecayTimeMapException; the filter does \b not silently
+     * fall back to DICOM-derived values for missing cells. Callers that
+     * want a DICOM baseline plus a few overrides must seed the map from
+     * \c GetEffectiveDecayCorrection() after a Configure pass without
+     * the override.
+     *
+     * \pre \c GetDecayTimeOverrideInSec() is empty. The two overrides are
+     *      mutually exclusive (see \c SetDecayTimeOverrideInSec).
+     *
+     * \throw ConflictingDecayTimeOverrideException if the precondition is
+     *        violated.
+     */
+    void SetDecayTimeOverrideMap(DecayTimeMapType map);
+    void ClearDecayTimeOverrideMap();
+    std::optional<DecayTimeMapType> GetDecayTimeOverrideMap() const;
+
     DecayCorrectionInfo GetEffectiveDecayCorrection() const;
 
     /**
@@ -169,6 +206,28 @@ namespace mitk
     SUVInputModel GetEffectiveInputModel() const;
 
     /**
+     * \brief Input model classified (or override-derived) by the most
+     *        recent ConfigureFromProperties call, regardless of whether
+     *        that call completed.
+     *
+     * Unlike \c GetEffectiveInputModel, this accessor never throws and
+     * survives rollbacks: ConfigureFromProperties resets it on entry and
+     * runs input-model classification first, so once that step produces a
+     * value it stays available even if a later validation step in the same
+     * call throws.
+     *
+     * The intended consumer is a UI that needs to know whether the
+     * input is pre-normalized (and what its source variant is) in order
+     * to drive UI affordances such as showing variant-specific patient
+     * inputs even after a configuration failure further downstream.
+     *
+     * Returns \c std::nullopt if the most recent call did not reach a
+     * successful classification (it threw at or before that step), or if
+     * ConfigureFromProperties has never run.
+     */
+    std::optional<SUVInputModel> GetDetectedInputModel() const noexcept;
+
+    /**
      * \brief Resolve all unset fields from a property provider.
      *
      * Reads the standard PET DICOM tags (patient weight / height / sex,
@@ -192,6 +251,10 @@ namespace mitk
      * \throw BenchmarkAdaptationRequiredException (or a subclass) if
      *        DICOMReadPolicy is Strict and the input would have required
      *        an IBSI-SUV-recommended adaptation.
+     * \throw InvalidDecayTimeMapException if a per-(timestep, slice)
+     *        decay-time override map is set and its shape does not match
+     *        the input image geometry (sparse cells or out-of-range
+     *        timestep / slice coordinates).
      */
     void ConfigureFromProperties(const IPropertyProvider *props);
 
@@ -205,9 +268,6 @@ namespace mitk
   private:
     /** \brief Throw \c mitk::Exception with a "Configure first" message. */
     static void RequireConfigured(bool configured, const char *fieldName);
-
-    /** \brief Compute the per-(timestep, slice) decay map from the override. */
-    DecayCorrectionInfo BuildOverrideDecayInfo(const Image *image, double decayTime) const;
 
     /** \brief Process one 3D timestep through the SUV functor and write to \p dst. */
     void ProcessTimeStep(const Image *stepIn,
@@ -228,6 +288,7 @@ namespace mitk
     std::optional<double> m_InjectedActivityInBq;
     std::optional<double> m_HalfLifeInSec;
     std::optional<double> m_DecayTimeOverrideInSec;
+    std::optional<DecayTimeMapType> m_DecayTimeOverrideMap;
     std::optional<int> m_TracerIndex;
     std::optional<SUVInputModel> m_InputModelOverride;
 
@@ -239,6 +300,15 @@ namespace mitk
     std::optional<double> m_EffectiveHalfLifeInSec;
     std::optional<DecayCorrectionInfo> m_EffectiveDecayCorrection;
     std::optional<SUVInputModel> m_EffectiveInputModel;
+
+    // Detected input model: sticky across rollbacks (does not need to
+    // round-trip the failure case because classification is a pure
+    // function of (props, override, policy)). Drives UI affordances
+    // that must remain available even after a configuration failure
+    // further downstream (e.g. showing the sex / height combos when
+    // the source variant of a pre-normalized input requires them).
+    std::optional<SUVInputModel> m_DetectedInputModel;
+
     bool m_Configured{false};
   };
 } // namespace mitk

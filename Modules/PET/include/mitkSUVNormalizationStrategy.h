@@ -300,6 +300,34 @@ namespace mitk
    */
   std::unique_ptr<SUVNormalizationStrategy> MITKPET_EXPORT
   MakeSUVNormalizationStrategy(SUVVariant variant);
+
+  /**
+   * \brief Whether the given SUV variant's scale numerator depends on
+   *        the patient's height.
+   *
+   * Used by the SUVImageFilter to decide whether to require / validate
+   * a patient-height value during ConfigureFromProperties, and by the
+   * GUI to decide whether to expose a patient-height override control.
+   * Single source of truth for both consumers.
+   *
+   * \param[in] variant The SUV variant in question.
+   * \return \c true for every variant except \c SUVVariant::BW.
+   */
+  bool MITKPET_EXPORT VariantRequiresPatientHeight(SUVVariant variant);
+
+  /**
+   * \brief Whether the given SUV variant's scale numerator depends on
+   *        the patient's sex.
+   *
+   * \c true for the three sex-specific variants
+   * (\c LBM_Janmahasatian, \c LBM_James128, \c IBW); \c false for
+   * \c BW and \c BSA. Same role as VariantRequiresPatientHeight: single
+   * source of truth for filter validation and GUI gating.
+   *
+   * \param[in] variant The SUV variant in question.
+   * \return \c true iff the variant is sex-specific.
+   */
+  bool MITKPET_EXPORT VariantRequiresPatientSex(SUVVariant variant);
 }
 
 #endif

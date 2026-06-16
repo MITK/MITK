@@ -241,6 +241,46 @@ namespace mitk
   };
 
   /**
+   * \brief A user-supplied per-(timestep, slice) decay-time override map is
+   *        not a complete and well-formed match for the input image geometry.
+   *
+   * Raised by \c SUVImageFilter::ConfigureFromProperties when the map
+   * installed via \c SetDecayTimeOverrideMap either does not cover every
+   * (timestep, slice) pair the input image owns, or contains entries for
+   * (timestep, slice) coordinates that are out of range for the input.
+   *
+   * The filter does not silently fall back to DICOM-derived values for
+   * missing entries: a partial map is an explicit caller bug. Callers that
+   * want a DICOM-derived baseline plus a few overrides must seed the map
+   * from \c GetEffectiveDecayCorrection() (after a Configure pass without
+   * the override) and then mutate the entries they intend to override.
+   *
+   * The exception message names the first offending (timestep, slice).
+   */
+  class MITKPET_EXPORT InvalidDecayTimeMapException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(InvalidDecayTimeMapException, SUVHelperException);
+  };
+
+  /**
+   * \brief Raised when a uniform decay-time override and a per-(timestep,
+   *        slice) decay-time override map are set simultaneously.
+   *
+   * The two override modes are mutually exclusive: each represents a
+   * distinct caller intent (a single global value vs. a fully resolved
+   * per-slice grid), so the filter refuses to silently drop one in favour
+   * of the other. The caller must clear the active override explicitly
+   * (\c ClearDecayTimeOverrideInSec or \c ClearDecayTimeOverrideMap)
+   * before engaging the other mode.
+   */
+  class MITKPET_EXPORT ConflictingDecayTimeOverrideException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(ConflictingDecayTimeOverrideException, SUVHelperException);
+  };
+
+  /**
    * \brief Policy controlling whether benchmark-recommended adaptations
    *        of borderline / non-spec DICOM input are applied.
    *

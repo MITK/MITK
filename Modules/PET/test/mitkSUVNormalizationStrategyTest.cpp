@@ -63,6 +63,10 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   MITK_TEST(Factory_IBW_ReturnsCorrectStrategy);
   MITK_TEST(Factory_BSA_ReturnsBodySurfaceAreaStrategy);
 
+  // Variant-requires queries (shared by SUVImageFilter and the GUI plugin)
+  MITK_TEST(VariantRequiresPatientHeight_AllVariants);
+  MITK_TEST(VariantRequiresPatientSex_AllVariants);
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -403,6 +407,26 @@ public:
     auto s = mitk::MakeSUVNormalizationStrategy(mitk::SUVVariant::BSA);
     CPPUNIT_ASSERT(s != nullptr);
     CPPUNIT_ASSERT_EQUAL(mitk::SUVVariant::BSA, s->Variant());
+  }
+
+  // ---- Variant-requires queries ----
+
+  void VariantRequiresPatientHeight_AllVariants()
+  {
+    CPPUNIT_ASSERT_EQUAL(false, mitk::VariantRequiresPatientHeight(mitk::SUVVariant::BW));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientHeight(mitk::SUVVariant::LBM_Janmahasatian));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientHeight(mitk::SUVVariant::LBM_James128));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientHeight(mitk::SUVVariant::IBW));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientHeight(mitk::SUVVariant::BSA));
+  }
+
+  void VariantRequiresPatientSex_AllVariants()
+  {
+    CPPUNIT_ASSERT_EQUAL(false, mitk::VariantRequiresPatientSex(mitk::SUVVariant::BW));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientSex(mitk::SUVVariant::LBM_Janmahasatian));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientSex(mitk::SUVVariant::LBM_James128));
+    CPPUNIT_ASSERT_EQUAL(true,  mitk::VariantRequiresPatientSex(mitk::SUVVariant::IBW));
+    CPPUNIT_ASSERT_EQUAL(false, mitk::VariantRequiresPatientSex(mitk::SUVVariant::BSA));
   }
 };
 

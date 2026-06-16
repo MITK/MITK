@@ -65,27 +65,31 @@ namespace
     return override_.has_value() ? override_.value() : fromProperties();
   }
 
-  // True iff the variant's scale numerator depends on patient sex.
+  // Single source of truth lives in mitkSUVNormalizationStrategy; these
+  // file-local wrappers exist only to keep the local call sites readable.
   bool IsSexSpecificVariant(mitk::SUVVariant v)
+  {
+    return mitk::VariantRequiresPatientSex(v);
+  }
+
+  bool NeedsHeight(mitk::SUVVariant v)
+  {
+    return mitk::VariantRequiresPatientHeight(v);
+  }
+
+  const char* VariantDisplayName(mitk::SUVVariant v)
   {
     switch (v)
     {
-      case mitk::SUVVariant::LBM_Janmahasatian:
-      case mitk::SUVVariant::LBM_James128:
-      case mitk::SUVVariant::IBW:
-        return true;
-      case mitk::SUVVariant::BW:
-      case mitk::SUVVariant::BSA:
-      default:
-        return false;
+      case mitk::SUVVariant::BW:                return "BW";
+      case mitk::SUVVariant::LBM_Janmahasatian: return "LBM-Janmahasatian";
+      case mitk::SUVVariant::LBM_James128:      return "LBM-James128";
+      case mitk::SUVVariant::IBW:               return "IBW (Sugawara)";
+      case mitk::SUVVariant::BSA:               return "BSA (DuBois)";
     }
-  }
-
-  // True iff the variant's scale numerator needs the patient height.
-  // BW is the only variant that does not consume height.
-  bool NeedsHeight(mitk::SUVVariant v)
-  {
-    return v != mitk::SUVVariant::BW;
+    mitkThrow() << "VariantDisplayName: unhandled SUVVariant value ("
+                << static_cast<int>(v) << "). The switch must cover every "
+                   "enumerator; this is a programmer error.";
   }
 
   // Resolve the scale numerator under the ambiguous-sex policy gate.
@@ -106,10 +110,22 @@ namespace
   // not a specific encoding) and prevents the gate from being silently
   // bypassed when an upstream path leaves the effective sex empty on a
   // sex-specific target variant.
+  //
+  // \p role describes which leg of the renormalization chain the gate is
+  // covering, so the resulting exception / warning message points at the
+  // actual source of the sex dependency. Typical values: "target" or
+  // "source (pre-normalized input)".
+  //
+  // \p emitWarnings gates the Lenient-policy MITK_WARN. Configure-time
+  // validation passes false to avoid spamming the log on every GUI control
+  // change; GenerateData leaves it true so the adaptation is announced once
+  // per computation. The Strict-policy exception is unaffected.
   double ResolveScaleNumeratorUnderSexPolicy(
     const mitk::SUVNormalizationStrategy&  strategy,
     const mitk::SUVNormalizationInputs&    inputs,
-    mitk::DICOMReadPolicy                  policy)
+    mitk::DICOMReadPolicy                  policy,
+    const char*                            role,
+    bool                                   emitWarnings = true)
   {
     if (!IsSexSpecificVariant(strategy.Variant()))
     {
@@ -126,19 +142,25 @@ namespace
     const char* const trigger = inputs.sex.has_value()
       ? "= 'O' (Other)"
       : "is not available";
+    const char* const variantName = VariantDisplayName(strategy.Variant());
 
     if (mitk::DICOMReadPolicy::Strict == policy)
     {
       mitkThrowException(mitk::AmbiguousPatientSexAdaptationRefusedException)
-        << "Patient sex (0010,0040) " << trigger << " and the chosen SUV "
-           "variant is sex-specific. The IBSI mean-of-M-and-F adaptation "
-           "is refused under DICOMReadPolicy::Strict. Provide an explicit "
-           "patient-sex override or relax the policy to Lenient.";
+        << "Patient sex (0010,0040) " << trigger << " and the " << role
+        << " SUV variant " << variantName << " is sex-specific. The IBSI "
+           "mean-of-M-and-F adaptation is refused under "
+           "DICOMReadPolicy::Strict. Provide an explicit patient-sex "
+           "override or relax the policy to Lenient.";
     }
 
-    MITK_WARN << "Patient sex (0010,0040) " << trigger << ". Applying the "
-                 "IBSI-SUV recommended mean of male- and female-specific "
-                 "scale numerators (DICOMReadPolicy::Lenient).";
+    if (emitWarnings)
+    {
+      MITK_WARN << "Patient sex (0010,0040) " << trigger << ". Applying the "
+                   "IBSI-SUV recommended mean of male- and female-specific "
+                   "scale numerators for the " << role << " variant "
+                << variantName << " (DICOMReadPolicy::Lenient).";
+    }
 
     auto inputsCopy = inputs;
     inputsCopy.sex  = mitk::Sex::Male;
@@ -181,6 +203,121 @@ namespace
       << "Input contains a multi-item Radiopharmaceutical Information "
          "Sequence (0054,0016). Set an explicit tracer index to select one. "
          "Items: " << names.str();
+  }
+
+  // Uniform override: build a synthetic per-(timestep, slice) decay map with
+  // the same value everywhere. Mirrors the existing CLI --decay-time semantic.
+  mitk::DecayCorrectionInfo BuildOverrideDecayInfo(
+    const mitk::Image* image,
+    double             decayTime)
+  {
+    mitk::DecayCorrectionInfo info;
+    info.strategy = mitk::DecayCorrectionStrategy::Manual;
+
+    const auto timeSteps = image->GetTimeSteps();
+    for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
+    {
+      const auto* sliced = image->GetSlicedGeometry(t);
+      const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1U;
+      for (unsigned int z = 0; z < slices; ++z)
+      {
+        info.decayTimes[t][z] = decayTime;
+      }
+    }
+    return info;
+  }
+
+  // Validate the per-(timestep, slice) override map against the input image
+  // geometry and wrap it in a DecayCorrectionInfo.
+  //
+  // \pre image must not be null.
+  // \throw mitk::InvalidDecayTimeMapException if the map is sparse or
+  //        contains out-of-range coordinates.
+  mitk::DecayCorrectionInfo BuildOverrideDecayInfoFromMap(
+    const mitk::Image*            image,
+    const mitk::DecayTimeMapType& map)
+  {
+    if (nullptr == image)
+    {
+      mitkThrow() << "BuildOverrideDecayInfoFromMap: image is null.";
+    }
+
+    // The per-(timestep, slice) override is an all-or-nothing promise from
+    // the caller: an entry must exist for every (t, z) the image owns, and
+    // no entries are allowed for coordinates outside that range. We refuse
+    // to silently fill missing cells from DICOM because a sparse map is far
+    // more likely to be an application bug than an intentional partial
+    // override.
+    const auto timeSteps = image->GetTimeSteps();
+
+    std::size_t expectedEntries = 0U;
+    for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
+    {
+      const auto* sliced = image->GetSlicedGeometry(t);
+      const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1U;
+
+      const auto tIt = map.find(t);
+      if (tIt == map.end())
+      {
+        mitkThrowException(mitk::InvalidDecayTimeMapException)
+          << "Per-slice decay-time override map is missing timestep " << t
+          << " (image has " << timeSteps << " timestep(s)).";
+      }
+      for (unsigned int z = 0; z < slices; ++z)
+      {
+        if (tIt->second.find(z) == tIt->second.end())
+        {
+          mitkThrowException(mitk::InvalidDecayTimeMapException)
+            << "Per-slice decay-time override map is missing entry for "
+               "timestep " << t << ", slice " << z << " (timestep has "
+            << slices << " slice(s)).";
+        }
+      }
+      expectedEntries += slices;
+    }
+
+    // Catch out-of-range coordinates (extra timesteps or extra slices) by
+    // counting and by direct range checks. Counting alone is sufficient
+    // once per-cell presence is established above, but we also surface the
+    // offending coordinate to make caller debugging easier.
+    std::size_t suppliedEntries = 0U;
+    for (const auto& tEntry : map)
+    {
+      if (tEntry.first >= timeSteps)
+      {
+        mitkThrowException(mitk::InvalidDecayTimeMapException)
+          << "Per-slice decay-time override map contains out-of-range "
+             "timestep " << tEntry.first << " (image has " << timeSteps
+          << " timestep(s)).";
+      }
+      const auto* sliced = image->GetSlicedGeometry(tEntry.first);
+      const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1U;
+      for (const auto& zEntry : tEntry.second)
+      {
+        if (zEntry.first < 0 || static_cast<unsigned int>(zEntry.first) >= slices)
+        {
+          mitkThrowException(mitk::InvalidDecayTimeMapException)
+            << "Per-slice decay-time override map contains out-of-range "
+               "slice " << zEntry.first << " for timestep " << tEntry.first
+            << " (timestep has " << slices << " slice(s)).";
+        }
+      }
+      suppliedEntries += tEntry.second.size();
+    }
+    if (suppliedEntries != expectedEntries)
+    {
+      // Defensive: the per-cell loops above already cover sparse + extra
+      // coordinates. If we reach here, the map shape is inconsistent in a
+      // way the targeted checks somehow missed; refuse rather than guess.
+      mitkThrowException(mitk::InvalidDecayTimeMapException)
+        << "Per-slice decay-time override map has " << suppliedEntries
+        << " entries but image geometry requires " << expectedEntries << ".";
+    }
+
+    mitk::DecayCorrectionInfo info;
+    info.strategy   = mitk::DecayCorrectionStrategy::Manual;
+    info.decayTimes = map;
+    return info;
   }
 }
 
@@ -232,6 +369,24 @@ void mitk::SUVImageFilter::ClearHalfLifeInSec()
   }
 }
 
+void mitk::SUVImageFilter::SetDecayTimeOverrideInSec(double value)
+{
+  // Uniform and per-(timestep, slice) decay-time overrides are mutually
+  // exclusive by design. The caller must explicitly clear the map first;
+  // we refuse to silently discard it because that would mask a likely
+  // application bug (e.g. losing tree-view edits on a stray spinbox event).
+  if (m_DecayTimeOverrideMap.has_value())
+  {
+    mitkThrowException(ConflictingDecayTimeOverrideException)
+      << "SUVImageFilter::SetDecayTimeOverrideInSec: a per-(timestep, "
+         "slice) decay-time override map is already set. Call "
+         "ClearDecayTimeOverrideMap() before engaging the uniform "
+         "override.";
+  }
+  m_DecayTimeOverrideInSec = value;
+  this->Modified();
+}
+
 void mitk::SUVImageFilter::ClearDecayTimeOverrideInSec()
 {
   if (m_DecayTimeOverrideInSec.has_value())
@@ -239,6 +394,34 @@ void mitk::SUVImageFilter::ClearDecayTimeOverrideInSec()
     m_DecayTimeOverrideInSec.reset();
     this->Modified();
   }
+}
+
+void mitk::SUVImageFilter::SetDecayTimeOverrideMap(DecayTimeMapType map)
+{
+  if (m_DecayTimeOverrideInSec.has_value())
+  {
+    mitkThrowException(ConflictingDecayTimeOverrideException)
+      << "SUVImageFilter::SetDecayTimeOverrideMap: a uniform "
+         "decay-time override is already set. Call "
+         "ClearDecayTimeOverrideInSec() before engaging the "
+         "per-(timestep, slice) override.";
+  }
+  m_DecayTimeOverrideMap = std::move(map);
+  this->Modified();
+}
+
+void mitk::SUVImageFilter::ClearDecayTimeOverrideMap()
+{
+  if (m_DecayTimeOverrideMap.has_value())
+  {
+    m_DecayTimeOverrideMap.reset();
+    this->Modified();
+  }
+}
+
+std::optional<mitk::DecayTimeMapType> mitk::SUVImageFilter::GetDecayTimeOverrideMap() const
+{
+  return m_DecayTimeOverrideMap;
 }
 
 void mitk::SUVImageFilter::ClearTracerIndex()
@@ -274,6 +457,11 @@ mitk::SUVInputModel mitk::SUVImageFilter::GetEffectiveInputModel() const
 {
   RequireConfigured(m_EffectiveInputModel.has_value(), "InputModel");
   return m_EffectiveInputModel.value();
+}
+
+std::optional<mitk::SUVInputModel> mitk::SUVImageFilter::GetDetectedInputModel() const noexcept
+{
+  return m_DetectedInputModel;
 }
 
 void mitk::SUVImageFilter::RequireConfigured(bool configured, const char* fieldName)
@@ -322,27 +510,6 @@ mitk::DecayCorrectionInfo mitk::SUVImageFilter::GetEffectiveDecayCorrection() co
   return m_EffectiveDecayCorrection.value();
 }
 
-mitk::DecayCorrectionInfo mitk::SUVImageFilter::BuildOverrideDecayInfo(const Image* image,
-                                                                      double       decayTime) const
-{
-  // Uniform override: build a synthetic per-(timestep, slice) map with the
-  // same value everywhere. Mirrors the existing CLI --decay-time semantic.
-  DecayCorrectionInfo info;
-  info.strategy = DecayCorrectionStrategy::Manual;
-
-  const auto timeSteps = image->GetTimeSteps();
-  for (TimeStepType t = 0; t < timeSteps; ++t)
-  {
-    const auto* sliced = image->GetSlicedGeometry(t);
-    const unsigned int slices = (nullptr != sliced) ? sliced->GetSlices() : 1U;
-    for (unsigned int z = 0; z < slices; ++z)
-    {
-      info.decayTimes[t][z] = decayTime;
-    }
-  }
-  return info;
-}
-
 void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* props)
 {
   if (nullptr == props)
@@ -374,6 +541,12 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
   m_EffectiveDecayCorrection.reset();
   m_EffectiveInputModel.reset();
 
+  // Reset on entry but, unlike the effective fields above, deliberately not
+  // snapshotted for rollback: the detection slot must reflect this call's
+  // classification, so a re-classification that fails clears it instead of
+  // resurfacing the previous input's model.
+  m_DetectedInputModel.reset();
+
   try
   {
     // ---- Input pixel semantics ------------------------------------------
@@ -381,6 +554,12 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_EffectiveInputModel = m_InputModelOverride.has_value()
       ? m_InputModelOverride.value()
       : ClassifyPETInput(props, m_DICOMReadPolicy);
+
+    // Sticky detection slot: keep the classification result across
+    // subsequent validation failures in this same Configure call so
+    // the UI can keep showing source-variant affordances even if the
+    // sex / dose / decay gate further down throws.
+    m_DetectedInputModel = m_EffectiveInputModel;
 
     // ---- Radiopharmaceutical info: tracer + activity + half-life ----------
     //
@@ -488,7 +667,15 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
 
     if (needsRadioPharma)
     {
-      if (m_DecayTimeOverrideInSec.has_value())
+      // Precedence: per-(timestep, slice) map > uniform override > DICOM.
+      // The first two are mutually exclusive at set time, so at most one
+      // branch is taken here; the order is purely defensive.
+      if (m_DecayTimeOverrideMap.has_value())
+      {
+        m_EffectiveDecayCorrection =
+          BuildOverrideDecayInfoFromMap(image, m_DecayTimeOverrideMap.value());
+      }
+      else if (m_DecayTimeOverrideInSec.has_value())
       {
         m_EffectiveDecayCorrection = BuildOverrideDecayInfo(image,
                                                             m_DecayTimeOverrideInSec.value());
@@ -498,6 +685,37 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
         m_EffectiveDecayCorrection = DeduceDecayCorrection(image,
                                                            m_EffectiveHalfLifeInSec.value(),
                                                            m_DICOMReadPolicy);
+      }
+    }
+
+    // ---- Eager validation of the (sex x variant x policy) gate ----------
+    //
+    // ResolveScaleNumeratorUnderSexPolicy fires for ambiguous sex on a
+    // sex-specific variant under Strict. Calling it here -- not only in
+    // GenerateData -- lets the plugin disable the Calculate button before
+    // the user clicks it instead of surfacing the exception mid-Update.
+    SUVNormalizationInputs normInputs;
+    normInputs.bodyWeightKg = m_EffectivePatientWeightInGram.value() / 1000.0;
+    if (m_EffectivePatientHeightInCm.has_value())
+    {
+      normInputs.heightM = m_EffectivePatientHeightInCm.value() / 100.0;
+    }
+    if (m_EffectivePatientSex.has_value())
+    {
+      normInputs.sex = m_EffectivePatientSex.value();
+    }
+    {
+      auto targetStrategy = MakeSUVNormalizationStrategy(m_TargetVariant);
+      (void)ResolveScaleNumeratorUnderSexPolicy(*targetStrategy, normInputs,
+                                                m_DICOMReadPolicy, "target",
+                                                /*emitWarnings=*/false);
+      if (sourceNeedsRenormPatientData)
+      {
+        auto sourceStrategy = MakeSUVNormalizationStrategy(sourceVariant);
+        (void)ResolveScaleNumeratorUnderSexPolicy(*sourceStrategy, normInputs,
+                                                  m_DICOMReadPolicy,
+                                                  "source (pre-normalized input)",
+                                                  /*emitWarnings=*/false);
       }
     }
 
@@ -700,7 +918,8 @@ void mitk::SUVImageFilter::GenerateData()
 
   auto targetStrategy = MakeSUVNormalizationStrategy(m_TargetVariant);
   const double scaleNumeratorTarget =
-    ResolveScaleNumeratorUnderSexPolicy(*targetStrategy, normInputs, m_DICOMReadPolicy);
+    ResolveScaleNumeratorUnderSexPolicy(*targetStrategy, normInputs,
+                                        m_DICOMReadPolicy, "target");
 
   const auto& inputModel = m_EffectiveInputModel.value();
 
@@ -751,7 +970,9 @@ void mitk::SUVImageFilter::GenerateData()
     // No decay correction, dose, or half-life is consumed.
     auto sourceStrategy = MakeSUVNormalizationStrategy(inputModel.sourceVariant);
     const double scaleNumeratorSource =
-      ResolveScaleNumeratorUnderSexPolicy(*sourceStrategy, normInputs, m_DICOMReadPolicy);
+      ResolveScaleNumeratorUnderSexPolicy(*sourceStrategy, normInputs,
+                                          m_DICOMReadPolicy,
+                                          "source (pre-normalized input)");
     if (scaleNumeratorSource <= 0.0)
     {
       mitkThrow() << "SUVImageFilter: source-variant scale numerator must be "

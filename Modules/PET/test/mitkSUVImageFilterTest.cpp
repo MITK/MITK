@@ -21,6 +21,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <vector>
+
 class mitkSUVImageFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSUVImageFilterTestSuite);
@@ -57,6 +59,17 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(SexPolicyGate_LenientWithSexOther_Succeeds);
   MITK_TEST(SexPolicyGate_StrictWithUnsetEffectiveSex_Throws);
   MITK_TEST(SexPolicyGate_LenientWithUnsetEffectiveSex_Succeeds);
+
+  // Per-(timestep, slice) decay-time override map
+  MITK_TEST(SetClear_DecayTimeOverrideMap);
+  MITK_TEST(DecayMap_SetUniformThenMap_Throws);
+  MITK_TEST(DecayMap_SetMapThenUniform_Throws);
+  MITK_TEST(DecayMap_ConfigureWithCompleteMap_EffectiveStrategyIsManual);
+  MITK_TEST(DecayMap_ConfigureWithCompleteMap_EffectiveDecayTimesMatch);
+  MITK_TEST(DecayMap_ConfiguredWithoutUniform_MapValuesSurface);
+  MITK_TEST(DecayMap_MissingSliceEntry_Throws);
+  MITK_TEST(DecayMap_OutOfRangeSlice_Throws);
+  MITK_TEST(DecayMap_OutOfRangeTimestep_Throws);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -313,9 +326,19 @@ public:
 
   void SexPolicyGate_StrictWithSexOther_Throws()
   {
-    auto f = MakeFilterWithExplicitSex(mitk::Sex::Other,
-                                       mitk::DICOMReadPolicy::Strict);
-    CPPUNIT_ASSERT_THROW(f->Update(),
+    // Eager validation: the gate fires inside ConfigureFromProperties,
+    // not only at Update time, so the plugin can disable the Calculate
+    // button before the user clicks it.
+    auto f   = mitk::SUVImageFilter::New();
+    auto img = MakeMinimalImage();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::LBM_Janmahasatian);
+    f->SetDICOMReadPolicy(mitk::DICOMReadPolicy::Strict);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetPatientHeightInCm(170.0);
+    f->SetPatientSex(mitk::Sex::Other);
+    f->SetInputModelOverride(MakePrenormalizedBwInputModel());
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
                          mitk::AmbiguousPatientSexAdaptationRefusedException);
   }
 
@@ -337,6 +360,186 @@ public:
   {
     auto f = MakeFilterWithUnsetEffectiveSex(mitk::DICOMReadPolicy::Lenient);
     CPPUNIT_ASSERT_NO_THROW(f->Update());
+  }
+
+  // ---- Per-(timestep, slice) decay-time override map ----
+  //
+  // The map slot lets the caller pin decay durations on a per-slice basis,
+  // bypassing the DICOM-derived pipeline. The filter's contract:
+  //   - mutually exclusive with the uniform override at Set-time;
+  //   - must be a complete and well-formed match for the input image
+  //     geometry at Configure-time (no silent DICOM fallback);
+  //   - strategy reported back as DecayCorrectionStrategy::Manual.
+  //
+  // The image fixture is single-timestep 1x1xN so timestep / slice failure
+  // modes can be exercised independently.
+
+private:
+  static mitk::Image::Pointer MakeMultiSliceImage(unsigned int nSlices)
+  {
+    auto img = mitk::Image::New();
+    const auto pixelType = mitk::MakeScalarPixelType<float>();
+    const unsigned int dims[3] = { 1u, 1u, nSlices };
+    img->Initialize(pixelType, 3, dims);
+    std::vector<float> data(nSlices, 0.0f);
+    img->SetVolume(data.data());
+    return img;
+  }
+
+  static mitk::SUVInputModel MakeActivityInputModel()
+  {
+    mitk::SUVInputModel m;
+    m.semantics     = mitk::SUVPixelSemantics::ActivityConcentration;
+    m.activityScale = 1.0;
+    return m;
+  }
+
+  // Build a filter that can be Configured without DICOM properties: BW
+  // variant + explicit overrides for everything Configure needs on the
+  // activity-to-SUV path. The decay-time override slot is left untouched
+  // and must be set by the test before Configure.
+  static mitk::SUVImageFilter::Pointer MakeFilterWithActivityOverrides(
+    const mitk::Image::Pointer& img)
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetInput(img);
+    f->SetTargetVariant(mitk::SUVVariant::BW);
+    f->SetPatientWeightInGram(70000.0);
+    f->SetInjectedActivityInBq(3.7e8);
+    f->SetHalfLifeInSec(6586.2);
+    f->SetInputModelOverride(MakeActivityInputModel());
+    return f;
+  }
+
+  static mitk::DecayTimeMapType MakeCompleteMap(unsigned int nSlices,
+                                                double         value)
+  {
+    mitk::DecayTimeMapType m;
+    for (unsigned int z = 0; z < nSlices; ++z)
+    {
+      m[0][z] = value;
+    }
+    return m;
+  }
+
+public:
+
+  void SetClear_DecayTimeOverrideMap()
+  {
+    auto f = mitk::SUVImageFilter::New();
+    CPPUNIT_ASSERT(!f->GetDecayTimeOverrideMap().has_value());
+
+    auto map = MakeCompleteMap(3, 1200.0);
+    f->SetDecayTimeOverrideMap(map);
+    CPPUNIT_ASSERT(f->GetDecayTimeOverrideMap().has_value());
+    CPPUNIT_ASSERT_EQUAL(std::size_t{1}, f->GetDecayTimeOverrideMap().value().size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1200.0,
+      f->GetDecayTimeOverrideMap().value().at(0).at(1), 1e-9);
+
+    f->ClearDecayTimeOverrideMap();
+    CPPUNIT_ASSERT(!f->GetDecayTimeOverrideMap().has_value());
+  }
+
+  void DecayMap_SetUniformThenMap_Throws()
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetDecayTimeOverrideInSec(1200.0);
+    CPPUNIT_ASSERT_THROW(f->SetDecayTimeOverrideMap(MakeCompleteMap(1, 1200.0)),
+                         mitk::ConflictingDecayTimeOverrideException);
+    // Uniform slot is unchanged after the rejected map set.
+    CPPUNIT_ASSERT(f->GetDecayTimeOverrideInSec().has_value());
+    CPPUNIT_ASSERT(!f->GetDecayTimeOverrideMap().has_value());
+  }
+
+  void DecayMap_SetMapThenUniform_Throws()
+  {
+    auto f = mitk::SUVImageFilter::New();
+    f->SetDecayTimeOverrideMap(MakeCompleteMap(1, 1200.0));
+    CPPUNIT_ASSERT_THROW(f->SetDecayTimeOverrideInSec(1200.0),
+                         mitk::ConflictingDecayTimeOverrideException);
+    // Map slot is unchanged after the rejected uniform set.
+    CPPUNIT_ASSERT(f->GetDecayTimeOverrideMap().has_value());
+    CPPUNIT_ASSERT(!f->GetDecayTimeOverrideInSec().has_value());
+  }
+
+  void DecayMap_ConfigureWithCompleteMap_EffectiveStrategyIsManual()
+  {
+    auto img = MakeMultiSliceImage(3);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    f->SetDecayTimeOverrideMap(MakeCompleteMap(3, 1500.0));
+    CPPUNIT_ASSERT_NO_THROW(f->ConfigureFromProperties(img.GetPointer()));
+    CPPUNIT_ASSERT(mitk::DecayCorrectionStrategy::Manual ==
+                   f->GetEffectiveDecayCorrection().strategy);
+  }
+
+  void DecayMap_ConfigureWithCompleteMap_EffectiveDecayTimesMatch()
+  {
+    auto img = MakeMultiSliceImage(3);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    mitk::DecayTimeMapType map;
+    map[0][0] = 1000.0;
+    map[0][1] = 2000.0;
+    map[0][2] = 3000.0;
+    f->SetDecayTimeOverrideMap(map);
+    f->ConfigureFromProperties(img.GetPointer());
+    const auto& eff = f->GetEffectiveDecayCorrection().decayTimes;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1000.0, eff.at(0).at(0), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2000.0, eff.at(0).at(1), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3000.0, eff.at(0).at(2), 1e-9);
+  }
+
+  // A map+uniform combination is unreachable through the public API (the
+  // Set-time mutex rejects setting both), so the map-over-uniform precedence
+  // cannot be exercised directly; this covers the reachable case: a decay map
+  // alone resolves to the effective decay times.
+  void DecayMap_ConfiguredWithoutUniform_MapValuesSurface()
+  {
+    auto img = MakeMultiSliceImage(2);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    mitk::DecayTimeMapType map;
+    map[0][0] = 4242.0;
+    map[0][1] = 4243.0;
+    f->SetDecayTimeOverrideMap(map);
+    f->ConfigureFromProperties(img.GetPointer());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4242.0,
+      f->GetEffectiveDecayCorrection().decayTimes.at(0).at(0), 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4243.0,
+      f->GetEffectiveDecayCorrection().decayTimes.at(0).at(1), 1e-9);
+  }
+
+  void DecayMap_MissingSliceEntry_Throws()
+  {
+    auto img = MakeMultiSliceImage(3);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    mitk::DecayTimeMapType map;
+    map[0][0] = 1000.0;
+    // slice 1 missing
+    map[0][2] = 3000.0;
+    f->SetDecayTimeOverrideMap(map);
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::InvalidDecayTimeMapException);
+  }
+
+  void DecayMap_OutOfRangeSlice_Throws()
+  {
+    auto img = MakeMultiSliceImage(3);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    auto map = MakeCompleteMap(3, 1500.0);
+    map[0][9] = 9999.0;
+    f->SetDecayTimeOverrideMap(map);
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::InvalidDecayTimeMapException);
+  }
+
+  void DecayMap_OutOfRangeTimestep_Throws()
+  {
+    auto img = MakeMultiSliceImage(3);
+    auto f   = MakeFilterWithActivityOverrides(img);
+    auto map = MakeCompleteMap(3, 1500.0);
+    map[1][0] = 100.0;  // image has only timestep 0
+    f->SetDecayTimeOverrideMap(map);
+    CPPUNIT_ASSERT_THROW(f->ConfigureFromProperties(img.GetPointer()),
+                         mitk::InvalidDecayTimeMapException);
   }
 };
 

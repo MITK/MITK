@@ -142,6 +142,40 @@ double mitk::BodySurfaceAreaStrategy::ComputeScaleNumerator(const SUVNormalizati
   return bsaM2 * 10000.0;
 }
 
+bool mitk::VariantRequiresPatientHeight(SUVVariant variant)
+{
+  switch (variant)
+  {
+    case SUVVariant::LBM_Janmahasatian:
+    case SUVVariant::LBM_James128:
+    case SUVVariant::IBW:
+    case SUVVariant::BSA:
+      return true;
+    case SUVVariant::BW:
+      return false;
+  }
+  mitkThrow() << "VariantRequiresPatientHeight: unhandled SUVVariant value ("
+              << static_cast<int>(variant) << "). The switch must cover every "
+                 "enumerator; this is a programmer error.";
+}
+
+bool mitk::VariantRequiresPatientSex(SUVVariant variant)
+{
+  switch (variant)
+  {
+    case SUVVariant::LBM_Janmahasatian:
+    case SUVVariant::LBM_James128:
+    case SUVVariant::IBW:
+      return true;
+    case SUVVariant::BW:
+    case SUVVariant::BSA:
+      return false;
+  }
+  mitkThrow() << "VariantRequiresPatientSex: unhandled SUVVariant value ("
+              << static_cast<int>(variant) << "). The switch must cover every "
+                 "enumerator; this is a programmer error.";
+}
+
 std::unique_ptr<mitk::SUVNormalizationStrategy>
 mitk::MakeSUVNormalizationStrategy(SUVVariant variant)
 {

@@ -324,6 +324,20 @@ if(MITK_DOXYGEN_BUILD_ALWAYS)
   )
 endif()
 
+# Optional override of the generated Python wheel version (PythonWheel
+# configuration). Empty (the default) derives the version from git; a value
+# is forwarded to the inner build, where build_wheel.py reads it from the
+# cache. Lets a CI job pin an explicit, PyPI-uploadable version without a tag.
+set(MITK_WHEEL_VERSION "" CACHE STRING
+  "Override the generated Python wheel version (PEP 440 public version); empty derives from git")
+mark_as_advanced(MITK_WHEEL_VERSION)
+
+if(MITK_WHEEL_VERSION)
+  list(APPEND mitk_optional_cache_args
+    "-DMITK_WHEEL_VERSION:STRING=${MITK_WHEEL_VERSION}"
+  )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

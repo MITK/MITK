@@ -21,6 +21,11 @@ and runs a platform-specific delocator to bundle all native dependencies.
 Usage:
   python build_wheel.py --build-dir <MITK-build>
 
+The wheel version is resolved in this order of precedence: the
+``--version`` argument, the ``MITK_WHEEL_VERSION`` CMake cache entry,
+otherwise derived from git (the tag at HEAD, or ``<base>+g<shorthash>``
+for an untagged commit).
+
 Prerequisites:
   - MITK must be fully built (SuperBuild completed, PythonWheel configuration)
   - The 'wheel' package must be installed: pip install wheel
@@ -121,6 +126,49 @@ def compute_version(source_dir, base_version):
     return base_version
 
 
+def get_cache_version_override(build_dir):
+    """Return the MITK_WHEEL_VERSION cache entry, or '' if unset/empty.
+
+    The CMake build (PythonWheel configuration) exposes MITK_WHEEL_VERSION
+    so a CI job can pin an explicit, PyPI-uploadable version via
+    ``-DMITK_WHEEL_VERSION=...``. An empty value falls through to the git
+    logic. The cache entry type is matched loosely so a value set directly
+    on the inner build (``:UNINITIALIZED=``) is honored too.
+    """
+    cache_file = Path(build_dir) / "CMakeCache.txt"
+    for line in cache_file.read_text().splitlines():
+        match = re.match(r"^MITK_WHEEL_VERSION(?::[^=]*)?=(.*)$", line)
+        if match:
+            return match.group(1).strip()
+    return ""
+
+
+def normalize_version(version):
+    """Validate and normalize an explicit version override (PEP 440).
+
+    Returns the normalized form (so the wheel filename, METADATA, and the
+    package __version__ all agree; ``wheel pack`` normalizes the filename
+    regardless) or None if the string is not a valid PEP 440 version.
+    Best-effort: if 'packaging' is unavailable the raw string is returned.
+    A local version segment ('+...') is rejected by PyPI on upload, so warn.
+    """
+    try:
+        from packaging.version import Version, InvalidVersion
+    except ImportError:
+        return version
+    try:
+        parsed = Version(version)
+    except InvalidVersion:
+        return None
+    if parsed.local is not None:
+        print(
+            f"Warning: version '{version}' has a local segment ('+...'); "
+            "PyPI will reject it on upload",
+            file=sys.stderr,
+        )
+    return str(parsed)
+
+
 def cmake_install_wheel_component(build_dir, staging_dir, cmake_command="cmake"):
     """Run cmake --install to stage the wheel component."""
     cmd = [
@@ -134,6 +182,28 @@ def cmake_install_wheel_component(build_dir, staging_dir, cmake_command="cmake")
 
     print(f"Staging wheel component: {' '.join(cmd)}")
     subprocess.check_call(cmd)
+
+
+def set_staged_version(staging_dir, version):
+    """Rewrite __version__ in the staged package so it matches the wheel.
+
+    The staged mitk/__init__.py carries the value CMake substituted for
+    @MITK_VERSION_STRING@ at configure time. Overwrite it with the resolved
+    wheel version so that `import mitk; mitk.__version__` equals the wheel
+    filename and METADATA for every version source (CLI, cache, or git).
+    """
+    init_py = staging_dir / "mitk" / "__init__.py"
+    text = init_py.read_text(encoding="utf-8")
+    text, count = re.subn(
+        r'(?m)^__version__\s*=\s*".*"$',
+        f'__version__ = "{version}"',
+        text,
+    )
+    if count != 1:
+        raise RuntimeError(
+            f"expected exactly one __version__ line in {init_py}, found {count}"
+        )
+    init_py.write_text(text, encoding="utf-8")
 
 
 def get_mitk_version(build_dir):
@@ -386,6 +456,12 @@ def main():
         help="Path to cmake executable (default: cmake)",
     )
     parser.add_argument(
+        "--version",
+        default=None,
+        help="Override the wheel version (PEP 440). Empty or omitted: use the "
+             "MITK_WHEEL_VERSION cache entry, else derive from git.",
+    )
+    parser.add_argument(
         "--skip-repair",
         action="store_true",
         help="Skip the delocator step (for debugging)",
@@ -399,11 +475,19 @@ def main():
         print(f"Error: build directory not found: {build_dir}", file=sys.stderr)
         return 1
 
-    # Get version: tag at HEAD if present, otherwise base + '+g<shorthash>'
-    base_version = get_mitk_version(build_dir)
-    source_dir = get_source_dir(build_dir)
-    version = compute_version(source_dir, base_version)
-    print(f"MITK version: {version}")
+    # Version precedence: --version, then the MITK_WHEEL_VERSION cache entry,
+    # then git (tag at HEAD, otherwise base + '+g<shorthash>').
+    override = (args.version or "").strip() or get_cache_version_override(build_dir)
+    if override:
+        version = normalize_version(override)
+        if version is None:
+            print(f"Error: invalid PEP 440 version: {override!r}", file=sys.stderr)
+            return 1
+        print(f"MITK version (override): {version}")
+    else:
+        base_version = get_mitk_version(build_dir)
+        version = compute_version(get_source_dir(build_dir), base_version)
+        print(f"MITK version: {version}")
 
     with tempfile.TemporaryDirectory() as tmpdir:
         staging_dir = Path(tmpdir) / "staging"
@@ -417,6 +501,9 @@ def main():
         if not mitk_pkg.is_dir():
             print("Error: cmake --install did not produce mitk/ directory", file=sys.stderr)
             return 1
+
+        # Make the package __version__ match the resolved wheel version
+        set_staged_version(staging_dir, version)
 
         # Write dist-info
         dist_info_dir = write_dist_info(staging_dir, "mitk", version)

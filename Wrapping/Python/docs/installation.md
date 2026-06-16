@@ -16,11 +16,12 @@ need to build MITK from source to use the Python bindings.
 ## Install
 
 ```bash
-pip install mitk
+pip install mitk-python
 ```
 
 ```{note}
-At the time of writing, `mitk` is not yet on PyPI. The wheel is distributed
+The PyPI distribution is named `mitk-python`; the import name stays `mitk`.
+At the time of writing, `mitk-python` is not yet on PyPI. The wheel is distributed
 through the MITK project's internal channels. Once a public release is
 available, the command above will Just Work.
 ```
@@ -28,7 +29,7 @@ available, the command above will Just Work.
 To install a wheel built locally or downloaded directly:
 
 ```bash
-pip install /path/to/mitk-<version>-<tags>.whl
+pip install /path/to/mitk_python-<version>-<tags>.whl
 ```
 
 ## Verify the install

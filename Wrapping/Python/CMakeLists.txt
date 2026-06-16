@@ -70,7 +70,7 @@ add_custom_target(mitk_python_docs
   COMMAND ${CMAKE_COMMAND} -E rm -rf "${_python_docs_source_dir}/api/generated"
   # Pass MITK_VERSION through the environment so conf.py can render the
   # real version in titles and signatures. The in-tree mitk package is
-  # not pip-installed, so importlib.metadata.version("mitk") would fail.
+  # not pip-installed, so importlib.metadata.version("mitk-python") would fail.
   COMMAND ${CMAKE_COMMAND} -E env "MITK_VERSION=${MITK_VERSION_STRING}"
           ${_python_docs_venv_python} -s
           "${_python_docs_source_dir}/_run_sphinx.py"

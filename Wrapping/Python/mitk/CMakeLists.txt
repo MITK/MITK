@@ -164,9 +164,18 @@ endif()
 # Usage:
 #   cmake --install <build-dir> --component wheel --prefix <staging-dir>
 #   python Wrapping/Python/wheel/build_wheel.py --build-dir <build-dir>
+#
+# Set MITK_WHEEL_VERSION (or pass build_wheel.py --version) to pin an
+# explicit PEP 440 wheel version; empty derives it from git.
 # ---------------------------------------------------------------------------
 
 if(MITK_BUILD_CONFIGURATION STREQUAL "PythonWheel")
+  # Declared so the value (forwarded from the superbuild, or set directly on
+  # this build) is stored as MITK_WHEEL_VERSION:STRING in CMakeCache.txt for
+  # build_wheel.py to read. Empty derives the version from git.
+  set(MITK_WHEEL_VERSION "" CACHE STRING
+    "Override the generated Python wheel version (PEP 440 public version); empty derives from git")
+
   if(APPLE)
     set_target_properties(mitk_python_bindings PROPERTIES
       INSTALL_RPATH "@loader_path"

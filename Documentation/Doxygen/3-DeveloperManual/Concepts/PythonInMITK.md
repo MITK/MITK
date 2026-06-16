@@ -174,7 +174,7 @@ The `mitkPythonBindingsTest` described above relies on this mechanism and create
 
 ## Python Wheel
 
-The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk-*.whl`).
+The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk_python-*.whl`).
 This allows users to `pip install` the MITK bindings into any compatible Python environment without building MITK from source.
 
 ### What is in the wheel?
@@ -204,8 +204,8 @@ The target:
 3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
 
 The platform delocators are:
-- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk.libs/`
-- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk.libs/` and patches RPATH
+- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk_python.libs/`
+- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk_python.libs/` and patches RPATH
 - **macOS**: [delocate](https://github.com/matthew-brett/delocate) — copies dylibs into `mitk/.dylibs/` and rewrites load commands
 
 ### Testing the wheel
@@ -236,7 +236,7 @@ Use `--output-dir` to write it elsewhere, or `--skip-repair` to skip the delocat
 Doxygen does not handle Python well: it does not understand Google-style docstrings, dataclasses, or `typing.Literal`/union hints, and its native Python rendering undersells a typed binding surface.
 For that reason, the `mitk` Python package has its own Sphinx-based documentation site, built and published independently of this C++ Doxygen site.
 
-The Python documentation lives at <https://docs.mitk.org/python/latest/>.
+The Python documentation lives at <https://mitk-python.readthedocs.io/en/latest/>.
 It is also reachable from the "Python API" tab in the top navigation bar of this Doxygen site.
 
 ### Sources
@@ -270,11 +270,11 @@ Missing-target cross-references (e.g. a stale `:py:class:` pointing at a name th
 
 ### Publishing
 
-The Jenkins job that already builds the wheel runs `sphinx-build` against the just-built wheel and publishes the resulting HTML tree alongside the C++ Doxygen output, under the `python/` subpath of `docs.mitk.org` (so the published site is `https://docs.mitk.org/python/latest/`).
+The published site is hosted on Read the Docs at <https://mitk-python.readthedocs.io/en/latest/>. A separate repository, `MITK/mitk-python-docs`, drives the build: it fetches `Wrapping/Python/docs` from here and runs `sphinx-build` against the `mitk-python` wheel installed from PyPI, so the site tracks the bindings without keeping a second copy of the sources.
 
 ### What goes where
 
-- Consumer-facing (`pip install mitk`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
+- Consumer-facing (`pip install mitk-python`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
 - This Doxygen page (`PythonInMITK`) is the developer-facing reference: how the wheel is built, how the C++ side embeds Python, why Standalone Python Builds, platform quirks, and so on.
 
 The two are intentionally complementary, not duplicates.

@@ -2,7 +2,7 @@
 \page PythonBindingsPage Python bindings
 
 The Python bindings for MITK are documented separately at the
-<a href="https://docs.mitk.org/python/latest/">MITK Python documentation site</a>.
+<a href="https://mitk-python.readthedocs.io/en/latest/">MITK Python documentation site</a>.
 
 That site covers the `mitk` Python package: installation of the wheel,
 NumPy interop, file I/O, geometry, properties, and a full API reference

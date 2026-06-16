@@ -169,18 +169,46 @@ def write_dist_info(staging_dir, package_name, version):
     abi_tag = get_abi_tag()
     platform_tag = get_platform_tag()
 
+    # The long description is the METADATA message body (everything after the
+    # headers and a blank line); its format is declared by
+    # Description-Content-Type. Read it relative to this script so the lookup
+    # does not depend on the working directory.
+    readme = Path(__file__).resolve().parent / "README.md"
+    long_description = readme.read_text(encoding="utf-8")
+
+    classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Healthcare Industry",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering :: Medical Science Apps.",
+        "Topic :: Scientific/Engineering :: Image Processing",
+    ]
+
+    headers = [
+        "Metadata-Version: 2.4",
+        f"Name: {package_name}",
+        f"Version: {version}",
+        "Summary: Python bindings for the Medical Imaging Interaction Toolkit (MITK)",
+        "Author: German Cancer Research Center (DKFZ)",
+        "License: BSD-3-Clause",
+        *[f"Classifier: {c}" for c in classifiers],
+        f"Requires-Python: >={sys.version_info.major}.{sys.version_info.minor}",
+        "Requires-Dist: numpy>=2.0",
+        "Project-URL: Homepage, https://www.mitk.org",
+        "Project-URL: Documentation, https://docs.mitk.org/python/latest/",
+        "Project-URL: Repository, https://github.com/MITK/MITK",
+        "Description-Content-Type: text/markdown",
+    ]
+
     # METADATA
     (dist_info_dir / "METADATA").write_text(
-        f"Metadata-Version: 2.4\n"
-        f"Name: {package_name}\n"
-        f"Version: {version}\n"
-        f"Summary: Python bindings for the Medical Imaging Interaction Toolkit (MITK)\n"
-        f"License: BSD-3-Clause\n"
-        f"Requires-Python: >={sys.version_info.major}.{sys.version_info.minor}\n"
-        f"Requires-Dist: numpy>=2.0\n"
-        f"Project-URL: Homepage, https://www.mitk.org\n"
-        f"Project-URL: Documentation, https://docs.mitk.org/python/latest/\n"
-        f"Project-URL: Repository, https://github.com/MITK/MITK\n"
+        "\n".join(headers) + "\n\n" + long_description,
+        encoding="utf-8",
     )
 
     # WHEEL

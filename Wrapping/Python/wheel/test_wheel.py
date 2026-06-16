@@ -133,7 +133,7 @@ def run_tests():
 
 def find_wheel(search_dir):
     """Find the MITK wheel in the given directory."""
-    pattern = os.path.join(search_dir, "mitk-*.whl")
+    pattern = os.path.join(search_dir, "mitk_python-*.whl")
     wheels = sorted(glob.glob(pattern))
     if not wheels:
         return None
@@ -163,7 +163,7 @@ def main():
     wheel_path = find_wheel(search_dir)
 
     if not wheel_path:
-        print(f"Error: no mitk-*.whl found in {search_dir}", file=sys.stderr)
+        print(f"Error: no mitk_python-*.whl found in {search_dir}", file=sys.stderr)
         return 1
 
     print(f"Wheel: {wheel_path}")

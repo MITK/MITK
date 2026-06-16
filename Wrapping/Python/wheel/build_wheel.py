@@ -49,6 +49,16 @@ from base64 import urlsafe_b64encode
 from pathlib import Path
 
 
+# PyPI (pip install) distribution name. Kept distinct from the import name
+# `mitk`, which PyPI refuses to register as too similar to existing projects.
+# The import name (PYBIND11_MODULE, the staged mitk/ package, top_level.txt)
+# is unaffected.
+DIST_NAME = "mitk-python"
+# Normalized form for the wheel filename and .dist-info directory (PEP 503
+# normalization, then '-' -> '_'): "mitk_python".
+WHEEL_FILE_STEM = re.sub(r"[-_.]+", "_", DIST_NAME.lower())
+
+
 def get_platform_tag():
     """Return the wheel platform tag for the current platform.
 
@@ -230,9 +240,9 @@ def get_mitk_version(build_dir):
     )
 
 
-def write_dist_info(staging_dir, package_name, version):
+def write_dist_info(staging_dir, version):
     """Write wheel metadata (METADATA, WHEEL, top_level.txt, RECORD)."""
-    dist_info_dir = staging_dir / f"{package_name}-{version}.dist-info"
+    dist_info_dir = staging_dir / f"{WHEEL_FILE_STEM}-{version}.dist-info"
     dist_info_dir.mkdir(parents=True, exist_ok=True)
 
     python_tag = get_python_tag()
@@ -261,7 +271,7 @@ def write_dist_info(staging_dir, package_name, version):
 
     headers = [
         "Metadata-Version: 2.4",
-        f"Name: {package_name}",
+        f"Name: {DIST_NAME}",
         f"Version: {version}",
         "Summary: Python bindings for the Medical Imaging Interaction Toolkit (MITK)",
         "Author: German Cancer Research Center (DKFZ)",
@@ -328,7 +338,7 @@ def pack_wheel(staging_dir, output_dir):
     subprocess.check_call(cmd)
 
     # Find the produced wheel
-    wheels = list(output_dir.glob("mitk-*.whl"))
+    wheels = list(output_dir.glob(f"{WHEEL_FILE_STEM}-*.whl"))
     if not wheels:
         raise RuntimeError("No wheel produced")
     return wheels[0]
@@ -421,14 +431,14 @@ def repair_wheel(wheel_path, output_dir, search_paths):
     # (output_dir is typically MITK-build, not a temp dir), and auditwheel
     # may rewrite the platform tag so the output filename can differ from
     # wheel_path.name. Tracking name+mtime handles both cases.
-    before = {p: p.stat().st_mtime for p in output_dir.glob("mitk-*.whl")}
+    before = {p: p.stat().st_mtime for p in output_dir.glob(f"{WHEEL_FILE_STEM}-*.whl")}
 
     print(f"Repairing wheel: {' '.join(cmd)}")
     env_to_use = env if system != "Windows" else None
     subprocess.check_call(cmd, env=env_to_use)
 
     new_or_updated = [
-        p for p in output_dir.glob("mitk-*.whl")
+        p for p in output_dir.glob(f"{WHEEL_FILE_STEM}-*.whl")
         if p not in before or p.stat().st_mtime > before[p]
     ]
     if not new_or_updated:
@@ -506,7 +516,7 @@ def main():
         set_staged_version(staging_dir, version)
 
         # Write dist-info
-        dist_info_dir = write_dist_info(staging_dir, "mitk", version)
+        dist_info_dir = write_dist_info(staging_dir, version)
         write_record(staging_dir, dist_info_dir)
 
         # Pack raw wheel

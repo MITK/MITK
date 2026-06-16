@@ -10,8 +10,10 @@ building MITK from source.
 ## Installation
 
 ```
-pip install mitk
+pip install mitk-python
 ```
+
+The PyPI distribution is named `mitk-python`; the import name is `mitk`.
 
 ## Quick start
 

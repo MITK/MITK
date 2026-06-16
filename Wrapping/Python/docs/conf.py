@@ -17,14 +17,14 @@ def _detect_release() -> str:
 
     The CMake target passes ``MITK_VERSION`` via the environment when the
     docs are built from a build tree; that takes precedence. Otherwise
-    fall back to ``importlib.metadata`` (works when ``mitk`` is pip-installed)
+    fall back to ``importlib.metadata`` (works when ``mitk-python`` is pip-installed)
     and finally to ``"unknown"``.
     """
     env_version = os.environ.get("MITK_VERSION")
     if env_version:
         return env_version
     try:
-        return importlib.metadata.version("mitk")
+        return importlib.metadata.version("mitk-python")
     except importlib.metadata.PackageNotFoundError:
         return "unknown"
 

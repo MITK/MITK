@@ -1,19 +1,21 @@
+import glob as _glob
 import os as _os
 import sys as _sys
 
 _pkg_dir = _os.path.dirname(_os.path.abspath(__file__))
 
-# Detect wheel install by looking for bundled native libraries.
-# delvewheel (Windows) places them at mitk/.libs/ (inside the package),
-# delocate (macOS) places them at mitk/.dylibs/ (inside the package),
-# auditwheel (Linux) places them at mitk.libs/ (sibling of the package).
-# In a build-tree install none of these directories exist; the wheel-only
-# environment setup below is then skipped.
-_libs_dir = _os.path.join(_pkg_dir, ".libs")
+# Detect a wheel install by locating the bundled native-library directory.
+# delvewheel (Windows) and auditwheel (Linux) create it as a sibling of the
+# package, named after the distribution (e.g. "mitk_python.libs"); delocate
+# (macOS) creates a ".dylibs" directory inside the package. The sibling name
+# tracks the PyPI distribution name, so match it by prefix instead of
+# hardcoding it. In a build-tree install none of these exist and the
+# wheel-only environment setup below is skipped.
+_libs_dir = _os.path.join(_pkg_dir, ".dylibs")
 if not _os.path.isdir(_libs_dir):
-    _libs_dir = _os.path.join(_pkg_dir, ".dylibs")
-if not _os.path.isdir(_libs_dir):
-    _libs_dir = _os.path.join(_os.path.dirname(_pkg_dir), "mitk.libs")
+    _siblings = _glob.glob(_os.path.join(_os.path.dirname(_pkg_dir), "mitk*.libs"))
+    if _siblings:
+        _libs_dir = _siblings[0]
 _is_wheel = _os.path.isdir(_libs_dir)
 
 if _is_wheel:
@@ -29,8 +31,8 @@ if _is_wheel:
     if _sys.platform == "win32":
         _os.add_dll_directory(_libs_dir)
         _os.environ["PATH"] = _libs_dir + _os.pathsep + _os.environ.get("PATH", "")
-    # Linux: auditwheel sets RPATH to $ORIGIN/../mitk.libs
-    # macOS: delocate rewrites @loader_path references
+    # Linux: auditwheel sets the extension RPATH to the sibling .libs dir.
+    # macOS: delocate rewrites @loader_path references.
 
 from .mitk import *
 

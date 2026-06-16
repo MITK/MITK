@@ -174,7 +174,7 @@ The `mitkPythonBindingsTest` described above relies on this mechanism and create
 
 ## Python Wheel
 
-The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk-*.whl`).
+The `mitk` Python module can be packaged as a standalone, redistributable wheel (`mitk_python-*.whl`).
 This allows users to `pip install` the MITK bindings into any compatible Python environment without building MITK from source.
 
 ### What is in the wheel?
@@ -204,8 +204,8 @@ The target:
 3. Packs a raw wheel and repairs it with the platform delocator to bundle all native dependencies
 
 The platform delocators are:
-- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk.libs/`
-- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk.libs/` and patches RPATH
+- **Windows**: [delvewheel](https://github.com/adang1345/delvewheel) — copies DLLs into `mitk_python.libs/`
+- **Linux**: [auditwheel](https://github.com/pypa/auditwheel) — copies shared libraries into `mitk_python.libs/` and patches RPATH
 - **macOS**: [delocate](https://github.com/matthew-brett/delocate) — copies dylibs into `mitk/.dylibs/` and rewrites load commands
 
 ### Testing the wheel
@@ -274,7 +274,7 @@ The Jenkins job that already builds the wheel runs `sphinx-build` against the ju
 
 ### What goes where
 
-- Consumer-facing (`pip install mitk`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
+- Consumer-facing (`pip install mitk-python`, NumPy interop, file I/O, geometry, properties) lives on the Sphinx site.
 - This Doxygen page (`PythonInMITK`) is the developer-facing reference: how the wheel is built, how the C++ side embeds Python, why Standalone Python Builds, platform quirks, and so on.
 
 The two are intentionally complementary, not duplicates.

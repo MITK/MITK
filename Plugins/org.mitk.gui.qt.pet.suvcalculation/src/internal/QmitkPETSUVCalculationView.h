@@ -3,7 +3,7 @@
 The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Division of Medical Image Computing.
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -33,22 +33,29 @@ namespace Ui
 #include <QStyledItemDelegate>
 
 /**
-* @brief Custom tree model for displaying decay time data
-*
-* This model handles both auto and user - defined modes :
-*-Auto mode : Shows hierarchical structure(time steps->slices)
-* -User - defined mode : Shows flat structure with single decay time per time step
-*/
+ * \brief Custom tree model for displaying decay time data.
+ *
+ * Three display modes:
+ *  - Auto:        hierarchical structure (time steps -> slices) reflecting
+ *                 the per-(timestep, slice) decay times the filter resolved.
+ *                 Read-only.
+ *  - UserDefined: flat structure showing the uniform user-defined decay time
+ *                 per time step. Read-only (the spinbox is the authority).
+ *  - PerSlice:    hierarchical (time steps -> slices), editable. Each cell
+ *                 write emits dataChanged so the view can push the full map
+ *                 to the filter.
+ */
 class DecayTimeMapModel : public QAbstractItemModel
 {
   Q_OBJECT
 
 public:
-  enum class Mode { Auto, UserDefined };
+  enum class Mode { Auto, UserDefined, PerSlice };
 
   explicit DecayTimeMapModel(QObject* parent = nullptr);
 
   void SetDecayTimeMap(const mitk::DecayTimeMapType& map);
+  const mitk::DecayTimeMapType& GetDecayTimeMap() const;
   void SetMode(Mode mode);
   Mode GetMode() const;
 
@@ -72,9 +79,8 @@ private:
 };
 
 /**
- * @brief Custom delegate for editing decay time values
- *
- * Provides a double spin box editor for decay time values when in user-defined mode
+ * \brief Delegate providing a double spin-box editor for the decay-time
+ *        column in per-slice mode.
  */
 class DecayTimeDelegate : public QStyledItemDelegate
 {
@@ -93,20 +99,26 @@ public:
 
 private:
   static constexpr double MIN_DECAY_TIME = 0.0;
-  static constexpr double MAX_DECAY_TIME = 1000000.0; // 1 million seconds
-  static constexpr int DECIMALS = 6;
-  static constexpr double SINGLE_STEP = 0.1;
+  static constexpr double MAX_DECAY_TIME = 1000000.0;
+  static constexpr int    DECIMALS       = 6;
+  static constexpr double SINGLE_STEP    = 0.1;
 };
 
 /*!
- *	@brief Plugin for SUV calculations of PET images.
+ *  \brief Plugin view for SUV calculations of PET images.
+ *
+ *  The view drives a single \c mitk::SUVImageFilter. Every UI control is
+ *  either an override slot on that filter (weight, activity, ...) or a
+ *  configuration flag (variant, strict-DICOM, force-units). Whenever a
+ *  control changes, the filter is reconfigured against the currently
+ *  selected PET image and the resulting effective values / diagnostics
+ *  are rendered back into the UI.
  */
 class QmitkPETSUVCalculationView : public QmitkAbstractView
 {
   Q_OBJECT
 
 public:
-  /*! @brief The view's unique ID - required by MITK */
   static const std::string VIEW_ID;
 
   QmitkPETSUVCalculationView();
@@ -115,71 +127,118 @@ public:
 protected slots:
 
   void OnCalculateSUVButtonClicked();
-  void OnNuclideLookupClicked();
+
   void OnCheckPETOnlyToggled(bool);
+
+  void OnVariantChanged(int);
+  void OnPatientHeightChanged(double);
+  void OnPatientSexChanged(int);
 
   void OnInjectedActivityChanged(double);
   void OnBodyWeightChanged(double);
   void OnHalfLifeChanged(double);
+  void OnNuclideComboChanged(int);
+
   void OnTimeToMeasurementChanged(int);
   void OnDecayTimeRadioToggled();
+  void OnPerSliceDecayMapEdited(const QModelIndex&, const QModelIndex&, const QList<int>&);
+
+  void OnTracerIndexChanged(int);
+
+  void OnForcePETToggled(bool);
+  void OnForceBqMlToggled(bool);
+  void OnStrictDicomToggled(bool);
+
   void OnPETSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
 protected:
-  // Overridden base class functions
-
-  /*!
-   *	@brief					Sets up the UI controls and connects the slots and signals. Gets
-   *							called by the framework to create the GUI at the right time.
-   *	@param[in,out] parent	The parent QWidget, as this class itself is not a QWidget
-   *							subclass.
-   */
-  void CreateQtPartControl(QWidget *parent) override;
-
-  /*!
-   *	@brief	Sets the focus to the plot curve button. Gets called by the framework to set the
-   *			focus on the right widget.
-   */
+  void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
 
-  /**updates the widgets according to the internal values.*/
+  /** Refresh every UI control from the filter's current state. */
   void UpdateWidgets();
 
-  /**Function populates the nuclide half life map.*/
+  /** Populate \c m_HalfLifeMap and the nuclide combo. */
   void GenerateHalfLifeMap();
 
-  // Variables
-
-  /*! @brief The view's UI controls */
   std::unique_ptr<Ui::QmitkPETSUVCalculationViewControls> m_Controls;
 
 private:
-  /** SUV computation backend. Holds user overrides as std::optional slots and
-   *  derives the rest from the input image's DICOM properties on selection.
-   *  Replaced (not just reset) on every selection so previous overrides do
-   *  not bleed across nodes. */
+  /** SUV computation backend. Holds user overrides as std::optional slots
+   *  and derives the rest from the input image's DICOM properties.
+   *  Replaced (not just reset) on every selection so previous overrides
+   *  cannot bleed across nodes. */
   mitk::SUVImageFilter::Pointer m_Filter;
 
   /** Description of the most recent ConfigureFromProperties failure, or
-   *  empty when the filter is configured. Surfaces in the UI so the user
-   *  understands why Calculate is disabled. */
+   *  empty when the filter is configured. */
   std::string m_LastConfigError;
 
-  /** Mirrors m_Filter's internal "configured" state. Needed because the
-   *  GetEffective* accessors throw when called pre-configuration; reading
-   *  this flag in UpdateWidgets keeps the widget refresh exception-free. */
+  /** UI-friendly per-category guidance text derived from the typed
+   *  exception. Drives \c diagnosticsWidget independently of the raw
+   *  exception description in \c m_LastConfigError. */
+  std::string m_LastConfigActionable;
+
+  /** \c true when the most recent configuration problem stems from decay
+   *  timing (ambiguous auto-detection, or an invalid / conflicting manual
+   *  override). Lets the time group's strategy line surface the actionable
+   *  warning in red, where it is harder to miss than in the compact
+   *  diagnostics box. */
+  bool m_DecayTimingProblem = false;
+
+  /** Mirrors m_Filter's internal "configured" state. */
   bool m_Configured = false;
 
-  /**The predefined nuclide by the image data. Empty string implies no definition/custom value.*/
-  std::string m_DefinedNuclide;
+  /** \c true if the current input's Radiopharmaceutical Information
+   *  Sequence holds more than one item. Drives the visibility of the
+   *  tracer row (\c tracerCombo). */
+  bool m_MultiTracerDetected = false;
 
-  typedef std::map<std::string, double> HalfLifeMapType;
+  /** Sentinel for "custom" entry in the nuclide combo (i.e. the half-life
+   *  was edited manually and no longer maps to a named nuclide). */
+  static const QString NUCLIDE_CUSTOM_LABEL;
 
+  using HalfLifeMapType = std::map<std::string, double>;
   HalfLifeMapType m_HalfLifeMap;
 
-  std::unique_ptr<DecayTimeMapModel> m_decayTimeModel;
+  DecayTimeMapModel* m_decayTimeModel = nullptr;
 
-  QWidget *m_ParentWidget;
+  QWidget* m_ParentWidget = nullptr;
+
+  /** Re-run \c ConfigureFromProperties on the currently selected image
+   *  and refresh \c m_LastConfigError / \c m_LastConfigActionable. */
+  void ReconfigureFilterFromCurrentImage();
+
+  /** Read the multi-tracer state of the currently selected image and
+   *  repopulate \c tracerCombo. Called once per selection. */
+  void DetectAndPopulateTracers();
+
+  /** Best-effort lookup of the auto-detected nuclide name (from the
+   *  current input's radiopharmaceutical info) and selection of the
+   *  matching entry in \c nuclideCombo. */
+  void RefreshNuclideComboFromImage();
+
+  /** Push the model's current per-slice map to the filter, reconfigure,
+   *  and refresh the UI. Used when the user edits a cell in PerSlice
+   *  mode and when the radio is toggled to PerSlice. */
+  void PushPerSliceMapToFilter();
+
+  /** Seed a complete per-(timestep, slice) decay-time map from the
+   *  filter's current effective decay correction. Returns an empty map
+   *  if the filter is not configured. */
+  mitk::DecayTimeMapType SeedPerSliceMapFromEffective() const;
+
+  /** Read the currently selected image from \c petNodeSelector, or
+   *  return \c nullptr if none is selected / not an Image. */
+  mitk::Image* CurrentInputImage() const;
+
+  /** Compose the "Auto-detected" summary text shown in the diagnostics
+   *  widget: pixel semantics, vendor, activity / prenorm scale, decay
+   *  strategy, nuclide, tracer index, force-flags. Returns an empty
+   *  string if no image is selected; if an image is selected but
+   *  configuration failed, returns the partial auto-detected fields
+   *  plus a failure note. */
+  QString BuildDetectedInfoText() const;
 };
 
 #endif

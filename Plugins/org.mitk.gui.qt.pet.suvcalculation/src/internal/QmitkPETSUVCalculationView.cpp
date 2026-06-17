@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMultiLabelPredicateHelper.h>
 
 #include <QApplication>
+#include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -52,37 +53,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cmath>
 #include <limits>
 
-const std::string QmitkPETSUVCalculationView::VIEW_ID = "org.mitk.QmitkPETSUVCalculationView";
 const QString QmitkPETSUVCalculationView::NUCLIDE_CUSTOM_LABEL = QStringLiteral("(custom)");
 
 namespace
 {
-  mitk::NodePredicateBase::Pointer GenerateSelectionPredicate(bool onlyPET)
-  {
-    // Predicate shape is determined entirely by the boolean argument, so
-    // build each variant once and reuse on every modality toggle.
-    static const mitk::NodePredicateBase::Pointer kAnyImage = []() {
-      auto isImage  = mitk::TNodePredicateDataType<mitk::Image>::New();
-      auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
-      return mitk::NodePredicateBase::Pointer(mitk::NodePredicateAnd::New(isImage, isNoMask).GetPointer());
-    }();
-    static const mitk::NodePredicateBase::Pointer kPETOnly = []() {
-      auto isImage  = mitk::TNodePredicateDataType<mitk::Image>::New();
-      auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
-      auto modalityCheck = [](const mitk::DataNode* node)
-      {
-        if (nullptr == node || nullptr == node->GetData())
-          return false;
-        auto props = mitk::GetPropertyByDICOMTagPath(node->GetData(), mitk::DICOMTagPath(0x0008, 0x0060));
-        return !props.empty() && props.begin()->second->GetValueAsString() == "PT";
-      };
-      auto pred = mitk::NodePredicateAnd::New(isImage, isNoMask);
-      pred->AddPredicate(mitk::NodePredicateFunction::New(modalityCheck));
-      return mitk::NodePredicateBase::Pointer(pred.GetPointer());
-    }();
-    return onlyPET ? kPETOnly : kAnyImage;
-  }
-
   std::string GetBaseDataPropValueAsString(const mitk::BaseData* data, const mitk::DICOMTagPath& path)
   {
     if (nullptr == data) return {};
@@ -104,6 +78,32 @@ namespace
   bool IsPETModality(const mitk::BaseData* image)
   {
     return TrimUpper(GetBaseDataPropValueAsString(image, mitk::DICOMTagPath(0x0008, 0x0060))) == "PT";
+  }
+
+  mitk::NodePredicateBase::Pointer GenerateSelectionPredicate(bool onlyPET)
+  {
+    // Predicate shape is determined entirely by the boolean argument, so
+    // build each variant once and reuse on every modality toggle.
+    static const mitk::NodePredicateBase::Pointer kAnyImage = []() {
+      auto isImage  = mitk::TNodePredicateDataType<mitk::Image>::New();
+      auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+      return mitk::NodePredicateBase::Pointer(mitk::NodePredicateAnd::New(isImage, isNoMask).GetPointer());
+    }();
+    static const mitk::NodePredicateBase::Pointer kPETOnly = []() {
+      auto isImage  = mitk::TNodePredicateDataType<mitk::Image>::New();
+      auto isNoMask = mitk::NodePredicateNot::New(mitk::GetMultiLabelSegmentationPredicate());
+      // Route through IsPETModality so the selector and the calculation
+      // gate apply the same trimmed, upper-cased Modality comparison; a
+      // raw "== PT" here would hide " PT " / "pt" images the gate accepts.
+      auto modalityCheck = [](const mitk::DataNode* node)
+      {
+        return nullptr != node && IsPETModality(node->GetData());
+      };
+      auto pred = mitk::NodePredicateAnd::New(isImage, isNoMask);
+      pred->AddPredicate(mitk::NodePredicateFunction::New(modalityCheck));
+      return mitk::NodePredicateBase::Pointer(pred.GetPointer());
+    }();
+    return onlyPET ? kPETOnly : kAnyImage;
   }
 
   QString VariantToString(mitk::SUVVariant v)
@@ -296,9 +296,9 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget* parent)
   m_Controls->decayTimeView->setRootIsDecorated(true);
   m_Controls->decayTimeView->setSortingEnabled(false);
 
-  m_decayTimeModel = new DecayTimeMapModel(this);
+  m_decayTimeModel = new QmitkDecayTimeMapModel(this);
   m_Controls->decayTimeView->setModel(m_decayTimeModel);
-  m_Controls->decayTimeView->setItemDelegate(new DecayTimeDelegate(this));
+  m_Controls->decayTimeView->setItemDelegate(new QmitkDecayTimeDelegate(this));
 
   m_Controls->decayTimeView->header()->setStretchLastSection(false);
   m_Controls->decayTimeView->header()->resizeSection(0, 200);
@@ -347,7 +347,7 @@ void QmitkPETSUVCalculationView::CreateQtPartControl(QWidget* parent)
 
   // Per-slice edits flow from the model's dataChanged signal back through
   // the view, which packages the full map and pushes it to the filter.
-  connect(m_decayTimeModel, &DecayTimeMapModel::dataChanged,
+  connect(m_decayTimeModel, &QmitkDecayTimeMapModel::dataChanged,
           this, &QmitkPETSUVCalculationView::OnPerSliceDecayMapEdited);
 
   connect(m_Controls->tracerCombo,      QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &QmitkPETSUVCalculationView::OnTracerIndexChanged);
@@ -529,7 +529,13 @@ void QmitkPETSUVCalculationView::OnVariantChanged(int idx)
 
 void QmitkPETSUVCalculationView::OnPatientHeightChanged(double valueCm)
 {
-  m_Filter->SetPatientHeightInCm(valueCm);
+  // The spinbox minimum (0) is the "unknown, derive from DICOM" sentinel,
+  // not a real 0 cm override; map it back to Clear so the DICOM value is
+  // used rather than installing a 0 the filter would reject.
+  if (valueCm <= 0.0)
+    m_Filter->ClearPatientHeightInCm();
+  else
+    m_Filter->SetPatientHeightInCm(valueCm);
   this->ReconfigureFilterFromCurrentImage();
   this->UpdateWidgets();
 }
@@ -552,8 +558,14 @@ void QmitkPETSUVCalculationView::OnInjectedActivityChanged(double value)
 
 void QmitkPETSUVCalculationView::OnBodyWeightChanged(double value)
 {
-  // widget is [kg], filter override is [g]
-  m_Filter->SetPatientWeightInGram(value * 1000.0);
+  // widget is [kg], filter override is [g]. The spinbox minimum (0) is the
+  // "unknown, derive from DICOM" sentinel, not a real 0 kg override; map it
+  // back to Clear so the DICOM value is used rather than installing a 0 the
+  // filter would reject.
+  if (value <= 0.0)
+    m_Filter->ClearPatientWeightInGram();
+  else
+    m_Filter->SetPatientWeightInGram(value * 1000.0);
   this->ReconfigureFilterFromCurrentImage();
   this->UpdateWidgets();
 }
@@ -592,6 +604,10 @@ void QmitkPETSUVCalculationView::OnTimeToMeasurementChanged(int value)
 {
   if (m_Controls->radioTimeUser->isChecked())
   {
+    // The uniform override is intentionally an integer-minute control: it
+    // is the quick "single decay time for the whole image" affordance. Sub-
+    // minute / per-slice precision is offered by the per-slice tree editor,
+    // not here. Minutes are converted to the filter's [s] contract.
     m_Filter->SetDecayTimeOverrideInSec(static_cast<double>(value) * 60.0);
     this->ReconfigureFilterFromCurrentImage();
   }
@@ -753,7 +769,21 @@ void QmitkPETSUVCalculationView::OnCalculateSUVButtonClicked()
 
   try
   {
-    m_Filter->Update();
+    // Update() runs synchronously on the GUI thread; show a busy cursor for
+    // its duration so a multi-timestep whole-body PET does not look frozen.
+    // Scoped tightly around the heavy call and restored on success or throw.
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    try
+    {
+      m_Filter->Update();
+    }
+    catch (...)
+    {
+      QApplication::restoreOverrideCursor();
+      throw;
+    }
+    QApplication::restoreOverrideCursor();
+
     auto suvImage = m_Filter->GetOutput();
 
     auto resultNode = mitk::DataNode::New();
@@ -1063,9 +1093,9 @@ void QmitkPETSUVCalculationView::UpdateWidgets()
     {
       m_decayTimeModel->SetDecayTimeMap({});
     }
-    const auto modelMode = uniformMode    ? DecayTimeMapModel::Mode::UserDefined
-                         : perSliceMode   ? DecayTimeMapModel::Mode::PerSlice
-                                          : DecayTimeMapModel::Mode::Auto;
+    const auto modelMode = uniformMode    ? QmitkDecayTimeMapModel::Mode::UserDefined
+                         : perSliceMode   ? QmitkDecayTimeMapModel::Mode::PerSlice
+                                          : QmitkDecayTimeMapModel::Mode::Auto;
     m_decayTimeModel->SetMode(modelMode);
   }
 
@@ -1253,10 +1283,10 @@ QString QmitkPETSUVCalculationView::BuildDetectedInfoText() const
 
 
 // =============================================================================
-// DecayTimeMapModel
+// QmitkDecayTimeMapModel
 // =============================================================================
 
-DecayTimeMapModel::DecayTimeMapModel(QObject* parent)
+QmitkDecayTimeMapModel::QmitkDecayTimeMapModel(QObject* parent)
   : QAbstractItemModel(parent)
   , m_Mode(Mode::Auto)
 {
@@ -1266,14 +1296,14 @@ namespace
 {
   // Hierarchical layout (timestep -> slices) applies to both Auto and PerSlice.
   // The (legacy) UserDefined mode keeps its flat layout.
-  bool IsHierarchicalMode(DecayTimeMapModel::Mode m)
+  bool IsHierarchicalMode(QmitkDecayTimeMapModel::Mode m)
   {
-    return m == DecayTimeMapModel::Mode::Auto ||
-           m == DecayTimeMapModel::Mode::PerSlice;
+    return m == QmitkDecayTimeMapModel::Mode::Auto ||
+           m == QmitkDecayTimeMapModel::Mode::PerSlice;
   }
 }
 
-QModelIndex DecayTimeMapModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex QmitkDecayTimeMapModel::index(int row, int column, const QModelIndex& parent) const
 {
   if (!hasIndex(row, column, parent)) return QModelIndex();
 
@@ -1288,7 +1318,7 @@ QModelIndex DecayTimeMapModel::index(int row, int column, const QModelIndex& par
   return createIndex(row, column);
 }
 
-QModelIndex DecayTimeMapModel::parent(const QModelIndex& child) const
+QModelIndex QmitkDecayTimeMapModel::parent(const QModelIndex& child) const
 {
   if (!child.isValid()) return QModelIndex();
 
@@ -1303,7 +1333,7 @@ QModelIndex DecayTimeMapModel::parent(const QModelIndex& child) const
   return QModelIndex();
 }
 
-int DecayTimeMapModel::rowCount(const QModelIndex& parent) const
+int QmitkDecayTimeMapModel::rowCount(const QModelIndex& parent) const
 {
   if (!parent.isValid())
   {
@@ -1320,12 +1350,12 @@ int DecayTimeMapModel::rowCount(const QModelIndex& parent) const
   return 0;
 }
 
-int DecayTimeMapModel::columnCount(const QModelIndex&) const
+int QmitkDecayTimeMapModel::columnCount(const QModelIndex&) const
 {
   return 2;
 }
 
-QVariant DecayTimeMapModel::data(const QModelIndex& index, int role) const
+QVariant QmitkDecayTimeMapModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid()) return QVariant();
 
@@ -1338,7 +1368,7 @@ QVariant DecayTimeMapModel::data(const QModelIndex& index, int role) const
     if (m_Mode == Mode::UserDefined)
     {
       if (!timeStepOpt) return QVariant();
-      if (col == 0)    return QString("Time Step %1").arg(*timeStepOpt);
+      if (col == 0)    return tr("Time Step %1").arg(*timeStepOpt);
 
       const auto decayTime = m_DecayTimeMap.at(*timeStepOpt).at(*sliceOpt);
       return QVariant(decayTime);
@@ -1348,38 +1378,38 @@ QVariant DecayTimeMapModel::data(const QModelIndex& index, int role) const
       if (!index.parent().isValid() && !this->hasSingleTimeStep())
       {
         if (col == 0 && timeStepOpt)
-          return QString("Time Step %1").arg(*timeStepOpt);
+          return tr("Time Step %1").arg(*timeStepOpt);
       }
       else if (timeStepOpt && sliceOpt)
       {
         const auto decayTime = m_DecayTimeMap.at(*timeStepOpt).at(*sliceOpt);
-        if (col == 0) return QString("Slice %1").arg(*sliceOpt);
+        if (col == 0) return tr("Slice %1").arg(*sliceOpt);
         return QVariant(decayTime);
       }
     }
   }
   else if (role == Qt::ToolTipRole && index.column() == 1)
   {
-    return QString("Decay time in seconds");
+    return tr("Decay time in seconds");
   }
   return {};
 }
 
-QVariant DecayTimeMapModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkDecayTimeMapModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
   {
     switch (section)
     {
-      case 0: return "Item";
-      case 1: return "Decay Time [s]";
+      case 0: return tr("Item");
+      case 1: return tr("Decay Time [s]");
       default: return QVariant();
     }
   }
   return QVariant();
 }
 
-Qt::ItemFlags DecayTimeMapModel::flags(const QModelIndex& index) const
+Qt::ItemFlags QmitkDecayTimeMapModel::flags(const QModelIndex& index) const
 {
   if (!index.isValid()) return Qt::NoItemFlags;
 
@@ -1396,7 +1426,7 @@ Qt::ItemFlags DecayTimeMapModel::flags(const QModelIndex& index) const
   return flags;
 }
 
-bool DecayTimeMapModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool QmitkDecayTimeMapModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
   if (role != Qt::EditRole || !index.isValid() || index.column() != 1) return false;
   if (m_Mode != Mode::PerSlice) return false;
@@ -1417,19 +1447,19 @@ bool DecayTimeMapModel::setData(const QModelIndex& index, const QVariant& value,
   return true;
 }
 
-void DecayTimeMapModel::SetDecayTimeMap(const mitk::DecayTimeMapType& decayTimeMap)
+void QmitkDecayTimeMapModel::SetDecayTimeMap(const mitk::DecayTimeMapType& decayTimeMap)
 {
   beginResetModel();
   m_DecayTimeMap = decayTimeMap;
   endResetModel();
 }
 
-const mitk::DecayTimeMapType& DecayTimeMapModel::GetDecayTimeMap() const
+const mitk::DecayTimeMapType& QmitkDecayTimeMapModel::GetDecayTimeMap() const
 {
   return m_DecayTimeMap;
 }
 
-void DecayTimeMapModel::SetMode(Mode mode)
+void QmitkDecayTimeMapModel::SetMode(Mode mode)
 {
   if (m_Mode != mode)
   {
@@ -1439,17 +1469,17 @@ void DecayTimeMapModel::SetMode(Mode mode)
   }
 }
 
-DecayTimeMapModel::Mode DecayTimeMapModel::GetMode() const
+QmitkDecayTimeMapModel::Mode QmitkDecayTimeMapModel::GetMode() const
 {
   return m_Mode;
 }
 
-bool DecayTimeMapModel::hasSingleTimeStep() const
+bool QmitkDecayTimeMapModel::hasSingleTimeStep() const
 {
   return m_DecayTimeMap.size() == 1;
 }
 
-std::optional<mitk::TimeStepType> DecayTimeMapModel::GetTimeStep(const QModelIndex& index) const
+std::optional<mitk::TimeStepType> QmitkDecayTimeMapModel::GetTimeStep(const QModelIndex& index) const
 {
   if (!index.isValid()) return std::nullopt;
   if (hasSingleTimeStep()) return 0;
@@ -1460,7 +1490,7 @@ std::optional<mitk::TimeStepType> DecayTimeMapModel::GetTimeStep(const QModelInd
   return it->first;
 }
 
-std::optional<mitk::SlicedData::IndexValueType> DecayTimeMapModel::GetSliceIndex(const QModelIndex& index) const
+std::optional<mitk::SlicedData::IndexValueType> QmitkDecayTimeMapModel::GetSliceIndex(const QModelIndex& index) const
 {
   if (!index.isValid()) return std::nullopt;
   if (m_Mode == Mode::UserDefined) return 0;
@@ -1486,15 +1516,15 @@ std::optional<mitk::SlicedData::IndexValueType> DecayTimeMapModel::GetSliceIndex
 
 
 // =============================================================================
-// DecayTimeDelegate
+// QmitkDecayTimeDelegate
 // =============================================================================
 
-DecayTimeDelegate::DecayTimeDelegate(QObject* parent)
+QmitkDecayTimeDelegate::QmitkDecayTimeDelegate(QObject* parent)
   : QStyledItemDelegate(parent)
 {
 }
 
-QWidget* DecayTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+QWidget* QmitkDecayTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option,
                                           const QModelIndex& index) const
 {
   Q_UNUSED(option)
@@ -1508,14 +1538,14 @@ QWidget* DecayTimeDelegate::createEditor(QWidget* parent, const QStyleOptionView
   return spinBox;
 }
 
-void DecayTimeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+void QmitkDecayTimeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
   auto* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
   if (!spinBox) return;
   spinBox->setValue(index.model()->data(index, Qt::EditRole).toDouble());
 }
 
-void DecayTimeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
+void QmitkDecayTimeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
                                        const QModelIndex& index) const
 {
   auto* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
@@ -1524,7 +1554,7 @@ void DecayTimeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
   model->setData(index, spinBox->value(), Qt::EditRole);
 }
 
-void DecayTimeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+void QmitkDecayTimeDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
                                                const QModelIndex& index) const
 {
   Q_UNUSED(index)

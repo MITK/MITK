@@ -50,7 +50,8 @@ and may be overridden via the controls below.
    tree-view below. The other two modes are described in
    \ref PETSUV_DecayTime.
 -# When the diagnostics widget reports \b Configuration \b OK, click
-   \b Calculate \b SUV. A new node named <tt>&lt;series-name&gt;_SUV</tt>
+   \b Calculate \b SUV. A new node named
+   <tt>&lt;selected-node-name&gt;_SUV</tt>
    is added as a child of the selected PET node. The SUV image has
    <tt>double</tt> pixel type regardless of the input pixel type.
 

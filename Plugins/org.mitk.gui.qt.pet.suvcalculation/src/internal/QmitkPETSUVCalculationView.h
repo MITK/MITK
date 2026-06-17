@@ -45,14 +45,14 @@ namespace Ui
  *                 write emits dataChanged so the view can push the full map
  *                 to the filter.
  */
-class DecayTimeMapModel : public QAbstractItemModel
+class QmitkDecayTimeMapModel : public QAbstractItemModel
 {
   Q_OBJECT
 
 public:
   enum class Mode { Auto, UserDefined, PerSlice };
 
-  explicit DecayTimeMapModel(QObject* parent = nullptr);
+  explicit QmitkDecayTimeMapModel(QObject* parent = nullptr);
 
   void SetDecayTimeMap(const mitk::DecayTimeMapType& map);
   const mitk::DecayTimeMapType& GetDecayTimeMap() const;
@@ -82,12 +82,12 @@ private:
  * \brief Delegate providing a double spin-box editor for the decay-time
  *        column in per-slice mode.
  */
-class DecayTimeDelegate : public QStyledItemDelegate
+class QmitkDecayTimeDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
 public:
-  explicit DecayTimeDelegate(QObject* parent = nullptr);
+  explicit QmitkDecayTimeDelegate(QObject* parent = nullptr);
 
   QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
     const QModelIndex& index) const override;
@@ -119,8 +119,6 @@ class QmitkPETSUVCalculationView : public QmitkAbstractView
   Q_OBJECT
 
 public:
-  static const std::string VIEW_ID;
-
   QmitkPETSUVCalculationView();
   ~QmitkPETSUVCalculationView() override;
 
@@ -201,7 +199,7 @@ private:
   using HalfLifeMapType = std::map<std::string, double>;
   HalfLifeMapType m_HalfLifeMap;
 
-  DecayTimeMapModel* m_decayTimeModel = nullptr;
+  QmitkDecayTimeMapModel* m_decayTimeModel = nullptr;
 
   QWidget* m_ParentWidget = nullptr;
 

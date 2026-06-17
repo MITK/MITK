@@ -53,7 +53,7 @@ namespace mitk
    * \li \c LBM_James128      - lean-body-mass-normalized SUV using the
    *                            James (1976) "James 128" formula. Output [g/mL].
    * \li \c IBW               - ideal-body-weight-normalized SUV using the
-   *                            Devine (1974) formula. Output [g/mL].
+   *                            Sugawara (1999) formula. Output [g/mL].
    *                            Sex-specific.
    * \li \c BSA               - body-surface-area-normalized SUV (SUVbsa) using
    *                            the DuBois & DuBois (1916) formula. Output [cm^2/mL].

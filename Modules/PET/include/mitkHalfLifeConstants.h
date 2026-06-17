@@ -18,11 +18,11 @@ namespace mitk
  * \par Source
  *
  * Values are taken from the NNDC NuDat 3 nuclear data search
- * (https://www.nndc.bnl.gov/nudat3/), retrieved 2026-04-30. The values shown
- * below are the recommended half-lives evaluated from the cited Nuclear Data
- * Sheets entries; the bracketed quantities are the experimental uncertainties
- * from the same source. Where NNDC reports the half-life in minutes, the
- * value here is the minute value multiplied by 60 (no further rounding).
+ * (https://www.nndc.bnl.gov/nudat3/), retrieved 2026-04-30. Each per-constant
+ * comment lists the recommended half-life and the experimental uncertainty
+ * (shown with +/-) from the same source. Half-lives NNDC reports in minutes
+ * are converted to seconds (value * 60); those reported in seconds are used
+ * verbatim.
  *
  * \sa computeSUVScaleFactor, SUVFunctorPolicy
  */

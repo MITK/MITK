@@ -255,6 +255,7 @@ public:
     RequireTopLevel(0x0054, 0x1102, "(0054,1102) DecayCorrection");
     RequireTopLevel(0x0054, 0x1321, "(0054,1321) DecayFactor");
     RequireTopLevel(0x0054, 0x1300, "(0054,1300) FrameReferenceTime");
+    RequireTopLevel(0x0018, 0x1242, "(0018,1242) ActualFrameDuration");
   }
 
   void PatientPhysicalTags()

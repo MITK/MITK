@@ -52,11 +52,11 @@ Expected runtime: ~30-60 s (32 DROs, each ~20 DICOM slices).
 
 The test runs all 32 DROs unconditionally and stays **strict-red** if
 any case deviates. There is no per-DRO xfail wrapper or "expected to
-fail" carve-out -- every case must pass or the suite fails. This is
-deliberate pressure on the SUV pipeline maturation work tracked in
-`PLAN_SUV_INPUT_UNITS_AND_VARIANTS.md`: the test merges as part of the
-same MR as the variant + input-unit implementation work, so `develop`
-is never left in a red intermediate state.
+fail" carve-out -- every case must pass or the suite fails. This is a
+deliberate, permanent invariant: the SUV pipeline must reproduce the
+IBSI reference triple for every shipped DRO, so a regression in any
+variant or input-unit path fails the suite rather than being quietly
+tolerated.
 
 ### Skip behavior
 

@@ -43,7 +43,7 @@ class mitkSUVNormalizationStrategyTestSuite : public mitk::TestFixture
   MITK_TEST(LBMJames128_Other_Throws);
   MITK_TEST(LBMJames128_VariantId);
 
-  // Ideal body weight (Devine)
+  // Ideal body weight (Sugawara)
   MITK_TEST(IBW_Male_KnownInputs);
   MITK_TEST(IBW_Female_KnownInputs);
   MITK_TEST(IBW_Other_Throws);
@@ -129,6 +129,9 @@ public:
     mitk::LeanBodyMassJanmahasatianStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
+    // Independent hard-coded anchor: a coefficient typo mirrored into the
+    // formula above would slip past the recomputed check but not this one.
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(58954.51, strategy.ComputeScaleNumerator(inputs), 0.1);
   }
 
   void LBMJanma_Female_KnownInputs()
@@ -223,6 +226,8 @@ public:
     mitk::LeanBodyMassJames128Strategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
+    // Independent hard-coded anchor (see LBMJanma_Male_KnownInputs).
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(59775.60, strategy.ComputeScaleNumerator(inputs), 0.1);
   }
 
   void LBMJames128_Female_KnownInputs()
@@ -282,6 +287,8 @@ public:
     mitk::IdealBodyWeightStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
+    // Independent hard-coded anchor (see LBMJanma_Male_KnownInputs).
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(75560.0, strategy.ComputeScaleNumerator(inputs), 0.1);
   }
 
   void IBW_Female_KnownInputs()
@@ -346,6 +353,8 @@ public:
     mitk::BodySurfaceAreaStrategy strategy;
     CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, strategy.ComputeScaleNumerator(inputs),
                                  expected * 1e-12);
+    // Independent hard-coded anchor (see LBMJanma_Male_KnownInputs).
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(18481.43, strategy.ComputeScaleNumerator(inputs), 0.1);
   }
 
   void BSA_VariantId()

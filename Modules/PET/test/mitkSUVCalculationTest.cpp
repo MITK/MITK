@@ -28,6 +28,7 @@ class mitkSUVCalculationTestSuite : public mitk::TestFixture
   MITK_TEST(ScaleFactor_NegativeDecay_HalvesRatio);
   MITK_TEST(ComputeSUVbw_RoundTrip);
   MITK_TEST(ScaleFactor_LargeDecay_Finite);
+  MITK_TEST(HalfLifeConstants_PinnedValues);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -40,7 +41,7 @@ public:
     constexpr double activity   = 1.85e8;                              // 5 mCi in Bq
     constexpr double weight     = 70.0;                                // kg
     constexpr double decayTime  = 3600.0;                              // 60 min
-    const double halfLife       = mitk::HALFLIFECONSTANTS::VALUE_18F;  // 6586.26 s
+    const double halfLife       = mitk::HALFLIFECONSTANTS::VALUE_18F;  // 6586.2 s
 
     const double expected =
       (weight * 1000.0) / (activity * std::pow(2.0, -decayTime / halfLife));
@@ -120,6 +121,18 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Large-decay factor must be finite.", std::isfinite(actual));
     CPPUNIT_ASSERT_MESSAGE("Large-decay factor must be positive.", actual > 0.0);
+  }
+
+  void HalfLifeConstants_PinnedValues()
+  {
+    // Pin the literal half-life values. The formula tests recompute their
+    // "expected" from the same constant and so cannot catch a typo in the
+    // constant itself; a wrong half-life rescales every SUV. Values are
+    // NNDC NuDat 3 (see mitkHalfLifeConstants.h).
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(6586.2, mitk::HALFLIFECONSTANTS::VALUE_18F,  1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4062.6, mitk::HALFLIFECONSTANTS::VALUE_68Ga, 1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1221.8, mitk::HALFLIFECONSTANTS::VALUE_11C,  1e-9);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(122.24, mitk::HALFLIFECONSTANTS::VALUE_15O,  1e-9);
   }
 };
 

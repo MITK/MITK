@@ -29,13 +29,14 @@ namespace itk
   IndexedUnaryFunctorImageFilter< TInputImage, TOutputImage, TFunction >
     ::IndexedUnaryFunctorImageFilter()
   {
-    // Use the legacy BeforeThreadedGenerateData / ThreadedGenerateData
-    // threading model (instead of the newer DynamicThreadedGenerateData
-    // introduced in ITK 5). The per-pixel functor work for SUV decay
-    // correction is non-trivial and the legacy model has well-understood
-    // stability characteristics under that workload. Re-enabling dynamic
-    // multi-threading should be done together with profiling and is
-    // intentionally left as a separate change.
+    // Mandatory, not a tuning knob: this filter implements only the legacy
+    // ThreadedGenerateData signature (see below), not the
+    // DynamicThreadedGenerateData introduced in ITK 5. With dynamic
+    // multithreading left on (the ITK 5.4 default) the base class never
+    // dispatches to ThreadedGenerateData and the functor would not run, so
+    // this must stay off unless a DynamicThreadedGenerateData override is
+    // added. Switching threading models should also be accompanied by
+    // profiling.
     this->DynamicMultiThreadingOff();
     this->SetNumberOfRequiredInputs(1);
     this->InPlaceOff();

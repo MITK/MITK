@@ -62,11 +62,16 @@ mitk::GetFirstDICOMValueAsString(const mitk::IPropertyProvider* provider, const 
   {
     return {};
   }
+  const auto& baseProp = matches.begin()->second;
   const auto* dicomProp =
-    dynamic_cast<const mitk::DICOMProperty*>(matches.begin()->second.GetPointer());
-  if (nullptr == dicomProp)
+    dynamic_cast<const mitk::DICOMProperty*>(baseProp.GetPointer());
+  if (nullptr != dicomProp)
   {
-    return {};
+    return dicomProp->GetValue(0, 0, true, true);
   }
-  return dicomProp->GetValue(0, 0, true, true);
+  // Not a TemporoSpatialStringProperty (e.g. a uniform-value StringProperty
+  // produced for a tag whose value is constant across all slices): fall back
+  // to the generic string accessor so the helper works for any property kind
+  // an IPropertyProvider may carry, not only the DICOM reader's output.
+  return baseProp->GetValueAsString();
 }

@@ -68,14 +68,17 @@ namespace mitk
    *
    * Convenience wrapper for the (very common) "look up a single tag and
    * read its string value at the default temporo-spatial slot" pattern.
-   * Returns an empty string if \p provider is \c nullptr, no property
-   * matches \p path, or the matching property is not a \c DICOMProperty.
+   * Returns an empty string if \p provider is \c nullptr or no property
+   * matches \p path.
    *
    * \param[in] provider The property provider to search.
    * \param[in] path     The DICOMTagPath to look up.
-   * \return The DICOM property value at slot (timeStep=0, slice=0) with
-   *         \c allowLossyConversion and \c useDefaultContext both
-   *         enabled, or an empty string when not found.
+   * \return For a \c DICOMProperty (TemporoSpatialStringProperty) match,
+   *         the value at timeStep 0, slice 0, falling back to the closest
+   *         earlier time step and slice if the exact slot is absent
+   *         (\c allowCloseTime and \c allowCloseSlice both enabled). For
+   *         any other property kind, its plain string value
+   *         (\c GetValueAsString). Empty when no property matches.
    * \sa GetPropertyByDICOMTagPath
    */
   MITKDICOM_EXPORT std::string

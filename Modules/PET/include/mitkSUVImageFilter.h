@@ -89,9 +89,10 @@ namespace mitk
      * \brief Policy for IBSI-SUV-recommended adaptations of borderline /
      *        ambiguous DICOM input.
      *
-     * Default \c DICOMReadPolicy::Lenient, mirroring
-     * SUVCalculationHelper. Governs ConfigureFromProperties only; has no
-     * effect on Update once the filter is configured.
+     * Default \c DICOMReadPolicy::Lenient, mirroring SUVCalculationHelper.
+     * Governs parameter resolution. Like the other setters, changing it
+     * after the filter has been configured re-resolves the parameters on
+     * the next Update.
      */
     itkSetEnumMacro(DICOMReadPolicy, DICOMReadPolicy);
     itkGetConstMacro(DICOMReadPolicy, DICOMReadPolicy);
@@ -240,6 +241,13 @@ namespace mitk
      * radiopharmaceutical info, decay-correction strategy). Explicit
      * overrides set via the dedicated setters always take precedence
      * over property-derived values.
+     *
+     * Calling this is optional: Update() resolves the same way the first
+     * time it runs. Call it explicitly when you need to read \c GetEffective*
+     * or \c GetDetectedInputModel before Update (e.g. to drive a UI). The
+     * resolved configuration is a function of the input properties and the
+     * overrides, so a later change to the input or any setter re-resolves the
+     * parameters on the next Update.
      *
      * \param[in] props The source of DICOM properties; typically the
      *                  filter's input image.

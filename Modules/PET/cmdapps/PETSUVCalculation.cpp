@@ -393,9 +393,8 @@ int main(int argc, char* argv[])
                    "if the input pixels really are in [Bq/mL].";
     }
 
-    // Update() auto-configures from the input image when no explicit
-    // ConfigureFromProperties has run, surfacing configuration errors with
-    // the same exit-code mapping, so no separate call is needed here.
+    // Update() auto-configures from the input image; an explicit
+    // ConfigureFromProperties is not needed (identical exit-code mapping).
     filter->Update();
 
     auto output = filter->GetOutput();

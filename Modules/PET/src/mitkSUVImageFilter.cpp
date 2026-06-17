@@ -738,12 +738,15 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     m_Configured                    = prevConf;
     throw;
   }
-  this->Modified();
-  // Snapshot the modification time AFTER the Modified() bump above. A later
-  // override setter also calls Modified(), pushing GetMTime() past this
-  // snapshot, which is how GenerateData detects that the resolved
-  // m_Effective* slots are stale and reconfigures. Capturing before the
-  // bump would make every first Update() reconfigure spuriously.
+  // Deliberately no this->Modified() here. The resolved m_Effective* values
+  // are a pure function of the override slots, the input image's properties,
+  // and the policy -- all of which already mark the filter modified when they
+  // change, so signalling again would be redundant. It is also actively
+  // harmful on the GenerateData auto-configure path: calling Modified()
+  // mid-execution leaves the just-produced output looking stale, so a later
+  // access re-triggers the pipeline -- a writer holding a read lock then
+  // deadlocks. Capture the current modification time so GenerateData
+  // reconfigures only when a later setter pushes GetMTime() past this snapshot.
   m_ConfigureMTime = this->GetMTime();
 }
 

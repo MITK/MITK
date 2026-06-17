@@ -50,6 +50,8 @@ namespace
     InvalidDICOMPropertyValue  = 6,
     MissingSUVInput            = 7,
     BenchmarkAdaptationRefused = 8,
+    InputReadError             = 9,
+    OutputWriteError           = 10,
   };
 
   int AsInt(ExitCode c) { return static_cast<int>(c); }
@@ -152,7 +154,7 @@ namespace
       "SUV variant",
       "One of: bw (body weight, default), lbm-janma (lean body mass, "
       "Janmahasatian 2005, IBSI-SUV recommended), lbm-james128 (lean body "
-      "mass, James 1976), ibw (ideal body weight, Devine 1974), "
+      "mass, James 1976), ibw (ideal body weight, Sugawara 1999), "
       "bsa (body surface area, DuBois).",
       us::Any(std::string("bw")));
     parser.endGroup();
@@ -318,7 +320,7 @@ int main(int argc, char* argv[])
   setupParser(parser);
 
   const auto parsedArgs = parser.parseArguments(argc, argv);
-  if (parsedArgs.count("help") || parsedArgs.count("h"))
+  if (parsedArgs.count("help"))
   {
     std::cout << parser.helpText();
     return AsInt(ExitCode::Success);
@@ -331,20 +333,31 @@ int main(int argc, char* argv[])
     return AsInt(ExitCode::InvalidArguments);
   }
 
+  // ---- Load ---------------------------------------------------------------
+  //
+  // Loaded in a dedicated try so an unreadable input is distinguishable
+  // (InputReadError) from an internal computation error further down.
+  mitk::Image::Pointer image;
   try
   {
-    // ---- Load -----------------------------------------------------------
-
     if (s.verbose) MITK_INFO << "Loading input: " << s.inFileName;
     mitk::PreferenceListReaderOptionsFunctor readerFunctor(
       { "MITK DICOM Reader v2 (autoselect)" }, { "" });
-    auto image = mitk::IOUtil::Load<mitk::Image>(s.inFileName, &readerFunctor);
-    if (image.IsNull())
-    {
-      MITK_ERROR << "Cannot load input image: " << s.inFileName;
-      return AsInt(ExitCode::Generic);
-    }
+    image = mitk::IOUtil::Load<mitk::Image>(s.inFileName, &readerFunctor);
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Cannot load input image '" << s.inFileName << "': " << e.what();
+    return AsInt(ExitCode::InputReadError);
+  }
+  if (image.IsNull())
+  {
+    MITK_ERROR << "Cannot load input image: " << s.inFileName;
+    return AsInt(ExitCode::InputReadError);
+  }
 
+  try
+  {
     // ---- Validate modality / units -------------------------------------
 
     if (!ValidateModality(image, s.ignoreModalityCheck))
@@ -380,20 +393,28 @@ int main(int argc, char* argv[])
                    "if the input pixels really are in [Bq/mL].";
     }
 
-    // The filter's Update() will call ConfigureFromProperties() internally
-    // if it has not been called explicitly, using the input image as the
-    // property source. Calling it here is equivalent and lets us surface
-    // configuration errors with the exact same exit-code mapping the CLI
-    // had before the migration to the filter.
-    filter->ConfigureFromProperties(image);
+    // Update() auto-configures from the input image when no explicit
+    // ConfigureFromProperties has run, surfacing configuration errors with
+    // the same exit-code mapping, so no separate call is needed here.
     filter->Update();
 
     auto output = filter->GetOutput();
 
     // ---- Save -----------------------------------------------------------
-
-    if (s.verbose) MITK_INFO << "Saving output: " << s.outFileName;
-    mitk::IOUtil::Save(output, s.outFileName);
+    //
+    // Wrapped separately so an output-write failure is distinguishable
+    // (OutputWriteError) from an internal computation error.
+    try
+    {
+      if (s.verbose) MITK_INFO << "Saving output: " << s.outFileName;
+      mitk::IOUtil::Save(output, s.outFileName);
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << "Cannot write output image '" << s.outFileName
+                 << "': " << e.what();
+      return AsInt(ExitCode::OutputWriteError);
+    }
 
     if (s.verbose) MITK_INFO << "SUV computation finished.";
     return AsInt(ExitCode::Success);
@@ -408,6 +429,12 @@ int main(int argc, char* argv[])
     MITK_ERROR << "Strict DICOM input policy refused a benchmark-recommended "
                   "adaptation: " << e.GetDescription();
     return AsInt(ExitCode::BenchmarkAdaptationRefused);
+  }
+  catch (const mitk::MultiItemRadiopharmaceuticalSequenceException& e)
+  {
+    MITK_ERROR << "Multi-item Radiopharmaceutical Information Sequence "
+                  "without --tracer-index: " << e.GetDescription();
+    return AsInt(ExitCode::MultiTracerWithoutIndex);
   }
   catch (const mitk::InvalidDICOMPropertyValueException& e)
   {

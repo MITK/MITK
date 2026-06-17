@@ -195,7 +195,7 @@ NRRD does not carry the corresponding DICOM tags.
 | `lbm-janma`     | Janmahasatian (2005): `LBM_male = (9270*W)/(6680+216*BMI)`, `LBM_female = (9270*W)/(8780+244*BMI)`, then `*1000`. **IBSI-SUV-recommended LBM formula.**                                                                          | `g/mL`      |
 | `lbm-james128`  | James (1976): `LBM_male = 1.10*W - 0.0128*W^2/H^2`, `LBM_female = 1.07*W - 0.0148*W^2/H^2` (W in kg, H in m), then `*1000`.                                                                                                      | `g/mL`      |
 | `ibw`           | Sugawara (1999): `IBW_male = 48.0 + 1.06*(H_cm - 152)`, `IBW_female = 45.5 + 0.91*(H_cm - 152)`, then `*1000`. Below 152 cm the formula returns values below the constant; the tool does not clamp. Also adopted verbatim by the IBSI-SUV benchmark.   | `g/mL`      |
-| `bsa`           | DuBois (1916): `BSA_m² = 0.007184 * W^0.425 * H_cm^0.725`, then `*10000` (cm²).                                                                                                                                                  | `cm²/mL`    |
+| `bsa`           | DuBois (1916): `BSA_m2 = 0.007184 * W^0.425 * H_cm^0.725`, then `*10000` (cm^2).                                                                                                                                                 | `cm^2/mL`   |
 
 The math kernel is the same for all variants on activity-concentration
 inputs:
@@ -305,17 +305,17 @@ resulting decay would be negative).
 #### DC=START fallback chain
 
 The reference time used to compute the residual decay correction is
-chosen by the IBSI-SUV-benchmark-recommended fallback chain — *the first
-condition whose preconditions are met determines the result*:
+chosen by the IBSI-SUV-benchmark-recommended fallback chain (*the first
+condition whose preconditions are met determines the result*):
 
 1. **Vendor private datetime tag.**
-   - Siemens: `(0071,0x22)` in private block `"SIEMENS MEDCOM HEADER"`.
+   - Siemens: `(0071,0x22)` in private block `"SIEMENS MED PT"`.
    - GE: `(0009,0x0D)` in private block `"GEMS_PETD_01"`.
    The PET reader lifts these out of the dataset at load time and
    attaches them as named properties (`mitk.pet.SiemensDecayDateTime` /
-   `mitk.pet.GEScanDateTime`); see issue #783 for the design status.
-   When present and yielding a non-negative decay, the value is used as
-   the uniform reference time across all slices.
+   `mitk.pet.GEScanDateTime`). When present and yielding a non-negative
+   decay, the value is used as the uniform reference time across all
+   slices.
 
 2. **`(0008,0032) AcquisitionTime` equals `(0008,0031) SeriesTime`** in
    seconds at slice 0, and Manufacturer is one of Siemens, GE, Philips.
@@ -335,8 +335,8 @@ condition whose preconditions are met determines the result*:
    `AcquisitionTime - FrameReferenceTime`. Requires the same per-slice
    tags as Step 3 (with the same non-negativity / positivity preconditions).
 
-If none of these applies — typically an unrecognized manufacturer with
-no private tag and no per-slice frame timing — the helper raises an
+If none of these applies (typically an unrecognized manufacturer with
+no private tag and no per-slice frame timing), the helper raises an
 `AmbiguousDecayTimingException`. The tool refuses to silently extend a
 vendor-specific formula to an input it cannot classify, and exits with
 code `3`. Use `--decay-time` to supply timing externally.
@@ -414,6 +414,8 @@ respective heuristic.
 | `6`  | A DICOM property holds an unsupported value                      |
 | `7`  | A required SUV input (e.g. height for `lbm`) is missing          |
 | `8`  | `--strict-dicom`: a benchmark-recommended adaptation was refused |
+| `9`  | The input image could not be read                               |
+| `10` | The output image could not be written                           |
 
 ## Output Format
 

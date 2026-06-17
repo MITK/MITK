@@ -98,10 +98,11 @@ namespace mitk
 
     // ---- Override fields ---------------------------------------------------
     //
-    // Set / Get use itk macros, except SetDecayTimeOverrideInSec,
-    // SetDecayTimeOverrideMap, and GetDecayTimeOverrideMap, which are
-    // hand-written to enforce the override mutual-exclusion. Clear and
-    // GetEffective are hand-written.
+    // Most Set / Get use itk macros. The decay-time and input-model
+    // overrides (SetDecayTimeOverrideInSec, SetDecayTimeOverrideMap,
+    // GetDecayTimeOverrideMap, SetInputModelOverride, GetInputModelOverride)
+    // are hand-written to enforce mutual-exclusion / value validation. All
+    // Clear and GetEffective accessors are hand-written.
 
     /** \brief Override DICOM (0010,1030) Patient Weight, in [g]. */
     itkSetMacro(PatientWeightInGram, double);
@@ -141,6 +142,9 @@ namespace mitk
      * value is applied uniformly to every voxel and the
      * DICOM-decay-correction pipeline is bypassed entirely.
      *
+     * \p value must be finite and non-negative. Zero is accepted and
+     * reproduces ADMIN-style behaviour (residual decay factor 2^0 = 1).
+     *
      * \pre \c GetDecayTimeOverrideMap() is empty. The uniform and the
      *      per-(timestep, slice) decay-time overrides are mutually
      *      exclusive; the caller must \c ClearDecayTimeOverrideMap()
@@ -148,6 +152,8 @@ namespace mitk
      *
      * \throw ConflictingDecayTimeOverrideException if the precondition is
      *        violated.
+     * \throw InvalidDecayTimeOverrideException if \p value is non-finite
+     *        or negative.
      */
     void SetDecayTimeOverrideInSec(double value);
     itkGetConstMacro(DecayTimeOverrideInSec, std::optional<double>);
@@ -175,9 +181,9 @@ namespace mitk
      */
     void SetDecayTimeOverrideMap(DecayTimeMapType map);
     void ClearDecayTimeOverrideMap();
-    std::optional<DecayTimeMapType> GetDecayTimeOverrideMap() const;
+    const std::optional<DecayTimeMapType>& GetDecayTimeOverrideMap() const;
 
-    DecayCorrectionInfo GetEffectiveDecayCorrection() const;
+    const DecayCorrectionInfo& GetEffectiveDecayCorrection() const;
 
     /**
      * \brief Optional explicit selection for multi-item Radiopharmaceutical
@@ -310,6 +316,12 @@ namespace mitk
     std::optional<SUVInputModel> m_DetectedInputModel;
 
     bool m_Configured{false};
+
+    // Modification time captured at the end of the last successful
+    // ConfigureFromProperties. GenerateData reconfigures when a later
+    // setter bumps GetMTime() past this value, so override changes made
+    // after configuration are not silently ignored at Update().
+    itk::ModifiedTimeType m_ConfigureMTime{0};
   };
 } // namespace mitk
 

@@ -95,6 +95,25 @@ namespace mitk
   };
 
   /**
+   * \brief A multi-item Radiopharmaceutical Information Sequence (0054,0016)
+   *        was supplied without an explicit tracer selection.
+   *
+   * Distinct from the generic \c InvalidDICOMPropertyValueException so a
+   * caller (e.g. the CLI) can report this recoverable case separately: it
+   * is resolved by selecting one item via the tracer-index override rather
+   * than by fixing the input. Derives from
+   * \c InvalidDICOMPropertyValueException so handlers that do not
+   * distinguish the case still treat it as an invalid-value error.
+   */
+  class MITKPET_EXPORT MultiItemRadiopharmaceuticalSequenceException
+    : public InvalidDICOMPropertyValueException
+  {
+  public:
+    mitkExceptionClassMacro(MultiItemRadiopharmaceuticalSequenceException,
+                            InvalidDICOMPropertyValueException);
+  };
+
+  /**
    * \brief Base class for failures triggered by a benchmark-recommended
    *        adaptation that the active policy refuses to perform.
    *
@@ -261,6 +280,22 @@ namespace mitk
   {
   public:
     mitkExceptionClassMacro(InvalidDecayTimeMapException, SUVHelperException);
+  };
+
+  /**
+   * \brief A uniform decay-time override value is not a usable decay
+   *        duration.
+   *
+   * Raised by \c SUVImageFilter::SetDecayTimeOverrideInSec for a
+   * non-finite (NaN / infinite) value or a negative duration. Zero is
+   * accepted: it reproduces ADMIN-style behaviour (residual decay factor
+   * 2^0 = 1). A NaN value would otherwise propagate to an all-NaN output
+   * and a negative value would scale the dose upward, both silently.
+   */
+  class MITKPET_EXPORT InvalidDecayTimeOverrideException : public SUVHelperException
+  {
+  public:
+    mitkExceptionClassMacro(InvalidDecayTimeOverrideException, SUVHelperException);
   };
 
   /**
@@ -553,7 +588,7 @@ namespace mitk
    *
    * \anchor DCStartFallbackChain
    *  -# <b>Vendor private datetime tag.</b> Siemens: (0071,0x22) "SIEMENS
-   *     MEDCOM HEADER" decay-correction datetime (lifted to property
+   *     MED PT" decay-correction datetime (lifted to property
    *     \c mitk.pet.SiemensDecayDateTime by \c BaseDICOMReaderService);
    *     GE: (0009,0x0D) "GEMS_PETD_01" scan datetime (lifted to
    *     \c mitk.pet.GEScanDateTime). Used as the uniform reference time
@@ -636,7 +671,7 @@ namespace mitk
    *        fallback chain" (vendor-specific empirical formula).
    *
    * \sa GetDecayCorrectionStrategy, GetManufacturerFamily,
-   *     computeSUVbwScaleFactor, SUVbwFunctorPolicy
+   *     computeSUVbwScaleFactor
    */
   DecayCorrectionInfo MITKPET_EXPORT DeduceDecayCorrection(
     const mitk::SlicedData* data,

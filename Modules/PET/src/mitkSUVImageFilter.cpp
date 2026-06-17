@@ -199,7 +199,7 @@ namespace
       if (i > 0) names << ", ";
       names << "[" << i << "] " << (infos[i].name.empty() ? "<unnamed>" : infos[i].name);
     }
-    mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+    mitkThrowException(mitk::MultiItemRadiopharmaceuticalSequenceException)
       << "Input contains a multi-item Radiopharmaceutical Information "
          "Sequence (0054,0016). Set an explicit tracer index to select one. "
          "Items: " << names.str();
@@ -250,7 +250,6 @@ namespace
     // override.
     const auto timeSteps = image->GetTimeSteps();
 
-    std::size_t expectedEntries = 0U;
     for (mitk::TimeStepType t = 0; t < timeSteps; ++t)
     {
       const auto* sliced = image->GetSlicedGeometry(t);
@@ -273,14 +272,13 @@ namespace
             << slices << " slice(s)).";
         }
       }
-      expectedEntries += slices;
     }
 
-    // Catch out-of-range coordinates (extra timesteps or extra slices) by
-    // counting and by direct range checks. Counting alone is sufficient
-    // once per-cell presence is established above, but we also surface the
-    // offending coordinate to make caller debugging easier.
-    std::size_t suppliedEntries = 0U;
+    // Reject out-of-range coordinates and unusable values. The presence
+    // loop above plus this no-extras pass establish an exact 1:1 match
+    // between map entries and image cells (map keys are unique), so no
+    // separate cardinality cross-check is needed. Zero is a valid decay
+    // duration (ADMIN-style); NaN or negative entries are not.
     for (const auto& tEntry : map)
     {
       if (tEntry.first >= timeSteps)
@@ -301,17 +299,15 @@ namespace
                "slice " << zEntry.first << " for timestep " << tEntry.first
             << " (timestep has " << slices << " slice(s)).";
         }
+        if (!std::isfinite(zEntry.second) || zEntry.second < 0.0)
+        {
+          mitkThrowException(mitk::InvalidDecayTimeMapException)
+            << "Per-slice decay-time override map has an invalid decay time "
+            << zEntry.second << " s for timestep " << tEntry.first
+            << ", slice " << zEntry.first
+            << " (must be finite and non-negative).";
+        }
       }
-      suppliedEntries += tEntry.second.size();
-    }
-    if (suppliedEntries != expectedEntries)
-    {
-      // Defensive: the per-cell loops above already cover sparse + extra
-      // coordinates. If we reach here, the map shape is inconsistent in a
-      // way the targeted checks somehow missed; refuse rather than guess.
-      mitkThrowException(mitk::InvalidDecayTimeMapException)
-        << "Per-slice decay-time override map has " << suppliedEntries
-        << " entries but image geometry requires " << expectedEntries << ".";
     }
 
     mitk::DecayCorrectionInfo info;
@@ -383,6 +379,15 @@ void mitk::SUVImageFilter::SetDecayTimeOverrideInSec(double value)
          "ClearDecayTimeOverrideMap() before engaging the uniform "
          "override.";
   }
+  // Zero is valid (ADMIN-style: residual decay factor 2^0 = 1); a NaN would
+  // propagate to an all-NaN output and a negative duration would scale the
+  // dose upward, both silently. Reject them at the boundary.
+  if (!std::isfinite(value) || value < 0.0)
+  {
+    mitkThrowException(InvalidDecayTimeOverrideException)
+      << "SUVImageFilter::SetDecayTimeOverrideInSec: decay time must be a "
+         "finite, non-negative duration in seconds (got " << value << ").";
+  }
   m_DecayTimeOverrideInSec = value;
   this->Modified();
 }
@@ -419,7 +424,7 @@ void mitk::SUVImageFilter::ClearDecayTimeOverrideMap()
   }
 }
 
-std::optional<mitk::DecayTimeMapType> mitk::SUVImageFilter::GetDecayTimeOverrideMap() const
+const std::optional<mitk::DecayTimeMapType>& mitk::SUVImageFilter::GetDecayTimeOverrideMap() const
 {
   return m_DecayTimeOverrideMap;
 }
@@ -504,7 +509,7 @@ double mitk::SUVImageFilter::GetEffectiveHalfLifeInSec() const
   return m_EffectiveHalfLifeInSec.value();
 }
 
-mitk::DecayCorrectionInfo mitk::SUVImageFilter::GetEffectiveDecayCorrection() const
+const mitk::DecayCorrectionInfo& mitk::SUVImageFilter::GetEffectiveDecayCorrection() const
 {
   RequireConfigured(m_EffectiveDecayCorrection.has_value(), "DecayCorrection");
   return m_EffectiveDecayCorrection.value();
@@ -734,6 +739,12 @@ void mitk::SUVImageFilter::ConfigureFromProperties(const IPropertyProvider* prop
     throw;
   }
   this->Modified();
+  // Snapshot the modification time AFTER the Modified() bump above. A later
+  // override setter also calls Modified(), pushing GetMTime() past this
+  // snapshot, which is how GenerateData detects that the resolved
+  // m_Effective* slots are stale and reconfigures. Capturing before the
+  // bump would make every first Update() reconfigure spuriously.
+  m_ConfigureMTime = this->GetMTime();
 }
 
 void mitk::SUVImageFilter::GenerateOutputInformation()
@@ -782,6 +793,21 @@ void mitk::SUVImageFilter::ProcessTimeStep(const Image*                 stepIn,
     if (idx < expectedSlices)
     {
       sliceDecay[idx] = kv.second;
+    }
+  }
+
+  // A missing or sparse decay map leaves NaN slots that would silently
+  // produce an all-NaN SUV slab: the functor's IsConfigured() boundary
+  // check only covers the scalar parameters, not the per-slice decay
+  // lookup. Reject here so an uncovered slice surfaces as a loud error on
+  // every path (DICOM-derived, uniform, and per-slice override).
+  for (std::size_t z = 0; z < sliceDecay.size(); ++z)
+  {
+    if (!std::isfinite(sliceDecay[z]))
+    {
+      mitkThrow() << "SUVImageFilter: no decay time resolved for slice " << z
+                  << " of timestep " << dstStep << "; the decay-correction "
+                     "map does not cover every slice of this timestep.";
     }
   }
 
@@ -898,9 +924,11 @@ void mitk::SUVImageFilter::GenerateData()
   }
 
   // ConfigureFromProperties is the explicit, externally-callable resolution
-  // step. We call it here only if the user has not done so already, using
-  // the input image as the property source.
-  if (!m_Configured)
+  // step. Reconfigure if it has never run, or if a setter changed a
+  // parameter after the last run (otherwise the cached m_Effective* slots
+  // would be stale and the change silently ignored). The auto-reconfigure
+  // resolves against the input image, matching every shipped caller.
+  if (!m_Configured || this->GetMTime() > m_ConfigureMTime)
   {
     this->ConfigureFromProperties(inputImage);
   }

@@ -54,11 +54,13 @@ class mitkSUVImageFilterTestSuite : public mitk::TestFixture
   MITK_TEST(ConfigureFromProperties_NullProvider_Throws);
   MITK_TEST(ConfigureFromProperties_NoInput_Throws);
 
-  // Ambiguous-sex policy gate (Sex::Other and unset effective sex)
+  // Ambiguous-sex policy gate (Sex::Other)
   MITK_TEST(SexPolicyGate_StrictWithSexOther_Throws);
   MITK_TEST(SexPolicyGate_LenientWithSexOther_Succeeds);
-  MITK_TEST(SexPolicyGate_StrictWithUnsetEffectiveSex_Throws);
-  MITK_TEST(SexPolicyGate_LenientWithUnsetEffectiveSex_Succeeds);
+
+  // Reconfigure-on-change (M1): a target-variant change after configure
+  // re-resolves at Update instead of reusing stale resolved state.
+  MITK_TEST(TargetVariantChange_AfterConfigure_RequiresSex);
 
   // Per-(timestep, slice) decay-time override map
   MITK_TEST(SetClear_DecayTimeOverrideMap);
@@ -301,12 +303,13 @@ private:
     return f;
   }
 
-  // Build a filter whose effective sex is left empty even though the
-  // active target variant is sex-specific. Configures with target=BSA
-  // (sex-independent) so Configure does not resolve sex, then switches
-  // to LBM_Janma before Update. Tests of the policy gate's defensive
-  // behavior in this state.
-  static mitk::SUVImageFilter::Pointer MakeFilterWithUnsetEffectiveSex(
+  // Build a filter configured for a sex-independent target (BSA), then
+  // switched to a sex-specific target (LBM_Janma) with no explicit sex and
+  // against an image carrying no sex tag. With the M1 reconfigure-on-change
+  // guard, Update() re-resolves against the new variant and surfaces the
+  // now-missing sex rather than silently reusing the BSA-time (sex-
+  // unresolved) state.
+  static mitk::SUVImageFilter::Pointer MakeFilterSwitchedToSexSpecificTarget(
     mitk::DICOMReadPolicy policy)
   {
     auto f   = mitk::SUVImageFilter::New();
@@ -349,17 +352,22 @@ public:
     CPPUNIT_ASSERT_NO_THROW(f->Update());
   }
 
-  void SexPolicyGate_StrictWithUnsetEffectiveSex_Throws()
+  void TargetVariantChange_AfterConfigure_RequiresSex()
   {
-    auto f = MakeFilterWithUnsetEffectiveSex(mitk::DICOMReadPolicy::Strict);
-    CPPUNIT_ASSERT_THROW(f->Update(),
-                         mitk::AmbiguousPatientSexAdaptationRefusedException);
-  }
-
-  void SexPolicyGate_LenientWithUnsetEffectiveSex_Succeeds()
-  {
-    auto f = MakeFilterWithUnsetEffectiveSex(mitk::DICOMReadPolicy::Lenient);
-    CPPUNIT_ASSERT_NO_THROW(f->Update());
+    // M1: a target-variant change after ConfigureFromProperties must not be
+    // silently ignored at Update(). Switching from BSA (sex-independent) to
+    // LBM (sex-specific) triggers a reconfigure that needs patient sex; the
+    // minimal image carries none, so Update() throws. It throws for both
+    // policies because the missing-sex error precedes the policy gate (so an
+    // unset effective sex can no longer leak into the gate via stale config).
+    {
+      auto f = MakeFilterSwitchedToSexSpecificTarget(mitk::DICOMReadPolicy::Strict);
+      CPPUNIT_ASSERT_THROW(f->Update(), mitk::MissingDICOMPropertyException);
+    }
+    {
+      auto f = MakeFilterSwitchedToSexSpecificTarget(mitk::DICOMReadPolicy::Lenient);
+      CPPUNIT_ASSERT_THROW(f->Update(), mitk::MissingDICOMPropertyException);
+    }
   }
 
   // ---- Per-(timestep, slice) decay-time override map ----

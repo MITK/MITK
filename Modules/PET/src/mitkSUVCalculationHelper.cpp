@@ -157,19 +157,17 @@ namespace
          "Radiopharmaceutical Start Time was found.";
   }
 
-  // Compute (reference - injection) in seconds with rollover handling.
+  // Numeric rollover guard for a precomputed (reference - injection)
+  // duration in seconds; it does not compute the difference itself.
   // - If the result is negative AND the injection time was derived from
-  //   the (0018,1072) TM-only tag, subtract 24 h from the injection and try
-  //   once more. This recovers the typical "injected last night, scanned
-  //   this morning" ambiguity.
+  //   the (0018,1072) TM-only tag (whose date had to be assembled from the
+  //   acquisition date), subtract 24 h from the injection and try once more.
+  //   This recovers the typical "injected last night, scanned this morning"
+  //   ambiguity.
   // - If the result is still outside [0, 24 h], throw
   //   AmbiguousDecayTimingException.
   // - For (0018,1078)-derived data, no rollover correction is applied; any
   //   negative duration throws.
-  // Numeric rollover guard. Validates a precomputed (reference - injection)
-  // duration in seconds, optionally recovering a one-shot 24 h rollover when
-  // the injection time was derived from the (0018,1072) TM-only tag (whose
-  // date had to be assembled from the acquisition date).
   double GuardDecayDurationSeconds(double durationSeconds,
                                    bool injectionFromTimeOnlyTag)
   {
@@ -193,14 +191,6 @@ namespace
     }
 
     return seconds;
-  }
-
-  double ComputeDecayTimeWithRolloverGuard(const OFDateTime& injection,
-                                           const OFDateTime& reference,
-                                           bool injectionFromTimeOnlyTag)
-  {
-    return GuardDecayDurationSeconds(
-      DurationInSeconds(injection, reference), injectionFromTimeOnlyTag);
   }
 
   // Pull a named property (attached out-of-band — e.g. the lifted vendor

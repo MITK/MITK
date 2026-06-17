@@ -59,12 +59,11 @@ namespace mitk
    *
    * The SUV variant (SUVbw, SUVlbm, SUVbsa, ...) is encoded externally:
    * pick a SUVNormalizationStrategy, compute its scale numerator from
-   * the patient measurements, and feed it to SetScaleNumerator(). For
-   * the legacy SUVbw use case, SUVbwFunctorPolicy provides a thin
-   * BW-specific shortcut that takes body weight in [kg].
+   * the patient measurements, and feed it to SetScaleNumerator(). For the
+   * body-weight case, pair this with a BodyWeightStrategy.
    *
    * \sa computeSUVScaleFactor, SUVNormalizationStrategy,
-   *     SUVbwFunctorPolicy, itk::IndexedUnaryFunctorImageFilter
+   *     itk::IndexedUnaryFunctorImageFilter
    */
   class MITKPET_EXPORT SUVFunctorPolicy
   {
@@ -112,13 +111,6 @@ namespace mitk
 
     /** \brief Destructor. */
     virtual ~SUVFunctorPolicy();
-
-    /**
-     * \brief Get the number of output components per pixel.
-     *
-     * \return Always returns 1.
-     */
-    unsigned int GetNumberOfOutputs() const;
 
     /**
      * \brief Set the functor used to query the decay time for a given
@@ -183,7 +175,10 @@ namespace mitk
      *
      * \param[in] other The other policy to compare against.
      * \return \c true if injected activity, scale numerator, and
-     *         half-life are identical.
+     *         half-life are identical. A default-constructed (NaN-seeded)
+     *         policy compares unequal to itself because NaN != NaN; this
+     *         only over-invalidates (forces a re-run) and never falsely
+     *         reports equality.
      */
     bool operator==(const SUVFunctorPolicy& other) const;
 
@@ -216,48 +211,6 @@ namespace mitk
     double m_HalfLife         = std::numeric_limits<double>::quiet_NaN();
 
     DecayTimeFunctionType m_Functor;
-  };
-
-  /**
-   * \brief Body-weight-normalized SUV functor policy (SUVbw).
-   *
-   * Backward-compatible thin specialization of SUVFunctorPolicy that
-   * accepts body weight in [kg] directly. The body weight is converted
-   * to grams internally and stored in the base class as the scale
-   * numerator, so the math is identical to SUVFunctorPolicy + a
-   * BodyWeightStrategy.
-   *
-   * New code should prefer SUVFunctorPolicy together with a
-   * SUVNormalizationStrategy; this class is kept so the existing PET
-   * SUV plugin keeps compiling against the same API it used before
-   * SUVlbm/SUVbsa were added.
-   *
-   * \sa SUVFunctorPolicy, BodyWeightStrategy
-   */
-  class MITKPET_EXPORT SUVbwFunctorPolicy : public SUVFunctorPolicy
-  {
-  public:
-    /** \brief Default constructor. See SUVFunctorPolicy::SUVFunctorPolicy(). */
-    SUVbwFunctorPolicy() = default;
-
-    /**
-     * \brief Construct a fully configured policy in one step.
-     *
-     * \param[in] injectedActivity Injected activity in [Bq].
-     * \param[in] bodyweight       Body weight in [kg].
-     * \param[in] halfLife         Radionuclide half-life in [s].
-     */
-    SUVbwFunctorPolicy(double injectedActivity, double bodyweight, double halfLife);
-
-    /**
-     * \brief Set the patient's body weight.
-     *
-     * Internally stores \c w * 1000 (i.e. grams) as the scale numerator
-     * on the base class.
-     *
-     * \param[in] w Body weight in [kg].
-     */
-    void SetBodyWeight(double w);
   };
 
 }

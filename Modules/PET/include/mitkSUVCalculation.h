@@ -72,7 +72,7 @@ namespace mitk
    * \return The SUVbw scale factor (output [g/Bq]; applied to a
    *         [Bq/mL] image yields [g/mL]).
    *
-   * \sa computeSUVbw, SUVbwFunctorPolicy, HALFLIFECONSTANTS
+   * \sa computeSUVbw, HALFLIFECONSTANTS
    */
   double MITKPET_EXPORT computeSUVbwScaleFactor(double injectedActivity, double bodyweight, double decayTime, double halfLife);
 
@@ -89,7 +89,7 @@ namespace mitk
    * \param[in] halfLife Half-life of the used radionuclide in [s].
    * \return The computed SUVbw value [g/ml].
    *
-   * \sa computeSUVbwScaleFactor, SUVbwFunctorPolicy
+   * \sa computeSUVbwScaleFactor
    */
   double MITKPET_EXPORT computeSUVbw(double value, double injectedActivity, double bodyweight, double decayTime, double halfLife);
 };

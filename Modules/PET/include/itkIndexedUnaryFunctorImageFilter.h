@@ -49,7 +49,7 @@ namespace itk
  * output[index] = functor(input[index], index);
  * \endcode
  *
- * \sa itk::UnaryFunctorImageFilter, itk::UnaryGeneratorImageFilter, SUVbwFunctorPolicy
+ * \sa itk::UnaryFunctorImageFilter, itk::UnaryGeneratorImageFilter, SUVFunctorPolicy
  */
 
   template< typename TInputImage, typename TOutputImage, typename TFunction >

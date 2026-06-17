@@ -34,12 +34,7 @@ class mitkSUVFunctorPolicyTestSuite : public mitk::TestFixture
   // Generic SUVFunctorPolicy
   MITK_TEST(Generic_AppliesScaleNumerator);
   MITK_TEST(Generic_DecayTimePerVoxel);
-  MITK_TEST(Generic_GetNumberOfOutputs_IsOne);
   MITK_TEST(Generic_Equality_OnScalarsOnly);
-
-  // Backward-compat SUVbwFunctorPolicy
-  MITK_TEST(SUVbw_MathMatchesGenericWithWeightTimes1000);
-  MITK_TEST(SUVbw_SetBodyWeight_UpdatesScaleNumerator);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -161,12 +156,6 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(exp5, out5, std::fabs(exp5) * 1e-12);
   }
 
-  void Generic_GetNumberOfOutputs_IsOne()
-  {
-    mitk::SUVFunctorPolicy f;
-    CPPUNIT_ASSERT_EQUAL(1u, f.GetNumberOfOutputs());
-  }
-
   void Generic_Equality_OnScalarsOnly()
   {
     // operator== compares the three scalar parameters; the decay-time
@@ -183,40 +172,6 @@ public:
     CPPUNIT_ASSERT(!(a != b));
     CPPUNIT_ASSERT(a != c);
     CPPUNIT_ASSERT(!(a == c));
-  }
-
-  // ---- Backward-compat SUVbwFunctorPolicy ----
-
-  void SUVbw_MathMatchesGenericWithWeightTimes1000()
-  {
-    constexpr double decayTime = 1800.0;
-    constexpr double pixel     = 4.2e3;
-
-    mitk::SUVbwFunctorPolicy bw(kActivity, kWeight, kHalfLife);
-    bw.SetDecayTimeFunctor(ConstantDecay(decayTime));
-
-    mitk::SUVFunctorPolicy generic(kActivity, kWeight * 1000.0, kHalfLife);
-    generic.SetDecayTimeFunctor(ConstantDecay(decayTime));
-
-    const auto bwOut      = bw(pixel,      mitk::SUVFunctorPolicy::IndexType{ {0, 0, 0} });
-    const auto genericOut = generic(pixel, mitk::SUVFunctorPolicy::IndexType{ {0, 0, 0} });
-
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(genericOut, bwOut, std::fabs(genericOut) * 1e-12);
-  }
-
-  void SUVbw_SetBodyWeight_UpdatesScaleNumerator()
-  {
-    mitk::SUVbwFunctorPolicy bw;
-    bw.SetInjectedActivity(kActivity);
-    bw.SetHalfLife(kHalfLife);
-    bw.SetBodyWeight(kWeight);
-    bw.SetDecayTimeFunctor(ConstantDecay(0.0));
-
-    constexpr double pixel = 1.0e3;
-    const double expected = pixel * mitk::computeSUVbwScaleFactor(kActivity, kWeight, 0.0, kHalfLife);
-    const double actual   = bw(pixel, mitk::SUVFunctorPolicy::IndexType{ {0, 0, 0} });
-
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected, actual, std::fabs(expected) * 1e-12);
   }
 };
 

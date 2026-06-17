@@ -32,11 +32,6 @@ mitk::SUVFunctorPolicy::SUVFunctorPolicy(double injectedActivity, double scaleNu
 
 mitk::SUVFunctorPolicy::~SUVFunctorPolicy() = default;
 
-unsigned int mitk::SUVFunctorPolicy::GetNumberOfOutputs() const
-{
-  return 1;
-}
-
 void mitk::SUVFunctorPolicy::SetDecayTimeFunctor(const DecayTimeFunctionType& functor)
 {
   m_Functor = functor;
@@ -83,14 +78,4 @@ mitk::SUVFunctorPolicy::operator()(const SUVPixelType& value,
                                    const IndexType& currentIndex) const
 {
   return value * computeSUVScaleFactor(m_InjectedActivity, m_ScaleNumerator, m_Functor(currentIndex), m_HalfLife);
-}
-
-
-mitk::SUVbwFunctorPolicy::SUVbwFunctorPolicy(double injectedActivity, double bodyweight, double halfLife)
-  : SUVFunctorPolicy(injectedActivity, bodyweight * 1000.0, halfLife)
-{}
-
-void mitk::SUVbwFunctorPolicy::SetBodyWeight(double w)
-{
-  SetScaleNumerator(w * 1000.0);
 }

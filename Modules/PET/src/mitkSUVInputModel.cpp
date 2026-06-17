@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 #include <mitkBaseProperty.h>
 #include <mitkDICOMProperty.h>
@@ -41,18 +42,6 @@ namespace
     return mitk::GetFirstDICOMValueAsString(provider, path);
   }
 
-  // Read a named simple property as a string. Used for the named
-  // properties the PET DICOM reader lifts out of vendor private blocks
-  // (e.g. mitk.pet.PhilipsSUVScale); those bypass DICOMTagPath because
-  // they have no creator-string-aware path representation in MITK.
-  std::string ReadNamedString(const mitk::IPropertyProvider *provider, const std::string &name)
-  {
-    auto prop = provider->GetConstProperty(name);
-    if (prop.IsNull())
-      return {};
-    return prop->GetValueAsString();
-  }
-
   bool ParsePositiveDouble(const std::string &raw, double &outValue)
   {
     if (raw.empty())
@@ -65,6 +54,59 @@ namespace
     if (!std::isfinite(v) || v <= 0.0)
       return false;
     outValue = v;
+    return true;
+  }
+
+  // Read a lifted vendor private numeric factor that the PET reader attaches
+  // per-(timestep, slice). Philips emits a single series-level scale, but it
+  // is stored on every frame; read all populated slots and require them to
+  // agree so a malformed multi-bed export does not silently collapse to the
+  // first frame (the sibling decay-datetime consumer also reads per-(t,s)).
+  // Returns false when the property is absent or holds no usable value;
+  // throws InvalidDICOMPropertyValueException when populated slots disagree.
+  bool ReadUniformPositiveFactor(const mitk::IPropertyProvider *provider,
+                                 const std::string &name,
+                                 double &outValue)
+  {
+    auto baseProp = provider->GetConstProperty(name);
+    if (baseProp.IsNull())
+      return false;
+
+    const auto *tsProp =
+      dynamic_cast<const mitk::TemporoSpatialStringProperty *>(baseProp.GetPointer());
+    if (nullptr == tsProp)
+    {
+      // Already collapsed to a single uniform value.
+      return ParsePositiveDouble(baseProp->GetValueAsString(), outValue);
+    }
+
+    bool haveValue = false;
+    double common = 0.0;
+    for (const auto t : tsProp->GetAvailableTimeSteps())
+    {
+      for (const auto s : tsProp->GetAvailableSlices(t))
+      {
+        double v = 0.0;
+        if (!ParsePositiveDouble(tsProp->GetValue(t, s, false, false), v))
+          continue;
+        if (!haveValue)
+        {
+          common = v;
+          haveValue = true;
+        }
+        else if (std::fabs(v - common) >
+                 1e-9 * std::max(std::fabs(v), std::fabs(common)))
+        {
+          mitkThrowException(mitk::InvalidDICOMPropertyValueException)
+            << "Philips private scale factor '" << name << "' varies across "
+               "frames (" << common << " vs " << v << "); the SUV pipeline "
+               "treats it as a single series-level factor.";
+        }
+      }
+    }
+    if (!haveValue)
+      return false;
+    outValue = common;
     return true;
   }
 
@@ -180,14 +222,12 @@ mitk::SUVInputModel mitk::ClassifyPETInput(const IPropertyProvider *provider, DI
 
     // Look for the lifted Philips private factors. The lift is performed
     // by mitk::BaseDICOMReaderService when reading PET DICOM with
-    // (7053,xx00) "Philips PET Private Group" present.
-    const std::string suvScaleStr = ReadNamedString(provider, "mitk.pet.PhilipsSUVScale");
-    const std::string activityScaleStr = ReadNamedString(provider, "mitk.pet.PhilipsActivityScale");
-
+    // (7053,xx00) "Philips PET Private Group" present. Read per-(t,s) and
+    // require uniformity rather than trusting the first frame.
     double suvScale = 0.0;
     double actScale = 0.0;
-    const bool haveSuv = ParsePositiveDouble(suvScaleStr, suvScale);
-    const bool haveActivity = ParsePositiveDouble(activityScaleStr, actScale);
+    const bool haveSuv = ReadUniformPositiveFactor(provider, "mitk.pet.PhilipsSUVScale", suvScale);
+    const bool haveActivity = ReadUniformPositiveFactor(provider, "mitk.pet.PhilipsActivityScale", actScale);
 
     if (haveSuv)
     {

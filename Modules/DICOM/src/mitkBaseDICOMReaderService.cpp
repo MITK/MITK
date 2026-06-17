@@ -135,8 +135,9 @@ namespace
   // Per-frame lift: open each file in the frame list once, extract the
   // requested private element, and build a DICOMCachedValueLookupTable
   // keyed by frame index (with the descriptor's frame -> (t, s) mapping
-  // computed inline). Returns true if every frame yielded a non-empty
-  // value; partial-availability data falls through to the next step.
+  // computed inline). Returns true only if every frame yielded a non-empty
+  // value; on any missing frame it returns false and attaches nothing
+  // (all-or-nothing), leaving the caller to fall back.
   bool LiftPrivateTagPerFrame(const mitk::DICOMImageBlockDescriptor& desc,
                               Uint16 group, const char* creator, Uint16 elementOffset,
                               mitk::DICOMCachedValueLookupTable& outTable)
@@ -203,8 +204,9 @@ namespace
   // vendor branch is independent; they all share the same lift
   // mechanism (LiftPrivateTagPerFrame) and per-(t,s) property attach.
   //
-  // The lift visits every file in the frame list (DCMTK in metaInfo-only
-  // read mode) so the resulting DICOMProperty is per-(t, s) -- exactly
+  // The lift visits every file in the frame list, reading the full dataset
+  // (the private groups live in the dataset, not the file meta header), so
+  // the resulting DICOMProperty is per-(t, s) -- exactly
   // what mitk::GetDICOMPropertyForDICOMValuesFunctor produces for a
   // standard tag-of-interest. When the private value is identical
   // across all files (the common case) the SUV pipeline's per-slice
@@ -219,6 +221,9 @@ namespace
 
     const std::string modality = TrimAndUpper(
       mitk::GetFirstDICOMValueAsString(data, mitk::DICOMTagPath(0x0008, 0x0060)));
+    // Accept the non-standard "PET" spelling alongside the DICOM-standard
+    // "PT": some legacy exports use it, and the lift is harmless on a
+    // non-PET series (the private values simply are not present).
     if ("PT" != modality && "PET" != modality) return;
 
     const std::string manuf = TrimAndUpper(

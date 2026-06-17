@@ -4,10 +4,10 @@ MITK_CREATE_MODULE_TESTS()
 
 # Tag every test registered by MITK_CREATE_MODULE_TESTS with the "PET"
 # label so it shows up grouped in ctest reports and can be selected via
-# `ctest -L PET`. files.cmake is the authoritative source list, and the
-# macro derives test names from each entry's basename.
-include(files.cmake)
-foreach(_pet_test ${MODULE_TESTS} ${MODULE_RENDERING_TESTS})
+# `ctest -L PET`. MITK_CREATE_MODULE_TESTS is a macro, so MODULE_TESTS
+# (populated from files.cmake) is still in scope here; the macro derives
+# each test name from the entry's basename.
+foreach(_pet_test ${MODULE_TESTS})
   get_filename_component(_pet_test_name ${_pet_test} NAME_WE)
   if(TEST ${_pet_test_name})
     set_property(TEST ${_pet_test_name} APPEND PROPERTY LABELS "PET")

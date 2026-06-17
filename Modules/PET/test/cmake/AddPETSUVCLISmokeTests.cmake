@@ -51,7 +51,6 @@ function(_add_petsuv_cli_smoke name expected_exit)
             -P "${_assert_script}")
   set_property(TEST ${name} APPEND PROPERTY ENVIRONMENT "PATH=${_smoke_path}")
   set_property(TEST ${name} PROPERTY LABELS "PET" "PETSUVCLI")
-  set_property(TEST ${name} PROPERTY SKIP_RETURN_CODE 77)
 endfunction()
 
 # ---- Argument-parsing cases (no IBSI data needed) ---------------------

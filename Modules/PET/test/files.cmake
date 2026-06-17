@@ -6,4 +6,5 @@ set(MODULE_TESTS
   mitkSUVInputModelTest.cpp
   mitkSUVNormalizationStrategyTest.cpp
   mitkPETIBSIBenchmarkTest.cpp
+  mitkPETPrivateTagLiftTest.cpp
 )

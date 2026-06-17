@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <dcmtk/dcmdata/dcvrdt.h>
 
+#include <cmath>
+
 namespace mitk
 {
   std::chrono::sys_time<std::chrono::milliseconds>
@@ -26,11 +28,27 @@ namespace mitk
       month{static_cast<unsigned>(time.getDate().getMonth())},
       day{static_cast<unsigned>(time.getDate().getDay())}};
 
-    return sys_days{ymd}
-         + hours{time.getTime().getHour()}
-         + minutes{time.getTime().getMinute()}
-         + seconds{time.getTime().getIntSecond()}
-         + milliseconds{time.getTime().getMilliSecond()};
+    auto tp = sys_days{ymd}
+            + hours{time.getTime().getHour()}
+            + minutes{time.getTime().getMinute()}
+            + seconds{time.getTime().getIntSecond()}
+            + milliseconds{time.getTime().getMilliSecond()};
+
+    // A DICOM DT may carry an explicit UTC offset (&ZZXX). When present,
+    // normalize the broken-down local time to UTC so a difference taken
+    // against another OFDateTime is offset-consistent (e.g. an injection
+    // (0018,1078) stamped "+0100" differenced against an offset-less
+    // reference time). DCMTK reports an absent offset as "unspecified";
+    // in that case leave the value as-is, which keeps the common
+    // single-timezone path bit-identical to before (two offset-less
+    // stamps still difference correctly).
+    if (time.getTime().hasTimeZone())
+    {
+      const double tzHours = time.getTime().getTimeZone();
+      tp -= milliseconds{std::llround(tzHours * 3600.0 * 1000.0)};
+    }
+
+    return tp;
   }
 
   double ComputeMiliSecDuration(const OFDateTime& start, const OFDateTime& stop)

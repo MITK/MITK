@@ -553,17 +553,17 @@ API information and capabilities.
   "data": {
     "name": "MITK Workbench REST API",
     "api_version": "v1",
-    "mitk_version": "2026.02.0",
+    "mitk_version": "2025.12.99",
     "capabilities": {
       "transfer_modes": ["direct", "file-reference"],
       "authentication": ["api-token"]
     },
-    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html"
+    "documentation_url": "https://docs.mitk.org/nightly/MITKRESTAPISpec.html"
   }
 }
 ```
 
-The `documentation_url` is constructed from the running MITK version as `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`.
+The `documentation_url` is constructed from the running MITK version: released builds use `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`, while development builds (patch level 99) use `https://docs.mitk.org/nightly/MITKRESTAPISpec.html`.
 
 > **Note:** The `capabilities.events` section with `zeromq_endpoint` is planned for a future version when ZeroMQ event notification support is implemented. Currently, this field is not included in the response.
 

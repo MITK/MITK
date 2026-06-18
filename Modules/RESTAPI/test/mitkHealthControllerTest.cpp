@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkHealthController.h"
 #include <mitkDataStorageBridge.h>
+#include <mitkRestServerConfig.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkVersion.h>
 
@@ -30,6 +31,8 @@ class mitkHealthControllerTestSuite : public mitk::TestFixture
   MITK_TEST(InfoContainsMitkVersion);
   MITK_TEST(InfoContainsCapabilities);
   MITK_TEST(InfoContainsDocumentationUrl);
+  MITK_TEST(DocumentationUrlUsesNightlyForDevBuild);
+  MITK_TEST(DocumentationUrlUsesVersionForReleaseBuild);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -160,9 +163,25 @@ public:
 
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT(json["data"].contains("documentation_url"));
-    std::string refURL = "https://docs.mitk.org/" + std::to_string(MITK_VERSION_MAJOR) + "."
-      + std::to_string(MITK_VERSION_MINOR) + "/MITKRESTAPISpec.html";
+    const std::string refURL =
+      mitk::GetRestApiDocumentationUrl(MITK_VERSION_MAJOR, MITK_VERSION_MINOR, MITK_VERSION_PATCH);
     CPPUNIT_ASSERT_EQUAL(refURL, json["data"]["documentation_url"].get<std::string>());
+  }
+
+  void DocumentationUrlUsesNightlyForDevBuild()
+  {
+    // patch == 99 is MITK's development-build sentinel and must map to /nightly/,
+    // which is the only docs path that resolves for an unreleased version.
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("https://docs.mitk.org/nightly/MITKRESTAPISpec.html"),
+      mitk::GetRestApiDocumentationUrl(2025, 12, 99));
+  }
+
+  void DocumentationUrlUsesVersionForReleaseBuild()
+  {
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("https://docs.mitk.org/2024.6/MITKRESTAPISpec.html"),
+      mitk::GetRestApiDocumentationUrl(2024, 6, 0));
   }
 };
 

@@ -4,6 +4,7 @@ set(H_FILES
 )
 
 set(CPP_FILES
+  mitkRestServerConfig.cpp
   mitkIRestServerService.cpp
   mitkRestServer.cpp
   mitkDataStorageBridge.cpp

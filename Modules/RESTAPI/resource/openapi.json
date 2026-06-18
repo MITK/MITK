@@ -113,8 +113,8 @@
                   "data": {
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
-                    "mitk_version": "2026.02.0",
-                    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html",
+                    "mitk_version": "2025.12.99",
+                    "documentation_url": "https://docs.mitk.org/nightly/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -3445,12 +3445,12 @@
           },
           "mitk_version": {
             "type": "string",
-            "example": "2026.02.0"
+            "example": "2025.12.99"
           },
           "documentation_url": {
             "type": "string",
             "format": "uri",
-            "example": "https://docs.mitk.org/api/v1"
+            "example": "https://docs.mitk.org/nightly/MITKRESTAPISpec.html"
           },
           "capabilities": {
             "type": "object",

@@ -98,6 +98,20 @@ namespace mitk
     std::string sslCertPath;               ///< \brief Path to the SSL/TLS certificate file.
     std::string sslKeyPath;                ///< \brief Path to the SSL/TLS private key file.
   };
+
+  /**
+   * \brief Build the public docs.mitk.org URL of the REST API specification for a
+   *        given MITK version.
+   *
+   * Released builds publish under \c /<major>.<minor>/; development builds publish
+   * under \c /nightly/. A patch level of 99 is MITK's development-build sentinel
+   * (the top-level build appends the git revision to the version string in that
+   * case), so \p patch \c == \c 99 selects the nightly path. Pass the
+   * \c MITK_VERSION_MAJOR / \c MINOR / \c PATCH macros from \c mitkVersion.h at the
+   * call site; taking them as parameters keeps the mapping rule unit-testable for
+   * release versions, which a dev build can never exercise.
+   */
+  MITKRESTAPI_EXPORT std::string GetRestApiDocumentationUrl(int major, int minor, int patch);
 }
 
 #endif

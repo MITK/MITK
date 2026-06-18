@@ -443,6 +443,12 @@ void mitk::nnInteractiveTool::UndoLastInteraction()
   // DoUpdatePreview).
   m_Impl->UndoRefreshPending = true;
   this->UpdatePreview();
+
+  // UpdatePreview() is synchronous, so the one-shot refresh has happened by
+  // now. Clear the flag defensively: if UpdatePreview() returned before
+  // reaching DoUpdatePreview (no input or preview image), a stale true would
+  // make the next interaction take the refresh branch and be dropped silently.
+  m_Impl->UndoRefreshPending = false;
 }
 
 bool mitk::nnInteractiveTool::CanUndo() const

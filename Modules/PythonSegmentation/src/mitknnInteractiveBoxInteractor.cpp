@@ -119,7 +119,9 @@ namespace mitk::nnInteractive
       if (iter == this->BoxNodes.end() || iter->second.empty())
         return;
 
-      m_Owner->GetDataStorage()->Remove(iter->second.back());
+      if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        dataStorage->Remove(iter->second.back());
+
       iter->second.pop_back();
     }
 

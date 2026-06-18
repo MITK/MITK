@@ -331,10 +331,10 @@ private:
   void UpdateUndoButtonState();
 
   /** \brief Updates the Initialize button label to reflect the configured
-   *         inference mode, e.g. "Initialize (local)" or
-   *         "Initialize (remote server)", so the active mode is visible in the
-   *         tool panel. Reads the preference fresh; called on init and whenever
-   *         the inference-mode preference changes.
+   *         inference mode: plain "Initialize" for local, or
+   *         "Initialize (remote server)" for remote, so the active mode is
+   *         visible in the tool panel. Reads the preference fresh; called on
+   *         init and whenever the inference-mode preference changes.
    */
   void UpdateInitializeButtonText();
 

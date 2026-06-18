@@ -183,6 +183,19 @@ namespace mitk::nnInteractive
      */
     virtual bool HasInteractions() const = 0;
 
+    /** \brief Removes the most recent interaction for the given prompt type.
+     *
+     * Drops the last recorded prompt of \p promptType (the most recently
+     * placed point, box, scribble, or lasso) and its visualization. Used to
+     * undo the last interaction; the prompt type is the one that was active
+     * when that interaction was made, which is not necessarily the currently
+     * active prompt type. A no-op if no such interaction exists.
+     *
+     * \param[in] promptType The prompt type whose most recent interaction
+     *                       should be removed.
+     */
+    virtual void RemoveLastInteraction(PromptType promptType) = 0;
+
     /** \brief Event triggered after an interaction has occurred.
      *
      * Observers of this event are notified whenever a new interaction is

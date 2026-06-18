@@ -6,63 +6,54 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>402</height>
+    <width>290</width>
+    <height>446</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>nnInteractive</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="initializeButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Initialize</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="settingsButton">
-          <property name="text">
-           <string>Settings</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="initializeButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Initialize</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
-      <item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="settingsButton">
+        <property name="styleSheet">
+         <string notr="true">text-align: left;</string>
+        </property>
+        <property name="text">
+         <string>Settings</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Gear</normaloff>:/nnInteractive/Gear</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QPushButton" name="resetButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Reset Interactions</string>
+         <string>Reset all Interactions</string>
         </property>
         <property name="icon">
          <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
@@ -70,16 +61,30 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="modelLicenseLabel">
-        <property name="visible">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="undoButton">
+        <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">text-align: left;</string>
+        </property>
+        <property name="text">
+         <string>Undo</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
+          <normaloff>:/nnInteractive/Undo</normaloff>:/nnInteractive/Undo</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="modelLicenseLabel">
+        <property name="text">
+         <string/>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
       </item>

@@ -387,6 +387,24 @@ namespace mitk::nnInteractive
       return false;
     }
 
+    void RemoveLastLasso(PromptType promptType)
+    {
+      auto iter = m_LassoNodes.find(promptType);
+
+      if (iter == m_LassoNodes.end() || iter->second.empty())
+        return;
+
+      if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        dataStorage->Remove(iter->second.back());
+
+      iter->second.pop_back();
+
+      // The cached "last lasso" referred to the contour just removed; it is
+      // only read while applying a fresh contour, so dropping it is safe.
+      m_LastLassoMask = nullptr;
+      m_LastLassoBoundingBox.reset();
+    }
+
     void DestroyLassoNodes()
     {
       auto dataStorage = m_Owner->GetDataStorage();
@@ -484,6 +502,11 @@ mitk::Image::ConstPointer mitk::nnInteractive::LassoInteractor::GetLastLassoMask
 const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::LassoInteractor::GetLastLassoBoundingBox() const
 {
   return m_Impl->m_LastLassoBoundingBox.has_value() ? &m_Impl->m_LastLassoBoundingBox.value() : nullptr;
+}
+
+void mitk::nnInteractive::LassoInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  m_Impl->RemoveLastLasso(promptType);
 }
 
 void mitk::nnInteractive::LassoInteractor::OnHandleEvent(InteractionEvent* event)

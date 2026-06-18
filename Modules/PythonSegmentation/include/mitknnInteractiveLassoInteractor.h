@@ -81,6 +81,15 @@ namespace mitk::nnInteractive
      */
     const InteractionBoundingBox* GetLastLassoBoundingBox() const;
 
+    /** \brief Removes the most recently drawn contour for the given prompt type.
+     *
+     * Removes the last lasso overlay node of \p promptType from the data
+     * storage. A no-op if no contour exists for that prompt type.
+     *
+     * \param[in] promptType The prompt type whose last contour should be removed.
+     */
+    void RemoveLastInteraction(PromptType promptType) override;
+
   private:
     void OnHandleEvent(InteractionEvent* event) override;
     void OnEnable() override;

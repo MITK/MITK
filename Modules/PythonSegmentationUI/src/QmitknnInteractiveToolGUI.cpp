@@ -45,6 +45,7 @@ namespace
   // of the uppercase letters, so the same constant drives the QShortcut,
   // the tooltip hint, and the label suffix.
   constexpr Qt::Key RESET_KEY       = Qt::Key_R;
+  constexpr Qt::Key UNDO_KEY        = Qt::Key_U;
   constexpr Qt::Key CONFIRM_KEY     = Qt::Key_C;
   constexpr Qt::Key PROMPT_TYPE_KEY = Qt::Key_T;
   constexpr Qt::Key POINT_KEY       = Qt::Key_P;
@@ -199,7 +200,9 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   mainLayout->addWidget(wrapperWidget);
   m_Ui->setupUi(wrapperWidget);
 
+  SetIcon(m_Ui->settingsButton, "Gear");
   SetIcon(m_Ui->resetButton, "Reset");
+  SetIcon(m_Ui->undoButton, "Undo");
   SetIcon(m_Ui->positiveButton, "Positive");
   SetIcon(m_Ui->negativeButton, "Negative");
   SetIcon(m_Ui->maskButton, "Mask");
@@ -207,6 +210,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
   connect(m_Ui->resetButton, &QPushButton::clicked, this, &Self::OnResetInteractionsButtonClicked);
+  connect(m_Ui->undoButton, &QPushButton::clicked, this, &Self::OnUndoButtonClicked);
 
   this->InitializePromptType();
   this->InitializeInteractorButtons();
@@ -238,6 +242,8 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_HeartbeatTimer = new QTimer(this);
   connect(m_HeartbeatTimer, &QTimer::timeout, this, &Self::OnHeartbeatTimeout);
 
+  this->UpdateModelLicenseDisplay(std::nullopt);
+
   Superclass::InitializeUI(mainLayout);
 
   // TODO: Once we agree on a common shortcut concept, the confirm binding
@@ -246,6 +252,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   auto confirmButton = this->GetConfirmSegmentationButton();
 
   BindShortcut(this, RESET_KEY, m_Ui->resetButton, "Press %1 to reset all interactions");
+  BindShortcut(this, UNDO_KEY, m_Ui->undoButton, "Press %1 to undo the last interaction");
   BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
 
   // Cache the base label of each shortcut-bound widget as seen from the
@@ -255,6 +262,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_ShortcutLabels = {
     { m_Ui->resetButton,    RESET_KEY,    m_Ui->resetButton->text() },
+    { m_Ui->undoButton,     UNDO_KEY,     m_Ui->undoButton->text() },
     { m_Ui->pointButton,    POINT_KEY,    m_Ui->pointButton->text() },
     { m_Ui->boxButton,      BOX_KEY,      m_Ui->boxButton->text() },
     { m_Ui->scribbleButton, SCRIBBLE_KEY, m_Ui->scribbleButton->text() },
@@ -606,8 +614,28 @@ void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
   // Reset any interactions.
   this->GetTool()->ResetInteractions();
 
+  // Nothing is undoable after a reset.
+  this->UpdateUndoButtonState();
+
   // Switch to positive prompt type.
   m_Ui->positiveButton->click();
+}
+
+void QmitknnInteractiveToolGUI::OnUndoButtonClicked()
+{
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  tool->UndoLastInteraction();
+  this->UpdateUndoButtonState();
+}
+
+void QmitknnInteractiveToolGUI::UpdateUndoButtonState()
+{
+  auto* tool = this->GetTool();
+  m_Ui->undoButton->setEnabled(m_SupportsUndo && tool != nullptr && tool->CanUndo());
 }
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
@@ -691,6 +719,10 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
   // Reset interactions and initialize a new session with a mask/label.
   this->OnResetInteractionsButtonClicked();
   this->GetTool()->InitializeSessionWithMask(mask);
+
+  // The mask initialization is one undoable step (no PreviewUpdatedEvent is
+  // emitted for it, so refresh the button state here).
+  this->UpdateUndoButtonState();
 }
 
 void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
@@ -813,6 +845,8 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   this->UncheckOtherInteractorButtons(nullptr);
 
   m_Ui->resetButton->setEnabled(false);
+  m_Ui->undoButton->setEnabled(false);
+  m_SupportsUndo = false;
   m_Ui->promptTypeGroupBox->setEnabled(false);
   m_Ui->interactionToolsGroupBox->setEnabled(false);
 
@@ -924,6 +958,11 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
   m_Ui->lassoButton->setEnabled(caps.Lasso);
   m_Ui->maskButton->setEnabled(caps.Mask);
 
+  // Cache whether this session supports single-level undo (nnInteractive
+  // >= 2.3.3). The Undo button stays disabled until the first interaction.
+  m_SupportsUndo = tool->SupportsUndo();
+  this->UpdateUndoButtonState();
+
   // A checkpoint that advertises no interactions at all would leave the user with
   // an initialized session and no usable controls. Say so, rather than presenting
   // a silently dead panel.
@@ -939,6 +978,10 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()
 {
+  // A prompt interaction just landed, so it is now undoable. Update before the
+  // auto-confirm early-outs below so the Undo button reflects every interaction.
+  this->UpdateUndoButtonState();
+
   if (m_AutoConfirmInProgress)
     return;
 
@@ -1000,7 +1043,7 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
 {
   const bool remote = m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
-  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize (local)");
+  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize");
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

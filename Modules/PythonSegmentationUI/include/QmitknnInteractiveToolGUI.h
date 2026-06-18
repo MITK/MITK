@@ -124,6 +124,14 @@ protected:
    */
   void OnResetInteractionsButtonClicked();
 
+  /** \brief Undoes the last interaction and refreshes the Undo button state.
+   *
+   * Delegates to nnInteractiveTool::UndoLastInteraction(), which reverts the
+   * most recent interaction (single-level) and removes its prompt
+   * visualization.
+   */
+  void OnUndoButtonClicked();
+
   /** \brief Handles auto-refine checkbox toggle.
    *
    * \param[in] checked Whether auto-refine should be enabled.
@@ -313,6 +321,15 @@ private:
    */
   void ApplyCapabilityGating();
 
+  /** \brief Enables the Undo button only when the running session supports
+   *         undo and an interaction is currently undoable.
+   *
+   * Single-level undo: the button is enabled right after a new interaction and
+   * disabled again once it is undone or the interactions are reset. Cached
+   * m_SupportsUndo keeps it disabled on nnInteractive versions without undo.
+   */
+  void UpdateUndoButtonState();
+
   /** \brief Updates the Initialize button label to reflect the configured
    *         inference mode, e.g. "Initialize (local)" or
    *         "Initialize (remote server)", so the active mode is visible in the
@@ -338,6 +355,11 @@ private:
   mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
+
+  // Whether the running session reports undo support (nnInteractive >= 2.3.3).
+  // Cached at session start (ApplyCapabilityGating) and used to gate the Undo
+  // button; older versions report no support and the button stays disabled.
+  bool m_SupportsUndo = false;
 
   QTimer* m_HeartbeatTimer = nullptr;
 

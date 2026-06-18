@@ -175,6 +175,45 @@ namespace mitk
      */
     bool HasInteractions() const;
 
+    /** \brief Reverts the most recent interaction (single-level undo).
+     *
+     * Calls the nnInteractive session's \c undo(), which restores the
+     * prediction to the state before the last interaction (point, box,
+     * scribble, lasso, or initial-segmentation mask). On success, the
+     * visualization of the undone prompt is removed and the preview is
+     * refreshed from the restored target buffer.
+     *
+     * nnInteractive supports only single-level undo: after one undo, nothing
+     * is undoable again until a new interaction is added. This is a no-op when
+     * no session is running or CanUndo() is \c false.
+     *
+     * \sa CanUndo(), SupportsUndo()
+     */
+    void UndoLastInteraction();
+
+    /** \brief Returns whether an interaction is currently available to undo.
+     *
+     * \c true after a new interaction has been applied, until it is undone or
+     * the interactions are reset. Cheap (no Python call); reflects the tool's
+     * record of the last applied interaction.
+     *
+     * \return \c true if UndoLastInteraction() would revert something.
+     *
+     * \sa UndoLastInteraction(), SupportsUndo()
+     */
+    bool CanUndo() const;
+
+    /** \brief Returns whether the running session's backend supports undo.
+     *
+     * Reads the session's \c supports_undo capability (present on both local
+     * and remote sessions). Older nnInteractive versions without undo report
+     * \c false, letting the GUI keep the Undo control disabled. Returns
+     * \c false when no session is running.
+     *
+     * \sa UndoLastInteraction()
+     */
+    bool SupportsUndo() const;
+
     /** \brief Returns whether auto-zoom is enabled.
      *
      * When auto-zoom is enabled, the nnInteractive model automatically

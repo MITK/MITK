@@ -3450,6 +3450,7 @@
           "documentation_url": {
             "type": "string",
             "format": "uri",
+            "description": "URL of the REST API specification for the running MITK version. Released builds point to a version-specific path (e.g. /2026.06/); development builds (patch level 99) point to /nightly/.",
             "example": "https://docs.mitk.org/2026.06/MITKRESTAPISpec.html"
           },
           "capabilities": {

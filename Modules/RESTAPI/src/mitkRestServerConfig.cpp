@@ -15,6 +15,13 @@ found in the LICENSE file.
 #include <iomanip>
 #include <sstream>
 
+namespace
+{
+  // MITK's development-build sentinel: CMake sets the patch level to 99 for
+  // unreleased builds (and appends the git revision to the version string).
+  constexpr int devBuildPatchSentinel = 99;
+}
+
 namespace mitk
 {
   std::string GetRestApiDocumentationUrl(int major, int minor, int patch)
@@ -23,7 +30,7 @@ namespace mitk
     // (e.g. /2026.06/); a single-digit minor without the pad 404s. Development
     // builds (patch level 99) publish under /nightly/ instead.
     std::string segment;
-    if (99 == patch)
+    if (devBuildPatchSentinel == patch)
     {
       segment = "nightly";
     }

@@ -563,7 +563,7 @@ API information and capabilities.
 }
 ```
 
-The `documentation_url` is constructed from the running MITK version: released builds use `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`, while development builds (patch level 99) use `https://docs.mitk.org/nightly/MITKRESTAPISpec.html`.
+The `documentation_url` is constructed from the running MITK version: released builds use `https://docs.mitk.org/<YYYY>.<MM>/MITKRESTAPISpec.html`, where `<MM>` is the minor version zero-padded to two digits (e.g. `2026.06`), while development builds (patch level 99) use `https://docs.mitk.org/nightly/MITKRESTAPISpec.html`.
 
 > **Note:** The `capabilities.events` section with `zeromq_endpoint` is planned for a future version when ZeroMQ event notification support is implemented. Currently, this field is not included in the response.
 

@@ -122,6 +122,7 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(AllCodeErrorCodesExistInSpec);
   MITK_TEST(AllCodeErrorCodesHaveComponentResponse);
   MITK_TEST(AllCodeErrorCodesDocumentedInSpecMd);
+  MITK_TEST(CodeErrorCodeListHasExpectedCount);
   MITK_TEST(ErrorResponseContainsInstancePath);
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
@@ -457,12 +458,13 @@ private:
     return m_Spec["components"]["parameters"][paramName]["schema"]["maximum"].get<T>();
   }
 
-  /** Collect all error codes from response examples throughout the spec. */
-  std::set<std::string> CollectSpecErrorCodes() const
+  /**
+   * Collect error codes from a `responses` map (a path operation's responses or
+   * the reusable `components/responses` definitions), reading both the single
+   * `example` and the multi `examples` (each carrying a `value`) shapes.
+   */
+  static void CollectErrorCodesFromResponses(const nlohmann::json& responses, std::set<std::string>& codes)
   {
-    std::set<std::string> codes;
-
-    // Helper to extract error code from an example object
     auto extractCode = [&codes](const nlohmann::json& example) {
       if (example.contains("error") && example["error"].contains("code"))
       {
@@ -470,42 +472,48 @@ private:
       }
     };
 
+    for (const auto& [name, response] : responses.items())
+    {
+      if (!response.contains("content"))
+      {
+        continue;
+      }
+
+      for (const auto& [mediaType, mediaObj] : response["content"].items())
+      {
+        // Single example
+        if (mediaObj.contains("example"))
+        {
+          extractCode(mediaObj["example"]);
+        }
+        // Multiple examples
+        if (mediaObj.contains("examples"))
+        {
+          for (const auto& [exName, exObj] : mediaObj["examples"].items())
+          {
+            if (exObj.contains("value"))
+            {
+              extractCode(exObj["value"]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /** Collect all error codes from response examples throughout the spec. */
+  std::set<std::string> CollectSpecErrorCodes() const
+  {
+    std::set<std::string> codes;
+
     // Walk all paths and their responses
     for (const auto& [path, pathItem] : m_Spec["paths"].items())
     {
       for (const auto& [method, operation] : pathItem.items())
       {
-        if (!operation.contains("responses"))
+        if (operation.contains("responses"))
         {
-          continue;
-        }
-
-        for (const auto& [statusCode, response] : operation["responses"].items())
-        {
-          if (!response.contains("content"))
-          {
-            continue;
-          }
-
-          for (const auto& [mediaType, mediaObj] : response["content"].items())
-          {
-            // Single example
-            if (mediaObj.contains("example"))
-            {
-              extractCode(mediaObj["example"]);
-            }
-            // Multiple examples
-            if (mediaObj.contains("examples"))
-            {
-              for (const auto& [exName, exObj] : mediaObj["examples"].items())
-              {
-                if (exObj.contains("value"))
-                {
-                  extractCode(exObj["value"]);
-                }
-              }
-            }
-          }
+          CollectErrorCodesFromResponses(operation["responses"], codes);
         }
       }
     }
@@ -513,31 +521,7 @@ private:
     // Walk shared responses in components.responses
     if (m_Spec.contains("components") && m_Spec["components"].contains("responses"))
     {
-      for (const auto& [name, response] : m_Spec["components"]["responses"].items())
-      {
-        if (!response.contains("content"))
-        {
-          continue;
-        }
-
-        for (const auto& [mediaType, mediaObj] : response["content"].items())
-        {
-          if (mediaObj.contains("example"))
-          {
-            extractCode(mediaObj["example"]);
-          }
-          if (mediaObj.contains("examples"))
-          {
-            for (const auto& [exName, exObj] : mediaObj["examples"].items())
-            {
-              if (exObj.contains("value"))
-              {
-                extractCode(exObj["value"]);
-              }
-            }
-          }
-        }
-      }
+      CollectErrorCodesFromResponses(m_Spec["components"]["responses"], codes);
     }
 
     return codes;
@@ -552,40 +536,9 @@ private:
   {
     std::set<std::string> codes;
 
-    auto extractCode = [&codes](const nlohmann::json& example) {
-      if (example.contains("error") && example["error"].contains("code"))
-      {
-        codes.insert(example["error"]["code"].get<std::string>());
-      }
-    };
-
     if (m_Spec.contains("components") && m_Spec["components"].contains("responses"))
     {
-      for (const auto& [name, response] : m_Spec["components"]["responses"].items())
-      {
-        if (!response.contains("content"))
-        {
-          continue;
-        }
-
-        for (const auto& [mediaType, mediaObj] : response["content"].items())
-        {
-          if (mediaObj.contains("example"))
-          {
-            extractCode(mediaObj["example"]);
-          }
-          if (mediaObj.contains("examples"))
-          {
-            for (const auto& [exName, exObj] : mediaObj["examples"].items())
-            {
-              if (exObj.contains("value"))
-              {
-                extractCode(exObj["value"]);
-              }
-            }
-          }
-        }
-      }
+      CollectErrorCodesFromResponses(m_Spec["components"]["responses"], codes);
     }
 
     return codes;
@@ -1698,6 +1651,21 @@ public:
         "ErrorResponse code '" + code + "' is not documented in the spec MD Error Handling section",
         errorSection.find(code) != std::string::npos);
     }
+  }
+
+  void CodeErrorCodeListHasExpectedCount()
+  {
+    // GetAllCodeErrorCodes() is a hand-maintained mirror of the CODE_* constants
+    // in mitkErrorResponse.h, and the bidirectional tests above are only as
+    // complete as that list. The CODE_* are individual constexpr members with no
+    // enumerable container to diff against, so this count is the tripwire: bump
+    // it together with the list (and the header) whenever a CODE_* is added or
+    // removed. A duplicated or dropped list entry also trips it.
+    constexpr std::size_t expectedErrorCodeCount = 27;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "GetAllCodeErrorCodes() no longer has the expected number of CODE_* constants; "
+      "update the list and this count in lockstep with mitkErrorResponse.h",
+      expectedErrorCodeCount, GetAllCodeErrorCodes().size());
   }
 
   void ErrorResponseContainsInstancePath()

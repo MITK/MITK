@@ -163,9 +163,13 @@ public:
 
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT(json["data"].contains("documentation_url"));
-    const std::string refURL =
-      mitk::GetRestApiDocumentationUrl(MITK_VERSION_MAJOR, MITK_VERSION_MINOR, MITK_VERSION_PATCH);
-    CPPUNIT_ASSERT_EQUAL(refURL, json["data"]["documentation_url"].get<std::string>());
+    // Check the controller emits a well-formed docs URL without recomputing it
+    // through GetRestApiDocumentationUrl (the handler's own source), which would
+    // make the assertion self-referential. The exact version-to-path mapping is
+    // pinned independently by the two dedicated tests below.
+    const auto url = json["data"]["documentation_url"].get<std::string>();
+    CPPUNIT_ASSERT(url.starts_with("https://docs.mitk.org/"));
+    CPPUNIT_ASSERT(url.ends_with("/MITKRESTAPISpec.html"));
   }
 
   void DocumentationUrlUsesNightlyForDevBuild()

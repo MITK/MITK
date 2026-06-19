@@ -83,6 +83,42 @@ namespace mitk
       bool Mask = true;     /**< \brief Initial-segmentation mask ("initial_label") supported. */
     };
 
+    /** \brief Outcome of comparing the installed nnInteractive package against
+     *         the version range this MITK build supports.
+     *
+     * \sa CheckInstalledVersion()
+     */
+    enum class VersionStatus
+    {
+      Unknown,         /**< \brief The installed or latest version could not be determined. */
+      BelowMinimum,    /**< \brief Installed version is older than MINIMUM_VERSION (incompatible). */
+      UpdateAvailable, /**< \brief A newer in-range release exists on PyPI than the one installed. */
+      UpToDate         /**< \brief Installed version is supported and no newer in-range release is known. */
+    };
+
+    /** \brief Result of CheckInstalledVersion(): the verdict plus the version
+     *         strings it was derived from (empty when not determined).
+     */
+    struct VersionCheckResult
+    {
+      VersionStatus Status = VersionStatus::Unknown;
+      std::string Installed;
+      std::string Latest;
+    };
+
+    /** \brief Minimum nnInteractive version this MITK build supports.
+     *
+     * Used both to build the pip requirement at install time and to detect a
+     * too-old package left behind in a reused virtual environment (see
+     * CheckInstalledVersion()). Keep in sync with the install requirement.
+     */
+    static constexpr const char* MINIMUM_VERSION = "2.4.0";
+
+    /** \brief Exclusive upper bound on the supported nnInteractive version
+     *         (the next major release is assumed to break compatibility).
+     */
+    static constexpr const char* MAXIMUM_VERSION_EXCLUSIVE = "3.0.0";
+
     mitkClassMacro(nnInteractiveTool, SegWithPreviewTool)
     itkFactorylessNewMacro(Self)
 
@@ -308,6 +344,31 @@ namespace mitk
      * \return \c true if the package is installed, \c false otherwise.
      */
     bool IsInstalled() const;
+
+    /** \brief Compares the installed nnInteractive package against the
+     *         supported version range.
+     *
+     * Reads the installed version via importlib.metadata and compares it with
+     * MINIMUM_VERSION using packaging's version semantics. When \p checkForUpdate
+     * is \c true and the installed version meets the minimum, it additionally
+     * queries PyPI (best-effort, short timeout) for the newest release within the
+     * supported range to spot an available update; the query is skipped when the
+     * installed version is already below the minimum (it is going to be
+     * reinstalled anyway) and on any network failure, so the offline verdict is
+     * always fast and reliable. Pass \c false to do the offline minimum check
+     * only (the caller has already performed the update check this run, so the
+     * network round-trip would be wasted).
+     *
+     * \param[in] checkForUpdate Whether to query PyPI for a newer release.
+     *
+     * \pre A Python context must have been created via CreatePythonContext().
+     *
+     * \return A VersionCheckResult; Status is Unknown when the installed version
+     *         could not be read (the caller should then not block or nag).
+     *
+     * \sa IsInstalled(), VersionStatus
+     */
+    VersionCheckResult CheckInstalledVersion(bool checkForUpdate = true) const;
 
     /** \brief Queries CUDA device information via PyTorch.
      *

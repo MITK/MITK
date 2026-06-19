@@ -380,7 +380,7 @@
        <item>
         <widget class="QGroupBox" name="backendGroupBox">
          <property name="title">
-          <string>Backend</string>
+          <string>Computation backend</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -425,7 +425,68 @@
            </layout>
           </item>
           <item>
+           <widget class="QCheckBox" name="torchCompileCheckBox">
+            <property name="text">
+             <string>Faster interactions at the cost of slightly longer initialization time.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="backendRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="storageBackendGroupBox">
+         <property name="title">
+          <string>Storage backend</string>
+         </property>
+         <layout class="QVBoxLayout" name="storageBackendLayout">
+          <item>
+           <widget class="QRadioButton" name="autoStorageRadioButton">
+            <property name="toolTip">
+             <string>Use a dense tensor for smaller images and blosc2 for larger ones.</string>
+            </property>
+            <property name="text">
+             <string>Auto (recommended)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="blosc2StorageRadioButton">
+            <property name="text">
+             <string>blosc2 (less memory, slower)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="tensorStorageRadioButton">
+            <property name="text">
+             <string>Tensor (more memory, faster)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="storageBackendRestartNoteLabel">
             <property name="font">
              <font>
               <italic>true</italic>
@@ -524,6 +585,10 @@
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendLineEdit</tabstop>
+  <tabstop>torchCompileCheckBox</tabstop>
+  <tabstop>autoStorageRadioButton</tabstop>
+  <tabstop>blosc2StorageRadioButton</tabstop>
+  <tabstop>tensorStorageRadioButton</tabstop>
   <tabstop>showShortcutsInLabelsCheckBox</tabstop>
   <tabstop>uninstallButton</tabstop>
  </tabstops>

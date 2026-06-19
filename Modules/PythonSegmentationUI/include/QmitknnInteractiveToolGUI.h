@@ -330,13 +330,23 @@ private:
    */
   void UpdateUndoButtonState();
 
-  /** \brief Updates the Initialize button label to reflect the configured
-   *         inference mode: plain "Initialize" for local, or
-   *         "Initialize (remote server)" for remote, so the active mode is
-   *         visible in the tool panel. Reads the preference fresh; called on
-   *         init and whenever the inference-mode preference changes.
+  /** \brief Updates the Initialize button label to reflect the current state:
+   *         "Uninitialize" while a session is running, otherwise the action the
+   *         next click performs for the configured inference mode ("Initialize"
+   *         for local, "Initialize (remote server)" for remote). Reads the
+   *         preference fresh; called on init, on session start/end, and whenever
+   *         the inference-mode preference changes.
    */
   void UpdateInitializeButtonText();
+
+  /** \brief Unchecks the Initialize button without re-triggering
+   *         OnInitializeButtonToggled.
+   *
+   * Used on the paths that abort an initialize (unsupported platform, install
+   * declined, session start failed) so the toggle does not stay stuck in the
+   * checked state.
+   */
+  void UncheckInitializeButton();
 
   struct ShortcutLabel
   {

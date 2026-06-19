@@ -3,7 +3,7 @@
   "info": {
     "title": "MITK Workbench REST API",
     "version": "1.2.0",
-    "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 7807 Problem Details format.\n",
+    "description": "REST API for MITK Workbench external process integration.\nEnables Python scripts, web applications, and external tools\nto interact with MITK Workbench via standard HTTP.\n\n## Transfer Modes\n\nData endpoints support two transfer modes:\n- **direct**: Binary data in HTTP body (`application/octet-stream`)\n- **file-reference**: JSON with server file path (`application/json`)\n\nThe `X-MITK-Transfer-Mode` header takes precedence over the `Accept` header\nwhen determining the response format for data endpoints.\n\n## Property Scopes\n\nProperty endpoints support three scopes:\n- **all**: Both node and data properties (default for GET)\n- **node**: Only properties from the DataNode's property list (default for PUT/PATCH/DELETE)\n- **data**: Only properties from the BaseData's property list\n\n## Error Format\n\nAll errors follow RFC 9457 Problem Details format.\n",
     "license": {
       "name": "BSD-3-Clause",
       "url": "https://opensource.org/licenses/BSD-3-Clause"
@@ -113,8 +113,8 @@
                   "data": {
                     "name": "MITK Workbench REST API",
                     "api_version": "v1",
-                    "mitk_version": "2025.12.99",
-                    "documentation_url": "https://docs.mitk.org/nightly/MITKRESTAPISpec.html",
+                    "mitk_version": "2026.06.0",
+                    "documentation_url": "https://docs.mitk.org/2026.06/MITKRESTAPISpec.html",
                     "capabilities": {
                       "transfer_modes": [
                         "direct",
@@ -581,7 +581,7 @@
                 },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/CIRCULAR_HIERARCHY_REFERENCE",
+                    "type": "https://rest-api.mitk.org/errors/CIRCULAR_HIERARCHY_REFERENCE",
                     "code": "CIRCULAR_HIERARCHY_REFERENCE",
                     "title": "Circular Hierarchy Reference",
                     "message": "Cannot reparent node: the target parent is a descendant of this node",
@@ -674,7 +674,7 @@
                 },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/NODE_HAS_CHILDREN",
+                    "type": "https://rest-api.mitk.org/errors/NODE_HAS_CHILDREN",
                     "code": "NODE_HAS_CHILDREN",
                     "title": "Node Has Children",
                     "message": "Node has 3 children. Use ?recursive=true to delete.",
@@ -996,7 +996,7 @@
                     "summary": "Node not found",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                        "type": "https://rest-api.mitk.org/errors/NODE_NOT_FOUND",
                         "code": "NODE_NOT_FOUND",
                         "title": "Node Not Found",
                         "message": "No node found with UID 'invalid-uid'",
@@ -1009,7 +1009,7 @@
                     "summary": "Node has no data attached",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                        "type": "https://rest-api.mitk.org/errors/NO_DATA",
                         "code": "NO_DATA",
                         "title": "No Data",
                         "message": "Node 'node_1' has no data attached",
@@ -1037,7 +1037,7 @@
                     "summary": "Unexpected internal error",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/INTERNAL_ERROR",
+                        "type": "https://rest-api.mitk.org/errors/INTERNAL_ERROR",
                         "code": "INTERNAL_ERROR",
                         "title": "Internal Server Error",
                         "message": "An unexpected error occurred",
@@ -1049,7 +1049,7 @@
                     "summary": "Data serialization failed",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/SERIALIZATION_ERROR",
+                        "type": "https://rest-api.mitk.org/errors/SERIALIZATION_ERROR",
                         "code": "SERIALIZATION_ERROR",
                         "title": "Serialization Error",
                         "message": "Failed to serialize node data to temporary file",
@@ -1185,7 +1185,7 @@
                     "summary": "Referenced file does not exist",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/FILE_NOT_FOUND",
+                        "type": "https://rest-api.mitk.org/errors/FILE_NOT_FOUND",
                         "code": "FILE_NOT_FOUND",
                         "title": "File Not Found",
                         "message": "Referenced file path does not exist: /path/to/file.nrrd",
@@ -1197,7 +1197,7 @@
                     "summary": "File exists but could not be read",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/FILE_READ_ERROR",
+                        "type": "https://rest-api.mitk.org/errors/FILE_READ_ERROR",
                         "code": "FILE_READ_ERROR",
                         "title": "File Read Error",
                         "message": "Failed to read file: /path/to/file.nrrd",
@@ -1712,7 +1712,7 @@
                     "summary": "Node not found",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                        "type": "https://rest-api.mitk.org/errors/NODE_NOT_FOUND",
                         "code": "NODE_NOT_FOUND",
                         "title": "Node Not Found",
                         "message": "No node found with UID 'invalid-uid'",
@@ -1725,7 +1725,7 @@
                     "summary": "Property not found on node",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/PROPERTY_NOT_FOUND",
+                        "type": "https://rest-api.mitk.org/errors/PROPERTY_NOT_FOUND",
                         "code": "PROPERTY_NOT_FOUND",
                         "title": "Property Not Found",
                         "message": "Property 'nonexistent' not found on node 'node_1'",
@@ -1953,7 +1953,7 @@
                 },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/PROPERTY_PROTECTED",
+                    "type": "https://rest-api.mitk.org/errors/PROPERTY_PROTECTED",
                     "code": "PROPERTY_PROTECTED",
                     "title": "Property Protected",
                     "message": "Property 'name' cannot be deleted",
@@ -2030,7 +2030,7 @@
                 },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "type": "https://rest-api.mitk.org/errors/RENDERING_ERROR",
                     "code": "RENDERING_ERROR",
                     "title": "Rendering Error",
                     "message": "Rendering operation failed: ...",
@@ -2120,7 +2120,7 @@
                     "summary": "Node has no data attached",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/NO_DATA",
+                        "type": "https://rest-api.mitk.org/errors/NO_DATA",
                         "code": "NO_DATA",
                         "title": "No Data",
                         "message": "Node 'node_1' has no data attached.",
@@ -2133,7 +2133,7 @@
                     "summary": "Node data has no usable geometry",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/NO_GEOMETRY",
+                        "type": "https://rest-api.mitk.org/errors/NO_GEOMETRY",
                         "code": "NO_GEOMETRY",
                         "title": "No Geometry",
                         "message": "Node 'node_1' has no usable time geometry.",
@@ -2146,7 +2146,7 @@
                     "summary": "Unexpected rendering framework error",
                     "value": {
                       "error": {
-                        "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                        "type": "https://rest-api.mitk.org/errors/RENDERING_ERROR",
                         "code": "RENDERING_ERROR",
                         "title": "Rendering Error",
                         "message": "Rendering operation failed: ...",
@@ -2518,7 +2518,7 @@
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "type": "https://rest-api.mitk.org/errors/RENDERING_ERROR",
                     "code": "RENDERING_ERROR",
                     "title": "Rendering Error",
                     "message": "Camera update failed: ...",
@@ -2616,7 +2616,7 @@
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/INVALID_REQUEST",
+                    "type": "https://rest-api.mitk.org/errors/INVALID_REQUEST",
                     "code": "INVALID_REQUEST",
                     "title": "Invalid Request",
                     "message": "'position' is not accepted on StdMulti selected-slice. Use PUT /rendering/selected-position to move by world coordinates.",
@@ -2634,7 +2634,7 @@
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "example": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDERING_ERROR",
+                    "type": "https://rest-api.mitk.org/errors/RENDERING_ERROR",
                     "code": "RENDERING_ERROR",
                     "title": "Rendering Error",
                     "message": "Slice update failed: ...",
@@ -3445,12 +3445,12 @@
           },
           "mitk_version": {
             "type": "string",
-            "example": "2025.12.99"
+            "example": "2026.06.0"
           },
           "documentation_url": {
             "type": "string",
             "format": "uri",
-            "example": "https://docs.mitk.org/nightly/MITKRESTAPISpec.html"
+            "example": "https://docs.mitk.org/2026.06/MITKRESTAPISpec.html"
           },
           "capabilities": {
             "type": "object",
@@ -3547,7 +3547,7 @@
       },
       "Error": {
         "type": "object",
-        "description": "RFC 7807 Problem Details error envelope",
+        "description": "RFC 9457 Problem Details error envelope",
         "required": [
           "error"
         ],
@@ -3567,7 +3567,7 @@
                 "type": "string",
                 "format": "uri",
                 "description": "Error type URI",
-                "example": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND"
+                "example": "https://rest-api.mitk.org/errors/NODE_NOT_FOUND"
               },
               "code": {
                 "type": "string",
@@ -4094,7 +4094,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+                "type": "https://rest-api.mitk.org/errors/NODE_NOT_FOUND",
                 "code": "NODE_NOT_FOUND",
                 "title": "Node Not Found",
                 "message": "No node found with UID 'invalid-uid'",
@@ -4114,7 +4114,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/INVALID_REQUEST",
+                "type": "https://rest-api.mitk.org/errors/INVALID_REQUEST",
                 "code": "INVALID_REQUEST",
                 "title": "Invalid Request",
                 "message": "Invalid JSON: parse error at line 1",
@@ -4134,7 +4134,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/UNSUPPORTED_FORMAT",
+                "type": "https://rest-api.mitk.org/errors/UNSUPPORTED_FORMAT",
                 "code": "UNSUPPORTED_FORMAT",
                 "title": "Unsupported Format",
                 "message": "Unsupported Content-Type. Use 'application/json' or 'application/octet-stream'.",
@@ -4174,7 +4174,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/TRANSFER_MODE_NOT_AVAILABLE",
+                "type": "https://rest-api.mitk.org/errors/TRANSFER_MODE_NOT_AVAILABLE",
                 "code": "TRANSFER_MODE_NOT_AVAILABLE",
                 "title": "Transfer Mode Not Available",
                 "message": "Requested transfer mode 'invalid' is not supported",
@@ -4198,7 +4198,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/FILE_NOT_FOUND",
+                "type": "https://rest-api.mitk.org/errors/FILE_NOT_FOUND",
                 "code": "FILE_NOT_FOUND",
                 "title": "File Not Found",
                 "message": "Referenced file path does not exist: /path/to/file.nrrd",
@@ -4217,7 +4217,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/INTERNAL_ERROR",
+                "type": "https://rest-api.mitk.org/errors/INTERNAL_ERROR",
                 "code": "INTERNAL_ERROR",
                 "title": "Internal Server Error",
                 "message": "An unexpected error occurred",
@@ -4237,7 +4237,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/TIME_NAVIGATION_NOT_AVAILABLE",
+                "type": "https://rest-api.mitk.org/errors/TIME_NAVIGATION_NOT_AVAILABLE",
                 "code": "TIME_NAVIGATION_NOT_AVAILABLE",
                 "title": "Time Navigation Not Available",
                 "message": "Time navigation controller is not available.",
@@ -4257,7 +4257,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/TIME_STEPPER_NOT_AVAILABLE",
+                "type": "https://rest-api.mitk.org/errors/TIME_STEPPER_NOT_AVAILABLE",
                 "code": "TIME_STEPPER_NOT_AVAILABLE",
                 "title": "Time Stepper Not Available",
                 "message": "Time stepper is not available.",
@@ -4277,7 +4277,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/DATASTORAGE_NOT_AVAILABLE",
+                "type": "https://rest-api.mitk.org/errors/DATASTORAGE_NOT_AVAILABLE",
                 "code": "DATASTORAGE_NOT_AVAILABLE",
                 "title": "DataStorage Not Available",
                 "message": "No DataStorage is currently connected to the REST API server",
@@ -4297,7 +4297,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/ACCESS_DENIED",
+                "type": "https://rest-api.mitk.org/errors/ACCESS_DENIED",
                 "code": "ACCESS_DENIED",
                 "title": "Access Denied",
                 "message": "Client IP 10.0.0.1 is not allowed",
@@ -4317,7 +4317,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/UNAUTHORIZED",
+                "type": "https://rest-api.mitk.org/errors/UNAUTHORIZED",
                 "code": "UNAUTHORIZED",
                 "title": "Unauthorized",
                 "message": "Authentication required. Provide Authorization: Bearer <token> header.",
@@ -4337,7 +4337,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/RATE_LIMIT_EXCEEDED",
+                "type": "https://rest-api.mitk.org/errors/RATE_LIMIT_EXCEEDED",
                 "code": "RATE_LIMIT_EXCEEDED",
                 "title": "Rate Limit Exceeded",
                 "message": "Too many requests. Try again later.",
@@ -4358,7 +4358,7 @@
             },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/FILE_ACCESS_DENIED",
+                "type": "https://rest-api.mitk.org/errors/FILE_ACCESS_DENIED",
                 "code": "FILE_ACCESS_DENIED",
                 "title": "File Access Denied",
                 "message": "Path outside allowed directories",
@@ -4376,7 +4376,7 @@
             "schema": { "$ref": "#/components/schemas/Error" },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                "type": "https://rest-api.mitk.org/errors/RENDER_WINDOW_NOT_AVAILABLE",
                 "code": "RENDER_WINDOW_NOT_AVAILABLE",
                 "title": "Render Window Not Available",
                 "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
@@ -4397,7 +4397,7 @@
                 "summary": "No callback registered",
                 "value": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "type": "https://rest-api.mitk.org/errors/RENDER_WINDOW_NOT_AVAILABLE",
                     "code": "RENDER_WINDOW_NOT_AVAILABLE",
                     "title": "Render Window Not Available",
                     "message": "No screenshot provider is connected. The Qt workbench plugin must be running.",
@@ -4410,7 +4410,7 @@
                 "summary": "Editor alias not exposed by this workbench",
                 "value": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_AVAILABLE",
+                    "type": "https://rest-api.mitk.org/errors/RENDER_WINDOW_NOT_AVAILABLE",
                     "code": "RENDER_WINDOW_NOT_AVAILABLE",
                     "title": "Render Window Not Available",
                     "message": "Editor alias 'mxn' is not exposed by the workbench's editor list provider.",
@@ -4423,7 +4423,7 @@
                 "summary": "Editor not open",
                 "value": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/EDITOR_NOT_ACTIVE",
+                    "type": "https://rest-api.mitk.org/errors/EDITOR_NOT_ACTIVE",
                     "code": "EDITOR_NOT_ACTIVE",
                     "title": "Editor Not Active",
                     "message": "StdMultiWidgetEditor is not open",
@@ -4443,7 +4443,7 @@
             "schema": { "$ref": "#/components/schemas/Error" },
             "example": {
               "error": {
-                "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                "type": "https://rest-api.mitk.org/errors/RENDER_WINDOW_NOT_FOUND",
                 "code": "RENDER_WINDOW_NOT_FOUND",
                 "title": "Render Window Not Found",
                 "message": "No render window with id 'bogus' in the addressed editor",
@@ -4471,7 +4471,7 @@
                 "summary": "Unknown window name",
                 "value": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/RENDER_WINDOW_NOT_FOUND",
+                    "type": "https://rest-api.mitk.org/errors/RENDER_WINDOW_NOT_FOUND",
                     "code": "RENDER_WINDOW_NOT_FOUND",
                     "title": "Render Window Not Found",
                     "message": "No render window with id 'bogus' in the addressed editor",
@@ -4484,7 +4484,7 @@
                 "summary": "Sub-resource not applicable",
                 "value": {
                   "error": {
-                    "type": "https://docs.mitk.org/api/errors/UNSUPPORTED_OPERATION",
+                    "type": "https://rest-api.mitk.org/errors/UNSUPPORTED_OPERATION",
                     "code": "UNSUPPORTED_OPERATION",
                     "title": "Unsupported Operation",
                     "message": "selected-slice is not applicable to the 3D window.",
@@ -4492,6 +4492,207 @@
                     "instance": "/api/v1/rendering/editors/stdmulti/windows/3d/selected-slice"
                   }
                 }
+              }
+            }
+          }
+        }
+      },
+      "PropertyNotFound": {
+        "description": "Property does not exist on the node",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/PROPERTY_NOT_FOUND",
+                "code": "PROPERTY_NOT_FOUND",
+                "title": "Property Not Found",
+                "message": "Property 'color' not found on node 'node_1'",
+                "status": 404,
+                "instance": "/api/v1/datastorage/nodes/node_1/properties/color"
+              }
+            }
+          }
+        }
+      },
+      "PropertyProtected": {
+        "description": "A protected property cannot be modified or deleted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/PROPERTY_PROTECTED",
+                "code": "PROPERTY_PROTECTED",
+                "title": "Property Protected",
+                "message": "Property 'name' cannot be deleted",
+                "status": 400,
+                "instance": "/api/v1/datastorage/nodes/node_1/properties/name"
+              }
+            }
+          }
+        }
+      },
+      "NodeHasChildren": {
+        "description": "Cannot delete a node that still has children unless recursive=true is passed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/NODE_HAS_CHILDREN",
+                "code": "NODE_HAS_CHILDREN",
+                "title": "Node Has Children",
+                "message": "Node has 3 children. Use ?recursive=true to delete.",
+                "status": 409,
+                "instance": "/api/v1/datastorage/nodes/node_1",
+                "children_count": 3
+              }
+            }
+          }
+        }
+      },
+      "NoData": {
+        "description": "The node exists but has no data attached (422 on /rendering endpoints)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/NO_DATA",
+                "code": "NO_DATA",
+                "title": "No Data",
+                "message": "Node 'node_1' has no data attached",
+                "status": 404,
+                "instance": "/api/v1/datastorage/nodes/node_1/data"
+              }
+            }
+          }
+        }
+      },
+      "NoGeometry": {
+        "description": "The node data has no usable time geometry",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/NO_GEOMETRY",
+                "code": "NO_GEOMETRY",
+                "title": "No Geometry",
+                "message": "Node 'node_1' has no usable time geometry",
+                "status": 422,
+                "instance": "/api/v1/rendering/screenshot"
+              }
+            }
+          }
+        }
+      },
+      "RenderingError": {
+        "description": "Rendering the requested view failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/RENDERING_ERROR",
+                "code": "RENDERING_ERROR",
+                "title": "Rendering Error",
+                "message": "Failed to render the requested view",
+                "status": 422,
+                "instance": "/api/v1/rendering/screenshot"
+              }
+            }
+          }
+        }
+      },
+      "CircularHierarchyReference": {
+        "description": "The target parent is a descendant of the node being reparented",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/CIRCULAR_HIERARCHY_REFERENCE",
+                "code": "CIRCULAR_HIERARCHY_REFERENCE",
+                "title": "Circular Hierarchy Reference",
+                "message": "Cannot reparent node: the target parent is a descendant of this node",
+                "status": 409,
+                "instance": "/api/v1/datastorage/nodes/node_1/parent"
+              }
+            }
+          }
+        }
+      },
+      "SerializationError": {
+        "description": "Failed to serialize data for transfer",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/SERIALIZATION_ERROR",
+                "code": "SERIALIZATION_ERROR",
+                "title": "Serialization Error",
+                "message": "Failed to serialize node data to temporary file",
+                "status": 500,
+                "instance": "/api/v1/datastorage/nodes/node_1/data"
+              }
+            }
+          }
+        }
+      },
+      "FileReadError": {
+        "description": "The referenced file exists but could not be read",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/FILE_READ_ERROR",
+                "code": "FILE_READ_ERROR",
+                "title": "File Read Error",
+                "message": "Failed to read file: /path/to/file.nrrd",
+                "status": 422,
+                "instance": "/api/v1/datastorage/nodes"
+              }
+            }
+          }
+        }
+      },
+      "RendererUnavailable": {
+        "description": "A render window exists but its renderer is currently unavailable (server-side state inconsistency)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": {
+                "type": "https://rest-api.mitk.org/errors/RENDERER_UNAVAILABLE",
+                "code": "RENDERER_UNAVAILABLE",
+                "title": "Renderer Unavailable",
+                "message": "Render window 'axial' exists but its renderer is currently unavailable",
+                "status": 500,
+                "instance": "/api/v1/rendering/editors/stdmulti/windows/axial/camera"
               }
             }
           }

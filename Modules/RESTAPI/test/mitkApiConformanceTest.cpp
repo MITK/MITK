@@ -72,7 +72,7 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   MITK_TEST(SuccessListResponseHasMetaEnvelope);
   MITK_TEST(NodeObjectHasAllRequiredFields);
   MITK_TEST(NodeFieldTypesCorrect);
-  MITK_TEST(ErrorResponseMatchesRFC7807);
+  MITK_TEST(ErrorResponseMatchesRFC9457);
   MITK_TEST(ErrorResponseHasAllRequiredFields);
   MITK_TEST(PaginationResponseHasRequiredFields);
   MITK_TEST(HealthResponseStructure);
@@ -120,6 +120,8 @@ class mitkApiConformanceTestSuite : public mitk::TestFixture
   // Category 6: Bidirectional Validation
   MITK_TEST(AllSpecErrorCodesExistInCode);
   MITK_TEST(AllCodeErrorCodesExistInSpec);
+  MITK_TEST(AllCodeErrorCodesHaveComponentResponse);
+  MITK_TEST(AllCodeErrorCodesDocumentedInSpecMd);
   MITK_TEST(ErrorResponseContainsInstancePath);
   MITK_TEST(CreateNodeResponseHasLocationMeta);
   MITK_TEST(ChildrenEndpointIncludesParentUid);
@@ -541,7 +543,61 @@ private:
     return codes;
   }
 
-  /** Get all error code constants defined in ErrorResponse. */
+  /**
+   * Collect error codes documented in components/responses (the reusable error
+   * response definitions), reading both the single `example` and the multi
+   * `examples` (each carrying a `value`) shapes.
+   */
+  std::set<std::string> CollectComponentResponseErrorCodes() const
+  {
+    std::set<std::string> codes;
+
+    auto extractCode = [&codes](const nlohmann::json& example) {
+      if (example.contains("error") && example["error"].contains("code"))
+      {
+        codes.insert(example["error"]["code"].get<std::string>());
+      }
+    };
+
+    if (m_Spec.contains("components") && m_Spec["components"].contains("responses"))
+    {
+      for (const auto& [name, response] : m_Spec["components"]["responses"].items())
+      {
+        if (!response.contains("content"))
+        {
+          continue;
+        }
+
+        for (const auto& [mediaType, mediaObj] : response["content"].items())
+        {
+          if (mediaObj.contains("example"))
+          {
+            extractCode(mediaObj["example"]);
+          }
+          if (mediaObj.contains("examples"))
+          {
+            for (const auto& [exName, exObj] : mediaObj["examples"].items())
+            {
+              if (exObj.contains("value"))
+              {
+                extractCode(exObj["value"]);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return codes;
+  }
+
+  /**
+   * Get all error code constants defined in ErrorResponse.
+   *
+   * This list must mirror the CODE_* constants in mitkErrorResponse.h exactly;
+   * the bidirectional tests below are only as complete as this list. Add the
+   * matching entry here whenever a CODE_* constant is added.
+   */
   static std::set<std::string> GetAllCodeErrorCodes()
   {
     return {
@@ -570,7 +626,8 @@ private:
       mitk::ErrorResponse::CODE_TIME_STEPPER_NOT_AVAILABLE,
       mitk::ErrorResponse::CODE_EDITOR_NOT_ACTIVE,
       mitk::ErrorResponse::CODE_RENDER_WINDOW_NOT_FOUND,
-      mitk::ErrorResponse::CODE_UNSUPPORTED_OPERATION
+      mitk::ErrorResponse::CODE_UNSUPPORTED_OPERATION,
+      mitk::ErrorResponse::CODE_RENDERER_UNAVAILABLE
     };
   }
 
@@ -842,7 +899,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("children_count >= 0", nodeData["children_count"].get<int>() >= 0);
   }
 
-  void ErrorResponseMatchesRFC7807()
+  void ErrorResponseMatchesRFC9457()
   {
     // Trigger 404 error
     auto req = this->CreateRequest("/api/v1/datastorage/nodes/nonexistent", "",
@@ -908,11 +965,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(404, error["status"].get<int>());
     CPPUNIT_ASSERT_EQUAL(std::string("NODE_NOT_FOUND"), error["code"].get<std::string>());
 
-    // Type URI must follow the canonical prefix `https://docs.mitk.org/api/errors/<CODE>`.
+    // Type URI must follow the canonical prefix `https://rest-api.mitk.org/errors/<CODE>`.
     // A loose "contains code" check would silently accept e.g. `https://example.com/NODE_NOT_FOUND`
     // after a refactor -- assert the full prefix verbatim so prefix drift is caught.
     const std::string typeUri = error["type"].get<std::string>();
-    const std::string expectedPrefix = "https://docs.mitk.org/api/errors/";
+    const std::string expectedPrefix = "https://rest-api.mitk.org/errors/";
     CPPUNIT_ASSERT_MESSAGE(
       "type URI must start with '" + expectedPrefix + "' but was '" + typeUri + "'",
       typeUri.rfind(expectedPrefix, 0) == 0);
@@ -1601,6 +1658,45 @@ public:
       CPPUNIT_ASSERT_MESSAGE(
         "ErrorResponse code '" + code + "' has no spec example",
         specCodes.count(code) > 0);
+    }
+  }
+
+  void AllCodeErrorCodesHaveComponentResponse()
+  {
+    // Every ErrorResponse code must be documented as a reusable components/responses
+    // entry, so the machine-readable spec describes every error a client can receive
+    // rather than only those that happen to appear inline on some path.
+    const auto componentCodes = this->CollectComponentResponseErrorCodes();
+    const auto codeCodes = GetAllCodeErrorCodes();
+
+    for (const auto& code : codeCodes)
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "ErrorResponse code '" + code + "' has no components/responses entry",
+        componentCodes.count(code) > 0);
+    }
+  }
+
+  void AllCodeErrorCodesDocumentedInSpecMd()
+  {
+    // The error `type` identifiers (https://rest-api.mitk.org/errors/<CODE>) resolve,
+    // via an external redirect, to the spec's Error Handling section. Guarantee that
+    // section documents every code, so no identifier lands on a page that omits it.
+    const auto md = this->LoadSpecMarkdown();
+    const std::string marker = "{#sec-9-error-handling}";
+    const auto sectionStart = md.find(marker);
+    CPPUNIT_ASSERT_MESSAGE("spec MD is missing the Error Handling section anchor " + marker,
+                           sectionStart != std::string::npos);
+    const auto sectionEnd = md.find("\n## ", sectionStart);
+    const std::string errorSection = md.substr(
+      sectionStart,
+      sectionEnd == std::string::npos ? std::string::npos : sectionEnd - sectionStart);
+
+    for (const auto& code : GetAllCodeErrorCodes())
+    {
+      CPPUNIT_ASSERT_MESSAGE(
+        "ErrorResponse code '" + code + "' is not documented in the spec MD Error Handling section",
+        errorSection.find(code) != std::string::npos);
     }
   }
 

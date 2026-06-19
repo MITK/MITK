@@ -373,7 +373,7 @@ namespace mitk
 
     /**
      * \brief Map a bridge exception thrown by a RenderWindowBridge callback to
-     *        a matching HTTP status and RFC 7807 error payload.
+     *        a matching HTTP status and RFC 9457 error payload.
      *
      * Recognises the four typed bridge exceptions:
      * - RenderWindowBridgeNoEditorException              -> 503 EDITOR_NOT_ACTIVE
@@ -384,7 +384,7 @@ namespace mitk
      * Any other std::exception is reported as 500 INTERNAL_ERROR.
      *
      * \param e    The caught exception.
-     * \param instance The request path for the RFC 7807 "instance" field.
+     * \param instance The request path for the RFC 9457 "instance" field.
      * \return A pair of {HTTP status, JSON payload} ready for SendErrorResponse.
      */
     static std::pair<int, nlohmann::json> MapBridgeException(

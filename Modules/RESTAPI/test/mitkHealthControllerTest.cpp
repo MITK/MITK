@@ -179,8 +179,10 @@ public:
 
   void DocumentationUrlUsesVersionForReleaseBuild()
   {
+    // docs.mitk.org serves release docs under a zero-padded YYYY.MM path, so a
+    // single-digit minor (June -> 6) must render as 06 or the URL 404s.
     CPPUNIT_ASSERT_EQUAL(
-      std::string("https://docs.mitk.org/2024.6/MITKRESTAPISpec.html"),
+      std::string("https://docs.mitk.org/2024.06/MITKRESTAPISpec.html"),
       mitk::GetRestApiDocumentationUrl(2024, 6, 0));
   }
 };

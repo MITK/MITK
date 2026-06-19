@@ -12,13 +12,27 @@ found in the LICENSE file.
 
 #include <mitkRestServerConfig.h>
 
+#include <iomanip>
+#include <sstream>
+
 namespace mitk
 {
   std::string GetRestApiDocumentationUrl(int major, int minor, int patch)
   {
-    const std::string segment = (99 == patch)
-      ? "nightly"
-      : std::to_string(major) + "." + std::to_string(minor);
+    // Released docs live under a zero-padded YYYY.MM path on docs.mitk.org
+    // (e.g. /2026.06/); a single-digit minor without the pad 404s. Development
+    // builds (patch level 99) publish under /nightly/ instead.
+    std::string segment;
+    if (99 == patch)
+    {
+      segment = "nightly";
+    }
+    else
+    {
+      std::ostringstream oss;
+      oss << major << '.' << std::setw(2) << std::setfill('0') << minor;
+      segment = oss.str();
+    }
 
     return "https://docs.mitk.org/" + segment + "/MITKRESTAPISpec.html";
   }

@@ -63,8 +63,8 @@ void HealthController::HandleGET_info(const httplib::Request& /*req*/, httplib::
   response["data"]["name"] = "MITK Workbench REST API";
   response["data"]["api_version"] = "v1";
   response["data"]["mitk_version"] = MITK_VERSION_STRING;
-  response["data"]["documentation_url"] = "https://docs.mitk.org/"
-    +std::to_string(MITK_VERSION_MAJOR)+"."+std::to_string(MITK_VERSION_MINOR)+"/MITKRESTAPISpec.html";
+  response["data"]["documentation_url"] =
+    GetRestApiDocumentationUrl(MITK_VERSION_MAJOR, MITK_VERSION_MINOR, MITK_VERSION_PATCH);
   nlohmann::json capabilities;
   capabilities["transfer_modes"] = nlohmann::json::array({"direct", "file-reference"});
   capabilities["authentication"] = nlohmann::json::array({"api-token"});

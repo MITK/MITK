@@ -553,17 +553,17 @@ API information and capabilities.
   "data": {
     "name": "MITK Workbench REST API",
     "api_version": "v1",
-    "mitk_version": "2026.02.0",
+    "mitk_version": "2026.06.0",
     "capabilities": {
       "transfer_modes": ["direct", "file-reference"],
       "authentication": ["api-token"]
     },
-    "documentation_url": "https://docs.mitk.org/2026.02/MITKRESTAPISpec.html"
+    "documentation_url": "https://docs.mitk.org/2026.06/MITKRESTAPISpec.html"
   }
 }
 ```
 
-The `documentation_url` is constructed from the running MITK version as `https://docs.mitk.org/<MAJOR>.<MINOR>/MITKRESTAPISpec.html`.
+The `documentation_url` is constructed from the running MITK version: released builds use `https://docs.mitk.org/<YYYY>.<MM>/MITKRESTAPISpec.html`, where `<MM>` is the minor version zero-padded to two digits (e.g. `2026.06`), while development builds (patch level 99) use `https://docs.mitk.org/nightly/MITKRESTAPISpec.html`.
 
 > **Note:** The `capabilities.events` section with `zeromq_endpoint` is planned for a future version when ZeroMQ event notification support is implemented. Currently, this field is not included in the response.
 
@@ -2565,12 +2565,12 @@ Per-cell summary plus capability flags.
 
 ### 9.1 Error Response Format
 
-Following RFC 7807 (Problem Details for HTTP APIs):
+Following RFC 9457 (Problem Details for HTTP APIs):
 
 ```json
 {
   "error": {
-    "type": "https://docs.mitk.org/api/errors/NODE_NOT_FOUND",
+    "type": "https://rest-api.mitk.org/errors/NODE_NOT_FOUND",
     "code": "NODE_NOT_FOUND",
     "title": "Node Not Found",
     "message": "No node found with UID 'invalid-uid'",
@@ -2604,10 +2604,12 @@ Following RFC 7807 (Problem Details for HTTP APIs):
 | 422 | `FILE_NOT_FOUND` | Referenced file path does not exist |
 | 422 | `FILE_READ_ERROR` | Cannot read referenced file |
 | 422 | `NO_GEOMETRY` | Node data has no usable time geometry |
+| 422 | `RENDERING_ERROR` | Rendering the requested view failed |
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests |
 | 500 | `INTERNAL_ERROR` | Unexpected server error |
 | 500 | `SERIALIZATION_ERROR` | Failed to serialize data for transfer |
 | 500 | `TIME_STEPPER_NOT_AVAILABLE` | Time stepper is not available |
+| 500 | `RENDERER_UNAVAILABLE` | Render window exists but its renderer is currently unavailable |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected to REST server |
 | 503 | `RENDER_WINDOW_NOT_AVAILABLE` | No render window bridge callback registered (headless mode or Qt plugin not loaded) |
 | 503 | `EDITOR_NOT_ACTIVE` | Addressed editor (e.g. StdMultiWidgetEditor) is not currently open in the workbench |

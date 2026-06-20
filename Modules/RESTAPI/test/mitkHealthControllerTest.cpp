@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkHealthController.h"
 #include <mitkDataStorageBridge.h>
+#include <mitkRestServerConfig.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkVersion.h>
 
@@ -30,6 +31,8 @@ class mitkHealthControllerTestSuite : public mitk::TestFixture
   MITK_TEST(InfoContainsMitkVersion);
   MITK_TEST(InfoContainsCapabilities);
   MITK_TEST(InfoContainsDocumentationUrl);
+  MITK_TEST(DocumentationUrlUsesNightlyForDevBuild);
+  MITK_TEST(DocumentationUrlUsesVersionForReleaseBuild);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -160,9 +163,31 @@ public:
 
     auto json = nlohmann::json::parse(res.body);
     CPPUNIT_ASSERT(json["data"].contains("documentation_url"));
-    std::string refURL = "https://docs.mitk.org/" + std::to_string(MITK_VERSION_MAJOR) + "."
-      + std::to_string(MITK_VERSION_MINOR) + "/MITKRESTAPISpec.html";
-    CPPUNIT_ASSERT_EQUAL(refURL, json["data"]["documentation_url"].get<std::string>());
+    // Check the controller emits a well-formed docs URL without recomputing it
+    // through GetRestApiDocumentationUrl (the handler's own source), which would
+    // make the assertion self-referential. The exact version-to-path mapping is
+    // pinned independently by the two dedicated tests below.
+    const auto url = json["data"]["documentation_url"].get<std::string>();
+    CPPUNIT_ASSERT(url.starts_with("https://docs.mitk.org/"));
+    CPPUNIT_ASSERT(url.ends_with("/MITKRESTAPISpec.html"));
+  }
+
+  void DocumentationUrlUsesNightlyForDevBuild()
+  {
+    // patch == 99 is MITK's development-build sentinel and must map to /nightly/,
+    // which is the only docs path that resolves for an unreleased version.
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("https://docs.mitk.org/nightly/MITKRESTAPISpec.html"),
+      mitk::GetRestApiDocumentationUrl(2025, 12, 99));
+  }
+
+  void DocumentationUrlUsesVersionForReleaseBuild()
+  {
+    // docs.mitk.org serves release docs under a zero-padded YYYY.MM path, so a
+    // single-digit minor (June -> 6) must render as 06 or the URL 404s.
+    CPPUNIT_ASSERT_EQUAL(
+      std::string("https://docs.mitk.org/2024.06/MITKRESTAPISpec.html"),
+      mitk::GetRestApiDocumentationUrl(2024, 6, 0));
   }
 };
 

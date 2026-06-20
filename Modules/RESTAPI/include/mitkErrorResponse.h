@@ -22,9 +22,9 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Helper class for generating RFC 7807 compliant error responses.
+   * \brief Helper class for generating RFC 9457 compliant error responses.
    *
-   * RFC 7807 defines a standard format for HTTP API error responses.
+   * RFC 9457 defines a standard format for HTTP API error responses.
    * This class provides factory methods for common error types.
    */
   class MITKRESTAPI_EXPORT ErrorResponse
@@ -62,14 +62,14 @@ namespace mitk
     static constexpr const char* CODE_RENDERER_UNAVAILABLE = "RENDERER_UNAVAILABLE";
 
     /**
-     * \brief Create an RFC 7807 error response.
+     * \brief Create an RFC 9457 error response.
      *
      * \param code Error code (e.g., "NODE_NOT_FOUND")
      * \param title Human-readable title
      * \param detail Detailed error message
      * \param status HTTP status code
      * \param instance Request path that caused the error
-     * \return JSON object following RFC 7807 format
+     * \return JSON object following RFC 9457 format
      */
     static Json Create(
       const std::string& code,

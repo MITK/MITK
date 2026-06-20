@@ -22,7 +22,10 @@ namespace mitk
     const std::string& instance)
   {
     Json error;
-    error["type"] = "https://docs.mitk.org/api/errors/" + code;
+    // Problem-type identifier per RFC 9457: a stable, version-less URI that clients
+    // compare for equality. It is kept off the versioned docs host so the identifier
+    // never changes across MITK releases.
+    error["type"] = "https://rest-api.mitk.org/errors/" + code;
     error["code"] = code;
     error["title"] = title;
     error["message"] = detail;

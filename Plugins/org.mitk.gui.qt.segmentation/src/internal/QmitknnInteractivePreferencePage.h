@@ -52,6 +52,9 @@ private:
   void OnUninstallButtonClicked();
   void UpdateUninstallButton();
 
+  void OnCheckForUpdatesButtonClicked();
+  void UpdateCheckForUpdatesButton();
+
   std::unique_ptr<Ui::QmitknnInteractivePreferencePage> m_Ui;
   QWidget* m_Control;
 };

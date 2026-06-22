@@ -19,11 +19,13 @@ found in the LICENSE file.
 #include <mitkSegmentationPluginConfig.h>
 
 #if MITK_HAS_PYTHON
+#include <mitknnInteractiveVersion.h>
 #include <mitkPythonHelper.h>
 #endif
 
 #include <QmitkRun.h>
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QMessageBox>
 
@@ -67,9 +69,12 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect(m_Ui->uninstallButton, &QPushButton::clicked, m_Control,
                    [this] { this->OnUninstallButtonClicked(); });
+  QObject::connect(m_Ui->checkForUpdatesButton, &QPushButton::clicked, m_Control,
+                   [this] { this->OnCheckForUpdatesButtonClicked(); });
 
 #if !MITK_HAS_PYTHON
   m_Ui->uninstallButton->setVisible(false);
+  m_Ui->checkForUpdatesButton->setVisible(false);
 #endif
 
   connect(m_Ui->hfSourceRadioButton, &QRadioButton::toggled,
@@ -254,6 +259,7 @@ void QmitknnInteractivePreferencePage::Update()
   this->OnInferenceModeToggled();
 
   this->UpdateUninstallButton();
+  this->UpdateCheckForUpdatesButton();
 }
 
 void QmitknnInteractivePreferencePage::OnModelSourceToggled()
@@ -383,5 +389,88 @@ void QmitknnInteractivePreferencePage::UpdateUninstallButton()
   m_Ui->uninstallButton->setEnabled(mitk::PythonHelper::VirtualEnvExists("nnInteractive"));
 #else
   m_Ui->uninstallButton->setEnabled(false);
+#endif
+}
+
+void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
+{
+#if MITK_HAS_PYTHON
+  // The PyPI query blocks up to 5 s. Run it synchronously on the main thread
+  // (the embedded Python interpreter must be driven from there) and show a wait
+  // cursor so the user sees that something is happening.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  const auto result = mitk::nnInteractive::CheckInstalledVersion();
+  QApplication::restoreOverrideCursor();
+
+  using mitk::nnInteractive::VersionStatus;
+
+  switch (result.Status)
+  {
+    case VersionStatus::BelowMinimum:
+      QMessageBox::warning(
+        m_Control,
+        "nnInteractive",
+        QString(
+          "<p>The installed nnInteractive %1 is older than the version this "
+          "application requires (%2 or newer) and may not work correctly.</p>"
+          "<p>Click <em>Uninstall nnInteractive</em>, then initialize again to "
+          "install a compatible version.</p>")
+          .arg(QString::fromStdString(result.Installed))
+          .arg(mitk::nnInteractive::MINIMUM_VERSION));
+      break;
+
+    case VersionStatus::UpdateAvailable:
+      QMessageBox::information(
+        m_Control,
+        "nnInteractive",
+        QString(
+          "<p>A newer nnInteractive is available.</p>"
+          "<p>nnInteractive %1 is installed; %2 is available. To update, click "
+          "<em>Uninstall nnInteractive</em>, then initialize again.</p>")
+          .arg(QString::fromStdString(result.Installed))
+          .arg(QString::fromStdString(result.Latest)));
+      break;
+
+    case VersionStatus::UpToDate:
+      // A non-empty Latest means PyPI was reached and confirmed nothing newer
+      // is in range; an empty one means the query did not complete, so an
+      // available update cannot be ruled out and we must not claim "up to date".
+      if (!result.Latest.empty())
+      {
+        QMessageBox::information(
+          m_Control,
+          "nnInteractive",
+          QString("You are up to date (v%1).")
+            .arg(QString::fromStdString(result.Installed)));
+      }
+      else
+      {
+        QMessageBox::information(
+          m_Control,
+          "nnInteractive",
+          QString(
+            "<p>nnInteractive %1 is installed.</p>"
+            "<p>Could not check for newer versions. Check your internet "
+            "connection and try again.</p>")
+            .arg(QString::fromStdString(result.Installed)));
+      }
+      break;
+
+    case VersionStatus::Unknown:
+      QMessageBox::warning(
+        m_Control,
+        "nnInteractive",
+        "Could not determine the installed nnInteractive version.");
+      break;
+  }
+#endif
+}
+
+void QmitknnInteractivePreferencePage::UpdateCheckForUpdatesButton()
+{
+#if MITK_HAS_PYTHON
+  m_Ui->checkForUpdatesButton->setEnabled(mitk::PythonHelper::VirtualEnvExists("nnInteractive"));
+#else
+  m_Ui->checkForUpdatesButton->setEnabled(false);
 #endif
 }

@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
+#include <mitknnInteractiveVersion.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
@@ -387,12 +388,13 @@ bool QmitknnInteractiveToolGUI::Install()
       // run so an offline user never waits on the PyPI timeout repeatedly.
       static bool s_OnlineCheckDone = false;
       const bool checkForUpdate = !s_OnlineCheckDone;
-      const auto versionCheck = this->GetTool()->CheckInstalledVersion(checkForUpdate);
+      const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
+        *this->GetTool()->GetPythonContext(), checkForUpdate);
 
       if (checkForUpdate)
         s_OnlineCheckDone = true;
 
-      if (versionCheck.Status == mitk::nnInteractiveTool::VersionStatus::BelowMinimum)
+      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum)
       {
         const auto message = QString(
           "<h3 %1>nnInteractive is outdated</h3>"
@@ -403,13 +405,13 @@ bool QmitknnInteractiveToolGUI::Install()
           "automatically.</p>")
           .arg(LINE_HEIGHT_STYLE)
           .arg(QString::fromStdString(versionCheck.Installed))
-          .arg(mitk::nnInteractiveTool::MINIMUM_VERSION);
+          .arg(mitk::nnInteractive::MINIMUM_VERSION);
 
         QMessageBox::warning(nullptr, "nnInteractive", message);
         return false;
       }
 
-      if (versionCheck.Status == mitk::nnInteractiveTool::VersionStatus::UpdateAvailable)
+      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
       {
         // The installed version still works, so updating is optional. Offer to
         // stop here (Cancel) so the user can update before doing anything else,
@@ -483,8 +485,8 @@ bool QmitknnInteractiveToolGUI::Install()
 
   mitk::PipInstallGroup nnInteractiveGroup;
   nnInteractiveGroup.requirements = {
-    std::string("nninteractive>=") + mitk::nnInteractiveTool::MINIMUM_VERSION
-      + ",<" + mitk::nnInteractiveTool::MAXIMUM_VERSION_EXCLUSIVE };
+    std::string("nninteractive>=") + mitk::nnInteractive::MINIMUM_VERSION
+      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
   if (modelSource != "local")

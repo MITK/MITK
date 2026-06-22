@@ -4,5 +4,7 @@
     <file alias="Negative">Negative.svg</file>
     <file alias="Positive">Positive.svg</file>
     <file alias="Reset">Reset.svg</file>
+    <file alias="Undo">Undo.svg</file>
+    <file alias="Gear">Gear.svg</file>
   </qresource>
 </RCC>

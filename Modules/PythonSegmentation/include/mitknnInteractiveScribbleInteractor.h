@@ -81,6 +81,15 @@ namespace mitk::nnInteractive
      */
     const InteractionBoundingBox* GetLastScribbleBoundingBox() const;
 
+    /** \brief Removes the most recently drawn brushstroke for the given prompt type.
+     *
+     * Removes the last stroke overlay node of \p promptType from the data
+     * storage. A no-op if no stroke exists for that prompt type.
+     *
+     * \param[in] promptType The prompt type whose last stroke should be removed.
+     */
+    void RemoveLastInteraction(PromptType promptType) override;
+
   private:
     void OnHandleEvent(InteractionEvent* event) override;
     void OnEnable() override;

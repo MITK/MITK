@@ -59,6 +59,16 @@ namespace mitk::nnInteractive
      */
     std::optional<Point3D> GetLastPoint() const;
 
+    /** \brief Removes the most recently placed point for the given prompt type.
+     *
+     * A no-op if no point set exists for \p promptType or it is already empty.
+     * The point set node is left in place (it may be the actively bound node);
+     * empty sets are cleaned up by OnDisable() / OnReset() as before.
+     *
+     * \param[in] promptType The prompt type whose last point should be removed.
+     */
+    void RemoveLastInteraction(PromptType promptType) override;
+
   private:
     void OnEnable() override;
     void OnDisable() override;

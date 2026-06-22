@@ -19,16 +19,19 @@ found in the LICENSE file.
 #include <mitkSegmentationPluginConfig.h>
 
 #if MITK_HAS_PYTHON
+#include <mitknnInteractiveVersion.h>
 #include <mitkPythonHelper.h>
 #endif
 
 #include <QmitkRun.h>
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QMessageBox>
 
 #include <QDir>
 #include <QFileDialog>
+#include <QLineEdit>
 
 namespace
 {
@@ -66,9 +69,12 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect(m_Ui->uninstallButton, &QPushButton::clicked, m_Control,
                    [this] { this->OnUninstallButtonClicked(); });
+  QObject::connect(m_Ui->checkForUpdatesButton, &QPushButton::clicked, m_Control,
+                   [this] { this->OnCheckForUpdatesButtonClicked(); });
 
 #if !MITK_HAS_PYTHON
   m_Ui->uninstallButton->setVisible(false);
+  m_Ui->checkForUpdatesButton->setVisible(false);
 #endif
 
   connect(m_Ui->hfSourceRadioButton, &QRadioButton::toggled,
@@ -82,6 +88,20 @@ void QmitknnInteractivePreferencePage::CreateQtControl(QWidget* parent)
     this, &QmitknnInteractivePreferencePage::OnInferenceModeToggled);
   connect(m_Ui->remoteModeRadioButton, &QRadioButton::toggled,
     this, &QmitknnInteractivePreferencePage::OnInferenceModeToggled);
+
+  // torch.compile relies on Triton, which is unavailable outside Linux; hide the
+  // option there. Its enabled state tracks the computation backend (CUDA only).
+#ifndef __linux__
+  m_Ui->torchCompileCheckBox->setVisible(false);
+#endif
+  connect(m_Ui->autoBackendRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnComputationBackendChanged);
+  connect(m_Ui->cpuBackendRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnComputationBackendChanged);
+  connect(m_Ui->gpuBackendRadioButton, &QRadioButton::toggled,
+    this, &QmitknnInteractivePreferencePage::OnComputationBackendChanged);
+  connect(m_Ui->gpuBackendLineEdit, &QLineEdit::textChanged,
+    this, &QmitknnInteractivePreferencePage::OnComputationBackendChanged);
 
   this->Update();
 }
@@ -120,6 +140,21 @@ bool QmitknnInteractivePreferencePage::PerformOk()
 
   prefs->Put("nnInteractive/gpuBackend", gpuBackend);
 
+  prefs->PutBool("nnInteractive/useTorchCompile", m_Ui->torchCompileCheckBox->isChecked());
+
+  if (m_Ui->blosc2StorageRadioButton->isChecked())
+  {
+    prefs->Put("nnInteractive/interactionsStorage", "blosc2");
+  }
+  else if (m_Ui->tensorStorageRadioButton->isChecked())
+  {
+    prefs->Put("nnInteractive/interactionsStorage", "tensor");
+  }
+  else
+  {
+    prefs->Put("nnInteractive/interactionsStorage", "auto");
+  }
+
   auto modelCheckpoint = m_Ui->checkpointLineEdit->text().toStdString();
 
   if (modelCheckpoint.empty())
@@ -154,6 +189,8 @@ void QmitknnInteractivePreferencePage::Update()
   const auto showShortcutsInLabels = prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
   const auto backend = prefs->Get("nnInteractive/backend", "auto");
   const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
+  const auto useTorchCompile = prefs->GetBool("nnInteractive/useTorchCompile", false);
+  const auto interactionsStorage = prefs->Get("nnInteractive/interactionsStorage", "auto");
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
   const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");
   const auto localModelPath = prefs->Get("nnInteractive/localModelPath", "");
@@ -183,6 +220,24 @@ void QmitknnInteractivePreferencePage::Update()
 
   m_Ui->gpuBackendLineEdit->setText(QString::fromStdString(gpuBackend));
 
+  m_Ui->torchCompileCheckBox->setChecked(useTorchCompile);
+
+  if (interactionsStorage == "blosc2")
+  {
+    m_Ui->blosc2StorageRadioButton->setChecked(true);
+  }
+  else if (interactionsStorage == "tensor")
+  {
+    m_Ui->tensorStorageRadioButton->setChecked(true);
+  }
+  else
+  {
+    m_Ui->autoStorageRadioButton->setChecked(true);
+  }
+
+  // Reflect the just-restored backend selection in the torch.compile checkbox.
+  this->OnComputationBackendChanged();
+
   m_Ui->checkpointLineEdit->setText(QString::fromStdString(modelCheckpoint));
 
   if (modelSource == "local")
@@ -204,6 +259,7 @@ void QmitknnInteractivePreferencePage::Update()
   this->OnInferenceModeToggled();
 
   this->UpdateUninstallButton();
+  this->UpdateCheckForUpdatesButton();
 }
 
 void QmitknnInteractivePreferencePage::OnModelSourceToggled()
@@ -229,13 +285,29 @@ void QmitknnInteractivePreferencePage::OnInferenceModeToggled()
   m_Ui->apiKeyLineEdit->setEnabled(remote);
   m_Ui->remoteHelpLabel->setEnabled(remote);
 
-  // Model and backend selection only apply to local inference; a remote server
-  // provides its own model and compute device.
+  // Model, compute backend, and storage selection only apply to local
+  // inference; a remote server provides its own model, compute device, and
+  // interaction storage.
   m_Ui->modelGroupBox->setEnabled(!remote);
   m_Ui->backendGroupBox->setEnabled(!remote);
+  m_Ui->storageBackendGroupBox->setEnabled(!remote);
 
   if (!remote)
     this->OnModelSourceToggled();
+}
+
+void QmitknnInteractivePreferencePage::OnComputationBackendChanged()
+{
+  // torch.compile only makes sense on a CUDA device. The tool applies it
+  // whenever the session runs on CUDA, which includes the default "auto"
+  // backend when a compatible CUDA device is detected, not only the explicitly
+  // forced GPU backend. So enable the option whenever the backend is not pinned
+  // to CPU and the device string targets CUDA. If "auto" falls back to CPU at
+  // runtime, the tool's own useCUDADevice guard neutralizes the stored
+  // preference.
+  const bool cudaDevice = m_Ui->gpuBackendLineEdit->text().trimmed().startsWith("cuda", Qt::CaseInsensitive);
+
+  m_Ui->torchCompileCheckBox->setEnabled(!m_Ui->cpuBackendRadioButton->isChecked() && cudaDevice);
 }
 
 void QmitknnInteractivePreferencePage::OnBrowseLocalModelPath()
@@ -317,5 +389,88 @@ void QmitknnInteractivePreferencePage::UpdateUninstallButton()
   m_Ui->uninstallButton->setEnabled(mitk::PythonHelper::VirtualEnvExists("nnInteractive"));
 #else
   m_Ui->uninstallButton->setEnabled(false);
+#endif
+}
+
+void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
+{
+#if MITK_HAS_PYTHON
+  // The PyPI query blocks up to 5 s. Run it synchronously on the main thread
+  // (the embedded Python interpreter must be driven from there) and show a wait
+  // cursor so the user sees that something is happening.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  const auto result = mitk::nnInteractive::CheckInstalledVersion();
+  QApplication::restoreOverrideCursor();
+
+  using mitk::nnInteractive::VersionStatus;
+
+  switch (result.Status)
+  {
+    case VersionStatus::BelowMinimum:
+      QMessageBox::warning(
+        m_Control,
+        "nnInteractive",
+        QString(
+          "<p>The installed nnInteractive %1 is older than the version this "
+          "application requires (%2 or newer) and may not work correctly.</p>"
+          "<p>Click <em>Uninstall nnInteractive</em>, then initialize again to "
+          "install a compatible version.</p>")
+          .arg(QString::fromStdString(result.Installed))
+          .arg(mitk::nnInteractive::MINIMUM_VERSION));
+      break;
+
+    case VersionStatus::UpdateAvailable:
+      QMessageBox::information(
+        m_Control,
+        "nnInteractive",
+        QString(
+          "<p>A newer nnInteractive is available.</p>"
+          "<p>nnInteractive %1 is installed; %2 is available. To update, click "
+          "<em>Uninstall nnInteractive</em>, then initialize again.</p>")
+          .arg(QString::fromStdString(result.Installed))
+          .arg(QString::fromStdString(result.Latest)));
+      break;
+
+    case VersionStatus::UpToDate:
+      // A non-empty Latest means PyPI was reached and confirmed nothing newer
+      // is in range; an empty one means the query did not complete, so an
+      // available update cannot be ruled out and we must not claim "up to date".
+      if (!result.Latest.empty())
+      {
+        QMessageBox::information(
+          m_Control,
+          "nnInteractive",
+          QString("You are up to date (v%1).")
+            .arg(QString::fromStdString(result.Installed)));
+      }
+      else
+      {
+        QMessageBox::information(
+          m_Control,
+          "nnInteractive",
+          QString(
+            "<p>nnInteractive %1 is installed.</p>"
+            "<p>Could not check for newer versions. Check your internet "
+            "connection and try again.</p>")
+            .arg(QString::fromStdString(result.Installed)));
+      }
+      break;
+
+    case VersionStatus::Unknown:
+      QMessageBox::warning(
+        m_Control,
+        "nnInteractive",
+        "Could not determine the installed nnInteractive version.");
+      break;
+  }
+#endif
+}
+
+void QmitknnInteractivePreferencePage::UpdateCheckForUpdatesButton()
+{
+#if MITK_HAS_PYTHON
+  m_Ui->checkForUpdatesButton->setEnabled(mitk::PythonHelper::VirtualEnvExists("nnInteractive"));
+#else
+  m_Ui->checkForUpdatesButton->setEnabled(false);
 #endif
 }

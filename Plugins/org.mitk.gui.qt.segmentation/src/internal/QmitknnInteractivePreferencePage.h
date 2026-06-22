@@ -42,9 +42,18 @@ private Q_SLOTS:
   void OnInferenceModeToggled();
   void OnBrowseLocalModelPath();
 
+  /** \brief Enables the torch.compile checkbox only when the computation
+   *         backend selects a CUDA device, since torch.compile is meaningful
+   *         only there. Connected to the backend radio buttons and the GPU
+   *         device line edit. */
+  void OnComputationBackendChanged();
+
 private:
   void OnUninstallButtonClicked();
   void UpdateUninstallButton();
+
+  void OnCheckForUpdatesButtonClicked();
+  void UpdateCheckForUpdatesButton();
 
   std::unique_ptr<Ui::QmitknnInteractivePreferencePage> m_Ui;
   QWidget* m_Control;

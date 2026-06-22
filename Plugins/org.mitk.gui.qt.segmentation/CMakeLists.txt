@@ -10,6 +10,7 @@ set(MODULE_DEPENDS
 
 if(TARGET MitkPythonSegmentationUI)
   list(APPEND MODULE_DEPENDS
+    MitkPythonSegmentation
     MitkPythonSegmentationUI
   )
 

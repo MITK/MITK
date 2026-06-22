@@ -395,6 +395,24 @@ namespace mitk::nnInteractive
       return false;
     }
 
+    void RemoveLastStroke(PromptType promptType)
+    {
+      auto iter = m_StrokeNodes.find(promptType);
+
+      if (iter == m_StrokeNodes.end() || iter->second.empty())
+        return;
+
+      if (auto dataStorage = m_Owner->GetDataStorage(); dataStorage != nullptr)
+        dataStorage->Remove(iter->second.back());
+
+      iter->second.pop_back();
+
+      // The cached "last stroke" referred to the stroke just removed; it is
+      // only read while applying a fresh stroke, so dropping it is safe.
+      m_LastStrokeMask = nullptr;
+      m_LastStrokeBoundingBox.reset();
+    }
+
     void DestroyStrokeNodes()
     {
       auto dataStorage = m_Owner->GetDataStorage();
@@ -496,6 +514,11 @@ mitk::Image::ConstPointer mitk::nnInteractive::ScribbleInteractor::GetLastScribb
 const mitk::nnInteractive::InteractionBoundingBox* mitk::nnInteractive::ScribbleInteractor::GetLastScribbleBoundingBox() const
 {
   return m_Impl->m_LastStrokeBoundingBox.has_value() ? &m_Impl->m_LastStrokeBoundingBox.value() : nullptr;
+}
+
+void mitk::nnInteractive::ScribbleInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  m_Impl->RemoveLastStroke(promptType);
 }
 
 void mitk::nnInteractive::ScribbleInteractor::OnHandleEvent(InteractionEvent* event)

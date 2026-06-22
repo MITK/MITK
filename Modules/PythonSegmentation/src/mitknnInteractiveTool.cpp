@@ -214,6 +214,19 @@ namespace mitk
     void AddLassoInteraction(const Image* mask, const InteractionBoundingBox* boundingBox) const;
     void AddInitialSegInteraction(MultiLabelSegmentation* previewImage, TimeStepType timeStep) const;
     void ResetInteractions() const;
+    bool Undo() const;
+
+    bool HasUndoableInteraction() const
+    {
+      return LastInteractionType.has_value() || LastInteractionWasMask;
+    }
+
+    void ClearLastInteraction()
+    {
+      LastInteractionType.reset();
+      LastInteractionPromptType.reset();
+      LastInteractionWasMask = false;
+    }
 
     Image::Pointer TargetBuffer;
     nnInteractive::PromptType PromptType;
@@ -225,6 +238,16 @@ namespace mitk
     int HeartbeatIntervalMs = 0;
     TimeStepType SessionReferenceDataTimeStep = 0;
     TimeStepType SessionWorkingDataTimeStep = 0;
+
+    // Single-level undo bookkeeping. nnInteractive can undo only the last
+    // interaction, so one record of what it was (an interactor prompt, or the
+    // initial-segmentation mask) is enough to remove the right visualization
+    // on undo. UndoRefreshPending makes DoUpdatePreview repaint the preview
+    // from the restored target buffer instead of adding an interaction.
+    std::optional<nnInteractive::InteractionType> LastInteractionType;
+    std::optional<nnInteractive::PromptType> LastInteractionPromptType;
+    bool LastInteractionWasMask = false;
+    bool UndoRefreshPending = false;
 
   private:
     std::optional<Backend> m_Backend;
@@ -334,6 +357,7 @@ void mitk::nnInteractiveTool::ResetInteractions()
     interactor->Reset();
 
   m_Impl->InitialSeg = nullptr;
+  m_Impl->ClearLastInteraction();
 
   if (this->IsSessionRunning())
   {
@@ -368,6 +392,68 @@ bool mitk::nnInteractiveTool::HasInteractions() const
 
   // Check if the initialization segmentation has been set.
   return m_Impl->InitialSeg.IsNotNull();
+}
+
+void mitk::nnInteractiveTool::UndoLastInteraction()
+{
+  if (!this->IsSessionRunning() || !this->CanUndo())
+    return;
+
+  bool undone = false;
+
+  try
+  {
+    undone = m_Impl->Undo();
+  }
+  catch (const Exception& e)
+  {
+    // A remote session can fail here (lease expired, server gone, or at
+    // capacity). Tear it down and notify the GUI; otherwise propagate as the
+    // other session operations do.
+    if (this->HandleSessionError(Description(e)))
+      return;
+
+    throw;
+  }
+
+  if (!undone)
+  {
+    // The session reports nothing to undo; resync our record and stop.
+    m_Impl->ClearLastInteraction();
+    return;
+  }
+
+  // Remove the visualization of the undone interaction. The recorded prompt
+  // type is the one used at interaction time, which is not necessarily the
+  // currently active prompt type.
+  if (m_Impl->LastInteractionType.has_value())
+  {
+    m_Impl->Interactors.at(m_Impl->LastInteractionType.value())
+      ->RemoveLastInteraction(m_Impl->LastInteractionPromptType.value());
+  }
+  else if (m_Impl->LastInteractionWasMask)
+  {
+    m_Impl->InitialSeg = nullptr;
+  }
+
+  m_Impl->ClearLastInteraction();
+
+  // session.undo() restored the target buffer in place; repaint the preview
+  // from it via the regular update path (see the UndoRefreshPending branch in
+  // DoUpdatePreview).
+  m_Impl->UndoRefreshPending = true;
+  this->UpdatePreview();
+
+  // UpdatePreview() is synchronous, so the one-shot refresh has happened by
+  // now. Clear the flag defensively: if UpdatePreview() returned before
+  // reaching DoUpdatePreview (no input or preview image), a stale true would
+  // make the next interaction take the refresh branch and be dropped silently.
+  m_Impl->UndoRefreshPending = false;
+}
+
+bool mitk::nnInteractiveTool::CanUndo() const
+{
+  return this->IsSessionRunning() && m_Impl->HasUndoableInteraction();
 }
 
 bool mitk::nnInteractiveTool::GetAutoZoom() const
@@ -462,6 +548,17 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
   this->SetPreviewLabel(1, this->GetSpecialPreviewColor());
 
+  // An undo restored the target buffer in place; just repaint the preview from
+  // it. This must run before the interactor branch (an interactor is typically
+  // still enabled while undoing) and must not emit PreviewUpdatedEvent, so it
+  // does not trigger the GUI's auto-confirm.
+  if (m_Impl->UndoRefreshPending)
+  {
+    m_Impl->UndoRefreshPending = false;
+    previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
+    return;
+  }
+
   const auto* interactor = m_Impl->GetEnabledInteractor();
 
   try
@@ -513,15 +610,29 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
 
       previewImage->UpdateGroupImage(previewImage->GetActiveLayer(), m_Impl->TargetBuffer, timeStep, 0);
 
+      // Record this interaction so UndoLastInteraction() knows which prompt to
+      // remove. m_Impl->PromptType is the prompt type the enabled interactor
+      // was activated with, i.e. the one used for this interaction.
+      m_Impl->LastInteractionType = interactor->GetType();
+      m_Impl->LastInteractionPromptType = m_Impl->PromptType;
+      m_Impl->LastInteractionWasMask = false;
+
       this->PreviewUpdatedEvent.Send();
     }
     else if (m_Impl->InitialSeg.IsNotNull())
     {
       m_Impl->AddInitialSegInteraction(previewImage, timeStep);
+
+      // The initial-segmentation mask is one undoable step (the session
+      // snapshots before applying it); it has no prompt node to remove.
+      m_Impl->LastInteractionType.reset();
+      m_Impl->LastInteractionPromptType.reset();
+      m_Impl->LastInteractionWasMask = true;
     }
     else
     {
       this->ResetPreviewContentAtTimeStep(timeStep);
+      m_Impl->ClearLastInteraction();
     }
   }
   catch (const Exception& e)
@@ -910,14 +1021,32 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
   if (!useCUDADevice)
     this->SetAutoZoom(false);
 
+  // torch.compile is only meaningful on Linux with a CUDA device (the library
+  // itself forces it off on Windows, and it relies on Triton/NVIDIA). The
+  // useCUDADevice guard also neutralizes a stale preference, e.g. enabled and
+  // then the backend switched to CPU or auto-fell back to CPU.
+  bool useTorchCompile = false;
+#if defined(__linux__)
+  useTorchCompile = useCUDADevice && prefs->GetBool("nnInteractive/useTorchCompile", false);
+#endif
+
+  // Storage backend for the interaction tensor. "auto" (the library default)
+  // uses a dense tensor for smaller images and blosc2 for larger ones; blosc2
+  // trades speed for lower RAM, tensor the other way around. Only applies to
+  // local sessions; a remote server decides this server-side.
+  auto storageBackend = prefs->Get("nnInteractive/interactionsStorage", "auto");
+  if (storageBackend != "blosc2" && storageBackend != "tensor")
+    storageBackend = "auto";
+
   {
     std::ostringstream pyCommands; pyCommands
       << "session = inference_class(\n"
       << "    device=torch.device('" << (useCUDADevice ? gpuBackendPref : "cpu") << "'),\n"
-      << "    use_torch_compile=False,\n"
+      << "    use_torch_compile=" << (useTorchCompile ? "True" : "False") << ",\n"
       << "    torch_n_threads=os.cpu_count(),\n"
       << "    verbose=False,\n"
-      << "    do_autozoom=" << m_Impl->AutoZoom << '\n'
+      << "    do_autozoom=" << m_Impl->AutoZoom << ",\n"
+      << "    interactions_storage='" << storageBackend << "'\n"
       << ")\n"
       << "session.initialize_from_trained_model_folder(checkpoint_path)\n";
     pythonContext->Execute(pyCommands.str());
@@ -981,6 +1110,11 @@ void mitk::nnInteractiveTool::BindSessionImageAndTargetBuffer()
   m_Impl->SessionWorkingDataTimeStep = workingSeg != nullptr
     ? workingSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint)
     : 0;
+
+  // A fresh session has nothing to undo (set_image resets the session's undo
+  // state); keep the tool's record in sync.
+  m_Impl->ClearLastInteraction();
+  m_Impl->UndoRefreshPending = false;
 }
 
 void mitk::nnInteractiveTool::EndSession()
@@ -1024,6 +1158,8 @@ void mitk::nnInteractiveTool::EndSession()
   m_Impl->HeartbeatIntervalMs = 0;
   m_Impl->SessionReferenceDataTimeStep = 0;
   m_Impl->SessionWorkingDataTimeStep = 0;
+  m_Impl->ClearLastInteraction();
+  m_Impl->UndoRefreshPending = false;
 
   this->SessionEndedEvent.Send();
 }
@@ -1152,6 +1288,31 @@ std::optional<std::string> mitk::nnInteractiveTool::GetModelLicense() const
   {
     MITK_WARN << "nnInteractive: could not read the model license: " << e.GetDescription();
     return std::nullopt;
+  }
+}
+
+bool mitk::nnInteractiveTool::SupportsUndo() const
+{
+  if (!this->IsSessionRunning())
+    return false;
+
+  try
+  {
+    auto pythonContext = m_Impl->GetPythonContext();
+
+    // supports_undo is a plain attribute on both local and remote sessions
+    // (the remote one mirrors it from the server's capabilities), so this is a
+    // local attribute read: no network call and no remote guard needed.
+    pythonContext->Execute("nni_supports_undo = bool(getattr(session, 'supports_undo', False))\n");
+    const auto supported = pythonContext->GetVariableAsBool("nni_supports_undo").value_or(false);
+    pythonContext->Execute("del nni_supports_undo\n");
+
+    return supported;
+  }
+  catch (const Exception& e)
+  {
+    MITK_WARN << "nnInteractive: could not read undo support: " << e.GetDescription();
+    return false;
   }
 }
 
@@ -1365,4 +1526,14 @@ void mitk::nnInteractiveTool::Impl::AddInitialSegInteraction(MultiLabelSegmentat
 void mitk::nnInteractiveTool::Impl::ResetInteractions() const
 {
   this->ExecuteSession("session.reset_interactions()\n");
+}
+
+bool mitk::nnInteractiveTool::Impl::Undo() const
+{
+  this->ExecuteSession("nni_undone = bool(session.undo())\n");
+
+  const auto undone = m_PythonContext->GetVariableAsBool("nni_undone").value_or(false);
+  m_PythonContext->Execute("del nni_undone\n");
+
+  return undone;
 }

@@ -62,6 +62,16 @@ namespace mitk::nnInteractive
      */
     const PlanarFigure* GetLastBox() const;
 
+    /** \brief Removes the most recently completed box for the given prompt type.
+     *
+     * Removes the last box node of \p promptType from the data storage. A
+     * no-op if no completed box exists for that prompt type. The in-progress
+     * "next box" node is left untouched.
+     *
+     * \param[in] promptType The prompt type whose last box should be removed.
+     */
+    void RemoveLastInteraction(PromptType promptType) override;
+
   private:
     void OnEnable() override;
     void OnDisable() override;

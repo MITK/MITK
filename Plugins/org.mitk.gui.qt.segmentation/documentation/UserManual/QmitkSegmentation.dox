@@ -526,11 +526,13 @@ The following 3D tools are available:
 
 <table>
 <tr><th>Category</th><th>Action</th><th>Shortcut</th></tr>
-<tr><td rowspan="6"><b>nnInteractive</b></td><td>Switch prompt type (positive ↔ negative)</td><td><tt>T</tt></td></tr>
+<tr><td rowspan="8"><b>nnInteractive</b></td><td>Switch prompt type (positive ↔ negative)</td><td><tt>T</tt></td></tr>
 <tr><td>Toggle point interaction</td><td><tt>P</tt></td></tr>
 <tr><td>Toggle box interaction</td><td><tt>B</tt></td></tr>
 <tr><td>Toggle scribble interaction</td><td><tt>S</tt></td></tr>
 <tr><td>Toggle lasso interaction</td><td><tt>L</tt></td></tr>
+<tr><td>Undo last interaction</td><td><tt>U</tt></td></tr>
+<tr><td>Reset all interactions</td><td><tt>R</tt></td></tr>
 <tr><td>Confirm segmentation</td><td><tt>C</tt></td></tr>
 <tr><td><b>Label management</b></td><td>Add and select new label</td><td><tt>CTRL+L, CTRL+A</tt></td></tr>
 </table>
@@ -553,6 +555,11 @@ These options require some technical understanding.
 
 \imageMacro{nnInteractive_Install.png,"Installing nnInteractive",16.00}
 
+nnInteractive is installed into a private virtual environment that is reused across MITK updates.
+If the installed version is too old for the current version of MITK, initialization is stopped and a message asks you to uninstall it and reinitialize.
+Use the <b>Uninstall nnInteractive</b> button on the nnInteractive preferences page; the next initialization then installs a compatible version.
+When a newer compatible release becomes available, MITK points this out so you can update it the same way.
+
 \subsubsection org_mitk_views_segmentation3dnninteractive_init Initialization
 
 nnInteractive must be initialized before it can operate on an image.
@@ -562,10 +569,16 @@ The very first initialization after installation may take up to a minute because
 Once initialization completes successfully, you can begin using the nnInteractive tool.
 If no supported GPU is detected, a warning message will inform you that nnInteractive will run slowly and will recommend hardware that enables a fully interactive workflow.
 
+The <b>Initialize</b> button is a toggle: while a session is running it is labeled <b>Uninitialize</b>.
+Click it to end the session and release its resources without leaving the tool.
+
 If initialization fails, you may attempt to change the device on which nnInteractive is executed.
 A <b>Settings</b> button is available next to the <b>Initialize</b> button, opening the nnInteractive preferences page.
-There you can switch between <i>Auto</i> (default), <i>CPU</i>, and <i>GPU</i>.
+Under <i>Computation backend</i> you can switch between <i>Auto</i> (default), <i>CPU</i>, and <i>GPU</i>.
 When selecting <i>GPU</i>, you may also specify the device number if you are working on a multi-GPU system.
+On Linux with a CUDA GPU, an additional option enables <tt>torch.compile</tt> for faster interactions at the cost of a slightly longer initialization.
+The <i>Storage backend</i> setting controls how interaction data is held in memory: <i>Auto</i> (default) balances speed and memory, <i>blosc2</i> minimizes memory use, and <i>tensor</i> maximizes speed.
+The computation and storage backend settings apply to local sessions only; a remote server provides its own compute device and interaction storage.
 
 \imageMacro{nnInteractive_CPU.png,"A warning when nnInteractive is running on CPU",16.00}
 
@@ -574,11 +587,18 @@ When selecting <i>GPU</i>, you may also specify the device number if you are wor
 After a session has been initialized, you can begin interacting by placing points, drawing bounding boxes, outlining contours, or scribbling with simple mouse clicks.
 Each interaction can be set to positive or negative, thereby adding or removing areas from the proposed segmentation.
 
-A key characteristic of nnInteractive is that individual interactions cannot be undone.
-Instead, you may reset all current interactions and start over.
+You can undo the most recent interaction with the <b>Undo</b> button (or press <tt>U</tt>).
+nnInteractive supports a single level of undo, so after undoing once nothing more can be undone until you add another interaction.
+To discard all current interactions and start over, use <b>Reset</b> (or press <tt>R</tt>).
 When you are satisfied with the result - often after only a single point or scribble - press <b>Confirm Segmentation</b> to write the segmented pixels to the currently selected label.
 
 Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
+
+The tool's <b>Undo</b> and the application-wide undo work at different levels, and both stay available while the tool is active.
+The tool's <b>Undo</b> (<tt>U</tt>) reverts only your most recent interaction within the current, unconfirmed result; there is no further interaction history to step back through.
+Confirming a segmentation is recorded as a single step on the application-wide undo stack, just like the other editing tools, so a confirmed label is reverted with the application-wide <b>Undo</b> in the toolbar (<tt>CTRL+Z</tt>) rather than with the tool's <b>Undo</b>.
+While you have an unconfirmed result in progress, the application-wide <b>Undo</b> does not affect your current interactions; it reverts a previously confirmed label or an earlier operation instead.
+In short, press <tt>U</tt> to take back your last interaction and <tt>CTRL+Z</tt> to take back a confirmed label.
 
 \subsection org_mitk_views_segmentation3dthresholdtool 3D Threshold tool
 

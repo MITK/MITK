@@ -50,7 +50,7 @@ namespace Ui
  *   auto-create-next-label on confirm, with an optional bypass of the
  *   global label-naming preferences)
  * - Optional shortcut hints in button labels
- * - Keyboard shortcuts for common actions (R: reset, C: confirm,
+ * - Keyboard shortcuts for common actions (R: reset, U: undo, C: confirm,
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
  * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
@@ -105,10 +105,12 @@ protected:
 
   /** \brief Handles the initialize button toggle event.
    *
-   * Creates the virtual environment, Python context, and installs
-   * nnInteractive if needed, then starts the inference session.
+   * When checked, creates the virtual environment, Python context, and
+   * installs nnInteractive if needed, then starts the inference session.
    *
-   * \param[in] checked Whether the button is checked (unused).
+   * When unchecked, ends the current inference session.
+   *
+   * \param[in] checked Whether the button is checked.
    */
   void OnInitializeButtonToggled(bool checked);
 
@@ -123,6 +125,14 @@ protected:
    * remove a label the user has effectively re-claimed by resetting.
    */
   void OnResetInteractionsButtonClicked();
+
+  /** \brief Undoes the last interaction and refreshes the Undo button state.
+   *
+   * Delegates to nnInteractiveTool::UndoLastInteraction(), which reverts the
+   * most recent interaction (single-level) and removes its prompt
+   * visualization.
+   */
+  void OnUndoButtonClicked();
 
   /** \brief Handles auto-refine checkbox toggle.
    *
@@ -313,13 +323,32 @@ private:
    */
   void ApplyCapabilityGating();
 
-  /** \brief Updates the Initialize button label to reflect the configured
-   *         inference mode, e.g. "Initialize (local)" or
-   *         "Initialize (remote server)", so the active mode is visible in the
-   *         tool panel. Reads the preference fresh; called on init and whenever
+  /** \brief Enables the Undo button only when the running session supports
+   *         undo and an interaction is currently undoable.
+   *
+   * Single-level undo: the button is enabled right after a new interaction and
+   * disabled again once it is undone or the interactions are reset. Cached
+   * m_SupportsUndo keeps it disabled on nnInteractive versions without undo.
+   */
+  void UpdateUndoButtonState();
+
+  /** \brief Updates the Initialize button label to reflect the current state:
+   *         "Uninitialize" while a session is running, otherwise the action the
+   *         next click performs for the configured inference mode ("Initialize"
+   *         for local, "Initialize (remote server)" for remote). Reads the
+   *         preference fresh; called on init, on session start/end, and whenever
    *         the inference-mode preference changes.
    */
   void UpdateInitializeButtonText();
+
+  /** \brief Unchecks the Initialize button without re-triggering
+   *         OnInitializeButtonToggled.
+   *
+   * Used on the paths that abort an initialize (unsupported platform, install
+   * declined, session start failed) so the toggle does not stay stuck in the
+   * checked state.
+   */
+  void UncheckInitializeButton();
 
   struct ShortcutLabel
   {
@@ -338,6 +367,11 @@ private:
   mitk::WeakPointer<mitk::MultiLabelSegmentation> m_AutoCreatedLabelSegmentation;
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
+
+  // Whether the running session reports undo support (nnInteractive >= 2.3.3).
+  // Cached at session start (ApplyCapabilityGating) and used to gate the Undo
+  // button; older versions report no support and the button stays disabled.
+  bool m_SupportsUndo = false;
 
   QTimer* m_HeartbeatTimer = nullptr;
 

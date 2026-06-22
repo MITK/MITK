@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
+#include <mitknnInteractiveVersion.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
@@ -45,6 +46,7 @@ namespace
   // of the uppercase letters, so the same constant drives the QShortcut,
   // the tooltip hint, and the label suffix.
   constexpr Qt::Key RESET_KEY       = Qt::Key_R;
+  constexpr Qt::Key UNDO_KEY        = Qt::Key_U;
   constexpr Qt::Key CONFIRM_KEY     = Qt::Key_C;
   constexpr Qt::Key PROMPT_TYPE_KEY = Qt::Key_T;
   constexpr Qt::Key POINT_KEY       = Qt::Key_P;
@@ -199,7 +201,9 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   mainLayout->addWidget(wrapperWidget);
   m_Ui->setupUi(wrapperWidget);
 
+  SetIcon(m_Ui->settingsButton, "Gear");
   SetIcon(m_Ui->resetButton, "Reset");
+  SetIcon(m_Ui->undoButton, "Undo");
   SetIcon(m_Ui->positiveButton, "Positive");
   SetIcon(m_Ui->negativeButton, "Negative");
   SetIcon(m_Ui->maskButton, "Mask");
@@ -207,6 +211,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
   connect(m_Ui->resetButton, &QPushButton::clicked, this, &Self::OnResetInteractionsButtonClicked);
+  connect(m_Ui->undoButton, &QPushButton::clicked, this, &Self::OnUndoButtonClicked);
 
   this->InitializePromptType();
   this->InitializeInteractorButtons();
@@ -238,6 +243,8 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   m_HeartbeatTimer = new QTimer(this);
   connect(m_HeartbeatTimer, &QTimer::timeout, this, &Self::OnHeartbeatTimeout);
 
+  this->UpdateModelLicenseDisplay(std::nullopt);
+
   Superclass::InitializeUI(mainLayout);
 
   // TODO: Once we agree on a common shortcut concept, the confirm binding
@@ -246,6 +253,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   auto confirmButton = this->GetConfirmSegmentationButton();
 
   BindShortcut(this, RESET_KEY, m_Ui->resetButton, "Press %1 to reset all interactions");
+  BindShortcut(this, UNDO_KEY, m_Ui->undoButton, "Press %1 to undo the last interaction");
   BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
 
   // Cache the base label of each shortcut-bound widget as seen from the
@@ -255,6 +263,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
 
   m_ShortcutLabels = {
     { m_Ui->resetButton,    RESET_KEY,    m_Ui->resetButton->text() },
+    { m_Ui->undoButton,     UNDO_KEY,     m_Ui->undoButton->text() },
     { m_Ui->pointButton,    POINT_KEY,    m_Ui->pointButton->text() },
     { m_Ui->boxButton,      BOX_KEY,      m_Ui->boxButton->text() },
     { m_Ui->scribbleButton, SCRIBBLE_KEY, m_Ui->scribbleButton->text() },
@@ -371,7 +380,65 @@ bool QmitknnInteractiveToolGUI::Install()
       return false;
 
     if (this->GetTool()->IsInstalled())
+    {
+      // A reused virtual environment can hold an nnInteractive that predates
+      // this MITK build (the venv survives MITK upgrades). The offline minimum
+      // check runs on every initialize and blocks an incompatible version; the
+      // online "newer release available" nag runs at most once per application
+      // run so an offline user never waits on the PyPI timeout repeatedly.
+      static bool s_OnlineCheckDone = false;
+      const bool checkForUpdate = !s_OnlineCheckDone;
+      const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
+        *this->GetTool()->GetPythonContext(), checkForUpdate);
+
+      if (checkForUpdate)
+        s_OnlineCheckDone = true;
+
+      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum)
+      {
+        const auto message = QString(
+          "<h3 %1>nnInteractive is outdated</h3>"
+          "<p %1>The installed nnInteractive %2 is older than the version this "
+          "application requires (%3 or newer) and may not work correctly.</p>"
+          "<p %1>Open <em>Settings</em> and click <em>Uninstall nnInteractive</em>. "
+          "The next time you initialize, a compatible version is installed "
+          "automatically.</p>")
+          .arg(LINE_HEIGHT_STYLE)
+          .arg(QString::fromStdString(versionCheck.Installed))
+          .arg(mitk::nnInteractive::MINIMUM_VERSION);
+
+        QMessageBox::warning(nullptr, "nnInteractive", message);
+        return false;
+      }
+
+      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
+      {
+        // The installed version still works, so updating is optional. Offer to
+        // stop here (Cancel) so the user can update before doing anything else,
+        // or to keep going with the installed version (Continue). The
+        // s_OnlineCheckDone guard above limits this prompt to once per run.
+        const auto message = QString(
+          "<h3 %1>A newer nnInteractive is available</h3>"
+          "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
+          "<p %1>Open <em>Settings</em>, click <em>Uninstall nnInteractive</em>, then "
+          "initialize again to install the latest version. Click <em>Continue</em> to "
+          "keep using the installed version.</p>")
+          .arg(LINE_HEIGHT_STYLE)
+          .arg(QString::fromStdString(versionCheck.Installed))
+          .arg(QString::fromStdString(versionCheck.Latest));
+
+        QMessageBox messageBox(QMessageBox::Information, "nnInteractive", message);
+        auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
+        messageBox.addButton(QMessageBox::Cancel);
+        messageBox.setDefaultButton(continueButton);
+        messageBox.exec();
+
+        if (messageBox.clickedButton() != continueButton)
+          return false; // Abort so the user can update first.
+      }
+
       return true;
+    }
   }
 
   // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
@@ -417,7 +484,9 @@ bool QmitknnInteractiveToolGUI::Install()
   spec.groups.push_back(std::move(torchGroup));
 
   mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive>=2.3.2,<3.0.0" };
+  nnInteractiveGroup.requirements = {
+    std::string("nninteractive>=") + mitk::nnInteractive::MINIMUM_VERSION
+      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE };
   spec.groups.push_back(std::move(nnInteractiveGroup));
 
   if (modelSource != "local")
@@ -442,8 +511,18 @@ bool QmitknnInteractiveToolGUI::Install()
   return this->GetTool()->CreatePythonContext();
 }
 
-void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
+void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 {
+  if (!checked)
+  {
+    // The button is a toggle: unchecking it uninitializes. EndSession() fires
+    // SessionEndedEvent -> OnSessionEnded(), which reverts the session-dependent
+    // controls and the button label. No confirmation prompt, matching Reset and
+    // tool deactivation, which also discard unconfirmed work silently.
+    this->GetTool()->EndSession();
+    return;
+  }
+
 #if defined(__APPLE__) && !defined(__aarch64__)
   QMessageBox::information(
     nullptr,
@@ -454,12 +533,16 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
       "<p %1>It is not compatible with Intel-based Macs.</p>")
       .arg(LINE_HEIGHT_STYLE),
     QMessageBox::Ok);
+
+  // Nothing was initialized; release the toggle without re-entering this slot.
+  this->UncheckInitializeButton();
 #else
   this->EnableInitializeButtons(false);
 
   if (!Install())
   {
     this->EnableInitializeButtons(true);
+    this->UncheckInitializeButton();
     return;
   }
 
@@ -512,15 +595,18 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool /*checked*/)
       errorMsgBox->exec();
 
       this->EnableInitializeButtons(true);
+      this->UncheckInitializeButton();
       return;
     }
 
     messageBox->accept();
 
-    // Re-enable the settings button so the user can adjust preferences that
-    // apply mid-session (e.g., interaction mode). The initialize button
-    // stays disabled because re-initialization within the same session is
-    // not supported.
+    // Keep the Initialize button enabled so a second click uninitializes the
+    // session; its label flips to "Uninitialize" while a session is running
+    // (see UpdateInitializeButtonText). Re-enable the settings button too so the
+    // user can adjust preferences that apply mid-session (e.g. interaction mode).
+    m_Ui->initializeButton->setEnabled(true);
+    this->UpdateInitializeButtonText();
     m_Ui->settingsButton->setEnabled(true);
 
     m_Ui->resetButton->setEnabled(true);
@@ -606,8 +692,28 @@ void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
   // Reset any interactions.
   this->GetTool()->ResetInteractions();
 
+  // Nothing is undoable after a reset.
+  this->UpdateUndoButtonState();
+
   // Switch to positive prompt type.
   m_Ui->positiveButton->click();
+}
+
+void QmitknnInteractiveToolGUI::OnUndoButtonClicked()
+{
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  tool->UndoLastInteraction();
+  this->UpdateUndoButtonState();
+}
+
+void QmitknnInteractiveToolGUI::UpdateUndoButtonState()
+{
+  auto* tool = this->GetTool();
+  m_Ui->undoButton->setEnabled(m_SupportsUndo && tool != nullptr && tool->CanUndo());
 }
 
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
@@ -691,6 +797,10 @@ void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
   // Reset interactions and initialize a new session with a mask/label.
   this->OnResetInteractionsButtonClicked();
   this->GetTool()->InitializeSessionWithMask(mask);
+
+  // The mask initialization is one undoable step (no PreviewUpdatedEvent is
+  // emitted for it, so refresh the button state here).
+  this->UpdateUndoButtonState();
 }
 
 void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
@@ -813,16 +923,17 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   this->UncheckOtherInteractorButtons(nullptr);
 
   m_Ui->resetButton->setEnabled(false);
+  m_Ui->undoButton->setEnabled(false);
+  m_SupportsUndo = false;
   m_Ui->promptTypeGroupBox->setEnabled(false);
   m_Ui->interactionToolsGroupBox->setEnabled(false);
 
-  // Re-enable Initialize and uncheck it without re-triggering OnInitializeButtonToggled,
-  // which would immediately start a new session against the user's intent.
-  {
-    QSignalBlocker blocker(m_Ui->initializeButton);
-    m_Ui->initializeButton->setChecked(false);
-  }
+  // Re-enable Initialize and uncheck it without re-triggering
+  // OnInitializeButtonToggled, then restore the idle label now that no session
+  // is running (the session has already been torn down when this fires).
+  this->UncheckInitializeButton();
   m_Ui->initializeButton->setEnabled(true);
+  this->UpdateInitializeButtonText();
   m_Ui->settingsButton->setEnabled(true);
 }
 
@@ -924,6 +1035,11 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
   m_Ui->lassoButton->setEnabled(caps.Lasso);
   m_Ui->maskButton->setEnabled(caps.Mask);
 
+  // Cache whether this session supports single-level undo (nnInteractive
+  // >= 2.3.3). The Undo button stays disabled until the first interaction.
+  m_SupportsUndo = tool->SupportsUndo();
+  this->UpdateUndoButtonState();
+
   // A checkpoint that advertises no interactions at all would leave the user with
   // an initialized session and no usable controls. Say so, rather than presenting
   // a silently dead panel.
@@ -939,6 +1055,10 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
 
 void QmitknnInteractiveToolGUI::OnPreviewUpdated()
 {
+  // A prompt interaction just landed, so it is now undoable. Update before the
+  // auto-confirm early-outs below so the Undo button reflects every interaction.
+  this->UpdateUndoButtonState();
+
   if (m_AutoConfirmInProgress)
     return;
 
@@ -999,8 +1119,28 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 
 void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
 {
+  // While a session is running the button uninitializes, so it reads
+  // "Uninitialize". Otherwise it shows what the next click will do, reflecting
+  // the configured inference mode. This is the single source of truth and is
+  // also called on inference-mode preference changes, so the running-session
+  // guard keeps it from clobbering "Uninitialize" mid-session.
+  auto* tool = this->GetTool();
+  if (tool != nullptr && tool->IsSessionRunning())
+  {
+    m_Ui->initializeButton->setText("Uninitialize");
+    return;
+  }
+
   const bool remote = m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
-  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize (local)");
+  m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize");
+}
+
+void QmitknnInteractiveToolGUI::UncheckInitializeButton()
+{
+  // Revert the toggle without re-entering OnInitializeButtonToggled, which would
+  // immediately start or end a session against the user's intent.
+  QSignalBlocker blocker(m_Ui->initializeButton);
+  m_Ui->initializeButton->setChecked(false);
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

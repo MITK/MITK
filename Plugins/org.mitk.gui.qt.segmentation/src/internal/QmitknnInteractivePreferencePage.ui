@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>702</width>
-    <height>593</height>
+    <height>1074</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
         <x>0</x>
         <y>0</y>
         <width>702</width>
-        <height>593</height>
+        <height>1074</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -68,7 +68,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Once you confirm a label, a new empty label is ready so you can keep segmenting right away. Unused auto-created labels are removed when you leave the tool.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Once you confirm a label, a new empty label is ready so you can keep segmenting right away.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -119,7 +119,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Skip the &quot;default label naming&quot; dialog and the &quot;enforce suggestions&quot; picker for this auto-create flow only. Other label-creation paths still honor those preferences.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Preserve a smooth workflow by bypassing other label naming preferences and constraints.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -144,7 +144,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Confirm automatically after the first successful interaction. Best when a single interaction is enough per label.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Confirm automatically after the first interaction. Use when a single interaction per label is enough.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -245,7 +245,7 @@
                </font>
               </property>
               <property name="text">
-               <string>&lt;small&gt;The API key is stored in plain text in the application preferences. If left empty, the NN_INTERACTIVE_API_KEY environment variable is used instead.&lt;/small&gt;</string>
+               <string>&lt;small&gt;If left empty, the NN_INTERACTIVE_API_KEY environment variable is used instead.&lt;br&gt;The API key above is stored in plain text in the application preferences.&lt;/small&gt;</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
@@ -380,7 +380,7 @@
        <item>
         <widget class="QGroupBox" name="backendGroupBox">
          <property name="title">
-          <string>Backend</string>
+          <string>Computation backend</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -425,7 +425,68 @@
            </layout>
           </item>
           <item>
+           <widget class="QCheckBox" name="torchCompileCheckBox">
+            <property name="text">
+             <string>Faster interactions for slightly longer initialization (torch.compile).</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="backendRestartNoteLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="storageBackendGroupBox">
+         <property name="title">
+          <string>Storage backend</string>
+         </property>
+         <layout class="QVBoxLayout" name="storageBackendLayout">
+          <item>
+           <widget class="QRadioButton" name="autoStorageRadioButton">
+            <property name="toolTip">
+             <string>Use a dense tensor for smaller images and blosc2 for larger ones.</string>
+            </property>
+            <property name="text">
+             <string>Auto (recommended)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="blosc2StorageRadioButton">
+            <property name="text">
+             <string>blosc2 (less memory, slower)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="tensorStorageRadioButton">
+            <property name="text">
+             <string>Tensor (more memory, faster)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="storageBackendRestartNoteLabel">
             <property name="font">
              <font>
               <italic>true</italic>
@@ -450,7 +511,7 @@
          <property name="title">
           <string>Other</string>
          </property>
-         <layout class="QVBoxLayout" name="otherLayout">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QCheckBox" name="showShortcutsInLabelsCheckBox">
             <property name="text">
@@ -462,26 +523,20 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="uninstallLayout">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QPushButton" name="uninstallButton">
+             <widget class="QPushButton" name="checkForUpdatesButton">
               <property name="text">
-               <string>Uninstall nnInteractive</string>
+               <string>Check for updates...</string>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="uninstallSpacer">
-              <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+             <widget class="QPushButton" name="uninstallButton">
+              <property name="text">
+               <string>Uninstall nnInteractive...</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
+             </widget>
             </item>
            </layout>
           </item>
@@ -524,6 +579,10 @@
   <tabstop>cpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendRadioButton</tabstop>
   <tabstop>gpuBackendLineEdit</tabstop>
+  <tabstop>torchCompileCheckBox</tabstop>
+  <tabstop>autoStorageRadioButton</tabstop>
+  <tabstop>blosc2StorageRadioButton</tabstop>
+  <tabstop>tensorStorageRadioButton</tabstop>
   <tabstop>showShortcutsInLabelsCheckBox</tabstop>
   <tabstop>uninstallButton</tabstop>
  </tabstops>

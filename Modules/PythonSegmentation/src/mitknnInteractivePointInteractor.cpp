@@ -33,7 +33,9 @@ namespace mitk::nnInteractive
       // crosshair navigation via left clicks.
       this->Interactor->SetEventConfig("PointSetConfigLMB.xml");
 
-      // nnInteractive currently does not support undo.
+      // Keep point placement off MITK's global operation-based undo stack;
+      // nnInteractive undo is handled at the session level (single-level
+      // undo of the last interaction), not via the workbench undo controller.
       this->Interactor->EnableUndo(false);
       this->Interactor->EnableInteraction(false);
       this->Interactor->EnableMovement(false);
@@ -149,6 +151,19 @@ std::optional<mitk::Point3D> mitk::nnInteractive::PointInteractor::GetLastPoint(
     return std::nullopt;
 
   return pointSet->GetPoint(pointSet->GetSize() - 1);
+}
+
+void mitk::nnInteractive::PointInteractor::RemoveLastInteraction(PromptType promptType)
+{
+  auto iter = m_Impl->PointSetNodes.find(promptType);
+
+  if (iter == m_Impl->PointSetNodes.end())
+    return;
+
+  auto pointSet = iter->second->GetDataAs<PointSet>();
+
+  if (!pointSet->IsEmpty())
+    pointSet->RemovePointAtEnd(0);
 }
 
 void mitk::nnInteractive::PointInteractor::OnEnable()

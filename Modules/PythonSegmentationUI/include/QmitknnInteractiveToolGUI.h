@@ -50,7 +50,7 @@ namespace Ui
  *   auto-create-next-label on confirm, with an optional bypass of the
  *   global label-naming preferences)
  * - Optional shortcut hints in button labels
- * - Keyboard shortcuts for common actions (R: reset, C: confirm,
+ * - Keyboard shortcuts for common actions (R: reset, U: undo, C: confirm,
  *   T: toggle prompt type, P/B/S/L: toggle interactors)
  *
  * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
@@ -105,10 +105,12 @@ protected:
 
   /** \brief Handles the initialize button toggle event.
    *
-   * Creates the virtual environment, Python context, and installs
-   * nnInteractive if needed, then starts the inference session.
+   * When checked, creates the virtual environment, Python context, and
+   * installs nnInteractive if needed, then starts the inference session.
    *
-   * \param[in] checked Whether the button is checked (unused).
+   * When unchecked, ends the current inference session.
+   *
+   * \param[in] checked Whether the button is checked.
    */
   void OnInitializeButtonToggled(bool checked);
 

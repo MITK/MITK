@@ -83,6 +83,8 @@ public:
 
   void UpdateCrosshairVisibility(bool visible);
 
+  void UpdateCrosshair3DVisibility(bool visible);
+
   void UpdateCrosshairRotationMode(int mode);
 
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
@@ -111,6 +113,8 @@ Q_SIGNALS:
 
   void CrosshairVisibilityChanged(bool);
 
+  void Crosshair3DVisibilityChanged(bool);
+
   // \brief int parameters are enum from QmitkStdMultiWidget
   void CrosshairRotationModeChanged(int);
 
@@ -131,6 +135,7 @@ protected Q_SLOTS:
 
   void OnCrosshairMenuAboutToShow();
   void OnCrosshairVisibilityChanged(bool);
+  void OnCrosshair3DVisibilityChanged(bool);
   void OnCrosshairRotationModeSelected(QAction *);
 
   /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of
@@ -186,6 +191,7 @@ private:
 
   int m_CrosshairRotationMode;
   bool m_CrosshairVisibility;
+  bool m_Crosshair3DVisibility;
 
   LayoutIndex m_Layout;
   LayoutDesign m_LayoutDesign;

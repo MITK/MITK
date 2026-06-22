@@ -211,6 +211,10 @@ void QmitkStdMultiWidget::SetCrosshairVisibility(bool visible)
 
   emit NotifyCrosshairVisibilityChanged(visible);
 
+  // The global toggle also writes the 3D renderer's property list, so keep
+  // the 3D-only menu entry in sync with the master.
+  emit NotifyCrosshair3DVisibilityChanged(visible);
+
   this->RequestUpdateAll();
 }
 
@@ -240,6 +244,29 @@ bool QmitkStdMultiWidget::GetCrosshairVisibility() const
   }
 
   return crosshairVisibility;
+}
+
+void QmitkStdMultiWidget::SetCrosshair3DVisibility(bool visible)
+{
+  auto* renderWindow4 = this->GetRenderWindow4();
+  if (nullptr == renderWindow4)
+  {
+    return;
+  }
+
+  const mitk::BaseRenderer* renderer = renderWindow4->GetRenderer();
+
+  for (const auto& planeNode : { m_PlaneNode1, m_PlaneNode2, m_PlaneNode3 })
+  {
+    if (planeNode.IsNotNull())
+    {
+      planeNode->SetVisibility(visible, renderer);
+    }
+  }
+
+  emit NotifyCrosshair3DVisibilityChanged(visible);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
 }
 
 void QmitkStdMultiWidget::SetCrosshairGap(unsigned int gapSize)
@@ -719,8 +746,10 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
 
   connect(renderWindow4, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);
   connect(renderWindow4, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshairVisibility);
+  connect(renderWindow4, &QmitkRenderWindow::Crosshair3DVisibilityChanged, this, &QmitkStdMultiWidget::SetCrosshair3DVisibility);
   connect(renderWindow4, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkStdMultiWidget::SetWidgetPlaneMode);
   connect(renderWindow4, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairVisibilityChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshairVisibility);
+  connect(this, &QmitkStdMultiWidget::NotifyCrosshair3DVisibilityChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshair3DVisibility);
   connect(this, &QmitkStdMultiWidget::NotifyCrosshairRotationModeChanged, renderWindow4, &QmitkRenderWindow::UpdateCrosshairRotationMode);
 }

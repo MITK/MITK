@@ -594,6 +594,12 @@ When you are satisfied with the result - often after only a single point or scri
 
 Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
 
+The tool's <b>Undo</b> and the application-wide undo work at different levels, and both stay available while the tool is active.
+The tool's <b>Undo</b> (<tt>U</tt>) reverts only your most recent interaction within the current, unconfirmed result; there is no further interaction history to step back through.
+Confirming a segmentation is recorded as a single step on the application-wide undo stack, just like the other editing tools, so a confirmed label is reverted with the application-wide <b>Undo</b> in the toolbar (<tt>CTRL+Z</tt>) rather than with the tool's <b>Undo</b>.
+While you have an unconfirmed result in progress, the application-wide <b>Undo</b> does not affect your current interactions; it reverts a previously confirmed label or an earlier operation instead.
+In short, press <tt>U</tt> to take back your last interaction and <tt>CTRL+Z</tt> to take back a confirmed label.
+
 \subsection org_mitk_views_segmentation3dthresholdtool 3D Threshold tool
 
 The thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled as part of the segmentation.

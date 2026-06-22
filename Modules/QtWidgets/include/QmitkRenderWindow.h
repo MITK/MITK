@@ -86,6 +86,12 @@ public:
   void UpdateCrosshairVisibility(bool visible);
 
   /**
+   * \brief Updates the 3D-only crosshair visibility state in the menu widget.
+   * \param[in] visible True to show the crosshair in the 3D render window, false to hide it.
+   */
+  void UpdateCrosshair3DVisibility(bool visible);
+
+  /**
    * \brief Updates the crosshair rotation mode in the menu widget.
    * \param[in] mode The new rotation mode.
    */
@@ -147,6 +153,8 @@ Q_SIGNALS:
   void CrosshairRotationModeChanged(int);
 
   void CrosshairVisibilityChanged(bool);
+
+  void Crosshair3DVisibilityChanged(bool);
 
   void moved();
 

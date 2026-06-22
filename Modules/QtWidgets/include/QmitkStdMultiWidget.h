@@ -70,6 +70,16 @@ public:
   virtual bool GetCrosshairVisibility() const override;
   void SetCrosshairGap(unsigned int gapSize) override;
 
+  /**
+  * \brief Set the crosshair visibility in the 3D render window only.
+  *
+  * Sets the 'visible' property of the three plane nodes on the 3D
+  * render window's renderer-specific property list, which takes
+  * precedence over the general property list. This leaves the
+  * crosshair visibility in the 2D render windows untouched.
+  */
+  void SetCrosshair3DVisibility(bool visible);
+
   virtual void ResetCrosshair() override;
 
   virtual void SetWidgetPlaneMode(int mode) override;
@@ -135,6 +145,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
   void NotifyCrosshairVisibilityChanged(bool visible);
+  void NotifyCrosshair3DVisibilityChanged(bool visible);
   void NotifyCrosshairRotationModeChanged(int mode);
 
   void WheelMoved(QWheelEvent *);

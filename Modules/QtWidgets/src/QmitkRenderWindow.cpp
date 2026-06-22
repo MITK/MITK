@@ -114,6 +114,11 @@ void QmitkRenderWindow::UpdateCrosshairVisibility(bool visible)
   m_MenuWidget->UpdateCrosshairVisibility(visible);
 }
 
+void QmitkRenderWindow::UpdateCrosshair3DVisibility(bool visible)
+{
+  m_MenuWidget->UpdateCrosshair3DVisibility(visible);
+}
+
 void QmitkRenderWindow::UpdateCrosshairRotationMode(int mode)
 {
   m_MenuWidget->UpdateCrosshairRotationMode(mode);
@@ -140,6 +145,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     connect(m_MenuWidget, &QmitkRenderWindowMenu::LayoutDesignChanged, this, &QmitkRenderWindow::LayoutDesignChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::ResetView, this, &QmitkRenderWindow::ResetView);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
   }
   else
@@ -147,6 +153,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LayoutDesignChanged, this, &QmitkRenderWindow::LayoutDesignChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::ResetView, this, &QmitkRenderWindow::ResetView);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::Crosshair3DVisibilityChanged, this, &QmitkRenderWindow::Crosshair3DVisibilityChanged);
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
 
     m_MenuWidget->hide();

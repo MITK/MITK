@@ -221,7 +221,7 @@ void mitk::CrosshairVtkMapper2D::ApplyAllProperties(BaseRenderer* renderer)
   LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
   ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairActor);
 
-  float thickness;
+  float thickness = 1.0f;
   this->GetDataNode()->GetFloatProperty("Line width", thickness, renderer);
   ls->m_CrosshairActor->GetProperty()->SetLineWidth(thickness);
 }

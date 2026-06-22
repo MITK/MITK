@@ -567,7 +567,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties(BaseRenderer *renderer)
   ApplyColorAndOpacityProperties2D(renderer, ls->m_CrosshairHelperLineActor);
   ApplyColorAndOpacityProperties2D(renderer, ls->m_ArrowActor);
 
-  float thickness;
+  float thickness = 1.0f;
   this->GetDataNode()->GetFloatProperty("Line width", thickness, renderer);
   ls->m_CrosshairActor->GetProperty()->SetLineWidth(thickness);
   ls->m_CrosshairHelperLineActor->GetProperty()->SetLineWidth(thickness);

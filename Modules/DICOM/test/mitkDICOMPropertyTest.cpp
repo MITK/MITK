@@ -22,6 +22,11 @@ class mitkDICOMPropertyTestSuite : public mitk::TestFixture
 
   MITK_TEST(GetPropertyByDICOMTagPath);
   MITK_TEST(GetPropertyByDICOMTagPath_2);
+  MITK_TEST(GetPropertyByDICOMTagPath_NullProvider);
+  MITK_TEST(GetFirstDICOMValueAsString_DICOMProperty);
+  MITK_TEST(GetFirstDICOMValueAsString_StringProperty);
+  MITK_TEST(GetFirstDICOMValueAsString_NoMatch);
+  MITK_TEST(GetFirstDICOMValueAsString_NullProvider);
   MITK_TEST(ConvertDICOMStrToValue);
   MITK_TEST(ConvertValueToDICOMStr);
 
@@ -84,7 +89,7 @@ public:
 
   void GetPropertyByDICOMTagPath()
   {
-    std::map< std::string, mitk::BaseProperty::Pointer> result = mitk::GetPropertyByDICOMTagPath(data, simplePath);
+    std::map<std::string, mitk::BaseProperty::ConstPointer> result = mitk::GetPropertyByDICOMTagPath(data, simplePath);
     CPPUNIT_ASSERT(result.size() == 1);
     CPPUNIT_ASSERT_EQUAL(result.begin()->second->GetValueAsString(), std::string("simplePath"));
 
@@ -116,7 +121,7 @@ public:
 
   void GetPropertyByDICOMTagPath_2()
   {
-    std::map< std::string, mitk::BaseProperty::Pointer> result = mitk::GetPropertyByDICOMTagPath(data->GetPropertyList(), simplePath);
+    std::map<std::string, mitk::BaseProperty::ConstPointer> result = mitk::GetPropertyByDICOMTagPath(data->GetPropertyList(), simplePath);
     CPPUNIT_ASSERT(result.size() == 1);
     CPPUNIT_ASSERT_EQUAL(result.begin()->second->GetValueAsString(), std::string("simplePath"));
 
@@ -143,6 +148,52 @@ public:
 
     result = mitk::GetPropertyByDICOMTagPath(data->GetPropertyList(), emptyPath);
     CPPUNIT_ASSERT(result.size() == 0);
+  }
+
+  void GetPropertyByDICOMTagPath_NullProvider()
+  {
+    // A nullptr provider must yield an empty map, not dereference-crash.
+    auto result = mitk::GetPropertyByDICOMTagPath(nullptr, simplePath);
+    CPPUNIT_ASSERT(result.empty());
+  }
+
+  void GetFirstDICOMValueAsString_DICOMProperty()
+  {
+    // A TemporoSpatialStringProperty (DICOMProperty) match is read at the
+    // default slot (timeStep 0, slice 0).
+    auto img = mitk::Image::New();
+    mitk::DICOMTagPath path;
+    path.AddElement(0x0054, 0x1001);
+    auto prop = mitk::DICOMProperty::New();
+    prop->SetValue(0, 0, "BQML");
+    img->GetPropertyList()->SetProperty(
+      mitk::DICOMTagPathToPropertyName(path).c_str(), prop);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("BQML"),
+                         mitk::GetFirstDICOMValueAsString(img, path));
+  }
+
+  void GetFirstDICOMValueAsString_StringProperty()
+  {
+    // A match that is a plain StringProperty (not a
+    // TemporoSpatialStringProperty) falls back to GetValueAsString rather
+    // than returning empty. setUp() stored simplePath via SetStringProperty.
+    CPPUNIT_ASSERT_EQUAL(std::string("simplePath"),
+                         mitk::GetFirstDICOMValueAsString(data, simplePath));
+  }
+
+  void GetFirstDICOMValueAsString_NoMatch()
+  {
+    mitk::DICOMTagPath absent;
+    absent.AddElement(0x0099, 0x0099);
+    CPPUNIT_ASSERT_EQUAL(std::string(),
+                         mitk::GetFirstDICOMValueAsString(data, absent));
+  }
+
+  void GetFirstDICOMValueAsString_NullProvider()
+  {
+    CPPUNIT_ASSERT_EQUAL(std::string(),
+                         mitk::GetFirstDICOMValueAsString(nullptr, simplePath));
   }
 
   void ConvertDICOMStrToValue()

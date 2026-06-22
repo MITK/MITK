@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSUVFunctorPolicy_h
 #define mitkSUVFunctorPolicy_h
 
-#include <vector>
 #include <functional>
+#include <limits>
 
 #include <itkIndex.h>
 #include <mitkNumericConstants.h>
@@ -29,19 +29,43 @@ namespace mitk
 {
 
   /**
-   * \brief Functor policy for computing body-weight-normalized SUV (SUVbw) on a per-voxel basis.
+   * \brief Generic functor policy for computing SUV on a per-voxel basis.
    *
-   * This class is designed to be used as the functor template argument for
-   * itk::IndexedUnaryFunctorImageFilter. It converts raw PET pixel values to SUVbw
-   * values, where the decay time can vary per voxel (looked up via a configurable
-   * decay time functor based on the voxel's image index).
+   * Designed to be used as the functor template argument for
+   * itk::IndexedUnaryFunctorImageFilter. It converts raw PET pixel
+   * values to SUV values using the variant-agnostic scale factor
+   * (\ref computeSUVScaleFactor) where the per-variant normalization is
+   * encoded in \c m_ScaleNumerator.
    *
-   * Before use, the injected activity, body weight, half-life, and a decay time
-   * functor must be configured.
+   * The decay time can vary per voxel (looked up via a configurable
+   * decay-time functor based on the voxel's image index).
    *
-   * \sa computeSUVbwScaleFactor, computeSUVbw, itk::IndexedUnaryFunctorImageFilter
+   * \par Configuration contract
+   *
+   * Default-constructed instances hold NaN for the injected activity,
+   * scale numerator, and half-life, and an empty decay-time functor.
+   * Such an instance is intentionally invalid: use the parameterised
+   * constructor or the corresponding setters to bring it into a usable
+   * state, and call IsConfigured() to verify the contract before
+   * invoking operator(). Zero and negative values are also invalid
+   * even though they are finite: they cause a zero or negative
+   * denominator in the SUV formula and produce NaN/Inf output.
+   *
+   * If operator() is called on an unconfigured instance, the NaN values
+   * propagate through the math and produce a fully NaN output image.
+   * That makes misuse visible at the output but does not raise an
+   * exception. Callers that want a loud failure should validate at the
+   * boundary via IsConfigured().
+   *
+   * The SUV variant (SUVbw, SUVlbm, SUVbsa, ...) is encoded externally:
+   * pick a SUVNormalizationStrategy, compute its scale numerator from
+   * the patient measurements, and feed it to SetScaleNumerator(). For the
+   * body-weight case, pair this with a BodyWeightStrategy.
+   *
+   * \sa computeSUVScaleFactor, SUVNormalizationStrategy,
+   *     itk::IndexedUnaryFunctorImageFilter
    */
-  class MITKPET_EXPORT SUVbwFunctorPolicy
+  class MITKPET_EXPORT SUVFunctorPolicy
   {
   public:
     /** \brief Pixel type for SUV output values. */
@@ -58,24 +82,42 @@ namespace mitk
      */
     using DecayTimeFunctionType = std::function < double(const IndexType&) >;
 
-    /** \brief Default constructor. */
-    SUVbwFunctorPolicy();
+    /**
+     * \brief Default constructor.
+     *
+     * Leaves the policy in an unconfigured state (NaN scalars, empty
+     * decay-time functor). Setters must be called before invoking
+     * operator(); see IsConfigured(). The default constructor exists to
+     * satisfy itk::IndexedUnaryFunctorImageFilter, which holds a
+     * default-constructed functor value member that is overwritten by
+     * SetFunctor().
+     */
+    SUVFunctorPolicy();
+
+    /**
+     * \brief Construct a fully configured policy in one step.
+     *
+     * The decay-time functor must still be supplied via
+     * SetDecayTimeFunctor() before the policy is invoked.
+     *
+     * \param[in] injectedActivity Injected activity in [Bq].
+     * \param[in] scaleNumerator   Variant-specific normalization
+     *                             quantity (e.g. body weight in [g]
+     *                             for SUVbw / SUVlbm, BSA in [cm^2]
+     *                             for SUVbsa).
+     * \param[in] halfLife         Radionuclide half-life in [s].
+     */
+    SUVFunctorPolicy(double injectedActivity, double scaleNumerator, double halfLife);
 
     /** \brief Destructor. */
-    ~SUVbwFunctorPolicy();
+    virtual ~SUVFunctorPolicy();
 
     /**
-     * \brief Get the number of output components per pixel.
+     * \brief Set the functor used to query the decay time for a given
+     *        voxel index.
      *
-     * \return Always returns 1.
-     */
-    unsigned int GetNumberOfOutputs() const;
-
-    /**
-     * \brief Set the functor used to query the decay time for a given voxel index.
-     *
-     * \param[in] functor A callable that accepts an IndexType and returns the decay
-     *            time in seconds.
+     * \param[in] functor A callable that accepts an IndexType and
+     *            returns the decay time in seconds.
      */
     void SetDecayTimeFunctor(const DecayTimeFunctionType& functor);
 
@@ -87,11 +129,12 @@ namespace mitk
     void SetInjectedActivity(double a);
 
     /**
-     * \brief Set the patient's body weight.
+     * \brief Set the variant-specific scale numerator.
      *
-     * \param[in] w Body weight in [kg].
+     * \param[in] n Scale numerator. Units depend on the SUV variant
+     *              (see SUVNormalizationStrategy).
      */
-    void SetBodyWeight(double w);
+    void SetScaleNumerator(double n);
 
     /**
      * \brief Set the radionuclide half-life.
@@ -101,44 +144,71 @@ namespace mitk
     void SetHalfLife(double tau);
 
     /**
+     * \brief Check whether the policy is fully configured and safe to invoke.
+     *
+     * Returns \c true iff all three numeric parameters (injected
+     * activity, scale numerator, half-life) are finite and strictly
+     * positive, and a decay-time functor has been set. Callers should
+     * validate at the boundary before invoking operator().
+     *
+     * \return \c true if every required parameter has been supplied.
+     */
+    bool IsConfigured() const;
+
+    /**
      * \brief Inequality comparison operator.
      *
+     * Compares only the three scalar parameters. The decay-time functor
+     * is deliberately not compared (std::function does not provide a
+     * meaningful equality).
+     *
      * \param[in] other The other policy to compare against.
-     * \return \c true if the policies differ in injected activity, body weight, or half-life.
+     * \return \c true if the policies differ in injected activity,
+     *         scale numerator, or half-life.
      */
-    bool operator!=(const SUVbwFunctorPolicy& other) const;
+    bool operator!=(const SUVFunctorPolicy& other) const;
 
     /**
      * \brief Equality comparison operator.
      *
+     * Compares only the three scalar parameters; see operator!=.
+     *
      * \param[in] other The other policy to compare against.
-     * \return \c true if injected activity, body weight, and half-life are identical.
+     * \return \c true if injected activity, scale numerator, and
+     *         half-life are identical. A default-constructed (NaN-seeded)
+     *         policy compares unequal to itself because NaN != NaN; this
+     *         only over-invalidates (forces a re-run) and never falsely
+     *         reports equality.
      */
-    bool operator==(const SUVbwFunctorPolicy& other) const;
+    bool operator==(const SUVFunctorPolicy& other) const;
 
     /**
-     * \brief Compute the SUVbw for a single pixel value at a given image index.
+     * \brief Compute the SUV for a single pixel value at a given image index.
      *
-     * Looks up the decay time via the configured decay time functor and multiplies
-     * the input value by the SUVbw scale factor.
+     * Looks up the decay time via the configured decay-time functor and
+     * multiplies the input value by the SUV scale factor. No per-voxel
+     * validation is performed; see IsConfigured() for the boundary
+     * check.
      *
      * \param[in] value The raw PET pixel value.
-     * \param[in] currentIndex The 3D image index of the current pixel (used to query decay time).
-     * \return The computed SUVbw value.
+     * \param[in] currentIndex The 3D image index of the current pixel
+     *            (used to query decay time).
+     * \return The computed SUV value. NaN if the policy was not
+     *         configured.
      *
-     * \pre A decay time functor must have been set via SetDecayTimeFunctor().
+     * \pre IsConfigured() returns true. If not, the result will be NaN.
      */
     SUVPixelType operator()(const SUVPixelType& value,
       const IndexType& currentIndex) const;
 
-  private:
+  protected:
 
-    /**Activity injected in [Bq]*/
-    double m_InjectedActivity;
-    /**Weight of the subject in [kg]*/
-    double m_bodyweight;
-    /**Halflife of the used nuclide in [sec] */
-    double m_halfLife;
+    /** Activity injected in [Bq]. NaN until SetInjectedActivity is called. */
+    double m_InjectedActivity = std::numeric_limits<double>::quiet_NaN();
+    /** Variant-specific scale numerator. NaN until SetScaleNumerator is called. */
+    double m_ScaleNumerator   = std::numeric_limits<double>::quiet_NaN();
+    /** Halflife of the used nuclide in [s]. NaN until SetHalfLife is called. */
+    double m_HalfLife         = std::numeric_limits<double>::quiet_NaN();
 
     DecayTimeFunctionType m_Functor;
   };
@@ -146,4 +216,4 @@ namespace mitk
 }
 
 
-#endif // LEVENBERGMARQUARDTMODELFITFUNCTOR_H
+#endif

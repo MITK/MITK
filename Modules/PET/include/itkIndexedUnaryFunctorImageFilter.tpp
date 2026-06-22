@@ -29,6 +29,15 @@ namespace itk
   IndexedUnaryFunctorImageFilter< TInputImage, TOutputImage, TFunction >
     ::IndexedUnaryFunctorImageFilter()
   {
+    // Mandatory, not a tuning knob: this filter implements only the legacy
+    // ThreadedGenerateData signature (see below), not the
+    // DynamicThreadedGenerateData introduced in ITK 5. With dynamic
+    // multithreading left on (the ITK 5.4 default) the base class never
+    // dispatches to ThreadedGenerateData and the functor would not run, so
+    // this must stay off unless a DynamicThreadedGenerateData override is
+    // added. Switching threading models should also be accompanied by
+    // profiling.
+    this->DynamicMultiThreadingOff();
     this->SetNumberOfRequiredInputs(1);
     this->InPlaceOff();
   }

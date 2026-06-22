@@ -30,6 +30,15 @@ namespace itk
  * of a pixel within the image is relevant for computing the output (e.g., spatially varying
  * decay correction in PET SUV calculations).
  *
+ * \par Why a custom filter?
+ *
+ * No upstream ITK filter exposes "(pixel value, image index) -> output pixel" directly.
+ * itk::UnaryFunctorImageFilter passes only the pixel value; itk::UnaryGeneratorImageFilter
+ * is region-based (functor signature is (input, region, threadId, ProgressReporter)) and
+ * not pixel-based. Hand-rolling around itk::ImageRegionConstIteratorWithIndex /
+ * itk::ImageRegionIterator -- which is what this filter does -- is the standard way to
+ * close that gap.
+ *
  * \tparam TInputImage  Type of the input image.
  * \tparam TOutputImage Type of the output image.
  * \tparam TFunction    Functor type. Must define \c operator()(const InputPixelType&, const IndexType&)
@@ -40,7 +49,7 @@ namespace itk
  * output[index] = functor(input[index], index);
  * \endcode
  *
- * \sa itk::UnaryFunctorImageFilter, SUVbwFunctorPolicy
+ * \sa itk::UnaryFunctorImageFilter, itk::UnaryGeneratorImageFilter, SUVFunctorPolicy
  */
 
   template< typename TInputImage, typename TOutputImage, typename TFunction >

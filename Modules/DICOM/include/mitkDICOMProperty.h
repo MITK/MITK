@@ -43,28 +43,46 @@ namespace mitk
   MITKDICOM_EXPORT mitk::BaseProperty::Pointer GetDICOMPropertyForDICOMValuesFunctor(const DICOMCachedValueLookupTable& cacheLookupTable);
 
 
-  class PropertyList;
-  class BaseData;
+  class IPropertyProvider;
 
   /**
-   * \brief Search a PropertyList for properties matching a DICOM tag path.
+   * \brief Search a property provider for properties matching a DICOM tag path.
    *
-   * \param[in] list The PropertyList to search.
-   * \param[in] path The DICOMTagPath to match against property names.
-   * \return A map of matching property names to BaseProperty smart pointers.
-   * \sa DICOMTagPathToPropertyRegEx
+   * Iterates the provider's property keys, parses each as a DICOM tag path,
+   * and returns the entries whose path equals \p path. Works uniformly for
+   * any \c IPropertyProvider, so callers may pass a \c BaseData* or a
+   * \c PropertyList* (both inherit \c IPropertyOwner / \c IPropertyProvider)
+   * without further wrapping.
+   *
+   * \param[in] provider The property provider to search. \c nullptr yields
+   *                     an empty map.
+   * \param[in] path     The DICOMTagPath to match against property names.
+   * \return A map of matching property names to const BaseProperty smart pointers.
+   * \sa DICOMTagPathToPropertyRegEx, GetFirstDICOMValueAsString
    */
-  MITKDICOM_EXPORT std::map< std::string, BaseProperty::Pointer> GetPropertyByDICOMTagPath(const PropertyList* list, const DICOMTagPath& path);
+  MITKDICOM_EXPORT std::map<std::string, BaseProperty::ConstPointer>
+  GetPropertyByDICOMTagPath(const IPropertyProvider* provider, const DICOMTagPath& path);
 
   /**
-   * \brief Search a BaseData's properties for those matching a DICOM tag path.
+   * \brief Read the first matching DICOM property's string value.
    *
-   * \param[in] data The BaseData whose property list is searched.
-   * \param[in] path The DICOMTagPath to match against property names.
-   * \return A map of matching property names to BaseProperty smart pointers.
-   * \sa DICOMTagPathToPropertyRegEx
+   * Convenience wrapper for the (very common) "look up a single tag and
+   * read its string value at the default temporo-spatial slot" pattern.
+   * Returns an empty string if \p provider is \c nullptr or no property
+   * matches \p path.
+   *
+   * \param[in] provider The property provider to search.
+   * \param[in] path     The DICOMTagPath to look up.
+   * \return For a \c DICOMProperty (TemporoSpatialStringProperty) match,
+   *         the value at timeStep 0, slice 0, falling back to the closest
+   *         earlier time step and slice if the exact slot is absent
+   *         (\c allowCloseTime and \c allowCloseSlice both enabled). For
+   *         any other property kind, its plain string value
+   *         (\c GetValueAsString). Empty when no property matches.
+   * \sa GetPropertyByDICOMTagPath
    */
-  MITKDICOM_EXPORT std::map< std::string, BaseProperty::Pointer> GetPropertyByDICOMTagPath(const BaseData* data, const DICOMTagPath& path);
+  MITKDICOM_EXPORT std::string
+  GetFirstDICOMValueAsString(const IPropertyProvider* provider, const DICOMTagPath& path);
 
   /**
    * \brief Convert a DICOM property string to a numeric value.

@@ -2,35 +2,168 @@
 \page org_mitk_petSUVCalculation The PET SUV Calculation View
 
 \li \ref PETSUV_Introduction
-\li \ref PETSUV_Contact
 \li \ref PETSUV_Usage
+\li \ref PETSUV_Variants
+\li \ref PETSUV_DecayTime
+\li \ref PETSUV_Validation
+\li \ref PETSUV_Diagnostics
+\li \ref PETSUV_Contact
 
 \section PETSUV_Introduction Introduction
-This view offers the user a way to calculate SUV maps out of PET images. the generated SUV maps become child nodes
-of the selected PET image and can then be visualized or analysed like any other image.\n
-@remark Currently the view works only with PET images loaded from DICOM files because special DICOM tags are needed
-to correctly compute the SUV map.
+
+The PET SUV Calculation view converts a PET image into a Standardized
+Uptake Value (SUV) image. The generated SUV map is added as a child
+node of the selected PET image and can be visualized or analysed like
+any other image. SUV computation follows the IBSI-SUV benchmark
+recommendations.
+
+The view requires DICOM-tagged PET input. Acquisition information
+(patient weight / height / sex, injected activity, half-life, decay
+correction strategy, units) is read from the input's DICOM properties
+and may be overridden via the controls below.
+
+\image html usage_suv.png "The PET SUV Calculation view."
 
 \section PETSUV_Usage Usage
-To generate a SUV map do the following:
--# Set the time to measurement.
--# Specify the injected activity for the data set.
--# Specify the body weight of the person and the unit (kg or g).
--# Selected the tracer isotope. Currently the following isotopes are supported:
-	- 11C
-	- 15O
-	- 18F
-	- 68Ga
--# Selected the PET image.
--# Press the "Calculate SUV" button.
 
-The SUV map will be added as child node to the selected PET image.
+-# Select a PET image in the \b PET \b node \b selector at the top of
+   the view. With \b Select \b only \b PET \b images enabled (default),
+   only nodes whose DICOM Modality tag (0008,0060) is \c PT can be
+   selected.
+-# Choose the desired SUV variant from the \b SUV \b variant combo.
+   The \b Patient group always shows body weight; the height and sex
+   fields appear only for variants that consume them (LBM, IBW, BSA).
+   All fields are auto-populated from DICOM and can be overridden
+   manually.
+-# For activity-concentration input, review and, if needed, override
+   the fields in the \b Radiopharmaceutical \b / \b activity group
+   (\b Injected \b activity, \b Radio \b nuclide / \b half-life).
+   Picking a nuclide from the combo sets the half-life; manually
+   editing the half-life flips the combo to <em>(custom)</em>. This
+   group, and the \b Time \b to \b measurement section below, are
+   hidden when the input is already a pre-normalized SUV, since
+   neither applies.
+-# Inspect the \b Time \b to \b measurement section: in \b Auto
+   \b detect mode (default), the decay-correction strategy is derived
+   from DICOM and shown as the \b Strategy label, and the
+   per-(timestep, slice) decay durations populate the read-only
+   tree-view below. The other two modes are described in
+   \ref PETSUV_DecayTime.
+-# When the diagnostics widget reports \b Configuration \b OK, click
+   \b Calculate \b SUV. A new node named
+   <tt>&lt;selected-node-name&gt;_SUV</tt>
+   is added as a child of the selected PET node. The SUV image has
+   <tt>double</tt> pixel type regardless of the input pixel type.
 
-\image html usage_suv.png "GUI of the PET SUV view."
+\section PETSUV_Variants Variants and patient measurements
+
+The variant combo lists the five supported SUV normalizations:
+- \b BW (body weight)
+- \b LBM-Janmahasatian (lean body mass, Janmahasatian 2005)
+- \b LBM-James128 (lean body mass, James 1976 with factor 1.28)
+- \b IBW (ideal body weight, Sugawara 1999)
+- \b BSA (body surface area, DuBois 1916)
+
+Each variant declares the patient measurements it consumes. The body
+weight field is always shown; the height and sex fields appear only
+when the selected variant needs them:
+- \b BW needs only body weight.
+- \b LBM-Janmahasatian / \b LBM-James128 need weight, height, and sex.
+- \b IBW needs height and sex (weight is shown but not used by the formula).
+- \b BSA needs weight and height.
+
+For sex-specific variants, an ambiguous patient sex
+(\c O <em>Other</em>, or absent / unresolved) triggers the IBSI-SUV
+mean-of-male-and-female adaptation under
+\b DICOMReadPolicy::Lenient (logged as a warning). Under
+\b DICOMReadPolicy::Strict (see \ref PETSUV_Validation), the
+adaptation is refused and the user is prompted to supply an
+unambiguous sex override.
+
+\section PETSUV_DecayTime Decay-time mode
+
+The \b Time \b to \b measurement group offers three modes:
+
+- \b Auto \b detect (default). Decay durations are derived per
+  (timestep, slice) following the IBSI-SUV strategy chain
+  (DICOM Decay Correction = ADMIN / START / NONE, vendor private
+  datetime tags, AcquisitionTime / SeriesTime fallbacks). The
+  detected strategy is shown as the \b Strategy label; the
+  per-(timestep, slice) values populate the read-only tree-view
+  below.
+
+- \b User \b defined \b (uniform). A single decay duration is applied
+  uniformly to every voxel. Enter the value (in minutes) in the
+  spinbox next to the radio button. The DICOM decay-correction
+  pipeline is bypassed entirely; the strategy reads \em "User-defined
+  decay time".
+
+- \b User \b defined \b (per-slice, edit in table below). The
+  per-(timestep, slice) decay-time map becomes editable in the
+  tree-view. The map is seeded from the currently effective values
+  when this mode is engaged, so the user starts editing from the
+  Auto-detected baseline rather than from zero. Every cell edit is
+  pushed to the filter immediately; the diagnostics widget surfaces
+  any validation failure (for example, an out-of-range slice index
+  or a map shape that no longer matches the image geometry).
+
+The uniform and per-slice overrides are mutually exclusive by design;
+toggling between modes clears the previously engaged slot.
+
+A decay-timing problem (ambiguous auto-detection, or an invalid or
+conflicting manual override) is shown on the \b Strategy line in the
+warning colour, not only in the diagnostics widget.
+
+\section PETSUV_Validation Validation controls
+
+The \b Validation group holds three persistent toggles that affect
+how borderline DICOM input is handled. Toggle changes immediately
+re-run the configuration; the diagnostics widget reflects the new
+state.
+
+- \b Force \b PET \b semantics. Bypass the (0008,0060) Modality == "PT"
+  check. Use only on data that is genuinely PET but ships an incorrect
+  Modality tag.
+
+- \b Force \b activity-concentration \b semantics \b ([Bq/mL]).
+  Treat the input pixel values as activity concentration regardless
+  of (0054,1001) Units. Required for inputs whose Units value is
+  outside the documented set the pipeline supports
+  (BQML / GML / CM2ML / CNTS with Philips private factor) but that
+  are nonetheless in [Bq/mL]. Only physically meaningful if the
+  pixels really are [Bq/mL].
+
+- \b Strict \b DICOM \b input \b policy. Refuse the IBSI-SUV
+  recommended empirical adaptations of borderline DICOM input
+  (sub-1e4 Radionuclide Total Dose reinterpreted as MBq, vendor-
+  specific decay-timing fallbacks, ambiguous patient sex). Each
+  refused adaptation surfaces a typed exception with a per-category
+  actionable message in the diagnostics widget.
+
+\section PETSUV_Diagnostics Diagnostics widget
+
+The diagnostics widget below the validation group renders two
+blocks:
+
+-# An <em>Auto-detected</em> summary of what the filter deduced from
+   the input: vendor, pixel semantics, injected dose, half-life,
+   decay-correction strategy, tracer index, and the active policy
+   / overrides.
+-# An actionable message: either \b Configuration \b OK or a
+   per-category hint mapped from the typed exception raised by the
+   filter (missing DICOM property, invalid DICOM property,
+   ambiguous decay timing, missing variant input, unsupported
+   units, missing Philips scale, vendor-empirical decay refused,
+   implausible dose, ambiguous-sex adaptation refused, generic
+   benchmark adaptation required).
+
+The \b Calculate \b SUV button is enabled exactly when the
+configuration is OK.
 
 \section PETSUV_Contact Contact information
-This plug-in is being developed by Charlotte Debus (E210 - Translational Radiooncology)
-at the DKFZ (German Cancer Research Center).
-If you have any questions, need support,
-find a bug or have a feature request, feel free to contact c.debus@dkfz.de.
+
+The plug-in is maintained by the Division of Medical Image Computing
+at the DKFZ (German Cancer Research Center). If you have any
+questions, need support, find a bug or have a feature request, please
+contact the MITK team via http://www.mitk.org.
 */

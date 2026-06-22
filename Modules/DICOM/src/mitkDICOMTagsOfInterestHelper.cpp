@@ -191,6 +191,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x0031))); //dicom.pet.Radiopharmaceutical
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1072))); //dicom.pet.RadiopharmaceuticalStartTime
+    result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1078))); //dicom.pet.RadiopharmaceuticalStartDateTime
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1074))); //dicom.pet.RadionuclideTotalDose
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1075))); //dicom.pet.RadionuclideHalfLife
     result.insert(MakeEntry(DICOMTagPath(radioPharmaRootTag).AddElement(0x0018, 0x1076))); //dicom.pet.RadionuclidePositronFraction
@@ -200,9 +201,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTagPath(radioNuclideRootTag).AddElement(0x0008, 0x0104))); //dicom.pet.Radionuclide.CodeMeaning
 
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1001))); //dicom.pet.RadioactivityUnits
+    result.insert(MakeEntry(DICOMTag(0x0054, 0x1006))); //dicom.pet.SUVType
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1102))); //dicom.pet.DecayCorrection
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1321))); //dicom.pet.DecayFactor
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1300))); //dicom.pet.FrameReferenceTime
+    result.insert(MakeEntry(DICOMTag(0x0018, 0x1242))); //dicom.pet.ActualFrameDuration
 
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1030))); //dicom.patient.PatientWeight
     result.insert(MakeEntry(DICOMTag(0x0010, 0x1020))); //dicom.patient.PatientSize

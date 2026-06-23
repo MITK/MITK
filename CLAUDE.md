@@ -16,10 +16,8 @@ activate automatically when matching files are touched.
 - Educated guesses are fine once or twice. When they do not hold
   up empirically, switch to observation: add temporary logging or
   instrumentation before guessing again.
-- Preserve the line-ending style of existing files. For files you
-  create from scratch, default to LF. Per `.gitattributes`, C++ and
-  CMake files must not use tabs for indentation and must end with
-  a newline.
+- C++ and CMake files must not use tabs for indentation and must
+  end with a newline.
 - Ask before committing anything.
 - Never push without an explicit go-ahead for that specific push.
 

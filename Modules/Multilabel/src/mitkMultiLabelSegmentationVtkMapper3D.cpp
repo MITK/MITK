@@ -230,7 +230,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::CheckForOutdatedGroups(mitk::MultiLabel
       pipeline->m_PolyMapper->InterpolateScalarsBeforeMappingOff();
 
       pipeline->m_Actor->SetMapper(pipeline->m_PolyMapper);
-      pipeline->m_Actor->GetProperty()->SetAmbient(0.4);
+      pipeline->m_Actor->GetProperty()->SetAmbient(0.1);
       pipeline->m_Actor->GetProperty()->SetDiffuse(1.0);
       pipeline->m_Actor->GetProperty()->SetSpecular(0.2);
       pipeline->m_Actor->GetProperty()->SetSpecularPower(20.0);

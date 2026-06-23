@@ -75,7 +75,7 @@ CalculateIntensityPeak(const itk::Image<TPixel, VImageDimension>* itkImage, cons
       {
         localMean /= localCount;
       }
-        localMean = std::abs<double>(localIndex + 1 - localMean);
+        localMean = std::abs(localIndex + 1 - localMean);
 
         pVector[localIndex] += 1;
         sVector[localIndex] += localMean;
@@ -114,8 +114,8 @@ CalculateIntensityPeak(const itk::Image<TPixel, VImageDimension>* itkImage, cons
       contrastA += pVector[i] * pVector[j] * iMinusj*iMinusj;
       if ((pVector[i] > 0) && (pVector[j] > 0))
       {
-        busynessA += std::abs<double>((i + 1.0)*pVector[i] - (j + 1.0)*pVector[j]);
-        complexity += std::abs<double>(iMinusj)*(pVector[i] * sVector[i] + pVector[j] * sVector[j]) / (pVector[i] + pVector[j]);
+        busynessA += std::abs((i + 1.0)*pVector[i] - (j + 1.0)*pVector[j]);
+        complexity += std::abs(iMinusj)*(pVector[i] * sVector[i] + pVector[j] * sVector[j]) / (pVector[i] + pVector[j]);
         strengthA += (pVector[i] + pVector[j])*iMinusj*iMinusj;
       }
     }

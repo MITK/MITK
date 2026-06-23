@@ -338,9 +338,9 @@ void CalculateFeatures(
       }
       results.AngularSecondMoment += pij*pij;
       results.Contrast += (iInt - jInt)* (iInt - jInt) * pij;
-      results.Dissimilarity += std::abs<double>(iInt - jInt) * pij;
-      results.InverseDifference += pij / (1 + (std::abs<double>(iInt - jInt)));
-      results.InverseDifferenceNormalised += pij / (1 + (std::abs<double>(iInt - jInt) / Ng));
+      results.Dissimilarity += std::abs(iInt - jInt) * pij;
+      results.InverseDifference += pij / (1 + (std::abs(iInt - jInt)));
+      results.InverseDifferenceNormalised += pij / (1 + (std::abs(iInt - jInt) / Ng));
       results.InverseDifferenceMoment += pij / (1 + (iInt - jInt)*(iInt - jInt));
       results.InverseDifferenceMomentNormalised += pij / (1 + (iInt - jInt)*(iInt - jInt)/Ng/Ng);
       results.Autocorrelation += iInt*jInt * pij;

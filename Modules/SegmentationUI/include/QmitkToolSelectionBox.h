@@ -69,7 +69,7 @@ public:
 
     \param toolGroups A comma-separated string of tool group names to display.
   */
-  void SetDisplayedToolGroups(const std::string &toolGroups = nullptr);
+  void SetDisplayedToolGroups(const std::string &toolGroups = {});
 
   /** \brief Called when a tool is modified. Public for itk::Command callbacks. */
   void OnToolManagerToolModified();

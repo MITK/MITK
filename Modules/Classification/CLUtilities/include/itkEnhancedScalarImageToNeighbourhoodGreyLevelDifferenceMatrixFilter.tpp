@@ -298,7 +298,7 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
 
     PixelType mean = sum / px;
 
-    double si = std::abs<double>(mean-centerPixelIntensity);
+    double si = std::abs(static_cast<double>(mean-centerPixelIntensity));
 
     run[0] = centerPixelIntensity;
 

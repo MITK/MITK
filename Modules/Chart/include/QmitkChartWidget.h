@@ -222,7 +222,7 @@ public:
                               const std::string& type,
                               const std::string& color,
                               const std::string& lineStyle,
-                              const std::string& pieLabelsData = 0);
+                              const std::string& pieLabelsData = {});
 
   /**
    * \brief Add a 2D data series to the chart.
@@ -259,7 +259,7 @@ public:
                            const std::string& type,
                            const std::string& color,
                            const std::string& style,
-                           const std::string& pieLabelsData = 0);
+                           const std::string& pieLabelsData = {});
 
   /**
    * \brief Remove a data series from the chart.

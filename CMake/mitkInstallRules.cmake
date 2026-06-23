@@ -52,6 +52,7 @@ foreach(_bindir _fwdir _depset IN ZIP_LISTS MITK_INSTALL_BINDIR MITK_INSTALL_FRA
       "^concrt[0-9]+"
       "^vcomp[0-9]+"
       "^ucrtbase"
+      "Qt[A-Z].*\\.framework"   # macOS: pre-exclude; unresolved @rpath Qt refs (e.g. VTK) are fatal before POST_EXCLUDE runs
     POST_EXCLUDE_REGEXES
       "[/\\\\][Ww][Ii][Nn][Dd][Oo][Ww][Ss][/\\\\]"
       "^/usr/lib"

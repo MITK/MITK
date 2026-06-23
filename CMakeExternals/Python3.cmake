@@ -52,9 +52,9 @@ if(MITK_USE_Python3)
     )
 
     if(WIN32)
-      set(python3_executable "python.exe")
+      set(python3_executable "<SOURCE_DIR>/python.exe")
     else()
-      set(python3_executable "bin/python3")
+      set(python3_executable "<SOURCE_DIR>/bin/python3")
     endif()
 
     if(OPENSSL_VERSION)
@@ -79,8 +79,8 @@ if(MITK_USE_Python3)
       )
     else()
       ExternalProject_Add_Step(${proj} pip
-        COMMAND ${python3_executable} -m pip install --no-warn-script-location --upgrade pip
-        COMMAND ${python3_executable} -m pip install --no-warn-script-location numpy~=2.3
+        COMMAND ${python3_executable} -s -m pip install --no-warn-script-location --upgrade pip
+        COMMAND ${python3_executable} -s -m pip install --no-warn-script-location numpy~=2.3
         DEPENDEES patch
         DEPENDERS configure
         WORKING_DIRECTORY "<SOURCE_DIR>"

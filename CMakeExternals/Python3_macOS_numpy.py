@@ -70,5 +70,5 @@ if not best_wheel:
     sys.exit(1)
 
 # Upgrade pip and install
-subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "--upgrade", "pip"])
-subprocess.check_call([sys.executable, "-m", "pip", "install", "--no-warn-script-location", best_wheel["url"]])
+subprocess.check_call([sys.executable, "-s", "-m", "pip", "install", "--no-warn-script-location", "--upgrade", "pip"])
+subprocess.check_call([sys.executable, "-s", "-m", "pip", "install", "--no-warn-script-location", best_wheel["url"]])

@@ -103,7 +103,7 @@ namespace mitk
    * \brief Build the public docs.mitk.org URL of the REST API specification for a
    *        given MITK version.
    *
-   * Released builds publish under \c /<major>.<minor>/ with the minor zero-padded
+   * Released builds publish under \c /\<major\>.\<minor\>/ with the minor zero-padded
    * to two digits (e.g. \c /2026.06/); development builds publish under
    * \c /nightly/. A patch level of 99 is MITK's development-build sentinel
    * (the top-level build appends the git revision to the version string in that

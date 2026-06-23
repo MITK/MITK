@@ -282,13 +282,13 @@ namespace mitk
     /**
      * \brief Callback type for taking a screenshot.
      *
-     * \param size Optional output size (width, height). Both dimensions must be
-     *             provided together; nullopt means native resolution.
-     * \param format Desired image encoding (Png or Jpeg).
+     * The callback receives an optional output size (width, height) -- both
+     * dimensions must be provided together; nullopt means native resolution --
+     * and the desired image encoding (Png or Jpeg). It returns the encoded
+     * image bytes and throws std::exception on failure.
+     *
      * \note Exceptions thrown by the callback are caught by the bridge and
      *       transported to the REST thread -- they never reach the UI event loop.
-     * \return Encoded image bytes.
-     * \throws std::exception on failure.
      */
     using ScreenshotProvider =
       std::function<std::vector<unsigned char>(

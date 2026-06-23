@@ -172,7 +172,7 @@ curl http://127.0.0.1:8080/api/v1/datastorage/nodes/{uid}
 
 <b>Important:</b> The REST API is intended for local development and trusted network environments.
 
-- By default, the server binds to <tt>::</tt> (the IPv6 wildcard, dual-stack). The default client-access mode (<tt>LocalhostOnly</tt>) still rejects requests whose remote address is not <tt>127.0.0.1</tt>, <tt>::1</tt>, or <tt>%::ffff:127.0.0.1</tt>, so even though the socket itself can accept off-host connections, only loopback clients are served.
+- By default, the server binds to <tt>::</tt> (the IPv6 wildcard, dual-stack). The default client-access mode (<tt>LocalhostOnly</tt>) still rejects requests whose remote address is not <tt>127.0.0.1</tt>, <tt>::1</tt>, or <tt>::%ffff:127.0.0.1</tt>, so even though the socket itself can accept off-host connections, only loopback clients are served.
 - If you change the host to <tt>0.0.0.0</tt>, the server becomes accessible from other machines on your network. Only do this in trusted environments.
 - There is currently no authentication. Any process that can reach the server can read and modify your data.
 - For production or untrusted environments, consider using a firewall or VPN.

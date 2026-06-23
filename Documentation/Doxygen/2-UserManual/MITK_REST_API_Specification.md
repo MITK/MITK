@@ -725,7 +725,6 @@ GET /api/v1/datastorage/nodes?hierarchy=toplevel&data_type=Image&filter.visible=
 }
 ```
 
----
 
 ##### POST /api/v1/datastorage/nodes
 
@@ -818,7 +817,6 @@ If some properties in the request could not be deserialized, the node is still c
 | 500 | `SERIALIZATION_ERROR` / `INTERNAL_ERROR` | Server error while creating the node |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | DataStorage not connected |
 
----
 
 ##### GET /api/v1/datastorage/nodes/{uid}
 
@@ -850,7 +848,6 @@ Get node system information.
 
 > **Note:** To retrieve node properties (except `name`), use `GET /api/v1/datastorage/nodes/{uid}/properties`.
 
----
 
 ##### PATCH /api/v1/datastorage/nodes/{uid}
 
@@ -895,7 +892,6 @@ Content-Type: application/json
 | 500 | `INTERNAL_ERROR` | Unexpected server error |
 | 503 | `DATASTORAGE_NOT_AVAILABLE` | No DataStorage is currently connected |
 
----
 
 ##### DELETE /api/v1/datastorage/nodes/{uid}
 
@@ -935,7 +931,6 @@ DELETE /api/v1/datastorage/nodes/node-001?recursive=true
 }
 ```
 
----
 
 #### 8.2.2 Node Data Payload {#sec-822-node-data-payload}
 
@@ -976,7 +971,6 @@ X-MITK-Transfer-Mode: file-reference
 
 **Response:** See [Section 7.3](#sec-73-mode-file-reference)
 
----
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/data
 
@@ -1052,7 +1046,6 @@ Content-Disposition: attachment; filename="ct_updated.nrrd"
 
 > **Error 415:** Requests with missing or unsupported `Content-Type` header will receive a 415 Unsupported Media Type response. Use `application/json` for file-reference mode or `application/octet-stream` for direct transfer mode.
 
----
 
 #### 8.2.3 Node Children {#sec-823-node-children}
 
@@ -1105,7 +1098,6 @@ Same pagination fields as `GET /datastorage/nodes` (including `links` with `prev
 |-------|------|-------------|
 | `parent_uid` | string | UID of the parent node |
 
----
 
 ##### POST /api/v1/datastorage/nodes/{uid}/children
 
@@ -1152,7 +1144,6 @@ Content-Type: application/json
 
 > **Content-Type:** Use `application/json` for file-reference mode (JSON body with optional `transfer.file_path`) or `application/octet-stream` for direct transfer mode (binary body). Requests with unsupported Content-Type values will receive a 415 Unsupported Media Type response. Omitting Content-Type entirely creates a child node with default values only (no data, auto-generated name).
 
----
 
 #### 8.2.4 Node Properties {#sec-824-node-properties}
 
@@ -1281,7 +1272,6 @@ GET /api/v1/datastorage/nodes/node-001/properties?names=visible,opacity,color
 GET /api/v1/datastorage/nodes/node-001/properties?context=stdmulti.widget0&property_scope=node
 ```
 
----
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties
 
@@ -1335,7 +1325,6 @@ Content-Type: application/json
 
 > **Warning:** `PUT` replaces all properties in the specified scope. Properties not included in the request will be removed (except protected system properties). Use `PATCH` for partial updates.
 
----
 
 ##### PATCH /api/v1/datastorage/nodes/{uid}/properties
 
@@ -1404,7 +1393,6 @@ Content-Type: application/json
 }
 ```
 
----
 
 ##### GET /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
@@ -1463,7 +1451,6 @@ Get a single property value.
 | `property_scope` | string | The scope used for property lookup (`all`, `node`, `data`) |
 | `context` | string/null | The context used for property lookup (null for default) |
 
----
 
 ##### PUT /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 
@@ -1519,7 +1506,6 @@ Content-Type: application/json
 | `property_key` | string | Name of the property that was set |
 | `replaced` | boolean | `true` if an existing property was replaced, `false` if a new property was created |
 
----
 
 ##### DELETE /api/v1/datastorage/nodes/{uid}/properties/{property_key}
 

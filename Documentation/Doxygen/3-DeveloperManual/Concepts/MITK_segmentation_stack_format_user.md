@@ -80,7 +80,7 @@ Each label includes visual and semantic metadata, and optionally its own image f
 ```
 
 | Key           | Import/ Export | Suggestion | Preset |Description                                            |
-|----------------|----------|--------------------------------------------------------|
+|----------------|----------------|------------|--------|--------------------------------------------------------|
 | `name`         | ✅ | ✅ | ✅ | Label name. When stored as DICOM this will be mapped into the tag `Segment Label (0062,0005)` |
 | `value`        | ✅ | ⭕ | ✅ | Unique label value (*it has to be unique for the whole segmentation not just the group!*) |
 | `color`        | ⭕ | ⭕ | ⭕ | Controls UI color — RGB values `[r, g, b]` If encoded as unsigned int, the value range per channel is 0–255. If encoded as float, the value range per channel is 0.0–1.0. Default is [1.,1.,1.] if not set. When stored as DICOM this will be mapped into the tag `Recommended Display CIELab Value (0062,000D)` |

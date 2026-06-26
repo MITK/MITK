@@ -218,19 +218,8 @@ bool RestServer::Start()
     m_Server->set_payload_max_length(
       static_cast<size_t>(m_PendingConfig.maxPayloadSizeMB) * 1024 * 1024);
 
-    // Bind to the port synchronously so failures (port already in use, permission
-    // denied) are detected here and reported before the server thread is launched.
-    // listen_after_bind() is called from ServerThreadFunc once the thread starts.
-    if (!m_Server->bind_to_port(m_PendingConfig.host, m_PendingConfig.port))
-    {
-      m_LastError = "Port " + std::to_string(m_PendingConfig.port) +
-                    " on " + SanitizeForLog(m_PendingConfig.host) +
-                    " is already in use or cannot be bound";
-      MITK_ERROR << *m_LastError;
-      return false;
-    }
-
-    // Setup temp directory for data serialization
+    // Setup temp directory for data serialization. Done before bind_to_port() so a
+    // failure here returns without a bound socket (see the bind_to_port() comment below).
     if (!this->SetupTempDirectory())
     {
       m_LastError = "Failed to create temporary directory for data operations";
@@ -279,6 +268,29 @@ bool RestServer::Start()
                    "in this application.";
     }
 
+    // Bind to the port synchronously so failures (port already in use, permission
+    // denied) are detected and reported here, before the server thread is launched;
+    // listen_after_bind() then runs on the thread in ServerThreadFunc.
+    //
+    // Bind is intentionally the last fallible step. httplib offers no way to close a
+    // socket that was bound but never entered its listen loop (~Server is defaulted
+    // and stop() is a no-op until is_running_), so any failure between bind and the
+    // running listen loop leaks the bound socket: the catch block's m_Server.reset()
+    // cannot close it either. Doing all other setup first shrinks this window to two
+    // residual throws -- copying the running config (std::bad_alloc) and launching the
+    // server thread (std::system_error) -- both extremely unlikely but not impossible.
+    if (!m_Server->bind_to_port(m_PendingConfig.host, m_PendingConfig.port))
+    {
+      m_LastError = "Port " + std::to_string(m_PendingConfig.port) +
+                    " on " + SanitizeForLog(m_PendingConfig.host) +
+                    " is already in use or cannot be bound";
+      MITK_ERROR << *m_LastError;
+      // The temp directory was created above; drop it so a failed bind does not orphan it.
+      this->CleanupTempDirectory(m_TempDirectory);
+      m_TempDirectory.clear();
+      return false;
+    }
+
     // Record start time for uptime tracking
     m_StartTime = std::chrono::steady_clock::now();
 
@@ -322,6 +334,8 @@ bool RestServer::Start()
 
       m_LastError = "Server listen failed after successful port bind";
       MITK_ERROR << *m_LastError;
+      this->CleanupTempDirectory(m_TempDirectory);
+      m_TempDirectory.clear();
       return false;
     }
 
@@ -336,6 +350,10 @@ bool RestServer::Start()
     m_LastError = std::string("Failed to start server: ") + e.what();
     m_Running = false;
     m_RunningConfig = std::nullopt;
+    m_StartTime = std::nullopt;
+    m_Server.reset();
+    this->CleanupTempDirectory(m_TempDirectory);
+    m_TempDirectory.clear();
     MITK_ERROR << *m_LastError;
     return false;
   }

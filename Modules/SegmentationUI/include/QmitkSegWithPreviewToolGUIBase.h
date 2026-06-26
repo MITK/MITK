@@ -22,6 +22,7 @@ found in the LICENSE file.
 class QCheckBox;
 class QPushButton;
 class QBoxLayout;
+class QSlider;
 
 /**
   \brief GUI base class for tools derived from mitk::SegWithPreviewTool.
@@ -48,6 +49,8 @@ protected slots:
   void OnNewToolAssociated(mitk::Tool *);
 
   void OnAcceptPreview();
+
+  void OnPreviewOpacityChanged(int value);
 
 protected:
   /**
@@ -97,6 +100,7 @@ private:
   QCheckBox* m_CheckIgnoreLocks = nullptr;
   QCheckBox* m_CheckMerge = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
+  QSlider* m_PreviewOpacitySlider = nullptr;
   QPushButton* m_ConfirmSegBtn = nullptr;
   QBoxLayout* m_MainLayout = nullptr;
 

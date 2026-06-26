@@ -192,6 +192,11 @@ namespace mitk
     const MultiLabelSegmentation* GetPreviewSegmentation() const;
     DataNode* GetPreviewSegmentationNode();
 
+    /** Sets the opacity (0.0 - 1.0) used to render the preview
+        segmentation. The value persists across preview regenerations. */
+    void SetPreviewOpacity(float opacity);
+    itkGetConstMacro(PreviewOpacity, float);
+
   protected:
     ToolCommand::Pointer m_ProgressCommand;
 
@@ -385,6 +390,12 @@ namespace mitk
     LabelTransferMode m_LabelTransferMode = LabelTransferMode::MapLabel;
 
     bool m_IsPreviewGenerated = false;
+
+    /** Opacity (0.0 - 1.0) used when rendering the preview segmentation.
+     * Kept as tool state so a user-defined value survives the opacity
+     * reset that happens whenever the preview node is regenerated
+     * (see ResetPreviewNode).*/
+    float m_PreviewOpacity = 1.0f / 3.0f;
 
     /** This variable tracks if there should be a user-confirmation before a tool is deactivated or not.
      * Call RequestDeactivationConfirmationOn() in the tool class to avail this feature.

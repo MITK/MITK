@@ -74,16 +74,16 @@ QmitkPipInstallAdvancedDialog::QmitkPipInstallAdvancedDialog(const mitk::PipInst
   mainLayout->addWidget(addGroupButton);
   connect(addGroupButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnAddGroup);
 
-  // --- Hugging Face Downloads section ---
+  // --- Post-install steps section ---
 
-  mainLayout->addWidget(new QLabel("<b>Hugging Face Downloads</b>"));
+  mainLayout->addWidget(new QLabel("<b>Post-install Steps</b>"));
 
-  m_DownloadsLayout = new QVBoxLayout;
-  mainLayout->addLayout(m_DownloadsLayout);
+  m_StepsLayout = new QVBoxLayout;
+  mainLayout->addLayout(m_StepsLayout);
 
-  auto* addDownloadButton = new QPushButton("Add Hugging Face Download");
-  mainLayout->addWidget(addDownloadButton);
-  connect(addDownloadButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnAddDownload);
+  auto* addStepButton = new QPushButton("Add Post-install Step");
+  mainLayout->addWidget(addStepButton);
+  connect(addStepButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnAddStep);
 
   mainLayout->addStretch();
 
@@ -148,24 +148,15 @@ mitk::PipInstallSpec QmitkPipInstallAdvancedDialog::GetInstallSpec() const
     spec.groups.push_back(std::move(group));
   }
 
-  for (const auto& widgets : m_DownloadWidgets)
+  for (const auto& widgets : m_StepWidgets)
   {
-    mitk::HuggingFaceDownload download;
+    mitk::PostInstallStep step;
 
-    download.displayName = widgets.displayName->text().trimmed().toStdString();
-    download.repoId = widgets.repoId->text().trimmed().toStdString();
+    step.displayName = widgets.displayName->text().trimmed().toStdString();
+    step.pythonCode = widgets.pythonCode->toPlainText().toStdString();
+    step.optional = widgets.optionalCheckBox->isChecked();
 
-    auto lines = widgets.allowPatterns->toPlainText().split('\n', Qt::SkipEmptyParts);
-    for (const auto& line : lines)
-    {
-      const auto trimmed = line.trimmed();
-      if (!trimmed.isEmpty())
-        download.allowPatterns.push_back(trimmed.toStdString());
-    }
-
-    download.optional = widgets.optionalCheckBox->isChecked();
-
-    spec.huggingFaceDownloads.push_back(std::move(download));
+    spec.postInstallSteps.push_back(std::move(step));
   }
 
   return spec;
@@ -216,46 +207,36 @@ QGroupBox* QmitkPipInstallAdvancedDialog::CreateGroupWidget(const mitk::PipInsta
   return groupBox;
 }
 
-QGroupBox* QmitkPipInstallAdvancedDialog::CreateDownloadWidget(const mitk::HuggingFaceDownload& download, int index)
+QGroupBox* QmitkPipInstallAdvancedDialog::CreateStepWidget(const mitk::PostInstallStep& step, int index)
 {
-  auto* groupBox = new QGroupBox(QString("Hugging Face Download %1").arg(index + 1));
+  auto* groupBox = new QGroupBox(QString("Post-install Step %1").arg(index + 1));
   auto* layout = new QVBoxLayout(groupBox);
   auto* formLayout = new QFormLayout;
 
   auto* displayName = new QLineEdit;
-  displayName->setPlaceholderText("Optional label (falls back to repository ID)");
-  displayName->setText(QString::fromStdString(download.displayName));
+  displayName->setPlaceholderText("Label shown in the installer UI");
+  displayName->setText(QString::fromStdString(step.displayName));
   formLayout->addRow("Display name:", displayName);
 
-  auto* repoId = new QLineEdit;
-  repoId->setPlaceholderText("e.g. owner/repository");
-  repoId->setText(QString::fromStdString(download.repoId));
-  formLayout->addRow("Repository ID:", repoId);
-
-  auto* allowPatterns = new QPlainTextEdit;
-  allowPatterns->setTabChangesFocus(true);
-  allowPatterns->setMinimumHeight(60);
-  allowPatterns->setPlaceholderText("One pattern per line, leave empty to download the whole repository");
-
-  QStringList patternLines;
-  for (const auto& p : download.allowPatterns)
-    patternLines.append(QString::fromStdString(p));
-  allowPatterns->setPlainText(patternLines.join('\n'));
-
-  formLayout->addRow("Allow patterns:", allowPatterns);
+  auto* pythonCode = new QPlainTextEdit;
+  pythonCode->setTabChangesFocus(true);
+  pythonCode->setMinimumHeight(60);
+  pythonCode->setPlaceholderText("Python source run via `python -c` in the virtual environment");
+  pythonCode->setPlainText(QString::fromStdString(step.pythonCode));
+  formLayout->addRow("Python code:", pythonCode);
 
   auto* optionalCheckBox = new QCheckBox("Optional (failure does not block installation)");
-  optionalCheckBox->setChecked(download.optional);
+  optionalCheckBox->setChecked(step.optional);
   formLayout->addRow("", optionalCheckBox);
 
   layout->addLayout(formLayout);
 
   auto* removeButton = new QPushButton("Remove");
   layout->addWidget(removeButton, 0, Qt::AlignRight);
-  connect(removeButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnRemoveDownload);
+  connect(removeButton, &QPushButton::clicked, this, &QmitkPipInstallAdvancedDialog::OnRemoveStep);
 
-  m_DownloadWidgets.push_back({ displayName, repoId, allowPatterns, optionalCheckBox });
-  m_DownloadBoxes.push_back(groupBox);
+  m_StepWidgets.push_back({ displayName, pythonCode, optionalCheckBox });
+  m_StepBoxes.push_back(groupBox);
 
   return groupBox;
 }
@@ -266,10 +247,10 @@ void QmitkPipInstallAdvancedDialog::RenumberGroupTitles()
     m_GroupBoxes[i]->setTitle(QString("Install Group %1").arg(i + 1));
 }
 
-void QmitkPipInstallAdvancedDialog::RenumberDownloadTitles()
+void QmitkPipInstallAdvancedDialog::RenumberStepTitles()
 {
-  for (int i = 0; i < static_cast<int>(m_DownloadBoxes.size()); ++i)
-    m_DownloadBoxes[i]->setTitle(QString("Hugging Face Download %1").arg(i + 1));
+  for (int i = 0; i < static_cast<int>(m_StepBoxes.size()); ++i)
+    m_StepBoxes[i]->setTitle(QString("Post-install Step %1").arg(i + 1));
 }
 
 void QmitkPipInstallAdvancedDialog::RebuildFromSpec(const mitk::PipInstallSpec& spec)
@@ -281,12 +262,12 @@ void QmitkPipInstallAdvancedDialog::RebuildFromSpec(const mitk::PipInstallSpec& 
   m_GroupWidgets.clear();
   m_GroupBoxes.clear();
 
-  // Clear existing downloads.
-  for (auto* box : m_DownloadBoxes)
+  // Clear existing post-install steps.
+  for (auto* box : m_StepBoxes)
     delete box;
 
-  m_DownloadWidgets.clear();
-  m_DownloadBoxes.clear();
+  m_StepWidgets.clear();
+  m_StepBoxes.clear();
 
   // Populate general fields.
   m_NameEdit->setText(QString::fromStdString(spec.name));
@@ -297,9 +278,9 @@ void QmitkPipInstallAdvancedDialog::RebuildFromSpec(const mitk::PipInstallSpec& 
   for (int i = 0; i < static_cast<int>(spec.groups.size()); ++i)
     m_GroupsLayout->addWidget(this->CreateGroupWidget(spec.groups[i], i));
 
-  // Populate downloads.
-  for (int i = 0; i < static_cast<int>(spec.huggingFaceDownloads.size()); ++i)
-    m_DownloadsLayout->addWidget(this->CreateDownloadWidget(spec.huggingFaceDownloads[i], i));
+  // Populate post-install steps.
+  for (int i = 0; i < static_cast<int>(spec.postInstallSteps.size()); ++i)
+    m_StepsLayout->addWidget(this->CreateStepWidget(spec.postInstallSteps[i], i));
 }
 
 void QmitkPipInstallAdvancedDialog::OnAddGroup()
@@ -332,13 +313,13 @@ void QmitkPipInstallAdvancedDialog::OnRemoveGroup()
   this->RenumberGroupTitles();
 }
 
-void QmitkPipInstallAdvancedDialog::OnAddDownload()
+void QmitkPipInstallAdvancedDialog::OnAddStep()
 {
-  const int index = static_cast<int>(m_DownloadBoxes.size());
-  m_DownloadsLayout->addWidget(this->CreateDownloadWidget(mitk::HuggingFaceDownload(), index));
+  const int index = static_cast<int>(m_StepBoxes.size());
+  m_StepsLayout->addWidget(this->CreateStepWidget(mitk::PostInstallStep(), index));
 }
 
-void QmitkPipInstallAdvancedDialog::OnRemoveDownload()
+void QmitkPipInstallAdvancedDialog::OnRemoveStep()
 {
   auto* button = qobject_cast<QPushButton*>(sender());
   if (!button)
@@ -348,17 +329,17 @@ void QmitkPipInstallAdvancedDialog::OnRemoveDownload()
   if (!groupBox)
     return;
 
-  auto it = std::find(m_DownloadBoxes.begin(), m_DownloadBoxes.end(), groupBox);
-  if (it == m_DownloadBoxes.end())
+  auto it = std::find(m_StepBoxes.begin(), m_StepBoxes.end(), groupBox);
+  if (it == m_StepBoxes.end())
     return;
 
-  int index = static_cast<int>(std::distance(m_DownloadBoxes.begin(), it));
+  int index = static_cast<int>(std::distance(m_StepBoxes.begin(), it));
 
-  m_DownloadBoxes.erase(m_DownloadBoxes.begin() + index);
-  m_DownloadWidgets.erase(m_DownloadWidgets.begin() + index);
+  m_StepBoxes.erase(m_StepBoxes.begin() + index);
+  m_StepWidgets.erase(m_StepWidgets.begin() + index);
   delete groupBox;
 
-  this->RenumberDownloadTitles();
+  this->RenumberStepTitles();
 }
 
 void QmitkPipInstallAdvancedDialog::OnLoadSpec()

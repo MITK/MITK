@@ -52,7 +52,7 @@ namespace mitk
      * too-old package left behind in a reused virtual environment (see
      * CheckInstalledVersion()). Keep in sync with the install requirement.
      */
-    inline constexpr const char* MINIMUM_VERSION = "2.4.0";
+    inline constexpr const char* MINIMUM_VERSION = "2.5.0";
 
     /** \brief Exclusive upper bound on the supported nnInteractive version
      *         (the next major release is assumed to break compatibility).
@@ -83,13 +83,20 @@ namespace mitk
      * \param[in] context An activated Python context bound to the nnInteractive
      *                    virtual environment.
      * \param[in] checkForUpdate Whether to query PyPI for a newer release.
+     * \param[in] distributionName The installed pip distribution to query. The full
+     *                    install registers the distribution "nnInteractive"; a
+     *                    client-only install registers "nninteractive-client". The
+     *                    shared "nnInteractive" import namespace is the same for both,
+     *                    so the distribution name (not the import name) must be used
+     *                    here for importlib.metadata and the PyPI lookup. Only
+     *                    C++-controlled literals are ever passed.
      *
      * \return A VersionCheckResult; Status is Unknown when the installed version
      *         could not be read (the caller should then not block or nag).
      *
      * \sa VersionStatus
      */
-    MITKPYTHONSEGMENTATION_EXPORT VersionCheckResult CheckInstalledVersion(PythonContext& context, bool checkForUpdate = true);
+    MITKPYTHONSEGMENTATION_EXPORT VersionCheckResult CheckInstalledVersion(PythonContext& context, bool checkForUpdate = true, const std::string& distributionName = "nnInteractive");
 
     /** \brief Convenience overload for callers without a Python context.
      *
@@ -99,12 +106,15 @@ namespace mitk
      * interpreter fails to initialize), the result Status is Unknown.
      *
      * \param[in] checkForUpdate Whether to query PyPI for a newer release.
+     * \param[in] distributionName The installed pip distribution to query
+     *                    ("nnInteractive" for a full install, "nninteractive-client"
+     *                    for a client-only install).
      *
      * \return A VersionCheckResult (see the context-taking overload).
      *
-     * \sa CheckInstalledVersion(PythonContext&, bool)
+     * \sa CheckInstalledVersion(PythonContext&, bool, const std::string&)
      */
-    MITKPYTHONSEGMENTATION_EXPORT VersionCheckResult CheckInstalledVersion(bool checkForUpdate = true);
+    MITKPYTHONSEGMENTATION_EXPORT VersionCheckResult CheckInstalledVersion(bool checkForUpdate = true, const std::string& distributionName = "nnInteractive");
   }
 }
 

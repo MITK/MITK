@@ -31,6 +31,11 @@ class QButtonGroup;
 class QPushButton;
 class QTimer;
 
+namespace mitk::nnInteractive
+{
+  struct VersionCheckResult;
+}
+
 namespace Ui
 {
   class QmitknnInteractiveToolGUI;
@@ -349,6 +354,43 @@ private:
    * checked state.
    */
   void UncheckInitializeButton();
+
+  /** \brief Offers an in-place update when the installed version is below the
+   *         minimum or a newer release is available.
+   *
+   * Replaces the former "uninstall and reinitialize" guidance. Runs the pip
+   * upgrade through QmitkPipInstallDialog in update mode. An in-place update is
+   * refused (with a restart hint) while nnInteractive modules are loaded into the
+   * process, because pip cannot replace mapped binaries on Windows.
+   *
+   * \param[in] versionCheck The version-check result that triggered the offer.
+   * \param[in] clientOnly Whether this is a client-only install (upgrades
+   *                       nninteractive-client instead of nnInteractive).
+   * \param[in] belowMinimum \c true for the BelowMinimum case (update is required
+   *                         to continue), \c false for an optional UpdateAvailable.
+   *
+   * \return \c true if initialization should proceed (updated successfully, or the
+   *         user chose to continue with the installed version), \c false to abort.
+   */
+  bool OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly, bool belowMinimum);
+
+  /** \brief Runs the pip upgrade dialog and recreates the Python context.
+   *
+   * \param[in] clientOnly Whether to upgrade nninteractive-client (vs nnInteractive).
+   * \return \c true if the update completed and the context was recreated.
+   */
+  bool RunUpdate(bool clientOnly);
+
+  /** \brief Once per run, offers to switch to a newer recommended model checkpoint.
+   *
+   * No-op unless local inference is available and the configured model source is
+   * the managed (Hugging Face) source in local mode. Compares the configured model
+   * id against the library's recommended default and, when they differ, offers to
+   * update the \c nnInteractive/modelCheckpoint preference.
+   *
+   * \param[in] localAvailable Whether local inference is available (full install).
+   */
+  void MaybePromptModelSwitch(bool localAvailable);
 
   struct ShortcutLabel
   {

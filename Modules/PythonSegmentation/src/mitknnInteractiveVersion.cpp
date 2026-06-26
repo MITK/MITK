@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <sstream>
 
-mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(PythonContext& context, bool checkForUpdate)
+mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(PythonContext& context, bool checkForUpdate, const std::string& distributionName)
 {
   VersionCheckResult result;
 
@@ -37,7 +37,7 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
     << "try:\n"
     << "    from importlib.metadata import version\n"
     << "    from packaging.version import Version\n"
-    << "    nni_installed = version('nnInteractive')\n"
+    << "    nni_installed = version('" << distributionName << "')\n"
     << "    nni_below_min = Version(nni_installed) < Version('" << MINIMUM_VERSION << "')\n";
 
   if (checkForUpdate)
@@ -47,7 +47,7 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
       << "        try:\n"
       << "            from packaging.specifiers import SpecifierSet\n"
       << "            import urllib.request, json\n"
-      << "            with urllib.request.urlopen('https://pypi.org/pypi/nnInteractive/json', timeout=5) as _r:\n"
+      << "            with urllib.request.urlopen('https://pypi.org/pypi/" << distributionName << "/json', timeout=5) as _r:\n"
       << "                _data = json.load(_r)\n"
       << "            _spec = SpecifierSet('" << spec << "')\n"
       // Consider only releases with installable, non-yanked files. PyPI's
@@ -94,14 +94,14 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
   return result;
 }
 
-mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(bool checkForUpdate)
+mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(bool checkForUpdate, const std::string& distributionName)
 {
   try
   {
     PythonContext context("nnInteractive");
     context.Activate();
 
-    return CheckInstalledVersion(context, checkForUpdate);
+    return CheckInstalledVersion(context, checkForUpdate, distributionName);
   }
   catch (const Exception& e)
   {

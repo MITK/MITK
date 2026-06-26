@@ -309,6 +309,21 @@ namespace mitk
      */
     bool IsInstalled() const;
 
+    /** \brief Checks whether local (in-process) inference is available.
+     *
+     * The full nnInteractive package provides local inference; the lightweight
+     * client-only distribution (nninteractive-client) provides remote sessions
+     * only and shares the same "nnInteractive" import namespace. This probes for
+     * the local inference module via importlib without importing PyTorch, so it
+     * stays cheap and never fails on a torch-free client-only install.
+     *
+     * \pre A Python context must have been created via CreatePythonContext().
+     *
+     * \return \c true if local inference is available (full install), \c false for
+     *         a client-only install.
+     */
+    bool IsLocalInferenceAvailable() const;
+
     /** \brief Queries CUDA device information via PyTorch.
      *
      * Checks for CUDA availability and retrieves device properties from the

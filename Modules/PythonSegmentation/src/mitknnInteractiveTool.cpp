@@ -712,6 +712,18 @@ bool mitk::nnInteractiveTool::IsInstalled() const
   return pythonContext->GetVariableAsBool("is_installed").value_or(false);
 }
 
+bool mitk::nnInteractiveTool::IsLocalInferenceAvailable() const
+{
+  std::ostringstream pyCommands; pyCommands
+    << "import importlib.util\n"
+    << "is_local_available = importlib.util.find_spec('nnInteractive.inference.inference_session') is not None\n";
+
+  auto pythonContext = m_Impl->GetPythonContext();
+  pythonContext->Execute(pyCommands.str());
+
+  return pythonContext->GetVariableAsBool("is_local_available").value_or(false);
+}
+
 bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
 {
   auto prefs = GetPreferences();
@@ -791,7 +803,7 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
 
   if (serverUrl.empty())
     mitkThrow() << "Remote mode is selected but no server URL is configured. "
-                   "Set it in Preferences -> Segmentation -> nnInteractive.";
+                   "Click on Settings to configure a server URL.";
 
   m_Impl->ResetBackend();
 
@@ -837,7 +849,7 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
       << "                             'check the server URL and NO_PROXY.')\n"
       << "except ImportError:\n"
       << "    nni_connect_error = ('The installed nnInteractive does not support remote mode. '\n"
-      << "                         'Reinstall or upgrade nnInteractive (remote mode requires v2.3.2 or newer).')\n"
+      << "                         'Reinstall or upgrade nnInteractive.')\n"
       << "finally:\n"
       << "    del nni_api_key\n";
     pythonContext->Execute(pyCommands.str());
@@ -895,6 +907,15 @@ void mitk::nnInteractiveTool::ConstructRemoteSession()
 void mitk::nnInteractiveTool::ConstructLocalSession()
 {
   auto pythonContext = m_Impl->GetPythonContext();
+
+  // A client-only install (nninteractive-client) has no local inference backend
+  // and no PyTorch. Fail fast with an actionable message instead of letting the
+  // torch import below raise a raw traceback.
+  if (!this->IsLocalInferenceAvailable())
+    mitkThrow() << "This is a client-only nnInteractive installation, which supports remote "
+                   "sessions only. Select Remote in Preferences -> Segmentation -> nnInteractive, "
+                   "or uninstall and reinitialize in Full mode to enable local inference.";
+
   bool useCUDADevice = false;
 
   auto prefs = GetPreferences();
@@ -953,7 +974,8 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
       << "from pathlib import Path\n"
       << "from nnunetv2.utilities.find_class_by_name import recursive_find_python_class\n"
       << "from batchgenerators.utilities.file_and_folder_operations import join, load_json\n"
-      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n";
+      << "print(f'nnInteractive version: {version(\"nnInteractive\")}')\n"
+      << "nni_model_error = ''\n";
 
     if (modelSource == "local")
     {
@@ -971,22 +993,41 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
     }
     else
     {
-      const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "nnInteractive_v1.0");
+      // Discover and (if needed) download the checkpoint through nnInteractive's
+      // model-management API. ensure_model_available is idempotent and works
+      // offline once a checkpoint has been downloaded, so it also serves as the
+      // fallback when the install-time pre-download was skipped or failed. An
+      // empty preference means "use the library's recommended default". Failures
+      // are mapped to a clean, user-facing message instead of a raw traceback.
+      const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
 
       pyCommands
-        << "from huggingface_hub import snapshot_download\n"
-        << "print('Model source: Hugging Face')\n"
-        << "print('Model checkpoint: " << modelCheckpoint << "')\n"
-        << "repo_id = 'nnInteractive/nnInteractive'\n"
-        << "download_path = snapshot_download(\n"
-        << "    repo_id = repo_id,\n"
-        << "    allow_patterns = ['" << modelCheckpoint << "/*'],\n"
-        << "    force_download = False\n"
-        << ")\n"
-        << "checkpoint_path = Path(download_path).joinpath('" << modelCheckpoint << "')\n";
+        << "print('Model source: managed (nnInteractive model management)')\n"
+        << "try:\n"
+        << "    from nnInteractive.model_management import ensure_model_available, get_default_model_id\n";
+
+      if (modelCheckpoint.empty())
+        pyCommands << "    nni_model_id = get_default_model_id()\n";
+      else
+        pyCommands << "    nni_model_id = " << PyQuote(modelCheckpoint) << "\n";
+
+      pyCommands
+        << "    print(f'Model checkpoint: {nni_model_id}')\n"
+        << "    checkpoint_path = Path(ensure_model_available(nni_model_id))\n"
+        << "except ImportError:\n"
+        << "    nni_model_error = ('The installed nnInteractive does not provide model management. '\n"
+        << "                       'Upgrade nnInteractive to v2.5.0 or newer.')\n"
+        << "except Exception as _nni_model_e:\n"
+        << "    nni_model_error = ('Could not obtain the nnInteractive model checkpoint. Check your '\n"
+        << "                       'internet connection, or set a local checkpoint folder in '\n"
+        << "                       f'Preferences -> Segmentation -> nnInteractive. ({_nni_model_e})')\n";
     }
 
     pythonContext->Execute(pyCommands.str());
+
+    const auto modelError = pythonContext->GetVariableAsString("nni_model_error").value_or("");
+    if (!modelError.empty())
+      mitkThrow() << modelError;
   }
 
   {
@@ -1000,13 +1041,27 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
   }
 
   {
+    // Resolve the inference session class. nnInteractive 2.5.0 carries this in
+    // 'inference_info.json'; older checkpoints use the legacy
+    // 'inference_session_class.json'. Prefer the new file when it actually names
+    // a class, fall back to the legacy file, then to the default class (correct
+    // for the official checkpoints). Either file may hold a bare string or a
+    // dict with an 'inference_class' key.
     std::ostringstream pyCommands; pyCommands
-      << "if Path(checkpoint_path).joinpath('inference_session_class.json').is_file():\n"
-      << "    inference_class = load_json(\n"
-      << "        Path(checkpoint_path).joinpath('inference_session_class.json'))\n"
-      << "    if isinstance (inference_class, dict):\n"
-      << "        inference_class = inference_class['inference_class']\n"
-      << "else:\n"
+      << "inference_class = None\n"
+      << "_nni_info = Path(checkpoint_path).joinpath('inference_info.json')\n"
+      << "if _nni_info.is_file():\n"
+      << "    _nni_data = load_json(_nni_info)\n"
+      << "    if isinstance(_nni_data, dict):\n"
+      << "        inference_class = _nni_data.get('inference_class')\n"
+      << "    elif isinstance(_nni_data, str):\n"
+      << "        inference_class = _nni_data\n"
+      << "if inference_class is None:\n"
+      << "    _nni_legacy = Path(checkpoint_path).joinpath('inference_session_class.json')\n"
+      << "    if _nni_legacy.is_file():\n"
+      << "        _nni_data = load_json(_nni_legacy)\n"
+      << "        inference_class = _nni_data['inference_class'] if isinstance(_nni_data, dict) else _nni_data\n"
+      << "if inference_class is None:\n"
       << "    inference_class = 'nnInteractiveInferenceSession'\n"
       << "inference_class = recursive_find_python_class(\n"
       << "    join(nnInteractive.__path__[0], 'inference'),\n"

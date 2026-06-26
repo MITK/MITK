@@ -18,12 +18,14 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
 #include <mitknnInteractiveInteractor.h>
+#include <mitknnInteractiveModel.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
 #include <mitkToolManagerProvider.h>
 
 #include <QmitkMultiLabelInspector.h>
+#include <QmitknnInteractiveInstallModeDialog.h>
 #include <QmitkPipInstallDialog.h>
 #include <mitkPipPackageInfo.h>
 #include <QmitkStyleManager.h>
@@ -31,10 +33,14 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
+#include <QCoreApplication>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QTimer>
 #include <QWidget>
+
+#include <string>
+#include <unordered_set>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -138,6 +144,139 @@ namespace
 
     auto button = QMessageBox::question(nullptr, "nnInteractive", message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     return button == QMessageBox::Yes;
+  }
+
+  // Settings baked into a session at initialization. Changing any of these while a
+  // session runs makes it stale, so the GUI ends the session (see
+  // OnPreferenceChangedEvent). Live or GUI-only settings (auto-zoom, auto-refine,
+  // automation, shortcut labels, installMode) are deliberately excluded.
+  bool IsSessionDefiningPreference(const std::string& key)
+  {
+    static const std::unordered_set<std::string> keys = {
+      "nnInteractive/inferenceMode",
+      "nnInteractive/serverUrl",
+      "nnInteractive/apiKey",
+      "nnInteractive/modelSource",
+      "nnInteractive/modelCheckpoint",
+      "nnInteractive/localModelPath",
+      "nnInteractive/backend",
+      "nnInteractive/gpuBackend",
+      "nnInteractive/useTorchCompile",
+      "nnInteractive/interactionsStorage",
+    };
+
+    return keys.find(key) != keys.end();
+  }
+
+  std::string nnInteractiveVersionRange()
+  {
+    return std::string(">=") + mitk::nnInteractive::MINIMUM_VERSION
+      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE;
+  }
+
+  // Builds the pip install spec for a fresh install. Full mode installs PyTorch and
+  // nnInteractive and pre-downloads the model checkpoint; client-only mode installs
+  // just the lightweight, torch-free nninteractive-client.
+  mitk::PipInstallSpec BuildInstallSpec(mitk::IPreferences* prefs, const std::string& venvName, bool clientOnly)
+  {
+    mitk::PipInstallSpec spec;
+    spec.name = "nnInteractive";
+    spec.venvName = venvName;
+    spec.upgradePipFirst = true;
+
+    const auto versionRange = nnInteractiveVersionRange();
+
+    if (clientOnly)
+    {
+      mitk::PipInstallGroup clientGroup;
+      clientGroup.requirements = { "nninteractive-client" + versionRange };
+      spec.groups.push_back(std::move(clientGroup));
+      return spec;
+    }
+
+    // PyTorch needs a CUDA-specific index URL on Windows; other platforms use the
+    // default PyPI index. (cu128: with CUDA 12.9 our lowest supported GPU arch
+    // hits "no kernel image is available".)
+#if defined(_WIN32)
+    const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
+#else
+    const std::string cudaIndexUrl;
+#endif
+
+    mitk::PipInstallGroup torchGroup;
+    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+    torchGroup.indexUrl = cudaIndexUrl;
+    spec.groups.push_back(std::move(torchGroup));
+
+    mitk::PipInstallGroup nnInteractiveGroup;
+    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
+    spec.groups.push_back(std::move(nnInteractiveGroup));
+
+    // Pre-download the model checkpoint via nnInteractive's model management so the
+    // first local StartSession() does not surprise the user with a silent
+    // multi-minute download. Skipped when a local checkpoint folder is configured.
+    // Optional: a failure here is non-fatal, since ConstructLocalSession() calls
+    // ensure_model_available() again as a fallback.
+    if (prefs != nullptr && prefs->Get("nnInteractive/modelSource", "huggingface") != "local")
+    {
+      const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
+      const std::string ensureArg = modelCheckpoint.empty()
+        ? "get_default_model_id()"
+        : "'" + modelCheckpoint + "'";
+
+      mitk::PostInstallStep step;
+      step.displayName = "Download model weights";
+      step.pythonCode =
+        "from nnInteractive.model_management import ensure_model_available, get_default_model_id\n"
+        "ensure_model_available(" + ensureArg + ")\n";
+      step.optional = true;
+      spec.postInstallSteps.push_back(std::move(step));
+    }
+
+    return spec;
+  }
+
+  // Builds the pip spec for an in-place update of an existing install. Reuses the
+  // resolve-then-install engine with --upgrade; the venv already exists.
+  mitk::PipInstallSpec BuildUpgradeSpec(const std::string& venvName, bool clientOnly)
+  {
+    mitk::PipInstallSpec spec;
+    spec.name = "nnInteractive";
+    spec.venvName = venvName;
+    spec.upgradePipFirst = false;
+
+    const auto versionRange = nnInteractiveVersionRange();
+
+    if (clientOnly)
+    {
+      mitk::PipInstallGroup clientGroup;
+      clientGroup.requirements = { "nninteractive-client" + versionRange };
+      clientGroup.extraPipArgs = { "--upgrade" };
+      spec.groups.push_back(std::move(clientGroup));
+      return spec;
+    }
+
+    // Upgrade the torch group first (with its CUDA index) so a transitive torch
+    // bump from upgrading nnInteractive cannot pull a non-CUDA wheel from PyPI on
+    // Windows; the version pin keeps torch within its supported range.
+#if defined(_WIN32)
+    const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
+#else
+    const std::string cudaIndexUrl;
+#endif
+
+    mitk::PipInstallGroup torchGroup;
+    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+    torchGroup.indexUrl = cudaIndexUrl;
+    torchGroup.extraPipArgs = { "--upgrade" };
+    spec.groups.push_back(std::move(torchGroup));
+
+    mitk::PipInstallGroup nnInteractiveGroup;
+    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
+    nnInteractiveGroup.extraPipArgs = { "--upgrade" };
+    spec.groups.push_back(std::move(nnInteractiveGroup));
+
+    return spec;
   }
 }
 
@@ -372,8 +511,9 @@ bool QmitknnInteractiveToolGUI::Install()
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
 
-  // If the venv already exists, check if packages are installed.
-  // This avoids showing the install dialog when everything is up to date.
+  // If the venv already exists with nnInteractive installed, skip the install
+  // dialog: reconcile the recorded install mode, run the version check, and offer
+  // an in-place update if one is needed.
   if (mitk::PythonHelper::VirtualEnvExists(venvName))
   {
     if (!this->GetTool()->CreatePythonContext())
@@ -381,134 +521,235 @@ bool QmitknnInteractiveToolGUI::Install()
 
     if (this->GetTool()->IsInstalled())
     {
-      // A reused virtual environment can hold an nnInteractive that predates
-      // this MITK build (the venv survives MITK upgrades). The offline minimum
-      // check runs on every initialize and blocks an incompatible version; the
-      // online "newer release available" nag runs at most once per application
-      // run so an offline user never waits on the PyPI timeout repeatedly.
+      // A context exists here, so the find_spec probe is cheap. Reconcile the
+      // recorded install mode with what is actually installed (e.g. a venv built
+      // by a different MITK version) so the GUI and preferences adapt correctly.
+      const bool localAvailable = this->GetTool()->IsLocalInferenceAvailable();
+      const std::string installMode = localAvailable ? "full" : "client";
+
+      if (m_Preferences->Get("nnInteractive/installMode", "full") != installMode)
+        m_Preferences->Put("nnInteractive/installMode", installMode);
+
+      // Client-only can only run remote sessions; keep the inference mode consistent.
+      if (!localAvailable && m_Preferences->Get("nnInteractive/inferenceMode", "local") != "remote")
+        m_Preferences->Put("nnInteractive/inferenceMode", "remote");
+
+      const std::string distributionName = localAvailable ? "nnInteractive" : "nninteractive-client";
+
+      // A reused virtual environment can hold an nnInteractive that predates this
+      // MITK build (the venv survives MITK upgrades). The offline minimum check
+      // runs on every initialize; the online "newer release available" check runs
+      // at most once per run so an offline user never waits on the PyPI timeout
+      // repeatedly.
       static bool s_OnlineCheckDone = false;
       const bool checkForUpdate = !s_OnlineCheckDone;
       const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
-        *this->GetTool()->GetPythonContext(), checkForUpdate);
+        *this->GetTool()->GetPythonContext(), checkForUpdate, distributionName);
 
       if (checkForUpdate)
         s_OnlineCheckDone = true;
 
       if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum)
       {
-        const auto message = QString(
-          "<h3 %1>nnInteractive is outdated</h3>"
-          "<p %1>The installed nnInteractive %2 is older than the version this "
-          "application requires (%3 or newer) and may not work correctly.</p>"
-          "<p %1>Open <em>Settings</em> and click <em>Uninstall nnInteractive</em>. "
-          "The next time you initialize, a compatible version is installed "
-          "automatically.</p>")
-          .arg(LINE_HEIGHT_STYLE)
-          .arg(QString::fromStdString(versionCheck.Installed))
-          .arg(mitk::nnInteractive::MINIMUM_VERSION);
-
-        QMessageBox::warning(nullptr, "nnInteractive", message);
-        return false;
+        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable, true))
+          return false;
       }
-
-      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
+      else if (versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
       {
-        // The installed version still works, so updating is optional. Offer to
-        // stop here (Cancel) so the user can update before doing anything else,
-        // or to keep going with the installed version (Continue). The
-        // s_OnlineCheckDone guard above limits this prompt to once per run.
-        const auto message = QString(
-          "<h3 %1>A newer nnInteractive is available</h3>"
-          "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
-          "<p %1>Open <em>Settings</em>, click <em>Uninstall nnInteractive</em>, then "
-          "initialize again to install the latest version. Click <em>Continue</em> to "
-          "keep using the installed version.</p>")
-          .arg(LINE_HEIGHT_STYLE)
-          .arg(QString::fromStdString(versionCheck.Installed))
-          .arg(QString::fromStdString(versionCheck.Latest));
-
-        QMessageBox messageBox(QMessageBox::Information, "nnInteractive", message);
-        auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
-        messageBox.addButton(QMessageBox::Cancel);
-        messageBox.setDefaultButton(continueButton);
-        messageBox.exec();
-
-        if (messageBox.clickedButton() != continueButton)
-          return false; // Abort so the user can update first.
+        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable, false))
+          return false;
       }
+
+      // Offer to adopt a newer recommended model checkpoint (full + local only).
+      this->MaybePromptModelSwitch(localAvailable);
 
       return true;
     }
   }
 
-  // PyTorch needs a CUDA-specific index URL on Windows. On other platforms
-  // pip uses the default PyPI index.
-#if defined(_WIN32)
-  // Starting with CUDA v12.9 we get the following error on our lowest
-  // supported GPU architecture (e.g. GeForce 10 Series):
-  //   torch.AcceleratorError: CUDA error: no kernel image is available
-  //   for exec
-  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-  const std::string cudaIndexUrl;
-#endif
+  // Fresh install: let the user choose between a full and a client-only install.
+  QmitknnInteractiveInstallModeDialog modeDialog(this);
 
-  // Pre-fetch the model weights so the first StartSession() doesn't surprise
-  // the user with a silent multi-minute download. The checkpoint name mirrors
-  // the preference mitknnInteractiveTool::StartSession() reads. Guard each
-  // link in the preferences chain so a missing preferences service doesn't
-  // crash the installer before it even starts. In local mode the user points
-  // at a checkpoint folder on disk, so no Hugging Face download is queued.
-  std::string modelSource = "huggingface";
-  std::string checkpoint = "nnInteractive_v1.0";
-  if (auto* prefsService = mitk::CoreServices::GetPreferencesService())
-  {
-    if (auto* system = prefsService->GetSystemPreferences())
-    {
-      if (auto* prefs = system->Node("org.mitk.views.segmentation"))
-      {
-        modelSource = prefs->Get("nnInteractive/modelSource", modelSource);
-        checkpoint = prefs->Get("nnInteractive/modelCheckpoint", checkpoint);
-      }
-    }
-  }
+  if (modeDialog.exec() != QDialog::Accepted)
+    return false;
 
-  mitk::PipInstallSpec spec;
-  spec.name = "nnInteractive";
-  spec.venvName = venvName;
-  spec.upgradePipFirst = true;
+  const bool clientOnly =
+    modeDialog.SelectedMode() == QmitknnInteractiveInstallModeDialog::Mode::ClientOnly;
 
-  mitk::PipInstallGroup torchGroup;
-  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-  torchGroup.indexUrl = cudaIndexUrl;
-  spec.groups.push_back(std::move(torchGroup));
-
-  mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = {
-    std::string("nninteractive>=") + mitk::nnInteractive::MINIMUM_VERSION
-      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE };
-  spec.groups.push_back(std::move(nnInteractiveGroup));
-
-  if (modelSource != "local")
-  {
-    mitk::HuggingFaceDownload modelDownload;
-    modelDownload.repoId = "nnInteractive/nnInteractive";
-    modelDownload.allowPatterns = { checkpoint + "/*" };
-    modelDownload.displayName = "model checkpoint " + checkpoint;
-    modelDownload.optional = true;
-    spec.huggingFaceDownloads.push_back(std::move(modelDownload));
-  }
+  auto spec = BuildInstallSpec(m_Preferences, venvName, clientOnly);
 
   QmitkPipInstallDialog dialog(spec, this);
 
   if (dialog.exec() != QDialog::Accepted)
     return false;
 
+  // Record the chosen mode so the GUI and preferences adapt; a client-only install
+  // can only run remote sessions, so force the inference mode accordingly.
+  m_Preferences->Put("nnInteractive/installMode", clientOnly ? "client" : "full");
+
+  if (clientOnly)
+    m_Preferences->Put("nnInteractive/inferenceMode", "remote");
+
   // The dialog populated the venv (and possibly created it). Create a fresh
   // context so the embedded interpreter picks up the newly installed packages.
   // PythonContext checks Py_IsInitialized internally, so calling this a second
   // time after the early-return path above is safe.
   return this->GetTool()->CreatePythonContext();
+}
+
+bool QmitknnInteractiveToolGUI::RunUpdate(bool clientOnly)
+{
+  const auto venvName = this->GetTool()->GetVirtualEnvName();
+  auto spec = BuildUpgradeSpec(venvName, clientOnly);
+
+  QmitkPipInstallDialog dialog(spec, this, QmitkPipInstallDialog::Mode::Update);
+
+  if (dialog.exec() != QDialog::Accepted)
+    return false;
+
+  // Recreate the context so the interpreter sees the upgraded packages. Safe
+  // because an in-place update is only reached when no nnInteractive modules are
+  // loaded (see OfferInPlaceUpdate).
+  return this->GetTool()->CreatePythonContext();
+}
+
+bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly, bool belowMinimum)
+{
+  const auto venvName = this->GetTool()->GetVirtualEnvName();
+  const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(venvName);
+
+  const auto appName = QCoreApplication::applicationName();
+  const auto restartTarget = appName.isEmpty() ? QStringLiteral("the application") : appName;
+  const auto installed = QString::fromStdString(versionCheck.Installed);
+
+  if (belowMinimum)
+  {
+    const auto minimum = QString(mitk::nnInteractive::MINIMUM_VERSION);
+
+    if (modulesLoaded)
+    {
+      QMessageBox::warning(nullptr, "nnInteractive",
+        QString(
+          "<h3 %1>nnInteractive is outdated</h3>"
+          "<p %1>The installed nnInteractive %2 is older than the version this "
+          "application requires (%3 or newer) and may not work correctly.</p>"
+          "<p %1>nnInteractive is currently loaded, so it cannot be updated right now. "
+          "Restart %4 and initialize again to update.</p>")
+          .arg(LINE_HEIGHT_STYLE).arg(installed).arg(minimum).arg(restartTarget));
+      return false;
+    }
+
+    QMessageBox messageBox(QMessageBox::Warning, "nnInteractive",
+      QString(
+        "<h3 %1>nnInteractive is outdated</h3>"
+        "<p %1>The installed nnInteractive %2 is older than the version this "
+        "application requires (%3 or newer) and may not work correctly.</p>"
+        "<p %1>Click <em>Update now</em> to update to a compatible version.</p>")
+        .arg(LINE_HEIGHT_STYLE).arg(installed).arg(minimum));
+    auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
+    messageBox.addButton(QMessageBox::Cancel);
+    messageBox.setDefaultButton(updateButton);
+    messageBox.exec();
+
+    if (messageBox.clickedButton() != updateButton)
+      return false;
+
+    return this->RunUpdate(clientOnly);
+  }
+
+  // UpdateAvailable: the installed version still works, so updating is optional.
+  const auto latest = QString::fromStdString(versionCheck.Latest);
+
+  if (modulesLoaded)
+  {
+    QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
+      QString(
+        "<h3 %1>A newer nnInteractive is available</h3>"
+        "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
+        "<p %1>nnInteractive is currently loaded, so it cannot be updated right now. "
+        "Restart %4 and initialize again to update, or click <em>Continue</em> to keep "
+        "using the installed version.</p>")
+        .arg(LINE_HEIGHT_STYLE).arg(installed).arg(latest).arg(restartTarget));
+    auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
+    messageBox.addButton(QMessageBox::Cancel);
+    messageBox.setDefaultButton(continueButton);
+    messageBox.exec();
+
+    return messageBox.clickedButton() == continueButton;
+  }
+
+  QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
+    QString(
+      "<h3 %1>A newer nnInteractive is available</h3>"
+      "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
+      "<p %1>Click <em>Update now</em> to update, or <em>Continue with installed</em> "
+      "to keep using %2.</p>")
+      .arg(LINE_HEIGHT_STYLE).arg(installed).arg(latest));
+  auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
+  auto* continueButton = messageBox.addButton("Continue with installed", QMessageBox::AcceptRole);
+  messageBox.addButton(QMessageBox::Cancel);
+  messageBox.setDefaultButton(continueButton);
+  messageBox.exec();
+
+  if (messageBox.clickedButton() == updateButton)
+    return this->RunUpdate(clientOnly);
+
+  return messageBox.clickedButton() == continueButton;
+}
+
+void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
+{
+  if (!localAvailable || m_Preferences == nullptr)
+    return;
+
+  // Only relevant for local inference with the managed (Hugging Face) model source;
+  // a remote server and a local checkpoint folder both pick their own model.
+  if (m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote")
+    return;
+
+  if (m_Preferences->Get("nnInteractive/modelSource", "huggingface") == "local")
+    return;
+
+  // The manifest refresh hits the network, so check at most once per run.
+  static bool s_ModelCheckDone = false;
+  if (s_ModelCheckDone)
+    return;
+  s_ModelCheckDone = true;
+
+  auto* context = this->GetTool()->GetPythonContext();
+  if (context == nullptr)
+    return;
+
+  const auto selectedId = m_Preferences->Get("nnInteractive/modelCheckpoint", "");
+  const auto check = mitk::nnInteractive::CheckModelUpdate(*context, selectedId);
+
+  if (check.Status != mitk::nnInteractive::ModelUpdateStatus::UpdateAvailable)
+    return;
+
+  const auto current = check.CurrentId.empty()
+    ? QStringLiteral("the default")
+    : QString::fromStdString(check.CurrentId);
+
+  QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
+    QString(
+      "<h3 %1>A newer model checkpoint is available</h3>"
+      "<p %1>nnInteractive now recommends the model <em>%2</em>; you are using <em>%3</em>.</p>"
+      "<p %1>Switch to the recommended model? It will be downloaded the next time you "
+      "initialize if it is not already available.</p>")
+      .arg(LINE_HEIGHT_STYLE)
+      .arg(QString::fromStdString(check.RecommendedId))
+      .arg(current));
+  auto* switchButton = messageBox.addButton("Switch", QMessageBox::AcceptRole);
+  messageBox.addButton("Keep current", QMessageBox::RejectRole);
+  messageBox.setDefaultButton(switchButton);
+  messageBox.exec();
+
+  if (messageBox.clickedButton() == switchButton)
+  {
+    // No session is running yet (this runs in Install(), before StartSession), so
+    // the session-defining-preference observer is a harmless no-op here.
+    m_Preferences->Put("nnInteractive/modelCheckpoint", check.RecommendedId);
+  }
 }
 
 void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
@@ -524,19 +765,35 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
   }
 
 #if defined(__APPLE__) && !defined(__aarch64__)
-  QMessageBox::information(
-    nullptr,
-    "nnInteractive",
-    QString(
-      "<h3 %1>Unsupported Platform</h3>"
-      "<p %1>nnInteractive requires an Apple Silicon Mac.</p>"
-      "<p %1>It is not compatible with Intel-based Macs.</p>")
-      .arg(LINE_HEIGHT_STYLE),
-    QMessageBox::Ok);
+  // Intel Macs have no local PyTorch/GPU support, but a client-only or remote
+  // session offloads inference to a server, so only block when a local session
+  // would actually run.
+  {
+    const bool clientOnly = m_Preferences->Get("nnInteractive/installMode", "full") == "client";
+    const bool remote = clientOnly || m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
 
-  // Nothing was initialized; release the toggle without re-entering this slot.
-  this->UncheckInitializeButton();
-#else
+    if (!remote)
+    {
+      QMessageBox::information(
+        nullptr,
+        "nnInteractive",
+        QString(
+          "<h3 %1>Unsupported platform</h3>"
+          "<p %1>Local nnInteractive inference requires an Apple Silicon Mac and is "
+          "not available on Intel-based Macs.</p>"
+          "<p %1>You can still use a remote nnInteractive server: select "
+          "<em>Remote server</em> in the nnInteractive preferences under "
+          "<em>Inference</em>.</p>")
+          .arg(LINE_HEIGHT_STYLE),
+        QMessageBox::Ok);
+
+      // Nothing was initialized; release the toggle without re-entering this slot.
+      this->UncheckInitializeButton();
+      return;
+    }
+  }
+#endif
+
   this->EnableInitializeButtons(false);
 
   if (!Install())
@@ -548,7 +805,8 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 
   const auto initMessage = QString(
     "<h3 %1>Initializing nnInteractive</h3>"
-    "<p %1>Please wait a few seconds until nnInteractive is fully initialized...</p>").arg(LINE_HEIGHT_STYLE);
+    "<p %1>Please wait while nnInteractive is initialized. If a model checkpoint "
+    "still needs to be downloaded, this can take a few minutes.</p>").arg(LINE_HEIGHT_STYLE);
  
   auto messageBox = new QMessageBox(QMessageBox::Information, "nnInteractive", initMessage);
   messageBox->setStandardButtons(QMessageBox::NoButton);
@@ -671,7 +929,6 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     QMessageBox::warning(nullptr, "nnInteractive", cpuBackendMessage);
   #endif
   });
-#endif
 }
 
 void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
@@ -1111,9 +1368,23 @@ void QmitknnInteractiveToolGUI::ApplyShortcutLabels()
 
 void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)
 {
-  if (event.GetProperty() == "nnInteractive/showShortcutsInLabels")
+  const auto& property = event.GetProperty();
+
+  // A change to a setting baked into the session at initialization (inference
+  // mode, server, model, backend, storage) makes a running session stale, so end
+  // it; the user then re-initializes with the new settings. SetProperty fires this
+  // only on an actual value change, so clicking OK without edits is a no-op. It is
+  // idempotent when several such keys change in one OK: the first EndSession()
+  // tears the session down, the rest see no running session.
+  if (IsSessionDefiningPreference(property))
+  {
+    if (auto* tool = this->GetTool(); tool != nullptr && tool->IsSessionRunning())
+      tool->EndSession();
+  }
+
+  if (property == "nnInteractive/showShortcutsInLabels")
     this->ApplyShortcutLabels();
-  else if (event.GetProperty() == "nnInteractive/inferenceMode")
+  else if (property == "nnInteractive/inferenceMode" || property == "nnInteractive/installMode")
     this->UpdateInitializeButtonText();
 }
 
@@ -1131,7 +1402,10 @@ void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
     return;
   }
 
-  const bool remote = m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
+  // A client-only install can only run remote sessions, so the button always
+  // reflects remote initialization regardless of the stored inference mode.
+  const bool clientOnly = m_Preferences->Get("nnInteractive/installMode", "full") == "client";
+  const bool remote = clientOnly || m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
   m_Ui->initializeButton->setText(remote ? "Initialize (remote server)" : "Initialize");
 }
 

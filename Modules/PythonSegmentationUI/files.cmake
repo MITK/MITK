@@ -1,9 +1,11 @@
 set(CPP_FILES
   mitkPythonSegmentationUI.cpp
+  QmitknnInteractiveInstallModeDialog.cpp
   QmitknnInteractiveToolGUI.cpp
 )
 
 set(UI_FILES
+  QmitknnInteractiveInstallModeDialog.ui
   QmitknnInteractiveToolGUI.ui
 )
 

@@ -12,10 +12,13 @@ found in the LICENSE file.
 
 #include <QmitkSegWithPreviewToolGUIBase.h>
 
-#include <QCheckBox>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <QApplication>
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSlider>
+#include <QVBoxLayout>
 
 bool DefaultEnableConfirmSegBtnFunction(bool enabled)
 {
@@ -76,9 +79,32 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     this->InitializeUI(m_MainLayout);
 
     m_MainLayout->addWidget(m_ConfirmSegBtn);
-    m_MainLayout->addWidget(m_CheckIgnoreLocks);
-    m_MainLayout->addWidget(m_CheckMerge);
-    m_MainLayout->addWidget(m_CheckProcessAll);
+
+    auto* optionsLayout = new QHBoxLayout();
+    optionsLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto* checkBoxLayout = new QVBoxLayout();
+    checkBoxLayout->setContentsMargins(0, 0, 0, 0);
+    checkBoxLayout->addWidget(m_CheckIgnoreLocks);
+    checkBoxLayout->addWidget(m_CheckMerge);
+    checkBoxLayout->addWidget(m_CheckProcessAll);
+    optionsLayout->addLayout(checkBoxLayout);
+
+    optionsLayout->addSpacing(32);
+
+    auto* opacityLayout = new QVBoxLayout();
+    opacityLayout->setContentsMargins(0, 0, 0, 0);
+    opacityLayout->addWidget(new QLabel("Preview opacity", this));
+    m_PreviewOpacitySlider = new QSlider(Qt::Horizontal, this);
+    m_PreviewOpacitySlider->setRange(0, 100);
+    m_PreviewOpacitySlider->setValue(static_cast<int>(m_Tool->GetPreviewOpacity() * 100));
+    m_PreviewOpacitySlider->setToolTip("Adjust the opacity of the preview segmentation.");
+    connect(m_PreviewOpacitySlider, &QSlider::valueChanged,
+            this, &QmitkSegWithPreviewToolGUIBase::OnPreviewOpacityChanged);
+    opacityLayout->addWidget(m_PreviewOpacitySlider);
+    optionsLayout->addLayout(opacityLayout);
+
+    m_MainLayout->addLayout(optionsLayout);
   }
 
   if (m_Tool.IsNotNull())
@@ -113,6 +139,14 @@ void QmitkSegWithPreviewToolGUIBase::OnAcceptPreview()
 
     m_ConfirmSegBtn->setEnabled(false);
     m_Tool->ConfirmSegmentation();
+  }
+}
+
+void QmitkSegWithPreviewToolGUIBase::OnPreviewOpacityChanged(int value)
+{
+  if (m_Tool.IsNotNull())
+  {
+    m_Tool->SetPreviewOpacity(value / 100.0f);
   }
 }
 
@@ -171,6 +205,10 @@ void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
     if (nullptr != m_CheckProcessAll)
     {
       m_CheckProcessAll->setEnabled(enabled);
+    }
+    if (nullptr != m_PreviewOpacitySlider)
+    {
+      m_PreviewOpacitySlider->setEnabled(enabled);
     }
   }
 }

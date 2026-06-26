@@ -32,6 +32,8 @@ found in the LICENSE file.
 
 #include <mitkSegChangeOperationApplier.h>
 
+#include <algorithm>
+
 mitk::SegWithPreviewTool::SegWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = ToolCommand::New();
@@ -120,7 +122,7 @@ void mitk::SegWithPreviewTool::Activated()
     m_PreviewSegmentationNode = DataNode::New();
     m_PreviewSegmentationNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0));
     m_PreviewSegmentationNode->SetProperty("name", StringProperty::New(std::string(this->GetName())+" preview"));
-    m_PreviewSegmentationNode->SetProperty("opacity", FloatProperty::New(0.3));
+    m_PreviewSegmentationNode->SetProperty("opacity", FloatProperty::New(m_PreviewOpacity));
     m_PreviewSegmentationNode->SetProperty("binary", BoolProperty::New(true));
     m_PreviewSegmentationNode->SetProperty("helper object", BoolProperty::New(true));
   }
@@ -219,6 +221,17 @@ const mitk::MultiLabelSegmentation* mitk::SegWithPreviewTool::GetPreviewSegmenta
 mitk::DataNode* mitk::SegWithPreviewTool::GetPreviewSegmentationNode()
 {
   return m_PreviewSegmentationNode;
+}
+
+void mitk::SegWithPreviewTool::SetPreviewOpacity(float opacity)
+{
+  m_PreviewOpacity = std::clamp(opacity, 0.0f, 1.0f);
+
+  if (m_PreviewSegmentationNode.IsNotNull())
+  {
+    m_PreviewSegmentationNode->SetOpacity(m_PreviewOpacity);
+    RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 const mitk::Image* mitk::SegWithPreviewTool::GetSegmentationInput() const
@@ -323,7 +336,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
     }
 
     m_PreviewSegmentationNode->SetColor(previewColor);
-    m_PreviewSegmentationNode->SetOpacity(0.5);
+    m_PreviewSegmentationNode->SetOpacity(m_PreviewOpacity);
 
     int layer(50);
     m_ReferenceDataNode->GetIntProperty("layer", layer);

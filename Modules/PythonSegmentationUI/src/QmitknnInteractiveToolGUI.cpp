@@ -1285,15 +1285,18 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
   const auto& property = event.GetProperty();
 
   // A change to a setting baked into the session at initialization (inference
-  // mode, server, model, backend, storage) makes a running session stale, so end
-  // it; the user then re-initializes with the new settings. SetProperty fires this
-  // only on an actual value change, so clicking OK without edits is a no-op. It is
-  // idempotent when several such keys change in one OK: the first EndSession()
-  // tears the session down, the rest see no running session.
+  // mode, server, model, backend, storage) makes a running session stale, so tear
+  // it down; the user then re-initializes with the new settings. AbortSession()
+  // (rather than the bare EndSession()) also clears the now-orphaned interaction
+  // prompts and preview and refreshes the views, so the canvas does not keep
+  // showing a result that no longer has a session behind it. SetProperty fires
+  // this only on an actual value change, so clicking OK without edits is a no-op.
+  // It is idempotent when several such keys change in one OK: the first
+  // AbortSession() tears the session down, the rest see no running session.
   if (IsSessionDefiningPreference(property))
   {
     if (auto* tool = this->GetTool(); tool != nullptr && tool->IsSessionRunning())
-      tool->EndSession();
+      tool->AbortSession();
   }
 
   if (property == "nnInteractive/showShortcutsInLabels")

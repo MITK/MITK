@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkSegmentationPluginConfig.h>
 
 #if MITK_HAS_PYTHON
+#include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveModel.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPipPackageInfo.h>
@@ -45,54 +46,6 @@ namespace
     auto prefService = mitk::CoreServices::GetPreferencesService();
     return prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
   }
-
-#if MITK_HAS_PYTHON
-  // Builds the pip spec for an in-place update of an existing install. Mirrors the
-  // tool GUI's builder (kept separate to avoid a core dependency on it). The venv
-  // already exists; --upgrade drives the resolve-then-install engine to upgrade.
-  mitk::PipInstallSpec BuildUpgradeSpec(const std::string& venvName, bool clientOnly)
-  {
-    using namespace mitk::nnInteractive;
-
-    mitk::PipInstallSpec spec;
-    spec.name = "nnInteractive";
-    spec.venvName = venvName;
-    spec.upgradePipFirst = false;
-
-    const std::string versionRange =
-      std::string(">=") + MINIMUM_VERSION + ",<" + MAXIMUM_VERSION_EXCLUSIVE;
-
-    if (clientOnly)
-    {
-      mitk::PipInstallGroup clientGroup;
-      clientGroup.requirements = { "nninteractive-client" + versionRange };
-      clientGroup.extraPipArgs = { "--upgrade" };
-      spec.groups.push_back(std::move(clientGroup));
-      return spec;
-    }
-
-    // Upgrade torch first from its CUDA index so a transitive torch bump cannot
-    // pull a non-CUDA wheel from PyPI on Windows.
-#if defined(_WIN32)
-    const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-    const std::string cudaIndexUrl;
-#endif
-
-    mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-    torchGroup.indexUrl = cudaIndexUrl;
-    torchGroup.extraPipArgs = { "--upgrade" };
-    spec.groups.push_back(std::move(torchGroup));
-
-    mitk::PipInstallGroup nnInteractiveGroup;
-    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
-    nnInteractiveGroup.extraPipArgs = { "--upgrade" };
-    spec.groups.push_back(std::move(nnInteractiveGroup));
-
-    return spec;
-  }
-#endif
 }
 
 QmitknnInteractivePreferencePage::QmitknnInteractivePreferencePage()
@@ -221,13 +174,17 @@ bool QmitknnInteractivePreferencePage::PerformOk()
     prefs->Put("nnInteractive/interactionsStorage", "auto");
   }
 
-  // Prefer the selected item's model id (stored as userData); otherwise take the
-  // free-text entry. An empty value is kept as-is and means "use the recommended
-  // default" (resolved via get_default_model_id() at session start).
+  // Prefer the selected item's model id (stored as userData), but only while the
+  // visible text still matches that item. An editable combo keeps currentIndex
+  // after the user edits the text, so currentData() could otherwise return a
+  // previously selected id and silently discard a typed-in value. An empty value
+  // is kept as-is and means "use the recommended default" (resolved via
+  // get_default_model_id() at session start).
   QString modelCheckpoint;
-  const auto comboData = m_Ui->checkpointComboBox->currentData();
-  if (comboData.isValid())
-    modelCheckpoint = comboData.toString();
+  const int currentIndex = m_Ui->checkpointComboBox->currentIndex();
+  if (currentIndex >= 0 &&
+      m_Ui->checkpointComboBox->currentText() == m_Ui->checkpointComboBox->itemText(currentIndex))
+    modelCheckpoint = m_Ui->checkpointComboBox->itemData(currentIndex).toString();
   else
     modelCheckpoint = m_Ui->checkpointComboBox->currentText().trimmed();
 
@@ -429,7 +386,7 @@ void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
   // Listing models refreshes the manifest from Hugging Face and spins up a
   // transient Python context, so it can block briefly.
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  const auto models = mitk::nnInteractive::ListModels();
+  const auto models = mitk::nnInteractive::ListModels("nnInteractive");
   QApplication::restoreOverrideCursor();
 
   if (models.empty())
@@ -696,7 +653,7 @@ void QmitknnInteractivePreferencePage::UpdateCheckForUpdatesButton()
 bool QmitknnInteractivePreferencePage::RunUpdate(bool clientOnly)
 {
 #if MITK_HAS_PYTHON
-  auto spec = BuildUpgradeSpec("nnInteractive", clientOnly);
+  auto spec = mitk::nnInteractive::BuildUpgradeSpec("nnInteractive", clientOnly);
 
   QmitkPipInstallDialog dialog(spec, m_Control, QmitkPipInstallDialog::Mode::Update);
 

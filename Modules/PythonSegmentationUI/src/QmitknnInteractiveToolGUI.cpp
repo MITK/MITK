@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIPreferencesService.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitknnInteractiveModel.h>
 #include <mitknnInteractiveVersion.h>
@@ -40,7 +41,6 @@ found in the LICENSE file.
 #include <QWidget>
 
 #include <string>
-#include <unordered_set>
 
 MITK_TOOL_GUI_MACRO(MITKPYTHONSEGMENTATIONUI_EXPORT, QmitknnInteractiveToolGUI, "")
 
@@ -146,137 +146,19 @@ namespace
     return button == QMessageBox::Yes;
   }
 
-  // Settings baked into a session at initialization. Changing any of these while a
+  // True for the preferences baked into a session at initialization (the single
+  // source of truth lives in nnInteractiveTool). Changing any of them while a
   // session runs makes it stale, so the GUI ends the session (see
-  // OnPreferenceChangedEvent). Live or GUI-only settings (auto-zoom, auto-refine,
-  // automation, shortcut labels, installMode) are deliberately excluded.
+  // OnPreferenceChangedEvent).
   bool IsSessionDefiningPreference(const std::string& key)
   {
-    static const std::unordered_set<std::string> keys = {
-      "nnInteractive/inferenceMode",
-      "nnInteractive/serverUrl",
-      "nnInteractive/apiKey",
-      "nnInteractive/modelSource",
-      "nnInteractive/modelCheckpoint",
-      "nnInteractive/localModelPath",
-      "nnInteractive/backend",
-      "nnInteractive/gpuBackend",
-      "nnInteractive/useTorchCompile",
-      "nnInteractive/interactionsStorage",
-    };
-
-    return keys.find(key) != keys.end();
-  }
-
-  std::string nnInteractiveVersionRange()
-  {
-    return std::string(">=") + mitk::nnInteractive::MINIMUM_VERSION
-      + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE;
-  }
-
-  // Builds the pip install spec for a fresh install. Full mode installs PyTorch and
-  // nnInteractive and pre-downloads the model checkpoint; client-only mode installs
-  // just the lightweight, torch-free nninteractive-client.
-  mitk::PipInstallSpec BuildInstallSpec(mitk::IPreferences* prefs, const std::string& venvName, bool clientOnly)
-  {
-    mitk::PipInstallSpec spec;
-    spec.name = "nnInteractive";
-    spec.venvName = venvName;
-    spec.upgradePipFirst = true;
-
-    const auto versionRange = nnInteractiveVersionRange();
-
-    if (clientOnly)
+    for (const auto& entry : mitk::nnInteractiveTool::GetSessionDefiningPreferences())
     {
-      mitk::PipInstallGroup clientGroup;
-      clientGroup.requirements = { "nninteractive-client" + versionRange };
-      spec.groups.push_back(std::move(clientGroup));
-      return spec;
+      if (entry.first == key)
+        return true;
     }
 
-    // PyTorch needs a CUDA-specific index URL on Windows; other platforms use the
-    // default PyPI index. (cu128: with CUDA 12.9 our lowest supported GPU arch
-    // hits "no kernel image is available".)
-#if defined(_WIN32)
-    const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-    const std::string cudaIndexUrl;
-#endif
-
-    mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-    torchGroup.indexUrl = cudaIndexUrl;
-    spec.groups.push_back(std::move(torchGroup));
-
-    mitk::PipInstallGroup nnInteractiveGroup;
-    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
-    spec.groups.push_back(std::move(nnInteractiveGroup));
-
-    // Pre-download the model checkpoint via nnInteractive's model management so the
-    // first local StartSession() does not surprise the user with a silent
-    // multi-minute download. Skipped when a local checkpoint folder is configured.
-    // Optional: a failure here is non-fatal, since ConstructLocalSession() calls
-    // ensure_model_available() again as a fallback.
-    if (prefs != nullptr && prefs->Get("nnInteractive/modelSource", "huggingface") != "local")
-    {
-      const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
-      const std::string ensureArg = modelCheckpoint.empty()
-        ? "get_default_model_id()"
-        : "'" + modelCheckpoint + "'";
-
-      mitk::PostInstallStep step;
-      step.displayName = "Download model weights";
-      step.pythonCode =
-        "from nnInteractive.model_management import ensure_model_available, get_default_model_id\n"
-        "ensure_model_available(" + ensureArg + ")\n";
-      step.optional = true;
-      spec.postInstallSteps.push_back(std::move(step));
-    }
-
-    return spec;
-  }
-
-  // Builds the pip spec for an in-place update of an existing install. Reuses the
-  // resolve-then-install engine with --upgrade; the venv already exists.
-  mitk::PipInstallSpec BuildUpgradeSpec(const std::string& venvName, bool clientOnly)
-  {
-    mitk::PipInstallSpec spec;
-    spec.name = "nnInteractive";
-    spec.venvName = venvName;
-    spec.upgradePipFirst = false;
-
-    const auto versionRange = nnInteractiveVersionRange();
-
-    if (clientOnly)
-    {
-      mitk::PipInstallGroup clientGroup;
-      clientGroup.requirements = { "nninteractive-client" + versionRange };
-      clientGroup.extraPipArgs = { "--upgrade" };
-      spec.groups.push_back(std::move(clientGroup));
-      return spec;
-    }
-
-    // Upgrade the torch group first (with its CUDA index) so a transitive torch
-    // bump from upgrading nnInteractive cannot pull a non-CUDA wheel from PyPI on
-    // Windows; the version pin keeps torch within its supported range.
-#if defined(_WIN32)
-    const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-    const std::string cudaIndexUrl;
-#endif
-
-    mitk::PipInstallGroup torchGroup;
-    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-    torchGroup.indexUrl = cudaIndexUrl;
-    torchGroup.extraPipArgs = { "--upgrade" };
-    spec.groups.push_back(std::move(torchGroup));
-
-    mitk::PipInstallGroup nnInteractiveGroup;
-    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
-    nnInteractiveGroup.extraPipArgs = { "--upgrade" };
-    spec.groups.push_back(std::move(nnInteractiveGroup));
-
-    return spec;
+    return false;
   }
 }
 
@@ -576,7 +458,7 @@ bool QmitknnInteractiveToolGUI::Install()
   const bool clientOnly =
     modeDialog.SelectedMode() == QmitknnInteractiveInstallModeDialog::Mode::ClientOnly;
 
-  auto spec = BuildInstallSpec(m_Preferences, venvName, clientOnly);
+  auto spec = mitk::nnInteractive::BuildInstallSpec(m_Preferences, venvName, clientOnly);
 
   QmitkPipInstallDialog dialog(spec, this);
 
@@ -588,7 +470,31 @@ bool QmitknnInteractiveToolGUI::Install()
   m_Preferences->Put("nnInteractive/installMode", clientOnly ? "client" : "full");
 
   if (clientOnly)
+  {
     m_Preferences->Put("nnInteractive/inferenceMode", "remote");
+
+    // Client-only runs inference on a remote server. If none is configured yet
+    // (the common case right after a first install), guide the user to set one now
+    // rather than letting StartSession() fail with a bare "no server URL" error.
+    if (m_Preferences->Get("nnInteractive/serverUrl", "").empty())
+    {
+      QMessageBox::information(nullptr, "nnInteractive",
+        QString(
+          "<h3 %1>Configure a server</h3>"
+          "<p %1>Client-only mode runs nnInteractive on a remote server. Set the "
+          "server URL (and an API key, if the server requires one) to continue.</p>")
+          .arg(LINE_HEIGHT_STYLE));
+
+      // Opens the nnInteractive preference page modally; the user can set the
+      // server URL here.
+      this->OnSettingsButtonClicked();
+
+      // Still unset: stop before starting a session that would only fail. The user
+      // can configure the server and click Initialize again.
+      if (m_Preferences->Get("nnInteractive/serverUrl", "").empty())
+        return false;
+    }
+  }
 
   // The dialog populated the venv (and possibly created it). Create a fresh
   // context so the embedded interpreter picks up the newly installed packages.
@@ -600,7 +506,7 @@ bool QmitknnInteractiveToolGUI::Install()
 bool QmitknnInteractiveToolGUI::RunUpdate(bool clientOnly)
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
-  auto spec = BuildUpgradeSpec(venvName, clientOnly);
+  auto spec = mitk::nnInteractive::BuildUpgradeSpec(venvName, clientOnly);
 
   QmitkPipInstallDialog dialog(spec, this, QmitkPipInstallDialog::Mode::Update);
 
@@ -673,6 +579,10 @@ bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::Ve
     auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
     messageBox.addButton(QMessageBox::Cancel);
     messageBox.setDefaultButton(continueButton);
+    // An optional update that can't be applied right now: dismissing (Esc or the
+    // window close button) should continue with the working installed version, not
+    // abort initialization.
+    messageBox.setEscapeButton(continueButton);
     messageBox.exec();
 
     return messageBox.clickedButton() == continueButton;
@@ -689,6 +599,9 @@ bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::Ve
   auto* continueButton = messageBox.addButton("Continue with installed", QMessageBox::AcceptRole);
   messageBox.addButton(QMessageBox::Cancel);
   messageBox.setDefaultButton(continueButton);
+  // Optional update: dismissing (Esc or the window close button) continues with
+  // the installed version rather than aborting initialization.
+  messageBox.setEscapeButton(continueButton);
   messageBox.exec();
 
   if (messageBox.clickedButton() == updateButton)
@@ -716,12 +629,13 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
     return;
   s_ModelCheckDone = true;
 
-  auto* context = this->GetTool()->GetPythonContext();
-  if (context == nullptr)
-    return;
-
   const auto selectedId = m_Preferences->Get("nnInteractive/modelCheckpoint", "");
-  const auto check = mitk::nnInteractive::CheckModelUpdate(*context, selectedId);
+
+  // CheckModelUpdate spins up a subprocess and refreshes the manifest over the
+  // network, so show a wait cursor while it runs.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId);
+  QApplication::restoreOverrideCursor();
 
   if (check.Status != mitk::nnInteractive::ModelUpdateStatus::UpdateAvailable)
     return;
@@ -734,8 +648,8 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
     QString(
       "<h3 %1>A newer model checkpoint is available</h3>"
       "<p %1>nnInteractive now recommends the model <em>%2</em>; you are using <em>%3</em>.</p>"
-      "<p %1>Switch to the recommended model? It will be downloaded the next time you "
-      "initialize if it is not already available.</p>")
+      "<p %1>Switch to the recommended model? It will be downloaded during "
+      "initialization if it is not already available.</p>")
       .arg(LINE_HEIGHT_STYLE)
       .arg(QString::fromStdString(check.RecommendedId))
       .arg(current));

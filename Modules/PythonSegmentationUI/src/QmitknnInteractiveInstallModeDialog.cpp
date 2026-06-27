@@ -22,6 +22,14 @@ QmitknnInteractiveInstallModeDialog::QmitknnInteractiveInstallModeDialog(QWidget
 {
   m_Ui->setupUi(this);
 
+#if defined(__APPLE__)
+  // On macOS local inference has no GPU acceleration (Apple Silicon runs on the
+  // CPU; Intel is unsupported for local), so default to the lightweight
+  // client-only install that offloads to a remote server. The .ui defaults to
+  // Full for other platforms.
+  m_Ui->clientOnlyRadioButton->setChecked(true);
+#endif
+
   if (auto* okButton = m_Ui->buttonBox->button(QDialogButtonBox::Ok))
     okButton->setText("Continue");
 

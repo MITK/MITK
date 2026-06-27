@@ -1,7 +1,6 @@
 set(CPP_FILES
   mitknnInteractiveEnums.cpp
   mitknnInteractiveInteractor.cpp
-  mitknnInteractiveModel.cpp
   mitknnInteractiveTool.cpp
   mitknnInteractiveVersion.cpp
   mitknnInteractiveBoundingBoxHelpers.cpp

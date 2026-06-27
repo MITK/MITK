@@ -13,15 +13,13 @@ found in the LICENSE file.
 #ifndef mitknnInteractiveModel_h
 #define mitknnInteractiveModel_h
 
-#include <MitkPythonSegmentationExports.h>
+#include <MitkPythonSegmentationUIExports.h>
 
 #include <string>
 #include <vector>
 
 namespace mitk
 {
-  class PythonContext;
-
   namespace nnInteractive
   {
     /** \brief A model checkpoint entry as reported by nnInteractive's model
@@ -59,41 +57,36 @@ namespace mitk
 
     /** \brief Lists the model checkpoints known to nnInteractive's model management.
      *
-     * Reads \c nnInteractive.model_management.list_models() (available in the full
-     * install only). The call refreshes the model manifest from Hugging Face
-     * (remote-first, with an offline cache fallback). Returns an empty list when
-     * model management is unavailable (a client-only install) or the query fails,
-     * so callers can treat "no models" as "fall back to free-text entry".
+     * Runs \c nnInteractive.model_management.list_models() in a short-lived
+     * subprocess driven by the virtual environment's own Python interpreter,
+     * rather than the embedded interpreter. This keeps model management (and its
+     * transitive native dependencies, e.g. PyYAML) out of the host process, so it
+     * never maps libraries from the virtual environment that would block a later
+     * in-place update on Windows. The call refreshes the model manifest from
+     * Hugging Face (remote-first, with an offline cache fallback).
      *
-     * \param[in] context An activated Python context bound to the nnInteractive
-     *                    virtual environment.
+     * Returns an empty list when the virtual environment or its interpreter is
+     * missing, model management is unavailable (a client-only install), or the
+     * query fails, so callers can treat "no models" as "fall back to free-text
+     * entry".
      *
-     * \return The known model checkpoints (possibly empty).
-     */
-    MITKPYTHONSEGMENTATION_EXPORT std::vector<ModelInfo> ListModels(PythonContext& context);
-
-    /** \brief Convenience overload for callers without a Python context.
-     *
-     * Creates and activates a transient Python context for the nnInteractive
-     * virtual environment, then forwards to ListModels(PythonContext&). Returns an
-     * empty list if the context cannot be created. Intended for the preferences
-     * page, which holds no live context.
+     * \param[in] venvName The nnInteractive virtual environment to query.
      *
      * \return The known model checkpoints (possibly empty).
      */
-    MITKPYTHONSEGMENTATION_EXPORT std::vector<ModelInfo> ListModels();
+    MITKPYTHONSEGMENTATIONUI_EXPORT std::vector<ModelInfo> ListModels(const std::string& venvName);
 
     /** \brief Checks whether a checkpoint newer than the selected one is recommended.
      *
-     * Compares \p selectedModelId against \c get_default_model_id(): the result is
-     * UpdateAvailable when the default is non-empty and differs from the selection,
-     * UpToDate when they match (or when the selection is empty, i.e. already
-     * tracking the default), and Unknown on any failure (offline, no model
-     * management). It deliberately does not parse version suffixes; "newer" means
-     * "the library now recommends a different default checkpoint".
+     * Compares \p selectedModelId against \c get_default_model_id() (queried in a
+     * subprocess, see ListModels()): the result is UpdateAvailable when the default
+     * is non-empty and differs from the selection, UpToDate when they match (or when
+     * the selection is empty, i.e. already tracking the default), and Unknown on any
+     * failure (offline, no model management). It deliberately does not parse version
+     * suffixes; "newer" means "the library now recommends a different default
+     * checkpoint".
      *
-     * \param[in] context An activated Python context bound to the nnInteractive
-     *                    virtual environment.
+     * \param[in] venvName The nnInteractive virtual environment to query.
      * \param[in] selectedModelId The model id currently configured (may be empty to
      *                    mean "use the recommended default").
      *
@@ -102,7 +95,7 @@ namespace mitk
      *
      * \sa ModelUpdateStatus
      */
-    MITKPYTHONSEGMENTATION_EXPORT ModelCheckResult CheckModelUpdate(PythonContext& context, const std::string& selectedModelId);
+    MITKPYTHONSEGMENTATIONUI_EXPORT ModelCheckResult CheckModelUpdate(const std::string& venvName, const std::string& selectedModelId);
   }
 }
 

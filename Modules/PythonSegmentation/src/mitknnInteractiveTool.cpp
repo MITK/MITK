@@ -714,14 +714,45 @@ bool mitk::nnInteractiveTool::IsInstalled() const
 
 bool mitk::nnInteractiveTool::IsLocalInferenceAvailable() const
 {
+  // Detect via distribution metadata, not by importing the package: the full
+  // "nnInteractive" distribution provides local inference, the client-only
+  // "nninteractive-client" distribution does not. importlib.metadata reads the
+  // installed dist-info without importing nnInteractive, so this has no import
+  // side effects (importing a submodule would map venv native libraries and
+  // block a later in-place update on Windows).
   std::ostringstream pyCommands; pyCommands
-    << "import importlib.util\n"
-    << "is_local_available = importlib.util.find_spec('nnInteractive.inference.inference_session') is not None\n";
+    << "import importlib.metadata\n"
+    << "try:\n"
+    << "    importlib.metadata.version('nnInteractive')\n"
+    << "    is_local_available = True\n"
+    << "except Exception:\n"
+    << "    is_local_available = False\n";
 
   auto pythonContext = m_Impl->GetPythonContext();
   pythonContext->Execute(pyCommands.str());
 
   return pythonContext->GetVariableAsBool("is_local_available").value_or(false);
+}
+
+const std::vector<std::pair<std::string, std::string>>& mitk::nnInteractiveTool::GetSessionDefiningPreferences()
+{
+  // Key, default-as-stored. The defaults must match what StartSession()/the
+  // session construction reads and what the preference page writes, so that
+  // seeding leaves the stored value equal to the effective one.
+  static const std::vector<std::pair<std::string, std::string>> keys = {
+    { "nnInteractive/inferenceMode", "local" },
+    { "nnInteractive/serverUrl", "" },
+    { "nnInteractive/apiKey", "" },
+    { "nnInteractive/modelSource", "huggingface" },
+    { "nnInteractive/modelCheckpoint", "" },
+    { "nnInteractive/localModelPath", "" },
+    { "nnInteractive/backend", "auto" },
+    { "nnInteractive/gpuBackend", "cuda:0" },
+    { "nnInteractive/useTorchCompile", "false" },
+    { "nnInteractive/interactionsStorage", "auto" },
+  };
+
+  return keys;
 }
 
 bool mitk::nnInteractiveTool::GetCUDADeviceInfo(CUDADeviceInfo& info) const
@@ -774,6 +805,16 @@ void mitk::nnInteractiveTool::StartSession()
     this->EndSession();
 
   auto prefs = GetPreferences();
+
+  // Materialize the session-defining preferences with their effective values so a
+  // later no-op preferences "OK" does not register as a value change and tear the
+  // session down (mitk::Preferences fires its change event only on an actual
+  // change, and a default written into a never-stored key counts as one). Safe
+  // here: no session is running yet, so the GUI's stale-session observer is a
+  // no-op for these writes.
+  for (const auto& [key, defaultValue] : GetSessionDefiningPreferences())
+    prefs->Put(key, prefs->Get(key, defaultValue));
+
   m_Impl->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
 
   try

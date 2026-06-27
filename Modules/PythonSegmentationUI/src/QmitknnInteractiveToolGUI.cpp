@@ -670,11 +670,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 {
   if (!checked)
   {
-    // The button is a toggle: unchecking it uninitializes. EndSession() fires
+    // The button is a toggle: unchecking it uninitializes. AbortSession() ends the
+    // session and also clears the interaction prompts and preview and refreshes the
+    // views (a bare EndSession() would leave them on screen), then fires
     // SessionEndedEvent -> OnSessionEnded(), which reverts the session-dependent
     // controls and the button label. No confirmation prompt, matching Reset and
     // tool deactivation, which also discard unconfirmed work silently.
-    this->GetTool()->EndSession();
+    this->GetTool()->AbortSession();
     return;
   }
 

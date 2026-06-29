@@ -243,6 +243,9 @@
         <property name="text">
          <string>Auto-zoom</string>
         </property>
+        <property name="toolTip">
+         <string>When on, the model widens the region it analyzes if a segment reaches the edge, so large structures are not cut off. Improves completeness at the cost of speed; not available on CPU.</string>
+        </property>
         <property name="checked">
          <bool>true</bool>
         </property>

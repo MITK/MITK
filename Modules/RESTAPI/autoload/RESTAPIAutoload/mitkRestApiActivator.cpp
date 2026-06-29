@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIPreferences.h>
 #include <mitkIDataStorageService.h>
 #include <mitkStorageThreadDispatcherBase.h>
+#include <mitkWeakPointer.h>
 #include <mitkLog.h>
 
 #include <cstdlib>
@@ -367,13 +368,13 @@ private:
       MITK_DEBUG << "Connecting DataStorage to REST server";
       m_RestServer->SetDataStorage(dataStorage);
 
-      StorageThreadDispatcherBase::Pointer dispatcher = service->GetDispatcher();
-      if (dispatcher.IsNotNull())
+      StorageThreadDispatcherBase* dispatcher = service->GetDispatcher();
+      if (dispatcher != nullptr)
       {
         m_RestServer->SetDispatcher(dispatcher);
       }
 
-      m_Dispatcher = dispatcher;        // cached for deferred auto-start (null in headless)
+      m_Dispatcher = dispatcher;        // borrowed for deferred auto-start (null in headless)
       m_DataStorageConnected = true;
       this->MaybeAutoStart();
     }
@@ -411,10 +412,11 @@ private:
 
     m_AutoStartPosted = true;
 
-    if (m_Dispatcher.IsNotNull())
+    auto dispatcher = m_Dispatcher.Lock();
+    if (dispatcher.IsNotNull())
     {
       MITK_INFO << "Auto-starting REST API server (deferred to the main event loop)";
-      m_Dispatcher->Post([this]() { this->StartDeferred(); });
+      dispatcher->Post([this]() { this->StartDeferred(); });
     }
     else
     {
@@ -472,11 +474,14 @@ private:
 
   // Auto-start gate state (all guarded by m_Mutex). Auto-start is deferred onto
   // the dispatch thread and fires at most once, when every prerequisite holds.
-  StorageThreadDispatcherBase::Pointer m_Dispatcher;  // cached for deferred auto-start; may be null (headless)
-  bool m_AutoStartRequested = false;                  // from the autoStart preference
-  bool m_ConfigEnabled = false;                       // from config.enabled
-  bool m_DataStorageConnected = false;                // set once a DataStorage is wired
-  bool m_AutoStartPosted = false;                     // latch: auto-start is posted/performed at most once
+  WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;  // borrowed; null in headless
+  bool m_AutoStartRequested = false;   // from the autoStart preference
+  bool m_ConfigEnabled = false;        // from config.enabled
+  bool m_DataStorageConnected = false; // set once a DataStorage is wired
+  // Latch: at-most-once per module load. Deliberately not reset on a DataStorage
+  // disconnect/swap -- disconnect never stops a running server, so re-arming would
+  // risk a redundant start for no benefit; a fresh module load gets a fresh activator.
+  bool m_AutoStartPosted = false;
 };
 
 } // namespace mitk

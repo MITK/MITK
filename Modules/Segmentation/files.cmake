@@ -56,19 +56,11 @@ set(CPP_FILES
   Interactions/mitkLabelSelectionTool.cpp
   Interactions/mitkLassoTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkMedSAMTool.cpp
-  Interactions/mitkMonaiLabel2DTool.cpp
-  Interactions/mitkMonaiLabel3DTool.cpp
-  Interactions/mitkMonaiLabelTool.cpp
-  Interactions/mitknnUnetTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPickingTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkRegionGrowingTool.cpp
-  Interactions/mitkSegmentAnythingProcessExecutor.cpp
-  Interactions/mitkSegmentAnythingPythonService.cpp
-  Interactions/mitkSegmentAnythingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegWithPreviewTool.cpp

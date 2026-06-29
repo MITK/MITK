@@ -1,7 +1,3 @@
-set(H_FILES
-  QmitknnUNetEnsembleLayout.h
-)
-
 set(CPP_FILES
   QmitkSegWithPreviewToolGUIBase.cpp
   QmitkMultiLabelSegWithPreviewToolGUIBase.cpp
@@ -24,9 +20,6 @@ set(CPP_FILES
   QmitkToolGUI.cpp
   QmitkToolGUIArea.cpp
   QmitkToolSelectionBox.cpp
-  QmitknnUNetFolderParser.cpp
-  QmitknnUNetToolGUI.cpp
-  QmitknnUNetWorker.cpp
   QmitknnUNetGPU.cpp
   QmitkSurfaceStampWidget.cpp
   QmitkStaticDynamicSegmentationDialog.cpp
@@ -46,11 +39,6 @@ set(CPP_FILES
   QmitkLabelColorItemDelegate.cpp
   QmitkLabelToggleItemDelegate.cpp
   QmitkFindSegmentationTaskDialog.cpp
-  QmitkSegmentAnythingToolGUI.cpp
-  QmitkMedSAMToolGUI.cpp
-  QmitkMonaiLabelToolGUI.cpp
-  QmitkMonaiLabel2DToolGUI.cpp
-  QmitkMonaiLabel3DToolGUI.cpp
   QmitkLabelSelectionToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
@@ -65,7 +53,6 @@ set(UI_FILES
   QmitkGrowCutToolWidgetControls.ui
   QmitkOtsuToolWidgetControls.ui
   QmitkSurfaceStampWidgetGUIControls.ui
-  QmitknnUNetToolGUIControls.ui
   QmitkEditableContourToolGUIControls.ui
   QmitkSegmentationTaskListWidget.ui
   QmitkTotalSegmentatorGUIControls.ui
@@ -74,9 +61,6 @@ set(UI_FILES
   QmitkMultiLabelSelectionLabel.ui
   QmitkMultiLabelSelectionWidget.ui
   QmitkFindSegmentationTaskDialog.ui
-  QmitkSegmentAnythingGUIControls.ui
-  QmitkMedSAMGUIControls.ui
-  QmitkMonaiLabelToolGUIControls.ui
   QmitkLabelSelectionToolGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

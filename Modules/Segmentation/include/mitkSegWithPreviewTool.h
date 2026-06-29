@@ -45,7 +45,7 @@ namespace mitk
     void Deactivated() override;
 
     /** \brief Preview tools are SEMIAUTOMATIC by default (the user supplies seeds/parameters).
-     * Fully automatic preview tools (e.g. nnUNet) override this again to AUTOMATIC. */
+     * Fully automatic preview tools (e.g. TotalSegmentator) override this again to AUTOMATIC. */
     mitk::Label::AlgorithmType GetAlgorithmType() const override;
 
     /**

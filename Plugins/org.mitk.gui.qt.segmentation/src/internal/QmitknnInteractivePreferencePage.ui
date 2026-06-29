@@ -177,6 +177,24 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="clientOnlyHintLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>&lt;small&gt;Local inference requires a full installation. Uninstall nnInteractive below and reinstall in Full mode to enable it.&lt;/small&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="indent">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QRadioButton" name="remoteModeRadioButton">
             <property name="toolTip">
              <string>Run inference on a remote nninteractive-server, which provides the model and GPU.</string>
@@ -262,7 +280,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -302,17 +320,30 @@
                <string>Checkpoint:</string>
               </property>
               <property name="buddy">
-               <cstring>checkpointLineEdit</cstring>
+               <cstring>checkpointComboBox</cstring>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="checkpointLineEdit">
-              <property name="text">
-               <string>nnInteractive_v1.0</string>
+             <widget class="QComboBox" name="checkpointComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="placeholderText">
-               <string>nnInteractive_v1.0</string>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="refreshModelsButton">
+              <property name="toolTip">
+               <string>Refresh the list of available model checkpoints.</string>
+              </property>
+              <property name="text">
+               <string>Refresh</string>
               </property>
              </widget>
             </item>
@@ -364,7 +395,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -439,7 +470,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -493,7 +524,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -571,7 +602,8 @@
   <tabstop>serverUrlLineEdit</tabstop>
   <tabstop>apiKeyLineEdit</tabstop>
   <tabstop>hfSourceRadioButton</tabstop>
-  <tabstop>checkpointLineEdit</tabstop>
+  <tabstop>checkpointComboBox</tabstop>
+  <tabstop>refreshModelsButton</tabstop>
   <tabstop>localSourceRadioButton</tabstop>
   <tabstop>localModelPathLineEdit</tabstop>
   <tabstop>localModelPathBrowseButton</tabstop>

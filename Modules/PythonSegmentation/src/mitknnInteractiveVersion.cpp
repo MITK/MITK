@@ -18,17 +18,19 @@ found in the LICENSE file.
 
 #include <sstream>
 
-mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(PythonContext& context, bool checkForUpdate)
+mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(PythonContext& context, bool checkForUpdate, const std::string& distributionName)
 {
   VersionCheckResult result;
 
   const std::string spec = std::string(">=") + MINIMUM_VERSION + ",<" + MAXIMUM_VERSION_EXCLUSIVE;
 
-  // Determine the offline verdict (installed vs. minimum) first and only reach
-  // out to PyPI when the installed version is already supported, so a too-old
-  // package is flagged instantly and a missing network never delays the result.
-  // packaging ships with pip/torch, so the imports are expected to succeed; any
-  // failure leaves nni_installed empty and the caller treats it as Unknown.
+  // Read the installed version with the standard library alone, so a missing
+  // third-party 'packaging' never hides an installed package behind an Unknown
+  // verdict (a client-only venv has no torch to pull 'packaging' in; the install
+  // requests it explicitly, but guard it regardless). 'packaging' is only needed
+  // for the comparisons that follow. Reach out to PyPI only once the installed
+  // version is known to be supported, so a too-old package is flagged instantly
+  // and a missing network never delays the result.
   std::ostringstream pyCommands; pyCommands
     << "nni_installed = ''\n"
     << "nni_latest = ''\n"
@@ -36,38 +38,45 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
     << "nni_update_available = False\n"
     << "try:\n"
     << "    from importlib.metadata import version\n"
-    << "    from packaging.version import Version\n"
-    << "    nni_installed = version('nnInteractive')\n"
-    << "    nni_below_min = Version(nni_installed) < Version('" << MINIMUM_VERSION << "')\n";
+    << "    nni_installed = version('" << distributionName << "')\n"
+    << "except Exception:\n"
+    << "    nni_installed = ''\n"
+    << "if nni_installed:\n"
+    << "    try:\n"
+    << "        from packaging.version import Version\n"
+    << "        nni_below_min = Version(nni_installed) < Version('" << MINIMUM_VERSION << "')\n";
 
   if (checkForUpdate)
   {
     pyCommands
-      << "    if not nni_below_min:\n"
-      << "        try:\n"
-      << "            from packaging.specifiers import SpecifierSet\n"
-      << "            import urllib.request, json\n"
-      << "            with urllib.request.urlopen('https://pypi.org/pypi/nnInteractive/json', timeout=5) as _r:\n"
-      << "                _data = json.load(_r)\n"
-      << "            _spec = SpecifierSet('" << spec << "')\n"
+      << "        if not nni_below_min:\n"
+      << "            try:\n"
+      << "                from packaging.specifiers import SpecifierSet\n"
+      << "                import urllib.request, json\n"
+      << "                with urllib.request.urlopen('https://pypi.org/pypi/" << distributionName << "/json', timeout=5) as _r:\n"
+      << "                    _data = json.load(_r)\n"
+      << "                _spec = SpecifierSet('" << spec << "')\n"
       // Consider only releases with installable, non-yanked files. PyPI's
       // 'releases' map keeps every version ever registered, including yanked or
       // fileless ones that pip would never install, so filtering by the version
       // string alone could advertise an update that cannot actually be had.
-      << "            _cands = [v for v, _files in _data['releases'].items()\n"
-      << "                      if _files and not all(_f.get('yanked') for _f in _files)\n"
-      << "                      and _spec.contains(v, prereleases=False)]\n"
-      << "            if _cands:\n"
-      << "                nni_latest = str(max(_cands, key=Version))\n"
-      << "                nni_update_available = Version(nni_latest) > Version(nni_installed)\n"
-      << "        except Exception:\n"
-      << "            nni_latest = ''\n"
-      << "            nni_update_available = False\n";
+      << "                _cands = [v for v, _files in _data['releases'].items()\n"
+      << "                          if _files and not all(_f.get('yanked') for _f in _files)\n"
+      << "                          and _spec.contains(v, prereleases=False)]\n"
+      << "                if _cands:\n"
+      << "                    nni_latest = str(max(_cands, key=Version))\n"
+      << "                    nni_update_available = Version(nni_latest) > Version(nni_installed)\n"
+      << "            except Exception:\n"
+      << "                nni_latest = ''\n"
+      << "                nni_update_available = False\n";
   }
 
   pyCommands
-    << "except Exception:\n"
-    << "    nni_installed = ''\n";
+    // A missing 'packaging' or an unparsable version string must not pass for
+    // UpToDate: clearing nni_installed makes the result inconclusive, so the
+    // C++ below reports Unknown rather than silently skipping the version gate.
+    << "    except Exception:\n"
+    << "        nni_installed = ''\n";
 
   try
   {
@@ -94,14 +103,14 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
   return result;
 }
 
-mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(bool checkForUpdate)
+mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersion(bool checkForUpdate, const std::string& distributionName)
 {
   try
   {
     PythonContext context("nnInteractive");
     context.Activate();
 
-    return CheckInstalledVersion(context, checkForUpdate);
+    return CheckInstalledVersion(context, checkForUpdate, distributionName);
   }
   catch (const Exception& e)
   {

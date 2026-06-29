@@ -17,6 +17,9 @@ found in the LICENSE file.
 #include <mitknnInteractiveEnums.h>
 
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace mitk::nnInteractive
 {
@@ -308,6 +311,40 @@ namespace mitk
      * \return \c true if the package is installed, \c false otherwise.
      */
     bool IsInstalled() const;
+
+    /** \brief Checks whether local (in-process) inference is available.
+     *
+     * Local inference is provided by the full "nnInteractive" distribution (which
+     * installs PyTorch and the inference backend); the lightweight client-only
+     * "nninteractive-client" distribution shares the same "nnInteractive" import
+     * namespace but offers remote sessions only. Detection reads the installed
+     * distribution metadata rather than importing the package, so it stays cheap
+     * and, crucially, has no import side effects: importing an nnInteractive
+     * submodule would map native libraries from the virtual environment and block
+     * a later in-place update on Windows.
+     *
+     * \pre A Python context must have been created via CreatePythonContext().
+     *
+     * \return \c true if local inference is available (full install), \c false for
+     *         a client-only install.
+     */
+    bool IsLocalInferenceAvailable() const;
+
+    /** \brief The preferences baked into a session at initialization, each paired
+     *         with its default value (as stored).
+     *
+     * Single source of truth shared by the tool and its GUI:
+     * - StartSession() seeds these so the stored values match what the session
+     *   actually uses. Otherwise the first preferences "OK" after a fresh install
+     *   writes a default into a never-stored key, which mitk::Preferences reports
+     *   as a value change and which the GUI would act on by ending the session.
+     * - The GUI ends a running session whenever one of these keys changes, since
+     *   the session can no longer match the new settings.
+     *
+     * Live or GUI-only settings (auto-zoom, auto-refine, automation, shortcut
+     * labels, install mode) are deliberately excluded.
+     */
+    static const std::vector<std::pair<std::string, std::string>>& GetSessionDefiningPreferences();
 
     /** \brief Queries CUDA device information via PyTorch.
      *

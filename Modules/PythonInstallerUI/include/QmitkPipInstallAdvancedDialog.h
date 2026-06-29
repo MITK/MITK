@@ -29,7 +29,7 @@ class QVBoxLayout;
 /** \brief Dialog for editing a PipInstallSpec before installation.
  *
  * Presents editable widgets for every field of the install spec, including
- * the ability to add and remove install groups and Hugging Face downloads.
+ * the ability to add and remove install groups and post-install steps.
  * The spec can also be loaded from and saved to JSON files.
  *
  * \sa QmitkPipInstallDialog, mitk::PipInstallSpec
@@ -47,8 +47,8 @@ public:
 private slots:
   void OnAddGroup();
   void OnRemoveGroup();
-  void OnAddDownload();
-  void OnRemoveDownload();
+  void OnAddStep();
+  void OnRemoveStep();
   void OnLoadSpec();
   void OnSaveSpec();
 
@@ -60,18 +60,17 @@ private:
     QLineEdit* extraPipArgs;
   };
 
-  struct DownloadWidgets
+  struct StepWidgets
   {
     QLineEdit* displayName;
-    QLineEdit* repoId;
-    QPlainTextEdit* allowPatterns;
+    QPlainTextEdit* pythonCode;
     QCheckBox* optionalCheckBox;
   };
 
   QGroupBox* CreateGroupWidget(const mitk::PipInstallGroup& group, int index);
-  QGroupBox* CreateDownloadWidget(const mitk::HuggingFaceDownload& download, int index);
+  QGroupBox* CreateStepWidget(const mitk::PostInstallStep& step, int index);
   void RenumberGroupTitles();
-  void RenumberDownloadTitles();
+  void RenumberStepTitles();
   void RebuildFromSpec(const mitk::PipInstallSpec& spec);
 
   QLineEdit* m_NameEdit = nullptr;
@@ -79,13 +78,13 @@ private:
   QCheckBox* m_UpgradePipFirstCheckBox = nullptr;
 
   QVBoxLayout* m_GroupsLayout = nullptr;
-  QVBoxLayout* m_DownloadsLayout = nullptr;
+  QVBoxLayout* m_StepsLayout = nullptr;
 
   std::vector<GroupWidgets> m_GroupWidgets;
   std::vector<QGroupBox*> m_GroupBoxes;
 
-  std::vector<DownloadWidgets> m_DownloadWidgets;
-  std::vector<QGroupBox*> m_DownloadBoxes;
+  std::vector<StepWidgets> m_StepWidgets;
+  std::vector<QGroupBox*> m_StepBoxes;
 };
 
 #endif

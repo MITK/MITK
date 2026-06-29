@@ -31,6 +31,11 @@ class QButtonGroup;
 class QPushButton;
 class QTimer;
 
+namespace mitk::nnInteractive
+{
+  struct VersionCheckResult;
+}
+
 namespace Ui
 {
   class QmitknnInteractiveToolGUI;
@@ -164,13 +169,16 @@ protected:
    */
   void OnInteractorToggled(mitk::nnInteractive::InteractionType interactionType, bool checked);
 
-  /** \brief Handles the mask initialization button click.
+  /** \brief Reacts to a change of the selected label in the host's label
+   *         inspector while a session is running.
    *
-   * Prompts the user to confirm initialization with the active label of
-   * the working segmentation, then resets interactions and initializes
-   * the session with the label mask.
+   * Acts only on a single-label selection and delegates to
+   * MaybeInitializeWithLabelMask(), which seeds the session from the selected
+   * label if it has content.
+   *
+   * \param[in] labels The now-selected label values.
    */
-  void OnMaskButtonClicked();
+  void OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels);
 
   /** \brief Handles cleanup confirmation from the tool.
    *
@@ -332,6 +340,31 @@ private:
    */
   void UpdateUndoButtonState();
 
+  /** \brief Rebases the running session on the given label.
+   *
+   * No-op unless a session is running and the model advertises the mask
+   * interaction. Otherwise resets the current interactions and preview (so a
+   * mask seeded from the previously selected label does not linger when
+   * switching labels) and, if the label has content, seeds the session from it.
+   * No confirmation: the selection has already changed, so the next Confirm
+   * would write into the new label regardless. Shared by the selection-change
+   * handler and the session-start path.
+   *
+   * \param[in] labelValue The working-segmentation label to rebase on.
+   */
+  void MaybeInitializeWithLabelMask(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+
+  /** \brief Refreshes the Confirm button to reflect the active target label.
+   *
+   * While a session runs, shows the label the next Confirm writes into as
+   * `Confirm "<name>"` with a color swatch matching the label; otherwise shows
+   * the plain base text. Appends the keyboard-shortcut suffix per the
+   * "show shortcuts in labels" preference. Called on session start/end,
+   * active-label changes, after auto-create-next-label, and on the
+   * shortcut-preference change.
+   */
+  void UpdateConfirmButtonLabel();
+
   /** \brief Updates the Initialize button label to reflect the current state:
    *         "Uninitialize" while a session is running, otherwise the action the
    *         next click performs for the configured inference mode ("Initialize"
@@ -349,6 +382,43 @@ private:
    * checked state.
    */
   void UncheckInitializeButton();
+
+  /** \brief Offers an in-place update when the installed version is below the
+   *         minimum or a newer release is available.
+   *
+   * Replaces the former "uninstall and reinitialize" guidance. Runs the pip
+   * upgrade through QmitkPipInstallDialog in update mode. An in-place update is
+   * refused (with a restart hint) while nnInteractive modules are loaded into the
+   * process, because pip cannot replace mapped binaries on Windows.
+   *
+   * \param[in] versionCheck The version-check result that triggered the offer.
+   * \param[in] clientOnly Whether this is a client-only install (upgrades
+   *                       nninteractive-client instead of nnInteractive).
+   * \param[in] belowMinimum \c true for the BelowMinimum case (update is required
+   *                         to continue), \c false for an optional UpdateAvailable.
+   *
+   * \return \c true if initialization should proceed (updated successfully, or the
+   *         user chose to continue with the installed version), \c false to abort.
+   */
+  bool OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly);
+
+  /** \brief Runs the pip upgrade dialog and recreates the Python context.
+   *
+   * \param[in] clientOnly Whether to upgrade nninteractive-client (vs nnInteractive).
+   * \return \c true if the update completed and the context was recreated.
+   */
+  bool RunUpdate(bool clientOnly);
+
+  /** \brief Once per run, offers to switch to a newer recommended model checkpoint.
+   *
+   * No-op unless local inference is available and the configured model source is
+   * the managed (Hugging Face) source in local mode. Compares the configured model
+   * id against the library's recommended default and, when they differ, offers to
+   * update the \c nnInteractive/modelCheckpoint preference.
+   *
+   * \param[in] localAvailable Whether local inference is available (full install).
+   */
+  void MaybePromptModelSwitch(bool localAvailable);
 
   struct ShortcutLabel
   {
@@ -368,10 +438,25 @@ private:
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
 
+  // Set while AutoCreateAndSelectNewLabel() drives the inspector's selection.
+  // The inspector emits CurrentSelectionChanged synchronously, which would
+  // otherwise re-enter OnActiveLabelChanged and reset/re-seed the session
+  // mid-confirm. The slot honours this guard and stays a no-op.
+  bool m_SuppressActiveLabelChanged = false;
+
   // Whether the running session reports undo support (nnInteractive >= 2.3.3).
   // Cached at session start (ApplyCapabilityGating) and used to gate the Undo
   // button; older versions report no support and the button stays disabled.
   bool m_SupportsUndo = false;
+
+  // Once-per-session guards for the network-backed checks run in Install(): the
+  // online "newer release available" version check and the model-switch prompt.
+  // Set only when the network was actually reached (so an offline failure
+  // retries) and reset on session teardown in OnSessionEnded() so a reinitialize
+  // checks again. Member-scoped, not process-static, so they track this GUI's
+  // session lifecycle rather than persisting for the whole run.
+  bool m_OnlineUpdateCheckDone = false;
+  bool m_ModelSwitchCheckDone = false;
 
   QTimer* m_HeartbeatTimer = nullptr;
 

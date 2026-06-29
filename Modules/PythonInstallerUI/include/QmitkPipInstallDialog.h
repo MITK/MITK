@@ -61,7 +61,16 @@ class MITKPYTHONINSTALLERUI_EXPORT QmitkPipInstallDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent = nullptr);
+  /** \brief Whether the dialog presents a fresh install or an in-place update.
+   *
+   * Only affects user-facing wording (window title, description, button labels,
+   * success message) and hides the Advanced-settings button in Update mode. The
+   * underlying install engine is identical; an update is driven by passing
+   * \c --upgrade in the spec's group extra pip arguments.
+   */
+  enum class Mode { Install, Update };
+
+  explicit QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent = nullptr, Mode mode = Mode::Install);
   ~QmitkPipInstallDialog() override;
 
 protected:
@@ -78,7 +87,7 @@ private slots:
   void OnPipUpgradeStarted();
   void OnResolveStarted();
   void OnPackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
-  void OnModelDownloadStarted(const QString& displayName);
+  void OnPostInstallStepStarted(const QString& displayName);
   void OnInstallFinished(bool success);
   void OnProgressChanged(int current, int total);
   void OnErrorOccurred(const QString& message);
@@ -98,6 +107,7 @@ private:
   std::unique_ptr<Ui::QmitkPipInstallDialog> m_Ui;
   QmitkPipInstaller* m_Installer = nullptr;
   mitk::PipInstallSpec m_Spec;
+  Mode m_Mode = Mode::Install;
   QTimer* m_DotTimer = nullptr;
   QString m_PackageLabelBaseText;
   int m_DotCount = 0;

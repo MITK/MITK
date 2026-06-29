@@ -25,34 +25,45 @@ found in the LICENSE file.
 #include <QShowEvent>
 #include <QTextCursor>
 
-QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent)
+QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, QWidget* parent, Mode mode)
   : QDialog(parent),
     m_Ui(std::make_unique<Ui::QmitkPipInstallDialog>()),
     m_Installer(new QmitkPipInstaller(this)),
-    m_Spec(spec)
+    m_Spec(spec),
+    m_Mode(mode)
 {
   m_Ui->setupUi(this);
 
   auto name = QString::fromStdString(spec.name);
 
-  this->setWindowTitle(name + " Installer");
+  const bool update = m_Mode == Mode::Update;
+  const QString actionTitle = update ? "Updater" : "Installer";
+  const QString actionVerb = update ? "update" : "install";
+  const QString actionButton = update ? "Update " : "Install ";
+
+  this->setWindowTitle(name + " " + actionTitle);
 
   m_Ui->descriptionLabel->setTextFormat(Qt::RichText);
   m_Ui->descriptionLabel->setText(
-    QString("<h3>Do you want to install %1?</h3>"
+    QString("<h3>Do you want to %1 %2?</h3>"
             "<p>This may take a while depending on your internet connection.</p>")
-      .arg(name.toHtmlEscaped()));
+      .arg(actionVerb, name.toHtmlEscaped()));
 
   m_Ui->statusLabel->setTextFormat(Qt::RichText);
 
-  // Hide progress elements until installation starts.
+  // Hide progress elements until the operation starts.
   m_Ui->statusLabel->hide();
   m_Ui->progressBar->hide();
   m_Ui->packageLabel->hide();
 
-  // Rename the Ok button to "Install <name>".
+  // Rename the Ok button to "Install <name>" / "Update <name>".
   if (auto* button = m_Ui->buttonBox->button(QDialogButtonBox::Ok))
-    button->setText("Install " + name);
+    button->setText(actionButton + name);
+
+  // The Advanced-settings editor authors a fresh install spec; it is not
+  // meaningful for an in-place update of a known package.
+  if (update)
+    m_Ui->advancedSettingsButton->hide();
 
   // Wire the Install (Ok) button to our slot instead of the default accept.
   disconnect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -71,7 +82,7 @@ QmitkPipInstallDialog::QmitkPipInstallDialog(const mitk::PipInstallSpec& spec, Q
   connect(m_Installer, &QmitkPipInstaller::PipUpgradeStarted, this, &QmitkPipInstallDialog::OnPipUpgradeStarted);
   connect(m_Installer, &QmitkPipInstaller::ResolveStarted, this, &QmitkPipInstallDialog::OnResolveStarted);
   connect(m_Installer, &QmitkPipInstaller::PackageStatusChanged, this, &QmitkPipInstallDialog::OnPackageStatusChanged);
-  connect(m_Installer, &QmitkPipInstaller::ModelDownloadStarted, this, &QmitkPipInstallDialog::OnModelDownloadStarted);
+  connect(m_Installer, &QmitkPipInstaller::PostInstallStepStarted, this, &QmitkPipInstallDialog::OnPostInstallStepStarted);
   connect(m_Installer, &QmitkPipInstaller::InstallFinished, this, &QmitkPipInstallDialog::OnInstallFinished);
   connect(m_Installer, &QmitkPipInstaller::ProgressChanged, this, &QmitkPipInstallDialog::OnProgressChanged);
   connect(m_Installer, &QmitkPipInstaller::ErrorOccurred, this, &QmitkPipInstallDialog::OnErrorOccurred);
@@ -137,16 +148,12 @@ void QmitkPipInstallDialog::OnAdvancedSettingsClicked()
 void QmitkPipInstallDialog::OnInstallClicked()
 {
   // Total steps: 1 (venv, if needed) + 1 (pip upgrade, if requested) + 2 per
-  // group + 1 per Hugging Face model download. The installer appends a
-  // synthetic huggingface_hub install group when Hugging Face downloads are
-  // present, so count that extra group here too.
+  // group (resolve + install) + 1 per post-install step.
   bool needsVirtualEnv = !m_Spec.venvName.empty() &&
                    !mitk::PythonHelper::VirtualEnvExists(m_Spec.venvName);
-  int effectiveGroups = static_cast<int>(m_Spec.groups.size()) +
-                        (m_Spec.huggingFaceDownloads.empty() ? 0 : 1);
   m_TotalSteps = (needsVirtualEnv ? 1 : 0) + (m_Spec.upgradePipFirst ? 1 : 0) +
-                 2 * effectiveGroups +
-                 static_cast<int>(m_Spec.huggingFaceDownloads.size());
+                 2 * static_cast<int>(m_Spec.groups.size()) +
+                 static_cast<int>(m_Spec.postInstallSteps.size());
   m_CurrentStep = 0;
 
   m_Installer->SetInstallSpec(m_Spec);
@@ -181,6 +188,9 @@ void QmitkPipInstallDialog::OnResolveStarted()
   ++m_CurrentStep;
   this->SetStatus("Resolve dependencies");
   m_Ui->progressBar->setRange(0, 0);
+  // Show the (indeterminate) bar here too: an update skips the venv-creation and
+  // pip-upgrade phases that otherwise reveal it, so resolve is the first phase.
+  m_Ui->progressBar->show();
   m_Ui->packageLabel->hide();
 }
 
@@ -210,22 +220,18 @@ void QmitkPipInstallDialog::OnPackageStatusChanged(int index, const QString& nam
   m_DotTimer->start();
 }
 
-void QmitkPipInstallDialog::OnModelDownloadStarted(const QString& displayName)
+void QmitkPipInstallDialog::OnPostInstallStepStarted(const QString& displayName)
 {
   m_DotTimer->stop();
   ++m_CurrentStep;
-  this->SetStatus("Download model weights");
+  this->SetStatus(displayName);
 
-  // Indeterminate while the download runs. tqdm progress from huggingface_hub
-  // shows up in the details view via OutputReceived.
+  // Indeterminate while the step runs: the busy progress bar conveys liveness;
+  // detailed progress (e.g. download tqdm output) shows up in the details view
+  // via OutputReceived.
   m_Ui->progressBar->setRange(0, 0);
   m_Ui->progressBar->show();
-
-  m_PackageLabelBaseText = QString("Downloading %1").arg(displayName);
-  m_DotCount = 0;
-  m_Ui->packageLabel->setText(m_PackageLabelBaseText);
-  m_Ui->packageLabel->show();
-  m_DotTimer->start();
+  m_Ui->packageLabel->hide();
 }
 
 void QmitkPipInstallDialog::OnInstallFinished(bool success)
@@ -242,7 +248,8 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
 
   if (success)
   {
-    this->SetTerminalStatus(QString::fromStdString(m_Spec.name) + " was installed successfully.");
+    this->SetTerminalStatus(QString::fromStdString(m_Spec.name) +
+      (m_Mode == Mode::Update ? " was updated successfully." : " was installed successfully."));
     m_Ui->packageLabel->hide();
     // The last phase may have left the bar in indeterminate (spinning) mode
     // (HF downloads use setRange(0, 0)), so hide it once we're done.
@@ -262,7 +269,7 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
   }
   else
   {
-    this->SetTerminalStatus("Installation failed. Please try again.");
+    this->SetTerminalStatus(m_Mode == Mode::Update ? "Update failed. Please try again." : "Installation failed. Please try again.");
     m_Ui->packageLabel->hide();
     m_Ui->progressBar->hide();
     this->OfferDetails();
@@ -279,7 +286,7 @@ void QmitkPipInstallDialog::OnErrorOccurred(const QString& message)
 {
   m_DotTimer->stop();
   this->SetUiFinished(false);
-  this->SetTerminalStatus("Installation failed: " + message);
+  this->SetTerminalStatus((m_Mode == Mode::Update ? QString("Update failed: ") : QString("Installation failed: ")) + message);
   m_Ui->packageLabel->hide();
   m_Ui->progressBar->hide();
   this->OfferDetails();

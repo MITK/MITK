@@ -124,19 +124,19 @@ signals:
    */
   void PackageStatusChanged(int index, const QString& name, mitk::PackageStatus status);
 
-  /** \brief Emitted when a Hugging Face model download starts.
+  /** \brief Emitted when a post-install step starts.
    *
-   * Fired once per entry in PipInstallSpec::huggingFaceDownloads, in order.
+   * Fired once per entry in PipInstallSpec::postInstallSteps, in order.
    *
-   * \param[in] displayName The download's display name (repoId if none set).
+   * \param[in] displayName The step's display name.
    */
-  void ModelDownloadStarted(const QString& displayName);
+  void PostInstallStepStarted(const QString& displayName);
 
   /** \brief Emitted when the installation terminates.
    *
    * Fires exactly once per StartInstall() call, covering both success and
-   * every failure mode (resolve failure, package install failure, model
-   * download failure of a non-optional download, setup errors).
+   * every failure mode (resolve failure, package install failure, a
+   * non-optional post-install step failure, setup errors).
    *
    * Setup and failure messages arrive via ErrorOccurred before this
    * signal; consumers that want to display a specific cause should use
@@ -183,7 +183,7 @@ private:
     UpgradingPip,
     Resolving,
     Installing,
-    DownloadingModels,
+    RunningPostInstall,
     Cancelling,
     Done,
     Failed
@@ -193,8 +193,8 @@ private:
   void StartPipUpgrade();
   void StartResolveGroup();
   void StartInstallPackage();
-  void BeginModelDownloadPhase();
-  void StartModelDownload();
+  void BeginPostInstallPhase();
+  void StartPostInstallStep();
   QStringList BuildPipArgs(const QStringList& baseArgs, const mitk::PipInstallGroup& group) const;
   void AdvanceToNextGroup();
   bool ParseResolveReport(const QString& reportPath, int groupIndex);
@@ -205,11 +205,10 @@ private:
 
   mitk::PipInstallSpec m_Spec;
 
-  // Working copy of the groups driving the current install run. Equals
-  // m_Spec.groups plus, when m_Spec.huggingFaceDownloads is non-empty,
-  // a trailing synthetic group with huggingface_hub so the inline
-  // snapshot_download script in StartModelDownload can always import it.
-  // Rebuilt in StartInstall() so the synthetic group survives retries.
+  // Working copy of the groups driving the current install run. Currently equal
+  // to m_Spec.groups; kept as a separate member so the install loop and
+  // ParseResolveReport index a stable list, and so future synthetic groups can
+  // be appended in StartInstall() without disturbing the caller's spec.
   std::vector<mitk::PipInstallGroup> m_Groups;
   std::vector<mitk::PipPackageInfo> m_ResolvedPackages;
 
@@ -221,7 +220,7 @@ private:
   int m_CurrentGroup = 0;
   int m_CurrentPackage = 0;
   int m_GroupStartIndex = 0;
-  int m_CurrentDownload = 0;
+  int m_CurrentPostInstallStep = 0;
 
   QTemporaryFile m_ReportFile;
 };

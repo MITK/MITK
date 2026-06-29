@@ -39,10 +39,7 @@ namespace mitk
     std::string specifier;  /**< Original requirement, e.g. "torch>=2.8.0,<2.9.0".
                                  Empty for transitive dependencies. */
     bool requested = false; /**< True if explicitly requested, false if transitive. */
-    int group = 0;          /**< Index of the install group this package belongs to.
-                                 Indexes the installer's working list, which may include
-                                 an implicit trailing group for huggingface_hub when the
-                                 spec carries Hugging Face downloads. */
+    int group = 0;          /**< Index of the install group this package belongs to. */
   };
 
   /** \brief A set of packages that share the same pip options.
@@ -70,35 +67,36 @@ namespace mitk
     std::vector<std::string> extraPipArgs; /**< Additional pip arguments, e.g. {"--no-cache-dir"}. */
   };
 
-  /// \brief Files to fetch from a Hugging Face repository after pip install.
+  /// \brief A Python command to run in the activated venv after pip install.
   ///
-  /// Processed by PipInstaller as a terminal phase once all pip groups have
-  /// been installed successfully. The download runs `huggingface_hub`'s
-  /// \c snapshot_download in the activated venv, so the venv must contain
-  /// \c huggingface_hub (typically a transitive dependency of an ML package
-  /// installed in one of the groups).
+  /// Processed by PipInstaller as a terminal phase once all pip groups have been
+  /// installed successfully. Each step runs as `python -c "<pythonCode>"` in the
+  /// activated virtual environment, so any imports it needs must be satisfied by
+  /// packages installed in the groups (directly or transitively). Raw stdout and
+  /// stderr (including tqdm progress) is forwarded to the installer's output signal.
   ///
   /// \code
-  /// HuggingFaceDownload model;
-  /// model.repoId = "nnInteractive/nnInteractive";
-  /// model.allowPatterns = { "nnInteractive_v1.0/*" };
-  /// model.displayName = "nnInteractive model";
-  /// spec.huggingFaceDownloads.push_back(std::move(model));
+  /// PostInstallStep step;
+  /// step.displayName = "Download model weights";
+  /// step.pythonCode =
+  ///   "from nnInteractive.model_management import ensure_model_available, get_default_model_id\n"
+  ///   "ensure_model_available(get_default_model_id())\n";
+  /// step.optional = true;
+  /// spec.postInstallSteps.push_back(std::move(step));
   /// \endcode
   ///
-  struct MITKPYTHONINSTALLER_EXPORT HuggingFaceDownload
+  struct MITKPYTHONINSTALLER_EXPORT PostInstallStep
   {
-    std::string repoId;                     /**< Hugging Face repo id, e.g. "nnInteractive/nnInteractive". */
-    std::vector<std::string> allowPatterns; /**< Glob patterns to restrict the download. Empty = whole repo. */
-    std::string displayName;                /**< Label for the installer UI. Falls back to \c repoId if empty. */
-    bool optional = false;                  /**< If true, a download failure does not fail the overall installation. */
+    std::string displayName; /**< Label for the installer UI. */
+    std::string pythonCode;  /**< Python source executed via `python -c`. */
+    bool optional = false;   /**< If true, a failure does not fail the overall installation. */
   };
 
   /** \brief Full specification for a pip installation run.
    *
    * Contains one or more install groups that are processed sequentially,
    * plus global options like whether to upgrade pip first, plus an optional
-   * list of Hugging Face repositories to fetch after pip install completes.
+   * list of Python commands to run after pip install completes.
    */
   struct MITKPYTHONINSTALLER_EXPORT PipInstallSpec
   {
@@ -106,7 +104,7 @@ namespace mitk
     std::string venvName;                  /**< If set, create and activate this venv before installing. */
     std::vector<PipInstallGroup> groups;   /**< Install groups, processed in order. */
     bool upgradePipFirst = true;           /**< Whether to upgrade pip before installing. */
-    std::vector<HuggingFaceDownload> huggingFaceDownloads; /**< Model weights to fetch after pip install. */
+    std::vector<PostInstallStep> postInstallSteps; /**< Python commands to run after pip install. */
 
     /** \brief Load a PipInstallSpec from a JSON file.
      *
@@ -135,8 +133,8 @@ namespace mitk
   MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, PipInstallGroup& g);
   MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const PipInstallGroup& g);
 
-  MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, HuggingFaceDownload& d);
-  MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const HuggingFaceDownload& d);
+  MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, PostInstallStep& s);
+  MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const PostInstallStep& s);
 
   MITKPYTHONINSTALLER_EXPORT void from_json(const nlohmann::ordered_json& j, PipInstallSpec& s);
   MITKPYTHONINSTALLER_EXPORT void to_json(nlohmann::ordered_json& j, const PipInstallSpec& s);

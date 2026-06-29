@@ -40,22 +40,20 @@ void mitk::to_json(nlohmann::ordered_json& j, const PipInstallGroup& g)
   j["extraPipArgs"] = g.extraPipArgs;
 }
 
-// --- HuggingFaceDownload JSON ---
+// --- PostInstallStep JSON ---
 
-void mitk::from_json(const nlohmann::ordered_json& j, HuggingFaceDownload& d)
+void mitk::from_json(const nlohmann::ordered_json& j, PostInstallStep& s)
 {
-  j.at("repoId").get_to(d.repoId);
-  d.allowPatterns = j.value("allowPatterns", std::vector<std::string>());
-  d.displayName = j.value("displayName", std::string());
-  d.optional = j.value("optional", false);
+  s.displayName = j.value("displayName", std::string());
+  j.at("pythonCode").get_to(s.pythonCode);
+  s.optional = j.value("optional", false);
 }
 
-void mitk::to_json(nlohmann::ordered_json& j, const HuggingFaceDownload& d)
+void mitk::to_json(nlohmann::ordered_json& j, const PostInstallStep& s)
 {
-  j["repoId"] = d.repoId;
-  j["allowPatterns"] = d.allowPatterns;
-  j["displayName"] = d.displayName;
-  j["optional"] = d.optional;
+  j["displayName"] = s.displayName;
+  j["pythonCode"] = s.pythonCode;
+  j["optional"] = s.optional;
 }
 
 // --- PipInstallSpec JSON ---
@@ -75,7 +73,7 @@ void mitk::from_json(const nlohmann::ordered_json& j, PipInstallSpec& s)
   s.venvName = j.value("venvName", std::string());
   s.groups = j.value("groups", std::vector<PipInstallGroup>());
   s.upgradePipFirst = j.value("upgradePipFirst", true);
-  s.huggingFaceDownloads = j.value("huggingFaceDownloads", std::vector<HuggingFaceDownload>());
+  s.postInstallSteps = j.value("postInstallSteps", std::vector<PostInstallStep>());
 }
 
 void mitk::to_json(nlohmann::ordered_json& j, const PipInstallSpec& s)
@@ -86,7 +84,7 @@ void mitk::to_json(nlohmann::ordered_json& j, const PipInstallSpec& s)
   j["venvName"] = s.venvName;
   j["upgradePipFirst"] = s.upgradePipFirst;
   j["groups"] = s.groups;
-  j["huggingFaceDownloads"] = s.huggingFaceDownloads;
+  j["postInstallSteps"] = s.postInstallSteps;
 }
 
 // --- Static factory methods ---

@@ -104,37 +104,6 @@ namespace
     static const QRegularExpression directRef(R"(^\s*[A-Za-z0-9][\w\-.]*\s*@\s*\S)");
     return directRef.match(QString::fromStdString(req)).hasMatch();
   }
-
-  // Format a std::string as a Python single-quoted string literal.
-  // Escapes backslashes and single quotes; everything else passes through.
-  QString PyQuote(const std::string& value)
-  {
-    // Decode as UTF-8 so multi-byte code points round-trip intact; escape `\`
-    // first to avoid double-escaping backslashes introduced by the `'` escape.
-    QString result = QString::fromUtf8(value.c_str(), static_cast<int>(value.size()));
-    result.replace('\\', "\\\\");
-    result.replace('\'', "\\'");
-    return '\'' + result + '\'';
-  }
-
-  // Format a vector<string> as a Python list literal, e.g.
-  // {"a", "b"} -> "['a', 'b']". An empty vector returns "None" so the
-  // caller can pass "allow_patterns=None" and get the whole-repo default.
-  QString PyListLiteralOrNone(const std::vector<std::string>& values)
-  {
-    if (values.empty())
-      return "None";
-
-    QString result = "[";
-    for (std::size_t i = 0; i < values.size(); ++i)
-    {
-      if (i > 0)
-        result.append(", ");
-      result.append(PyQuote(values[i]));
-    }
-    result.append(']');
-    return result;
-  }
 }
 
 QmitkPipInstaller::QmitkPipInstaller(QObject* parent)
@@ -187,22 +156,13 @@ void QmitkPipInstaller::StartInstall()
   m_CurrentGroup = 0;
   m_CurrentPackage = 0;
   m_GroupStartIndex = 0;
-  m_CurrentDownload = 0;
+  m_CurrentPostInstallStep = 0;
   m_AnyFailed = false;
 
-  // Build the working group list. If the spec has Hugging Face downloads,
-  // append a synthetic group that pulls huggingface_hub so the inline
-  // snapshot_download script in StartModelDownload can always import it.
-  // Pip fast-paths the "already satisfied" case when an earlier user group
-  // pulled huggingface_hub transitively, so this costs only a few seconds
-  // there and becomes load-bearing when no user group does.
+  // Working copy of the install groups. A post-install step (PipInstallSpec::
+  // postInstallSteps) must satisfy its own imports from packages installed by
+  // these groups; the installer no longer injects any synthetic group.
   m_Groups = m_Spec.groups;
-  if (!m_Spec.huggingFaceDownloads.empty())
-  {
-    mitk::PipInstallGroup hfGroup;
-    hfGroup.requirements = { "huggingface_hub" };
-    m_Groups.push_back(std::move(hfGroup));
-  }
 
   // m_CreatedVirtualEnv is intentionally not reset here. If a prior attempt
   // created the venv, a retry reuses it (BeginVirtualEnvPhase sees it exists
@@ -403,24 +363,24 @@ void QmitkPipInstaller::OnProcessFinished(int exitCode, QProcess::ExitStatus exi
     break;
   }
 
-  case State::DownloadingModels:
+  case State::RunningPostInstall:
   {
-    const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
+    const auto& step = m_Spec.postInstallSteps[m_CurrentPostInstallStep];
 
-    if (!success && !download.optional)
+    if (!success && !step.optional)
     {
       const auto displayName = QString::fromStdString(
-        download.displayName.empty() ? download.repoId : download.displayName);
+        step.displayName.empty() ? std::string("post-install step") : step.displayName);
       if (!m_AnyFailed)
-        emit ErrorOccurred(QString("Failed to download %1.").arg(displayName));
+        emit ErrorOccurred(QString("Failed to run %1.").arg(displayName));
       m_AnyFailed = true;
     }
 
-    m_CurrentDownload++;
+    m_CurrentPostInstallStep++;
 
-    if (m_CurrentDownload < static_cast<int>(m_Spec.huggingFaceDownloads.size()))
+    if (m_CurrentPostInstallStep < static_cast<int>(m_Spec.postInstallSteps.size()))
     {
-      this->StartModelDownload();
+      this->StartPostInstallStep();
     }
     else
     {
@@ -502,7 +462,7 @@ void QmitkPipInstaller::StartResolveGroup()
 
   if (m_CurrentGroup >= static_cast<int>(m_Groups.size()))
   {
-    this->BeginModelDownloadPhase();
+    this->BeginPostInstallPhase();
     return;
   }
 
@@ -546,7 +506,7 @@ void QmitkPipInstaller::StartInstallPackage()
 
   if (m_CurrentPackage >= static_cast<int>(m_ResolvedPackages.size()))
   {
-    this->BeginModelDownloadPhase();
+    this->BeginPostInstallPhase();
     return;
   }
 
@@ -688,57 +648,53 @@ void QmitkPipInstaller::AdvanceToNextGroup()
   }
   else
   {
-    this->BeginModelDownloadPhase();
+    this->BeginPostInstallPhase();
   }
 }
 
-// Called once all pip groups have finished. If no Hugging Face downloads are
+// Called once all pip groups have finished. If no post-install steps are
 // configured, immediately emits the terminal InstallFinished. Otherwise
-// enters the DownloadingModels state and kicks off the first download.
-void QmitkPipInstaller::BeginModelDownloadPhase()
+// enters the RunningPostInstall state and kicks off the first step.
+void QmitkPipInstaller::BeginPostInstallPhase()
 {
-  if (m_Spec.huggingFaceDownloads.empty())
+  if (m_Spec.postInstallSteps.empty())
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
     emit InstallFinished(!m_AnyFailed);
     return;
   }
 
-  m_State = State::DownloadingModels;
-  m_CurrentDownload = 0;
-  this->StartModelDownload();
+  m_State = State::RunningPostInstall;
+  m_CurrentPostInstallStep = 0;
+  this->StartPostInstallStep();
 }
 
-void QmitkPipInstaller::StartModelDownload()
+void QmitkPipInstaller::StartPostInstallStep()
 {
   const auto python = this->RequirePythonExecutable();
 
   if (python.isEmpty())
     return;
 
-  if (m_CurrentDownload >= static_cast<int>(m_Spec.huggingFaceDownloads.size()))
+  if (m_CurrentPostInstallStep >= static_cast<int>(m_Spec.postInstallSteps.size()))
   {
     m_State = m_AnyFailed ? State::Failed : State::Done;
     emit InstallFinished(!m_AnyFailed);
     return;
   }
 
-  const auto& download = m_Spec.huggingFaceDownloads[m_CurrentDownload];
+  const auto& step = m_Spec.postInstallSteps[m_CurrentPostInstallStep];
   const auto displayName = QString::fromStdString(
-    download.displayName.empty() ? download.repoId : download.displayName);
+    step.displayName.empty() ? std::string("post-install step") : step.displayName);
 
-  // Inline `python -c "<script>"`. QProcess::start with a QStringList handles
-  // argument quoting on Windows, so we only have to format repoId / patterns
-  // as Python literals. huggingface_hub writes tqdm progress to stderr, which
-  // our OnStandardErrorReady -> OutputReceived pipeline forwards to the UI
-  // details view. force_download=False keeps the cache authoritative: a
-  // re-run on a populated cache is effectively a no-op.
-  const auto script = QString(
-    "from huggingface_hub import snapshot_download\n"
-    "snapshot_download(repo_id=%1, allow_patterns=%2, force_download=False)\n")
-    .arg(PyQuote(download.repoId), PyListLiteralOrNone(download.allowPatterns));
+  // Run the step's Python source verbatim via `python -c`. QProcess::start with
+  // a QStringList handles argument quoting on Windows. Any imports must be
+  // satisfied by packages installed in the preceding groups; stdout/stderr
+  // (including tqdm progress) flows to the UI details view via
+  // OnStandardOutputReady / OnStandardErrorReady -> OutputReceived.
+  const auto script = QString::fromStdString(step.pythonCode);
 
-  emit ModelDownloadStarted(displayName);
+  emit PostInstallStepStarted(displayName);
 
   QStringList args = { "-c", script };
   MITK_INFO << FormatCommand(python, args).toStdString();

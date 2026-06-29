@@ -25,6 +25,49 @@ namespace
     return std::string(">=") + mitk::nnInteractive::MINIMUM_VERSION
       + ",<" + mitk::nnInteractive::MAXIMUM_VERSION_EXCLUSIVE;
   }
+
+  // PyTorch needs a CUDA-specific index URL on Windows; other platforms use the
+  // default PyPI index. (cu128: with CUDA 12.9 our lowest supported GPU arch
+  // hits "no kernel image is available".)
+  std::string CudaIndexUrl()
+  {
+#if defined(_WIN32)
+    return "https://download.pytorch.org/whl/cu128";
+#else
+    return {};
+#endif
+  }
+
+  // The install groups shared by a fresh install and an in-place upgrade. Client
+  // only installs the lightweight, torch-free nninteractive-client; full mode
+  // installs PyTorch (from the CUDA wheel index on Windows) and nnInteractive.
+  // The version check imports 'packaging'; the full install gets it via torch,
+  // so the client-only group must request it explicitly.
+  std::vector<mitk::PipInstallGroup> BuildGroups(bool clientOnly)
+  {
+    const auto versionRange = VersionRange();
+
+    std::vector<mitk::PipInstallGroup> groups;
+
+    if (clientOnly)
+    {
+      mitk::PipInstallGroup clientGroup;
+      clientGroup.requirements = { "nninteractive-client" + versionRange, "packaging" };
+      groups.push_back(std::move(clientGroup));
+      return groups;
+    }
+
+    mitk::PipInstallGroup torchGroup;
+    torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
+    torchGroup.indexUrl = CudaIndexUrl();
+    groups.push_back(std::move(torchGroup));
+
+    mitk::PipInstallGroup nnInteractiveGroup;
+    nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
+    groups.push_back(std::move(nnInteractiveGroup));
+
+    return groups;
+  }
 }
 
 mitk::PipInstallSpec mitk::nnInteractive::BuildInstallSpec(mitk::IPreferences* prefs, const std::string& venvName, bool clientOnly)
@@ -33,43 +76,15 @@ mitk::PipInstallSpec mitk::nnInteractive::BuildInstallSpec(mitk::IPreferences* p
   spec.name = "nnInteractive";
   spec.venvName = venvName;
   spec.upgradePipFirst = true;
-
-  const auto versionRange = VersionRange();
-
-  if (clientOnly)
-  {
-    mitk::PipInstallGroup clientGroup;
-    // The version check imports 'packaging'; the full install gets it via torch,
-    // so the client-only group must request it explicitly.
-    clientGroup.requirements = { "nninteractive-client" + versionRange, "packaging" };
-    spec.groups.push_back(std::move(clientGroup));
-    return spec;
-  }
-
-  // PyTorch needs a CUDA-specific index URL on Windows; other platforms use the
-  // default PyPI index. (cu128: with CUDA 12.9 our lowest supported GPU arch
-  // hits "no kernel image is available".)
-#if defined(_WIN32)
-  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-  const std::string cudaIndexUrl;
-#endif
-
-  mitk::PipInstallGroup torchGroup;
-  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-  torchGroup.indexUrl = cudaIndexUrl;
-  spec.groups.push_back(std::move(torchGroup));
-
-  mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
-  spec.groups.push_back(std::move(nnInteractiveGroup));
+  spec.groups = BuildGroups(clientOnly);
 
   // Pre-download the model checkpoint via nnInteractive's model management so the
   // first local StartSession() does not surprise the user with a silent
-  // multi-minute download. Skipped when a local checkpoint folder is configured.
-  // Optional: a failure here is non-fatal, since ConstructLocalSession() calls
-  // ensure_model_available() again as a fallback.
-  if (prefs != nullptr && prefs->Get("nnInteractive/modelSource", "huggingface") != "local")
+  // multi-minute download. Skipped for a client-only install (no local inference)
+  // and when a local checkpoint folder is configured. Optional: a failure here is
+  // non-fatal, since ConstructLocalSession() calls ensure_model_available() again
+  // as a fallback.
+  if (!clientOnly && prefs != nullptr && prefs->Get("nnInteractive/modelSource", "huggingface") != "local")
   {
     const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
     const std::string ensureArg = modelCheckpoint.empty()
@@ -94,38 +109,14 @@ mitk::PipInstallSpec mitk::nnInteractive::BuildUpgradeSpec(const std::string& ve
   spec.name = "nnInteractive";
   spec.venvName = venvName;
   spec.upgradePipFirst = false;
+  spec.groups = BuildGroups(clientOnly);
 
-  const auto versionRange = VersionRange();
-
-  if (clientOnly)
-  {
-    mitk::PipInstallGroup clientGroup;
-    // Keep 'packaging' present after an upgrade (see BuildInstallSpec).
-    clientGroup.requirements = { "nninteractive-client" + versionRange, "packaging" };
-    clientGroup.extraPipArgs = { "--upgrade" };
-    spec.groups.push_back(std::move(clientGroup));
-    return spec;
-  }
-
-  // Upgrade the torch group first (with its CUDA index) so a transitive torch
-  // bump from upgrading nnInteractive cannot pull a non-CUDA wheel from PyPI on
-  // Windows; the version pin keeps torch within its supported range.
-#if defined(_WIN32)
-  const std::string cudaIndexUrl = "https://download.pytorch.org/whl/cu128";
-#else
-  const std::string cudaIndexUrl;
-#endif
-
-  mitk::PipInstallGroup torchGroup;
-  torchGroup.requirements = { "torch>=2.8.0,<2.9.0", "torchvision>=0.23.0,<1.0.0" };
-  torchGroup.indexUrl = cudaIndexUrl;
-  torchGroup.extraPipArgs = { "--upgrade" };
-  spec.groups.push_back(std::move(torchGroup));
-
-  mitk::PipInstallGroup nnInteractiveGroup;
-  nnInteractiveGroup.requirements = { "nninteractive" + versionRange };
-  nnInteractiveGroup.extraPipArgs = { "--upgrade" };
-  spec.groups.push_back(std::move(nnInteractiveGroup));
+  // The venv already exists, so reuse the resolve-then-install engine with
+  // --upgrade (and do not upgrade pip first). On Windows the torch group keeps
+  // the CUDA wheel index set in BuildGroups, so a transitive torch bump from
+  // upgrading nnInteractive cannot pull a non-CUDA wheel from PyPI.
+  for (auto& group : spec.groups)
+    group.extraPipArgs.push_back("--upgrade");
 
   return spec;
 }

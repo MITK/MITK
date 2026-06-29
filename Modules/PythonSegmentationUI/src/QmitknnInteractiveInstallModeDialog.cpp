@@ -24,10 +24,20 @@ QmitknnInteractiveInstallModeDialog::QmitknnInteractiveInstallModeDialog(QWidget
 
 #if defined(__APPLE__)
   // On macOS local inference has no GPU acceleration (Apple Silicon runs on the
-  // CPU; Intel is unsupported for local), so default to the lightweight
+  // CPU; Intel does not support local at all), so default to the lightweight
   // client-only install that offloads to a remote server. The .ui defaults to
   // Full for other platforms.
   m_Ui->clientOnlyRadioButton->setChecked(true);
+
+#if !defined(__aarch64__)
+  // Intel Macs cannot run nnInteractive locally, so do not offer the full (local)
+  // install at all here; only client-only/remote is possible. This prevents a Full
+  // choice from downloading multi-GB PyTorch and a checkpoint that could never be
+  // used. (Apple Silicon keeps Full available: CPU-only inference is still useful
+  // when no server is around.)
+  m_Ui->fullRadioButton->setEnabled(false);
+  m_Ui->fullDescriptionLabel->setEnabled(false);
+#endif
 #endif
 
   if (auto* okButton = m_Ui->buttonBox->button(QDialogButtonBox::Ok))

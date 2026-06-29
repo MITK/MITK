@@ -14,6 +14,9 @@ found in the LICENSE file.
 #define QmitknnInteractivePreferencePage_h
 
 #include <berryIQtPreferencePage.h>
+
+#include <QString>
+
 #include <memory>
 
 namespace Ui
@@ -62,6 +65,13 @@ private:
 
   /** \brief Runs the pip upgrade dialog (update mode). Returns true on success. */
   bool RunUpdate(bool clientOnly);
+
+  /** \brief The currently selected model id: the item's stored id while the
+   *         visible text still matches it, otherwise the trimmed free text (empty
+   *         means "use the recommended default"). Resolving the id here, rather
+   *         than reading the decorated display label, is what keeps PerformOk and
+   *         OnRefreshModelsClicked from storing a label as the checkpoint id. */
+  QString CurrentModelId() const;
 
   std::unique_ptr<Ui::QmitknnInteractivePreferencePage> m_Ui;
   QWidget* m_Control;

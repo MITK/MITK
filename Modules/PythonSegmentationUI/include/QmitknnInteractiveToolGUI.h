@@ -400,7 +400,7 @@ private:
    * \return \c true if initialization should proceed (updated successfully, or the
    *         user chose to continue with the installed version), \c false to abort.
    */
-  bool OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly, bool belowMinimum);
+  bool OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly);
 
   /** \brief Runs the pip upgrade dialog and recreates the Python context.
    *

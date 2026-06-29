@@ -37,6 +37,18 @@ namespace
     return path;
   }
 
+  // The Python interpreter inside a virtual environment. The layout differs by
+  // platform (Windows under Scripts/, POSIX under bin/); keeping it in one place
+  // lets GetExecutablePath and GetVirtualEnvExecutablePath share the definition.
+  fs::path VenvPythonExe(const fs::path& venvPath)
+  {
+#if defined(_WIN32)
+    return venvPath / "Scripts" / "python.exe";
+#else
+    return venvPath / "bin" / "python3";
+#endif
+  }
+
   bool IsDirectoryWritable(const fs::path& path)
   {
     if (path.empty() || !fs::exists(path) || !fs::is_directory(path))
@@ -250,11 +262,7 @@ fs::path mitk::PythonHelper::GetExecutablePath()
 
   if (fs::exists(venvPath / "pyvenv.cfg"))
   {
-#if defined(_WIN32)
-    execPath = venvPath / "Scripts" / "python.exe";
-#else
-    execPath = venvPath / "bin" / "python3";
-#endif
+    execPath = VenvPythonExe(venvPath);
   }
   else
   {
@@ -339,6 +347,21 @@ bool mitk::PythonHelper::VirtualEnvExists(const std::string& name)
     return false;
 
   return fs::exists(venvPath / "pyvenv.cfg");
+}
+
+fs::path mitk::PythonHelper::GetVirtualEnvExecutablePath(const std::string& name)
+{
+  const auto venvPath = GetVirtualEnvPath(name);
+
+  if (venvPath.empty() || !fs::exists(venvPath / "pyvenv.cfg"))
+    return {};
+
+  const auto execPath = VenvPythonExe(venvPath);
+
+  if (fs::exists(execPath))
+    return execPath;
+
+  return {};
 }
 
 fs::path mitk::PythonHelper::CreateVirtualEnv(const std::string& name)

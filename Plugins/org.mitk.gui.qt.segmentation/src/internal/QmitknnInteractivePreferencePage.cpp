@@ -21,6 +21,7 @@ found in the LICENSE file.
 #if MITK_HAS_PYTHON
 #include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveModel.h>
+#include <mitknnInteractiveUpdatePrompt.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPipPackageInfo.h>
 #include <mitkPythonHelper.h>
@@ -174,21 +175,7 @@ bool QmitknnInteractivePreferencePage::PerformOk()
     prefs->Put("nnInteractive/interactionsStorage", "auto");
   }
 
-  // Prefer the selected item's model id (stored as userData), but only while the
-  // visible text still matches that item. An editable combo keeps currentIndex
-  // after the user edits the text, so currentData() could otherwise return a
-  // previously selected id and silently discard a typed-in value. An empty value
-  // is kept as-is and means "use the recommended default" (resolved via
-  // get_default_model_id() at session start).
-  QString modelCheckpoint;
-  const int currentIndex = m_Ui->checkpointComboBox->currentIndex();
-  if (currentIndex >= 0 &&
-      m_Ui->checkpointComboBox->currentText() == m_Ui->checkpointComboBox->itemText(currentIndex))
-    modelCheckpoint = m_Ui->checkpointComboBox->itemData(currentIndex).toString();
-  else
-    modelCheckpoint = m_Ui->checkpointComboBox->currentText().trimmed();
-
-  prefs->Put("nnInteractive/modelCheckpoint", modelCheckpoint.toStdString());
+  prefs->Put("nnInteractive/modelCheckpoint", this->CurrentModelId().toStdString());
 
   prefs->Put("nnInteractive/modelSource",
     m_Ui->localSourceRadioButton->isChecked() ? "local" : "huggingface");
@@ -373,6 +360,25 @@ void QmitknnInteractivePreferencePage::OnBrowseLocalModelPath()
     m_Ui->localModelPathLineEdit->setText(QDir::toNativeSeparators(selected));
 }
 
+QString QmitknnInteractivePreferencePage::CurrentModelId() const
+{
+  // Prefer the selected item's model id (stored as userData), but only while the
+  // visible text still matches that item. An editable combo keeps currentIndex
+  // after the user edits the text, so itemData could otherwise return a previously
+  // selected id and silently discard a typed-in value. The displayed item text is
+  // a decorated label ("name (recommended)"), so matching against it here, rather
+  // than against the stored id, is also what corrupts the value on a re-refresh.
+  // An empty value is kept as-is and means "use the recommended default" (resolved
+  // via get_default_model_id() at session start).
+  const int currentIndex = m_Ui->checkpointComboBox->currentIndex();
+
+  if (currentIndex >= 0 &&
+      m_Ui->checkpointComboBox->currentText() == m_Ui->checkpointComboBox->itemText(currentIndex))
+    return m_Ui->checkpointComboBox->itemData(currentIndex).toString();
+
+  return m_Ui->checkpointComboBox->currentText().trimmed();
+}
+
 void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
 {
 #if MITK_HAS_PYTHON
@@ -404,8 +410,9 @@ void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
     return;
   }
 
-  // Preserve the current entry so refreshing does not silently change the selection.
-  const auto currentText = m_Ui->checkpointComboBox->currentText().trimmed();
+  // Preserve the current selection by model id (not the decorated display label)
+  // so a refresh never silently changes or corrupts it.
+  const QString currentId = this->CurrentModelId();
 
   m_Ui->checkpointComboBox->clear();
 
@@ -427,14 +434,14 @@ void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
 
     m_Ui->checkpointComboBox->addItem(label, id);
 
-    if (id == currentText)
+    if (id == currentId)
       selectIndex = m_Ui->checkpointComboBox->count() - 1;
   }
 
   if (selectIndex >= 0)
     m_Ui->checkpointComboBox->setCurrentIndex(selectIndex);
   else
-    m_Ui->checkpointComboBox->setCurrentText(currentText); // Keep free-text / empty default.
+    m_Ui->checkpointComboBox->setCurrentText(currentId); // Free-text id or empty default, never a decorated label.
 #endif
 }
 
@@ -538,12 +545,7 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
 
   using mitk::nnInteractive::VersionStatus;
 
-  const auto installed = QString::fromStdString(result.Installed);
-  const auto latest = QString::fromStdString(result.Latest);
-  const auto minimum = QString(mitk::nnInteractive::MINIMUM_VERSION);
   const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded("nnInteractive");
-  const auto appName = QCoreApplication::applicationName();
-  const auto restartTarget = appName.isEmpty() ? QStringLiteral("the application") : appName;
 
   const auto runUpdateAndReport = [&](bool client) {
     if (!this->RunUpdate(client))
@@ -557,63 +559,13 @@ void QmitknnInteractivePreferencePage::OnCheckForUpdatesButtonClicked()
   switch (result.Status)
   {
     case VersionStatus::BelowMinimum:
-    {
-      if (modulesLoaded)
-      {
-        QMessageBox::warning(m_Control, "nnInteractive",
-          QString(
-            "<p>The installed nnInteractive %1 is older than the version this "
-            "application requires (%2 or newer) and may not work correctly.</p>"
-            "<p>nnInteractive is currently loaded, so it cannot be updated right now. "
-            "Restart %3 and try again.</p>")
-            .arg(installed).arg(minimum).arg(restartTarget));
-        break;
-      }
-
-      QMessageBox messageBox(QMessageBox::Warning, "nnInteractive",
-        QString(
-          "<p>The installed nnInteractive %1 is older than the version this "
-          "application requires (%2 or newer) and may not work correctly.</p>"
-          "<p>Click <em>Update now</em> to update to a compatible version.</p>")
-          .arg(installed).arg(minimum));
-      auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
-      messageBox.addButton(QMessageBox::Cancel);
-      messageBox.setDefaultButton(updateButton);
-      messageBox.exec();
-
-      if (messageBox.clickedButton() == updateButton)
-        runUpdateAndReport(clientOnly);
-      break;
-    }
-
     case VersionStatus::UpdateAvailable:
-    {
-      if (modulesLoaded)
-      {
-        QMessageBox::information(m_Control, "nnInteractive",
-          QString(
-            "<p>nnInteractive %1 is installed; %2 is available.</p>"
-            "<p>nnInteractive is currently loaded, so it cannot be updated right now. "
-            "Restart %3 and try again.</p>")
-            .arg(installed).arg(latest).arg(restartTarget));
-        break;
-      }
-
-      QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
-        QString(
-          "<p>A newer nnInteractive is available.</p>"
-          "<p>nnInteractive %1 is installed; %2 is available.</p>"
-          "<p>Click <em>Update now</em> to update.</p>")
-          .arg(installed).arg(latest));
-      auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
-      messageBox.addButton(QMessageBox::Close);
-      messageBox.setDefaultButton(updateButton);
-      messageBox.exec();
-
-      if (messageBox.clickedButton() == updateButton)
+      // Shared version-status dialog. Not in the init flow, so declining just
+      // closes; only an explicit "Update now" triggers the in-place update.
+      if (mitk::nnInteractive::ShowUpdatePrompt(m_Control, result, modulesLoaded, false)
+            == mitk::nnInteractive::UpdatePromptChoice::Update)
         runUpdateAndReport(clientOnly);
       break;
-    }
 
     case VersionStatus::UpToDate:
       // A non-empty Latest means PyPI was reached and confirmed nothing newer

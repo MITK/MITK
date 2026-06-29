@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveInstall.h>
 #include <mitknnInteractiveInteractor.h>
 #include <mitknnInteractiveModel.h>
+#include <mitknnInteractiveUpdatePrompt.h>
 #include <mitknnInteractiveVersion.h>
 #include <mitkPythonContext.h>
 #include <mitkPythonHelper.h>
@@ -413,14 +414,10 @@ bool QmitknnInteractiveToolGUI::Install()
       if (checkForUpdate && !versionCheck.Latest.empty())
         m_OnlineUpdateCheckDone = true;
 
-      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum)
+      if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum ||
+          versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
       {
-        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable, true))
-          return false;
-      }
-      else if (versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
-      {
-        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable, false))
+        if (!this->OfferInPlaceUpdate(versionCheck, !localAvailable))
           return false;
       }
 
@@ -501,95 +498,19 @@ bool QmitknnInteractiveToolGUI::RunUpdate(bool clientOnly)
   return this->GetTool()->CreatePythonContext();
 }
 
-bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly, bool belowMinimum)
+bool QmitknnInteractiveToolGUI::OfferInPlaceUpdate(const mitk::nnInteractive::VersionCheckResult& versionCheck, bool clientOnly)
 {
   const auto venvName = this->GetTool()->GetVirtualEnvName();
   const bool modulesLoaded = mitk::PythonHelper::IsAnyVirtualEnvModuleLoaded(venvName);
 
-  const auto appName = QCoreApplication::applicationName();
-  const auto restartTarget = appName.isEmpty() ? QStringLiteral("the application") : appName;
-  const auto installed = QString::fromStdString(versionCheck.Installed);
+  const auto choice = mitk::nnInteractive::ShowUpdatePrompt(nullptr, versionCheck, modulesLoaded, true);
 
-  if (belowMinimum)
-  {
-    const auto minimum = QString(mitk::nnInteractive::MINIMUM_VERSION);
-
-    if (modulesLoaded)
-    {
-      QMessageBox::warning(nullptr, "nnInteractive",
-        QString(
-          "<h3 %1>nnInteractive is outdated</h3>"
-          "<p %1>The installed nnInteractive %2 is older than the version this "
-          "application requires (%3 or newer) and may not work correctly.</p>"
-          "<p %1>nnInteractive is currently loaded, so it cannot be updated right now. "
-          "Restart %4 and initialize again to update.</p>")
-          .arg(LINE_HEIGHT_STYLE).arg(installed).arg(minimum).arg(restartTarget));
-      return false;
-    }
-
-    QMessageBox messageBox(QMessageBox::Warning, "nnInteractive",
-      QString(
-        "<h3 %1>nnInteractive is outdated</h3>"
-        "<p %1>The installed nnInteractive %2 is older than the version this "
-        "application requires (%3 or newer) and may not work correctly.</p>"
-        "<p %1>Click <em>Update now</em> to update to a compatible version.</p>")
-        .arg(LINE_HEIGHT_STYLE).arg(installed).arg(minimum));
-    auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
-    messageBox.addButton(QMessageBox::Cancel);
-    messageBox.setDefaultButton(updateButton);
-    messageBox.exec();
-
-    if (messageBox.clickedButton() != updateButton)
-      return false;
-
-    return this->RunUpdate(clientOnly);
-  }
-
-  // UpdateAvailable: the installed version still works, so updating is optional.
-  const auto latest = QString::fromStdString(versionCheck.Latest);
-
-  if (modulesLoaded)
-  {
-    QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
-      QString(
-        "<h3 %1>A newer nnInteractive is available</h3>"
-        "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
-        "<p %1>nnInteractive is currently loaded, so it cannot be updated right now. "
-        "Restart %4 and initialize again to update, or click <em>Continue</em> to keep "
-        "using the installed version.</p>")
-        .arg(LINE_HEIGHT_STYLE).arg(installed).arg(latest).arg(restartTarget));
-    auto* continueButton = messageBox.addButton("Continue", QMessageBox::AcceptRole);
-    messageBox.addButton(QMessageBox::Cancel);
-    messageBox.setDefaultButton(continueButton);
-    // An optional update that can't be applied right now: dismissing (Esc or the
-    // window close button) should continue with the working installed version, not
-    // abort initialization.
-    messageBox.setEscapeButton(continueButton);
-    messageBox.exec();
-
-    return messageBox.clickedButton() == continueButton;
-  }
-
-  QMessageBox messageBox(QMessageBox::Information, "nnInteractive",
-    QString(
-      "<h3 %1>A newer nnInteractive is available</h3>"
-      "<p %1>nnInteractive %2 is installed; %3 is available.</p>"
-      "<p %1>Click <em>Update now</em> to update, or <em>Continue with installed</em> "
-      "to keep using %2.</p>")
-      .arg(LINE_HEIGHT_STYLE).arg(installed).arg(latest));
-  auto* updateButton = messageBox.addButton("Update now", QMessageBox::AcceptRole);
-  auto* continueButton = messageBox.addButton("Continue with installed", QMessageBox::AcceptRole);
-  messageBox.addButton(QMessageBox::Cancel);
-  messageBox.setDefaultButton(continueButton);
-  // Optional update: dismissing (Esc or the window close button) continues with
-  // the installed version rather than aborting initialization.
-  messageBox.setEscapeButton(continueButton);
-  messageBox.exec();
-
-  if (messageBox.clickedButton() == updateButton)
+  if (choice == mitk::nnInteractive::UpdatePromptChoice::Update)
     return this->RunUpdate(clientOnly);
 
-  return messageBox.clickedButton() == continueButton;
+  // ContinueInstalled keeps initialization going with the working version; Cancel
+  // (and a below-minimum prompt the user dismissed) aborts it.
+  return choice == mitk::nnInteractive::UpdatePromptChoice::ContinueInstalled;
 }
 
 void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
@@ -1030,9 +951,8 @@ void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSeg
 {
   auto* tool = this->GetTool();
 
-  // Rebasing needs a live session, and the model must advertise the mask
-  // interaction. Outside a running session a selection change is a no-op.
-  if (tool == nullptr || !tool->IsSessionRunning() || !tool->GetSupportedInteractions().Mask)
+  // Outside a running session a selection change is a no-op.
+  if (tool == nullptr || !tool->IsSessionRunning())
     return;
 
   auto* segmentation = tool->GetTargetSegmentation();
@@ -1046,14 +966,20 @@ void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSeg
     return;
 
   // Switching the target label discards the previous label's interactions and
-  // preview, so the new label starts from a clean slate; in particular a mask
-  // seeded from the previous label must not linger when switching to an empty
-  // one. No confirmation: the selection has already changed, so the next
-  // Confirm would write into the new label anyway.
+  // preview, so the new label starts from a clean slate; in particular a stale
+  // preview from the previous label must never linger and then be committed into
+  // this one. This runs regardless of mask support, so models that cannot rebase
+  // from a mask still get a clean slate on the new target. No confirmation: the
+  // selection has already changed, so the next Confirm would write into the new
+  // label anyway.
   this->OnResetInteractionsButtonClicked();
 
-  // Seed from the label's existing content; an empty label just starts fresh.
-  if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
+  // Seed from the label's existing content, but only if the model can take an
+  // initial mask; otherwise the (re)selected label just starts fresh. The mask
+  // capability is a session round-trip, so only consult it once there is actually
+  // content to seed.
+  if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)) &&
+      tool->GetSupportedInteractions().Mask)
     tool->InitializeSessionWithMask(mitk::CreateLabelMask(segmentation, labelValue));
 
   // The mask initialization is one undoable step (no PreviewUpdatedEvent is

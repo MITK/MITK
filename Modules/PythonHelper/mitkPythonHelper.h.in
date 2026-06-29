@@ -33,6 +33,12 @@ namespace mitk::PythonHelper
   MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvBasePath();
   MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvPath(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool VirtualEnvExists(const std::string& name);
+
+  // Path to the Python interpreter inside the named virtual environment, or an
+  // empty path if the environment or its interpreter is missing. Use this for
+  // short-lived subprocesses that must run with the venv's own interpreter
+  // rather than the embedded one.
+  MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvExecutablePath(const std::string& name);
   MITKPYTHONHELPER_EXPORT fs::path CreateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);

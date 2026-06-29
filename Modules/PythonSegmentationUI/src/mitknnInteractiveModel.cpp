@@ -39,18 +39,9 @@ namespace
   // or its interpreter is missing, or the run is cancelled or times out.
   std::optional<QString> RunVenvPython(const std::string& venvName, const QString& script, QWidget* parent, const QString& busyMessage)
   {
-    const auto venvPath = mitk::PythonHelper::GetVirtualEnvPath(venvName);
+    const auto python = mitk::PythonHelper::GetVirtualEnvExecutablePath(venvName);
 
-    if (venvPath.empty() || !fs::exists(venvPath / "pyvenv.cfg"))
-      return std::nullopt;
-
-#if defined(_WIN32)
-    const auto python = venvPath / "Scripts" / "python.exe";
-#else
-    const auto python = venvPath / "bin" / "python3";
-#endif
-
-    if (!fs::exists(python))
+    if (python.empty())
       return std::nullopt;
 
     QProcess process;

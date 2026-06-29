@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
+#include "mitknnInteractiveRenderingHelpers.h"
 
 namespace
 {
@@ -335,6 +336,7 @@ namespace
       m_FeedbackNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
       m_FeedbackNode->SetFloatProperty("contour.width", 3.0f);
       m_FeedbackNode->SetColor(m_ContourColor, nullptr, "contour.color");
+      mitk::nnInteractive::HideNodeIn3DRenderWindows(m_FeedbackNode);
 
       if (m_DataStorage != nullptr)
         m_DataStorage->Add(m_FeedbackNode, m_ReferenceNode);
@@ -458,6 +460,7 @@ namespace mitk::nnInteractive
       node->SetFloatProperty("contour.width", 3.0f);
       node->SetBoolProperty("helper object", true);
       node->SetBoolProperty("includeInBoundingBox", false);
+      HideNodeIn3DRenderWindows(node);
 
       m_LassoNodes[promptType].push_back(node);
       m_Owner->GetDataStorage()->Add(node, referenceNode);

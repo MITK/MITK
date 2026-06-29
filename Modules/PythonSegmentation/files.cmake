@@ -4,6 +4,7 @@ set(CPP_FILES
   mitknnInteractiveTool.cpp
   mitknnInteractiveVersion.cpp
   mitknnInteractiveBoundingBoxHelpers.cpp
+  mitknnInteractiveRenderingHelpers.cpp
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

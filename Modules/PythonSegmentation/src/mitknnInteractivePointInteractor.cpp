@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkToolManager.h>
 
+#include "mitknnInteractiveRenderingHelpers.h"
+
 namespace mitk::nnInteractive
 {
   class PointInteractor::Impl
@@ -82,6 +84,7 @@ namespace mitk::nnInteractive
       node->SetBoolProperty("Pointset.2D.keep shape when selected", true);
       node->SetBoolProperty("Pointset.2D.fill shape", true);
       node->SetBoolProperty("helper object", true);
+      HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
       // storing the point set data node for the current prompt type as a

@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 #include <usModuleRegistry.h>
 
+#include "mitknnInteractiveRenderingHelpers.h"
+
 namespace mitk::nnInteractive
 {
   class BoxInteractor::Impl
@@ -73,6 +75,7 @@ namespace mitk::nnInteractive
       node->SetBoolProperty("planarfigure.hidecontrolpointsduringinteraction", true);
       node->SetBoolProperty("planarfigure.fill", true);
       node->SetBoolProperty("helper object", true);
+      HideNodeIn3DRenderWindows(node);
 
       // The creation is complete. Now, it's time to commit our progress by
       // storing the next box data node as a persistent class member and

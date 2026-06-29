@@ -280,7 +280,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -395,7 +395,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -470,7 +470,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -524,7 +524,7 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;small&gt;Changes apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
+             <string>&lt;small&gt;Changes end any running session and apply the next time you initialize nnInteractive.&lt;/small&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>

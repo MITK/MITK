@@ -438,10 +438,25 @@ private:
   QAbstractButton* m_LastInteractorButton = nullptr;
   bool m_AutoConfirmInProgress = false;
 
+  // Set while AutoCreateAndSelectNewLabel() drives the inspector's selection.
+  // The inspector emits CurrentSelectionChanged synchronously, which would
+  // otherwise re-enter OnActiveLabelChanged and reset/re-seed the session
+  // mid-confirm. The slot honours this guard and stays a no-op.
+  bool m_SuppressActiveLabelChanged = false;
+
   // Whether the running session reports undo support (nnInteractive >= 2.3.3).
   // Cached at session start (ApplyCapabilityGating) and used to gate the Undo
   // button; older versions report no support and the button stays disabled.
   bool m_SupportsUndo = false;
+
+  // Once-per-session guards for the network-backed checks run in Install(): the
+  // online "newer release available" version check and the model-switch prompt.
+  // Set only when the network was actually reached (so an offline failure
+  // retries) and reset on session teardown in OnSessionEnded() so a reinitialize
+  // checks again. Member-scoped, not process-static, so they track this GUI's
+  // session lifecycle rather than persisting for the whole run.
+  bool m_OnlineUpdateCheckDone = false;
+  bool m_ModelSwitchCheckDone = false;
 
   QTimer* m_HeartbeatTimer = nullptr;
 

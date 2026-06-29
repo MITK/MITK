@@ -40,6 +40,7 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
+#include <QScopeGuard>
 #include <QShortcut>
 #include <QTimer>
 #include <QWidget>
@@ -399,15 +400,18 @@ bool QmitknnInteractiveToolGUI::Install()
       // A reused virtual environment can hold an nnInteractive that predates this
       // MITK build (the venv survives MITK upgrades). The offline minimum check
       // runs on every initialize; the online "newer release available" check runs
-      // at most once per run so an offline user never waits on the PyPI timeout
-      // repeatedly.
-      static bool s_OnlineCheckDone = false;
-      const bool checkForUpdate = !s_OnlineCheckDone;
+      // at most once per initialized session so an offline user never waits on the
+      // PyPI timeout repeatedly. The guard is reset on session teardown (see
+      // OnSessionEnded), so a later reinitialize checks again.
+      const bool checkForUpdate = !m_OnlineUpdateCheckDone;
       const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
         *this->GetTool()->GetPythonContext(), checkForUpdate, distributionName);
 
-      if (checkForUpdate)
-        s_OnlineCheckDone = true;
+      // A non-empty Latest means PyPI was actually reached; an empty one means the
+      // query was skipped or the network was unreachable. Only mark the check done
+      // when it really ran, so an offline failure retries on the next initialize.
+      if (checkForUpdate && !versionCheck.Latest.empty())
+        m_OnlineUpdateCheckDone = true;
 
       if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum)
       {
@@ -601,19 +605,26 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
   if (m_Preferences->Get("nnInteractive/modelSource", "huggingface") == "local")
     return;
 
-  // The manifest refresh hits the network, so check at most once per run.
-  static bool s_ModelCheckDone = false;
-  if (s_ModelCheckDone)
+  // The manifest refresh hits the network, so check at most once per initialized
+  // session; the guard is reset on session teardown (see OnSessionEnded) so a
+  // later reinitialize checks again.
+  if (m_ModelSwitchCheckDone)
     return;
-  s_ModelCheckDone = true;
 
   const auto selectedId = m_Preferences->Get("nnInteractive/modelCheckpoint", "");
 
   // CheckModelUpdate spins up a subprocess and refreshes the manifest over the
-  // network, so show a wait cursor while it runs.
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId);
-  QApplication::restoreOverrideCursor();
+  // network; it drives that behind a modal progress dialog (parented to this
+  // GUI) so the Workbench stays responsive and the user can cancel.
+  const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId, this);
+
+  // Unknown means the manifest could not be refreshed (offline, no model
+  // management). Leave the guard unset so the check retries next time rather than
+  // marking a network failure as done.
+  if (check.Status == mitk::nnInteractive::ModelUpdateStatus::Unknown)
+    return;
+
+  m_ModelSwitchCheckDone = true;
 
   if (check.Status != mitk::nnInteractive::ModelUpdateStatus::UpdateAvailable)
     return;
@@ -658,10 +669,21 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     return;
   }
 
+  this->EnableInitializeButtons(false);
+
+  if (!Install())
+  {
+    this->EnableInitializeButtons(true);
+    this->UncheckInitializeButton();
+    return;
+  }
+
 #if defined(__APPLE__) && !defined(__aarch64__)
   // Intel Macs have no local PyTorch/GPU support, but a client-only or remote
   // session offloads inference to a server, so only block when a local session
-  // would actually run.
+  // would actually run. This runs after Install(), which is where the install
+  // mode is chosen (fresh install) or reconciled with what is actually present
+  // (reused venv); only then do the preferences reliably reflect the real mode.
   {
     const bool clientOnly = m_Preferences->Get("nnInteractive/installMode", "full") == "client";
     const bool remote = clientOnly || m_Preferences->Get("nnInteractive/inferenceMode", "local") == "remote";
@@ -681,21 +703,13 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
           .arg(LINE_HEIGHT_STYLE),
         QMessageBox::Ok);
 
-      // Nothing was initialized; release the toggle without re-entering this slot.
+      // No session was started; release the toggle without re-entering this slot.
+      this->EnableInitializeButtons(true);
       this->UncheckInitializeButton();
       return;
     }
   }
 #endif
-
-  this->EnableInitializeButtons(false);
-
-  if (!Install())
-  {
-    this->EnableInitializeButtons(true);
-    this->UncheckInitializeButton();
-    return;
-  }
 
   const auto initMessage = QString(
     "<h3 %1>Initializing nnInteractive</h3>"
@@ -788,15 +802,16 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
               this, &Self::OnActiveLabelChanged, Qt::UniqueConnection);
     }
 
-    // Seed immediately if a non-empty label is already selected at init time.
+    // Seed from the already-selected label at init time. Route it through the
+    // same handler as a running-session selection change so both entry points
+    // resolve and apply the label identically (set active label, seed the mask,
+    // refresh the Confirm button). No inspector signal is pending here, so the
+    // segmentation's active label is already authoritative.
     if (const auto* segmentation = this->GetTool()->GetTargetSegmentation(); segmentation != nullptr)
     {
       if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
-        this->MaybeInitializeWithLabelMask(activeLabel->GetValue());
+        this->OnActiveLabelChanged({ activeLabel->GetValue() });
     }
-
-    // Reflect the active target label on the Confirm button.
-    this->UpdateConfirmButtonLabel();
 
     auto backend = this->GetTool()->GetBackend();
 
@@ -977,11 +992,35 @@ mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
 
 void QmitknnInteractiveToolGUI::OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels)
 {
-  // Only a single-label selection drives mask seeding. Use the value from the
-  // signal payload: the segmentation's active label is not guaranteed to be
-  // updated yet when this slot runs.
+  // AutoCreateAndSelectNewLabel() drives the inspector's selection itself and
+  // sets up the new-label state directly; ignore the selection signals it emits
+  // so they do not reset or re-seed the just-confirmed session mid-confirm.
+  if (m_SuppressActiveLabelChanged)
+    return;
+
+  // Only a single-label selection drives the active target label. Use the value
+  // from the signal payload: the segmentation's active label is not guaranteed
+  // to be updated yet when this slot runs (the host view sets it later in the
+  // CurrentSelectionChanged chain).
   if (labels.size() != 1)
     return;
+
+  auto* tool = this->GetTool();
+
+  if (tool == nullptr)
+    return;
+
+  // Make the payload label the single source of truth up front, so every later
+  // read of the active label (the tool's preview color in DoUpdatePreview, the
+  // Confirm button below, and the mask seeding) resolves the new label rather
+  // than the stale one. SetActiveLabel only marks the segmentation modified (no
+  // CurrentSelectionChanged is re-emitted), so this does not re-enter this slot.
+  if (auto* segmentation = tool->GetTargetSegmentation(); segmentation != nullptr)
+  {
+    const auto* activeLabel = segmentation->GetActiveLabel();
+    if (activeLabel == nullptr || activeLabel->GetValue() != labels.front())
+      segmentation->SetActiveLabel(labels.front());
+  }
 
   this->MaybeInitializeWithLabelMask(labels.front());
   this->UpdateConfirmButtonLabel();
@@ -1160,6 +1199,12 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
 
   // No session is running now; revert the Confirm button to its base label.
   this->UpdateConfirmButtonLabel();
+
+  // Re-arm the once-per-session network checks so the next initialize re-runs the
+  // version-update and model-switch prompts (covers uninitialize/reinitialize and
+  // preference changes made between sessions).
+  m_OnlineUpdateCheckDone = false;
+  m_ModelSwitchCheckDone = false;
 }
 
 void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()
@@ -1427,6 +1472,14 @@ bool QmitknnInteractiveToolGUI::AutoCreateAndSelectNewLabel()
     return false;
 
   const auto previousActiveValue = activeLabel->GetValue();
+
+  // Driving the inspector's selection emits CurrentSelectionChanged
+  // synchronously, which would re-enter OnActiveLabelChanged and tear down or
+  // re-seed the just-confirmed session. Suppress our slot until the selection
+  // settles on the new label; the scope guard restores it even if AddNewLabel
+  // throws.
+  m_SuppressActiveLabelChanged = true;
+  auto restoreSuppression = qScopeGuard([this] { m_SuppressActiveLabelChanged = false; });
 
   // Align the inspector's selection with the active label so that
   // AddNewLabel() derives the correct group for the new label.

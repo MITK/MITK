@@ -72,8 +72,11 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
   }
 
   pyCommands
+    // A missing 'packaging' or an unparsable version string must not pass for
+    // UpToDate: clearing nni_installed makes the result inconclusive, so the
+    // C++ below reports Unknown rather than silently skipping the version gate.
     << "    except Exception:\n"
-    << "        pass\n";
+    << "        nni_installed = ''\n";
 
   try
   {

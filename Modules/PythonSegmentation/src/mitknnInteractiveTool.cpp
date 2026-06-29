@@ -23,6 +23,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveScribbleInteractor.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPythonContext.h>
+#include <mitkPythonUtil.h>
 #include <mitkRenderingManager.h>
 #include <mitkToolManager.h>
 
@@ -51,23 +52,6 @@ namespace
   {
     auto* preferencesService = mitk::CoreServices::GetPreferencesService();
     return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
-  }
-
-  // Format a std::string as a Python single-quoted string literal so a Windows
-  // path like C:\foo\bar round-trips safely through the generated Python code.
-  std::string PyQuote(const std::string& value)
-  {
-    std::string result;
-    result.reserve(value.size() + 2);
-    result.push_back('\'');
-    for (char c : value)
-    {
-      if (c == '\\' || c == '\'')
-        result.push_back('\\');
-      result.push_back(c);
-    }
-    result.push_back('\'');
-    return result;
   }
 
   // Strip credentials (a "user:pass@" userinfo) and any query/fragment from a URL

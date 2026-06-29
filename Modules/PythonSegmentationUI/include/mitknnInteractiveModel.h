@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <string>
 #include <vector>
 
+class QWidget;
+
 namespace mitk
 {
   namespace nnInteractive
@@ -55,6 +57,16 @@ namespace mitk
       std::string RecommendedId; /**< \brief The manifest's default model id (empty when unknown). */
     };
 
+    /** \brief Outcome of a ListModels() query, distinguishing an empty manifest
+     *         from a hard failure.
+     */
+    enum class ModelListStatus
+    {
+      Ok,     /**< \brief The query ran and returned at least one model. */
+      Empty,  /**< \brief The query ran but the manifest contains no models. */
+      Failed  /**< \brief The query could not run (no environment, offline, no model management). */
+    };
+
     /** \brief Lists the model checkpoints known to nnInteractive's model management.
      *
      * Runs \c nnInteractive.model_management.list_models() in a short-lived
@@ -68,13 +80,19 @@ namespace mitk
      * Returns an empty list when the virtual environment or its interpreter is
      * missing, model management is unavailable (a client-only install), or the
      * query fails, so callers can treat "no models" as "fall back to free-text
-     * entry".
+     * entry". Pass \p status to tell a genuinely empty manifest (Empty) apart
+     * from a failure to query at all (Failed); both yield an empty list.
+     *
+     * While it runs, a modal progress dialog parented to \p parent keeps the UI
+     * responsive and lets the user cancel (a cancel is reported as Failed).
      *
      * \param[in] venvName The nnInteractive virtual environment to query.
+     * \param[out] status Optional; set to Ok, Empty, or Failed (may be nullptr).
+     * \param[in] parent Widget the modal progress dialog is parented to (may be nullptr).
      *
      * \return The known model checkpoints (possibly empty).
      */
-    MITKPYTHONSEGMENTATIONUI_EXPORT std::vector<ModelInfo> ListModels(const std::string& venvName);
+    MITKPYTHONSEGMENTATIONUI_EXPORT std::vector<ModelInfo> ListModels(const std::string& venvName, ModelListStatus* status = nullptr, QWidget* parent = nullptr);
 
     /** \brief Checks whether a checkpoint newer than the selected one is recommended.
      *
@@ -86,16 +104,20 @@ namespace mitk
      * suffixes; "newer" means "the library now recommends a different default
      * checkpoint".
      *
+     * While it runs, a modal progress dialog parented to \p parent keeps the UI
+     * responsive and lets the user cancel (a cancel is reported as Unknown).
+     *
      * \param[in] venvName The nnInteractive virtual environment to query.
      * \param[in] selectedModelId The model id currently configured (may be empty to
      *                    mean "use the recommended default").
+     * \param[in] parent Widget the modal progress dialog is parented to (may be nullptr).
      *
      * \return A ModelCheckResult; Status is Unknown when it could not be determined
      *         (the caller should then not prompt).
      *
      * \sa ModelUpdateStatus
      */
-    MITKPYTHONSEGMENTATIONUI_EXPORT ModelCheckResult CheckModelUpdate(const std::string& venvName, const std::string& selectedModelId);
+    MITKPYTHONSEGMENTATIONUI_EXPORT ModelCheckResult CheckModelUpdate(const std::string& venvName, const std::string& selectedModelId, QWidget* parent = nullptr);
   }
 }
 

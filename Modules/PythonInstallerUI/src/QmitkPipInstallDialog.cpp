@@ -269,7 +269,7 @@ void QmitkPipInstallDialog::OnInstallFinished(bool success)
   }
   else
   {
-    this->SetTerminalStatus("Installation failed. Please try again.");
+    this->SetTerminalStatus(m_Mode == Mode::Update ? "Update failed. Please try again." : "Installation failed. Please try again.");
     m_Ui->packageLabel->hide();
     m_Ui->progressBar->hide();
     this->OfferDetails();
@@ -286,7 +286,7 @@ void QmitkPipInstallDialog::OnErrorOccurred(const QString& message)
 {
   m_DotTimer->stop();
   this->SetUiFinished(false);
-  this->SetTerminalStatus("Installation failed: " + message);
+  this->SetTerminalStatus((m_Mode == Mode::Update ? QString("Update failed: ") : QString("Installation failed: ")) + message);
   m_Ui->packageLabel->hide();
   m_Ui->progressBar->hide();
   this->OfferDetails();

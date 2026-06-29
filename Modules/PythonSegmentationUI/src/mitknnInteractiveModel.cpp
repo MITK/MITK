@@ -15,10 +15,14 @@ found in the LICENSE file.
 #include <mitkLog.h>
 #include <mitkPythonHelper.h>
 
+#include <QEventLoop>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QProgressDialog>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
+#include <QWidget>
 
 #include <optional>
 
@@ -29,9 +33,11 @@ namespace
   // than the embedded interpreter) keeps nnInteractive's model management and its
   // transitive native dependencies (e.g. PyYAML) out of the host process, so they
   // never map libraries from the virtual environment that would otherwise block a
-  // later in-place update on Windows. Returns std::nullopt if the environment or
-  // its interpreter is missing, or the process fails to run within the timeout.
-  std::optional<QString> RunVenvPython(const std::string& venvName, const QString& script)
+  // later in-place update on Windows. While the subprocess runs, a modal progress
+  // dialog (parented to \p parent, captioned with \p busyMessage) keeps the GUI
+  // responsive and lets the user cancel. Returns std::nullopt if the environment
+  // or its interpreter is missing, or the run is cancelled or times out.
+  std::optional<QString> RunVenvPython(const std::string& venvName, const QString& script, QWidget* parent, const QString& busyMessage)
   {
     const auto venvPath = mitk::PythonHelper::GetVirtualEnvPath(venvName);
 
@@ -66,14 +72,43 @@ namespace
       return std::nullopt;
     }
 
-    // The first call refreshes the model manifest from Hugging Face, so allow a
-    // generous window before giving up; callers show a wait cursor meanwhile.
-    if (!process.waitForFinished(60000))
+    // The first call refreshes the model manifest from Hugging Face, which can
+    // take up to a minute. QProcess is asynchronous, so wait on its completion
+    // through a local event loop rather than a blocking waitForFinished(): the
+    // loop keeps the GUI repainting while a modal progress dialog shows the busy
+    // state and offers Cancel. The subprocess only reads the manifest, so
+    // cancelling it (which kills the process) leaves nothing partially written.
+    QEventLoop loop;
+    QObject::connect(&process, &QProcess::finished, &loop, &QEventLoop::quit);
+    QObject::connect(&process, &QProcess::errorOccurred, &loop, &QEventLoop::quit);
+
+    QTimer timeoutTimer;
+    timeoutTimer.setSingleShot(true);
+    QObject::connect(&timeoutTimer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timeoutTimer.start(60000);
+
+    QProgressDialog dialog(busyMessage, QStringLiteral("Cancel"), 0, 0, parent);
+    dialog.setWindowTitle(QStringLiteral("nnInteractive"));
+    dialog.setWindowModality(Qt::WindowModal);
+    dialog.setMinimumDuration(0);
+    QObject::connect(&dialog, &QProgressDialog::canceled, &loop, &QEventLoop::quit);
+    dialog.show();
+
+    // The process can finish between waitForStarted() above and here; only enter
+    // the loop while it is still running, otherwise quit() would never arrive.
+    if (process.state() != QProcess::NotRunning)
+      loop.exec();
+
+    if (process.state() != QProcess::NotRunning)
     {
+      // Cancelled or timed out: the process is still running, so stop it.
       process.kill();
       process.waitForFinished(2000);
       return std::nullopt;
     }
+
+    if (process.exitStatus() != QProcess::NormalExit)
+      return std::nullopt;
 
     return QString::fromLocal8Bit(process.readAllStandardOutput());
   }
@@ -88,8 +123,16 @@ namespace
   }
 }
 
-std::vector<mitk::nnInteractive::ModelInfo> mitk::nnInteractive::ListModels(const std::string& venvName)
+std::vector<mitk::nnInteractive::ModelInfo> mitk::nnInteractive::ListModels(const std::string& venvName, ModelListStatus* status, QWidget* parent)
 {
+  const auto setStatus = [status](ModelListStatus value)
+  {
+    if (status != nullptr)
+      *status = value;
+  };
+
+  setStatus(ModelListStatus::Failed);
+
   // Each model is printed as a tab-separated NNI_MODEL row; a trailing NNI_OK
   // marks a successful run. The ids and short display names never contain tabs or
   // newlines (sanitized below as a safeguard), so one row round-trips one model.
@@ -112,7 +155,7 @@ except Exception as _e:
 
   std::vector<ModelInfo> models;
 
-  const auto output = RunVenvPython(venvName, script);
+  const auto output = RunVenvPython(venvName, script, parent, QStringLiteral("Loading the nnInteractive model list..."));
 
   if (!output.has_value())
     return models;
@@ -150,10 +193,19 @@ except Exception as _e:
     return {};
   }
 
+  if (models.empty())
+  {
+    MITK_WARN << "nnInteractive: model list is empty.";
+    setStatus(ModelListStatus::Empty);
+    return models;
+  }
+
+  setStatus(ModelListStatus::Ok);
+
   return models;
 }
 
-mitk::nnInteractive::ModelCheckResult mitk::nnInteractive::CheckModelUpdate(const std::string& venvName, const std::string& selectedModelId)
+mitk::nnInteractive::ModelCheckResult mitk::nnInteractive::CheckModelUpdate(const std::string& venvName, const std::string& selectedModelId, QWidget* parent)
 {
   ModelCheckResult result;
   result.CurrentId = selectedModelId;
@@ -169,7 +221,7 @@ except Exception as _e:
     sys.stdout.write('NNI_ERR\t' + str(_e).replace('\n', ' ') + '\n')
 )PY");
 
-  const auto output = RunVenvPython(venvName, script);
+  const auto output = RunVenvPython(venvName, script, parent, QStringLiteral("Checking the nnInteractive model manifest..."));
 
   if (!output.has_value())
     return result; // Status stays Unknown.

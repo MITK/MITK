@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <mitknnInteractiveInstall.h>
 
 #include <mitkIPreferences.h>
+#include <mitkPythonUtil.h>
 #include <mitknnInteractiveVersion.h>
 
 #include <utility>
@@ -73,7 +74,7 @@ mitk::PipInstallSpec mitk::nnInteractive::BuildInstallSpec(mitk::IPreferences* p
     const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
     const std::string ensureArg = modelCheckpoint.empty()
       ? "get_default_model_id()"
-      : "'" + modelCheckpoint + "'";
+      : mitk::PyQuote(modelCheckpoint);
 
     mitk::PostInstallStep step;
     step.displayName = "Download model weights";

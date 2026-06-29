@@ -384,15 +384,23 @@ void QmitknnInteractivePreferencePage::OnRefreshModelsClicked()
   }
 
   // Listing models refreshes the manifest from Hugging Face and spins up a
-  // transient Python context, so it can block briefly.
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  const auto models = mitk::nnInteractive::ListModels("nnInteractive");
-  QApplication::restoreOverrideCursor();
+  // transient Python context. ListModels drives it behind a modal progress
+  // dialog (parented to this page) so the Workbench stays responsive and the
+  // user can cancel.
+  auto status = mitk::nnInteractive::ModelListStatus::Failed;
+  const auto models = mitk::nnInteractive::ListModels("nnInteractive", &status, m_Control);
 
-  if (models.empty())
+  if (status == mitk::nnInteractive::ModelListStatus::Failed)
   {
     QMessageBox::information(m_Control, "nnInteractive",
       "Could not load the model list. Check your internet connection, or enter a model id manually.");
+    return;
+  }
+
+  if (status == mitk::nnInteractive::ModelListStatus::Empty)
+  {
+    QMessageBox::information(m_Control, "nnInteractive",
+      "nnInteractive reported no model checkpoints. Enter a model id manually.");
     return;
   }
 
@@ -470,15 +478,16 @@ void QmitknnInteractivePreferencePage::OnUninstallButtonClicked()
 
   if (removed)
   {
-    // nnInteractive is gone, so any client-only restriction no longer applies.
-    // Reset to a full/local default so the next Initialize installs fresh and
-    // lets the user choose the install mode again, and reflect that in the UI so
-    // a subsequent OK persists it (and the tool GUI's Initialize button updates
-    // via its preference observer).
-    auto* prefs = GetPreferences();
-    prefs->Put("nnInteractive/installMode", "full");
-    prefs->Put("nnInteractive/inferenceMode", "local");
+    // The venv is already deleted, so installMode must reflect that immediately,
+    // independent of this dialog's OK/Cancel cycle: the tool GUI mirrors it as a
+    // "reflects reality" preference and observes it to refresh its Initialize
+    // button. inferenceMode, in contrast, is a staged preference of this page
+    // (read in Update(), written in PerformOk()), so it is not touched here; the
+    // widget changes below select Local and let a subsequent OK persist it.
+    GetPreferences()->Put("nnInteractive/installMode", "full");
 
+    // No client-only restriction applies anymore: re-enable and select Local so
+    // the next Initialize can install fresh and the user can choose freely.
     m_ClientOnly = false;
     m_Ui->clientOnlyHintLabel->setVisible(false);
     m_Ui->localModeRadioButton->setEnabled(true);

@@ -38,7 +38,9 @@ mitk::PipInstallSpec mitk::nnInteractive::BuildInstallSpec(mitk::IPreferences* p
   if (clientOnly)
   {
     mitk::PipInstallGroup clientGroup;
-    clientGroup.requirements = { "nninteractive-client" + versionRange };
+    // The version check imports 'packaging'; the full install gets it via torch,
+    // so the client-only group must request it explicitly.
+    clientGroup.requirements = { "nninteractive-client" + versionRange, "packaging" };
     spec.groups.push_back(std::move(clientGroup));
     return spec;
   }
@@ -97,7 +99,8 @@ mitk::PipInstallSpec mitk::nnInteractive::BuildUpgradeSpec(const std::string& ve
   if (clientOnly)
   {
     mitk::PipInstallGroup clientGroup;
-    clientGroup.requirements = { "nninteractive-client" + versionRange };
+    // Keep 'packaging' present after an upgrade (see BuildInstallSpec).
+    clientGroup.requirements = { "nninteractive-client" + versionRange, "packaging" };
     clientGroup.extraPipArgs = { "--upgrade" };
     spec.groups.push_back(std::move(clientGroup));
     return spec;

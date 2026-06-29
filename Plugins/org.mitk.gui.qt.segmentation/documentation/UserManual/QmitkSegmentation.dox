@@ -465,62 +465,98 @@ The following 3D tools are available:
 <tr><td><b>Label management</b></td><td>Add and select new label</td><td><tt>CTRL+L, CTRL+A</tt></td></tr>
 </table>
 
+These shortcuts also appear in the tool's button labels. You can hide them by disabling <i>Show keyboard shortcuts</i> on the nnInteractive preferences page.
+
 The nnInteractive tool is a state-of-the-art AI solution for fully segmenting organs and other anatomical structures with minimal user interaction - often a single click is sufficient.
 This capability comes with significant resource requirements, including several gigabytes of disk space and a powerful GPU.
 Although nnInteractive can run on CPUs, performance is orders of magnitude slower compared to modern GPUs with at least 6 GB of VRAM.
 A truly interactive experience is only achievable on high-performance GPUs such as an Nvidia GeForce 4090, which can typically deliver response times of roughly one second per interaction.
 
-\imageMacro{nnInteractive_Point.gif,"Segmenting a whole kidney with a single Point interaction",16.00}
-
 \subsubsection org_mitk_views_segmentation3dnninteractive_install Installation
 
 Before its first use, nnInteractive must be installed.
-The first time you click <b>Initialize</b>, an installation dialog appears.
-In most cases, you can simply confirm the dialog and wait a few minutes for nnInteractive to complete installation.
+The first time you click <b>Initialize</b>, MITK asks which kind of installation you want.
+Choose <b>Full</b> to install nnInteractive together with PyTorch and a model checkpoint; this enables both local inference on your own machine and connecting to a remote server.
+Choose <b>Client only</b> for a lightweight installation that can connect to a remote nnInteractive server but cannot run inference locally.
+If you are unsure, pick <b>Full</b>.
 
+\imageMacro{nnInteractive_InstallMode.png,"Choosing the installation mode",16.00}
+
+After you confirm the mode, an installation dialog appears.
+In most cases, you can simply confirm it and wait a few minutes for the installation to complete; a full installation requires several gigabytes of disk space.
 If installation fails, several advanced settings are available to assist with troubleshooting.
 These options require some technical understanding.
 
 \imageMacro{nnInteractive_Install.png,"Installing nnInteractive",16.00}
 
 nnInteractive is installed into a private virtual environment that is reused across MITK updates.
-If the installed version is too old for the current version of MITK, initialization is stopped and a message asks you to uninstall it and reinitialize.
-Use the <b>Uninstall nnInteractive</b> button on the nnInteractive preferences page; the next initialization then installs a compatible version.
-When a newer compatible release becomes available, MITK points this out so you can update it the same way.
+If the installed version is too old for the current version of MITK, or when a newer compatible release becomes available, MITK offers to update nnInteractive in place.
+The update is offered automatically when you initialize, and you can also start it at any time with the <b>Check for updates</b> button on the nnInteractive preferences page.
+An in-place update is applied while nnInteractive is not yet loaded, so it normally takes place at the first initialization after MITK starts.
+The <b>Uninstall nnInteractive</b> button on the same preferences page removes the environment entirely, for example to switch between <b>Full</b> and <b>Client only</b> mode.
 
 \subsubsection org_mitk_views_segmentation3dnninteractive_init Initialization
 
 nnInteractive must be initialized before it can operate on an image.
-During initialization, the AI model weights are uploaded to the GPU, which may take several seconds.
-The very first initialization after installation may take up to a minute because the weights must be downloaded from the internet.
+For a local session, the model is loaded onto the compute device during initialization, which may take several seconds; the very first initialization after installation may take up to a minute because the model checkpoint is downloaded from the internet first.
+For a remote session, MITK connects to the configured server instead.
 
 Once initialization completes successfully, you can begin using the nnInteractive tool.
-If no supported GPU is detected, a warning message will inform you that nnInteractive will run slowly and will recommend hardware that enables a fully interactive workflow.
+If you run locally and no supported GPU is detected, a warning informs you that nnInteractive will run slowly and recommends hardware that enables a fully interactive workflow.
 
-The <b>Initialize</b> button is a toggle: while a session is running it is labeled <b>Uninitialize</b>.
-Click it to end the session and release its resources without leaving the tool.
+\imageMacro{nnInteractive_CPU.png,"A warning when nnInteractive is running on CPU",16.00}
 
-If initialization fails, you may attempt to change the device on which nnInteractive is executed.
-A <b>Settings</b> button is available next to the <b>Initialize</b> button, opening the nnInteractive preferences page.
+The <b>Initialize</b> button is a toggle: while a session is running it is labeled <b>Uninitialize</b>, which you can click to end the session and release its resources without leaving the tool.
+When nnInteractive is configured to use a remote server, the button reads <b>Initialize (remote server)</b>.
+
+Next to <b>Initialize</b> is a <b>Settings</b> button that opens the nnInteractive preferences page, where you configure how and where inference runs.
+
+\imageMacro{nnInteractive_Preferences.png,"The nnInteractive preferences",16.00}
+
+Under <i>Inference</i> you choose between <b>Local</b> (the default), which runs the model in this application's own Python environment, and <b>Remote server</b>, which offloads inference to an nnInteractive server that provides the model and GPU.
+For a remote server, enter its <i>Server URL</i> and, if required, an <i>API key</i>; when the key field is left empty, the <tt>NN_INTERACTIVE_API_KEY</tt> environment variable is used instead.
+An API key entered here is stored in plain text in the application preferences.
+A client-only installation can only run remotely, so its inference mode is fixed to <b>Remote server</b>.
+
+Under <i>Model</i>, nnInteractive uses a recommended checkpoint that is downloaded from Hugging Face by default.
+You can select a different checkpoint from the list or point nnInteractive to a checkpoint folder already present on disk.
+When you run locally with a downloaded checkpoint and a newer recommended checkpoint becomes available, MITK offers to switch to it once per session.
+Once a session is running, the checkpoint's license is shown in the tool, directly below the <b>Initialize</b> button.
+
 Under <i>Computation backend</i> you can switch between <i>Auto</i> (default), <i>CPU</i>, and <i>GPU</i>.
 When selecting <i>GPU</i>, you may also specify the device number if you are working on a multi-GPU system.
 On Linux with a CUDA GPU, an additional option enables <tt>torch.compile</tt> for faster interactions at the cost of a slightly longer initialization.
 The <i>Storage backend</i> setting controls how interaction data is held in memory: <i>Auto</i> (default) balances speed and memory, <i>blosc2</i> minimizes memory use, and <i>tensor</i> maximizes speed.
 The computation and storage backend settings apply to local sessions only; a remote server provides its own compute device and interaction storage.
+If a local session fails to initialize, switching the computation backend or choosing a specific device here is a good first troubleshooting step.
 
-\imageMacro{nnInteractive_CPU.png,"A warning when nnInteractive is running on CPU",16.00}
+The inference mode, server, model, and backend settings define how a session runs, so changing any of them ends a running session; the new setting takes effect the next time you initialize.
 
 \subsubsection org_mitk_views_segmentation3dnninteractive_interactions Interactions
 
 After a session has been initialized, you can begin interacting by placing points, drawing bounding boxes, outlining contours, or scribbling with simple mouse clicks.
 Each interaction can be set to positive or negative, thereby adding or removing areas from the proposed segmentation.
+Interactions are shown on the 2D slice on which you draw them; they are not rendered in the 3D window.
+
+\imageMacro{nnInteractive_Tool.png,"The nnInteractive tool",16.00}
+
+While you work, the proposed segmentation is shown as a live preview in the color of the active label.
+The Confirm button names the label that the result will be written to and shows its color, for example <b>Confirm Liver</b>, so you always know where the segmentation will go.
+When you are satisfied with the result - often after only a single point or scribble - click it (or press <tt>C</tt>) to write the segmented pixels to that label.
+
+The <b>Auto-zoom</b> option, enabled by default, lets the model widen the region it analyzes when a segment reaches the edge, so large structures are not cut off.
+It improves completeness at the cost of speed and is not available on the CPU.
+
+If the active label already contains a segmentation, nnInteractive uses it as a starting point, so you can refine an existing result instead of starting over.
+With <b>Auto-refine preexisting label content</b> enabled, the model refines that content immediately; with it disabled, the existing content is kept as-is until your next interaction.
+Refining preexisting content requires a model or server that supports it.
 
 You can undo the most recent interaction with the <b>Undo</b> button (or press <tt>U</tt>).
 nnInteractive supports a single level of undo, so after undoing once nothing more can be undone until you add another interaction.
 To discard all current interactions and start over, use <b>Reset</b> (or press <tt>R</tt>).
-When you are satisfied with the result - often after only a single point or scribble - press <b>Confirm Segmentation</b> to write the segmented pixels to the currently selected label.
 
 Within a single session, you can switch the active label at any time to segment multiple structures without reinitializing nnInteractive.
+Two automation options on the preferences page streamline this workflow: <i>Auto-create next label</i> prepares a new empty label as soon as you confirm one, so you can keep segmenting, and <i>Auto-confirm after single interaction</i> confirms automatically after your first interaction, which is convenient when a single interaction per label is enough.
 
 The tool's <b>Undo</b> and the application-wide undo work at different levels, and both stay available while the tool is active.
 The tool's <b>Undo</b> (<tt>U</tt>) reverts only your most recent interaction within the current, unconfirmed result; there is no further interaction history to step back through.

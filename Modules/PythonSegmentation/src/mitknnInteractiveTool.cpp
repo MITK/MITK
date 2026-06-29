@@ -546,7 +546,17 @@ void mitk::nnInteractiveTool::DoUpdatePreview(const Image* inputAtTimeStep, cons
   if (previewImage == nullptr || m_Impl->GetPythonContext() == nullptr)
     return;
 
-  this->SetPreviewLabel(1, this->GetSpecialPreviewColor());
+  // Color the preview with the selected target label's color (falling back to
+  // the special preview color) so it matches the label being segmented.
+  auto previewColor = this->GetSpecialPreviewColor();
+
+  if (const auto* segmentation = this->GetTargetSegmentation(); segmentation != nullptr)
+  {
+    if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
+      previewColor = activeLabel->GetColor();
+  }
+
+  this->SetPreviewLabel(1, previewColor);
 
   // An undo restored the target buffer in place; just repaint the preview from
   // it. This must run before the interactor branch (an interactor is typically

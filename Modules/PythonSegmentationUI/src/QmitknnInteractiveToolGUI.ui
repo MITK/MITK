@@ -229,26 +229,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="maskButton">
-        <property name="text">
-         <string>Initialize with Mask</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resource/nnInteractive/nnInteractive.qrc">
-          <normaloff>:/nnInteractive/Mask</normaloff>:/nnInteractive/Mask</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="autoRefineCheckBox">
         <property name="text">
-         <string>Auto-refine mask</string>
+         <string>Auto-refine preexisting label content</string>
+        </property>
+        <property name="toolTip">
+         <string>If off, the label's content is used as-is until your next interaction.</string>
         </property>
        </widget>
       </item>

@@ -34,8 +34,12 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
+#include <QColor>
 #include <QCoreApplication>
+#include <QIcon>
 #include <QMessageBox>
+#include <QPainter>
+#include <QPixmap>
 #include <QShortcut>
 #include <QTimer>
 #include <QWidget>
@@ -90,18 +94,26 @@ namespace
     return QCursor(pixmap, 0, 0);
   }
 
-  QString GetLabelAsString(const mitk::Label* label)
+  QIcon ColorSwatchIcon(const mitk::Color& color)
   {
-    QColor color(
-      static_cast<int>(label->GetColor().GetRed() * 255),
-      static_cast<int>(label->GetColor().GetGreen() * 255),
-      static_cast<int>(label->GetColor().GetBlue() * 255));
+    // Keep the icon size fixed but draw a smaller centered square so the swatch
+    // reads as a compact color chip rather than filling the whole icon area.
+    constexpr int iconSize = 16;
+    constexpr int swatchSize = 10;
+    constexpr int offset = (iconSize - swatchSize) / 2;
 
-    auto name = QString::fromStdString(label->GetName());
+    QPixmap pixmap(iconSize, iconSize);
+    pixmap.fill(Qt::transparent);
 
-    return QString("<span style='color: %1'>&#9609;</span> %2")
-      .arg(color.name())
-      .arg(name);
+    {
+      QPainter painter(&pixmap);
+      painter.fillRect(offset, offset, swatchSize, swatchSize, QColor(
+        static_cast<int>(color.GetRed() * 255),
+        static_cast<int>(color.GetGreen() * 255),
+        static_cast<int>(color.GetBlue() * 255)));
+    }
+
+    return QIcon(pixmap);
   }
 
   mitk::TimeStepType GetCurrentTimeStep(const mitk::BaseData* data)
@@ -112,38 +124,6 @@ namespace
     const auto geometry = data->GetTimeGeometry();
 
     return geometry->TimePointToTimeStep(timePoint);
-  }
-
-  bool IsLabelEmpty(const mitk::MultiLabelSegmentation* segmentation, const mitk::Label* label)
-  {
-    if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
-      return false;
-
-    auto message = QString(
-      "<h3 %1>Initialize with Mask</h3>"
-      "<p %1>The selected label cannot be used as a mask to start a new "
-      "session because it is empty.</p>"
-      "<p %1>Selected label: %2</p>")
-      .arg(LINE_HEIGHT_STYLE)
-      .arg(GetLabelAsString(label));
-
-    QMessageBox::information(nullptr, "nnInteractive", message, QMessageBox::Ok);
-
-    return true;
-  }
-
-  bool ConfirmInitializationWithMask(const mitk::Label* label)
-  {
-    auto message = QString(
-      "<h3 %1>Initialize with Mask</h3>"
-      "<p %1>Do you want to <strong>reset all interactions</strong> and start a "
-      "new session based on the existing content of the selected label?</p>"
-      "<p %1>Selected label: %2</p>")
-      .arg(LINE_HEIGHT_STYLE)
-      .arg(GetLabelAsString(label));
-
-    auto button = QMessageBox::question(nullptr, "nnInteractive", message, QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    return button == QMessageBox::Yes;
   }
 
   // True for the preferences baked into a session at initialization (the single
@@ -227,7 +207,6 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   SetIcon(m_Ui->undoButton, "Undo");
   SetIcon(m_Ui->positiveButton, "Positive");
   SetIcon(m_Ui->negativeButton, "Negative");
-  SetIcon(m_Ui->maskButton, "Mask");
 
   connect(m_Ui->initializeButton, &QPushButton::toggled, this, &Self::OnInitializeButtonToggled);
   connect(m_Ui->settingsButton, &QPushButton::clicked, this, &Self::OnSettingsButtonClicked);
@@ -278,9 +257,10 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
 
   // Cache the base label of each shortcut-bound widget as seen from the
-  // .ui file (and, for the confirm button, from the base class). The cache
-  // is the single source of truth for ApplyShortcutLabels, so repeated
-  // invocations never accumulate suffixes.
+  // .ui file. The cache is the single source of truth for ApplyShortcutLabels,
+  // so repeated invocations never accumulate suffixes. The confirm button is
+  // handled separately by UpdateConfirmButtonLabel, whose text also reflects
+  // the active target label.
 
   m_ShortcutLabels = {
     { m_Ui->resetButton,    RESET_KEY,    m_Ui->resetButton->text() },
@@ -289,7 +269,6 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
     { m_Ui->boxButton,      BOX_KEY,      m_Ui->boxButton->text() },
     { m_Ui->scribbleButton, SCRIBBLE_KEY, m_Ui->scribbleButton->text() },
     { m_Ui->lassoButton,    LASSO_KEY,    m_Ui->lassoButton->text() },
-    { confirmButton,        CONFIRM_KEY,  confirmButton->text() },
   };
   m_PromptTypeBaseTitle = m_Ui->promptTypeGroupBox->title();
 
@@ -300,6 +279,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
       this, &QmitknnInteractiveToolGUI::OnPreferenceChangedEvent);
 
   this->ApplyShortcutLabels();
+  this->UpdateConfirmButtonLabel();
   this->UpdateInitializeButtonText();
 }
 
@@ -385,8 +365,6 @@ void QmitknnInteractiveToolGUI::InitializeInteractorButtons()
       this->OnInteractorToggled(interactionType, checked);
     });
   }
-
-  connect(m_Ui->maskButton, &QPushButton::clicked, this, &Self::OnMaskButtonClicked);
 }
 
 bool QmitknnInteractiveToolGUI::Install()
@@ -799,6 +777,27 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
     // Surface the model's license terms now that a session is bound.
     this->UpdateModelLicenseDisplay(this->GetTool()->GetModelLicense());
 
+    // While the session runs, selecting a non-empty label in the host's label
+    // inspector seeds the session from that label's mask. Connect once
+    // (Qt::UniqueConnection prevents repeated initializations from stacking
+    // duplicate connections); Qt drops it when this GUI is destroyed on tool
+    // deactivation. The inspector is null when hosted outside a segmentation view.
+    if (auto* inspector = this->GetMultiLabelInspector(); inspector != nullptr)
+    {
+      connect(inspector, &QmitkMultiLabelInspector::CurrentSelectionChanged,
+              this, &Self::OnActiveLabelChanged, Qt::UniqueConnection);
+    }
+
+    // Seed immediately if a non-empty label is already selected at init time.
+    if (const auto* segmentation = this->GetTool()->GetTargetSegmentation(); segmentation != nullptr)
+    {
+      if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
+        this->MaybeInitializeWithLabelMask(activeLabel->GetValue());
+    }
+
+    // Reflect the active target label on the Confirm button.
+    this->UpdateConfirmButtonLabel();
+
     auto backend = this->GetTool()->GetBackend();
 
     if (!backend.has_value())
@@ -889,6 +888,39 @@ void QmitknnInteractiveToolGUI::UpdateUndoButtonState()
   m_Ui->undoButton->setEnabled(m_SupportsUndo && tool != nullptr && tool->CanUndo());
 }
 
+void QmitknnInteractiveToolGUI::UpdateConfirmButtonLabel()
+{
+  auto* confirmButton = this->GetConfirmSegmentationButton();
+
+  if (confirmButton == nullptr)
+    return;
+
+  QString text = "Confirm Segmentation";
+  QIcon icon;
+
+  // While a session runs, name the target label the next Confirm writes into
+  // and show its color as a swatch.
+  auto* tool = this->GetTool();
+
+  if (tool != nullptr && tool->IsSessionRunning())
+  {
+    if (auto* segmentation = tool->GetTargetSegmentation(); segmentation != nullptr)
+    {
+      if (const auto* activeLabel = segmentation->GetActiveLabel(); activeLabel != nullptr)
+      {
+        text = QString("Confirm %1").arg(QString::fromStdString(activeLabel->GetName()));
+        icon = ColorSwatchIcon(activeLabel->GetColor());
+      }
+    }
+  }
+
+  if (this->AreShortcutsShownInLabels())
+    text = LabelWithShortcut(text, CONFIRM_KEY);
+
+  confirmButton->setIcon(icon);
+  confirmButton->setText(text);
+}
+
 void QmitknnInteractiveToolGUI::OnPromptTypeChanged()
 {
   for (const auto& [interactionType, interactor] : this->GetTool()->GetInteractors())
@@ -943,36 +975,50 @@ mitk::nnInteractiveTool* QmitknnInteractiveToolGUI::GetTool()
   return this->GetConnectedToolAs<mitk::nnInteractiveTool>();
 }
 
-void QmitknnInteractiveToolGUI::OnMaskButtonClicked()
+void QmitknnInteractiveToolGUI::OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels)
 {
-  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  const auto* segmentation = toolManager->GetWorkingData(0)->GetDataAs<mitk::MultiLabelSegmentation>();
-  auto activeLabel = segmentation->GetActiveLabel();
-
-  if (activeLabel == nullptr)
-  {
-    MITK_ERROR << "Could not retrieve active label from segmentation!";
-    return;
-  }
-
-  // Check if the label is empty and notify the user if so.
-  if (IsLabelEmpty(segmentation, activeLabel))
+  // Only a single-label selection drives mask seeding. Use the value from the
+  // signal payload: the segmentation's active label is not guaranteed to be
+  // updated yet when this slot runs.
+  if (labels.size() != 1)
     return;
 
-  // Ask the user for confirmation, as this will reset all previous interactions
-  // (if any) and display the selected label to ensure the user is aware of the
-  // source label for the mask.
-  if (!ConfirmInitializationWithMask(activeLabel))
+  this->MaybeInitializeWithLabelMask(labels.front());
+  this->UpdateConfirmButtonLabel();
+}
+
+void QmitknnInteractiveToolGUI::MaybeInitializeWithLabelMask(mitk::MultiLabelSegmentation::LabelValueType labelValue)
+{
+  auto* tool = this->GetTool();
+
+  // Rebasing needs a live session, and the model must advertise the mask
+  // interaction. Outside a running session a selection change is a no-op.
+  if (tool == nullptr || !tool->IsSessionRunning() || !tool->GetSupportedInteractions().Mask)
     return;
 
-  auto mask = mitk::CreateLabelMask(segmentation, activeLabel->GetValue());
+  auto* segmentation = tool->GetTargetSegmentation();
 
-  // Reset interactions and initialize a new session with a mask/label.
+  if (segmentation == nullptr)
+    return;
+
+  auto label = segmentation->GetLabel(labelValue);
+
+  if (label.IsNull())
+    return;
+
+  // Switching the target label discards the previous label's interactions and
+  // preview, so the new label starts from a clean slate; in particular a mask
+  // seeded from the previous label must not linger when switching to an empty
+  // one. No confirmation: the selection has already changed, so the next
+  // Confirm would write into the new label anyway.
   this->OnResetInteractionsButtonClicked();
-  this->GetTool()->InitializeSessionWithMask(mask);
+
+  // Seed from the label's existing content; an empty label just starts fresh.
+  if (!segmentation->IsEmpty(label, GetCurrentTimeStep(segmentation)))
+    tool->InitializeSessionWithMask(mitk::CreateLabelMask(segmentation, labelValue));
 
   // The mask initialization is one undoable step (no PreviewUpdatedEvent is
-  // emitted for it, so refresh the button state here).
+  // emitted for it), so refresh the button state here.
   this->UpdateUndoButtonState();
 }
 
@@ -999,6 +1045,9 @@ void QmitknnInteractiveToolGUI::OnConfirmCleanUp(bool isConfirmed)
   // label instead of starting a fresh one.
   if (autoConfirm || createdNewLabel)
     this->ReEnableLastInteractor();
+
+  // The active label may have changed (auto-create-next-label); reflect it.
+  this->UpdateConfirmButtonLabel();
 }
 
 void QmitknnInteractiveToolGUI::OnToolDeactivated()
@@ -1108,6 +1157,9 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   m_Ui->initializeButton->setEnabled(true);
   this->UpdateInitializeButtonText();
   m_Ui->settingsButton->setEnabled(true);
+
+  // No session is running now; revert the Confirm button to its base label.
+  this->UpdateConfirmButtonLabel();
 }
 
 void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()
@@ -1206,7 +1258,6 @@ void QmitknnInteractiveToolGUI::ApplyCapabilityGating()
   m_Ui->boxButton->setEnabled(caps.Box);
   m_Ui->scribbleButton->setEnabled(caps.Scribble);
   m_Ui->lassoButton->setEnabled(caps.Lasso);
-  m_Ui->maskButton->setEnabled(caps.Mask);
 
   // Cache whether this session supports single-level undo (nnInteractive
   // >= 2.3.3). The Undo button stays disabled until the first interaction.
@@ -1302,7 +1353,10 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
   }
 
   if (property == "nnInteractive/showShortcutsInLabels")
+  {
     this->ApplyShortcutLabels();
+    this->UpdateConfirmButtonLabel();
+  }
   else if (property == "nnInteractive/inferenceMode" || property == "nnInteractive/installMode")
     this->UpdateInitializeButtonText();
 }

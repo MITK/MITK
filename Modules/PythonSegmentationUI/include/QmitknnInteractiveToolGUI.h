@@ -169,13 +169,16 @@ protected:
    */
   void OnInteractorToggled(mitk::nnInteractive::InteractionType interactionType, bool checked);
 
-  /** \brief Handles the mask initialization button click.
+  /** \brief Reacts to a change of the selected label in the host's label
+   *         inspector while a session is running.
    *
-   * Prompts the user to confirm initialization with the active label of
-   * the working segmentation, then resets interactions and initializes
-   * the session with the label mask.
+   * Acts only on a single-label selection and delegates to
+   * MaybeInitializeWithLabelMask(), which seeds the session from the selected
+   * label if it has content.
+   *
+   * \param[in] labels The now-selected label values.
    */
-  void OnMaskButtonClicked();
+  void OnActiveLabelChanged(const mitk::MultiLabelSegmentation::LabelValueVectorType& labels);
 
   /** \brief Handles cleanup confirmation from the tool.
    *
@@ -336,6 +339,31 @@ private:
    * m_SupportsUndo keeps it disabled on nnInteractive versions without undo.
    */
   void UpdateUndoButtonState();
+
+  /** \brief Rebases the running session on the given label.
+   *
+   * No-op unless a session is running and the model advertises the mask
+   * interaction. Otherwise resets the current interactions and preview (so a
+   * mask seeded from the previously selected label does not linger when
+   * switching labels) and, if the label has content, seeds the session from it.
+   * No confirmation: the selection has already changed, so the next Confirm
+   * would write into the new label regardless. Shared by the selection-change
+   * handler and the session-start path.
+   *
+   * \param[in] labelValue The working-segmentation label to rebase on.
+   */
+  void MaybeInitializeWithLabelMask(mitk::MultiLabelSegmentation::LabelValueType labelValue);
+
+  /** \brief Refreshes the Confirm button to reflect the active target label.
+   *
+   * While a session runs, shows the label the next Confirm writes into as
+   * `Confirm "<name>"` with a color swatch matching the label; otherwise shows
+   * the plain base text. Appends the keyboard-shortcut suffix per the
+   * "show shortcuts in labels" preference. Called on session start/end,
+   * active-label changes, after auto-create-next-label, and on the
+   * shortcut-preference change.
+   */
+  void UpdateConfirmButtonLabel();
 
   /** \brief Updates the Initialize button label to reflect the current state:
    *         "Uninitialize" while a session is running, otherwise the action the

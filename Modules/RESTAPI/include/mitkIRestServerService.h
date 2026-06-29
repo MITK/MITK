@@ -72,6 +72,11 @@ namespace mitk
      * If the server is already running, this is a no-op and returns true.
      * The pending configuration becomes the running configuration upon successful start.
      *
+     * \warning Blocks until the server's listen loop is ready. Do not call it
+     * synchronously while a platform loader / plugin-activation lock is held: the
+     * blocking wait under that lock deadlocks. Defer the call onto the dispatch thread
+     * via StorageThreadDispatcherBase::Post() in that case.
+     *
      * \return true if the server started successfully (or was already running), false otherwise.
      */
     virtual bool Start() = 0;

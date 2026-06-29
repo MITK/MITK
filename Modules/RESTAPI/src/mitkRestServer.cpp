@@ -264,8 +264,8 @@ bool RestServer::Start()
                    "all /rendering/editors/* endpoints will return 503 "
                    "RENDER_WINDOW_NOT_AVAILABLE until the Qt workbench plugin "
                    "'org.mitk.gui.qt.restapi' activates and wires the bridge "
-                   "callbacks. Ensure the plugin is loaded (eager activation) "
-                   "in this application.";
+                   "callbacks. The plugin activates lazily; open the REST API "
+                   "view once to activate it in this application.";
     }
 
     // Bind to the port synchronously so failures (port already in use, permission
@@ -336,6 +336,9 @@ bool RestServer::Start()
       MITK_ERROR << *m_LastError;
       this->CleanupTempDirectory(m_TempDirectory);
       m_TempDirectory.clear();
+      // Unlike the catch path, m_Server is intentionally not reset here: resetting it
+      // would not close the bound socket either (see the bind_to_port() note above),
+      // and m_Server is unconditionally reassigned at the top of the next Start().
       return false;
     }
 

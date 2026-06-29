@@ -13,7 +13,6 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPreferencePage.h"
-#include "QmitkSegmentAnythingPreferencePage.h"
 #include "QmitkTotalSegmentatorPreferencePage.h"
 #include "QmitknnInteractivePreferencePage.h"
 #include "QmitkSegmentationUtilitiesView.h"
@@ -53,7 +52,6 @@ void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentAnythingPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTotalSegmentatorPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitknnInteractivePreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)

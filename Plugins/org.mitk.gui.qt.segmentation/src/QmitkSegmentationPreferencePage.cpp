@@ -99,9 +99,6 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 
   prefs->PutBool("enforce suggestions", m_Ui->enforceSuggestionsCheckBox->isChecked());
 
-  prefs->PutBool("monailabel allow all models", m_Ui->allowAllModelsCheckBox->isChecked());
-  prefs->PutInt("monailabel timeout", std::stoi(m_Ui->monaiTimeoutEdit->text().toStdString()));
-
   prefs->PutBool("activate 3D rendering", m_Ui->check3DRendering->isChecked());
   prefs->PutBool("3D rendering smoothed", m_Ui->check3DSmoothed->isChecked());
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -170,11 +167,6 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", defaultPrefs.replaceStandardSuggestions));
   m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", defaultPrefs.suggestionOnce));
   m_Ui->enforceSuggestionsCheckBox->setChecked(prefs->GetBool("enforce suggestions", defaultPrefs.enforceSuggestions));
-
-  //MONAI
-
-  m_Ui->allowAllModelsCheckBox->setChecked(prefs->GetBool("monailabel allow all models", true));
-  m_Ui->monaiTimeoutEdit->setText(QString::number(prefs->GetInt("monailabel timeout", 180)));
 
   const bool activate3D = prefs->GetBool("activate 3D rendering", true);
   m_Ui->check3DRendering->setChecked(activate3D);

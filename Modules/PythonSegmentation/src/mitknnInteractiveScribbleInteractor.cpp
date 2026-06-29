@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <usModuleRegistry.h>
 
 #include "mitknnInteractiveBoundingBoxHelpers.h"
+#include "mitknnInteractiveRenderingHelpers.h"
 
 namespace
 {
@@ -293,6 +294,7 @@ namespace
       m_PaintingNode->SetProperty("opacity", mitk::FloatProperty::New(0.8f));
       m_PaintingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
       m_PaintingNode->SetColor(m_BrushColor);
+      mitk::nnInteractive::HideNodeIn3DRenderWindows(m_PaintingNode);
 
       if (m_DataStorage != nullptr)
         m_DataStorage->Add(m_PaintingNode, m_ReferenceNode);
@@ -470,6 +472,7 @@ namespace mitk::nnInteractive
       node->SetProperty("includeInBoundingBox", BoolProperty::New(false));
       node->SetProperty("opacity", FloatProperty::New(0.65f));
       node->SetProperty("levelwindow", LevelWindowProperty::New(LevelWindow(0, 1)));
+      HideNodeIn3DRenderWindows(node);
 
       m_StrokeNodes[promptType].push_back(node);
       m_Owner->GetDataStorage()->Add(node, referenceNode);

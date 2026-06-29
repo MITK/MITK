@@ -463,6 +463,15 @@ public:
       mitk::IOUtil::CreateTemporaryFile(blockerStream, "mitk-rest-blocker-XXXXXX");
     blockerStream.close();
 
+    // Remove the blocker file on scope exit so a mid-test assertion failure does not
+    // orphan it (it lives in the real temp dir). TempEnvOverride and the stream restore
+    // themselves via their own destructors.
+    struct BlockerFileGuard
+    {
+      std::string path;
+      ~BlockerFileGuard() { std::remove(path.c_str()); }
+    } blockerGuard{blockerFile};
+
     {
       TempEnvOverride tempGuard(blockerFile);  // temp resolver now points at a file
 
@@ -487,8 +496,6 @@ public:
     CPPUNIT_ASSERT_MESSAGE(
       "Port must be re-bindable after a failed start (no leaked listening socket)",
       occupier.IsOccupied());
-
-    std::remove(blockerFile.c_str());  // blocker lives in the real temp dir; clean up
   }
 
   // ===== Request logging tests =====

@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 #include <mitkIDataStorageService.h>
+#include <mitkStorageThreadDispatcherBase.h>
+#include <mitkWeakPointer.h>
 #include <mitkLog.h>
 
 #include <cstdlib>
@@ -157,6 +159,8 @@ private:
     {
       m_RestServer->SetDataStorage(nullptr);
       m_RestServer->SetDispatcher(nullptr);
+      m_DataStorageConnected = false;
+      m_Dispatcher = nullptr;
     }
   }
 
@@ -316,13 +320,12 @@ private:
 
     m_RestServer->SetConfig(config);
 
-    // Auto-start if enabled and not already running
-    bool autoStart = restApiPrefs->GetBool("autoStart", false);
-    if (autoStart && config.enabled && !m_RestServer->IsRunning())
-    {
-      MITK_INFO << "Auto-starting REST API server";
-      m_RestServer->Start();
-    }
+    // Record the auto-start intent and gate state. The actual Start() is deferred
+    // (see MaybeAutoStart) so it never runs inline during plugin bring-up, where
+    // creating and waiting on the listen thread under the loader lock deadlocks.
+    m_AutoStartRequested = restApiPrefs->GetBool("autoStart", false);
+    m_ConfigEnabled = config.enabled;
+    this->MaybeAutoStart();
   }
 
   void HandleDataStorageEvent(const us::ServiceEvent& event)
@@ -346,6 +349,8 @@ private:
         std::lock_guard<std::mutex> lock(m_Mutex);
         m_RestServer->SetDataStorage(nullptr);
         m_RestServer->SetDispatcher(nullptr);
+        m_DataStorageConnected = false;
+        m_Dispatcher = nullptr;
       }
     }
   }
@@ -363,12 +368,101 @@ private:
       MITK_DEBUG << "Connecting DataStorage to REST server";
       m_RestServer->SetDataStorage(dataStorage);
 
-      StorageThreadDispatcherBase::Pointer dispatcher = service->GetDispatcher();
-      if (dispatcher.IsNotNull())
+      StorageThreadDispatcherBase* dispatcher = service->GetDispatcher();
+      if (dispatcher != nullptr)
       {
         m_RestServer->SetDispatcher(dispatcher);
       }
+
+      m_Dispatcher = dispatcher;        // borrowed for deferred auto-start (null in headless)
+      m_DataStorageConnected = true;
+      this->MaybeAutoStart();
     }
+  }
+
+  /**
+   * @brief Post (or, headless, directly perform) the auto-start once all
+   *        prerequisites hold. Idempotent: starts at most once per module load.
+   *
+   * Prerequisites: auto-start requested, server enabled, a DataStorage is
+   * connected, and the server is not already running. Called from both
+   * ApplyPreferences and ConnectDataStorage so whichever event completes the
+   * prerequisite set triggers the start, regardless of arrival order.
+   *
+   * The start is deferred onto the dispatch (main) thread rather than run inline:
+   * during plugin bring-up the loader lock is held, and creating+waiting on the
+   * listen thread there deadlocks. Posting a queued task escapes that window.
+   *
+   * @pre m_Mutex is held by the caller.
+   */
+  void MaybeAutoStart()
+  {
+    if (m_AutoStartPosted || m_RestServer == nullptr)
+    {
+      return;
+    }
+    if (!m_AutoStartRequested || !m_ConfigEnabled || !m_DataStorageConnected)
+    {
+      return;
+    }
+    if (m_RestServer->IsRunning())
+    {
+      return;
+    }
+
+    m_AutoStartPosted = true;
+
+    auto dispatcher = m_Dispatcher.Lock();
+    if (dispatcher.IsNotNull())
+    {
+      MITK_INFO << "Auto-starting REST API server (deferred to the main event loop)";
+      dispatcher->Post([this]() { this->StartDeferred(); });
+    }
+    else
+    {
+      // No dispatcher means no event loop to defer onto, so start inline. This is
+      // safe only because no current host registers IDataStorageService without a
+      // dispatcher: such a host would drive ConnectDataStorage() to here during
+      // this module's Load(), i.e. under the loader lock, reintroducing the very
+      // deadlock the dispatcher path avoids. A genuinely dispatcher-less REST host
+      // must add its own non-Qt deferral rather than rely on this inline start.
+      MITK_INFO << "Auto-starting REST API server";
+      m_RestServer->Start();
+    }
+  }
+
+  /**
+   * @brief Body of the deferred auto-start; runs on the dispatch (main) thread.
+   *
+   * Re-checks the gate because state can change between posting and running (the
+   * user may have started the server manually, the DataStorage may have
+   * disconnected, or the server may have been disabled in the meantime).
+   *
+   * No liveness guard is needed: module Unload() runs on this same main thread
+   * after the Qt event loop has stopped, so this callback never races destruction
+   * of the activator or the RestServer. If that unload-thread assumption is ever
+   * invalidated, hold the RestServer through a shared owning handle and capture a
+   * weak handle here that this task locks before use.
+   */
+  void StartDeferred()
+  {
+    RestServer* server = nullptr;
+    {
+      std::lock_guard<std::mutex> lock(m_Mutex);
+      if (!m_AutoStartRequested || !m_ConfigEnabled || !m_DataStorageConnected ||
+          m_RestServer == nullptr || m_RestServer->IsRunning())
+      {
+        return;
+      }
+      server = m_RestServer.get();
+    }
+
+    // Start() outside the activator lock: it briefly blocks in wait_until_ready()
+    // and takes the RestServer's own mutex. Holding m_Mutex across it is
+    // unnecessary and would stall service-change handling. Safe to use `server`
+    // after the unlock because Unload() (the only path that destroys it) runs on
+    // this same main thread and cannot interleave.
+    server->Start();
   }
 
   us::ModuleContext* m_Context = nullptr;
@@ -377,6 +471,17 @@ private:
   us::ServiceRegistration<IRestServerService> m_RestServerRegistration;
 
   std::mutex m_Mutex;
+
+  // Auto-start gate state (all guarded by m_Mutex). Auto-start is deferred onto
+  // the dispatch thread and fires at most once, when every prerequisite holds.
+  WeakPointer<StorageThreadDispatcherBase> m_Dispatcher;  // borrowed; null in headless
+  bool m_AutoStartRequested = false;   // from the autoStart preference
+  bool m_ConfigEnabled = false;        // from config.enabled
+  bool m_DataStorageConnected = false; // set once a DataStorage is wired
+  // Latch: at-most-once per module load. Deliberately not reset on a DataStorage
+  // disconnect/swap -- disconnect never stops a running server, so re-arming would
+  // risk a redundant start for no benefit; a fresh module load gets a fresh activator.
+  bool m_AutoStartPosted = false;
 };
 
 } // namespace mitk

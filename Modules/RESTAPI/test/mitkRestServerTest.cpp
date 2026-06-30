@@ -15,8 +15,16 @@ found in the LICENSE file.
 
 #include <mitkRestServer.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkIOUtil.h>
 
 #include <httplib.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <optional>
+#include <utility>
+#include <vector>
 
 // Platform socket headers for PortOccupier
 #ifdef _WIN32
@@ -107,6 +115,78 @@ private:
 #endif
 };
 
+/**
+ * @brief RAII override of the temp-directory environment so that
+ *        std::filesystem::temp_directory_path() resolves to the caller-supplied
+ *        path (the test passes the path of a regular file).
+ *
+ * Forces RestServer::SetupTempDirectory() to fail. SetupTempDirectory() runs
+ * before bind_to_port(), so this exercises the pre-bind failure path: Start()
+ * returns before any socket is bound.
+ * Sets every variable the standard library consults on the respective platform
+ * and restores the originals on destruction (or on an explicit Restore()).
+ */
+class TempEnvOverride
+{
+public:
+  explicit TempEnvOverride(const std::string& tempRootPath)
+  {
+#ifdef _WIN32
+    // GetTempPath2W/GetTempPathW consults TMP, then TEMP (then USERPROFILE);
+    // setting the first two non-empty is enough (it returns the first non-empty
+    // value verbatim and only falls back to the system root when they are unset).
+    m_Vars = {"TMP", "TEMP"};
+#else
+    // glibc/libc++ consult TMPDIR, TMP, TEMP, TEMPDIR (first non-empty wins).
+    m_Vars = {"TMPDIR", "TMP", "TEMP", "TEMPDIR"};
+#endif
+    for (const auto& name : m_Vars)
+    {
+      const char* old = std::getenv(name.c_str());
+      m_Saved.emplace_back(name, old ? std::optional<std::string>(old) : std::nullopt);
+      SetEnv(name, tempRootPath);
+    }
+  }
+
+  ~TempEnvOverride() { this->Restore(); }
+
+  TempEnvOverride(const TempEnvOverride&) = delete;
+  TempEnvOverride& operator=(const TempEnvOverride&) = delete;
+
+  void Restore()
+  {
+    for (const auto& [name, value] : m_Saved)
+    {
+      if (value.has_value())
+        SetEnv(name, *value);
+      else
+        UnsetEnv(name);
+    }
+    m_Saved.clear();
+  }
+
+private:
+  static void SetEnv(const std::string& name, const std::string& value)
+  {
+#ifdef _WIN32
+    _putenv_s(name.c_str(), value.c_str());
+#else
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+  }
+  static void UnsetEnv(const std::string& name)
+  {
+#ifdef _WIN32
+    _putenv_s(name.c_str(), "");
+#else
+    unsetenv(name.c_str());
+#endif
+  }
+
+  std::vector<std::string> m_Vars;
+  std::vector<std::pair<std::string, std::optional<std::string>>> m_Saved;
+};
+
 class mitkRestServerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkRestServerTestSuite);
@@ -120,6 +200,7 @@ class mitkRestServerTestSuite : public mitk::TestFixture
   // Port conflict tests
   MITK_TEST(PortAlreadyInUseReturnsFalse);
   MITK_TEST(CanRestartOnDifferentPortAfterPortConflict);
+  MITK_TEST(FailedStartReleasesPort);
   // Request logging tests
   MITK_TEST(LogLimitDefaultsToUnlimited);
   MITK_TEST(LogLimitCanBeSet);
@@ -359,6 +440,62 @@ public:
 
     m_Server->Stop();
     CPPUNIT_ASSERT(!m_Server->IsRunning());
+  }
+
+  void FailedStartReleasesPort()
+  {
+    const int port = 18110;
+
+    // Force Start() to fail during setup by pointing the temp-directory resolver at a
+    // regular file: a directory cannot be created beneath a file, so SetupTempDirectory()
+    // fails deterministically on every platform. SetupTempDirectory() runs before
+    // bind_to_port(), so this is a pre-bind failure: no socket is bound, and the decisive
+    // check below confirms the port stays re-bindable. That catches the regression of
+    // reordering bind_to_port() ahead of temp-directory setup, which would strand a bound
+    // socket (httplib cannot close a socket that was bound but never entered its listen
+    // loop, so bind must remain the last fallible step in Start()).
+    //
+    // The post-bind cleanup branches (listen failure, catch block) are not covered here:
+    // reaching them needs bind to succeed and a later step to fail, which a unit test
+    // cannot inject without a test-only seam in Start().
+    std::ofstream blockerStream;
+    const std::string blockerFile =
+      mitk::IOUtil::CreateTemporaryFile(blockerStream, "mitk-rest-blocker-XXXXXX");
+    blockerStream.close();
+
+    // Remove the blocker file on scope exit so a mid-test assertion failure does not
+    // orphan it (it lives in the real temp dir). TempEnvOverride and the stream restore
+    // themselves via their own destructors.
+    struct BlockerFileGuard
+    {
+      std::string path;
+      ~BlockerFileGuard() { std::remove(path.c_str()); }
+    } blockerGuard{blockerFile};
+
+    {
+      TempEnvOverride tempGuard(blockerFile);  // temp resolver now points at a file
+
+      mitk::RestServerConfig config;
+      config.host = "127.0.0.1";
+      config.port = port;
+      config.enabled = true;
+      m_Server->SetConfig(config);
+
+      const bool started = m_Server->Start();
+
+      CPPUNIT_ASSERT_MESSAGE("Start() must fail when the temp dir cannot be created", !started);
+      CPPUNIT_ASSERT_MESSAGE("IsRunning() must be false after a failed start", !m_Server->IsRunning());
+      CPPUNIT_ASSERT_MESSAGE("GetLastError() must be set after a failed start", m_Server->GetLastError().has_value());
+    }  // temp env restored here (TempEnvOverride dtor), before the port probe
+
+    // Decisive check: the port must be re-bindable. Use an external socket, NOT a second
+    // Start() (which would reassign m_Server and could mask a leaked socket). PortOccupier
+    // omits SO_REUSEADDR (POSIX) / sets SO_EXCLUSIVEADDRUSE (Windows), so it cannot bind
+    // while any listening socket leaked by the failed Start() is still alive.
+    PortOccupier occupier(port);
+    CPPUNIT_ASSERT_MESSAGE(
+      "Port must be re-bindable after a failed start (no leaked listening socket)",
+      occupier.IsOccupied());
   }
 
   // ===== Request logging tests =====

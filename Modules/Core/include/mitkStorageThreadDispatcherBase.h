@@ -67,6 +67,22 @@ namespace mitk
     virtual bool IsDispatchThread() const = 0;
 
     /**
+     * \brief Post a task to run on the storage-owning thread, returning immediately.
+     *
+     * Unlike Execute(), Post() never runs the task inline: it always defers to a
+     * later turn of the dispatch thread's event loop, even when called from the
+     * dispatch thread itself. Callers rely on that deferral -- e.g. to escape a
+     * context (such as the platform loader lock held during library/plugin load)
+     * in which running the task synchronously would deadlock.
+     *
+     * The task's result, if any, is discarded (fire-and-forget). Ordering relative
+     * to other posted tasks follows the dispatch thread's own queue semantics.
+     *
+     * \pre task must not be empty.
+     */
+    virtual void Post(std::function<void()> task) = 0;
+
+    /**
      * \brief Convenience template for tasks that return a value.
      *
      * Blocks until the task completes and returns the result.

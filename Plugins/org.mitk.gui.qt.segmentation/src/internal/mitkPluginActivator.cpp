@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "QmitkSegmentationUtilitiesView.h"
 #include "QmitkSegmentationTaskListView.h"
 
+#include "QmitkAssignDistinctColorsAction.h"
 #include "QmitkAutocropAction.h"
 #include "QmitkAutocropLabelSetImageAction.h"
 #include "QmitkCreatePolygonModelAction.h"
@@ -56,6 +57,7 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitknnInteractivePreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationTaskListView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAssignDistinctColorsAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropLabelSetImageAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)

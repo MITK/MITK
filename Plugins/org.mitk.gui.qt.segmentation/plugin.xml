@@ -53,6 +53,7 @@
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" class="QmitkCreateSmoothedPolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Assign distinct mask colors" icon="" class="QmitkAssignDistinctColorsAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create polygon model" icon="" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Create smoothed polygon model" icon="" class="QmitkCreateSmoothedPolygonModelAction" />
     <contextMenuAction nodeDescriptorName="MultiLabelSegmentation" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />

@@ -90,6 +90,23 @@ namespace mitk
      */
     MITKMULTILABEL_EXPORT Label::Pointer CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix = "Label", bool hideIDIfUnique = false);
 
+    /**
+     * \brief Suggests the next color from the MULTILABEL color scheme, given the colors already in use.
+     *
+     *        This is the color-selection used by CreateNewLabel, exposed so the same scheme can be
+     *        applied outside of a MultiLabelSegmentation (e.g. to assign distinct colors to several
+     *        binary mask nodes). The first color of an otherwise empty set is palette index 0; every
+     *        subsequent color is the candidate (curated palette first, then generated colors) whose
+     *        nearest distance in CIE Lab space to the in-use colors and the reserved black background
+     *        is the largest.
+     *
+     * \param usedColors The colors already in use. The black background is always reserved implicitly
+     *                    and must not be included.
+     *
+     * \return           The suggested color.
+     */
+    MITKMULTILABEL_EXPORT mitk::Color SuggestNewLabelColor(const std::vector<mitk::Color>& usedColors);
+
     using GroupIDToLabelValueMapType = std::map<mitk::MultiLabelSegmentation::GroupIndexType, MultiLabelSegmentation::LabelValueVectorType>;
     MITKMULTILABEL_EXPORT GroupIDToLabelValueMapType SplitLabelValuesByGroup(const MultiLabelSegmentation* labelSetImage, const MultiLabelSegmentation::LabelValueVectorType& labelValues);
 

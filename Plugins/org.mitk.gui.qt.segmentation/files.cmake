@@ -11,6 +11,7 @@ set(INTERNAL_CPP_FILES
   QmitkSegmentationView.cpp
   QmitkSegmentationUtilitiesView.cpp
   QmitkSegmentationTaskListView.cpp
+  QmitkAssignDistinctColorsAction.cpp
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   QmitkCreatePolygonModelAction.cpp
@@ -43,6 +44,7 @@ set(MOC_H_FILES
   src/internal/QmitkSegmentationView.h
   src/internal/QmitkSegmentationUtilitiesView.h
   src/internal/QmitkSegmentationTaskListView.h
+  src/internal/QmitkAssignDistinctColorsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/QmitkCreatePolygonModelAction.h

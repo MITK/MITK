@@ -185,54 +185,26 @@ void mitk::LabelSetImageHelper::SetupDerivedSegmentation(MultiLabelSegmentation*
   }
 }
 
-mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix, bool hideIDIfUnique)
+mitk::Color mitk::LabelSetImageHelper::SuggestNewLabelColor(const std::vector<mitk::Color>& usedColors)
 {
-  if (nullptr == labelSetImage)
-    return nullptr;
-
-  const unsigned int minDigitsCount = 2;
-  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
-  int maxGenericLabelNumber = 0;
-
   // Every color already in use, expressed in CIE Lab. Black (the
   // background) is always reserved.
   const double blackRGB[3] = { 0.0, 0.0, 0.0 };
   std::vector<std::array<double, 3>> usedLabColors = { RGBToLab(blackRGB) };
 
-  for (auto & label : labelSetImage->GetLabels())
-  {
-    auto labelName = label->GetName();
-    std::smatch match;
+  for (const auto& color : usedColors)
+    usedLabColors.push_back(RGBToLab(color));
 
-    if (std::regex_match(labelName, match, genericLabelNameRegEx))
-      maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
-
-    usedLabColors.push_back(RGBToLab(label->GetColor()));
-  }
-
-  auto newLabel = mitk::Label::New();
-  if (hideIDIfUnique && 0 == maxGenericLabelNumber)
-  {
-    newLabel->SetName(namePrefix);
-  }
-  else
-  {
-    std::ostringstream name;
-    name << namePrefix << " " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
-    newLabel->SetName(name.str().c_str());
-  }
-
-  // Preserve the historical convention: the first label in an empty
-  // segmentation is palette[0] (the deep red-pink).
+  // Preserve the historical convention: the first color in an otherwise
+  // empty set is palette[0] (the deep red-pink).
   if (1 == usedLabColors.size())
   {
     std::array<double, 3> firstColor{};
     mitk::LookupTable::GetMultiLabelColor(0, firstColor.data());
-    newLabel->SetColor(mitk::MakeColor(
+    return mitk::MakeColor(
       static_cast<float>(firstColor[0]),
       static_cast<float>(firstColor[1]),
-      static_cast<float>(firstColor[2])));
-    return newLabel;
+      static_cast<float>(firstColor[2]));
   }
 
   // Maximin selection: pick the candidate whose nearest used-color
@@ -287,10 +259,46 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelS
     }
   }
 
-  newLabel->SetColor(mitk::MakeColor(
+  return mitk::MakeColor(
     static_cast<float>(bestRGB[0]),
     static_cast<float>(bestRGB[1]),
-    static_cast<float>(bestRGB[2])));
+    static_cast<float>(bestRGB[2]));
+}
+
+mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const MultiLabelSegmentation* labelSetImage, const std::string& namePrefix, bool hideIDIfUnique)
+{
+  if (nullptr == labelSetImage)
+    return nullptr;
+
+  const unsigned int minDigitsCount = 2;
+  const std::regex genericLabelNameRegEx(namePrefix + " ([0-9]+)");
+  int maxGenericLabelNumber = 0;
+
+  std::vector<mitk::Color> usedColors;
+  for (auto & label : labelSetImage->GetLabels())
+  {
+    auto labelName = label->GetName();
+    std::smatch match;
+
+    if (std::regex_match(labelName, match, genericLabelNameRegEx))
+      maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
+
+    usedColors.push_back(label->GetColor());
+  }
+
+  auto newLabel = mitk::Label::New();
+  if (hideIDIfUnique && 0 == maxGenericLabelNumber)
+  {
+    newLabel->SetName(namePrefix);
+  }
+  else
+  {
+    std::ostringstream name;
+    name << namePrefix << " " << std::setw(minDigitsCount) << std::setfill('0') << maxGenericLabelNumber + 1;
+    newLabel->SetName(name.str().c_str());
+  }
+
+  newLabel->SetColor(SuggestNewLabelColor(usedColors));
 
   return newLabel;
 }

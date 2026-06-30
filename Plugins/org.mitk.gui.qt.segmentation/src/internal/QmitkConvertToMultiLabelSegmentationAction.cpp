@@ -49,7 +49,7 @@ QmitkConvertToMultiLabelSegmentationAction::~QmitkConvertToMultiLabelSegmentatio
 
 void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  const bool warn = GetPreferences()->GetBool(WARN_PREF_KEY, true);
+  bool warn = GetPreferences()->GetBool(WARN_PREF_KEY, true);
 
   for (const auto &referenceNode : selectedNodes)
   {
@@ -63,15 +63,30 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
       continue;
     }
 
-    if (warn &&
-        mitk::CountDistinctForegroundValues(referenceImage, DISTINCT_VALUE_WARNING_THRESHOLD) >= DISTINCT_VALUE_WARNING_THRESHOLD)
+    unsigned int distinctValues = 0;
+    if (warn)
+    {
+      try
+      {
+        distinctValues = mitk::CountDistinctForegroundValues(referenceImage, DISTINCT_VALUE_WARNING_THRESHOLD);
+      }
+      catch (const std::exception &e)
+      {
+        // The plausibility count cannot analyze this image (e.g. an unsupported
+        // pixel type). Skip the warning; the conversion below surfaces any real
+        // problem to the user.
+        MITK_WARN << "Could not check distinct values before conversion: " << e.what();
+      }
+    }
+
+    if (distinctValues >= DISTINCT_VALUE_WARNING_THRESHOLD)
     {
       QMessageBox msgBox;
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.setWindowTitle(QStringLiteral("Convert to Segmentation"));
-      msgBox.setText(QString("Image \"%1\" contains at least %2 distinct values.")
-                       .arg(QString::fromStdString(referenceNode->GetName()))
-                       .arg(DISTINCT_VALUE_WARNING_THRESHOLD));
+      msgBox.setText(QStringLiteral("Image \"%1\" contains at least %2 distinct values.")
+                       .arg(QString::fromStdString(referenceNode->GetName()),
+                            QString::number(DISTINCT_VALUE_WARNING_THRESHOLD)));
       msgBox.setInformativeText(QStringLiteral(
         "Are you sure you meant to convert this image to a segmentation? "
         "Converting creates one label per distinct value, which can be slow and memory intensive."));
@@ -97,6 +112,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
         auto* prefs = GetPreferences();
         prefs->PutBool(WARN_PREF_KEY, false);
         prefs->Flush();
+        warn = false; // honor the choice for the remaining nodes in this selection
       }
 
       if (clickedButton == createButton)
@@ -116,9 +132,12 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
     {
       lsImage->InitializeByLabeledImage(referenceImage);
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      MITK_ERROR << "Could not convert image to segmentation: " << e.GetDescription();
+      QMessageBox::warning(nullptr, QStringLiteral("Convert to Segmentation"),
+        QStringLiteral("Could not convert image \"%1\" to a segmentation.")
+          .arg(QString::fromStdString(referenceNode->GetName())));
       continue;
     }
 

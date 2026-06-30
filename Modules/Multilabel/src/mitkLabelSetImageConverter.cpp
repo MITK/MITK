@@ -279,11 +279,15 @@ namespace
   void CountDistinctForegroundValuesInternal(const SourceImageType* sourceImage, unsigned int limit, unsigned int& result)
   {
     itk::ImageRegionConstIterator<SourceImageType> sourceIter(sourceImage, sourceImage->GetRequestedRegion());
-    std::set<mitk::MultiLabelSegmentation::LabelValueType> detectedValues;
+
+    // Count on the native pixel type: narrowing to LabelValueType (unsigned short)
+    // would alias values above the label range (e.g. 65536 to 0/background) and
+    // undercount the very wide-pixel images this check exists to flag.
+    std::set<typename SourceImageType::PixelType> detectedValues;
 
     for (sourceIter.GoToBegin(); !sourceIter.IsAtEnd(); ++sourceIter)
     {
-      const auto sourceValue = static_cast<mitk::MultiLabelSegmentation::LabelValueType>(sourceIter.Get());
+      const auto sourceValue = sourceIter.Get();
 
       if (sourceValue != mitk::Label::UNLABELED_VALUE)
       {

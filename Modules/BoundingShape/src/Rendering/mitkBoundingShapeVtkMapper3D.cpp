@@ -253,33 +253,55 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
     mitk::IntProperty::Pointer activeHandleId =
       dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty("Bounding Shape.Active Handle ID"));
 
+    // direction cosines of the geometry, used to orient the handle markers with the box
+    double dirCos[3][3];
+    for (int c = 0; c < 3; ++c)
+      for (int r = 0; r < 3; ++r)
+        dirCos[r][c] = imageTransform->GetElement(r, c) / spacing[c];
+
+    bool selected = false;
     int i = 0;
     for (auto &handle : localStorage->Handles)
     {
       Point3D handlecenter = m_Impl->HandlePropertyList[i].GetPosition();
-      handle->SetCenter(handlecenter[0], handlecenter[1], handlecenter[2]);
+      handle->SetCenter(0.0, 0.0, 0.0);
       handle->SetXLength(handlesize);
       handle->SetYLength(handlesize);
       handle->SetZLength(handlesize);
       handle->Update();
-      if (activeHandleId == nullptr)
+
+      // orient the marker cube with the box and move it onto the handle position
+      auto handleMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+      handleMatrix->Identity();
+      for (int c = 0; c < 3; ++c)
+        for (int r = 0; r < 3; ++r)
+          handleMatrix->SetElement(r, c, dirCos[r][c]);
+      handleMatrix->SetElement(0, 3, handlecenter[0]);
+      handleMatrix->SetElement(1, 3, handlecenter[1]);
+      handleMatrix->SetElement(2, 3, handlecenter[2]);
+
+      auto handleTransform = vtkSmartPointer<vtkTransform>::New();
+      handleTransform->SetMatrix(handleMatrix);
+
+      auto handleTransformFilter = vtkSmartPointer<vtkTransformFilter>::New();
+      handleTransformFilter->SetInputConnection(handle->GetOutputPort());
+      handleTransformFilter->SetTransform(handleTransform);
+      handleTransformFilter->Update();
+
+      auto orientedHandle = vtkSmartPointer<vtkPolyData>::New();
+      orientedHandle->DeepCopy(handleTransformFilter->GetPolyDataOutput());
+
+      if (activeHandleId != nullptr && activeHandleId->GetValue() == m_Impl->HandlePropertyList[i].GetIndex())
       {
-        appendPoly->AddInputConnection(handle->GetOutputPort());
+        selectedhandlemapper->SetInputData(orientedHandle);
+        localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
+        localStorage->SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
+        localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
+        selected = true;
       }
       else
       {
-        if (activeHandleId->GetValue() != m_Impl->HandlePropertyList[i].GetIndex())
-        {
-          appendPoly->AddInputConnection(handle->GetOutputPort());
-        }
-        else
-        {
-          selectedhandlemapper->SetInputData(handle->GetOutput());
-          localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
-          localStorage->SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
-          localStorage->SelectedHandleActor->GetMapper()->SetInputDataObject(handle->GetOutput());
-          localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
-        }
+        appendPoly->AddInputData(orientedHandle);
       }
       i++;
     }
@@ -318,7 +340,9 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
 
     localStorage->Actor->VisibilityOn();
     localStorage->HandleActor->VisibilityOn();
-    localStorage->SelectedHandleActor->VisibilityOn();
+    // show the selected (green) handle only when one is active this frame; its input is refreshed
+    // only on selection, so otherwise a deselected handle lingers with stale geometry
+    localStorage->SelectedHandleActor->SetVisibility(selected);
 
     localStorage->PropAssembly->AddPart(localStorage->Actor);
     localStorage->PropAssembly->AddPart(localStorage->HandleActor);

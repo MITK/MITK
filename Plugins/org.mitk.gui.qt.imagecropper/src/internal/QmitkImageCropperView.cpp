@@ -37,7 +37,7 @@ QmitkImageCropperView::QmitkImageCropperView(QObject *)
   , m_CropOutsideValue(0)
   , m_Controls(std::make_unique<Ui::QmitkImageCropperViewControls>())
 {
-  CreateBoundingShapeInteractor(false);
+  CreateBoundingShapeInteractor();
 }
 
 QmitkImageCropperView::~QmitkImageCropperView()
@@ -101,9 +101,6 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
 
 void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
-  bool rotationEnabled = false;
-  m_Controls->labelWarningRotation->setVisible(false);
-
   auto imageNode = m_Controls->imageSelectionWidget->GetSelectedNode();
   if (imageNode.IsNull())
   {
@@ -127,23 +124,7 @@ void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointe
     m_ParentWidget->setEnabled(true);
     m_Controls->buttonCreateNewBoundingBox->setEnabled(true);
 
-    vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
-    // check whether the image geometry is rotated; if so, no pixel aligned cropping or masking can be performed
-    if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&
-      (imageMat->GetElement(1, 2) == 0.0) && (imageMat->GetElement(2, 1) == 0.0) &&
-      (imageMat->GetElement(2, 0) == 0.0) && (imageMat->GetElement(0, 2) == 0.0))
-    {
-      rotationEnabled = false;
-      m_Controls->labelWarningRotation->setVisible(false);
-    }
-    else
-    {
-      rotationEnabled = true;
-      m_Controls->labelWarningRotation->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-      m_Controls->labelWarningRotation->setVisible(true);
-    }
-
-    this->CreateBoundingShapeInteractor(rotationEnabled);
+    this->CreateBoundingShapeInteractor();
 
     if (itk::IOPixelEnum::SCALAR == image->GetPixelType().GetPixelType())
     {
@@ -288,7 +269,7 @@ void QmitkImageCropperView::OnSliderValueChanged(int slidervalue)
   m_CropOutsideValue = slidervalue;
 }
 
-void QmitkImageCropperView::CreateBoundingShapeInteractor(bool rotationEnabled)
+void QmitkImageCropperView::CreateBoundingShapeInteractor()
 {
   if (m_BoundingShapeInteractor.IsNull())
   {
@@ -296,7 +277,6 @@ void QmitkImageCropperView::CreateBoundingShapeInteractor(bool rotationEnabled)
     m_BoundingShapeInteractor->LoadStateMachine("BoundingShapeInteraction.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
     m_BoundingShapeInteractor->SetEventConfig("BoundingShapeMouseConfig.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
   }
-  m_BoundingShapeInteractor->SetRotationEnabled(rotationEnabled);
 }
 
 mitk::Geometry3D::Pointer QmitkImageCropperView::InitializeWithImageGeometry(const mitk::BaseGeometry* geometry) const

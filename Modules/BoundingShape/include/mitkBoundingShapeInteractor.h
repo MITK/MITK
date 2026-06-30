@@ -19,6 +19,8 @@ found in the LICENSE file.
 
 #include <usServiceRegistration.h>
 
+#include <array>
+
 #include <MitkBoundingShapeExports.h>
 
 namespace mitk
@@ -61,12 +63,6 @@ namespace mitk
      */
     void SetDataNode(DataNode *dataNode) override;
 
-    /** \brief Enable or disable rotation interaction.
-     *
-     * \param[in] rotationEnabled If \c true, rotation of the bounding shape is allowed.
-     */
-    void SetRotationEnabled(bool rotationEnabled);
-
   protected:
     BoundingShapeInteractor();
     ~BoundingShapeInteractor() override;
@@ -82,7 +78,17 @@ namespace mitk
       */
     void DataNodeChanged() override;
 
-    void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
+    /**
+     * @brief Updates the handle positions for the renderer of the given event and reports which
+     *        handles are visible there.
+     *
+     * In a 2D render window a handle is placed where its box face crosses the current slice and is
+     * visible only when that intersection exists; in the 3D render window handles sit at the face
+     * centers and are always visible. \p handleVisible is filled accordingly.
+     */
+    void HandlePositionChanged(const InteractionEvent *interactionEvent,
+                               Point3D &center,
+                               std::array<bool, 6> &handleVisible);
 
     /**
     * @brief Checks if the mouse pointer is over the object.

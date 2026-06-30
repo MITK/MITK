@@ -68,7 +68,7 @@ protected Q_SLOTS:
 
 private:
 
-  void CreateBoundingShapeInteractor(bool rotationEnabled);
+  void CreateBoundingShapeInteractor();
 
   // initializes a new bounding shape using the selected image geometry.
   mitk::Geometry3D::Pointer InitializeWithImageGeometry(const mitk::BaseGeometry* geometry) const;

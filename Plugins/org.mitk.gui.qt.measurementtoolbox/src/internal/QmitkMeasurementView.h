@@ -77,6 +77,8 @@ private:
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
 
+    void SelectNode(const mitk::DataNode::Pointer& node);
+
     void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
     void UpdateMeasurementText();

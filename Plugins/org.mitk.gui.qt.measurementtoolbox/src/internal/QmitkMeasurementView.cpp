@@ -467,21 +467,36 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 
 void QmitkMeasurementView::PlanarFigureSelected(itk::Object* object, const itk::EventObject&)
 {
-  d->m_CurrentSelection.clear();
-
   auto lambda = [&object](const std::pair<mitk::DataNode::Pointer, QmitkPlanarFigureData>& element)
   {
     return element.second.m_Figure == object;
   };
 
   auto it = std::find_if(d->m_DataNodeToPlanarFigureData.begin(), d->m_DataNodeToPlanarFigureData.end(), lambda);
+
   if (it != d->m_DataNodeToPlanarFigureData.end())
-  {
-    d->m_CurrentSelection.push_back(it->first);
-  }
+    this->SelectNode(it->first);
 
   this->UpdateMeasurementText();
   this->RequestRenderWindowUpdate();
+}
+
+void QmitkMeasurementView::SelectNode(const mitk::DataNode::Pointer& node)
+{
+  for (auto& selectedNode : d->m_CurrentSelection)
+    selectedNode->SetSelected(false);
+
+  d->m_CurrentSelection.clear();
+  d->m_CurrentSelection.push_back(node);
+
+  this->FireNodeSelected(node);
+  this->SynchronizeDataManagerSelection();
+
+  // Set "selected" last: SynchronizeDataManagerSelection updates the Data Manager
+  // tree selection, whose NodeSelectionChanged handler re-derives every node's
+  // "selected" property and transiently clears it for the picked node. Setting it
+  // afterwards leaves the figure in the selected (red) appearance.
+  node->SetSelected(true);
 }
 
 void QmitkMeasurementView::PlanarFigureInitialized()
@@ -750,13 +765,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
     this->GetDataStorage()->Add(newNode);
   }
 
-  for (auto &node : d->m_CurrentSelection)
-    node->SetSelected(false);
-
-  newNode->SetSelected(true);
-
-  d->m_CurrentSelection.clear();
-  d->m_CurrentSelection.push_back(newNode);
+  this->SelectNode(newNode);
 
   this->UpdateMeasurementText();
 

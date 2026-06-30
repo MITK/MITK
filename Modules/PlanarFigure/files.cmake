@@ -1,4 +1,5 @@
 set(CPP_FILES
+  mitkPlanarFigureActivator.cpp
   Algorithms/mitkExtrudePlanarFigureFilter.cpp
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp

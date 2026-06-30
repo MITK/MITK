@@ -54,10 +54,10 @@ namespace
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_PropertyAliases(mitk::CoreServices::GetPropertyAliases(nullptr), nullptr),
-    m_PropertyDescriptions(mitk::CoreServices::GetPropertyDescriptions(nullptr), nullptr),
-    m_PropertyPersistence(mitk::CoreServices::GetPropertyPersistence(nullptr), nullptr),
-    m_PropertyTransience(mitk::CoreServices::GetPropertyTransience(nullptr), nullptr),
+  : m_PropertyAliases(mitk::CoreServices::GetPropertyAliases()),
+    m_PropertyDescriptions(mitk::CoreServices::GetPropertyDescriptions()),
+    m_PropertyPersistence(mitk::CoreServices::GetPropertyPersistence()),
+    m_PropertyTransience(mitk::CoreServices::GetPropertyTransience()),
     m_ProxyModel(nullptr),
     m_Model(nullptr),
     m_Delegate(nullptr),

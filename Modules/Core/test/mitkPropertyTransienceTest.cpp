@@ -84,8 +84,12 @@ public:
   void IsTransient_NullData()
   {
     m_Service->AddTransient<mitk::BaseData>("selected");
+    m_Service->AddTransient<mitk::Image>("image.only");
 
-    CPPUNIT_ASSERT_MESSAGE("Null data matches no rule", !m_Service->IsTransient(nullptr, "selected"));
+    CPPUNIT_ASSERT_MESSAGE("Any-type rule matches a data-less node (null data)",
+                           m_Service->IsTransient(nullptr, "selected"));
+    CPPUNIT_ASSERT_MESSAGE("Specific-type rule does not match null data",
+                           !m_Service->IsTransient(nullptr, "image.only"));
   }
 
   void IsTransient_UnregisteredName()

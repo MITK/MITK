@@ -83,6 +83,7 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   MITK_TEST(Test_SceneIOInterfaces);
   MITK_TEST(Test_ReconstructionOfScenes);
   MITK_TEST(Test_SelectedPropertyNotPersisted);
+  MITK_TEST(Test_SelectedPropertyNotPersistedForDataLessNode);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
@@ -157,6 +158,38 @@ public:
     bool hasSelected = restoredNode->GetBoolProperty("selected", selected);
     CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be persisted", !hasSelected || !selected);
     CPPUNIT_ASSERT_MESSAGE("Non-transient 'name' must survive", restoredNode->GetName() == "measurement");
+  }
+
+  void Test_SelectedPropertyNotPersistedForDataLessNode()
+  {
+    // "selected" is registered transient for any BaseData type, including
+    // data-less nodes (GetData() == nullptr). Filtering must not be skipped
+    // just because the node carries no data.
+    std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTransientTest_XXXXXX");
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    auto node = mitk::DataNode::New(); // no SetData: a data-less node
+    node->SetName("group");
+    node->SetSelected(true); // transient UI state
+    originalStorage->Add(node);
+
+    mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
+    CPPUNIT_ASSERT_MESSAGE("Saving scene with a selected data-less node",
+                           writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::SceneIO::Pointer reader = mitk::SceneIO::New();
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
+
+    mitk::DataNode::Pointer restoredNode = restoredStorage->GetNamedNode("group");
+    CPPUNIT_ASSERT_MESSAGE("Reloaded data-less node must exist", restoredNode.IsNotNull());
+
+    bool selected = false;
+    bool hasSelected = restoredNode->GetBoolProperty("selected", selected);
+    CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be persisted for a data-less node",
+                           !hasSelected || !selected);
+    CPPUNIT_ASSERT_MESSAGE("Non-transient 'name' must survive", restoredNode->GetName() == "group");
   }
 
 }; // class

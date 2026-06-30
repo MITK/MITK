@@ -371,6 +371,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
       }
 
+      // Acquire the transience service once for the whole save. SavePropertyList
+      // uses it to drop transient (runtime/UI) properties from each list.
+      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
+
       // write out objects, dependencies and properties
       for (auto iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
       {
@@ -421,7 +425,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *baseDataPropertiesElement =
-                SavePropertyList(document, propertyList, nullptr, filenameHint + "-data"); // returns a reference to a file
+                SavePropertyList(document, transience.Get(), propertyList, data, filenameHint + "-data"); // returns a reference to a file
               if (baseDataPropertiesElement)
                 dataElement->InsertEndChild(baseDataPropertiesElement);
             }
@@ -437,7 +441,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *renderWindowPropertiesElement =
-                SavePropertyList(document, propertyList, node->GetData(), filenameHint + "-" + renderWindowName); // returns a reference to a file
+                SavePropertyList(document, transience.Get(), propertyList, node->GetData(), filenameHint + "-" + renderWindowName); // returns a reference to a file
               if (renderWindowPropertiesElement)
               {
                 renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
@@ -451,7 +455,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           if (propertyList && !propertyList->IsEmpty())
           {
             auto *propertiesElement =
-              SavePropertyList(document, propertyList, node->GetData(), filenameHint + "-node"); // returns a reference to a file
+              SavePropertyList(document, transience.Get(), propertyList, node->GetData(), filenameHint + "-node"); // returns a reference to a file
             if (propertiesElement)
               nodeElement->InsertEndChild(propertiesElement);
           }
@@ -579,28 +583,43 @@ tinyxml2::XMLElement *mitk::SceneIO::SaveBaseData(tinyxml2::XMLDocument &doc, Ba
   return element;
 }
 
-tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint)
+tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, const IPropertyTransience *transience, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint)
 {
   assert(propertyList);
 
   // Drop transient DataNode properties (e.g. the "selected" UI flag) so they are
-  // not written to the scene file. Transience is decided per the node's BaseData type.
+  // not written to the scene file. Transience is decided per the node's BaseData
+  // type; data-less nodes (nodeData == nullptr) still match rules registered for
+  // mitk::BaseData. Only build a filtered copy when at least one property is
+  // actually transient, so the common case serializes the list as-is.
   PropertyList::Pointer persistable;
-  if (nodeData != nullptr)
+  if (transience != nullptr)
   {
-    CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
-    persistable = PropertyList::New();
-
+    bool anyTransient = false;
     for (const auto &property : *propertyList->GetMap())
     {
-      if (!transience->IsTransient(nodeData, property.first))
-        persistable->SetProperty(property.first, property.second);
+      if (transience->IsTransient(nodeData, property.first))
+      {
+        anyTransient = true;
+        break;
+      }
     }
 
-    if (persistable->IsEmpty())
-      return nullptr;
+    if (anyTransient)
+    {
+      persistable = PropertyList::New();
 
-    propertyList = persistable;
+      for (const auto &property : *propertyList->GetMap())
+      {
+        if (!transience->IsTransient(nodeData, property.first))
+          persistable->SetProperty(property.first, property.second);
+      }
+
+      if (persistable->IsEmpty())
+        return nullptr;
+
+      propertyList = persistable;
+    }
   }
 
   //  - TODO what to do about shared properties (same object in two lists or behind several keys)?

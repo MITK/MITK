@@ -954,6 +954,11 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
           // below may legitimately be null and is checked there).
           PropertyList *defaultList = entry.dataNode->GetPropertyList();
           ApplyPropertyMap(*defaultList, *propsIt, basePath, ctx);
+
+          // Drop transient properties (e.g. the "selected" UI flag) that may be
+          // present in older scene files, so reloading does not resurrect
+          // runtime or UI state. Mirrors SceneReaderV1 (XML).
+          mitk::SceneReaderHelpers::StripTransientProperties(*defaultList, entry.dataNode->GetData());
         }
         catch (const mitk::Exception &e)
         {
@@ -982,6 +987,7 @@ bool mitk::SceneJsonReader::LoadScene(const std::string &sceneSourcePath, DataSt
           try
           {
             ApplyPropertyMap(*ctxList, cit.value(), basePath, ctx);
+            mitk::SceneReaderHelpers::StripTransientProperties(*ctxList, entry.dataNode->GetData());
           }
           catch (const mitk::Exception &e)
           {

@@ -13,6 +13,14 @@ found in the LICENSE file.
 #include "org_mitk_gui_qt_properties_Activator.h"
 #include "QmitkPropertyTreeView.h"
 
+#include <usModuleInitialization.h>
+
+// Give the plugin a CppMicroServices module context so us::GetModuleContext()
+// resolves here. Without it, CoreServices acquire/release fall back to the null
+// context and the acquired core services (see QmitkPropertyTreeView) are never
+// released. Sibling plugins initialize their module the same way.
+US_INITIALIZE_MODULE
+
 ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::m_Context = nullptr;
 
 ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::GetContext()

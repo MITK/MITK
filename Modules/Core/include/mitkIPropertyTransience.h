@@ -33,7 +33,8 @@ namespace mitk
    * persisted to scene files. Although such properties live on the DataNode,
    * transience is declared per BaseData type: a rule registered for a type
    * applies to every node whose data is an instance of that type (or a
-   * subclass). Register against mitk::BaseData to cover all data types.
+   * subclass). Register against mitk::BaseData to cover all data types,
+   * including data-less nodes (data == nullptr).
    *
    * At serialization time the scene serializer queries IsTransient() with the
    * node's data to decide whether a property is excluded.
@@ -46,20 +47,31 @@ namespace mitk
     /** \brief Declare a property transient for nodes whose data is-a TData.
      *
      * \tparam TData BaseData or a subclass the rule applies to. Use
-     *         mitk::BaseData to mark the property transient for any data type.
+     *         mitk::BaseData to mark the property transient for any data type,
+     *         including data-less nodes (data == nullptr).
      * \param[in] propertyName Name of the transient property.
      */
     template <class TData, typename = std::enable_if_t<std::is_base_of_v<BaseData, TData>>>
     void AddTransient(const std::string &propertyName)
     {
-      this->InternalAddTransient(propertyName,
-                                 [](const BaseData *data) { return dynamic_cast<const TData *>(data) != nullptr; });
+      if constexpr (std::is_same_v<TData, BaseData>)
+      {
+        // A rule for BaseData applies to every node, including data-less ones
+        // where data is null and a dynamic_cast would fail. Match unconditionally.
+        this->InternalAddTransient(propertyName, [](const BaseData *) { return true; });
+      }
+      else
+      {
+        this->InternalAddTransient(propertyName,
+                                   [](const BaseData *data) { return dynamic_cast<const TData *>(data) != nullptr; });
+      }
     }
 
     /** \brief Check whether a property is transient for the given node data.
      *
-     * \param[in] data The node's BaseData. May be null, in which case no rule
-     *            matches.
+     * \param[in] data The node's BaseData. May be null (e.g. a data-less node);
+     *            rules registered for mitk::BaseData still match, type-specific
+     *            rules do not.
      * \param[in] propertyName Name of the property to check.
      * \return True if any registered rule for propertyName matches the data type.
      */

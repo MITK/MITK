@@ -29,6 +29,7 @@ namespace tinyxml2
 namespace mitk
 {
   class BaseData;
+  class IPropertyTransience;
   class PropertyList;
 
   /**
@@ -180,7 +181,7 @@ namespace mitk
     std::string CreateEmptyTempDirectory();
 
     tinyxml2::XMLElement *SaveBaseData(tinyxml2::XMLDocument &doc, BaseData *data, const std::string &filenamehint, bool &error);
-    tinyxml2::XMLElement *SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint);
+    tinyxml2::XMLElement *SavePropertyList(tinyxml2::XMLDocument &doc, const IPropertyTransience *transience, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint);
 
     void OnUnzipError(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> &info);
     void OnUnzipOk(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> &info);

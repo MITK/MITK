@@ -31,6 +31,9 @@ found in the LICENSE file.
 #include <mitkStringUtil.h>
 #include <mitkUIDGenerator.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPropertyTransience.h>
+
 #include <itkObjectFactoryBase.h>
 
 #include <fstream>
@@ -418,8 +421,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *baseDataPropertiesElement =
-                SavePropertyList(document, propertyList, filenameHint + "-data"); // returns a reference to a file
-              dataElement->InsertEndChild(baseDataPropertiesElement);
+                SavePropertyList(document, propertyList, nullptr, filenameHint + "-data"); // returns a reference to a file
+              if (baseDataPropertiesElement)
+                dataElement->InsertEndChild(baseDataPropertiesElement);
             }
 
             nodeElement->InsertEndChild(dataElement);
@@ -433,9 +437,12 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             if (propertyList && !propertyList->IsEmpty())
             {
               auto *renderWindowPropertiesElement =
-                SavePropertyList(document, propertyList, filenameHint + "-" + renderWindowName); // returns a reference to a file
-              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
-              nodeElement->InsertEndChild(renderWindowPropertiesElement);
+                SavePropertyList(document, propertyList, node->GetData(), filenameHint + "-" + renderWindowName); // returns a reference to a file
+              if (renderWindowPropertiesElement)
+              {
+                renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
+                nodeElement->InsertEndChild(renderWindowPropertiesElement);
+              }
             }
           }
 
@@ -444,8 +451,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           if (propertyList && !propertyList->IsEmpty())
           {
             auto *propertiesElement =
-              SavePropertyList(document, propertyList, filenameHint + "-node"); // returns a reference to a file
-            nodeElement->InsertEndChild(propertiesElement);
+              SavePropertyList(document, propertyList, node->GetData(), filenameHint + "-node"); // returns a reference to a file
+            if (propertiesElement)
+              nodeElement->InsertEndChild(propertiesElement);
           }
           document.InsertEndChild(nodeElement);
         }
@@ -571,9 +579,29 @@ tinyxml2::XMLElement *mitk::SceneIO::SaveBaseData(tinyxml2::XMLDocument &doc, Ba
   return element;
 }
 
-tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const std::string &filenamehint)
+tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const BaseData *nodeData, const std::string &filenamehint)
 {
   assert(propertyList);
+
+  // Drop transient DataNode properties (e.g. the "selected" UI flag) so they are
+  // not written to the scene file. Transience is decided per the node's BaseData type.
+  PropertyList::Pointer persistable;
+  if (nodeData != nullptr)
+  {
+    CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
+    persistable = PropertyList::New();
+
+    for (const auto &property : *propertyList->GetMap())
+    {
+      if (!transience->IsTransient(nodeData, property.first))
+        persistable->SetProperty(property.first, property.second);
+    }
+
+    if (persistable->IsEmpty())
+      return nullptr;
+
+    propertyList = persistable;
+  }
 
   //  - TODO what to do about shared properties (same object in two lists or behind several keys)?
   auto *element = doc.NewElement("properties");

@@ -19,6 +19,10 @@ found in the LICENSE file.
 #include <mitkSceneIO.h>
 #include <mitkSceneIOTestScenarioProvider.h>
 
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkStandaloneDataStorage.h>
+
 /**
   \brief Test cases for SceneIO.
 
@@ -78,6 +82,7 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkSceneIOTest2Suite);
   MITK_TEST(Test_SceneIOInterfaces);
   MITK_TEST(Test_ReconstructionOfScenes);
+  MITK_TEST(Test_SelectedPropertyNotPersisted);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
@@ -123,6 +128,35 @@ public:
             .CompareVerbose());
       }
     }
+  }
+
+  void Test_SelectedPropertyNotPersisted()
+  {
+    std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTransientTest_XXXXXX");
+    std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
+
+    auto originalStorage = mitk::StandaloneDataStorage::New();
+    auto node = mitk::DataNode::New();
+    node->SetData(mitk::PointSet::New());
+    node->SetName("measurement");
+    node->SetSelected(true); // transient UI state
+    originalStorage->Add(node);
+
+    mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
+    CPPUNIT_ASSERT_MESSAGE("Saving scene with a selected node",
+                           writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
+
+    mitk::SceneIO::Pointer reader = mitk::SceneIO::New();
+    mitk::DataStorage::Pointer restoredStorage;
+    CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
+
+    mitk::DataNode::Pointer restoredNode = restoredStorage->GetNamedNode("measurement");
+    CPPUNIT_ASSERT_MESSAGE("Reloaded node must exist", restoredNode.IsNotNull());
+
+    bool selected = false;
+    bool hasSelected = restoredNode->GetBoolProperty("selected", selected);
+    CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be persisted", !hasSelected || !selected);
+    CPPUNIT_ASSERT_MESSAGE("Non-transient 'name' must survive", restoredNode->GetName() == "measurement");
   }
 
 }; // class

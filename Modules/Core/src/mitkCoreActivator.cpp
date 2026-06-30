@@ -269,6 +269,10 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyRelations.reset(new mitk::PropertyRelations);
   context->RegisterService<mitk::IPropertyRelations>(m_PropertyRelations.get());
 
+  m_PropertyTransience.reset(new mitk::PropertyTransience);
+  context->RegisterService<mitk::IPropertyTransience>(m_PropertyTransience.get());
+  m_PropertyTransience->AddTransient<mitk::BaseData>("selected"); // transient UI state, never persisted
+
   m_PreferencesService.reset(new mitk::PreferencesService);
   context->RegisterService<mitk::IPreferencesService>(m_PreferencesService.get());
 

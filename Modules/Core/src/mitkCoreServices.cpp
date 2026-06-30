@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkIPropertyRelations.h>
+#include <mitkIPropertyTransience.h>
 #include <mitkIPreferencesService.h>
 
 #include <usGetModuleContext.h>
@@ -111,6 +112,11 @@ namespace mitk
   IPropertyRelations *CoreServices::GetPropertyRelations(us::ModuleContext *context)
   {
     return GetCoreService<IPropertyRelations>(context);
+  }
+
+  IPropertyTransience *CoreServices::GetPropertyTransience(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyTransience>(context);
   }
 
   IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)

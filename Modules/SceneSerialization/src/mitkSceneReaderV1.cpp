@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <mitkSerializerMacros.h>
 #include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyTransience.h>
 #include <tinyxml2.h>
 
 #include <mitkFileSystem.h>
@@ -431,6 +433,18 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
 
     if (readProperties.IsNotNull())
     {
+      // Drop transient properties (e.g. the "selected" UI flag) that may be present
+      // in older scene files. Transience is decided per the node's BaseData type.
+      CoreServicePointer<IPropertyTransience> transience(CoreServices::GetPropertyTransience());
+      std::vector<std::string> transientKeys;
+      for (const auto &property : *readProperties->GetMap())
+      {
+        if (transience->IsTransient(node->GetData(), property.first))
+          transientKeys.push_back(property.first);
+      }
+      for (const auto &key : transientKeys)
+        readProperties->DeleteProperty(key);
+
       propertyList->ConcatenatePropertyList(readProperties, true); // true = replace
     }
     else

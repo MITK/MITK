@@ -176,6 +176,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkIPropertyProvider.cpp
   DataManagement/mitkIPropertyRelations.cpp
+  DataManagement/mitkIPropertyTransience.cpp
   DataManagement/mitkITKEventObserverGuard.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
@@ -230,6 +231,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyPersistenceInfo.cpp
   DataManagement/mitkPropertyRelationRuleBase.cpp
   DataManagement/mitkPropertyRelations.cpp
+  DataManagement/mitkPropertyTransience.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp

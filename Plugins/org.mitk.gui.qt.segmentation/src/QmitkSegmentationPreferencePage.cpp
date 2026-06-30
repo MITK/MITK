@@ -80,6 +80,8 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
 
+  prefs->PutBool("warn before converting to segmentation", m_Ui->convertWarningCheckBox->isChecked());
+
   if (!prefs->IsOverridden("label set preset"))
     prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
 
@@ -129,6 +131,8 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->opacityFactorSlider->setValue(opacityFactor);
 
   m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
+
+  m_Ui->convertWarningCheckBox->setChecked(prefs->GetBool("warn before converting to segmentation", true));
 
   //label presets
   bool isOverridden = prefs->IsOverridden("label set preset");

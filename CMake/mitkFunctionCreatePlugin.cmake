@@ -126,35 +126,42 @@ function(mitk_create_plugin)
     set(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     set(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
 
-    # Create a list of Doxygen tag files from the plug-in dependencies
+    # Create a list of Doxygen tag files from the plug-in dependencies.
+    #
+    # Doxygen 1.11.0 ignores TAGFILES while generating Qt Help and emits an
+    # "error:"-prefixed advisory that MSBuild misclassifies as a build failure
+    # whenever the help step runs. Cross-plugin help links via TAGFILES only
+    # worked up to Doxygen 1.10, so collect them only for those versions.
     set(PLUGIN_DOXYGEN_TAGFILES)
-    foreach(_dep_target ${_PLUGIN_target_libraries})
-      string(REPLACE _ . _dep ${_dep_target})
+    if(DOXYGEN_VERSION VERSION_LESS 1.11.0)
+      foreach(_dep_target ${_PLUGIN_target_libraries})
+        string(REPLACE _ . _dep ${_dep_target})
 
-      get_target_property(_is_imported ${_dep_target} IMPORTED)
-      if(_is_imported)
-        get_target_property(_import_loc_debug ${_dep_target} IMPORTED_LOCATION_DEBUG)
-        get_target_property(_import_loc_release ${_dep_target} IMPORTED_LOCATION_RELEASE)
-        # There is not necessarily a debug and release build
-        if(_import_loc_release)
-          set(_import_loc ${_import_loc_release})
+        get_target_property(_is_imported ${_dep_target} IMPORTED)
+        if(_is_imported)
+          get_target_property(_import_loc_debug ${_dep_target} IMPORTED_LOCATION_DEBUG)
+          get_target_property(_import_loc_release ${_dep_target} IMPORTED_LOCATION_RELEASE)
+          # There is not necessarily a debug and release build
+          if(_import_loc_release)
+            set(_import_loc ${_import_loc_release})
+          else()
+            set(_import_loc ${_import_loc_debug})
+          endif()
+          get_filename_component(_target_filename "${_import_loc}" NAME)
+          # on windows there might be a Debug or Release subdirectory
+          string(REGEX REPLACE "/bin/plugins/(Debug/|Release/)?${_target_filename}" "/Plugins/${_dep}/documentation/UserManual" plugin_tag_dir "${_import_loc}" )
         else()
-          set(_import_loc ${_import_loc_debug})
+          set(plugin_tag_dir "${CMAKE_BINARY_DIR}/Plugins/${_dep}/documentation/UserManual")
         endif()
-        get_filename_component(_target_filename "${_import_loc}" NAME)
-        # on windows there might be a Debug or Release subdirectory
-        string(REGEX REPLACE "/bin/plugins/(Debug/|Release/)?${_target_filename}" "/Plugins/${_dep}/documentation/UserManual" plugin_tag_dir "${_import_loc}" )
-      else()
-        set(plugin_tag_dir "${CMAKE_BINARY_DIR}/Plugins/${_dep}/documentation/UserManual")
-      endif()
 
-      set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
-      if(EXISTS ${_tag_file})
-        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
+        set(_tag_file "${plugin_tag_dir}/${_dep_target}.tag")
+        if(EXISTS ${_tag_file})
+          set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} \"${_tag_file}=qthelp://${_dep}/bundle/\"")
+        endif()
+      endforeach()
+      if(_PLUGIN_DOXYGEN_TAGFILES)
+        set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
       endif()
-    endforeach()
-    if(_PLUGIN_DOXYGEN_TAGFILES)
-      set(PLUGIN_DOXYGEN_TAGFILES "${PLUGIN_DOXYGEN_TAGFILES} ${_PLUGIN_DOXYGEN_TAGFILES}")
     endif()
     #message("PLUGIN_DOXYGEN_TAGFILES: ${PLUGIN_DOXYGEN_TAGFILES}")
 

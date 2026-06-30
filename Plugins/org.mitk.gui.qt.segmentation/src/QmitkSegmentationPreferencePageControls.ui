@@ -329,6 +329,33 @@
      </property>
     </widget>
    </item>
+   <item row="15" column="1">
+    <widget class="Line" name="line_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="0">
+    <widget class="QLabel" name="convertToSegmentationLabel">
+     <property name="text">
+      <string>Convert to segmentation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <widget class="QCheckBox" name="convertWarningCheckBox">
+     <property name="toolTip">
+      <string>If checked, converting an image with many distinct values to a segmentation asks for confirmation first.</string>
+     </property>
+     <property name="text">
+      <string>Warn before converting images with many distinct values</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

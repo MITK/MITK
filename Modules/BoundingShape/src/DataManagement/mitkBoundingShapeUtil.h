@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkBaseGeometry.h>
 #include <mitkInteractionConst.h>
 
+#include <array>
+
 namespace mitk
 {
   /**
@@ -36,6 +38,37 @@ namespace mitk
    * \return A vector of four indices into the corner points array.
    */
   std::vector<int> GetHandleIndices(int index);
+
+  /**
+   * \brief Return the four corner-point indices of the box face that the given handle sits on,
+   *        ordered along the face perimeter so that consecutive indices (and the last-to-first
+   *        pair) form the four face edges.
+   *
+   * This is the face that is moved when the handle is dragged. In contrast to GetHandleIndices,
+   * which returns the opposite (anchor) face used during scaling, this returns the handle's own
+   * face in a winding order suitable for edge-based geometry such as plane intersection.
+   *
+   * \param handleIndex The handle index (0-5).
+   */
+  std::array<int, 4> GetHandleFaceCornerIndices(int handleIndex);
+
+  /**
+   * \brief Intersect a planar, convex quad (given by its four perimeter-ordered corner points)
+   *        with a plane and return the center of the resulting intersection segment.
+   *
+   * Used to position a face handle where its box face crosses the current slice plane, so the
+   * handle stays on the rendered cross-section outline for arbitrarily oriented (oblique) boxes.
+   *
+   * \param faceCorners The four corner points of the face, in perimeter (winding) order.
+   * \param planeOrigin A point on the plane.
+   * \param planeNormal The plane normal (need not be normalized).
+   * \param[out] center The center of the intersection segment, valid only if the function returns true.
+   * \return true if the plane crosses the face (the handle is visible on this slice), false otherwise.
+   */
+  bool GetFacePlaneIntersectionCenter(const std::array<mitk::Point3D, 4> &faceCorners,
+                                      const mitk::Point3D &planeOrigin,
+                                      const mitk::Vector3D &planeNormal,
+                                      mitk::Point3D &center);
 
   /**
   * \brief Helper Class for realizing the handles of bounding object encapsulated by a geometry data

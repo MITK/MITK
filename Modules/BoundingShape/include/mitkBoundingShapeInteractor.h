@@ -63,12 +63,6 @@ namespace mitk
      */
     void SetDataNode(DataNode *dataNode) override;
 
-    /** \brief Enable or disable rotation interaction.
-     *
-     * \param[in] rotationEnabled If \c true, rotation of the bounding shape is allowed.
-     */
-    void SetRotationEnabled(bool rotationEnabled);
-
   protected:
     BoundingShapeInteractor();
     ~BoundingShapeInteractor() override;

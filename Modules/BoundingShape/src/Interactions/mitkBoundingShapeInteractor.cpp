@@ -44,7 +44,7 @@ namespace mitk
   class BoundingShapeInteractor::Impl
   {
   public:
-    Impl() : OriginalInteractionEnabled(false), RotationEnabled(false)
+    Impl() : OriginalInteractionEnabled(false)
     {
       Point3D initialPoint;
       initialPoint.Fill(0.0);
@@ -61,7 +61,6 @@ namespace mitk
     std::vector<Handle> Handles;
     Handle ActiveHandle;
     Geometry3D::Pointer OriginalGeometry;
-    bool RotationEnabled;
     std::map<us::ServiceReferenceU, mitk::EventConfig> DisplayInteractionConfigs;
   };
 }
@@ -116,11 +115,6 @@ void mitk::BoundingShapeInteractor::ConnectActionsAndFunctions()
 //  geometry->ExecuteOperation(doOp);
 //  delete doOp;
 //}
-
-void mitk::BoundingShapeInteractor::SetRotationEnabled(bool rotationEnabled)
-{
-  m_Impl->RotationEnabled = rotationEnabled;
-}
 
 void mitk::BoundingShapeInteractor::DataNodeChanged()
 {
@@ -440,18 +434,26 @@ void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, Intera
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry =
     this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
-  Vector3D spacing = geometry->GetSpacing();
   Point3D currentPickedPoint;
   interactionEvent->GetSender()->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint);
-  Vector3D interactionMove;
 
-  // pixel aligned shifting of the bounding box
-  interactionMove[0] = std::round((currentPickedPoint[0] - m_Impl->LastPickedWorldPoint[0]) / spacing[0]) * spacing[0];
-  interactionMove[1] = std::round((currentPickedPoint[1] - m_Impl->LastPickedWorldPoint[1]) / spacing[1]) * spacing[1];
-  interactionMove[2] = std::round((currentPickedPoint[2] - m_Impl->LastPickedWorldPoint[2]) / spacing[2]) * spacing[2];
+  Vector3D worldMove;
+  worldMove[0] = currentPickedPoint[0] - m_Impl->LastPickedWorldPoint[0];
+  worldMove[1] = currentPickedPoint[1] - m_Impl->LastPickedWorldPoint[1];
+  worldMove[2] = currentPickedPoint[2] - m_Impl->LastPickedWorldPoint[2];
 
-  if ((interactionMove[0] + interactionMove[1] + interactionMove[2]) !=
-      0.0) // only update current position if a movement occurred
+  // Snap the translation to whole voxels in the box's own (index) space so the box stays on the
+  // voxel grid for any orientation, matching the resize behaviour (a per-world-axis rounding would
+  // drift an oblique box off the grid).
+  auto inverse = mitk::AffineTransform3D::New();
+  geometry->GetIndexToWorldTransform()->GetInverse(inverse);
+  Vector3D indexMove = inverse->TransformVector(worldMove);
+  indexMove[0] = std::round(indexMove[0]);
+  indexMove[1] = std::round(indexMove[1]);
+  indexMove[2] = std::round(indexMove[2]);
+  Vector3D interactionMove = geometry->GetIndexToWorldTransform()->TransformVector(indexMove);
+
+  if (indexMove[0] != 0.0 || indexMove[1] != 0.0 || indexMove[2] != 0.0) // only update if at least one voxel moved
   {
     m_Impl->LastPickedWorldPoint = currentPickedPoint;
 
@@ -475,7 +477,6 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
   interactionEvent->GetSender()->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint);
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
-  Vector3D spacing = geometry->GetSpacing();
 
   // pixel aligned bounding box
   Vector3D interactionMove;
@@ -507,6 +508,17 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
   faceNormal[2] = edge1[0] * edge2[1] - edge1[1] * edge2[0];
   Vector3D faceShift = ((faceNormal * interactionMove) / (faceNormal.GetNorm() * faceNormal.GetNorm())) * faceNormal;
 
+  // Snap the shift to whole voxels in the box's own (index) space. The moved face is perpendicular
+  // to one index axis, so rounding there keeps the resized edge on the voxel grid for any geometry,
+  // including oblique ones (a per-world-axis rounding would only be correct for axis-aligned boxes).
+  auto inverse = mitk::AffineTransform3D::New();
+  geometry->GetIndexToWorldTransform()->GetInverse(inverse);
+  Vector3D indexShift = inverse->TransformVector(faceShift);
+  indexShift[0] = std::round(indexShift[0]);
+  indexShift[1] = std::round(indexShift[1]);
+  indexShift[2] = std::round(indexShift[2]);
+  faceShift = geometry->GetIndexToWorldTransform()->TransformVector(indexShift);
+
   // calculate cornerpoints from geometry without visualization offset to update actual geometry
   cornerPoints = GetCornerPoints(geometry, false);
   num = 0;
@@ -521,18 +533,9 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
     if ((numFaces != faces[0]) && (numFaces != faces[1]) && (numFaces != faces[2]) && (numFaces != faces[3]))
     {
       Point3D point = pointscontainer->GetElement(numFaces);
-      if (m_Impl->RotationEnabled) // apply if geometry is rotated and a pixel aligned shift is not possible
-      {
-        point[0] += faceShift[0];
-        point[1] += faceShift[1];
-        point[2] += faceShift[2];
-      }
-      else // shift pixelwise
-      {
-        point[0] += std::round(faceShift[0] / spacing[0]) * spacing[0];
-        point[1] += std::round(faceShift[1] / spacing[1]) * spacing[1];
-        point[2] += std::round(faceShift[2] / spacing[2]) * spacing[2];
-      }
+      point[0] += faceShift[0];
+      point[1] += faceShift[1];
+      point[2] += faceShift[2];
 
       if (point == pointscontainer->GetElement(numFaces))
         positionChangeThreshold = false;
@@ -545,8 +548,6 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
 
   if (positionChangeThreshold) // update only if bounding box is shifted at least by one pixel
   {
-    auto inverse = mitk::AffineTransform3D::New();
-    geometry->GetIndexToWorldTransform()->GetInverse(inverse);
     for (unsigned int pointid = 0; pointid < 8; pointid++)
     {
       pointscontainer->InsertElement(pointid, inverse->TransformPoint(pointscontainer->GetElement(pointid)));

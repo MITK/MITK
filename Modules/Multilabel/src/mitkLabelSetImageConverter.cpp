@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <itkComposeImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkImageDuplicator.h>
+#include <itkImageRegionConstIterator.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
 
 template <typename TPixel, unsigned int VDimension>
@@ -267,6 +268,50 @@ mitk::Image::Pointer mitk::ConvertImageToGroupImage(const Image* inputImage, mit
   catch (...)
   {
     mitkThrow() << "Could not initialize by provided labeled image due to unknown error.";
+  }
+
+  return result;
+}
+
+namespace
+{
+  template <typename SourceImageType>
+  void CountDistinctForegroundValuesInternal(const SourceImageType* sourceImage, unsigned int limit, unsigned int& result)
+  {
+    itk::ImageRegionConstIterator<SourceImageType> sourceIter(sourceImage, sourceImage->GetRequestedRegion());
+    std::set<mitk::MultiLabelSegmentation::LabelValueType> detectedValues;
+
+    for (sourceIter.GoToBegin(); !sourceIter.IsAtEnd(); ++sourceIter)
+    {
+      const auto sourceValue = static_cast<mitk::MultiLabelSegmentation::LabelValueType>(sourceIter.Get());
+
+      if (sourceValue != mitk::Label::UNLABELED_VALUE)
+      {
+        detectedValues.insert(sourceValue);
+
+        if (detectedValues.size() >= limit)
+          break;
+      }
+    }
+
+    result = static_cast<unsigned int>(detectedValues.size());
+  }
+}
+
+unsigned int mitk::CountDistinctForegroundValues(const Image* image, unsigned int limit)
+{
+  if (nullptr == image || image->IsEmpty() || !image->IsInitialized() || 0 == limit)
+    return 0;
+
+  unsigned int result = 0;
+
+  if (image->GetDimension() == 3)
+  {
+    AccessFixedDimensionByItk_2(image, CountDistinctForegroundValuesInternal, 3, limit, result);
+  }
+  else if (image->GetDimension() == 4)
+  {
+    AccessFixedDimensionByItk_2(image, CountDistinctForegroundValuesInternal, 4, limit, result);
   }
 
   return result;

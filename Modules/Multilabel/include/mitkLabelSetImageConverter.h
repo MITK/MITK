@@ -38,6 +38,21 @@ namespace mitk
 
   MITKMULTILABEL_EXPORT Image::Pointer ConvertImageToGroupImage(const Image* inputImage, mitk::MultiLabelSegmentation::LabelValueVectorType& foundLabels);
 
+  /** \brief Counts distinct foreground (non-zero) pixel values, stopping early once \p limit is reached.
+   *
+   * Each distinct foreground value becomes a label when the image is converted to a
+   * MultiLabelSegmentation (see ConvertImageToGroupImage and
+   * MultiLabelSegmentation::InitializeByLabeledImage). Counting with an early exit makes this a
+   * cheap plausibility check before the potentially very expensive conversion.
+   *
+   * \param image image to inspect; only 3D and 4D images are counted (the dimensions the
+   *        conversion supports), all others return 0.
+   * \param limit count at which to stop; the result is capped at \p limit, so a return value equal
+   *        to \p limit means "at least \p limit".
+   * \return number of distinct foreground values found, capped at \p limit.
+   */
+  MITKMULTILABEL_EXPORT unsigned int CountDistinctForegroundValues(const Image* image, unsigned int limit);
+
   MITKMULTILABEL_EXPORT bool CheckForLabelValueConflictsAndResolve(const mitk::MultiLabelSegmentation::LabelValueVectorType& newValues, mitk::MultiLabelSegmentation::LabelValueVectorType& usedLabelValues, mitk::MultiLabelSegmentation::LabelValueVectorType& correctedLabelValues);
 
   /** Function creates a binary mask representing only the specified label of the multi label segmentation.

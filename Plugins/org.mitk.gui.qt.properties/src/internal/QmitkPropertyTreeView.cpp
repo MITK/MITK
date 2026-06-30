@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
+#include <mitkIPropertyTransience.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
 #include <memory>
@@ -56,6 +57,7 @@ QmitkPropertyTreeView::QmitkPropertyTreeView()
   : m_PropertyAliases(mitk::CoreServices::GetPropertyAliases(nullptr), nullptr),
     m_PropertyDescriptions(mitk::CoreServices::GetPropertyDescriptions(nullptr), nullptr),
     m_PropertyPersistence(mitk::CoreServices::GetPropertyPersistence(nullptr), nullptr),
+    m_PropertyTransience(mitk::CoreServices::GetPropertyTransience(nullptr), nullptr),
     m_ProxyModel(nullptr),
     m_Model(nullptr),
     m_Delegate(nullptr),
@@ -169,6 +171,10 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg"));
   m_Controls->saveLabel->setPixmap(icon.pixmap(ICON_SIZE));
 
+  icon = berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Properties/transient.svg"));
+  m_Controls->transientLabel->setPixmap(icon.pixmap(ICON_SIZE));
+  m_Controls->transientLabel->setToolTip(QStringLiteral("This property is transient and is not saved with the scene."));
+
   connect(m_Controls->singleSlot, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkPropertyTreeView::OnCurrentSelectionChanged);
   connect(m_Controls->filterLineEdit, &QLineEdit::textChanged,
@@ -273,6 +279,7 @@ void QmitkPropertyTreeView::HideAllIcons()
   m_Controls->tagLabel->hide();
   m_Controls->tagsLabel->hide();
   m_Controls->saveLabel->hide();
+  m_Controls->transientLabel->hide();
 }
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
@@ -311,7 +318,13 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
 
       bool isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
 
-      if (!description.isEmpty() || !aliases.empty() || isPersistent)
+      // Transience is a data node property concern, so do not show it for the base data property list.
+      const bool showingBaseData =
+        m_Renderer == nullptr && m_Controls->propertyListComboBox->currentText() == "Base data";
+      bool isTransient = !showingBaseData && m_SelectedNode.IsNotNull() &&
+        m_PropertyTransience->IsTransient(m_SelectedNode->GetData(), name.toStdString());
+
+      if (!description.isEmpty() || !aliases.empty() || isPersistent || isTransient)
       {
         QString customizedDescription;
 
@@ -342,6 +355,7 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
         m_Controls->tagsLabel->setVisible(!aliases.empty() && aliases.size() > 1);
         m_Controls->tagLabel->setVisible(!aliases.empty() && aliases.size() == 1);
         m_Controls->saveLabel->setVisible(isPersistent);
+        m_Controls->transientLabel->setVisible(isTransient);
 
         m_Controls->descriptionLabel->setText(customizedDescription);
         m_Controls->descriptionLabel->show();

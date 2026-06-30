@@ -39,6 +39,7 @@ namespace mitk
   class IPropertyAliases;
   class IPropertyDescriptions;
   class IPropertyPersistence;
+  class IPropertyTransience;
 }
 
 class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
@@ -89,6 +90,7 @@ private:
   mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
   mitk::CoreServicePointer<mitk::IPropertyDescriptions> m_PropertyDescriptions;
   mitk::CoreServicePointer<mitk::IPropertyPersistence> m_PropertyPersistence;
+  mitk::CoreServicePointer<mitk::IPropertyTransience> m_PropertyTransience;
   std::unique_ptr<Ui::QmitkPropertyTreeView> m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;

@@ -294,8 +294,19 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 if(Python3_ROOT_DIR)
+  # Pin the exact interpreter, not just the root hint. find_package(Python3)
+  # also consults PATH and the Windows registry and prefers the newest version
+  # it finds there, so a developer machine with a newer system Python would
+  # win over the standalone Python staged in MITK-build/python. Setting
+  # Python3_EXECUTABLE makes the inner build skip that search entirely.
+  if(WIN32)
+    set(_mitk_python3_executable "${Python3_ROOT_DIR}/python.exe")
+  else()
+    set(_mitk_python3_executable "${Python3_ROOT_DIR}/bin/python3")
+  endif()
   list(APPEND mitk_optional_cache_args
     "-DPython3_ROOT_DIR:PATH=${Python3_ROOT_DIR}"
+    "-DPython3_EXECUTABLE:FILEPATH=${_mitk_python3_executable}"
   )
 endif()
 

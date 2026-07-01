@@ -39,6 +39,15 @@ namespace mitk::PythonHelper
   // short-lived subprocesses that must run with the venv's own interpreter
   // rather than the embedded one.
   MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvExecutablePath(const std::string& name);
+
+  // Path to a named console script (entry point) inside the named virtual
+  // environment: bin/<scriptName> on POSIX, Scripts/<scriptName>.exe on Windows
+  // (e.g. GetVirtualEnvScriptPath(name, "TotalSegmentator")). Returns an empty
+  // path only if the environment location cannot be resolved; the script file
+  // itself is not checked for existence, so the caller decides how to handle a
+  // missing script.
+  MITKPYTHONHELPER_EXPORT fs::path GetVirtualEnvScriptPath(const std::string& name, const std::string& scriptName);
+
   MITKPYTHONHELPER_EXPORT fs::path CreateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const std::string& name);
   MITKPYTHONHELPER_EXPORT bool ActivateVirtualEnv(const fs::path& path);

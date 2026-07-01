@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkTotalSegmentatorPreferencePage</class>
+ <widget class="QWidget" name="QmitkTotalSegmentatorPreferencePage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="computationGroupBox">
+     <property name="title">
+      <string>Computation</string>
+     </property>
+     <layout class="QFormLayout" name="computationLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="deviceLabel">
+        <property name="text">
+         <string>Device:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="deviceComboBox">
+        <property name="toolTip">
+         <string>Device TotalSegmentator runs on. GPU is strongly recommended; CPU is significantly slower.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="licenseGroupBox">
+     <property name="title">
+      <string>License</string>
+     </property>
+     <layout class="QVBoxLayout" name="licenseLayout">
+      <item>
+       <widget class="QLabel" name="licenseInfoLabel">
+        <property name="text">
+         <string>Some tasks require a free (non-commercial) TotalSegmentator license.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="licenseInputLayout">
+        <item>
+         <widget class="QLineEdit" name="licenseLineEdit">
+          <property name="placeholderText">
+           <string>Enter your license key</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="applyLicenseButton">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeLicenseButton">
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="maintenanceGroupBox">
+     <property name="title">
+      <string>Maintenance</string>
+     </property>
+     <layout class="QHBoxLayout" name="maintenanceLayout">
+      <item>
+       <widget class="QPushButton" name="uninstallButton">
+        <property name="text">
+         <string>Uninstall TotalSegmentator</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clearWeightsButton">
+        <property name="toolTip">
+         <string>Delete all downloaded TotalSegmentator model weights. They are re-downloaded on demand.</string>
+        </property>
+        <property name="text">
+         <string>Clear model weights</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="maintenanceSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

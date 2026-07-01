@@ -614,7 +614,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->InitializeTools();
 
    QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire' Selection");
-   QString segTools3D = tr("nnInteractive Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut TotalSegmentator");
+   QString segTools3D = tr("nnInteractive TotalSegmentator Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut");
 
    std::regex extSegTool2DRegEx("SegTool2D$");
    std::regex extSegTool3DRegEx("SegTool3D$");

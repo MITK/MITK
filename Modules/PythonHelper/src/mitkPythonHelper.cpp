@@ -364,6 +364,22 @@ fs::path mitk::PythonHelper::GetVirtualEnvExecutablePath(const std::string& name
   return {};
 }
 
+fs::path mitk::PythonHelper::GetVirtualEnvScriptPath(const std::string& name, const std::string& scriptName)
+{
+  const auto venvPath = GetVirtualEnvPath(name);
+
+  if (venvPath.empty())
+    return {};
+
+  // Same platform layout as VenvPythonExe (Windows: Scripts/, POSIX: bin/), but
+  // for an arbitrary console script rather than the interpreter.
+#if defined(_WIN32)
+  return venvPath / "Scripts" / (scriptName + ".exe");
+#else
+  return venvPath / "bin" / scriptName;
+#endif
+}
+
 fs::path mitk::PythonHelper::CreateVirtualEnv(const std::string& name)
 {
   const auto venvPath = GetVirtualEnvPath(name);

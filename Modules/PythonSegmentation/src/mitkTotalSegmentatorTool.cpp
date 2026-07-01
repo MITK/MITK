@@ -159,9 +159,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   // The base UpdatePreview catches itk::ExceptionObject (what mitkThrow produces)
   // and only forwards it to ErrorMessage, which no GUI here listens to. So catch
   // every failure locally and record it in m_LastErrorMessage; the GUI shows that
-  // instead of the generic "cancelled or produced no result". Note SetProgress
-  // ADVANCES the shared progress bar by the given amount (it is not an absolute
-  // position); the base brackets the whole operation with its own steps.
+  // instead of the generic "cancelled or produced no result".
   try
   {
     // Programmer-guarantee guards: the GUI always injects both before running.
@@ -189,14 +187,10 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
     const std::string outputImagePath = outDir + IOUtil::GetDirectorySeparator() + "segmentation.nii.gz";
 
-    m_ProgressCommand->SetProgress(10);
     IOUtil::Save(inputAtTimeStep, inputImagePath);
-    m_ProgressCommand->SetProgress(20);
 
     const auto args = this->BuildArguments(inputImagePath, outputImagePath);
     const bool success = m_CommandRunner(m_ExecutablePath, args);
-
-    m_ProgressCommand->SetProgress(30);
 
     if (!success)
       return; // Cancelled by the user or the process failed: leave the preview empty.
@@ -213,8 +207,6 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     this->MapLabelsToSegmentation(outputBuffer, previewImage);
     previewImage->UpdateGroupImage(
       previewImage->GetActiveLayer(), outputBuffer->GetGroupImage(outputBuffer->GetActiveLayer()), timeStep);
-
-    m_ProgressCommand->SetProgress(40);
   }
   catch (const mitk::Exception& e)
   {

@@ -248,6 +248,23 @@ class TestGroupCRUD:
         seg.set_group_name(0, "MyGroup")
         assert seg.get_group_name(0) == "MyGroup"
 
+    def test_add_group_with_name(self, seg):
+        idx = seg.add_group(name="Anatomy")
+        assert seg.get_group_name(idx) == "Anatomy"
+
+    def test_add_group_with_name_and_labels(self, seg):
+        lbl = mitk.Label(10, "InNamedGroup")
+        idx = seg.add_group(name="Structures", labels=[lbl])
+        assert seg.get_group_name(idx) == "Structures"
+        assert len(seg.get_group_label_values(idx)) == 1
+
+    def test_add_group_positional_name(self, seg):
+        # Positional parity with the remote: the first positional argument is
+        # the name (name-first signature); the group image is auto-allocated.
+        idx = seg.add_group("PositionalName")
+        assert seg.num_groups == 2
+        assert seg.get_group_name(idx) == "PositionalName"
+
 
 # ---------------------------------------------------------------------------
 # Group queries
@@ -296,6 +313,99 @@ class TestGroupQueries:
 
 
 # ---------------------------------------------------------------------------
+# set_group_image with array input
+# ---------------------------------------------------------------------------
+
+class TestSetGroupImageArray:
+
+    def test_array_writes_pixels(self, seg):
+        lbl = seg.add_label("A", (1.0, 0.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        # Asymmetric voxel so a (z, y, x) axis-order mistake would be caught.
+        arr[1, 2, 3] = lbl.value
+        seg.set_group_image(0, arr)
+        out = seg.get_group_image(0).as_numpy()
+        assert out.shape == arr.shape
+        assert out[1, 2, 3] == lbl.value
+        assert out[0, 0, 0] == 0
+
+    def test_image_overload_still_works(self, seg):
+        lbl = seg.add_label("B", (0.0, 1.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 1] = lbl.value
+        seg.set_group_image(0, mitk.Image.from_numpy(arr))
+        assert seg.get_group_image(0).as_numpy()[0, 0, 1] == lbl.value
+
+    def test_wrong_shape_raises_value_error(self, seg):
+        arr = np.zeros((2, 4, 4), dtype=np.uint16)
+        with pytest.raises(ValueError):
+            seg.set_group_image(0, arr)
+
+    def test_float_dtype_raises_value_error(self, seg):
+        arr = np.zeros((4, 8, 8), dtype=np.float32)
+        with pytest.raises(ValueError):
+            seg.set_group_image(0, arr)
+
+    def test_non_array_non_image_raises_type_error(self, seg):
+        with pytest.raises(TypeError):
+            seg.set_group_image(0, object())
+
+    def test_bad_group_index_raises_index_error(self, seg):
+        arr = seg.get_group_image(0).as_numpy().copy()
+        with pytest.raises(IndexError):
+            seg.set_group_image(5, arr)
+
+    def test_int_array_cast_to_uint16(self, seg):
+        lbl = seg.add_label("C", (0.0, 0.0, 1.0), 0)
+        arr = np.zeros((4, 8, 8), dtype=np.int64)
+        arr[0, 0, 0] = lbl.value
+        seg.set_group_image(0, arr)
+        out = seg.get_group_image(0).as_numpy()
+        assert out.dtype == np.uint16
+        assert out[0, 0, 0] == lbl.value
+
+
+# ---------------------------------------------------------------------------
+# validate (pixel/label consistency)
+# ---------------------------------------------------------------------------
+
+class TestValidate:
+
+    def test_empty_seg_is_consistent(self, seg):
+        assert seg.validate() == []
+
+    def test_declared_and_painted_is_consistent(self, seg):
+        lbl = seg.add_label("Painted", (1.0, 0.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 0] = lbl.value
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), time_step=0, source_time_step=0)
+        assert seg.validate() == []
+
+    def test_undeclared_pixel_value_warns(self, seg):
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, 0] = 7  # no label declared with value 7
+        seg.update_group_image(0, mitk.Image.from_numpy(arr), time_step=0, source_time_step=0)
+        warnings = seg.validate()
+        assert warnings
+        assert any("7" in w for w in warnings)
+
+    def test_declared_but_unpainted_label_warns(self, seg):
+        # A label declared in a group but never painted is reported (parity
+        # with the remote).
+        seg.add_label("Unpainted", (1.0, 0.0, 0.0), 0)
+        assert seg.validate()
+
+    def test_array_write_then_validate_is_consistent(self, seg):
+        # The notebook sequence: add a label, paint its pixels via
+        # set_group_image(<array>), then validate() reports no inconsistency.
+        lbl = seg.add_label("Liver", (1.0, 0.0, 0.0), 0)
+        arr = seg.get_group_image(0).as_numpy().copy()
+        arr[0, 0, :3] = lbl.value
+        seg.set_group_image(0, arr)
+        assert seg.validate() == []
+
+
+# ---------------------------------------------------------------------------
 # Label queries
 # ---------------------------------------------------------------------------
 
@@ -321,7 +431,7 @@ class TestLabelQueries:
         assert found.name == "Find"
 
     def test_get_label_invalid(self, seg):
-        with pytest.raises(ValueError):
+        with pytest.raises(KeyError):
             seg.get_label(9999)
 
     def test_get_label_values_by_name(self, seg):
@@ -341,6 +451,16 @@ class TestLabelQueries:
         names = seg.label_class_names
         assert "Liver" in names
         assert "Kidney" in names
+
+    def test_has_label_true_and_false(self, seg):
+        lbl = seg.add_label("Present", (1.0, 0.0, 0.0), 0)
+        assert seg.has_label(lbl.value) is True
+        seg.remove_label(lbl.value)
+        assert seg.has_label(lbl.value) is False
+
+    def test_has_label_accepts_label_object(self, seg):
+        lbl = seg.add_label("ByObj", (0.2, 0.3, 0.4), 0)
+        assert seg.has_label(lbl) is True
 
 
 # ---------------------------------------------------------------------------
@@ -455,6 +575,33 @@ class TestLabel:
         r = repr(lbl)
         assert "7" in r
         assert "Test" in r
+
+    def test_full_kwargs_construction(self):
+        lbl = mitk.Label(5, "L", color=(0.1, 0.2, 0.3), locked=True)
+        assert lbl.value == 5
+        assert lbl.name == "L"
+        assert lbl.color == pytest.approx((0.1, 0.2, 0.3), abs=1e-5)
+        assert lbl.locked is True
+
+    def test_value_none_construction(self):
+        lbl = mitk.Label(None, "Deferred", color=(0.4, 0.5, 0.6))
+        assert lbl.name == "Deferred"
+        assert lbl.color == pytest.approx((0.4, 0.5, 0.6), abs=1e-5)
+
+    def test_value_none_added_gets_nonzero_value(self, seg):
+        # Native has no deferred-value model: Label(None) constructs with the
+        # reserved background value 0, which always collides on add and is
+        # reassigned to a real value.
+        added = seg.add_label(mitk.Label(None, "Deferred"), 0)
+        assert added.value != 0
+
+    def test_simple_overloads_still_bind(self):
+        # Overload-resolution guard: the plain forms must keep binding after
+        # the kwargs initializer is added.
+        a = mitk.Label(5, "L")
+        assert a.value == 5
+        assert a.name == "L"
+        assert mitk.Label() is not None
 
 
 # ---------------------------------------------------------------------------
@@ -897,13 +1044,48 @@ class TestBoundButUntestedAPI:
 
 class TestErrorPaths:
 
-    def test_get_label_invalid_value(self, seg):
-        with pytest.raises(ValueError):
-            seg.get_label(65000)
+    # Lookup failures follow Python container idioms: a group index is
+    # positional (list-like) -> IndexError; a label value is a sparse key
+    # (dict-like) -> KeyError. Both subclass LookupError.
 
-    def test_get_group_invalid_index(self, seg):
-        with pytest.raises(ValueError):
-            seg.get_group(999)
+    @pytest.mark.parametrize("call", [
+        lambda s: s.get_group(999),
+        lambda s: s.get_group_name(999),
+        lambda s: s.get_group_labels(999),
+        lambda s: s.get_group_label_values(999),
+        lambda s: s.get_group_class_names(999),
+        lambda s: s.get_group_image(999),
+        lambda s: s.set_group_name(999, "x"),
+        lambda s: s.remove_group(999),
+        lambda s: s.clear_group_image(999),
+        lambda s: s.update_group_image(
+            999, mitk.Image.from_numpy(np.zeros((4, 8, 8), dtype=np.uint16)),
+            time_step=0, source_time_step=0),
+        lambda s: s.add_label(mitk.Label(1, "x"), 999),
+        lambda s: s.add_label("x", (1.0, 0.0, 0.0), 999),
+    ])
+    def test_bad_group_index_raises_index_error(self, seg, call):
+        with pytest.raises(IndexError):
+            call(seg)
+
+    @pytest.mark.parametrize("call", [
+        lambda s: s.get_label(9999),
+        lambda s: s.remove_label(9999),
+        lambda s: s.rename_label(9999, "x", (0.0, 0.0, 0.0)),
+        lambda s: s.erase_label(9999),
+        lambda s: s.get_group_of_label(9999),
+    ])
+    def test_missing_label_raises_key_error(self, seg, call):
+        with pytest.raises(KeyError):
+            call(seg)
+
+    def test_group_index_error_is_lookup_error(self, seg):
+        with pytest.raises(LookupError):
+            seg.get_group_image(999)
+
+    def test_missing_label_error_is_lookup_error(self, seg):
+        with pytest.raises(LookupError):
+            seg.get_label(9999)
 
 
 # ---------------------------------------------------------------------------

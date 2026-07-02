@@ -475,7 +475,7 @@ A truly interactive experience is only achievable on high-performance GPUs such 
 \subsubsection org_mitk_views_segmentation3dnninteractive_install Installation
 
 Before its first use, nnInteractive must be installed.
-The first time you click <b>Initialize</b>, MITK asks which kind of installation you want.
+While it is not installed, the <b>Initialize</b> button reads <b>Install nnInteractive</b>; clicking it asks which kind of installation you want.
 Choose <b>Full</b> to install nnInteractive together with PyTorch and a model checkpoint; this enables both local inference on your own machine and connecting to a remote server.
 Choose <b>Client only</b> for a lightweight installation that can connect to a remote nnInteractive server but cannot run inference locally.
 If you are unsure, pick <b>Full</b>.
@@ -520,12 +520,12 @@ A client-only installation can only run remotely, so its inference mode is fixed
 
 Under <i>Model</i>, nnInteractive uses a recommended checkpoint that is downloaded from Hugging Face by default.
 You can select a different checkpoint from the list or point nnInteractive to a checkpoint folder already present on disk.
-When you run locally with a downloaded checkpoint and a newer recommended checkpoint becomes available, MITK offers to switch to it once per session.
+When you run locally with a downloaded checkpoint and a newer recommended checkpoint becomes available, MITK offers to switch to it once per application run.
 Once a session is running, the checkpoint's license is shown in the tool, directly below the <b>Initialize</b> button.
 
 Under <i>Computation backend</i> you can switch between <i>Auto</i> (default), <i>CPU</i>, and <i>GPU</i>.
 When selecting <i>GPU</i>, you may also specify the device number if you are working on a multi-GPU system.
-On Linux with a CUDA GPU, an additional option enables <tt>torch.compile</tt> for faster interactions at the cost of a slightly longer initialization.
+On Linux with a CUDA GPU, an additional option, enabled by default, uses <tt>torch.compile</tt> for faster interactions at the cost of a slightly longer initialization.
 The <i>Storage backend</i> setting controls how interaction data is held in memory: <i>Auto</i> (default) balances speed and memory, <i>blosc2</i> minimizes memory use, and <i>tensor</i> maximizes speed.
 The computation and storage backend settings apply to local sessions only; a remote server provides its own compute device and interaction storage.
 If a local session fails to initialize, switching the computation backend or choosing a specific device here is a good first troubleshooting step.

@@ -272,6 +272,18 @@ You can switch between the different toolsets by selecting the 2D or 3D tab in t
 
 \imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing 2D and 3D tools in MITK.",16.00}
 
+\section org_mitk_views_segmentationselectiontool Selection tool
+
+\imageMacro{QmitkSegmentation_IMGIconSelection.png,"Selection tool",2.00}
+
+The Selection tool allows you to identify and select labels directly in the 2D render views. When the tool is active, hovering over labels highlights them and displays a popup near the mouse cursor showing useful information such as name, color, pixel value, and anatomical region (if defined).
+
+If multiple labels from different groups overlap at the mouse position, all of them will be highlighted simultaneously (unless the "Check only active group" option is enabled).
+
+The tool provides a <b>Check only active group</b> option. When enabled, only labels belonging to the same group as the currently active label will be highlighted by the mouse cursor.
+
+<b>Left-click</b> to select the topmost highlighted label instance in the label manager and make it the active label.
+
 \section org_mitk_views_segmentation2dsegmentation 2D segmentation tools
 
 With 2D manual contouring you define which voxels are part of the segmentation and which are not. This allows you to create segmentations of any structures of interest in an image.
@@ -393,18 +405,6 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 \imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using the Live Wire Tool",16.00}
 
 The tool handling is the same like the Lasso tool (see for more info), except it generates live wire contours instead of straight lines.
-
-\subsection org_mitk_views_segmentationselectiontool Selection tool
-
-\imageMacro{QmitkSegmentation_IMGIconSelection.png,"Selection tool",2.00}
-
-The Selection tool allows you to identify and select labels directly in the 2D render views. When the tool is active, hovering over labels highlights them and displays a popup near the mouse cursor showing useful information such as name, color, pixel value, and anatomical region (if defined).
-
-If multiple labels from different groups overlap at the mouse position, all of them will be highlighted simultaneously (unless the "Check only active group" option is enabled).
-
-The tool provides a <b>Check only active group</b> option. When enabled, only labels belonging to the same group as the currently active label will be highlighted by the mouse cursor.
-
-<b>Left-click</b> to select the topmost highlighted label instance in the label manager and make it the active label.
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 

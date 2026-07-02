@@ -133,10 +133,13 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
 
   lowerIter.GoToBegin();
 
-  if (!lowerITK->GetLargestPossibleRegion().IsInside(upperITK->GetLargestPossibleRegion()) ||
-      !lowerITK->GetLargestPossibleRegion().IsInside(result->GetLargestPossibleRegion()))
+  // The loop below iterates the full lower region and accesses upper and result
+  // at the same indices, so all three regions must match exactly.
+  if (lowerITK->GetLargestPossibleRegion() != upperITK->GetLargestPossibleRegion() ||
+      lowerITK->GetLargestPossibleRegion() != result->GetLargestPossibleRegion())
   {
-    mitkThrow() << "The regions of the slices for the 2D interpolation are not equally sized.";
+    mitkThrowException(mitk::SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
   }
 
   float weight[2] = {1.0f - ratio, ratio};

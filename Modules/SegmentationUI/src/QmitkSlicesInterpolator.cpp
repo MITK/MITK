@@ -81,6 +81,19 @@ namespace
   // Provenance op-name stamped on labels when an interpolation result is accepted (Label::AddToolUse).
   // Defined once so the three accept paths cannot drift apart.
   const std::string INTERPOLATION_PROVENANCE_NAME = "Interpolation";
+
+  // Single point for the "interpolation failed" dialog so the catch handlers do
+  // not each rebuild an identical QMessageBox.
+  void ShowInterpolationError(QWidget* parent, const QString& details)
+  {
+    QMessageBox errorInfo(parent);
+    errorInfo.setWindowTitle("Interpolation Process");
+    errorInfo.setIcon(QMessageBox::Critical);
+    errorInfo.setText("An error occurred during interpolation.");
+    if (!details.isEmpty())
+      errorInfo.setInformativeText(details);
+    errorInfo.exec();
+  }
 }
 
 float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
@@ -872,10 +885,13 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     {
       activeLabelImage = mitk::CreateLabelMask(m_Segmentation, m_CurrentActiveLabelValue);
     }
-    catch (const std::exception& e)
+    catch (...)
     {
-      mitkThrow() << "Cannot accept all interpolations. Could not create mask of active label (value: "
-                  << m_CurrentActiveLabelValue << "). Reason: " << e.what();
+      // Rethrow unchanged: wrapping would erase the exception type the caller
+      // differentiates on (e.g. std::bad_alloc for the out-of-memory message).
+      MITK_ERROR << "Cannot accept all interpolations. Could not create mask of active label (value: "
+                 << m_CurrentActiveLabelValue << ").";
+      throw;
     }
     m_Interpolator->SetSegmentationVolume(activeLabelImage);
 
@@ -914,90 +930,148 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
     unsigned int totalChangedSlices = 0;
+    unsigned int completedSlices = 0;
 
-    // Reuse interpolation algorithm instance for each slice to cache boundary calculations
-    auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
-
-    auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
-
-    m_Interpolator->EnableSliceImageCache();
-
-    auto origin = planeGeometry->GetOrigin();
-
-    for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
+    // The try starts here (not at the loop) so that a throw from New() or
+    // TimePointToTimeStep() under memory pressure still rewinds the progress steps.
+    try
     {
-      slicedGeometry->WorldToIndex(origin, origin);
-      origin[sliceDimension] = sliceIndex;
-      slicedGeometry->IndexToWorld(origin, origin);
-      planeGeometry->SetOrigin(origin);
+      m_Interpolator->EnableSliceImageCache();
 
-      auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
+      // Reuse interpolation algorithm instance for each slice to cache boundary calculations
+      auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
 
-      if (interpolation.IsNotNull())
+      auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
+
+      auto origin = planeGeometry->GetOrigin();
+
+      for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
       {
-        // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
-        auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+        slicedGeometry->WorldToIndex(origin, origin);
+        origin[sliceDimension] = sliceIndex;
+        slicedGeometry->IndexToWorld(origin, origin);
+        planeGeometry->SetOrigin(origin);
 
-        // Set overwrite mode to true to write back to the image volume
-        reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
-        reslicer->SetOverwriteMode(true);
-        reslicer->Modified();
+        auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
 
-        auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+        if (interpolation.IsNotNull())
+        {
+          // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
+          auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
-        diffSliceWriter->SetInput(diffImage);
-        diffSliceWriter->SetTimeStep(0);
-        diffSliceWriter->SetWorldGeometry(planeGeometry);
-        diffSliceWriter->SetVtkOutputRequest(true);
-        diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
-        diffSliceWriter->Modified();
-        diffSliceWriter->Update();
+          // Set overwrite mode to true to write back to the image volume
+          reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
+          reslicer->SetOverwriteMode(true);
+          reslicer->Modified();
 
-        ++totalChangedSlices;
+          auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+
+          diffSliceWriter->SetInput(diffImage);
+          diffSliceWriter->SetTimeStep(0);
+          diffSliceWriter->SetWorldGeometry(planeGeometry);
+          diffSliceWriter->SetVtkOutputRequest(true);
+          diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
+          diffSliceWriter->Modified();
+          diffSliceWriter->Update();
+
+          ++totalChangedSlices;
+        }
+
+        mitk::ProgressBar::GetInstance()->Progress();
+        ++completedSlices;
       }
 
-      mitk::ProgressBar::GetInstance()->Progress();
-    }
+      m_Interpolator->DisableSliceImageCache();
 
-    m_Interpolator->DisableSliceImageCache();
-
-    if (totalChangedSlices > 0)
-    {
-      const auto activeLabel = m_Segmentation->GetActiveLabel();
-      if (nullptr == activeLabel)
+      if (totalChangedSlices > 0)
       {
-        MITK_ERROR << "AcceptAllInterpolations: no active label set.";
-        return;
+        const auto activeLabel = m_Segmentation->GetActiveLabel();
+        if (nullptr == activeLabel)
+        {
+          MITK_ERROR << "AcceptAllInterpolations: no active label set.";
+          return;
+        }
+        auto newDestinationLabel = activeLabel->GetValue();
+        auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
+
+        // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
+        mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
+
+        TransferLabelContentAtTimeStep(
+          diffImage,
+          m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()),
+          m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(m_Segmentation->GetActiveLayer())),
+          timeStep,
+          0,
+          0,
+          false,
+          { {1, newDestinationLabel} },
+          mitk::MultiLabelSegmentation::MergeStyle::Merge,
+          mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+        // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
+        activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
+
+        std::string name = "3D-interpolation - " + activeLabelName;
+
+        undoHelper.RegisterUndoRedoOperationEvent(name);
       }
-      auto newDestinationLabel = activeLabel->GetValue();
-      auto activeLabelName = mitk::LabelSetImageHelper::CreateDisplayLabelName(m_Segmentation, activeLabel);
-
-      // noLabels=false: include label-property snapshots so the "Interpolation" stamp below is captured by undo/redo.
-      mitk::SegGroupModifyUndoRedoHelper undoHelper(m_Segmentation, { m_Segmentation->GetActiveLayer() }, false, timeStep, false, false, true);
-
-      TransferLabelContentAtTimeStep(
-        diffImage,
-        m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()),
-        m_Segmentation->GetConstLabelsByValue(m_Segmentation->GetLabelValuesByGroup(m_Segmentation->GetActiveLayer())),
-        timeStep,
-        0,
-        0,
-        false,
-        { {1, newDestinationLabel} },
-        mitk::MultiLabelSegmentation::MergeStyle::Merge,
-        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
-
-      // Before RegisterUndoRedoOperationEvent so the redo snapshot captures the stamp (noLabels=false).
-      activeLabel->AddToolUse(mitk::Label::AlgorithmType::SEMIAUTOMATIC, INTERPOLATION_PROVENANCE_NAME);
-
-      std::string name = "3D-interpolation - " + activeLabelName;
-
-      undoHelper.RegisterUndoRedoOperationEvent(name);
     }
+    catch (...)
+    {
+      // The slice cache must not outlive this method: it is keyed only by slice
+      // index and time step, so a later run would silently reuse stale slices.
+      m_Interpolator->DisableSliceImageCache();
+
+      if (completedSlices < numSlices)
+        mitk::ProgressBar::GetInstance()->Progress(numSlices - completedSlices);
+
+      m_FeedbackNode->SetData(nullptr);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      throw;
+    }
+
     m_FeedbackNode->SetData(nullptr);
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSlicesInterpolator::AcceptAllInterpolationsWithErrorHandling(mitk::SliceNavigationController *slicer)
+{
+  try
+  {
+    this->AcceptAllInterpolations(slicer);
+  }
+  catch (const std::bad_alloc&)
+  {
+    MITK_ERROR << "Not enough memory to accept all interpolations.";
+    ShowInterpolationError(this, "There is not enough memory.");
+  }
+  catch (const itk::MemoryAllocationError&)
+  {
+    // ITK reports allocation failures as this type instead of std::bad_alloc.
+    MITK_ERROR << "Not enough memory to accept all interpolations.";
+    ShowInterpolationError(this, "There is not enough memory.");
+  }
+  catch (const itk::ExceptionObject& e)
+  {
+    // Covers mitk::Exception and the plain ITK exceptions thrown by the filters
+    // in the interpolation pipeline (e.g. distance-map computation).
+    // GetDescription() is the plain message; what() would prepend source file and line.
+    MITK_ERROR << "Error while accepting all interpolations: " << e.what();
+    ShowInterpolationError(this, QString::fromUtf8(e.GetDescription()));
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Error while accepting all interpolations: " << e.what();
+    ShowInterpolationError(this, QString::fromUtf8(e.what()));
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unknown error while accepting all interpolations.";
+    ShowInterpolationError(this, "The cause could not be determined.");
+  }
 }
 
 void QmitkSlicesInterpolator::FinishInterpolation(mitk::SliceNavigationController *slicer)
@@ -1006,7 +1080,7 @@ void QmitkSlicesInterpolator::FinishInterpolation(mitk::SliceNavigationControlle
   if (slicer == nullptr)
     OnAcceptAllInterpolationsClicked();
   else
-    AcceptAllInterpolations(slicer);
+    this->AcceptAllInterpolationsWithErrorHandling(slicer);
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
@@ -1194,40 +1268,9 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
 {
-  try
-  {
-    auto iter = m_ActionToSlicerMap.find(action);
-    if (iter != m_ActionToSlicerMap.end())
-    {
-      mitk::SliceNavigationController *slicer = iter->second;
-      this->AcceptAllInterpolations(slicer);
-    }
-  }
-  catch (const std::bad_alloc&)
-  {
-    MITK_ERROR << "Not enough memory to accept all interpolations.";
-
-    QMessageBox::critical(this, "Interpolation Process",
-      "An error occurred during interpolation: not enough memory.");
-  }
-  catch (const std::exception& e)
-  {
-    MITK_ERROR << "Error while accepting all interpolations: " << e.what();
-
-    QMessageBox errorInfo(this);
-    errorInfo.setWindowTitle("Interpolation Process");
-    errorInfo.setIcon(QMessageBox::Critical);
-    errorInfo.setText("An error occurred during interpolation.");
-    errorInfo.setInformativeText(QString::fromUtf8(e.what()));
-    errorInfo.exec();
-  }
-  catch (...)
-  {
-    MITK_ERROR << "Unknown error while accepting all interpolations.";
-
-    QMessageBox::critical(this, "Interpolation Process",
-      "An unknown error occurred during interpolation.");
-  }
+  auto iter = m_ActionToSlicerMap.find(action);
+  if (iter != m_ActionToSlicerMap.end())
+    this->AcceptAllInterpolationsWithErrorHandling(iter->second);
 }
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)

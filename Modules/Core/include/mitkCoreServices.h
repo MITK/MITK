@@ -37,6 +37,7 @@ namespace mitk
   class IPropertyFilters;
   class IPropertyPersistence;
   class IPropertyRelations;
+  class IPropertyTransience;
   class IPreferencesService;
 
   /**
@@ -123,6 +124,13 @@ namespace mitk
     * @return A non-nullptr IPropertyRelations instance.
     */
     static IPropertyRelations *GetPropertyRelations(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+    * @brief Get an IPropertyTransience instance.
+    * @param context The module context of the module getting the service.
+    * @return A non-nullptr IPropertyTransience instance.
+    */
+    static IPropertyTransience *GetPropertyTransience(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Get an IMimeTypeProvider instance.

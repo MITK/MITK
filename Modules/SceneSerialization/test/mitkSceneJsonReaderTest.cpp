@@ -80,6 +80,7 @@ class mitkSceneJsonReaderTestSuite : public mitk::TestFixture
   MITK_TEST(TestUnknownMetaKeyIgnored);
   MITK_TEST(TestInlineAndFileMutuallyExclusive);
   MITK_TEST(TestContextPropertiesApplied);
+  MITK_TEST(TestTransientPropertyStrippedOnLoad);
   MITK_TEST(TestParentChildRelationship);
   MITK_TEST(TestEmptyContextKeyRejected);
   MITK_TEST(TestNullContextKeyRejected);
@@ -282,6 +283,34 @@ public:
     CPPUNIT_ASSERT(ctxList != nullptr);
     auto *prop = ctxList->GetProperty("opacity");
     CPPUNIT_ASSERT(prop != nullptr);
+  }
+
+  void TestTransientPropertyStrippedOnLoad()
+  {
+    // 'selected' is registered transient for any data type and must be dropped
+    // on load, from both the default and named (context) property lists, so a
+    // reloaded scene does not resurrect UI state. Mirrors SceneReaderV1 (XML).
+    TempFile file(".mitkscene.json");
+    file.Write(R"({"type":"org.mitk.scene","version":1,"nodes":[
+      {"properties":{"name":"n","selected":true},
+       "context_properties":{"stdmulti.widget0":{"selected":true}}}
+    ]})");
+
+    auto reader = mitk::SceneJsonReader::New();
+    auto storage = mitk::StandaloneDataStorage::New();
+    CPPUNIT_ASSERT(reader->LoadScene(file.Path(), storage));
+
+    auto node = storage->GetNamedNode("n");
+    CPPUNIT_ASSERT(node != nullptr);
+
+    bool selected = false;
+    CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be applied from the default list",
+                           !node->GetBoolProperty("selected", selected) || !selected);
+
+    auto *ctxList = node->GetPropertyList("stdmulti.widget0");
+    CPPUNIT_ASSERT(ctxList != nullptr);
+    CPPUNIT_ASSERT_MESSAGE("Transient 'selected' must not be applied from a context list",
+                           ctxList->GetProperty("selected") == nullptr);
   }
 
   void TestParentChildRelationship()

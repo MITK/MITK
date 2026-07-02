@@ -431,6 +431,11 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
 
     if (readProperties.IsNotNull())
     {
+      // Drop transient properties (e.g. the "selected" UI flag) that may be
+      // present in older scene files, so reloading does not resurrect runtime
+      // or UI state. Transience is decided per the node's BaseData type.
+      mitk::SceneReaderHelpers::StripTransientProperties(*readProperties, node->GetData());
+
       propertyList->ConcatenatePropertyList(readProperties, true); // true = replace
     }
     else

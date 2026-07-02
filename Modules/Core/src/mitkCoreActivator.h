@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkPropertyFilters.h>
 #include <mitkPropertyPersistence.h>
 #include <mitkPropertyRelations.h>
+#include <mitkPropertyTransience.h>
 #include "mitkPreferencesService.h"
 
 // Micro Services
@@ -101,6 +102,7 @@ private:
   std::unique_ptr<mitk::PropertyFilters> m_PropertyFilters;
   std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
   std::unique_ptr<mitk::PropertyRelations> m_PropertyRelations;
+  std::unique_ptr<mitk::PropertyTransience> m_PropertyTransience;
   std::unique_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
   std::unique_ptr<mitk::PreferencesService> m_PreferencesService;
 

@@ -449,15 +449,6 @@ private:
   // button; older versions report no support and the button stays disabled.
   bool m_SupportsUndo = false;
 
-  // Once-per-session guards for the network-backed checks run in Install(): the
-  // online "newer release available" version check and the model-switch prompt.
-  // Set only when the network was actually reached (so an offline failure
-  // retries) and reset on session teardown in OnSessionEnded() so a reinitialize
-  // checks again. Member-scoped, not process-static, so they track this GUI's
-  // session lifecycle rather than persisting for the whole run.
-  bool m_OnlineUpdateCheckDone = false;
-  bool m_ModelSwitchCheckDone = false;
-
   QTimer* m_HeartbeatTimer = nullptr;
 
   // Set when a lost remote session is being torn down so a second

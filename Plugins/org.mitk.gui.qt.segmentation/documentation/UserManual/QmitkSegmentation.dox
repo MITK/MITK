@@ -520,7 +520,7 @@ A client-only installation can only run remotely, so its inference mode is fixed
 
 Under <i>Model</i>, nnInteractive uses a recommended checkpoint that is downloaded from Hugging Face by default.
 You can select a different checkpoint from the list or point nnInteractive to a checkpoint folder already present on disk.
-When you run locally with a downloaded checkpoint and a newer recommended checkpoint becomes available, MITK offers to switch to it once per session.
+When you run locally with a downloaded checkpoint and a newer recommended checkpoint becomes available, MITK offers to switch to it once per application run.
 Once a session is running, the checkpoint's license is shown in the tool, directly below the <b>Initialize</b> button.
 
 Under <i>Computation backend</i> you can switch between <i>Auto</i> (default), <i>CPU</i>, and <i>GPU</i>.

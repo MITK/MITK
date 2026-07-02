@@ -54,6 +54,17 @@ namespace
 {
   constexpr auto LINE_HEIGHT_STYLE = "style='line-height: 1.25'";
 
+  // Once-per-application-run guards for the network-backed checks in Install():
+  // the online "newer release available" version check and the model-switch
+  // prompt. Set after the first attempt, successful or not, so a permanently
+  // offline machine pays the failed network attempts only once per run; a
+  // temporarily offline user gets the checks again on the next application
+  // start. Process-static on purpose: the tool GUI is recreated on every tool
+  // activation, the answers do not change within one run, and once venv modules
+  // are loaded an in-place update is blocked until restart anyway.
+  bool onlineUpdateCheckDone = false;
+  bool modelSwitchCheckDone = false;
+
   // Qt::Key_A..Qt::Key_Z are 0x41..0x5a and coincide with the ASCII codes
   // of the uppercase letters, so the same constant drives the QShortcut,
   // the tooltip hint, and the label suffix.
@@ -401,18 +412,16 @@ bool QmitknnInteractiveToolGUI::Install()
       // A reused virtual environment can hold an nnInteractive that predates this
       // MITK build (the venv survives MITK upgrades). The offline minimum check
       // runs on every initialize; the online "newer release available" check runs
-      // at most once per initialized session so an offline user never waits on the
-      // PyPI timeout repeatedly. The guard is reset on session teardown (see
-      // OnSessionEnded), so a later reinitialize checks again.
-      const bool checkForUpdate = !m_OnlineUpdateCheckDone;
+      // at most once per application run so an offline user never waits on the
+      // PyPI timeout repeatedly.
+      const bool checkForUpdate = !onlineUpdateCheckDone;
       const auto versionCheck = mitk::nnInteractive::CheckInstalledVersion(
         *this->GetTool()->GetPythonContext(), checkForUpdate, distributionName);
 
-      // A non-empty Latest means PyPI was actually reached; an empty one means the
-      // query was skipped or the network was unreachable. Only mark the check done
-      // when it really ran, so an offline failure retries on the next initialize.
-      if (checkForUpdate && !versionCheck.Latest.empty())
-        m_OnlineUpdateCheckDone = true;
+      // Attempt-based: the PyPI query blocks the GUI for up to its 5 s timeout,
+      // so even a failed (offline) attempt counts and is not repeated this run.
+      if (checkForUpdate)
+        onlineUpdateCheckDone = true;
 
       if (versionCheck.Status == mitk::nnInteractive::VersionStatus::BelowMinimum ||
           versionCheck.Status == mitk::nnInteractive::VersionStatus::UpdateAvailable)
@@ -526,10 +535,9 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
   if (m_Preferences->Get("nnInteractive/modelSource", "huggingface") == "local")
     return;
 
-  // The manifest refresh hits the network, so check at most once per initialized
-  // session; the guard is reset on session teardown (see OnSessionEnded) so a
-  // later reinitialize checks again.
-  if (m_ModelSwitchCheckDone)
+  // The manifest refresh hits the network behind a visible progress dialog, so
+  // check at most once per application run.
+  if (modelSwitchCheckDone)
     return;
 
   const auto selectedId = m_Preferences->Get("nnInteractive/modelCheckpoint", "");
@@ -539,13 +547,10 @@ void QmitknnInteractiveToolGUI::MaybePromptModelSwitch(bool localAvailable)
   // GUI) so the Workbench stays responsive and the user can cancel.
   const auto check = mitk::nnInteractive::CheckModelUpdate(this->GetTool()->GetVirtualEnvName(), selectedId, this);
 
-  // Unknown means the manifest could not be refreshed (offline, no model
-  // management). Leave the guard unset so the check retries next time rather than
-  // marking a network failure as done.
-  if (check.Status == mitk::nnInteractive::ModelUpdateStatus::Unknown)
-    return;
-
-  m_ModelSwitchCheckDone = true;
+  // Attempt-based: even an Unknown result (offline without a cached manifest,
+  // or the user cancelled the progress dialog) counts, so the dialog does not
+  // reappear on every initialize of this run.
+  modelSwitchCheckDone = true;
 
   if (check.Status != mitk::nnInteractive::ModelUpdateStatus::UpdateAvailable)
     return;
@@ -1131,12 +1136,6 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
 
   // No session is running now; revert the Confirm button to its base label.
   this->UpdateConfirmButtonLabel();
-
-  // Re-arm the once-per-session network checks so the next initialize re-runs the
-  // version-update and model-switch prompts (covers uninitialize/reinitialize and
-  // preference changes made between sessions).
-  m_OnlineUpdateCheckDone = false;
-  m_ModelSwitchCheckDone = false;
 }
 
 void QmitknnInteractiveToolGUI::OnHeartbeatTimeout()

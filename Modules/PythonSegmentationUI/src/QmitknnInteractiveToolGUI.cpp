@@ -785,6 +785,12 @@ void QmitknnInteractiveToolGUI::OnInitializeButtonToggled(bool checked)
 void QmitknnInteractiveToolGUI::OnSettingsButtonClicked()
 {
   mitk::CoreServices::GetPreferencesService()->OpenPreferencesDialog("org.mitk.gui.qt.application.nnInteractionPreferencePage");
+
+  // The preferences dialog is modal; on return the user may have uninstalled
+  // nnInteractive there. That fires no preference event when the recorded
+  // install mode does not change (a full install was uninstalled), so
+  // re-evaluate the label here.
+  this->UpdateInitializeButtonText();
 }
 
 void QmitknnInteractiveToolGUI::OnResetInteractionsButtonClicked()
@@ -1116,11 +1122,11 @@ void QmitknnInteractiveToolGUI::OnSessionEnded()
   m_Ui->interactionToolsGroupBox->setEnabled(false);
 
   // Re-enable Initialize and uncheck it without re-triggering
-  // OnInitializeButtonToggled, then restore the idle label now that no session
-  // is running (the session has already been torn down when this fires).
+  // OnInitializeButtonToggled; unchecking also restores the idle label now
+  // that no session is running (the session has already been torn down when
+  // this fires).
   this->UncheckInitializeButton();
   m_Ui->initializeButton->setEnabled(true);
-  this->UpdateInitializeButtonText();
   m_Ui->settingsButton->setEnabled(true);
 
   // No session is running now; revert the Confirm button to its base label.
@@ -1335,14 +1341,25 @@ void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreference
 void QmitknnInteractiveToolGUI::UpdateInitializeButtonText()
 {
   // While a session is running the button uninitializes, so it reads
-  // "Uninitialize". Otherwise it shows what the next click will do, reflecting
-  // the configured inference mode. This is the single source of truth and is
+  // "Uninitialize". Otherwise it shows what the next click will do: install
+  // first if nnInteractive is missing, or initialize according to the
+  // configured inference mode. This is the single source of truth and is
   // also called on inference-mode preference changes, so the running-session
   // guard keeps it from clobbering "Uninitialize" mid-session.
   auto* tool = this->GetTool();
   if (tool != nullptr && tool->IsSessionRunning())
   {
     m_Ui->initializeButton->setText("Uninitialize");
+    return;
+  }
+
+  // Without the virtual environment, the next click installs first. The venv
+  // check is a plain filesystem probe (no Python context involved), cheap
+  // enough to run on every label update, and matches the first gate in
+  // Install(), so the label predicts what the click will actually do.
+  if (tool != nullptr && !mitk::PythonHelper::VirtualEnvExists(tool->GetVirtualEnvName()))
+  {
+    m_Ui->initializeButton->setText("Install nnInteractive");
     return;
   }
 
@@ -1357,8 +1374,15 @@ void QmitknnInteractiveToolGUI::UncheckInitializeButton()
 {
   // Revert the toggle without re-entering OnInitializeButtonToggled, which would
   // immediately start or end a session against the user's intent.
-  QSignalBlocker blocker(m_Ui->initializeButton);
-  m_Ui->initializeButton->setChecked(false);
+  {
+    QSignalBlocker blocker(m_Ui->initializeButton);
+    m_Ui->initializeButton->setChecked(false);
+  }
+
+  // Every path that reverts the toggle may have changed the install state just
+  // before (install cancelled, or completed without a session start), so
+  // re-evaluate the label here.
+  this->UpdateInitializeButtonText();
 }
 
 bool QmitknnInteractiveToolGUI::IsAutoConfirmEnabled() const

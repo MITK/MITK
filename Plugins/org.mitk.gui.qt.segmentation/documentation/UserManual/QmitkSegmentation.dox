@@ -475,7 +475,7 @@ A truly interactive experience is only achievable on high-performance GPUs such 
 \subsubsection org_mitk_views_segmentation3dnninteractive_install Installation
 
 Before its first use, nnInteractive must be installed.
-The first time you click <b>Initialize</b>, MITK asks which kind of installation you want.
+While it is not installed, the <b>Initialize</b> button reads <b>Install nnInteractive</b>; clicking it asks which kind of installation you want.
 Choose <b>Full</b> to install nnInteractive together with PyTorch and a model checkpoint; this enables both local inference on your own machine and connecting to a remote server.
 Choose <b>Client only</b> for a lightweight installation that can connect to a remote nnInteractive server but cannot run inference locally.
 If you are unsure, pick <b>Full</b>.

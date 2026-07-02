@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkSegmentationInterpolationAlgorithm_h
 
 #include <mitkCommon.h>
+#include <mitkExceptionMacro.h>
 #include <mitkImage.h>
 #include <MitkSegmentationExports.h>
 
@@ -21,6 +22,16 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /**
+   * \brief Exception thrown when a segmentation interpolation algorithm cannot
+   * compute a result from its input slices.
+   */
+  class MITKSEGMENTATION_EXPORT SegmentationInterpolationException : public Exception
+  {
+  public:
+    mitkExceptionClassMacro(SegmentationInterpolationException, Exception);
+  };
+
   /**
    * \brief Interface class for interpolation algorithms
    *

@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkShapeBasedInterpolationAlgorithm.h>
+#include <mitkExceptionMacro.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
@@ -132,12 +133,13 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
 
   lowerIter.GoToBegin();
 
-  if (!lowerITK->GetLargestPossibleRegion().IsInside(upperITK->GetLargestPossibleRegion()) ||
-      !lowerITK->GetLargestPossibleRegion().IsInside(result->GetLargestPossibleRegion()))
+  // The loop below iterates the full lower region and accesses upper and result
+  // at the same indices, so all three regions must match exactly.
+  if (lowerITK->GetLargestPossibleRegion() != upperITK->GetLargestPossibleRegion() ||
+      lowerITK->GetLargestPossibleRegion() != result->GetLargestPossibleRegion())
   {
-    // TODO Exception etc.
-    MITK_ERROR << "The regions of the slices for the 2D interpolation are not equally sized!";
-    return;
+    mitkThrowException(mitk::SegmentationInterpolationException)
+      << "The regions of the slices for the 2D interpolation are not equally sized.";
   }
 
   float weight[2] = {1.0f - ratio, ratio};

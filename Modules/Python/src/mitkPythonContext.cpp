@@ -117,14 +117,8 @@ mitk::PythonContext::PythonContext(const std::string& venvName)
   m_Impl = std::make_unique<Impl>();
 }
 
-void mitk::PythonContext::Activate()
+void mitk::PythonContext::Activate(bool importBindings)
 {
-  std::string appPath = IOUtil::GetAppBundlePath(IOUtil::AppBundlePath::Parent).string();
-
-#if defined(_WIN32)
-  std::replace(appPath.begin(), appPath.end(), '\\', '/');
-#endif
-
   std::ostringstream pyCommands; pyCommands
     << "import os, site, sys\n"
     << "def add_site_packages(base_path):\n"
@@ -135,12 +129,29 @@ void mitk::PythonContext::Activate()
     << "        site_packages = os.path.join(base_path, 'lib', version, 'site-packages')\n"
     << "    if site_packages not in sys.path:\n"
     << "        site.addsitedir(site_packages)\n"
-    << "add_site_packages(sys.base_prefix)\n"
-    << "import numpy as np\n"
-    << "app_dir = '" << appPath << "'\n"
-    << "if app_dir not in sys.path:\n"
-    << "    sys.path.insert(0, app_dir)\n"
-    << "import mitk\n"
+    << "add_site_packages(sys.base_prefix)\n";
+
+  // Importing NumPy (and the MITK module, which pulls it in) maps the venv's
+  // compiled extensions on Linux, where the venv is sys.prefix. Skip it for
+  // metadata-only contexts so an "is any venv module loaded?" check stays
+  // honest. See Activate()'s documentation.
+  if (importBindings)
+  {
+    std::string appPath = IOUtil::GetAppBundlePath(IOUtil::AppBundlePath::Parent).string();
+
+#if defined(_WIN32)
+    std::replace(appPath.begin(), appPath.end(), '\\', '/');
+#endif
+
+    pyCommands
+      << "import numpy as np\n"
+      << "app_dir = '" << appPath << "'\n"
+      << "if app_dir not in sys.path:\n"
+      << "    sys.path.insert(0, app_dir)\n"
+      << "import mitk\n";
+  }
+
+  pyCommands
     << "venv = os.environ.get('VIRTUAL_ENV')\n"
     << "if venv:\n"
     << "    add_site_packages(venv)\n";

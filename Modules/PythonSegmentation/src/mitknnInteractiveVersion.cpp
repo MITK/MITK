@@ -108,7 +108,11 @@ mitk::nnInteractive::VersionCheckResult mitk::nnInteractive::CheckInstalledVersi
   try
   {
     PythonContext context("nnInteractive");
-    context.Activate();
+
+    // Metadata-only: read the installed version and query PyPI without importing
+    // NumPy or the MITK module, so this check never maps a venv native library
+    // (which on Linux would then read back as "loaded" and block the update).
+    context.Activate(false);
 
     return CheckInstalledVersion(context, checkForUpdate, distributionName);
   }

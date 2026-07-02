@@ -73,15 +73,27 @@ namespace mitk
      * \brief Initializes the Python interpreter context and sets up module
      *        paths.
      *
-     * Adds the application path and the active virtual environment's
-     * site-packages to the Python sys.path. Also imports NumPy and MITK Python
-     * modules.
+     * Always adds the base interpreter's and the active virtual environment's
+     * site-packages to sys.path, so a distribution installed in the venv is
+     * importable and its metadata is readable. With \p importBindings (the
+     * default) it additionally imports NumPy and the MITK Python module for
+     * data exchange.
+     *
+     * Pass \c false to keep the context free of any venv native library. On
+     * Linux the activated venv becomes sys.prefix, so its site-packages
+     * precede the base on sys.path and importing NumPy would load it (and its
+     * compiled extensions) from the venv. A later "is any venv module loaded?"
+     * check would then report true and block an in-place update or uninstall.
+     * Metadata-only work (version and install probes) must therefore activate
+     * without bindings.
+     *
+     * \param[in] importBindings Import NumPy and the MITK module when \c true.
      *
      * \pre The PythonContext has been constructed.
      *
      * \throw mitk::Exception if any of the Python initialization commands fail.
      */
-    void Activate();
+    void Activate(bool importBindings = true);
 
     /**
      * \brief Checks whether a Python variable with the given name exists.

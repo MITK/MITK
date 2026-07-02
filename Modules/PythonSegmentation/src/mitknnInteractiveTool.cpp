@@ -742,7 +742,7 @@ const std::vector<std::pair<std::string, std::string>>& mitk::nnInteractiveTool:
     { "nnInteractive/localModelPath", "" },
     { "nnInteractive/backend", "auto" },
     { "nnInteractive/gpuBackend", "cuda:0" },
-    { "nnInteractive/useTorchCompile", "false" },
+    { "nnInteractive/useTorchCompile", "true" },
     { "nnInteractive/interactionsStorage", "auto" },
   };
 
@@ -1117,7 +1117,7 @@ void mitk::nnInteractiveTool::ConstructLocalSession()
   // then the backend switched to CPU or auto-fell back to CPU.
   bool useTorchCompile = false;
 #if defined(__linux__)
-  useTorchCompile = useCUDADevice && prefs->GetBool("nnInteractive/useTorchCompile", false);
+  useTorchCompile = useCUDADevice && prefs->GetBool("nnInteractive/useTorchCompile", true);
 #endif
 
   // Storage backend for the interaction tensor. "auto" (the library default)

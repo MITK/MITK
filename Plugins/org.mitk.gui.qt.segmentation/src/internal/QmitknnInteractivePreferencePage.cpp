@@ -205,7 +205,7 @@ void QmitknnInteractivePreferencePage::Update()
   const auto showShortcutsInLabels = prefs->GetBool("nnInteractive/showShortcutsInLabels", true);
   const auto backend = prefs->Get("nnInteractive/backend", "auto");
   const auto gpuBackend = prefs->Get("nnInteractive/gpuBackend", "cuda:0");
-  const auto useTorchCompile = prefs->GetBool("nnInteractive/useTorchCompile", false);
+  const auto useTorchCompile = prefs->GetBool("nnInteractive/useTorchCompile", true);
   const auto interactionsStorage = prefs->Get("nnInteractive/interactionsStorage", "auto");
   const auto modelCheckpoint = prefs->Get("nnInteractive/modelCheckpoint", "");
   const auto modelSource = prefs->Get("nnInteractive/modelSource", "huggingface");

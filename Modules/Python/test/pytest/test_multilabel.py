@@ -1063,6 +1063,10 @@ class TestErrorPaths:
             time_step=0, source_time_step=0),
         lambda s: s.add_label(mitk.Label(1, "x"), 999),
         lambda s: s.add_label("x", (1.0, 0.0, 0.0), 999),
+        lambda s: s.create_filtered_group_image(999, []),
+        lambda s: s.create_label_class_map(999),
+        lambda s: s.split_labels_by_class_name(999),
+        lambda s: s.split_labels_by_class_name(999, labels=[]),
     ])
     def test_bad_group_index_raises_index_error(self, seg, call):
         with pytest.raises(IndexError):
@@ -1074,6 +1078,8 @@ class TestErrorPaths:
         lambda s: s.rename_label(9999, "x", (0.0, 0.0, 0.0)),
         lambda s: s.erase_label(9999),
         lambda s: s.get_group_of_label(9999),
+        lambda s: s.merge_labels(9999, []),
+        lambda s: s.create_label_mask(9999),
     ])
     def test_missing_label_raises_key_error(self, seg, call):
         with pytest.raises(KeyError):

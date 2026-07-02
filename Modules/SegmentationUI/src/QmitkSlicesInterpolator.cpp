@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <mitkColorProperty.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkExceptionMacro.h>
 #include <mitkInteractionConst.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkOperationEvent.h>
@@ -65,8 +66,6 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 
 #include <array>
-#include <atomic>
-#include <thread>
 #include <vector>
 
 namespace
@@ -705,8 +704,15 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane)
   // calculate real slice position, i.e. slice of the image
   mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation->GetGroupImage(m_Segmentation->GetActiveLayer()), plane, clickedSliceDimension, clickedSliceIndex);
 
-  mitk::Image::Pointer interpolation =
-    m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
+  mitk::Image::Pointer interpolation;
+  try
+  {
+    interpolation = m_Interpolator->Interpolate(clickedSliceDimension, clickedSliceIndex, plane, timeStep);
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Error while interpolating slice for preview: " << e.what();
+  }
   m_FeedbackNode->SetData(interpolation);
 
   //  maybe just have a variable that stores the active label color.
@@ -868,7 +874,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     }
     catch (const std::exception& e)
     {
-      MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
+      mitkThrow() << "Cannot accept all interpolations. Could not create mask of active label (value: "
+                  << m_CurrentActiveLabelValue << "). Reason: " << e.what();
     }
     m_Interpolator->SetSegmentationVolume(activeLabelImage);
 
@@ -906,71 +913,50 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     const auto numSlices = m_Segmentation->GetDimensions()[sliceDimension];
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
-    std::atomic_uint totalChangedSlices;
+    unsigned int totalChangedSlices = 0;
 
     // Reuse interpolation algorithm instance for each slice to cache boundary calculations
     auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
 
-    // Distribute slice interpolations to multiple threads
-    const auto numThreads = std::min(std::thread::hardware_concurrency(), numSlices);
-    std::vector<std::vector<unsigned int>> sliceIndices(numThreads);
-
-    for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
-      sliceIndices[sliceIndex % numThreads].push_back(sliceIndex);
-
-    std::vector<std::thread> threads;
-    threads.reserve(numThreads);
-
     auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(m_TimePoint);
 
-    // This lambda will be executed by the threads
-    auto interpolate = [=, &interpolator = m_Interpolator, &totalChangedSlices](unsigned int threadIndex)
-    {
-      auto clonedPlaneGeometry = planeGeometry->Clone();
-      auto origin = clonedPlaneGeometry->GetOrigin();
-
-      //  Go through the sliced indices
-      for (auto sliceIndex : sliceIndices[threadIndex])
-      {
-        slicedGeometry->WorldToIndex(origin, origin);
-        origin[sliceDimension] = sliceIndex;
-        slicedGeometry->IndexToWorld(origin, origin);
-        clonedPlaneGeometry->SetOrigin(origin);
-
-        auto interpolation = interpolator->Interpolate(sliceDimension, sliceIndex, clonedPlaneGeometry, timeStep, algorithm);
-
-        if (interpolation.IsNotNull())
-        {
-          // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
-          auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-
-          // Set overwrite mode to true to write back to the image volume
-          reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
-          reslicer->SetOverwriteMode(true);
-          reslicer->Modified();
-
-          auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
-
-          diffSliceWriter->SetInput(diffImage);
-          diffSliceWriter->SetTimeStep(0);
-          diffSliceWriter->SetWorldGeometry(clonedPlaneGeometry);
-          diffSliceWriter->SetVtkOutputRequest(true);
-          diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
-          diffSliceWriter->Modified();
-          diffSliceWriter->Update();
-
-          ++totalChangedSlices;
-        }
-
-        mitk::ProgressBar::GetInstance()->Progress();
-      }
-    };
     m_Interpolator->EnableSliceImageCache();
 
-    //  Do the interpolation here.
-    for (size_t threadIndex = 0; threadIndex < numThreads; ++threadIndex)
+    auto origin = planeGeometry->GetOrigin();
+
+    for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
     {
-      interpolate(threadIndex);
+      slicedGeometry->WorldToIndex(origin, origin);
+      origin[sliceDimension] = sliceIndex;
+      slicedGeometry->IndexToWorld(origin, origin);
+      planeGeometry->SetOrigin(origin);
+
+      auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
+
+      if (interpolation.IsNotNull())
+      {
+        // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
+        auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+
+        // Set overwrite mode to true to write back to the image volume
+        reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
+        reslicer->SetOverwriteMode(true);
+        reslicer->Modified();
+
+        auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+
+        diffSliceWriter->SetInput(diffImage);
+        diffSliceWriter->SetTimeStep(0);
+        diffSliceWriter->SetWorldGeometry(planeGeometry);
+        diffSliceWriter->SetVtkOutputRequest(true);
+        diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
+        diffSliceWriter->Modified();
+        diffSliceWriter->Update();
+
+        ++totalChangedSlices;
+      }
+
+      mitk::ProgressBar::GetInstance()->Progress();
     }
 
     m_Interpolator->DisableSliceImageCache();
@@ -1217,16 +1203,30 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
       this->AcceptAllInterpolations(slicer);
     }
   }
-  catch (...)
+  catch (const std::bad_alloc&)
   {
-    /* Showing message box with possible memory error */
-    QMessageBox errorInfo;
+    MITK_ERROR << "Not enough memory to accept all interpolations.";
+
+    QMessageBox::critical(this, "Interpolation Process",
+      "An error occurred during interpolation: not enough memory.");
+  }
+  catch (const std::exception& e)
+  {
+    MITK_ERROR << "Error while accepting all interpolations: " << e.what();
+
+    QMessageBox errorInfo(this);
     errorInfo.setWindowTitle("Interpolation Process");
     errorInfo.setIcon(QMessageBox::Critical);
-    errorInfo.setText("An error occurred during interpolation. Possible cause: Not enough memory!");
+    errorInfo.setText("An error occurred during interpolation.");
+    errorInfo.setInformativeText(QString::fromUtf8(e.what()));
     errorInfo.exec();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unknown error while accepting all interpolations.";
 
-    std::cerr << "Ill construction in " __FILE__ " l. " << __LINE__ << std::endl;
+    QMessageBox::critical(this, "Interpolation Process",
+      "An unknown error occurred during interpolation.");
   }
 }
 

@@ -61,6 +61,8 @@ namespace QmitkVenvProcess
    * Blocks the calling thread, so run it from a worker thread (e.g. via
    * QmitkRunAsyncBlocking) rather than directly on the GUI thread.
    *
+   * \param executable The executable to run.
+   * \param args Command-line arguments passed to \p executable.
    * \param finishedTimeoutMs Milliseconds to wait for completion; a negative
    *        value waits indefinitely. On start failure or timeout the process is
    *        killed and Result::success stays false.

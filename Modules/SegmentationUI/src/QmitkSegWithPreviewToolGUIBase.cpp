@@ -76,6 +76,26 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     //would behave. As soon as it is sorted out we can remove that "feature switch"
     //or the comment.
 
+    // Create the preview visibility checkbox, its heading, and the opacity
+    // slider before InitializeUI() so derived tool GUIs can attach shortcuts to
+    // them, just as they can to m_ConfirmSegBtn (created above). The layout is
+    // assembled further below.
+    m_PreviewLabel = new QLabel("Preview visibility", this);
+
+    m_PreviewVisibleCheckBox = new QCheckBox(this);
+    m_PreviewVisibleCheckBox->setChecked(m_Tool->GetPreviewVisibility());
+    m_PreviewVisibleCheckBox->setToolTip("Toggle visibility of the preview segmentation.");
+    connect(m_PreviewVisibleCheckBox, &QCheckBox::toggled,
+            this, &QmitkSegWithPreviewToolGUIBase::OnPreviewVisibilityToggled);
+
+    m_PreviewOpacitySlider = new QSlider(Qt::Horizontal, this);
+    m_PreviewOpacitySlider->setRange(0, 100);
+    m_PreviewOpacitySlider->setValue(static_cast<int>(m_Tool->GetPreviewOpacity() * 100));
+    m_PreviewOpacitySlider->setToolTip("Adjust the opacity of the preview segmentation.");
+    m_PreviewOpacitySlider->setEnabled(m_Tool->GetPreviewVisibility());
+    connect(m_PreviewOpacitySlider, &QSlider::valueChanged,
+            this, &QmitkSegWithPreviewToolGUIBase::OnPreviewOpacityChanged);
+
     this->InitializeUI(m_MainLayout);
 
     m_MainLayout->addWidget(m_ConfirmSegBtn);
@@ -94,14 +114,14 @@ void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 
     auto* opacityLayout = new QVBoxLayout();
     opacityLayout->setContentsMargins(0, 0, 0, 0);
-    opacityLayout->addWidget(new QLabel("Preview opacity", this));
-    m_PreviewOpacitySlider = new QSlider(Qt::Horizontal, this);
-    m_PreviewOpacitySlider->setRange(0, 100);
-    m_PreviewOpacitySlider->setValue(static_cast<int>(m_Tool->GetPreviewOpacity() * 100));
-    m_PreviewOpacitySlider->setToolTip("Adjust the opacity of the preview segmentation.");
-    connect(m_PreviewOpacitySlider, &QSlider::valueChanged,
-            this, &QmitkSegWithPreviewToolGUIBase::OnPreviewOpacityChanged);
-    opacityLayout->addWidget(m_PreviewOpacitySlider);
+    opacityLayout->addWidget(m_PreviewLabel);
+
+    auto* sliderRow = new QHBoxLayout();
+    sliderRow->setContentsMargins(0, 0, 0, 0);
+    sliderRow->addWidget(m_PreviewVisibleCheckBox);
+    sliderRow->addWidget(m_PreviewOpacitySlider);
+    opacityLayout->addLayout(sliderRow);
+
     optionsLayout->addLayout(opacityLayout);
 
     m_MainLayout->addLayout(optionsLayout);
@@ -147,6 +167,19 @@ void QmitkSegWithPreviewToolGUIBase::OnPreviewOpacityChanged(int value)
   if (m_Tool.IsNotNull())
   {
     m_Tool->SetPreviewOpacity(value / 100.0f);
+  }
+}
+
+void QmitkSegWithPreviewToolGUIBase::OnPreviewVisibilityToggled(bool checked)
+{
+  if (m_Tool.IsNotNull())
+  {
+    m_Tool->SetPreviewVisibility(checked);
+  }
+
+  if (nullptr != m_PreviewOpacitySlider)
+  {
+    m_PreviewOpacitySlider->setEnabled(checked);
   }
 }
 
@@ -206,9 +239,14 @@ void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
     {
       m_CheckProcessAll->setEnabled(enabled);
     }
+    if (nullptr != m_PreviewVisibleCheckBox)
+    {
+      m_PreviewVisibleCheckBox->setEnabled(enabled);
+    }
     if (nullptr != m_PreviewOpacitySlider)
     {
-      m_PreviewOpacitySlider->setEnabled(enabled);
+      m_PreviewOpacitySlider->setEnabled(
+        enabled && m_PreviewVisibleCheckBox != nullptr && m_PreviewVisibleCheckBox->isChecked());
     }
   }
 }
@@ -232,4 +270,14 @@ void QmitkSegWithPreviewToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentat
 QPushButton* QmitkSegWithPreviewToolGUIBase::GetConfirmSegmentationButton() const
 {
   return m_ConfirmSegBtn;
+}
+
+QCheckBox* QmitkSegWithPreviewToolGUIBase::GetPreviewVisibilityCheckBox() const
+{
+  return m_PreviewVisibleCheckBox;
+}
+
+QLabel* QmitkSegWithPreviewToolGUIBase::GetPreviewLabel() const
+{
+  return m_PreviewLabel;
 }

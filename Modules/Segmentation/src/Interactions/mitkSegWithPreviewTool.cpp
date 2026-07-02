@@ -123,6 +123,7 @@ void mitk::SegWithPreviewTool::Activated()
     m_PreviewSegmentationNode->SetProperty("color", ColorProperty::New(0.0, 1.0, 0.0));
     m_PreviewSegmentationNode->SetProperty("name", StringProperty::New(std::string(this->GetName())+" preview"));
     m_PreviewSegmentationNode->SetProperty("opacity", FloatProperty::New(m_PreviewOpacity));
+    m_PreviewSegmentationNode->SetProperty("visible", BoolProperty::New(m_PreviewVisibility));
     m_PreviewSegmentationNode->SetProperty("binary", BoolProperty::New(true));
     m_PreviewSegmentationNode->SetProperty("helper object", BoolProperty::New(true));
   }
@@ -234,6 +235,17 @@ void mitk::SegWithPreviewTool::SetPreviewOpacity(float opacity)
   }
 }
 
+void mitk::SegWithPreviewTool::SetPreviewVisibility(bool visible)
+{
+  m_PreviewVisibility = visible;
+
+  if (m_PreviewSegmentationNode.IsNotNull())
+  {
+    m_PreviewSegmentationNode->SetVisibility(visible);
+    RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
 const mitk::Image* mitk::SegWithPreviewTool::GetSegmentationInput() const
 {
   if (m_SegmentationInputNode.IsNull())
@@ -337,6 +349,7 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
     m_PreviewSegmentationNode->SetColor(previewColor);
     m_PreviewSegmentationNode->SetOpacity(m_PreviewOpacity);
+    m_PreviewSegmentationNode->SetVisibility(m_PreviewVisibility);
 
     int layer(50);
     m_ReferenceDataNode->GetIntProperty("layer", layer);

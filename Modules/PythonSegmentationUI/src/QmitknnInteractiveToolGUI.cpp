@@ -35,9 +35,11 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QBoxLayout>
 #include <QButtonGroup>
+#include <QCheckBox>
 #include <QColor>
 #include <QCoreApplication>
 #include <QIcon>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPixmap>
@@ -76,6 +78,7 @@ namespace
   constexpr Qt::Key BOX_KEY         = Qt::Key_B;
   constexpr Qt::Key SCRIBBLE_KEY    = Qt::Key_S;
   constexpr Qt::Key LASSO_KEY       = Qt::Key_L;
+  constexpr Qt::Key VISIBILITY_KEY  = Qt::Key_V;
 
   QChar KeyChar(Qt::Key key)
   {
@@ -269,6 +272,16 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
   BindShortcut(this, UNDO_KEY, m_Ui->undoButton, "Press %1 to undo the last interaction");
   BindShortcut(this, CONFIRM_KEY, confirmButton, "Press %1 to confirm a segmentation");
 
+  // The preview-visibility checkbox is text-less, so BindShortcut (which clicks
+  // a button and sets its tooltip) does not apply; toggle the base-class
+  // checkbox directly, mirroring the prompt-type toggle.
+  this->GetPreviewVisibilityCheckBox()->setToolTip(
+    QString("Press %1 to toggle the preview visibility").arg(KeyChar(VISIBILITY_KEY)));
+
+  auto toggleVisibility = new QShortcut(QKeySequence(VISIBILITY_KEY), this);
+  connect(toggleVisibility, &QShortcut::activated, this,
+          [this]() { this->GetPreviewVisibilityCheckBox()->click(); });
+
   // Cache the base label of each shortcut-bound widget as seen from the
   // .ui file. The cache is the single source of truth for ApplyShortcutLabels,
   // so repeated invocations never accumulate suffixes. The confirm button is
@@ -284,6 +297,7 @@ void QmitknnInteractiveToolGUI::InitializeUI(QBoxLayout* mainLayout)
     { m_Ui->lassoButton,    LASSO_KEY,    m_Ui->lassoButton->text() },
   };
   m_PromptTypeBaseTitle = m_Ui->promptTypeGroupBox->title();
+  m_PreviewLabelBaseText = this->GetPreviewLabel()->text();
 
   auto prefService = mitk::CoreServices::GetPreferencesService();
   m_Preferences = prefService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
@@ -1307,6 +1321,10 @@ void QmitknnInteractiveToolGUI::ApplyShortcutLabels()
   m_Ui->promptTypeGroupBox->setTitle(show
     ? LabelWithShortcut(m_PromptTypeBaseTitle, PROMPT_TYPE_KEY)
     : m_PromptTypeBaseTitle);
+
+  this->GetPreviewLabel()->setText(show
+    ? LabelWithShortcut(m_PreviewLabelBaseText, VISIBILITY_KEY)
+    : m_PreviewLabelBaseText);
 }
 
 void QmitknnInteractiveToolGUI::OnPreferenceChangedEvent(const mitk::IPreferences::ChangeEvent& event)

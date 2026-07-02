@@ -82,7 +82,7 @@ private:
   void UpdateControlStates();
   void ApplyFilter(const QString& filterText);
   void SelectSuggestionByName(const QString& name);
-  bool TryPreselectMatchingSuggestion(const QString& name);
+  QString EffectiveNameFilter() const;
   bool GetAutoFilter() const;
 
   std::unique_ptr<Ui::QmitkNewSegmentationDialog> m_Ui;
@@ -94,6 +94,7 @@ private:
   mitk::Label::Pointer m_Suggestion;
   QColor m_Color;
   QString m_Name;
+  QString m_InitialName;
 
   int m_TotalSuggestions;
   int m_VisibleSuggestions;

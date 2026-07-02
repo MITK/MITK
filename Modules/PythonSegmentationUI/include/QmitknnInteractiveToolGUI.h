@@ -56,7 +56,8 @@ namespace Ui
  *   global label-naming preferences)
  * - Optional shortcut hints in button labels
  * - Keyboard shortcuts for common actions (R: reset, U: undo, C: confirm,
- *   T: toggle prompt type, P/B/S/L: toggle interactors)
+ *   T: toggle prompt type, P/B/S/L: toggle interactors, V: toggle preview
+ *   visibility)
  *
  * \sa mitk::nnInteractiveTool, QmitkSegWithPreviewToolGUIBase,
  *     QmitkPipInstallDialog
@@ -460,6 +461,7 @@ private:
   mitk::IPreferences* m_Preferences = nullptr;
   std::vector<ShortcutLabel> m_ShortcutLabels;
   QString m_PromptTypeBaseTitle;
+  QString m_PreviewLabelBaseText;
 };
 
 #endif

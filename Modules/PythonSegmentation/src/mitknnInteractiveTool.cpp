@@ -174,7 +174,13 @@ namespace mitk
     void CreatePythonContext(const std::string& venvName)
     {
       m_PythonContext = std::make_unique<PythonContext>(venvName);
-      m_PythonContext->Activate();
+
+      // Activate without bindings: the install and version/update checks that run
+      // right after creation must not map any venv native library (on Linux the
+      // venv is sys.prefix, so importing NumPy would load it from there and make
+      // the "loaded?" guard block the very update it is checking for). The
+      // bindings are imported later, in StartSession(), once a session needs them.
+      m_PythonContext->Activate(false);
     }
 
     void DestroyPythonContext()
@@ -810,6 +816,13 @@ void mitk::nnInteractiveTool::StartSession()
     prefs->Put(key, prefs->Get(key, defaultValue));
 
   m_Impl->Remote = prefs->Get("nnInteractive/inferenceMode", "local") == "remote";
+
+  // The context is created lightweight (see CreatePythonContext) so the
+  // pre-session checks map no venv native libraries. A session does need the
+  // bindings (NumPy for mask exchange, the MITK module), so import them now.
+  // Activate() is idempotent, so re-running it here only adds the bindings.
+  if (auto* pythonContext = m_Impl->GetPythonContext())
+    pythonContext->Activate();
 
   try
   {

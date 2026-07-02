@@ -23,6 +23,7 @@ class QCheckBox;
 class QPushButton;
 class QBoxLayout;
 class QSlider;
+class QLabel;
 
 /**
   \brief GUI base class for tools derived from mitk::SegWithPreviewTool.
@@ -51,6 +52,8 @@ protected slots:
   void OnAcceptPreview();
 
   void OnPreviewOpacityChanged(int value);
+
+  void OnPreviewVisibilityToggled(bool checked);
 
 protected:
   /**
@@ -96,11 +99,16 @@ protected:
 
   QPushButton* GetConfirmSegmentationButton() const;
 
+  QCheckBox* GetPreviewVisibilityCheckBox() const;
+  QLabel* GetPreviewLabel() const;
+
 private:
   QCheckBox* m_CheckIgnoreLocks = nullptr;
   QCheckBox* m_CheckMerge = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
   QSlider* m_PreviewOpacitySlider = nullptr;
+  QCheckBox* m_PreviewVisibleCheckBox = nullptr;
+  QLabel* m_PreviewLabel = nullptr;
   QPushButton* m_ConfirmSegBtn = nullptr;
   QBoxLayout* m_MainLayout = nullptr;
 

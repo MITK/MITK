@@ -197,6 +197,11 @@ namespace mitk
     void SetPreviewOpacity(float opacity);
     itkGetConstMacro(PreviewOpacity, float);
 
+    /** Sets whether the preview segmentation is rendered. The value persists
+        across preview regenerations. */
+    void SetPreviewVisibility(bool visible);
+    itkGetConstMacro(PreviewVisibility, bool);
+
   protected:
     ToolCommand::Pointer m_ProgressCommand;
 
@@ -396,6 +401,11 @@ namespace mitk
      * reset that happens whenever the preview node is regenerated
      * (see ResetPreviewNode).*/
     float m_PreviewOpacity = 1.0f / 3.0f;
+
+    /** Whether the preview segmentation is rendered. Kept as tool state, like
+     * m_PreviewOpacity, so it survives preview regeneration (see
+     * ResetPreviewNode).*/
+    bool m_PreviewVisibility = true;
 
     /** This variable tracks if there should be a user-confirmation before a tool is deactivated or not.
      * Call RequestDeactivationConfirmationOn() in the tool class to avail this feature.

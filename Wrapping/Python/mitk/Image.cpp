@@ -28,8 +28,10 @@ found in the LICENSE file.
 #include <pybind11/stl/filesystem.h>
 
 #include <array>
+#include <cstdio>
 #include <filesystem>
 #include <optional>
+#include <sstream>
 #include <string>
 
 namespace py = pybind11;
@@ -619,4 +621,67 @@ Examples:
     ...     print(key, img.properties[key])
     >>> del img.properties["my.custom.key"]
 )");
+
+  // Jupyter rich display. Style mirrors the mitk-workbench-remote client so
+  // native and remote images render alike in a notebook.
+  image_class.def("__repr__",
+    [](const Image& img) -> std::string {
+      if (!img.IsInitialized())
+        return "Image(uninitialized)";
+
+      auto shapeVec = ComputeNumpyShape(img);
+      py::tuple shape(shapeVec.size());
+      for (size_t i = 0; i < shapeVec.size(); ++i)
+        shape[i] = shapeVec[i];
+
+      const std::string shapeStr = py::str(shape);
+      const std::string dtypeStr = py::str(PixelTypeToDType(img.GetPixelType()));
+      const std::string spacingStr = py::str(py::cast(GetSpacing(img.GetTimeGeometry(), 0)));
+      return "Image(shape=" + shapeStr + ", dtype=" + dtypeStr + ", spacing=" + spacingStr + ")";
+    });
+
+  image_class.def("_repr_html_",
+    [](const Image& img) -> std::string {
+      if (!img.IsInitialized())
+        return "<table><tr><td><em>uninitialized image</em></td></tr></table>";
+
+      auto shapeVec = ComputeNumpyShape(img);
+      py::tuple shape(shapeVec.size());
+      for (size_t i = 0; i < shapeVec.size(); ++i)
+        shape[i] = shapeVec[i];
+
+      const std::string shapeStr = py::str(shape);
+      const std::string dtypeStr = py::str(PixelTypeToDType(img.GetPixelType()));
+      const std::string spacingStr = py::str(py::cast(GetSpacing(img.GetTimeGeometry(), 0)));
+      const std::string originStr = py::str(py::cast(GetOrigin(img.GetTimeGeometry(), 0)));
+
+      // Direction: 3 rows joined by " | ", cells by "  ", each %.4g. Matches
+      // the client's rendering of the direction cosine matrix.
+      const auto cosines = GetDirectionCosines(img.GetTimeGeometry(), 0);
+      const auto fmt4g = [](double v) {
+        char buf[32];
+        std::snprintf(buf, sizeof(buf), "%.4g", v);
+        return std::string(buf);
+      };
+      std::string dirStr;
+      for (int r = 0; r < 3; ++r)
+      {
+        if (r != 0) dirStr += " | ";
+        for (int c = 0; c < 3; ++c)
+        {
+          if (c != 0) dirStr += "  ";
+          dirStr += fmt4g(cosines[r * 3 + c]);
+        }
+      }
+
+      std::ostringstream os;
+      os << "<table>"
+         << "<tr><th>shape</th><td>" << shapeStr << "</td></tr>"
+         << "<tr><th>dtype</th><td>" << dtypeStr << "</td></tr>"
+         << "<tr><th>spacing</th><td>" << spacingStr << "</td></tr>"
+         << "<tr><th>origin</th><td>" << originStr << "</td></tr>"
+         << "<tr><th>direction</th><td>" << dirStr << "</td></tr>"
+         << "</table>";
+      return os.str();
+    });
 }

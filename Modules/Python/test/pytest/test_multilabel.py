@@ -1517,3 +1517,99 @@ class TestLabelRepr:
         lbl.set_anatomic_region(("T-D0050", "SRT", "Tissue"))
         r = repr(lbl)
         assert "+anatomic_region" in r
+
+
+class TestHtmlRepr:
+    """Notebook rich display: __repr__ / _repr_html_ for segmentation,
+    label group, and label. Style mirrors the mitk-workbench-remote client.
+    """
+
+    def _seg_with_labels(self, ref_image):
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        seg.set_group_name(0, "Organs")
+        seg.add_label("Liver", (1.0, 0.0, 0.0), 0)
+        seg.add_label("Kidney", (0.0, 1.0, 0.0), 0)
+        return seg
+
+    # --- MultiLabelSegmentation.__repr__ ---
+
+    def test_seg_repr_returns_str(self, ref_image):
+        text = repr(self._seg_with_labels(ref_image))
+        assert isinstance(text, str)
+        assert "MultiLabelSegmentation" in text
+        assert "groups=1" in text
+        assert "labels=2" in text
+
+    def test_seg_repr_empty_does_not_crash(self):
+        text = repr(mitk.MultiLabelSegmentation())
+        assert "groups=0" in text
+        assert "labels=0" in text
+
+    # --- MultiLabelSegmentation._repr_html_ ---
+
+    def test_seg_repr_html_contains_table_and_labels(self, ref_image):
+        html = self._seg_with_labels(ref_image)._repr_html_()
+        assert "<table>" in html
+        assert "Organs" in html
+        assert "Liver" in html
+        assert "Kidney" in html
+
+    def test_seg_repr_html_renders_color_swatch(self, ref_image):
+        html = self._seg_with_labels(ref_image)._repr_html_()
+        assert "rgb(255,0,0)" in html  # Liver
+        assert "rgb(0,255,0)" in html  # Kidney
+
+    def test_seg_repr_html_empty_does_not_crash(self):
+        html = mitk.MultiLabelSegmentation()._repr_html_()
+        assert isinstance(html, str)
+        assert "<table>" in html
+
+    def test_seg_repr_html_escapes_label_name(self, ref_image):
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        seg.add_label(mitk.Label(1, 'T<i>&"x'), 0)
+        html = seg._repr_html_()
+        assert "&lt;" in html
+        assert "&gt;" in html
+        assert "&amp;" in html
+        assert "<i>" not in html  # raw metacharacters must not leak
+
+    def test_seg_repr_html_escapes_group_name(self, ref_image):
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        seg.set_group_name(0, "G<x>&")
+        html = seg._repr_html_()
+        assert "&lt;" in html
+        assert "&amp;" in html
+        assert "<x>" not in html
+
+    def test_seg_repr_html_unnamed_group_falls_back(self, ref_image):
+        # A fresh group has an empty name; the header falls back to "Group <i>".
+        seg = mitk.MultiLabelSegmentation(ref_image)
+        assert seg.get_group_name(0) == ""
+        assert "Group 0" in seg._repr_html_()
+
+    # --- Label._repr_html_ ---
+
+    def test_label_repr_html(self):
+        lbl = mitk.Label(5, "Tumor")
+        lbl.color = (0.0, 0.0, 1.0)
+        html = lbl._repr_html_()
+        assert "<table>" in html
+        assert "Tumor" in html
+        assert "rgb(0,0,255)" in html
+        assert ">5<" in html
+
+    def test_label_repr_html_escapes_name(self):
+        html = mitk.Label(1, "A<b>&")._repr_html_()
+        assert "&lt;" in html
+        assert "&amp;" in html
+        assert "<b>" not in html
+
+    # --- LabelGroup._repr_html_ ---
+
+    def test_label_group_repr_html(self, ref_image):
+        group = self._seg_with_labels(ref_image).get_group(0)
+        html = group._repr_html_()
+        assert "<table>" in html
+        assert "Organs" in html
+        assert "Liver" in html
+        assert "Kidney" in html

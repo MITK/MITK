@@ -16,6 +16,10 @@ mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWidgetConnectorTest
   -platform minimal
 )

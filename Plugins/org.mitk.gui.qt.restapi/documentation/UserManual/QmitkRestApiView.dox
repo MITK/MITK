@@ -98,13 +98,13 @@ The REST API preferences can be accessed via <b>Window > Preferences > REST API<
 - <b>Auto-start server</b>: When enabled, the server starts automatically during
   Workbench startup, as soon as the Data Storage becomes available (shortly after
   launch, not at the very first moment of process start). The <tt>/health</tt> and
-  <tt>/datastorage/*</tt> endpoints respond as soon as the server is up, as do the
-  <tt>/rendering/*</tt> endpoints that drive the rendering manager directly
+  <tt>/datastorage/\*</tt> endpoints respond as soon as the server is up, as do the
+  <tt>/rendering/\*</tt> endpoints that drive the rendering manager directly
   (<tt>update</tt>, <tt>reinit</tt>, <tt>selected-time</tt>) -- though these still
   return <tt>503</tt> until the data they need exists (<tt>reinit</tt> needs a loaded
   Data Storage, <tt>selected-time</tt> a time navigation controller). The render-window
   endpoints (<tt>/rendering/selected-position</tt>, <tt>/rendering/screenshot</tt> and
-  <tt>/rendering/editors/*</tt>) additionally require the REST API workbench plugin
+  <tt>/rendering/editors/\*</tt>) additionally require the REST API workbench plugin
   (<tt>org.mitk.gui.qt.restapi</tt>) to be active and return <tt>503</tt> until it is --
   open the REST API view once to activate it.
 

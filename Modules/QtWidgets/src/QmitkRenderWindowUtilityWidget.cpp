@@ -268,11 +268,18 @@ void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType i
 {
   // Reactive growth: append a row carrying this group index as userData. We
   // de-dupe by data (not by position) so sparse / non-monotonic group indices
-  // map correctly. Appending preserves currentIndex and does not fire a
-  // selection signal.
+  // map correctly.
   if (m_SyncGroupSelector->findData(QVariant(index)) >= 0)
   {
     return;
   }
+  // The combobox is a passive view; populating it must never (re)assign the
+  // cell's group. The first addItem() on an empty combobox moves currentIndex
+  // from -1 to 0 and fires currentIndexChanged, which would bind this cell to
+  // the lowest-numbered group mid-construction - violating the explicit-id
+  // contract that a freshly created cell stays unattached until its caller
+  // places it. Block the combobox's signals so the authoritative assignment
+  // via SetSynchronizationGroup remains the only path that changes the group.
+  const QSignalBlocker blocker(m_SyncGroupSelector);
   m_SyncGroupSelector->addItem(QString("Group %1").arg(index), QVariant(index));
 }

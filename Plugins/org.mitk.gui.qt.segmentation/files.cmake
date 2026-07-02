@@ -1,9 +1,6 @@
 set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
   QmitkNewSegmentationDialog.cpp
-  QmitkTotalSegmentatorPreferencePage.cpp
-  QmitkToolInstallDialog.cpp
-  QmitkTotalSegmentatorToolInstaller.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -22,23 +19,21 @@ set(INTERNAL_CPP_FILES
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
   QmitknnInteractivePreferencePage.cpp
+  QmitkTotalSegmentatorPreferencePage.cpp
 )
 
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
-  src/QmitkTotalSegmentatorPreferencePage.ui
-  src/QmitkToolInstallDialog.ui
   src/QmitkNewSegmentationDialog.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/QmitkSegmentationTaskListView.ui
   src/internal/QmitknnInteractivePreferencePage.ui
+  src/internal/QmitkTotalSegmentatorPreferencePage.ui
 )
 
 set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
-  src/QmitkToolInstallDialog.h
-  src/QmitkTotalSegmentatorPreferencePage.h
   src/QmitkNewSegmentationDialog.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
@@ -55,6 +50,7 @@ set(MOC_H_FILES
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
   src/internal/QmitknnInteractivePreferencePage.h
+  src/internal/QmitkTotalSegmentatorPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES

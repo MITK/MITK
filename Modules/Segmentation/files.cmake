@@ -67,7 +67,6 @@ set(CPP_FILES
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkTotalSegmentatorTool.cpp
   Interactions/mitkLabelSelectionTool.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp

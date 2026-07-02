@@ -5,6 +5,7 @@ set(CPP_FILES
   mitknnInteractiveVersion.cpp
   mitknnInteractiveBoundingBoxHelpers.cpp
   mitknnInteractiveRenderingHelpers.cpp
+  mitkTotalSegmentatorTool.cpp
 )
 
 set(NNINTERACTIVE_INTERACTION_TYPES

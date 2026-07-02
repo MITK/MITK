@@ -25,8 +25,6 @@ set(CPP_FILES
   QmitkStaticDynamicSegmentationDialog.cpp
   QmitkSimpleLabelSetListWidget.cpp
   QmitkSegmentationTaskListWidget.cpp
-  QmitkTotalSegmentatorToolGUI.cpp
-  QmitkSetupVirtualEnvUtil.cpp
   QmitkMultiLabelInspector.cpp
   QmitkMultiLabelManager.cpp
   QmitkMultiLabelTreeModel.cpp
@@ -55,7 +53,6 @@ set(UI_FILES
   QmitkSurfaceStampWidgetGUIControls.ui
   QmitkEditableContourToolGUIControls.ui
   QmitkSegmentationTaskListWidget.ui
-  QmitkTotalSegmentatorGUIControls.ui
   QmitkMultiLabelInspectorControls.ui
   QmitkMultiLabelManagerControls.ui
   QmitkMultiLabelSelectionLabel.ui

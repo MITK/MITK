@@ -564,6 +564,23 @@ Confirming a segmentation is recorded as a single step on the application-wide u
 While you have an unconfirmed result in progress, the application-wide <b>Undo</b> does not affect your current interactions; it reverts a previously confirmed label or an earlier operation instead.
 In short, press <tt>U</tt> to take back your last interaction and <tt>CTRL+Z</tt> to take back a confirmed label.
 
+\subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
+
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png,"TotalSegmentator tool",2.00}
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called TotalSegmentator. With it you can predict segmentation masks for a large number of anatomical structures in CT and MR images loaded in MITK. For the list of tasks and supported classes, refer to https://github.com/wasserth/TotalSegmentator
+
+TotalSegmentator runs in a Python virtual environment that MITK creates and manages for you using its own embedded Python; no separate system Python installation is required. For best performance, a CUDA-enabled GPU is recommended.
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow
+
+-# Select the TotalSegmentator tool in the Segmentation View. If TotalSegmentator is not installed yet, click "Install TotalSegmentator". A dialog shows the installation progress; it downloads several packages and may take a while, but this is a one-time step.
+-# Once installed, choose a task from the drop-down. The default "total" segments the whole body. For the "total" and "total_mr" tasks, faster lower-resolution variants ("fast", 3 mm, and "fastest", 6 mm) are offered as separate entries. Tasks that require a (free, non-commercial) TotalSegmentator license are marked "License required:" and cannot be run until a license is set (see below).
+-# Click "Run TotalSegmentator" to compute a preview. On the first run of a task, the required model weights are downloaded automatically. The run executes in a background process, so the application stays responsive and can be cancelled.
+-# Confirm the preview to transfer it into your segmentation.
+
+Click "Settings" in the tool (or open Preferences (Ctrl+P) > TotalSegmentator) to choose the compute device (a specific GPU, or CPU), enter a TotalSegmentator license to unlock the licensed tasks, clear the downloaded model weights, or uninstall the managed environment.
+
 \subsection org_mitk_views_segmentation3dthresholdtool 3D Threshold tool
 
 The thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled as part of the segmentation.
@@ -605,37 +622,6 @@ your image but you are just interested in one special region.
 - <b>Relabel mode:</b> Allows you to select certain "islands". When the pick is confirmed, it will be relabeled and added to the active label content. Hint: This mode ignores the locks of other labels, hence you do not need to unlock them explicitly.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",16.00}
-
-\subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
-
-\imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",2.00}
-
-\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png,"TotalSegmentator tool",2.00}
-
-This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator (v2). With this tool, you can get a segmentation mask predicted for 117 classes in CT images, loaded in MITK.
-For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator
-
-The tool assumes that you have Python >= 3.9 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
-directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command: <tt>apt install python3-venv</tt>. For best results, your machine should be ideally equipped with a CUDA-enabled GPU.
-
-\subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow
-
--# Install TotalSegmentator: Goto Preferences (Ctrl+P) > TotalSegmentator and click "Install TotalSegmentator" to install TotalSegmentator (version: 2.9.0) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
-
-   \imageMacro{QmitkSegmentation_TotalSegmentatorTool_Preferences.png,"TotalSegmentator Preferences",16.00}
-
--# A new dialog window will open up, showing a detailed log. When the donwload is done, the "Close" button will be enabled and you may close the window.
--# Note: If Python is not listed by MITK in "System Python Path", click "Select..." in the dropdown to choose an unlisted installation of Python and try downloading again.
-   Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
-   No need to navigate all the way into "../usr/bin/python3", for example.
--# Once installed, the "Install TotalSegmentator" button is grayed out.
--# In case you want to use your own virtual environment containing TotalSegmentator check the "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path" > "Select...".
--# Select the preferred device for inferencing in the "Device" combobox. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
--# Click "OK" to save the preference settings.
--# Goto Segmentation View > 3D tools > TotalSegmentator.
--# Select a specific subtask in the "Tasks" drop-downs. The default is "total" for non-specific total segmentation.
--# Click on "Run TotalSegmentator" for a preview.
--# You can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <mitkDICOMCodeSequenceWithModifiers.h>
 #include <mitkIOUtil.h>
 #include <mitkImage.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkLabel.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageConverter.h>
@@ -29,8 +31,11 @@ found in the LICENSE file.
 #include <pybind11/stl/filesystem.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <optional>
+#include <set>
 #include <sstream>
 
 namespace py = pybind11;
@@ -206,6 +211,73 @@ MultiLabelSegmentation::Pointer LoadSegmentationOrInitializeFromImage(const std:
   if (seg.IsNull())
     throw py::value_error("Could not load: " + path);
   return seg;
+}
+
+// A group index is positional (list-like) -> IndexError; a label value is a
+// sparse key (dict-like) -> KeyError. Both subclass Python's LookupError, so
+// callers can catch any miss uniformly.
+void RequireGroup(const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index)
+{
+  if (!seg.ExistGroup(index))
+    throw py::index_error("Group index " + std::to_string(index) + " does not exist");
+}
+
+void RequireLabel(const MultiLabelSegmentation& seg, Label::PixelType value)
+{
+  if (!seg.ExistLabel(value))
+    throw py::key_error("Label value " + std::to_string(value) + " not found");
+}
+
+// Pixel/label consistency scan backing MultiLabelSegmentation.validate().
+// Group images are always uint16, so the buffer is read directly (no ITK type
+// dispatch). Checks two cases per group: pixel values present in the image but
+// not declared as a label, and labels declared but absent from the pixel data.
+std::vector<std::string> ValidateConsistency(const MultiLabelSegmentation& seg)
+{
+  std::vector<std::string> warnings;
+  const auto n = seg.GetNumberOfGroups();
+  for (unsigned int g = 0; g < n; ++g)
+  {
+    const auto declaredVec = seg.GetLabelValuesByGroup(g);
+    const std::set<Label::PixelType> declared(declaredVec.begin(), declaredVec.end());
+
+    std::set<Label::PixelType> present;
+    const Image* img = seg.GetGroupImage(g);
+    const auto steps = img->GetTimeSteps();
+    for (unsigned int t = 0; t < steps; ++t)
+    {
+      auto imageTimeStep = SelectImageByTimeStep(img, t);
+      std::unique_ptr<ImageReadAccessor> acc;
+      {
+        // The accessor takes the image read lock; release the GIL around its
+        // construction, matching AsNumpyAccessor. The buffer scan below touches
+        // no Python objects.
+        py::gil_scoped_release release;
+        acc = std::make_unique<ImageReadAccessor>(imageTimeStep);
+      }
+      const auto* buf = static_cast<const Label::PixelType*>(acc->GetData());
+      const std::size_t count = static_cast<std::size_t>(imageTimeStep->GetDimension(0)) *
+                                imageTimeStep->GetDimension(1) * imageTimeStep->GetDimension(2);
+      for (std::size_t i = 0; i < count; ++i)
+        if (buf[i] != MultiLabelSegmentation::UNLABELED_VALUE)
+          present.insert(buf[i]);
+    }
+
+    for (auto v : present)
+      if (!declared.count(v))
+        warnings.push_back("Group " + std::to_string(g) + ": pixel value " +
+          std::to_string(v) + " is present in the image but not declared as a label");
+
+    for (auto v : declared)
+      if (!present.count(v))
+      {
+        const auto lbl = seg.GetLabel(v);
+        const std::string name = lbl.IsNotNull() ? lbl->GetName() : "?";
+        warnings.push_back("Group " + std::to_string(g) + ": label " +
+          std::to_string(v) + " ('" + name + "') is declared but not present in the pixel data");
+      }
+  }
+  return warnings;
 }
 
 } // anonymous namespace
@@ -408,6 +480,45 @@ Args:
     value: Integer pixel value used to mark this label in the label
         image. Must be in ``[1, MAX_LABEL_VALUE]``; 0 is reserved.
     name: Human-readable label name.
+)")
+    .def(py::init([](std::optional<Label::PixelType> value, const std::string& name,
+                     std::optional<std::tuple<float, float, float>> color,
+                     std::optional<float> opacity, std::optional<bool> visible,
+                     std::optional<bool> locked, std::optional<std::string> description,
+                     std::optional<std::string> tracking_id,
+                     std::optional<std::string> tracking_uid) {
+        auto l = value.has_value() ? Label::New(*value, name) : Label::New();
+        if (!value.has_value() && !name.empty()) l->SetName(name);
+        if (color)        l->SetColor(TupleToColor(*color));
+        if (opacity)      l->SetOpacity(*opacity);
+        if (visible)      l->SetVisible(*visible);
+        if (locked)       l->SetLocked(*locked);
+        if (description)  l->SetDescription(*description);
+        if (tracking_id)  l->SetTrackingID(*tracking_id);
+        if (tracking_uid) l->SetTrackingUID(*tracking_uid);
+        return l;
+      }),
+      py::arg("value") = py::none(), py::arg("name") = "", py::kw_only(),
+      py::arg("color") = py::none(), py::arg("opacity") = py::none(),
+      py::arg("visible") = py::none(), py::arg("locked") = py::none(),
+      py::arg("description") = py::none(), py::arg("tracking_id") = py::none(),
+      py::arg("tracking_uid") = py::none(),
+      R"(Construct a label with optional attributes in one call.
+
+Args:
+    value: Integer pixel value in ``[1, MAX_LABEL_VALUE]``, or ``None`` to
+        defer assignment. When ``None``, the label is constructed with the
+        reserved background value 0; passing it to
+        :py:meth:`MultiLabelSegmentation.add_label` then assigns a real value
+        (0 always collides with the reserved background, forcing reassignment).
+    name: Human-readable label name.
+    color: Optional ``(r, g, b)`` tuple of floats in ``[0, 1]``.
+    opacity: Optional opacity in ``[0, 1]``.
+    visible: Optional visibility flag.
+    locked: Optional lock flag.
+    description: Optional free-text description.
+    tracking_id: Optional external tracking identifier.
+    tracking_uid: Optional external tracking UID.
 )")
     .def_property_readonly("value", &Label::GetValue)
     .def_property("name",
@@ -934,7 +1045,7 @@ Args:
       [](MultiLabelSegmentation& seg, Label::PixelType value) -> Label::Pointer {
         auto lbl = seg.GetLabel(value);
         if (lbl.IsNull())
-          throw py::value_error("Label value " + std::to_string(value) + " not found");
+          throw py::key_error("Label value " + std::to_string(value) + " not found");
         return lbl;
       },
       py::arg("value"),
@@ -947,7 +1058,21 @@ Returns:
     The matching :py:class:`Label`.
 
 Raises:
-    ValueError: If no label with that value exists.
+    KeyError: If no label with that value exists. A label value is a sparse
+        key rather than a position, so misses raise KeyError (a LookupError).
+)")
+    .def("has_label",
+      [](const MultiLabelSegmentation& seg, py::handle value) {
+        return seg.ExistLabel(ToLabelValue(value));
+      },
+      py::arg("value"),
+      R"(Return whether a label with the given value exists.
+
+Args:
+    value: Integer label pixel value, or a :py:class:`Label` object.
+
+Returns:
+    True if the label exists in any group, else False.
 )")
     .def("get_labels",
       [](MultiLabelSegmentation& seg, py::iterable values) {
@@ -966,7 +1091,10 @@ Returns:
     .def("get_label_values_by_name",
       [](const MultiLabelSegmentation& seg, const std::string& name, std::optional<MultiLabelSegmentation::GroupIndexType> group) {
         if (group.has_value())
+        {
+          RequireGroup(seg, *group);
           return seg.GetLabelValuesByName(*group, name);
+        }
         return seg.GetLabelValuesByName(name);
       },
       py::arg("name"), py::arg("group") = py::none(),
@@ -979,6 +1107,9 @@ Args:
 
 Returns:
     A list of integer label values. Empty if no label matches.
+
+Raises:
+    IndexError: If *group* is given but does not name an existing group.
 )")
     .def("get_label_values_at",
       [](const MultiLabelSegmentation& seg, const std::array<double, 3>& coords,
@@ -987,6 +1118,8 @@ Returns:
         pt[0] = coords[0];
         pt[1] = coords[1];
         pt[2] = coords[2];
+        if (group.has_value())
+          RequireGroup(seg, *group);
         return seg.GetLabelValuesByCoordinates(pt, timeStep, group);
       },
       py::arg("coordinates"), py::arg("time_step") = 0, py::arg("group") = py::none(),
@@ -1003,6 +1136,9 @@ Args:
 
 Returns:
     A list of integer label values at the given point.
+
+Raises:
+    IndexError: If *group* is given but does not name an existing group.
 )")
     .def_property_readonly("label_class_names",
       &MultiLabelSegmentation::GetLabelClassNames,
@@ -1014,8 +1150,7 @@ Returns:
       "Number of label groups in this segmentation.")
     .def("get_group",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
-        if (!seg.ExistGroup(index))
-          throw py::value_error("Group index " + std::to_string(index) + " does not exist");
+        RequireGroup(seg, index);
         return MakeLabelGroup(seg, index);
       },
       py::arg("index"),
@@ -1025,7 +1160,7 @@ Args:
     index: Zero-based group index.
 
 Raises:
-    ValueError: If the index does not exist.
+    IndexError: If the index does not name an existing group.
 )")
     .def_property_readonly("groups",
       [](MultiLabelSegmentation& seg) {
@@ -1059,30 +1194,63 @@ Returns:
 )")
     .def("get_group_name",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
+        RequireGroup(seg, index);
         return seg.GetGroupName(index);
       },
       py::arg("index"),
-      "Return the display name of the group at *index*.")
+      R"(Return the display name of the group at *index*.
+
+Args:
+    index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+)")
     .def("get_group_labels",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
+        RequireGroup(seg, index);
         return MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(index)));
       },
       py::arg("index"),
-      "Return the :py:class:`LabelVector` for the group at *index*.")
+      R"(Return the :py:class:`LabelVector` for the group at *index*.
+
+Args:
+    index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+)")
     .def("get_group_label_values",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
+        RequireGroup(seg, index);
         return seg.GetLabelValuesByGroup(index);
       },
       py::arg("index"),
-      "Return the integer label values for the group at *index*.")
+      R"(Return the integer label values for the group at *index*.
+
+Args:
+    index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+)")
     .def("get_group_class_names",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
+        RequireGroup(seg, index);
         return seg.GetLabelClassNamesByGroup(index);
       },
       py::arg("index"),
-      "Return the list of class-name strings for the group at *index*.")
+      R"(Return the list of class-name strings for the group at *index*.
+
+Args:
+    index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+)")
     .def("get_group_of_label",
       [](const MultiLabelSegmentation& seg, Label::PixelType value) {
+        RequireLabel(seg, value);
         return seg.GetGroupIndexOfLabel(value);
       },
       py::arg("value"),
@@ -1093,27 +1261,135 @@ Args:
 
 Returns:
     The owning group's index.
+
+Raises:
+    KeyError: If no label with that value exists.
 )")
     .def("get_group_image",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) -> Image::Pointer {
+        RequireGroup(seg, index);
         return seg.GetGroupImage(index);
       },
       py::arg("index"),
-      "Return the backing :py:class:`Image` of the group at *index*.")
+      R"(Return the backing :py:class:`Image` of the group at *index*.
+
+Args:
+    index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+)")
     .def("set_group_image",
-      [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index, const Image* image) {
-        seg.UpdateGroupImage(index, image, 0, 0);
+      [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
+         py::object image) {
+        // Pre-check so a bad index is a Pythonic IndexError; UpdateGroupImage
+        // would otherwise raise a generic mitk.Exception.
+        RequireGroup(seg, index);
+
+        if (py::isinstance<Image>(image))
+        {
+          seg.UpdateGroupImage(index, image.cast<const Image*>(), 0, 0);
+          return;
+        }
+
+        // Array-like path. numpy coerces an arbitrary Python object into a 0-d
+        // object-dtype array rather than failing, so a null result OR an object
+        // ('O') dtype both mean "not a usable numeric array" -> TypeError, in
+        // parity with the Image path's type contract.
+        auto arr = py::array::ensure(image, py::array::c_style);
+        const char kind = arr ? arr.dtype().kind() : '\0';
+        if (!arr || kind == 'O')
+          throw py::type_error(
+            "set_group_image expected a mitk.Image or a numpy array; got '" +
+            std::string(py::str(py::type::handle_of(image).attr("__name__"))) +
+            "'. If this is a mitk_workbench_remote object, convert it with "
+            ".to_mitk() first.");
+
+        // A label image holds integer pixel values, so a non-integer array is
+        // almost always the wrong input (a CT volume / probability map) and
+        // casting it would silently truncate. Reject it.
+        if (kind != 'i' && kind != 'u')
+          throw py::value_error(
+            "set_group_image expected an integer array (cast to the uint16 label "
+            "pixel type); got dtype kind '" + std::string(1, kind) + "'.");
+
+        auto arr16 = py::array_t<uint16_t, py::array::c_style | py::array::forcecast>::ensure(arr);
+
+        // Shape check against the group image's numpy shape (MITK dimensions
+        // reversed; group images are single-component, so no channel axis).
+        const Image* grp = seg.GetGroupImage(index);
+        if (grp->GetTimeSteps() > 1)
+          throw py::value_error(
+            "set_group_image array input supports only single-time-step (3D) "
+            "group images; this group has multiple time steps. Pass a mitk.Image "
+            "via the Image overload to update a 4D group.");
+        const unsigned int nd = grp->GetDimension();
+        bool shapeOk = (static_cast<unsigned int>(arr16.ndim()) == nd);
+        for (unsigned int i = 0; shapeOk && i < nd; ++i)
+          shapeOk = arr16.shape(static_cast<py::ssize_t>(i)) ==
+                    static_cast<py::ssize_t>(grp->GetDimension(nd - 1 - i));
+        if (!shapeOk)
+        {
+          std::ostringstream expected;
+          expected << '(';
+          for (unsigned int i = 0; i < nd; ++i)
+            expected << (i ? ", " : "") << grp->GetDimension(nd - 1 - i);
+          expected << ')';
+          throw py::value_error(
+            "set_group_image array shape does not match the group geometry; "
+            "expected numpy shape " + expected.str() + '.');
+        }
+
+        // Reuse the group's geometry with certainty: clone it, overwrite the
+        // volume, forward. UpdateGroupImage enforces mitk::Equal on geometry,
+        // which the clone satisfies trivially; no geometry is invented, so
+        // oblique / non-identity group geometries stay faithful.
+        Image::Pointer src = grp->Clone();
+        src->SetVolume(arr16.data(), 0);
+        seg.UpdateGroupImage(index, src, 0, 0);
       },
       py::arg("index"), py::arg("image"),
       R"(Replace the backing image of the group at *index*.
 
+Accepts either a :py:class:`mitk.Image` (which must match the segmentation's
+geometry) or an integer NumPy array shaped like the group image
+(``(z, y, x)``). Array input is supported only for single-time-step (3D)
+groups; to update a multi-time-step (4D) group, pass a :py:class:`mitk.Image`
+via the Image overload. Array input supplies pixels only; the group's existing
+geometry is reused unchanged. Integer arrays are cast to the ``uint16`` label
+pixel type; values above 65535 wrap under NumPy cast semantics. Non-integer
+(float / bool) arrays are rejected.
+
 Args:
     index: Zero-based group index.
-    image: New :py:class:`Image`. Must match the segmentation's geometry.
+    image: A :py:class:`mitk.Image`, or an integer NumPy array matching the
+        group image shape.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
+    TypeError: If *image* is neither an Image nor array-like.
+    ValueError: If the array dtype is non-integer, its shape does not match
+        the group geometry, or the group has multiple time steps.
+)")
+    .def("validate",
+      [](const MultiLabelSegmentation& seg) { return ValidateConsistency(seg); },
+      R"(Return human-readable consistency warnings between pixels and labels.
+
+Scans each group and reports (a) pixel values present in the group image but
+not declared as a label, and (b) labels declared in a group but absent from
+its pixel data. An empty list means the segmentation is internally consistent.
+
+This is a *pixel/label* consistency check. It is unrelated to
+:py:func:`mitk.dicom.segmentation.validate`, which checks DICOM-SEG
+export metadata completeness.
+
+Returns:
+    A list of warning strings (empty when consistent).
 )")
 
     .def("add_label",
       [](MultiLabelSegmentation& seg, Label* label, MultiLabelSegmentation::GroupIndexType group) -> Label::Pointer {
+        RequireGroup(seg, group);
         return seg.AddLabel(label, group, true, true);
       },
       py::arg("label"), py::arg("group") = 0,
@@ -1132,11 +1408,15 @@ Args:
 Returns:
     The cloned label as stored in the segmentation (its assigned pixel
     value may differ from the input). Use this object for further edits.
+
+Raises:
+    IndexError: If *group* does not name an existing group.
 )")
     .def("add_label",
       [](MultiLabelSegmentation& seg, const std::string& name,
          const std::tuple<float, float, float>& color,
          MultiLabelSegmentation::GroupIndexType group) -> Label::Pointer {
+        RequireGroup(seg, group);
         return seg.AddLabel(name, TupleToColor(color), group);
       },
       py::arg("name"), py::arg("color"), py::arg("group") = 0,
@@ -1149,16 +1429,24 @@ Args:
 
 Returns:
     The newly created label.
+
+Raises:
+    IndexError: If *group* does not name an existing group.
 )")
     .def("remove_label",
       [](MultiLabelSegmentation& seg, py::handle value) {
-        seg.RemoveLabel(ToLabelValue(value));
+        const auto v = ToLabelValue(value);
+        RequireLabel(seg, v);
+        seg.RemoveLabel(v);
       },
       py::arg("value"),
       R"(Remove a label entirely (metadata and pixels).
 
 Args:
     value: Label pixel value or :py:class:`Label` object.
+
+Raises:
+    KeyError: If no label with that value exists.
 )")
     .def("remove_labels",
       [](MultiLabelSegmentation& seg, py::iterable values) {
@@ -1172,7 +1460,9 @@ Args:
 )")
     .def("erase_label",
       [](MultiLabelSegmentation& seg, py::handle value) {
-        seg.EraseLabel(ToLabelValue(value));
+        const auto v = ToLabelValue(value);
+        RequireLabel(seg, v);
+        seg.EraseLabel(v);
       },
       py::arg("value"),
       R"(Clear the pixels of a label without removing its metadata.
@@ -1183,6 +1473,9 @@ label entirely.
 
 Args:
     value: Label pixel value or :py:class:`Label` object.
+
+Raises:
+    KeyError: If no label with that value exists.
 )")
     .def("erase_labels",
       [](MultiLabelSegmentation& seg, py::iterable values) {
@@ -1197,7 +1490,9 @@ Args:
     .def("rename_label",
       [](MultiLabelSegmentation& seg, py::handle value,
          const std::string& name, const std::tuple<float, float, float>& color) {
-        seg.RenameLabel(ToLabelValue(value), name, TupleToColor(color));
+        const auto v = ToLabelValue(value);
+        RequireLabel(seg, v);
+        seg.RenameLabel(v, name, TupleToColor(color));
       },
       py::arg("value"), py::arg("name"), py::arg("color"),
       R"(Change a label's display name and color.
@@ -1206,11 +1501,16 @@ Args:
     value: Label pixel value or :py:class:`Label` object.
     name: New display name.
     color: ``(r, g, b)`` tuple of floats in ``[0, 1]``.
+
+Raises:
+    KeyError: If no label with that value exists.
 )")
     .def("merge_labels",
       [](MultiLabelSegmentation& seg, py::handle target, py::iterable sources,
          py::handle overwriteStyle) {
-        seg.MergeLabels(ToLabelValue(target), ToLabelValues(sources), ToOverwriteStyle(overwriteStyle));
+        const auto targetValue = ToLabelValue(target);
+        RequireLabel(seg, targetValue);
+        seg.MergeLabels(targetValue, ToLabelValues(sources), ToOverwriteStyle(overwriteStyle));
       },
       py::arg("target"), py::arg("sources"),
       py::arg("overwrite_style") = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
@@ -1224,43 +1524,58 @@ Args:
     sources: Iterable of label values or :py:class:`Label` objects.
     overwrite_style: How to treat locked target pixels (see
         :py:class:`OverwriteStyle`). Defaults to ``REGARD_LOCKS``.
+
+Raises:
+    KeyError: If the *target* label does not exist.
 )")
 
     .def("add_group",
-      [](MultiLabelSegmentation& seg, Image* image, std::optional<py::list> labels) -> MultiLabelSegmentation::GroupIndexType {
+      [](MultiLabelSegmentation& seg, std::optional<std::string> name,
+         Image* image, std::optional<py::list> labels)
+         -> MultiLabelSegmentation::GroupIndexType {
         ConstLabelVector labelVec;
         if (labels.has_value())
-        {
           for (auto item : *labels)
             labelVec.push_back(Label::ConstPointer(item.cast<Label*>()));
-        }
-        if (image != nullptr)
-          return seg.AddGroup(image, labelVec);
-        return seg.AddGroup(labelVec);
+
+        const auto idx = (image != nullptr) ? seg.AddGroup(image, labelVec)
+                                            : seg.AddGroup(labelVec);
+        if (name.has_value())
+          seg.SetGroupName(idx, *name);
+        return idx;
       },
-      py::arg("image") = py::none(), py::arg("labels") = py::none(),
+      py::arg("name") = py::none(), py::arg("image") = py::none(),
+      py::arg("labels") = py::none(),
       R"(Append a new group to the segmentation.
 
 Args:
-    image: Optional :py:class:`Image` to use as the group's backing
-        image. If omitted, a fresh blank image is allocated.
-    labels: Optional list of :py:class:`Label` objects to populate the
-        new group with.
+    name: Optional display name for the new group.
+    image: Optional :py:class:`Image` to use as the group's backing image.
+        If omitted, a fresh blank image is allocated.
+    labels: Optional list of :py:class:`Label` objects to populate the new
+        group with.
 
 Returns:
     The index of the new group.
 )")
     .def("remove_group",
-      &MultiLabelSegmentation::RemoveGroup,
+      [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index) {
+        RequireGroup(seg, index);
+        seg.RemoveGroup(index);
+      },
       py::arg("index"),
       R"(Remove the group at *index*.
 
 Args:
     index: Zero-based group index.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
 )")
     .def("clear_group_image",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
          std::optional<TimeStepType> timeStep) {
+        RequireGroup(seg, index);
         if (timeStep.has_value())
           seg.ClearGroupImage(index, *timeStep);
         else
@@ -1275,6 +1590,9 @@ Args:
     index: Group index.
     time_step: If given, only that time step is cleared. Otherwise all
         time steps are cleared.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
 )")
     .def("clear_group_images",
       [](MultiLabelSegmentation& seg, std::optional<TimeStepType> timeStep) {
@@ -1371,6 +1689,7 @@ Raises:
     .def("update_group_image",
       [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
          const Image* source, TimeStepType timeStep, TimeStepType sourceTimeStep) {
+        RequireGroup(seg, index);
         seg.UpdateGroupImage(index, source, timeStep, sourceTimeStep);
       },
       py::arg("index"), py::arg("source"), py::arg("time_step"), py::arg("source_time_step") = 0,
@@ -1381,19 +1700,30 @@ Args:
     source: Source :py:class:`Image`.
     time_step: Destination time step in the segmentation.
     source_time_step: Time step to read from *source* (default 0).
+
+Raises:
+    IndexError: If *index* does not name an existing group.
 )")
     .def("set_group_name",
-      &MultiLabelSegmentation::SetGroupName,
+      [](MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType index,
+         const std::string& name) {
+        RequireGroup(seg, index);
+        seg.SetGroupName(index, name);
+      },
       py::arg("index"), py::arg("name"),
       R"(Set the display name of the group at *index*.
 
 Args:
     index: Group index.
     name: New display name.
+
+Raises:
+    IndexError: If *index* does not name an existing group.
 )")
 
     .def("create_label_mask",
       [](const MultiLabelSegmentation& seg, Label::PixelType labelValue, bool binary) {
+        RequireLabel(seg, labelValue);
         return CreateLabelMask(&seg, labelValue, binary);
       },
       py::arg("label"), py::arg("binary") = true,
@@ -1406,10 +1736,14 @@ Args:
 
 Returns:
     A new :py:class:`Image` masking the requested label.
+
+Raises:
+    KeyError: If no label with value *label* exists.
 )")
     .def("create_filtered_group_image",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType group,
          py::iterable labels) {
+        RequireGroup(seg, group);
         return CreateFilteredGroupImage(&seg, group, ToLabelValues(labels));
       },
       py::arg("group"), py::arg("labels"),
@@ -1423,10 +1757,14 @@ Args:
 
 Returns:
     A new :py:class:`Image` containing only the requested labels.
+
+Raises:
+    IndexError: If *group* does not name an existing group.
 )")
     .def("create_label_class_map",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType group,
          std::optional<py::iterable> labels) {
+        RequireGroup(seg, group);
         std::pair<Image::Pointer, IDToLabelClassNameMapType> result;
         if (labels.has_value())
           result = CreateLabelClassMap(&seg, group, ToLabelValues(*labels));
@@ -1454,6 +1792,9 @@ Returns:
     :py:class:`Image` and *class_name_map* is a ``dict[int, str]``
     mapping the remapped dense ID to its class name (background ID ``0``
     is omitted).
+
+Raises:
+    IndexError: If *group* does not name an existing group.
 )")
 
     .def("split_labels_by_group",
@@ -1472,6 +1813,7 @@ Returns:
     .def("split_labels_by_class_name",
       [](const MultiLabelSegmentation& seg, MultiLabelSegmentation::GroupIndexType group,
          std::optional<py::iterable> labels) {
+        RequireGroup(seg, group);
         if (labels.has_value())
           return LabelSetImageHelper::SplitLabelValuesByClassName(&seg, group, ToLabelValues(*labels));
         return LabelSetImageHelper::SplitLabelValuesByClassName(&seg, group);
@@ -1487,6 +1829,9 @@ Args:
 Returns:
     A mapping from class-name string to the subset of labels with that
     class name.
+
+Raises:
+    IndexError: If *group* does not name an existing group.
 )")
     .def_readonly_static("UNLABELED_VALUE", &MultiLabelSegmentation::UNLABELED_VALUE,
       "Pixel value used to mark unlabeled regions in a group image.");

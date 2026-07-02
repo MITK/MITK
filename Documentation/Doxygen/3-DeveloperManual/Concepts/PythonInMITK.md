@@ -55,7 +55,7 @@ When `MITK_USE_Python3` is enabled (which is the default in our standard `Workbe
 
 The project is then installed by copying `ep/src/Python3/` into `MITK-build/python`.
 
-Since our build system relies on CMake’s `find_package()` to locate external dependencies, we enforce consistency for calls to `find_package(Python3)` by explicitly setting `Python3_ROOT_DIR` to `MITK-build/python` and passing it from the superbuild down to the MITK build itself.
+Since our build system relies on CMake’s `find_package()` to locate external dependencies, we enforce consistency for calls to `find_package(Python3)` by passing both `Python3_ROOT_DIR` (set to `MITK-build/python`) and `Python3_EXECUTABLE` (the interpreter inside that directory) from the superbuild down to the MITK build itself. `Python3_ROOT_DIR` alone is only a search hint; `find_package(Python3)` still consults `PATH` and the Windows registry and prefers the newest version it finds there, so on a machine with a newer system Python the hint would be overruled. Pinning `Python3_EXECUTABLE` makes the MITK build skip that search and use the staged interpreter unconditionally.
 
 MITK modules can then depend on Python either via the classic MITK syntax `PACKAGE_DEPENDS Python3|Python` or by using the native CMake target like `TARGET_DEPENDS Python3::Python`.
 

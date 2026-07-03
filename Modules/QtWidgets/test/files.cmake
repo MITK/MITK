@@ -7,6 +7,7 @@ endif()
 
 set(MODULE_CUSTOM_TESTS
   QmitkDataStorageListModelTest.cpp
+  QmitkDataStorageTreeModelTest.cpp
   QmitkAbstractNodeSelectionWidgetTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNLayoutV2Test.cpp

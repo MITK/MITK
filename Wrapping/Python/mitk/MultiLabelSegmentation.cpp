@@ -310,6 +310,71 @@ LabelGroup MakeLabelGroup(MultiLabelSegmentation& seg, unsigned int index)
 } // namespace
 
 // ---------------------------------------------------------------------------
+// HTML representation helpers (Jupyter rich display)
+// ---------------------------------------------------------------------------
+
+namespace
+{
+
+// Shared header row for the label tables rendered by MultiLabelSegmentation,
+// LabelGroup, and Label.
+const char* const kLabelTableHeader =
+  "<tr><th>Value</th><th>Name</th><th>Color</th><th>Visible</th><th>Locked</th></tr>";
+
+std::string EscapeHtml(const std::string& s)
+{
+  std::string out;
+  out.reserve(s.size());
+  for (const char c : s)
+  {
+    switch (c)
+    {
+      case '&': out += "&amp;"; break;
+      case '<': out += "&lt;"; break;
+      case '>': out += "&gt;"; break;
+      case '"': out += "&quot;"; break;
+      case '\'': out += "&#x27;"; break;
+      default: out += c; break;
+    }
+  }
+  return out;
+}
+
+std::string LabelColorSwatch(const Label& l)
+{
+  const auto& c = l.GetColor();
+  std::ostringstream os;
+  os << "<span style=\"display:inline-block;width:12px;height:12px;background:rgb("
+     << static_cast<int>(c.GetRed() * 255) << ','
+     << static_cast<int>(c.GetGreen() * 255) << ','
+     << static_cast<int>(c.GetBlue() * 255) << ")\"></span>";
+  return os.str();
+}
+
+// Renders one label as a table row. Rows nested under a group header are
+// indented; a standalone Label table renders flush.
+std::string LabelRowHtml(const Label& l, bool indented)
+{
+  std::ostringstream os;
+  os << "<tr>"
+     << "<td" << (indented ? " style='padding-left:16px'" : "") << ">" << l.GetValue() << "</td>"
+     << "<td>" << EscapeHtml(l.GetName()) << "</td>"
+     << "<td>" << LabelColorSwatch(l) << "</td>"
+     << "<td>" << (l.GetVisible() ? "True" : "False") << "</td>"
+     << "<td>" << (l.GetLocked() ? "True" : "False") << "</td>"
+     << "</tr>";
+  return os.str();
+}
+
+std::string GroupHeaderRowHtml(const std::string& name, std::size_t index)
+{
+  const std::string display = name.empty() ? ("Group " + std::to_string(index)) : name;
+  return "<tr><td colspan='5'><b>" + EscapeHtml(display) + "</b></td></tr>";
+}
+
+} // namespace
+
+// ---------------------------------------------------------------------------
 // Module init
 // ---------------------------------------------------------------------------
 
@@ -732,6 +797,11 @@ Args:
         return os.str();
       });
 
+  label_class.def("_repr_html_",
+    [](const Label& l) {
+      return "<table>" + std::string(kLabelTableHeader) + LabelRowHtml(l, false) + "</table>";
+    });
+
   // Bind property owner methods on Label (it derives from PropertyList which is IPropertyOwner)
   bind_property_owner(label_class);
 
@@ -822,6 +892,16 @@ group's state at the moment it was returned by the parent segmentation.
       "List of class-name strings for the labels in this group.")
     .def_readonly("image", &LabelGroup::image,
       "Backing :py:class:`Image` that stores this group's labels.")
+    .def("_repr_html_",
+      [](const LabelGroup& g) {
+        std::ostringstream os;
+        os << "<table>" << kLabelTableHeader
+           << GroupHeaderRowHtml(g.name, g.index);
+        for (const auto& lbl : g.labels.items)
+          os << LabelRowHtml(*lbl, true);
+        os << "</table>";
+        return os.str();
+      })
     .def("__repr__",
       [](const LabelGroup& g) {
         std::ostringstream os;
@@ -1841,6 +1921,30 @@ Raises:
 
   // Bind property owner methods
   bind_property_owner(seg_class);
+
+  seg_class.def("__repr__",
+    [](const MultiLabelSegmentation& seg) {
+      std::ostringstream os;
+      os << "MultiLabelSegmentation(groups=" << seg.GetNumberOfGroups()
+         << ", labels=" << seg.GetTotalNumberOfLabels() << ")";
+      return os.str();
+    });
+
+  seg_class.def("_repr_html_",
+    [](MultiLabelSegmentation& seg) {
+      std::ostringstream os;
+      os << "<table>" << kLabelTableHeader;
+      const auto n = seg.GetNumberOfGroups();
+      for (unsigned int i = 0; i < n; ++i)
+      {
+        os << GroupHeaderRowHtml(seg.GetGroupName(i), i);
+        const auto labels = MakeLabelVector(seg.GetLabelsByValue(seg.GetLabelValuesByGroup(i)));
+        for (const auto& lbl : labels.items)
+          os << LabelRowHtml(*lbl, true);
+      }
+      os << "</table>";
+      return os.str();
+    });
 
   // =======================================================================
   // Module-level helpers

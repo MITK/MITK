@@ -235,20 +235,25 @@ bool QmitkDataStorageTreeModel::dropMimeData(
 
     if (listOfItemsToDrop[0] != dropItem && isValidDragAndDropOperation)
     {
-      int dragIndex = 0;
+      // Removing the dragged items shifts every later position - including the
+      // drop row - up by the number of dragged items lying above it. Count them
+      // now, on the original indices: GetIndex() shifts as the removal loop
+      // below deletes items one at a time, so it cannot be counted there.
+      int itemsAboveDropRow = 0;
+      if (row != -1)
+      {
+        for (TreeItem *const itemToDrop : listOfItemsToDrop)
+        {
+          if ((itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
+            ++itemsAboveDropRow;
+        }
+      }
 
       // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
       QList<TreeItem *>::iterator diIter;
       for (diIter = listOfItemsToDrop.begin(); diIter != listOfItemsToDrop.end(); diIter++)
       {
         TreeItem *itemToDrop = *diIter;
-
-        // if the item is dragged down we have to compensate its final position for the
-        // fact it is deleted lateron, this only applies if it is dragged within the same level
-        if ((itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
-        {
-          dragIndex = 1;
-        }
 
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
         this->beginRemoveRows(
@@ -264,18 +269,27 @@ bool QmitkDataStorageTreeModel::dropMimeData(
       TreeItem *const insertTargetItem = m_AllowHierarchyChange ? dropItem : (row == -1 ? parentItem : dropItem);
       const QModelIndex insertTargetModelIndex = this->IndexFromTreeItem(insertTargetItem);
 
-      // row = -1 dropped on an item, row != -1 dropped  in between two items
-      // Select the target index position, or put it at the end of the list.
+      // row = -1 dropped on an item, row != -1 dropped in between two items.
       int dropIndex = 0;
       if (row != -1)
       {
-        if (dragIndex == 0)
-          dropIndex = std::min(row, insertTargetItem->GetChildCount() - 1);
-        else
-          dropIndex = std::min(row - 1, insertTargetItem->GetChildCount() - 1);
+        // GetChildCount() is a valid append position - InsertChild push_backs
+        // when the index is out of range - so clamping to it keeps the last
+        // slot reachable. itemsAboveDropRow compensates for the dragged items
+        // already removed above the drop row.
+        dropIndex = std::min(row - itemsAboveDropRow, insertTargetItem->GetChildCount());
+      }
+      else if (m_AllowHierarchyChange)
+      {
+        // Reparent onto dropItem: append as a new child. dropItem->GetIndex() is
+        // dropItem's own sibling row, not a child position, so using it here
+        // would announce an insertion range that does not match its child count.
+        dropIndex = dropItem->GetChildCount();
       }
       else
       {
+        // Sibling reorder onto dropItem: insert into the shared parent at
+        // dropItem's position among its siblings.
         dropIndex = dropItem->GetIndex();
       }
 

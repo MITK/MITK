@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <QStack>
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace
@@ -147,9 +148,9 @@ namespace
 
 /**
  * Tests for QmitkDataStorageTreeModel, the model backing the Data Manager
- * view. The focus is the drag-and-drop reordering path (dropMimeData with
- * the default preference, i.e. hierarchy changes disabled) and pinning the
- * observable tree behaviour so a fix there cannot silently regress it.
+ * view. The focus is dropMimeData: sibling reordering under the default
+ * preference and, where a test enables it, hierarchy-changing reparent drops,
+ * pinning observable tree behaviour so a fix there cannot silently regress it.
  */
 class QmitkDataStorageTreeModelTestSuite : public mitk::TestFixture
 {
@@ -158,9 +159,12 @@ class QmitkDataStorageTreeModelTestSuite : public mitk::TestFixture
   MITK_TEST(TopLevelReorder_ReordersAndKeepsSignalsConsistent);
   MITK_TEST(ChildReorder_ReordersNodes);
   MITK_TEST(ChildReorder_KeepsSignalsConsistent);
+  MITK_TEST(ChildReorder_ToLastPosition_KeepsCorrectOrder);
   MITK_TEST(MultiNodeChildReorder_KeepsSignalsConsistent);
+  MITK_TEST(MultiNodeDownwardReorder_KeepsCorrectOrder);
   MITK_TEST(AllChildrenReorder_KeepsSignalsConsistent);
   MITK_TEST(ChildReorder_ParentNotAtRowZero_KeepsCorrectOrder);
+  MITK_TEST(Reparent_OntoChildlessNodeAtNonzeroRow_KeepsSignalsConsistent);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
@@ -193,8 +197,11 @@ public:
     m_DataStorage->Add(m_ChildA, m_ImageA);
     m_DataStorage->Add(m_ChildB, m_ImageA);
 
-    // Default Data Manager wiring: hierarchy changes via DnD are disabled.
-    m_Model = std::make_unique<QmitkDataStorageTreeModel>(m_DataStorage, false);
+    // Mirror the production Data Manager wiring: it constructs the model with
+    // "Place new nodes on top" defaulting to true. Hierarchy changes via DnD
+    // are governed by a separate flag (m_AllowHierarchyChange, off by default),
+    // not by this argument.
+    m_Model = std::make_unique<QmitkDataStorageTreeModel>(m_DataStorage, true);
   }
 
   void tearDown() override
@@ -284,6 +291,31 @@ public:
     CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
   }
 
+  //! Dropping a child past the last row (row == childCount) must move it to the
+  //! tail: the append position (childCount) has to be a reachable drop index,
+  //! otherwise the last slot cannot be targeted.
+  void ChildReorder_ToLastPosition_KeepsCorrectOrder()
+  {
+    QModelIndex imageAIndex = m_Model->GetIndex(m_ImageA);
+    const mitk::DataNode::Pointer child0 = m_Model->GetNode(m_Model->index(0, 0, imageAIndex));
+    const mitk::DataNode::Pointer child1 = m_Model->GetNode(m_Model->index(1, 0, imageAIndex));
+
+    SignalConsistencyGuard guard(m_Model.get());
+
+    // Drag the first child and drop it past the last row (Qt passes row == count).
+    const QModelIndex moverIndex = m_Model->GetIndex(child0);
+    const std::unique_ptr<QMimeData> mime(m_Model->mimeData(QModelIndexList{moverIndex}));
+    const bool handled = m_Model->dropMimeData(mime.get(), Qt::MoveAction, 2, 0, imageAIndex);
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+
+    imageAIndex = m_Model->GetIndex(m_ImageA);
+    CPPUNIT_ASSERT_EQUAL(2, m_Model->rowCount(imageAIndex));
+    CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(0, 0, imageAIndex)) == child1);
+    CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(1, 0, imageAIndex)) == child0);
+  }
+
   //! Dragging several children at once removes them one at a time before
   //! re-inserting (dropMimeData relies on GetIndex() staying valid across
   //! those removals). This exercises that multi-item path and checks that the
@@ -319,11 +351,54 @@ public:
     CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(2, 0, imageAIndex)) == row0);
   }
 
+  //! Dragging several children downward within the same parent must shift the
+  //! drop index up by the count of dragged items removed above the drop row, so
+  //! the moved block lands at the drop position, not one or more slots too low.
+  void MultiNodeDownwardReorder_KeepsCorrectOrder()
+  {
+    auto storage = mitk::StandaloneDataStorage::New();
+    const mitk::DataNode::Pointer parent = MakeImageNode("parent");
+    storage->Add(parent);
+    for (int i = 0; i < 6; ++i)
+      storage->Add(MakeImageNode("c" + std::to_string(i)), parent);
+
+    QmitkDataStorageTreeModel model(storage, false);
+
+    QModelIndex parentIndex = model.GetIndex(parent);
+    CPPUNIT_ASSERT_EQUAL(6, model.rowCount(parentIndex));
+
+    std::vector<mitk::DataNode::Pointer> ordered;
+    for (int i = 0; i < 6; ++i)
+      ordered.push_back(model.GetNode(model.index(i, 0, parentIndex)));
+
+    SignalConsistencyGuard guard(&model);
+
+    // Drag the first two children and drop them between the original 3rd and 4th.
+    QModelIndexList movers;
+    movers << model.GetIndex(ordered[0]) << model.GetIndex(ordered[1]);
+    const std::unique_ptr<QMimeData> mime(model.mimeData(movers));
+    const bool handled = model.dropMimeData(mime.get(), Qt::MoveAction, 3, 0, parentIndex);
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+
+    parentIndex = model.GetIndex(parent);
+    CPPUNIT_ASSERT_EQUAL(6, model.rowCount(parentIndex));
+    // Both dragged items were above the drop row, so it shifts up by two:
+    // [c0, c1, c2, c3, c4, c5] -> [c2, c0, c1, c3, c4, c5].
+    CPPUNIT_ASSERT(model.GetNode(model.index(0, 0, parentIndex)) == ordered[2]);
+    CPPUNIT_ASSERT(model.GetNode(model.index(1, 0, parentIndex)) == ordered[0]);
+    CPPUNIT_ASSERT(model.GetNode(model.index(2, 0, parentIndex)) == ordered[1]);
+    CPPUNIT_ASSERT(model.GetNode(model.index(3, 0, parentIndex)) == ordered[3]);
+    CPPUNIT_ASSERT(model.GetNode(model.index(4, 0, parentIndex)) == ordered[4]);
+    CPPUNIT_ASSERT(model.GetNode(model.index(5, 0, parentIndex)) == ordered[5]);
+  }
+
   //! Dragging every child of a node to a between-drop (row != -1) empties the
-  //! insert target in the removal loop before the re-insertion. The drop index
-  //! must stay non-negative; otherwise dropMimeData announces beginInsertRows()
-  //! with a negative first row, which asserts in debug builds and corrupts the
-  //! view's index bookkeeping in release.
+  //! insert target in the removal loop before the re-insertion. With the target
+  //! emptied, the drop index must still resolve to a valid position within it
+  //! so the announced beginInsertRows range matches the actual insertion and
+  //! the view's index bookkeeping stays consistent.
   void AllChildrenReorder_KeepsSignalsConsistent()
   {
     const QModelIndex imageAIndex = m_Model->GetIndex(m_ImageA);
@@ -343,6 +418,9 @@ public:
     CPPUNIT_ASSERT(handled);
     CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
     CPPUNIT_ASSERT_EQUAL(2, m_Model->rowCount(imageAIndex));
+    // Dropping the whole child set at the front preserves their relative order.
+    CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(0, 0, imageAIndex)) == child0);
+    CPPUNIT_ASSERT(m_Model->GetNode(m_Model->index(1, 0, imageAIndex)) == child1);
   }
 
   //! Complements ChildReorder_KeepsSignalsConsistent by putting the child-bearing
@@ -399,6 +477,46 @@ public:
     CPPUNIT_ASSERT(model.GetNode(model.index(0, 0, parentIndex)) == childRow2);
     CPPUNIT_ASSERT(model.GetNode(model.index(1, 0, parentIndex)) == childRow0);
     CPPUNIT_ASSERT(model.GetNode(model.index(2, 0, parentIndex)) == childRow1);
+  }
+
+  //! With hierarchy changes enabled, dropping a node onto a childless target
+  //! that sits at a nonzero top-level row must append it as the target's first
+  //! child. Using the target's own sibling row as the child insert position
+  //! announces an out-of-range beginInsertRows and corrupts the view bookkeeping
+  //! - the same crash class the sibling-reorder fix addresses, via the reparent
+  //! branch.
+  void Reparent_OntoChildlessNodeAtNonzeroRow_KeepsSignalsConsistent()
+  {
+    auto storage = mitk::StandaloneDataStorage::New();
+    const mitk::DataNode::Pointer source = MakeImageNode("source");
+    const mitk::DataNode::Pointer target = MakeImageNode("target");
+    // Explicit layers so "target" is deterministically the last top-level row
+    // (nonzero) and "source" is a separate top-level node carrying the dragged
+    // child. Higher layer sorts to the top (row 0), as in the row-not-zero test.
+    source->SetIntProperty("layer", 20);
+    target->SetIntProperty("layer", 10);
+    storage->Add(source);
+    storage->Add(target);
+    const mitk::DataNode::Pointer child = MakeImageNode("child");
+    storage->Add(child, source);
+
+    QmitkDataStorageTreeModel model(storage);
+    model.SetAllowHierarchyChange(true);
+
+    const QModelIndex targetIndex = model.GetIndex(target);
+    CPPUNIT_ASSERT(targetIndex.row() > 0);
+    CPPUNIT_ASSERT_EQUAL(0, model.rowCount(targetIndex));
+
+    SignalConsistencyGuard guard(&model);
+
+    // Drag the child of "source" onto the childless "target" (drop onto node).
+    const QModelIndex moverIndex = model.GetIndex(child);
+    const std::unique_ptr<QMimeData> mime(model.mimeData(QModelIndexList{moverIndex}));
+    const bool handled = model.dropMimeData(mime.get(), Qt::MoveAction, -1, -1, targetIndex);
+
+    CPPUNIT_ASSERT(handled);
+    CPPUNIT_ASSERT_MESSAGE(guard.FailureText(), guard.IsConsistent());
+    CPPUNIT_ASSERT_EQUAL(1, model.rowCount(model.GetIndex(target)));
   }
 };
 

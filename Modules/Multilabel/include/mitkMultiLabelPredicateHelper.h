@@ -19,6 +19,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  class DataStorage;
+
   /**
    * \brief Creates a predicate that matches valid multi-label segmentation data nodes.
    *
@@ -41,6 +43,24 @@ namespace mitk
    * \sa GetMultiLabelSegmentationPredicate
    */
   mitk::NodePredicateBase::Pointer MITKMULTILABEL_EXPORT GetSegmentationReferenceImagePredicate();
+
+  /**
+   * \brief Number of segmentation nodes whose geometry does not fit the reference.
+   *
+   * Counts data nodes that are multi-label segmentations (as by
+   * GetMultiLabelSegmentationPredicate()) but whose geometry is not a sub-geometry
+   * of referenceGeometry, i.e. exactly the segmentations that
+   * GetMultiLabelSegmentationPredicate(referenceGeometry) excludes solely because
+   * of the geometry restriction. This is deliberately geometry-specific so the
+   * result cannot be conflated with segmentations filtered for other reasons.
+   *
+   * \param[in] dataStorage The data storage to inspect.
+   * \param[in] referenceGeometry The geometry segmentations are expected to fit.
+   * \return The number of geometry-mismatched segmentations. Returns 0 if
+   *         dataStorage or referenceGeometry is null.
+   * \sa GetMultiLabelSegmentationPredicate
+   */
+  unsigned int MITKMULTILABEL_EXPORT GetGeometryMismatchedSegmentationCount(const mitk::DataStorage* dataStorage, const mitk::BaseGeometry* referenceGeometry);
 }
 
 #endif

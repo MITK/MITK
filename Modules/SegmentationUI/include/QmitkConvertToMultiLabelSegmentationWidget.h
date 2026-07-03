@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <QWidget>
 #include <memory>
+#include <vector>
 
 namespace Ui
 {
@@ -59,6 +60,10 @@ public:
   /** \brief Destructor. */
   ~QmitkConvertToMultiLabelSegmentationWidget() override;
 
+signals:
+  /** \brief Emitted after new segmentation result node(s) were added to the data storage. */
+  void NewResultsReady(const QList<mitk::DataNode::Pointer>& nodes);
+
 private slots:
 
   /** \brief Called when the input node selection in the workbench changes. */
@@ -72,14 +77,21 @@ private slots:
   /** \brief Called when the user clicks the convert button. */
   void OnConvertPressed();
 
+  /** \brief Removes the result node(s) created by the most recent conversion run. */
+  void OnRemoveResultPressed();
+
 private:
   void ConvertNodes(const QmitkNodeSelectionDialog::NodeList& nodes);
 
   bool m_InternalEvent = false;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  std::vector<mitk::WeakPointer<mitk::DataNode>> m_LastResultNodes;
 
   /** \brief Enables or disables buttons based on the current data selection validity. */
   void ConfigureWidgets();
+
+  /** \brief Enables the remove-result button only while a last result still exists in the data storage. */
+  void UpdateRemoveResultButton();
 
   std::unique_ptr<Ui::QmitkConvertToMultiLabelSegmentationWidgetControls> m_Controls;
 };

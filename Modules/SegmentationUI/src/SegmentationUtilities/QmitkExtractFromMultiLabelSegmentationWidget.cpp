@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkRenderingManager.h>
 
 #include <QmitkNodeSelectionDialog.h>
 
@@ -49,6 +50,7 @@ QmitkExtractFromMultiLabelSegmentationWidget::QmitkExtractFromMultiLabelSegmenta
   this->ConfigureWidgets();
 
   connect (m_Controls->btnExtract, &QAbstractButton::clicked, this, &QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed);
+  connect (m_Controls->btnRemoveResult, &QAbstractButton::clicked, this, &QmitkExtractFromMultiLabelSegmentationWidget::OnRemoveResultPressed);
 
   connect(m_Controls->segNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
     this, &QmitkExtractFromMultiLabelSegmentationWidget::OnSegSelectionChanged);
@@ -79,6 +81,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::ConfigureWidgets()
   bool isOK = (m_Controls->checkInstanceMap->isChecked() || m_Controls->checkInstanceMask->isChecked() || m_Controls->checkClassMap->isChecked());
   m_Controls->btnExtract->setEnabled(isOK);
 
+  this->UpdateRemoveResultButton();
   m_InternalEvent = false;
 }
 
@@ -91,7 +94,7 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnSegSelectionChanged(QmitkAb
   }
 }
 
-void QmitkExtractFromMultiLabelSegmentationWidget::StoreToDataStorage(mitk::Image* image, const std::string& name, mitk::DataNode* parent)
+mitk::DataNode::Pointer QmitkExtractFromMultiLabelSegmentationWidget::StoreToDataStorage(mitk::Image* image, const std::string& name, mitk::DataNode* parent)
 {
   auto dataStorage = m_DataStorage.Lock();
   if (dataStorage.IsNull())
@@ -104,6 +107,8 @@ void QmitkExtractFromMultiLabelSegmentationWidget::StoreToDataStorage(mitk::Imag
   outNode->SetData(image);
 
   dataStorage->Add(outNode, parent);
+
+  return outNode;
 }
 
 void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
@@ -115,6 +120,8 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
     return;
   }
   auto node = selectedNodes.front();
+
+  m_LastResultNodes.clear();
 
   auto seg = dynamic_cast<mitk::MultiLabelSegmentation*>(node->GetData());
 
@@ -143,14 +150,14 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
       }
 
       std::string name = "InstanceMap group "+std::to_string(groupID);
-      this->StoreToDataStorage(image, name, node);
+      m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
       mitk::ProgressBar::GetInstance()->Progress();
     }
     if (m_Controls->checkClassMap->isChecked())
     {
       auto [image,lookup] = mitk::CreateLabelClassMap(seg, groupID, labelValues);
       std::string name = "ClassMap group " + std::to_string(groupID);
-      this->StoreToDataStorage(image, name, node);
+      m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
       mitk::ProgressBar::GetInstance()->Progress();
     }
     if (m_Controls->checkInstanceMask->isChecked())
@@ -159,11 +166,61 @@ void QmitkExtractFromMultiLabelSegmentationWidget::OnExtractPressed()
       {
         auto image = mitk::CreateLabelMask(seg,labelValue,false);
         std::string name = "LabelMask " + seg->GetLabel(labelValue)->GetName() + " [" + std::to_string(labelValue) + "]";
-        this->StoreToDataStorage(image, name, node);
+        m_LastResultNodes.emplace_back(this->StoreToDataStorage(image, name, node).GetPointer());
         mitk::ProgressBar::GetInstance()->Progress();
       }
     }
   }
+  QList<mitk::DataNode::Pointer> resultNodes;
+  for (const auto& weakNode : m_LastResultNodes)
+  {
+    auto resultNode = weakNode.Lock();
+    if (resultNode.IsNotNull())
+      resultNodes.append(resultNode);
+  }
+
+  this->UpdateRemoveResultButton();
+
+  if (!resultNodes.empty())
+    emit NewResultsReady(resultNodes);
+
   mitk::ProgressBar::GetInstance()->Reset();
   QApplication::restoreOverrideCursor();
+}
+
+void QmitkExtractFromMultiLabelSegmentationWidget::OnRemoveResultPressed()
+{
+  auto dataStorage = m_DataStorage.Lock();
+  if (dataStorage.IsNotNull())
+  {
+    for (const auto& weakNode : m_LastResultNodes)
+    {
+      auto node = weakNode.Lock();
+      if (node.IsNotNull() && dataStorage->Exists(node))
+        dataStorage->Remove(node);
+    }
+  }
+
+  m_LastResultNodes.clear();
+  this->UpdateRemoveResultButton();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkExtractFromMultiLabelSegmentationWidget::UpdateRemoveResultButton()
+{
+  auto dataStorage = m_DataStorage.Lock();
+  bool canRemove = false;
+  if (dataStorage.IsNotNull())
+  {
+    for (const auto& weakNode : m_LastResultNodes)
+    {
+      auto node = weakNode.Lock();
+      if (node.IsNotNull() && dataStorage->Exists(node))
+      {
+        canRemove = true;
+        break;
+      }
+    }
+  }
+  m_Controls->btnRemoveResult->setEnabled(canRemove);
 }

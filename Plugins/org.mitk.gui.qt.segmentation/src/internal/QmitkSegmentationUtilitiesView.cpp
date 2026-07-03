@@ -44,6 +44,13 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   m_ConvertToSegWidget = new QmitkConvertToMultiLabelSegmentationWidget(dataStorage, parent);
   m_ExtractFromSegWidget = new QmitkExtractFromMultiLabelSegmentationWidget(dataStorage, parent);
 
+  connect(m_ImageMaskingWidget, &QmitkImageMaskingWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
+  connect(m_ConvertToSegWidget, &QmitkConvertToMultiLabelSegmentationWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
+  connect(m_ExtractFromSegWidget, &QmitkExtractFromMultiLabelSegmentationWidget::NewResultsReady,
+    this, &QmitkSegmentationUtilitiesView::OnNewResultsReady);
+
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
@@ -67,4 +74,21 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWind
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
+}
+
+void QmitkSegmentationUtilitiesView::OnNewResultsReady(const QList<mitk::DataNode::Pointer>& nodes)
+{
+  if (nodes.empty())
+    return;
+
+  // Order matters: SynchronizeDataManagerSelection() triggers the Data Manager's selection
+  // handler, which re-derives every node's "selected" property, so set it afterwards.
+  this->FireNodesSelected(nodes);
+  this->SynchronizeDataManagerSelection();
+
+  for (const auto& node : nodes)
+  {
+    if (node.IsNotNull())
+      node->SetSelected(true);
+  }
 }

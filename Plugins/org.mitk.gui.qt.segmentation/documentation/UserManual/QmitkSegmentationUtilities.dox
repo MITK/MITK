@@ -19,6 +19,8 @@ The <b>Segmentation Utilities View</b> allows to postprocess existing segmentati
 	<li> \ref org_mitk_views_segmentationUtilitiesExtractFromSegmentation
 </ul>
 
+The utilities that create new data nodes (<b>Image Masking</b>, <b>Convert to Segmentation</b> and <b>Extract from Segmentation</b>) select their newly created result node(s) in the Data Manager and provide a <b>Remove result(s)</b> button that deletes the output of the most recent run again from the data storage. The in-place operations (<b>Boolean Operations</b>, <b>Morphological Operations</b> and <b>Convert to Segmentation</b> added to an existing segmentation) do not add such nodes and can be reverted via the global Undo/Redo instead.
+
 \section org_mitk_views_segmentationUtilitiesDataSelection Data Selection
 
 All postprocessing operations provide one or more selection widgets, which allow to select the data for the operation.

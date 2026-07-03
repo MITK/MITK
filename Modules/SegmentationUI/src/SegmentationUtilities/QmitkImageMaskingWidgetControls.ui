@@ -74,11 +74,25 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnMaskImage">
-     <property name="text">
-      <string>Mask</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="actionButtonLayout">
+     <item>
+      <widget class="QPushButton" name="btnMaskImage">
+       <property name="text">
+        <string>Mask</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRemoveResult">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Remove result</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

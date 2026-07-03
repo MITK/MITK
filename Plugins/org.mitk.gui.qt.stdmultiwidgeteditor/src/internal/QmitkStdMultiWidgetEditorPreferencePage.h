@@ -14,17 +14,17 @@ found in the LICENSE file.
 #define QmitkStdMultiWidgetEditorPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
-#include <QString>
 
 #include <array>
 #include <memory>
-
-class QPushButton;
 
 namespace Ui
 {
   class QmitkStdMultiWidgetEditorPreferencePage;
 }
+
+class QCheckBox;
+class QmitkRenderWindowColorWidget;
 
 class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -44,59 +44,22 @@ public:
 
 public slots:
   /**
-   * @brief ResetColors set default colors and refresh the GUI.
+   * @brief Clear all preferences of this page and refresh the GUI with the defaults.
    */
   void ResetPreferencesAndGUI();
 
-  /**
-   * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
-   * @param i index of the combobox to select the widget (1-4).
-   */
-  void OnWidgetComboBoxChanged(int i);
-
-  /**
-   * @brief AnnotationTextChanged called when QLineEdit for the annotation was changed.
-   * @param text The new text.
-   */
-  void AnnotationTextChanged(QString text);
-
-protected:
-  /**
-   * @brief m_WidgetBackgroundColor1 the background colors.
-   *
-   * If two different colors are chosen, a gradient background appears.
-   */
-  std::array<QString, 4> m_WidgetBackgroundColor1;
-  std::array<QString, 4> m_WidgetBackgroundColor2;
-
-  /**
-   * @brief m_WidgetDecorationColor the decoration color.
-   *
-   * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
-   */
-  std::array<QString, 4> m_WidgetDecorationColor;
-
-  /**
-   * @brief m_Widget1Annotation the text of the corner annotation.
-   */
-  std::array<QString, 4> m_WidgetAnnotation;
-
-  /**
-   * @brief SetStyleSheetToColorChooserButton colorize a button.
-   * @param backgroundcolor color for the button.
-   * @param button the button.
-   */
-  void SetStyleSheetToColorChooserButton(QColor backgroundcolor, QPushButton* button);
-
-protected slots:
-
-  /**
-   * @brief ColorChooserButtonClicked slot called when a button to choose color was clicked.
-   */
-  void ColorChooserButtonClicked();
-
 private:
+  /** @brief When sync is enabled, copy the changed 2D window's background to the other 2D windows. */
+  void OnBackgroundChanged(int sourceIndex);
+
   std::unique_ptr<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
+
+  /** @brief One color editor per render window, ordered widget0..widget3. */
+  std::array<QmitkRenderWindowColorWidget*, 4> m_ColorWidgets;
+
+  /** @brief Toggles whether background changes propagate across the 2D windows (widget0..2). */
+  QCheckBox* m_SyncCheckBox;
+
   QWidget* m_Control;
 };
 

@@ -441,11 +441,15 @@ void QmitkNewSegmentationDialog::OnColorButtonClicked()
 
 void QmitkNewSegmentationDialog::OnSuggestionSelected()
 {
-  const auto* currentItem = m_Ui->suggestionList->currentItem();
+  // Read the selection, not the current item: clearSelection() leaves the
+  // current item untouched, so reading it here would misinterpret a
+  // cleared selection as a fresh pick.
+  const auto selectedItems = m_Ui->suggestionList->selectedItems();
+  const auto* selectedItem = selectedItems.isEmpty() ? nullptr : selectedItems.constFirst();
 
   m_Suggestion = nullptr;
 
-  if (nullptr == currentItem)
+  if (nullptr == selectedItem)
   {
     UpdateOKButton();
     UpdateControlStates();
@@ -454,7 +458,7 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
 
   // Retrieve the suggestion index stored in the item data
   bool ok = false;
-  int suggestionIndex = currentItem->data(Qt::UserRole).toInt(&ok);
+  int suggestionIndex = selectedItem->data(Qt::UserRole).toInt(&ok);
 
   if (!ok || suggestionIndex < 0 ||
     suggestionIndex >= static_cast<int>(m_Suggestions.size()))

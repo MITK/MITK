@@ -80,6 +80,23 @@ namespace
     }
     return all2DWindows;
   }
+
+  QString BuildWorkingNodeHint(unsigned int hiddenCount)
+  {
+    QString hint = QStringLiteral(
+      "<p>Select a segmentation that should be modified. Only segmentations with the same geometry "
+      "and within the bounds of the reference image are shown.</p>");
+
+    if (hiddenCount > 0)
+    {
+      hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
+        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(hiddenCount)
+        .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
+    }
+
+    return hint;
+  }
 }
 
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
@@ -223,6 +240,13 @@ void QmitkSegmentationView::OnAnySelectionChanged()
       m_ReferenceDataObserverTags[m_ReferenceNode] =
         m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
     }
+
+    const mitk::BaseGeometry* refGeometry = m_ReferenceNode.IsNull()
+      ? nullptr
+      : m_ReferenceNode->GetData()->GetGeometry();
+    const auto hiddenSegmentations =
+      mitk::GetGeometryMismatchedSegmentationCount(this->GetDataStorage(), refGeometry);
+    m_Controls->workingNodeSelector->SetPopUpHint(BuildWorkingNodeHint(hiddenSegmentations));
   }
 
   auto selectedWorkingNode = m_Controls->workingNodeSelector->GetSelectedNode();
@@ -595,7 +619,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
    m_Controls->workingNodeSelector->SetInvalidInfo("Select a segmentation");
    m_Controls->workingNodeSelector->SetPopUpTitel("Select a segmentation");
-   m_Controls->workingNodeSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
+   m_Controls->workingNodeSelector->SetPopUpHint(BuildWorkingNodeHint(0));
 
    connect(m_Controls->referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &Self::OnReferenceSelectionChanged);

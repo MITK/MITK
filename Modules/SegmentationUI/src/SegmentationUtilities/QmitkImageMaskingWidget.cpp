@@ -28,6 +28,8 @@ found in the LICENSE file.
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkLabelSetImageConverter.h>
 
+#include <QmitkStyleManager.h>
+
 #include <QMessageBox>
 
 #include <limits>
@@ -43,6 +45,23 @@ namespace
     isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
     isValidInput->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
     return isValidInput.GetPointer();
+  }
+
+  QString BuildSegSelectorHint(unsigned int hiddenCount)
+  {
+    QString hint = QStringLiteral(
+      "<p>Select the segmentation that should be used for masking. "
+      "The segmentation must have the same geometry as the image that should be masked.</p>");
+
+    if (hiddenCount > 0)
+    {
+      hint += QStringLiteral("<p style=\"color:%1;\">%2 segmentation%3 hidden: geometry does not match the selected image.</p>")
+        .arg(QmitkStyleManager::GetIconAccentColor())
+        .arg(hiddenCount)
+        .arg(hiddenCount == 1 ? QString() : QStringLiteral("s"));
+    }
+
+    return hint;
   }
 }
 
@@ -64,7 +83,7 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
   m_Controls->segNodeSelector->SetSelectionIsOptional(false);
   m_Controls->segNodeSelector->SetInvalidInfo(QStringLiteral("Please select a segmentation and its label"));
   m_Controls->segNodeSelector->SetPopUpTitel(QStringLiteral("Select segmentation"));
-  m_Controls->segNodeSelector->SetPopUpHint(QStringLiteral("Select the segmentation that should be used for masking.\nThe segmentation must have the same geometry as the image that should be masked."));
+  m_Controls->segNodeSelector->SetPopUpHint(BuildSegSelectorHint(0));
 
   this->ConfigureWidgets();
 
@@ -96,6 +115,10 @@ void QmitkImageMaskingWidget::OnImageSelectionChanged(QmitkAbstractNodeSelection
   }
 
   m_Controls->segNodeSelector->SetNodePredicate(mitk::GetMultiLabelSegmentationPredicate(refGeometry));
+
+  const auto hidden = mitk::GetGeometryMismatchedSegmentationCount(m_DataStorage.Lock(), refGeometry);
+  m_Controls->segNodeSelector->SetPopUpHint(BuildSegSelectorHint(hidden));
+
   this->ConfigureWidgets();
 }
 

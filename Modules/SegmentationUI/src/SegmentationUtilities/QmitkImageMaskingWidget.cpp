@@ -27,6 +27,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkMultiLabelPredicateHelper.h>
 #include <mitkLabelSetImageConverter.h>
+#include <mitkRenderingManager.h>
 
 #include <QMessageBox>
 
@@ -74,6 +75,7 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
     this, &QmitkImageMaskingWidget::OnSegSelectionChanged);
 
   connect(m_Controls->btnMaskImage, &QPushButton::clicked, this, &QmitkImageMaskingWidget::OnMaskImagePressed);
+  connect(m_Controls->btnRemoveResult, &QPushButton::clicked, this, &QmitkImageMaskingWidget::OnRemoveResultPressed);
   connect(m_Controls->rbnCustom, &QRadioButton::toggled, this, &QmitkImageMaskingWidget::OnCustomValueButtonToggled);
 
   m_Controls->imageNodeSelector->SetAutoSelectNewNodes(true);
@@ -122,6 +124,7 @@ void QmitkImageMaskingWidget::ConfigureWidgets()
   bool enable = iNode.IsNotNull() && sNode.IsNotNull() && !m_Controls->labelInspector->GetSelectedLabels().empty();
 
   this->EnableButtons(enable);
+  this->UpdateRemoveResultButton();
 }
 
 void QmitkImageMaskingWidget::EnableButtons(bool enable)
@@ -178,10 +181,16 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   }
 
   //Add result to data storage
-  this->AddToDataStorage(m_DataStorage.Lock(),
+  auto resultNode = this->AddToDataStorage(m_DataStorage.Lock(),
     resultImage,
     m_Controls->imageNodeSelector->GetSelectedNode()->GetName() + "_" + m_Controls->segNodeSelector->GetSelectedNode()->GetName(),
     m_Controls->imageNodeSelector->GetSelectedNode());
+
+  m_LastResultNode = resultNode;
+  this->UpdateRemoveResultButton();
+
+  if (resultNode.IsNotNull())
+    emit NewResultsReady({ resultNode });
 
   this->EnableButtons(true);
 
@@ -269,13 +278,14 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   return maskFilter->GetOutput();
 }
 
-void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
+mitk::DataNode::Pointer QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
 {
   if (dataStorage.IsNull())
   {
     std::string exception = "Cannot add result to the data storage. Data storage invalid.";
     MITK_ERROR << "Masking failed: " << exception;
     QMessageBox::information(nullptr, "Masking failed", QString::fromStdString(exception));
+    return nullptr;
   }
 
   auto dataNode = mitk::DataNode::New();
@@ -290,4 +300,26 @@ void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataSt
   }
 
   dataStorage->Add(dataNode, parent);
+
+  return dataNode;
+}
+
+void QmitkImageMaskingWidget::OnRemoveResultPressed()
+{
+  auto node = m_LastResultNode.Lock();
+  auto dataStorage = m_DataStorage.Lock();
+  if (node.IsNotNull() && dataStorage.IsNotNull() && dataStorage->Exists(node))
+    dataStorage->Remove(node);
+
+  m_LastResultNode = nullptr;
+  this->UpdateRemoveResultButton();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkImageMaskingWidget::UpdateRemoveResultButton()
+{
+  auto node = m_LastResultNode.Lock();
+  auto dataStorage = m_DataStorage.Lock();
+  const bool canRemove = node.IsNotNull() && dataStorage.IsNotNull() && dataStorage->Exists(node);
+  m_Controls->btnRemoveResult->setEnabled(canRemove);
 }

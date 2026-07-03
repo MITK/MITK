@@ -89,11 +89,25 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnExtract">
-     <property name="text">
-      <string>Extract</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="actionButtonLayout">
+     <item>
+      <widget class="QPushButton" name="btnExtract">
+       <property name="text">
+        <string>Extract</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRemoveResult">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Remove results</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

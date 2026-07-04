@@ -68,5 +68,17 @@ For a detailed description of the Image Navigator please be referred to the Imag
 
 The four window view of the standard display is the heart of the MITK image viewing. For a detailed description of the four window view and the levelwindow please be referred to the standard display view documentation:   \ref org_mitk_editors_stdmultiwidget.
 
+\section MITKWorkbenchManualPage_CrashDumpDialog Diagnostic Data After a Crash
+
+If MITK closed unexpectedly, a diagnostic snapshot (crash dump) of that session is saved on your computer. On the next start, a dialog lists the saved dumps and asks what to do with them:
+
+<ul>
+  <li><b>Keep / Show in Folder</b> keeps the dumps and opens the folder they are stored in, so you can attach them to a problem report. This is the only way a dump is kept.</li>
+  <li><b>Discard</b> (the default, also chosen when you simply close the dialog) deletes them immediately.</li>
+</ul>
+
+A crash dump contains parts of the application's memory from the crashed session and may therefore include patient data. MITK never uploads crash dumps; they stay on your computer until you delete them or pass them on yourself. Kept dumps are not shown again on later starts, and only the 20 most recent dumps are retained.
+
+If you do not want MITK to write crash dumps at all, start the application with the command-line option <tt>\--no-crash-dumps</tt> or set the environment variable <tt>MITK_NO_CRASH_DUMPS</tt>.
 
 */

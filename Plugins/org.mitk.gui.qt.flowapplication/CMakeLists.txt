@@ -12,6 +12,10 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_FLOW_BENCH_APP_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS
-  PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil 
+  PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil
   PACKAGE_DEPENDS Qt6|WebEngineWidgets ${additional_dependencies}
 )
+
+if(MITK_USE_sentry)
+  target_compile_definitions(${PLUGIN_TARGET} PRIVATE MITK_HAS_CRASHHANDLING)
+endif()

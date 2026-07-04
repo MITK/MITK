@@ -75,6 +75,10 @@ https://www.qt.io/
 
 https://qwt.sourceforge.io/
 
+\par sentry-native (MIT license; bundles Crashpad, Apache-2.0 license)
+
+https://github.com/getsentry/sentry-native
+
 \par TinyXML-2
 
 https://www.grinninglizard.com/tinyxml2/

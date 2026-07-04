@@ -1,0 +1,133 @@
+/**
+\page CrashDumpFacilityPage Crash Dump Facility
+
+\tableofcontents
+
+\section CrashDumpFacilityPage_Overview Overview
+
+Every mitk::BaseApplication based application (MITK Workbench, MITK
+FlowBench) arms an out-of-process crash handler at startup: a hard crash
+(access violation, abort, stack overflow) leaves a Crashpad minidump in a
+per-user directory, and the next start of the application offers to keep the
+dump for reporting or to discard it.
+
+The facility is built on
+<a href="https://github.com/getsentry/sentry-native">sentry-native</a>
+(superbuild option \c MITK_USE_sentry, on by default), which builds and ships
+getsentry's fork of Crashpad. The library is linked statically and only by
+the \c MitkCrashHandling module; a second target linking it would duplicate
+process-global handler state, so all consumers go through
+mitk::CrashDumpFacility.
+
+\section CrashDumpFacilityPage_Content What a dump contains
+
+A minidump contains the stacks of all threads, CPU context, the list of
+loaded modules, and memory ranges referenced by the stacks - not the full
+heap. Its size is therefore governed by thread count and module count, not
+by loaded image or patient data (a minimal process produces roughly 130 kB).
+Stack-referenced memory can still include fragments of session data,
+possibly patient data, which is why dumps are treated as sensitive and are
+discarded by default in the next-start dialog.
+
+\section CrashDumpFacilityPage_LocalOnly Local-only by construction
+
+Nothing is ever uploaded: no DSN is compiled in and no configuration surface
+can set one; the crash handler is started with an empty upload URL, so it has
+no endpoint to upload to; and sentry-native's own event transport is compiled
+out (\c SENTRY_TRANSPORT=none), so no HTTP client is even linked. The stock
+\c crashpad_handler still contains upload code - it is simply never handed an
+endpoint - so the accurate statement is "never uploads", not "physically
+cannot".
+
+\section CrashDumpFacilityPage_Storage Where dumps live
+
+The crash-dump database is
+<tt>&lt;generic user data location&gt;/&lt;organization&gt;/&lt;application&gt;/CrashDumps</tt>
+(on Windows typically under \c \%LOCALAPPDATA\%). Unlike the CTK framework
+storage directory, the path carries no per-install hash: the hash would
+require a QCoreApplication, which deliberately does not exist yet when the
+facility arms (see below). All builds and installs of the same application
+therefore share one database; the module list inside a dump still identifies
+the exact binaries.
+
+The facility keeps the newest 20 dumps; older ones are pruned at every
+initialization, and Crashpad prunes its database on its own age/size schedule
+as well. The primary cleanup, however, is the next-start dialog: dumps the
+user does not explicitly keep are deleted immediately.
+
+\section CrashDumpFacilityPage_Wiring Application wiring
+
+mitk::BaseApplication::run() initializes the facility first thing, before
+Poco option parsing and before any Qt application object exists - crashes
+during the Qt/CTK startup window are a common and important crash class.
+
+The handler executable is shipped as \c MitkCrashHandler (renamed from
+upstream's generic \c crashpad_handler so it is recognizable as MITK's in a
+task manager). The build tree copies it beside the binaries and the installer
+ships it in the application bin directory. Because the name differs from what
+the sentry backend would auto-resolve, the facility sets \c handler_path
+explicitly to <tt>&lt;directory of the current executable&gt;/MitkCrashHandler</tt>.
+The filename is defined once in the module CMake and passed to the facility as
+a compile definition, so the file that is shipped and the file the facility
+spawns cannot drift apart.
+
+Because arming happens before option parsing, the facility can only be
+disabled through the raw command line or the environment:
+
+- command-line flag \c --no-crash-dumps
+- environment variable \c MITK_NO_CRASH_DUMPS
+
+An application <tt>.ini</tt> file cannot gate the facility; its options are
+parsed only after the facility is armed. This is a documented limitation.
+
+If a run crashed, the next start shows QmitkCrashDumpDialog (hooked into the
+workbench window advisors of the Workbench and FlowBench). The trigger is a
+scan for dumps newer than the last acknowledged one - not sentry's
+crashed-last-run marker, which is experimental API and unreliable under the
+single-instance argument forwarding of \c setSingleMode(true); the marker is
+only used as a corroborating signal. Dumps are surfaced exactly once:
+keeping and discarding both acknowledge them.
+
+\section CrashDumpFacilityPage_Processes The handler process and multiple instances
+
+Each armed application spawns one \c MitkCrashHandler process as a child; it
+runs for the lifetime of the application and writes the dump out of process
+when the application crashes. In the default single-instance mode
+(\c setSingleMode(true)) a second launch forwards its arguments to the running
+instance and exits, so no extra handler lingers. Genuinely concurrent
+instances (for example started with \c --BlueBerry.newInstance) each get their
+own handler against the shared database; Crashpad supports a shared database
+via file locking, so this is safe.
+
+\section CrashDumpFacilityPage_Testing Testing
+
+\c MitkCrashHandling ships unit tests for the database logic
+(\c mitkCrashDumpDatabaseTest: scan ordering, retention pruning, the
+acknowledgment watermark) and integration tests that spawn a helper
+executable which really crashes (\c mitkCrashDumpCaptureTest, modes \c segv /
+\c abort / \c stackoverflow) and assert that the out-of-process handler wrote
+a dump. The latter suite also exercises the full facility cycle headlessly:
+after a real crash it arms the facility in the test process against the same
+database and walks list -> acknowledge -> delete, i.e. the operations the
+next-start dialog drives without any UI. Because these tests only pass when
+arming succeeds, they also pin the handler filename: a mismatch between the
+shipped file and the \c handler_path the facility sets would make them fail.
+
+On platforms where the handler cannot arm (e.g. ptrace restrictions in
+containers), the tests fail hard unless the environment explicitly allows
+skipping by setting \c MITK_CRASHTEST_ALLOW_SKIP, in which case they exit with
+the ctest skip code 77. No CI configuration change is needed: the tests are
+auto-discovered, and \c MITK_USE_sentry is on by default (only the PythonWheel
+and Minimal build configurations disable it).
+
+\section CrashDumpFacilityPage_MixedConfigs Debug and Release in one superbuild tree
+
+The static sentry/crashpad libraries of both configurations coexist in the
+superbuild's \c ep prefix (Debug carries the usual \c d postfix). The
+\c crashpad_handler executable has no such postfix: whichever configuration
+installed last provides <tt>ep/bin/crashpad_handler(.exe)</tt>. For running
+and testing this is harmless - the handler is a standalone tool and writes
+identical dumps - but before packaging a release, make sure the sentry
+external project was (re)installed in Release, or the package ships a Debug
+handler that depends on debug CRT libraries.
+*/

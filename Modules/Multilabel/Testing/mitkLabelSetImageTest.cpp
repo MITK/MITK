@@ -72,6 +72,9 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestExistsLabel);
   MITK_TEST(TestExistsGroup);
   MITK_TEST(TestRemoveLayer);
+  MITK_TEST(TestRemoveGroup_StaleActiveLabelReselection_Ignored);
+  MITK_TEST(TestSetActiveLabel_StaleValueIgnored_ActiveLayerStaysValid);
+  MITK_TEST(TestGetActiveLayer_StaleActiveDuringLabelRemovedEvent_FallsBack);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
   MITK_TEST(TestMergeLabels);
@@ -490,6 +493,100 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistGroup(0) == false);
     CPPUNIT_ASSERT_THROW_MESSAGE("GetActiveLayers does not fail although all layer have been removed",
                            m_LabelSetImage->GetActiveLayer(), mitk::Exception);
+  }
+
+  void TestRemoveGroup_StaleActiveLabelReselection_Ignored()
+  {
+    // Reproduces the reported crash layout: group 0 holds labels {1, 2},
+    // group 1 holds label {3}, and label 3 is the active label.
+    mitk::Label::Pointer label1 = mitk::Label::New();
+    label1->SetName("Label1");
+    label1->SetValue(1);
+
+    mitk::Label::Pointer label2 = mitk::Label::New();
+    label2->SetName("Label2");
+    label2->SetValue(2);
+
+    mitk::Label::Pointer label3 = mitk::Label::New();
+    label3->SetName("Label3");
+    label3->SetValue(3);
+
+    m_LabelSetImage->AddLabel(label1, 0);
+    m_LabelSetImage->AddLabel(label2, 0);
+    m_LabelSetImage->AddGroup({ label3 });
+    m_LabelSetImage->SetActiveLabel(3);
+
+    m_LabelSetImage->RemoveGroup(1);
+
+    // RemoveGroup leaves the model consistent: label 3 is gone and the active
+    // label falls back to a surviving label, so GetActiveLayer works.
+    CPPUNIT_ASSERT_MESSAGE("Label 3 must not exist after its group was removed",
+                           !m_LabelSetImage->ExistLabel(3));
+    CPPUNIT_ASSERT_MESSAGE("Active label should fall back to a surviving label",
+                           nullptr != m_LabelSetImage->GetActiveLabel() &&
+                           1 == m_LabelSetImage->GetActiveLabel()->GetValue());
+    CPPUNIT_ASSERT_NO_THROW(m_LabelSetImage->GetActiveLayer());
+
+    // A stale re-selection of the removed value is ignored (tolerated), not
+    // fatal, and must not mutate the object (no Modified(), hence no
+    // AfterChangeLayerEvent).
+    const auto mTimeBefore = m_LabelSetImage->GetMTime();
+    CPPUNIT_ASSERT_NO_THROW(m_LabelSetImage->SetActiveLabel(3));
+    CPPUNIT_ASSERT_MESSAGE("Ignoring a stale value must not modify the segmentation",
+                           mTimeBefore == m_LabelSetImage->GetMTime());
+    CPPUNIT_ASSERT_MESSAGE("Active label should be unchanged after ignoring a stale value",
+                           nullptr != m_LabelSetImage->GetActiveLabel() &&
+                           1 == m_LabelSetImage->GetActiveLabel()->GetValue());
+    CPPUNIT_ASSERT_NO_THROW(m_LabelSetImage->GetActiveLayer());
+  }
+
+  void TestSetActiveLabel_StaleValueIgnored_ActiveLayerStaysValid()
+  {
+    // setUp created a single empty group; no label is active (UNLABELED).
+    CPPUNIT_ASSERT_MESSAGE("Precondition: no active label expected",
+                           nullptr == m_LabelSetImage->GetActiveLabel());
+
+    // Selecting a non-existent value while UNLABELED is ignored, not poisoning.
+    CPPUNIT_ASSERT_NO_THROW(m_LabelSetImage->SetActiveLabel(3));
+    CPPUNIT_ASSERT_MESSAGE("Active label should remain unset after ignoring a stale value",
+                           nullptr == m_LabelSetImage->GetActiveLabel());
+
+    // GetActiveLayer is total here: it falls back to group 0 rather than throwing.
+    unsigned int activeLayer = 1;
+    CPPUNIT_ASSERT_NO_THROW(activeLayer = m_LabelSetImage->GetActiveLayer());
+    CPPUNIT_ASSERT_MESSAGE("GetActiveLayer should fall back to group 0", 0 == activeLayer);
+  }
+
+  void TestGetActiveLayer_StaleActiveDuringLabelRemovedEvent_FallsBack()
+  {
+    mitk::Label::Pointer label1 = mitk::Label::New();
+    label1->SetName("Label1");
+    label1->SetValue(1);
+
+    mitk::Label::Pointer label2 = mitk::Label::New();
+    label2->SetName("Label2");
+    label2->SetValue(2);
+
+    m_LabelSetImage->AddLabel(label1, 0);
+    m_LabelSetImage->AddGroup({ label2 });
+    m_LabelSetImage->SetActiveLabel(2); // active label lives in the group to be removed
+
+    // During RemoveGroup, LabelRemovedEvent for value 2 fires after the value is
+    // erased from the maps but before m_ActiveLabelValue is reset: GetActiveLayer
+    // is queried on a transiently-stale active value and must not throw.
+    bool observerThrew = false;
+    std::string description;
+    auto tag = m_LabelSetImage->AddObserver(mitk::LabelRemovedEvent(),
+      [this, &observerThrew, &description](const itk::EventObject&)
+      {
+        try { m_LabelSetImage->GetActiveLayer(); }
+        catch (const mitk::Exception &e) { observerThrew = true; description = e.GetDescription(); }
+      });
+
+    CPPUNIT_ASSERT_NO_THROW(m_LabelSetImage->RemoveGroup(1));
+    m_LabelSetImage->RemoveObserver(tag);
+    CPPUNIT_ASSERT_MESSAGE("GetActiveLayer must not throw on a transiently-stale active value: " + description,
+                           !observerThrew);
   }
 
   void TestRemoveLabels()

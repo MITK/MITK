@@ -622,11 +622,19 @@ namespace mitk
 
     /**
      * \brief Gets the ID of the currently active group
-     * \return the ID of the active group
-     * \pre at least on group must exist.
+     * \return the ID of the active group. If no label is active, or the active
+     * label value no longer exists, the first group (index 0) is returned.
+     * \pre at least one group must exist.
      */
     unsigned int GetActiveLayer() const;
 
+    /**
+     * \brief Sets the active label by its value.
+     * \param label the value of the label to activate, or UNLABELED_VALUE to
+     * clear the active label. A value that does not identify an existing label
+     * is ignored (the previous active label is kept) and logged as a warning;
+     * it is not treated as an error.
+     */
     void SetActiveLabel(LabelValueType label);
     Label* GetActiveLabel();
     const Label* GetActiveLabel() const;

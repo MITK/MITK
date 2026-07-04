@@ -120,6 +120,75 @@ the ctest skip code 77. No CI configuration change is needed: the tests are
 auto-discovered, and \c MITK_USE_sentry is on by default (only the PythonWheel
 and Minimal build configurations disable it).
 
+\section CrashDumpFacilityPage_Symbols Release debug symbols
+
+A stripped Release binary produces undecodable dumps. The option
+\c MITK_RELEASE_DEBUG_SYMBOLS (default ON, forwarded from the superbuild)
+makes a Release build emit debug symbols for MITK's own code - PDBs on MSVC,
+split DWARF on GCC/Clang, dSYM on macOS - so release dumps can be walked back
+to function, file, and line. It is deliberately independent of
+\c MITK_USE_sentry: the symbols are equally useful for dumps captured by other
+means.
+
+There is no execution-speed cost: the Release optimization level and inlining
+are preserved. (The MSVC binary is marginally larger - with \c /DEBUG present
+the linker's \c /OPT:ICF folds slightly fewer identical functions, to keep
+them individually debuggable - but this is a code-size, not a runtime-speed,
+difference.)
+
+- MSVC compiles with \c /Z7 (CodeView embedded per object, codegen-identical
+  to no debug info and parallel-build safe, unlike \c /Zi) while keeping
+  \c /O2 \c /Ob2 (full inlining, unlike RelWithDebInfo's \c /Ob1). The link
+  step uses \c /DEBUG:FULL (a self-contained, shippable PDB) and restores
+  \c /OPT:REF \c /OPT:ICF, which \c /DEBUG would otherwise disable.
+- GCC/Clang use \c -gsplit-dwarf, which is codegen-neutral and needs no
+  link-side flag; macOS uses \c -g plus \c dsymutil at archive time.
+
+The flags ride the \c MitkCompilerFlags interface target, which only code
+compiled by MITK's own module/plugin/application machinery links. Prebuilt
+third-party dependencies (ITK, VTK, Boost, Qt, ...) are built separately under
+the superbuild \c ep prefix and never see these flags, so they stay
+symbol-free. Bundled sources under \c Utilities/ that are compiled through the
+MITK machinery do receive symbols (they are MITK-built and linked into MITK
+libraries); this is harmless and still cost-free. The practical consequence:
+a crash inside a prebuilt third-party library resolves to
+function-name-plus-offset only, while MITK frames resolve to file and line.
+
+\subsection CrashDumpFacilityPage_Symbols_Archive Archiving symbols
+
+Shipped binaries stay symbol-free (on Linux they are never stripped, because
+MitkCppMicroServices appends ZIP resources to the shared libraries). The
+symbols are archived separately:
+
+\code
+cmake --build . --config Release --target package-symbols
+\endcode
+
+This writes <tt>&lt;CPACK_PACKAGE_FILE_NAME&gt;-symbols.zip</tt> (for example
+<tt>MITK-2025.12.99-windows-x86_64-symbols.zip</tt>) next to the other CPack
+artifacts, collecting the PDBs (Windows) / dwp files (Linux) / dSYM bundles
+(macOS) of the MITK-built binaries from the build-tree output directory. Keep
+the archive that matches a given release; a dump is only decodable against the
+symbols built from the exact same sources.
+
+\subsection CrashDumpFacilityPage_Symbols_HowTo Symbolicating a dump
+
+On Windows, point a debugger at the archive's PDBs and open the dump:
+
+\code
+cdb -z crash.dmp -y <extracted-symbols-dir> -c "!analyze -v; k; q"
+\endcode
+
+WinDbg loads a PDB whose signature matches the shipped DLL without any
+override. Cross-platform, convert the archived debug info with \c dump_syms
+and walk the dump with \c minidump_stackwalk (both from the Breakpad /
+Crashpad tooling):
+
+\code
+dump_syms MitkCore.pdb > MitkCore.sym          # or the ELF/dSYM equivalent
+minidump_stackwalk crash.dmp <symbol-dir>
+\endcode
+
 \section CrashDumpFacilityPage_MixedConfigs Debug and Release in one superbuild tree
 
 The static sentry/crashpad libraries of both configurations coexist in the

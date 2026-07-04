@@ -231,6 +231,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenMP
+  MITK_RELEASE_DEBUG_SYMBOLS
   )
 
 #-----------------------------------------------------------------------------

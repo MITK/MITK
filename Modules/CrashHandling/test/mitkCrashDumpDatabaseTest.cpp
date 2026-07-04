@@ -65,9 +65,9 @@ public:
 
   void ScanOrdersNewestFirst()
   {
-    CreateDump("middle.dmp", 20);
-    CreateDump("newest.dmp", 10);
-    CreateDump("oldest.dmp", 30);
+    this->CreateDump("middle.dmp", 20);
+    this->CreateDump("newest.dmp", 10);
+    this->CreateDump("oldest.dmp", 30);
 
     const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory);
 
@@ -80,7 +80,7 @@ public:
 
   void ScanIgnoresNonDumpFiles()
   {
-    CreateDump("crash.dmp", 10);
+    this->CreateDump("crash.dmp", 10);
     std::ofstream(m_DatabaseDirectory / "settings.dat") << "crashpad bookkeeping";
 
     const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory);
@@ -91,7 +91,7 @@ public:
 
   void ScanFindsDumpsInSubdirectories()
   {
-    CreateDump("reports/nested.dmp", 10);
+    this->CreateDump("reports/nested.dmp", 10);
 
     const auto dumps = mitk::ScanCrashDumps(m_DatabaseDirectory);
 
@@ -109,7 +109,7 @@ public:
   void PruneKeepsNewestDumps()
   {
     for (int i = 0; i < 5; ++i)
-      CreateDump("dump" + std::to_string(i) + ".dmp", 10 * (i + 1));
+      this->CreateDump("dump" + std::to_string(i) + ".dmp", 10 * (i + 1));
 
     const auto deleted = mitk::PruneCrashDumps(m_DatabaseDirectory, 3);
 
@@ -124,7 +124,7 @@ public:
 
   void PruneIsNoopBelowLimit()
   {
-    CreateDump("only.dmp", 10);
+    this->CreateDump("only.dmp", 10);
 
     CPPUNIT_ASSERT_EQUAL(std::size_t(0), mitk::PruneCrashDumps(m_DatabaseDirectory, 3));
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::ScanCrashDumps(m_DatabaseDirectory).size());
@@ -132,8 +132,8 @@ public:
 
   void UnacknowledgedIsEverythingWithoutWatermark()
   {
-    CreateDump("a.dmp", 10);
-    CreateDump("b.dmp", 20);
+    this->CreateDump("a.dmp", 10);
+    this->CreateDump("b.dmp", 20);
 
     CPPUNIT_ASSERT(!mitk::ReadLastAcknowledgedTime(m_DatabaseDirectory).has_value());
     CPPUNIT_ASSERT_EQUAL(std::size_t(2), mitk::ScanUnacknowledgedCrashDumps(m_DatabaseDirectory).size());
@@ -141,9 +141,9 @@ public:
 
   void WatermarkHidesOlderDumps()
   {
-    CreateDump("new.dmp", 10);
-    const auto middle = CreateDump("middle.dmp", 20);
-    CreateDump("old.dmp", 30);
+    this->CreateDump("new.dmp", 10);
+    const auto middle = this->CreateDump("middle.dmp", 20);
+    this->CreateDump("old.dmp", 30);
 
     const auto middleTime = std::filesystem::last_write_time(middle);
     CPPUNIT_ASSERT(mitk::WriteLastAcknowledgedTime(m_DatabaseDirectory, middleTime));
@@ -163,7 +163,7 @@ public:
 
   void UnreadableWatermarkCountsAsAbsent()
   {
-    CreateDump("crash.dmp", 10);
+    this->CreateDump("crash.dmp", 10);
     std::ofstream(mitk::GetAcknowledgedMarkerFilePath(m_DatabaseDirectory)) << "not a timestamp";
 
     CPPUNIT_ASSERT(!mitk::ReadLastAcknowledgedTime(m_DatabaseDirectory).has_value());

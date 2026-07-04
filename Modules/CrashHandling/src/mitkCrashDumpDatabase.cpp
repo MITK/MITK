@@ -43,20 +43,30 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
   if (error)
     return dumps;
 
-  for (const auto& entry : it)
+  // recursive_directory_iterator::operator++ throws on a mid-iteration
+  // filesystem error (e.g. a dump removed by a concurrent prune). This
+  // facility must not disturb the application it diagnoses, so treat such an
+  // error as end-of-scan and return whatever was collected so far.
+  try
   {
-    if (!entry.is_regular_file(error) || !HasDumpExtension(entry.path()))
-      continue;
+    for (const auto& entry : it)
+    {
+      if (!entry.is_regular_file(error) || !HasDumpExtension(entry.path()))
+        continue;
 
-    const auto lastWriteTime = entry.last_write_time(error);
-    if (error)
-      continue;
+      const auto lastWriteTime = entry.last_write_time(error);
+      if (error)
+        continue;
 
-    const auto size = entry.file_size(error);
-    if (error)
-      continue;
+      const auto size = entry.file_size(error);
+      if (error)
+        continue;
 
-    dumps.push_back({ entry.path(), lastWriteTime, size });
+      dumps.push_back({ entry.path(), lastWriteTime, size });
+    }
+  }
+  catch (const std::filesystem::filesystem_error&)
+  {
   }
 
   std::sort(dumps.begin(), dumps.end(), [](const CrashDumpInfo& lhs, const CrashDumpInfo& rhs) {

@@ -10,7 +10,7 @@
 
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.MxNMultiWidgetEditorPreferencePage"
-		  name="MxN Multi Widget Editor"
+		  name="MxN Display"
 		  class="QmitkMxNMultiWidgetEditorPreferencePage"
 		  category="org.mitk.EditorsPreferencePage">
       <keywordreference id="org.mitk.MxNMultiWidgetEditorPreferencePageKeywords"/>

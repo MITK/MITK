@@ -235,8 +235,9 @@ option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 option(MITK_PCH "Enable precompiled headers" ON)
 
 # Emit debug symbols for MITK's own code in Release builds (PDBs on MSVC,
-# split DWARF on GCC/Clang) so release crash dumps are decodable, without
-# any runtime-performance cost (Release optimization/layout is preserved).
+# split DWARF on GCC/Clang) so release crash dumps are decodable, with no
+# execution-speed cost (optimization and inlining are preserved; the MSVC
+# binary ends up marginally larger).
 # Declared here, before the superbuild include, so it can be forwarded to
 # the inner build via mitk_cmake_boolean_args in SuperBuild.cmake.
 option(MITK_RELEASE_DEBUG_SYMBOLS "Emit debug symbols for MITK code in Release builds" ON)
@@ -1159,7 +1160,9 @@ add_library(MitkCompilerFlags INTERFACE)
 #    untouched (full inlining, unlike RelWithDebInfo's /Ob1).
 #  - GCC/Clang: -gsplit-dwarf keeps debug info in .dwo files beside the
 #    objects, is codegen-neutral, and needs no link-side flag.
-#  - macOS: -g is codegen-neutral; the .dSYM is produced at archive time.
+#  - macOS: -g (not -gsplit-dwarf: dsymutil consumes plain DWARF, split
+#    DWARF is a Linux convention) is codegen-neutral; the .dSYM is produced
+#    at archive time.
 # The MSVC binary ends up marginally larger (~0.5%): /DEBUG makes /OPT:ICF
 # fold slightly fewer identical functions to keep them individually
 # debuggable. This is a code-size, not a runtime-speed, difference.
@@ -1179,6 +1182,8 @@ endif()
 # C++ and C flags (populated by mitkFunctionCheckCompilerFlags probes above)
 foreach(_var MITK_CXX_FLAGS MITK_C_FLAGS MITK_CXX_FLAGS_RELEASE MITK_C_FLAGS_RELEASE)
   string(STRIP "${${_var}}" ${_var})
+  # Collapse repeated spaces so the " "->";" split below emits no empty elements.
+  string(REGEX REPLACE " +" " " ${_var} "${${_var}}")
 endforeach()
 
 if(MITK_CXX_FLAGS)
@@ -1232,7 +1237,8 @@ endif()
 # which references the build's .obj files). /DEBUG silently flips the linker's
 # /OPT defaults to /OPT:NOREF,NOICF, which would disable dead-code elimination
 # and COMDAT folding and bloat the binary versus a plain Release; /OPT:REF
-# /OPT:ICF restore the Release behavior, keeping codegen and layout identical.
+# /OPT:ICF restore them. Codegen is unchanged, though /DEBUG keeps ICF
+# slightly more conservative, leaving the binary marginally larger.
 if(MITK_RELEASE_DEBUG_SYMBOLS AND MSVC)
   target_link_options(MitkCompilerFlags INTERFACE
     $<$<CONFIG:Release>:/DEBUG:FULL;/OPT:REF;/OPT:ICF>)

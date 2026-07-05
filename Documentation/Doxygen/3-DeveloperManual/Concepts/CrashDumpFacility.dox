@@ -76,7 +76,9 @@ moves the freshly written dump out of Crashpad's report area into a
 facility-owned subdirectory (<tt>mitk-snapshots</tt> or
 <tt>mitk-pending-freeze</tt>). The surfacable set (mitk::CrashDumpFacility::ListDumps)
 is therefore crash dumps plus <tt>mitk-pending-freeze</tt> survivors;
-<tt>mitk-snapshots</tt> is excluded.
+<tt>mitk-snapshots</tt> is excluded. The snapshot areas themselves are
+enumerable per kind via mitk::CrashDumpFacility::ListSnapshots, so diagnostic
+tooling can inspect them without knowing the directory layout.
 
 \subsection CrashDumpFacilityPage_Snapshots_Watchdog UI-freeze watchdog
 
@@ -139,6 +141,24 @@ instances (for example started with \c --BlueBerry.newInstance) each get their
 own handler against the shared database; Crashpad supports a shared database
 via file locking, so this is safe.
 
+\section CrashDumpFacilityPage_Debugger Running under a debugger
+
+A crash-dump handler and an attached debugger compete for the same
+exceptions, and on Windows the debugger wins. When a process runs under
+the Visual Studio debugger (Start Debugging / F5), the operating system
+delivers exceptions to the debugger first, and the top-level
+unhandled-exception path Crashpad relies on is bypassed while a debugger
+is present (\c IsDebuggerPresent). A genuine crash therefore breaks into
+the debugger instead of producing a minidump - the facility still arms
+normally, but no dump is written.
+
+To exercise real-crash capture from Visual Studio, launch without the
+debugger (Start Without Debugging / Ctrl+F5) or start the application
+from \c startMitkWorkbench_release.bat. The on-demand and watchdog
+snapshots use Crashpad's DumpWithoutCrash, which does not go through the
+unhandled-exception path, so those are still written under a debugger;
+only genuine crashes are intercepted.
+
 \section CrashDumpFacilityPage_Testing Testing
 
 \c MitkCrashHandling ships unit tests for the database logic
@@ -164,6 +184,23 @@ skipping by setting \c MITK_CRASHTEST_ALLOW_SKIP, in which case they exit with
 the ctest skip code 77. No CI configuration change is needed: the tests are
 auto-discovered, and \c MITK_USE_sentry is on by default (only the PythonWheel
 and Minimal build configurations disable it).
+
+The in-application paths automation cannot reach - the next-start dialog
+after a real crash, the "Capture diagnostics" button on the top-level error
+dialog, and the watchdog against a live event loop - are exercised manually
+with the \c org.mitk.gui.qt.crashtest plugin. Its Crash Test view offers one
+button per failure path: a hard crash (null-pointer write on the UI thread),
+an unhandled mitk::Exception (reaches the safe-mode error dialog), and a UI
+freeze of configurable duration (run the application with
+<tt>--ui-watchdog 5</tt> to watch the watchdog react without waiting for the
+default timeout). The view also lists the dumps currently in the database,
+including the snapshot areas the next-start dialog never shows - captures are
+thereby observable in-session, before a clean shutdown purges provisional
+snapshots or a dialog discard removes crash dumps. The plugin is a QA aid
+only: it is off by default
+(\c MITK_BUILD_org.mitk.gui.qt.crashtest), no shipping build configuration
+includes it, and a deliberate-crash surface must never be part of a released
+application.
 
 \section CrashDumpFacilityPage_Symbols Release debug symbols
 

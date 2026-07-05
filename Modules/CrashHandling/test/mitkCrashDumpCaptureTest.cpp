@@ -260,6 +260,24 @@ public:
     // ...into the on-demand subdirectory, so it is excluded from the
     // surfacable set and never triggers the next-start dialog.
     CPPUNIT_ASSERT(mitk::ScanCrashDumps(m_DatabaseDirectory, { "mitk-snapshots" }).empty());
+
+    // The facility's typed view of the same facts (what the crash-test
+    // plugin's dump list consumes).
+    mitk::CrashDumpFacility::Config config;
+    config.DatabaseDirectory = m_DatabaseDirectory;
+    config.ApplicationName = "mitkCrashDumpCaptureTest";
+    config.ApplicationVersion = "1.0";
+
+    if (!mitk::CrashDumpFacility::Initialize(config))
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1),
+      mitk::CrashDumpFacility::ListSnapshots(mitk::SnapshotKind::OnDemand).size());
+    CPPUNIT_ASSERT(
+      mitk::CrashDumpFacility::ListSnapshots(mitk::SnapshotKind::WatchdogProvisional).empty());
+    CPPUNIT_ASSERT(mitk::CrashDumpFacility::ListDumps().empty());
+
+    mitk::CrashDumpFacility::Shutdown();
   }
 
   /** UI-freeze watchdog, false-positive guard (direction A): a freeze that

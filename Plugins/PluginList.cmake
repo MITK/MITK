@@ -23,6 +23,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.datastorageviewertest:OFF
+  org.mitk.gui.qt.crashtest:OFF
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.restapi:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF

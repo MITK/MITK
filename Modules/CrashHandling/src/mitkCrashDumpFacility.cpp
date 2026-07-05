@@ -245,6 +245,16 @@ std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDump
   return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
 }
 
+std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListSnapshots(SnapshotKind kind)
+{
+  const auto& database = s_State.DatabaseDirectory;
+
+  if (database.empty())
+    return {};
+
+  return ScanCrashDumps(database / SubdirForKind(kind));
+}
+
 bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
 {
   std::error_code error;

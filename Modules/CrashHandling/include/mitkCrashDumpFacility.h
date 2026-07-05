@@ -120,6 +120,12 @@ namespace mitk
      *  a dialog is warranted exactly when this is non-empty. */
     static std::vector<CrashDumpInfo> ListUnacknowledgedDumps();
 
+    /** \brief The non-fatal snapshots currently filed under \p kind, newest
+     *  first. Complements ListDumps(), which never reports the on-demand
+     *  area; provisional (watchdog) snapshots appear in both. Returns an
+     *  empty list when the area does not exist. */
+    static std::vector<CrashDumpInfo> ListSnapshots(SnapshotKind kind);
+
     /** \brief Remove one dump file (and, best effort, its metadata). */
     static bool DeleteDump(const std::filesystem::path& dumpPath);
 

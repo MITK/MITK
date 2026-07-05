@@ -29,6 +29,25 @@ Stack-referenced memory can still include fragments of session data,
 possibly patient data, which is why dumps are treated as sensitive and are
 discarded by default in the next-start dialog.
 
+Whether a given piece of data appears depends on whether it was on a thread
+stack or in a register at capture time - not on whether it was loaded:
+
+| Data | Where it lives | In the dump? |
+| ---- | -------------- | ------------ |
+| Patient name / ID in node or image properties (`mitk::StringProperty`) | `std::string` on the heap | At rest, usually not - only a pointer would be on a stack |
+| Image pixel data | large heap allocations | No |
+| An identifier being actively processed at the crash point | arguments, locals, registers, stack | Plausibly yes |
+| Short strings held inline (`std::string` small-string optimization) | inline in a stack local | Yes, if such a local is live |
+| File paths during I/O (DICOM filenames often embed a name or ID) | local string | Likely, if the crash is during loading |
+| `QString` contents in general | heap; only a pointer on the stack | Usually not |
+
+A dump must be assumed to possibly contain fragments of whatever the
+application was handling at the moment of capture. It will not hold the bulk
+of loaded patient data, but it cannot be assumed free of personal data, and
+there is no way to verify that it is. Every kept dump should be treated as
+potentially containing patient data and shared only through the institution's
+process for handling such data.
+
 \section CrashDumpFacilityPage_LocalOnly Local-only by construction
 
 Nothing is ever uploaded: no DSN is compiled in and no configuration surface
@@ -50,7 +69,7 @@ facility arms (see below). All builds and installs of the same application
 therefore share one database; the module list inside a dump still identifies
 the exact binaries.
 
-The facility keeps the newest 20 dumps per area; older ones are pruned, and
+The facility keeps the newest 10 dumps per area; older ones are pruned, and
 Crashpad prunes its own report area on its age/size schedule as well. The
 primary cleanup, however, is the next-start dialog: dumps the user does not
 explicitly keep are deleted immediately.
@@ -238,20 +257,21 @@ function-name-plus-offset only, while MITK frames resolve to file and line.
 
 \subsection CrashDumpFacilityPage_Symbols_Archive Archiving symbols
 
-Shipped binaries stay symbol-free (on Linux they are never stripped, because
-MitkCppMicroServices appends ZIP resources to the shared libraries). The
-symbols are archived separately:
+The installers do not ship the symbols. On Windows the debug info lives in
+separate PDBs that are never installed; on Linux and macOS the binaries are
+not stripped (see \ref PackagingPage), so they keep their symbol tables while
+split DWARF holds the bulk of the debug info outside them. Either way the full
+symbols must be archived separately, by the \c package-symbols target:
 
 \code
 cmake --build . --config Release --target package-symbols
 \endcode
 
 This writes <tt>&lt;CPACK_PACKAGE_FILE_NAME&gt;-symbols.zip</tt> (for example
-<tt>MITK-2025.12.99-windows-x86_64-symbols.zip</tt>) next to the other CPack
-artifacts, collecting the PDBs (Windows) / dwp files (Linux) / dSYM bundles
-(macOS) of the MITK-built binaries from the build-tree output directory. Keep
-the archive that matches a given release; a dump is only decodable against the
-symbols built from the exact same sources.
+<tt>MITK-2025.12.99-windows-x86_64-symbols.zip</tt>). Keep the archive that
+matches a given release; a dump is only decodable against the symbols built
+from the exact same sources. Producing and archiving this file for every
+released build is a release-pipeline responsibility - see \ref PackagingPage.
 
 \subsection CrashDumpFacilityPage_Symbols_HowTo Symbolicating a dump
 

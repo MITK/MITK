@@ -48,9 +48,11 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
   this->setWindowTitle("Diagnostic Data From Previous Session");
 
   auto* messageLabel = new QLabel(
-    "<b>MITK previously closed unexpectedly or became unresponsive.</b><br/><br/>"
-    "A diagnostic snapshot (crash dump) of that session was saved. It can help the "
-    "developers find the cause if you keep it and hand it in with a problem report.");
+    "<b>We are sorry that MITK closed unexpectedly or became unresponsive during your "
+    "previous session, and for any inconvenience this may have caused.</b><br/><br/>"
+    "A diagnostic snapshot (crash dump) of that session was saved. If possible, please "
+    "keep it and hand it in with a problem report. It helps us find the cause and make "
+    "MITK more robust and reliable.");
   messageLabel->setWordWrap(true);
 
   auto* dumpList = new QListWidget;
@@ -62,8 +64,10 @@ QmitkCrashDumpDialog::QmitkCrashDumpDialog(const std::vector<mitk::CrashDumpInfo
 
   auto* privacyLabel = new QLabel(
     "A crash dump contains parts of the application's memory from that session and "
-    "may therefore include patient data. MITK never uploads it; it stays on this "
-    "computer. <b>Unless you keep it, it is deleted now.</b>");
+    "may therefore include patient data, and there is no way to verify that it does "
+    "not. MITK never uploads it; it stays on this computer. If you keep it, share it "
+    "only through your usual process for handling patient data. "
+    "<b>Unless you keep it, it is deleted now.</b>");
   privacyLabel->setWordWrap(true);
 
   auto* buttonBox = new QDialogButtonBox;

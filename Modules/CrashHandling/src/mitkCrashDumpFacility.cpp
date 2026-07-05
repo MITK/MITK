@@ -34,7 +34,7 @@ found in the LICENSE file.
 
 namespace
 {
-  constexpr std::size_t kMaxRetainedDumps = 20;
+  constexpr std::size_t kMaxRetainedDumps = 10;
 
   // Facility-owned subdirectories of the database. Snapshots taken via
   // CaptureSnapshot are moved out of Crashpad's report area into one of these

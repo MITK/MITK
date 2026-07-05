@@ -18,6 +18,14 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
+#ifdef MITK_HAS_CRASHHANDLING
+#include <mitkCrashDumpFacility.h>
+
+#include <QDesktopServices>
+#include <QPushButton>
+#include <QUrl>
+#endif
+
 /**
  * \brief Safely delivers a Qt event, catching and displaying any exceptions.
  *
@@ -62,6 +70,11 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   msgBox.setIcon(QMessageBox::Critical);
   msgBox.addButton("Exit immediately", QMessageBox::YesRole);
   msgBox.addButton("Ignore", QMessageBox::NoRole);
+#ifdef MITK_HAS_CRASHHANDLING
+  // Appended last on purpose: the switch below keys off the button add-order
+  // index, so this must stay case 2.
+  msgBox.addButton("Capture diagnostics", QMessageBox::ActionRole);
+#endif
 
   int ret = msgBox.exec();
 
@@ -75,6 +88,33 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
       MITK_ERROR
         << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";
       break;
+#ifdef MITK_HAS_CRASHHANDLING
+    case 2:
+    {
+      const auto snapshot = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
+
+      QMessageBox resultBox;
+      if (snapshot.has_value())
+      {
+        resultBox.setIcon(QMessageBox::Information);
+        resultBox.setText("A diagnostic snapshot was saved. It stays on this computer; hand it in with a problem report.");
+        resultBox.setDetailedText(QString::fromStdWString(snapshot->wstring()));
+        auto *showButton = resultBox.addButton("Show in folder", QMessageBox::ActionRole);
+        resultBox.addButton(QMessageBox::Ok);
+        resultBox.exec();
+
+        if (resultBox.clickedButton() == showButton)
+          QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(snapshot->parent_path().wstring())));
+      }
+      else
+      {
+        resultBox.setIcon(QMessageBox::Warning);
+        resultBox.setText("Could not capture a diagnostic snapshot.");
+        resultBox.exec();
+      }
+      break;
+    }
+#endif
   }
 
   return false;

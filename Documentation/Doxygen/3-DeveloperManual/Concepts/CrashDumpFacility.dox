@@ -50,10 +50,50 @@ facility arms (see below). All builds and installs of the same application
 therefore share one database; the module list inside a dump still identifies
 the exact binaries.
 
-The facility keeps the newest 20 dumps; older ones are pruned at every
-initialization, and Crashpad prunes its database on its own age/size schedule
-as well. The primary cleanup, however, is the next-start dialog: dumps the
-user does not explicitly keep are deleted immediately.
+The facility keeps the newest 20 dumps per area; older ones are pruned, and
+Crashpad prunes its own report area on its age/size schedule as well. The
+primary cleanup, however, is the next-start dialog: dumps the user does not
+explicitly keep are deleted immediately.
+
+\section CrashDumpFacilityPage_Snapshots Non-fatal snapshots and dump kinds
+
+Besides the crash dumps the handler writes automatically, the facility can
+capture a minidump of the running process without crashing it, via
+mitk::CrashDumpFacility::CaptureSnapshot (Crashpad's DumpWithoutCrash - a
+full, all-thread dump). Three kinds of dump are tracked so the next-start
+dialog surfaces only the right ones:
+
+- <b>Crash dumps</b> - written by the handler on a hard crash. Surfaced.
+- <b>On-demand snapshots</b> - the "Capture diagnostics" button on the
+  top-level error dialog (mitk::SnapshotKind::OnDemand). Shown once with
+  their location, kept, and never re-surfaced.
+- <b>Provisional freeze snapshots</b> - written by the UI-freeze watchdog
+  (mitk::SnapshotKind::WatchdogProvisional). Purged when the freeze recovers
+  or on clean shutdown, so only a hard-killed freeze leaves one behind.
+
+The kind is made a filesystem fact that survives a hard kill: CaptureSnapshot
+moves the freshly written dump out of Crashpad's report area into a
+facility-owned subdirectory (<tt>mitk-snapshots</tt> or
+<tt>mitk-pending-freeze</tt>). The surfacable set (mitk::CrashDumpFacility::ListDumps)
+is therefore crash dumps plus <tt>mitk-pending-freeze</tt> survivors;
+<tt>mitk-snapshots</tt> is excluded.
+
+\subsection CrashDumpFacilityPage_Snapshots_Watchdog UI-freeze watchdog
+
+The watchdog is opt-in and silent. A Qt-free mitk::HeartbeatMonitor runs a
+worker thread that watches a heartbeat counter; QmitkUiFreezeWatchdog bumps
+that counter from a QTimer on the UI thread. If the UI thread wedges, the
+timer stops firing; after the timeout (default 180 s) the monitor captures up
+to three provisional snapshots a few seconds apart, so an analyst can tell a
+permanent wedge from a slow loop. If the heartbeat resumes, the provisional
+snapshots from that episode are purged - so a temporary freeze leaves nothing
+behind and never prompts on the next start. Only a freeze that ends in a hard
+kill (the out-of-process handler already wrote the dumps) survives.
+
+It is off by default - legitimate long UI-thread operations exist, and false
+positives would erode trust. Enable it with a timeout in seconds via the
+environment variable \c MITK_UI_WATCHDOG or the command-line option
+\c --ui-watchdog (the environment variable takes precedence).
 
 \section CrashDumpFacilityPage_Wiring Application wiring
 
@@ -103,15 +143,20 @@ via file locking, so this is safe.
 
 \c MitkCrashHandling ships unit tests for the database logic
 (\c mitkCrashDumpDatabaseTest: scan ordering, retention pruning, the
-acknowledgment watermark) and integration tests that spawn a helper
-executable which really crashes (\c mitkCrashDumpCaptureTest, modes \c segv /
-\c abort / \c stackoverflow) and assert that the out-of-process handler wrote
-a dump. The latter suite also exercises the full facility cycle headlessly:
-after a real crash it arms the facility in the test process against the same
-database and walks list -> acknowledge -> delete, i.e. the operations the
-next-start dialog drives without any UI. Because these tests only pass when
-arming succeeds, they also pin the handler filename: a mismatch between the
-shipped file and the \c handler_path the facility sets would make them fail.
+acknowledgment watermark), unit tests for the freeze detector with short
+fake timeouts (\c mitkHeartbeatMonitorTest: stall, recovery, and the
+per-episode capture bound, no crash handler needed), and integration tests
+that spawn a helper executable (\c mitkCrashDumpCaptureTest). The helper
+really crashes (modes \c segv / \c abort / \c stackoverflow) to assert the
+handler wrote a dump; captures an on-demand snapshot (\c snapshot) to assert
+it is written but excluded from the surfacable set; and drives the watchdog
+in both directions (\c freeze / \c freeze-recover) to assert a hard-killed
+freeze leaves a provisional dump while a recovered one leaves none. The suite
+also walks the full facility cycle headlessly after a real crash - arm, list,
+acknowledge, delete - i.e. the operations the next-start dialog drives without
+any UI. Because these tests only pass when arming succeeds, they also pin the
+handler filename: a mismatch between the shipped file and the \c handler_path
+the facility sets would make them fail.
 
 On platforms where the handler cannot arm (e.g. ptrace restrictions in
 containers), the tests fail hard unless the environment explicitly allows

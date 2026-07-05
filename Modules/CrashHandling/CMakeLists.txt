@@ -11,6 +11,15 @@ if(MITK_USE_sentry)
   )
 
   if(TARGET ${MODULE_TARGET})
+    #[[ crashpad_client.h (used by CaptureSnapshot) includes util/... via the
+        crashpad root, which the imported sentry_crashpad::client target's
+        include interface does not expose (it only adds crashpad/client and
+        crashpad/mini_chromium). Add the root here so the header resolves. ]]
+    if(MITK_EXTERNAL_PROJECT_PREFIX)
+      target_include_directories(${MODULE_TARGET} PRIVATE
+        "${MITK_EXTERNAL_PROJECT_PREFIX}/include/crashpad")
+    endif()
+
     #[[ The handler is renamed from upstream's generic "crashpad_handler" to
         "MitkCrashHandler" so it is recognizable as MITK's in a task manager.
         The name is defined here once and handed to the facility as a compile

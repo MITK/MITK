@@ -26,6 +26,9 @@ found in the LICENSE file.
 #include <mitkCrashDumpFacility.h>
 #include <mitkVersion.h>
 
+#include <QmitkUiFreezeWatchdog.h>
+
+#include <chrono>
 #include <cstring>
 #endif
 
@@ -224,6 +227,7 @@ namespace mitk
   const QString BaseApplication::ARG_PREFERENCES_OVERRIDE = "MITK.preferences-override";
   const QString BaseApplication::ARG_PREFERENCES_PATCH = "MITK.preferences-patch";
   const QString BaseApplication::ARG_NO_CRASH_DUMPS = "no-crash-dumps";
+  const QString BaseApplication::ARG_UI_WATCHDOG = "ui-watchdog";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -879,6 +883,29 @@ namespace mitk
       d->m_QApp = this->getSingleMode()
         ? static_cast<QCoreApplication*>(new QmitkSingleApplication(d->m_Argc, d->m_Argv, this->getSafeMode()))
         : static_cast<QCoreApplication*>(new QmitkSafeApplication(d->m_Argc, d->m_Argv, this->getSafeMode()));
+
+#ifdef MITK_HAS_CRASHHANDLING
+      // Opt-in UI-freeze watchdog. Options are already parsed at this point;
+      // the environment variable takes precedence over the command-line one.
+      if (CrashDumpFacility::IsActive())
+      {
+        int watchdogSeconds = 0;
+
+        const auto envValue = qEnvironmentVariable("MITK_UI_WATCHDOG");
+        if (!envValue.isEmpty())
+          watchdogSeconds = envValue.toInt();
+        else
+          watchdogSeconds = QString::fromStdString(
+            this->config().getString(ARG_UI_WATCHDOG.toStdString(), "")).toInt();
+
+        if (watchdogSeconds > 0)
+        {
+          // Parented to the application: it lives for the session and its
+          // QTimer runs on the UI thread once the event loop starts.
+          new QmitkUiFreezeWatchdog(std::chrono::seconds(watchdogSeconds), d->m_QApp);
+        }
+      }
+#endif
     }
 
     return qApp;
@@ -1031,6 +1058,13 @@ namespace mitk
       "disable the crash-dump facility for this session");
     noCrashDumpsOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(noCrashDumpsOption);
+
+#ifdef MITK_HAS_CRASHHANDLING
+    Poco::Util::Option uiWatchdogOption(ARG_UI_WATCHDOG.toStdString(), "",
+      "enable the UI-freeze watchdog with the given timeout in seconds (opt-in)");
+    uiWatchdogOption.argument("<seconds>").binding(ARG_UI_WATCHDOG.toStdString());
+    options.addOption(uiWatchdogOption);
+#endif
 
     // Make Poco aware of QGuiApplication command-line options, even though they are only parsed by
     // Qt. Otherwise, Poco would throw exceptions for unknown options.

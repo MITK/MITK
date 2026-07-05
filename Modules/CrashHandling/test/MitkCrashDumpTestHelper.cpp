@@ -11,10 +11,13 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkCrashDumpFacility.h>
+#include <mitkHeartbeatMonitor.h>
 
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <thread>
 
 namespace
 {
@@ -39,7 +42,8 @@ int main(int argc, char* argv[])
 {
   if (argc != 3)
   {
-    std::cerr << "Usage: MitkCrashDumpTestHelper <noop|segv|abort|stackoverflow> <database-dir>" << std::endl;
+    std::cerr << "Usage: MitkCrashDumpTestHelper "
+                 "<noop|segv|abort|stackoverflow|snapshot|freeze|freeze-recover> <database-dir>" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -60,6 +64,69 @@ int main(int argc, char* argv[])
   {
     mitk::CrashDumpFacility::Shutdown();
     return EXIT_SUCCESS;
+  }
+
+  if (mode == "snapshot")
+  {
+    const auto path = mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::OnDemand);
+    mitk::CrashDumpFacility::Shutdown();
+
+    if (!path.has_value())
+    {
+      std::cerr << "On-demand snapshot capture failed." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+  }
+
+  if (mode == "freeze" || mode == "freeze-recover")
+  {
+    mitk::HeartbeatMonitor::Config config;
+    config.Timeout = std::chrono::milliseconds(200);
+    config.CaptureInterval = std::chrono::milliseconds(100);
+    config.PollInterval = std::chrono::milliseconds(30);
+    config.MaxCapturesPerEpisode = 1;
+
+    mitk::HeartbeatMonitor monitor(config,
+      [] { mitk::CrashDumpFacility::CaptureSnapshot(mitk::SnapshotKind::WatchdogProvisional); },
+      [] { mitk::CrashDumpFacility::PurgeProvisionalSnapshots(); });
+    monitor.Start();
+
+    // Simulate a freeze by never beating; wait for the provisional dump.
+    bool captured = false;
+    for (int i = 0; i < 100 && !captured; ++i)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      captured = !mitk::CrashDumpFacility::ListDumps().empty();
+    }
+
+    if (!captured)
+    {
+      std::cerr << "Watchdog did not produce a provisional dump." << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if (mode == "freeze")
+    {
+      // Simulate a hard kill mid-freeze: stop the monitor but do NOT shut the
+      // facility down, so no purge runs and the provisional dump persists.
+      monitor.Stop();
+      return EXIT_SUCCESS;
+    }
+
+    // freeze-recover: resume beating so the recovery callback purges the dump.
+    bool recovered = false;
+    for (int i = 0; i < 100 && !recovered; ++i)
+    {
+      monitor.Beat();
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      recovered = mitk::CrashDumpFacility::ListDumps().empty();
+    }
+    monitor.Stop();
+    mitk::CrashDumpFacility::Shutdown();
+
+    return recovered ? EXIT_SUCCESS : EXIT_FAILURE;
   }
 
   if (mode == "segv")

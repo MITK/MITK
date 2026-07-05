@@ -18,15 +18,40 @@ found in the LICENSE file.
 
 #include <sentry.h>
 
+#include <client/crashpad_client.h>
+#include <util/misc/capture_context.h>
+
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
 
+#include <chrono>
+#include <mutex>
+#include <set>
+#include <thread>
+
 namespace
 {
   constexpr std::size_t kMaxRetainedDumps = 20;
+
+  // Facility-owned subdirectories of the database. Snapshots taken via
+  // CaptureSnapshot are moved out of Crashpad's report area into one of these
+  // so their kind is a filesystem fact that survives a hard kill: on-demand
+  // snapshots are never surfaced, and provisional (watchdog) snapshots are
+  // purged unless the process is hard-killed mid-freeze.
+  const std::filesystem::path kSnapshotsSubdir = "mitk-snapshots";
+  const std::filesystem::path kPendingFreezeSubdir = "mitk-pending-freeze";
+
+  std::filesystem::path SubdirForKind(mitk::SnapshotKind kind)
+  {
+    return mitk::SnapshotKind::OnDemand == kind ? kSnapshotsSubdir : kPendingFreezeSubdir;
+  }
+
+  // Serializes CaptureSnapshot / PurgeProvisionalSnapshots, which may run on
+  // the watchdog thread and the UI thread concurrently.
+  std::mutex s_SnapshotMutex;
 
   // Provided by the module CMake (single source of truth, including the
   // platform executable suffix). The fallback only matters in a build that
@@ -46,6 +71,11 @@ namespace
     std::filesystem::path DatabaseDirectory;
     bool Active = false;
     bool CrashedLastRun = false;
+    // Provisional (watchdog) snapshots this process produced. Tracked in
+    // memory so a recovery or clean shutdown purges exactly this session's
+    // provisional dumps and never a previous hard-kill survivor the user may
+    // still want. A hard kill loses the list, so those dumps persist on disk.
+    std::vector<std::filesystem::path> ProvisionalSnapshots;
   };
 
   FacilityState s_State;
@@ -154,7 +184,11 @@ bool mitk::CrashDumpFacility::Initialize(const Config& config) noexcept
     s_State.Active = true;
     s_State.CrashedLastRun = sentry_get_crashed_last_run() == 1;
 
-    PruneCrashDumps(s_State.DatabaseDirectory, kMaxRetainedDumps);
+    // Bound only the crash-report area; the snapshot subdirectories keep their
+    // own retention (see CaptureSnapshot) and pending-freeze survivors must
+    // not be evicted here before the next-start dialog can surface them.
+    PruneCrashDumps(s_State.DatabaseDirectory, kMaxRetainedDumps,
+      { kSnapshotsSubdir, kPendingFreezeSubdir });
 
     return true;
   }
@@ -168,6 +202,10 @@ void mitk::CrashDumpFacility::Shutdown() noexcept
 {
   if (s_State.Active)
   {
+    // A clean shutdown means any provisional freeze snapshot was a false
+    // positive (the process was not hard-killed mid-freeze), so drop them.
+    PurgeProvisionalSnapshots();
+
     sentry_close();
     s_State.Active = false;
   }
@@ -190,19 +228,21 @@ void mitk::CrashDumpFacility::ClearCrashedLastRun()
   if (s_State.Active)
     sentry_clear_crashed_last_run();
 
-  const auto dumps = ScanCrashDumps(s_State.DatabaseDirectory);
+  // Watermark from the newest surfacable dump, so an on-demand snapshot
+  // (excluded from the surfacable set) can never mask a real crash dump.
+  const auto dumps = ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
   if (!dumps.empty())
     WriteLastAcknowledgedTime(s_State.DatabaseDirectory, dumps.front().LastWriteTime);
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListDumps()
 {
-  return ScanCrashDumps(s_State.DatabaseDirectory);
+  return ScanCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::CrashDumpFacility::ListUnacknowledgedDumps()
 {
-  return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory);
+  return ScanUnacknowledgedCrashDumps(s_State.DatabaseDirectory, { kSnapshotsSubdir });
 }
 
 bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
@@ -214,4 +254,93 @@ bool mitk::CrashDumpFacility::DeleteDump(const std::filesystem::path& dumpPath)
 std::filesystem::path mitk::CrashDumpFacility::GetDatabaseDirectory()
 {
   return s_State.DatabaseDirectory;
+}
+
+std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(SnapshotKind kind)
+{
+  std::lock_guard<std::mutex> lock(s_SnapshotMutex);
+
+  if (!s_State.Active)
+  {
+    MITK_WARN << "Cannot capture a diagnostic snapshot: the crash-dump facility is not active.";
+    return std::nullopt;
+  }
+
+  const auto& database = s_State.DatabaseDirectory;
+
+  // DumpWithoutCrash writes into Crashpad's report area; diff it against the
+  // set present before the call to find the freshly written file. The two
+  // facility subdirectories are excluded so a previously filed snapshot is
+  // never mistaken for the new one.
+  const std::vector<std::filesystem::path> reportArea = { kSnapshotsSubdir, kPendingFreezeSubdir };
+
+  std::set<std::filesystem::path> before;
+  for (const auto& dump : ScanCrashDumps(database, reportArea))
+    before.insert(dump.Path);
+
+  crashpad::NativeCPUContext context;
+  crashpad::CaptureContext(&context);
+#if defined(_WIN32)
+  crashpad::CrashpadClient::DumpWithoutCrash(context);
+#else
+  crashpad::CrashpadClient::DumpWithoutCrash(&context);
+#endif
+
+  // The handler writes out of process and asynchronously, so poll briefly.
+  std::filesystem::path newDump;
+  for (int attempt = 0; attempt < 50 && newDump.empty(); ++attempt)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    for (const auto& dump : ScanCrashDumps(database, reportArea))
+    {
+      if (before.find(dump.Path) == before.end())
+      {
+        newDump = dump.Path;
+        break;
+      }
+    }
+  }
+
+  if (newDump.empty())
+  {
+    MITK_WARN << "Diagnostic snapshot requested but no minidump was produced.";
+    return std::nullopt;
+  }
+
+  // Move the dump into its kind's subdirectory so the kind survives a hard
+  // kill. Same volume as the source, so rename does not cross devices.
+  const auto destinationDir = database / SubdirForKind(kind);
+  std::error_code error;
+  std::filesystem::create_directories(destinationDir, error);
+
+  const auto destination = destinationDir / newDump.filename();
+  std::filesystem::rename(newDump, destination, error);
+  if (error)
+  {
+    MITK_WARN << "Could not file the diagnostic snapshot under '" << destinationDir.string()
+              << "': " << error.message();
+    std::filesystem::remove(newDump, error); // avoid a stray dump surfacing as a crash
+    return std::nullopt;
+  }
+
+  if (SnapshotKind::WatchdogProvisional == kind)
+    s_State.ProvisionalSnapshots.push_back(destination);
+
+  PruneCrashDumps(destinationDir, kMaxRetainedDumps);
+
+  return destination;
+}
+
+void mitk::CrashDumpFacility::PurgeProvisionalSnapshots()
+{
+  std::lock_guard<std::mutex> lock(s_SnapshotMutex);
+
+  for (const auto& snapshot : s_State.ProvisionalSnapshots)
+  {
+    std::error_code error;
+    std::filesystem::remove(snapshot, error);
+  }
+
+  s_State.ProvisionalSnapshots.clear();
 }

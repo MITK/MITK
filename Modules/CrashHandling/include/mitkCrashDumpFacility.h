@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <cstdint>
 #include <filesystem>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -28,6 +29,22 @@ namespace mitk
     std::filesystem::path Path;
     std::filesystem::file_time_type LastWriteTime;
     std::uintmax_t SizeInBytes = 0;
+  };
+
+  /**
+   * \brief Provenance of a non-fatal snapshot, which governs whether it is
+   *        surfaced on the next start and how long it is retained.
+   *
+   * OnDemand: the user pressed "Capture diagnostics"; shown once, kept, and
+   * never re-surfaced by the next-start dialog. WatchdogProvisional: written
+   * by the UI-freeze watchdog; purged when the freeze recovers or on clean
+   * shutdown, so only a hard-killed freeze leaves one behind (and only those
+   * survivors are surfaced).
+   */
+  enum class SnapshotKind
+  {
+    OnDemand,
+    WatchdogProvisional
   };
 
   /**
@@ -91,7 +108,9 @@ namespace mitk
     static void ClearCrashedLastRun();
 
     /** \brief The surfacable dumps the next-start dialog shows, newest
-     *  first. *.dmp files only; internal run/metadata directories are not
+     *  first: crash dumps plus hard-killed UI-freeze survivors. On-demand
+     *  snapshots (see CaptureSnapshot) are held in a separate area and
+     *  excluded. *.dmp files only; internal run/metadata directories are not
      *  part of the contract. Returns an empty list when the database
      *  directory does not exist. */
     static std::vector<CrashDumpInfo> ListDumps();
@@ -105,6 +124,19 @@ namespace mitk
     static bool DeleteDump(const std::filesystem::path& dumpPath);
 
     static std::filesystem::path GetDatabaseDirectory();
+
+    /** \brief Write a minidump of the running process without crashing it
+     *  (Crashpad DumpWithoutCrash) and file it under \p kind. Returns the
+     *  new dump's path, or nullopt when the facility is inactive or the
+     *  freshly written dump cannot be located. Safe to call from any thread;
+     *  captures the calling thread's context. */
+    static std::optional<std::filesystem::path> CaptureSnapshot(
+      SnapshotKind kind = SnapshotKind::OnDemand);
+
+    /** \brief Delete all provisional (watchdog) snapshots. Called when a UI
+     *  freeze recovers and on clean shutdown, so only a hard-killed freeze
+     *  leaves a dump behind. */
+    static void PurgeProvisionalSnapshots();
   };
 }
 

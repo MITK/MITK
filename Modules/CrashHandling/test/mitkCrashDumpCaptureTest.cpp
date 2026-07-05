@@ -91,6 +91,9 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(CrashByStackOverflowLeavesDump);
   MITK_TEST(DumpsSurviveReinitialization);
   MITK_TEST(FacilityQueryAcknowledgeDeleteCycle);
+  MITK_TEST(OnDemandSnapshotIsCapturedButNotSurfaced);
+  MITK_TEST(HardKilledFreezeLeavesProvisionalDump);
+  MITK_TEST(RecoveredFreezeLeavesNoDump);
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_DatabaseDirectory;
@@ -238,6 +241,57 @@ public:
 
     mitk::CrashDumpFacility::Shutdown();
     CPPUNIT_ASSERT(!mitk::CrashDumpFacility::IsActive());
+  }
+
+  /** On-demand snapshot: the helper captures one without crashing (exits
+   *  cleanly) and it is filed where the next-start dialog never surfaces it. */
+  void OnDemandSnapshotIsCapturedButNotSurfaced()
+  {
+    const auto result = RunHelper("snapshot", m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE("snapshot helper must exit cleanly, without crashing",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+
+    // The snapshot was written...
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), mitk::ScanCrashDumps(m_DatabaseDirectory).size());
+    // ...into the on-demand subdirectory, so it is excluded from the
+    // surfacable set and never triggers the next-start dialog.
+    CPPUNIT_ASSERT(mitk::ScanCrashDumps(m_DatabaseDirectory, { "mitk-snapshots" }).empty());
+  }
+
+  /** UI-freeze watchdog, false-positive guard (direction A): a freeze that
+   *  ends in a hard kill (no purge) leaves the provisional dump behind. */
+  void HardKilledFreezeLeavesProvisionalDump()
+  {
+    const auto result = RunHelper("freeze", m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE("freeze helper must exit cleanly",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+
+    CPPUNIT_ASSERT_MESSAGE("a hard-killed freeze must leave a provisional dump",
+      !mitk::ScanCrashDumps(m_DatabaseDirectory).empty());
+  }
+
+  /** UI-freeze watchdog, false-positive guard (direction B): a freeze that
+   *  recovers purges its provisional dump, leaving nothing to surface. */
+  void RecoveredFreezeLeavesNoDump()
+  {
+    const auto result = RunHelper("freeze-recover", m_DatabaseDirectory);
+
+    if (result.Exited && result.ExitValue == 77)
+      this->FailOrSkipUnarmedHelper();
+
+    CPPUNIT_ASSERT_MESSAGE("freeze-recover helper must exit cleanly",
+      result.Exited && result.ExitValue == EXIT_SUCCESS);
+
+    CPPUNIT_ASSERT_MESSAGE("a recovered freeze must leave no dump",
+      mitk::ScanCrashDumps(m_DatabaseDirectory).empty());
   }
 };
 

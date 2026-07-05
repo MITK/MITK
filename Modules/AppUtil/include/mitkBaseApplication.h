@@ -105,6 +105,7 @@ namespace mitk
     static const QString ARG_PREFERENCES_OVERRIDE; ///< \brief Argument key for temporarily overriding preferences for this session ("MITK.preferences-override").
     static const QString ARG_PREFERENCES_PATCH;    ///< \brief Argument key for permanently patching preferences before session start ("MITK.preferences-patch").
     static const QString ARG_NO_CRASH_DUMPS;       /**< \brief Argument key to disable the crash-dump facility ("no-crash-dumps"). Evaluated from the raw argv before option parsing. */
+    static const QString ARG_UI_WATCHDOG;          /**< \brief Argument key for the UI-freeze watchdog timeout in seconds ("ui-watchdog"); 0 or unset disables it. */
     //\}
 
     /** \name BlueBerry Plugin Framework Property Constants

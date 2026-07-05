@@ -30,9 +30,25 @@ namespace
       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     return extension == ".dmp";
   }
+
+  bool IsExcluded(const std::filesystem::path& path,
+    const std::vector<std::filesystem::path>& excludedSubdirs)
+  {
+    if (excludedSubdirs.empty())
+      return false;
+
+    for (const auto& component : path)
+    {
+      if (std::find(excludedSubdirs.begin(), excludedSubdirs.end(), component) != excludedSubdirs.end())
+        return true;
+    }
+
+    return false;
+  }
 }
 
-std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::path& databaseDirectory)
+std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::path& databaseDirectory,
+  const std::vector<std::filesystem::path>& excludedSubdirs)
 {
   std::vector<CrashDumpInfo> dumps;
 
@@ -52,6 +68,9 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
     for (const auto& entry : it)
     {
       if (!entry.is_regular_file(error) || !HasDumpExtension(entry.path()))
+        continue;
+
+      if (IsExcluded(entry.path(), excludedSubdirs))
         continue;
 
       const auto lastWriteTime = entry.last_write_time(error);
@@ -77,9 +96,10 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanCrashDumps(const std::filesystem::pat
 }
 
 std::vector<mitk::CrashDumpInfo> mitk::ScanUnacknowledgedCrashDumps(
-  const std::filesystem::path& databaseDirectory)
+  const std::filesystem::path& databaseDirectory,
+  const std::vector<std::filesystem::path>& excludedSubdirs)
 {
-  auto dumps = ScanCrashDumps(databaseDirectory);
+  auto dumps = ScanCrashDumps(databaseDirectory, excludedSubdirs);
 
   const auto acknowledged = ReadLastAcknowledgedTime(databaseDirectory);
   if (acknowledged.has_value())
@@ -92,9 +112,10 @@ std::vector<mitk::CrashDumpInfo> mitk::ScanUnacknowledgedCrashDumps(
   return dumps;
 }
 
-std::size_t mitk::PruneCrashDumps(const std::filesystem::path& databaseDirectory, std::size_t maxCount)
+std::size_t mitk::PruneCrashDumps(const std::filesystem::path& databaseDirectory, std::size_t maxCount,
+  const std::vector<std::filesystem::path>& excludedSubdirs)
 {
-  const auto dumps = ScanCrashDumps(databaseDirectory);
+  const auto dumps = ScanCrashDumps(databaseDirectory, excludedSubdirs);
 
   std::size_t deleted = 0;
 

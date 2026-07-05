@@ -6,5 +6,8 @@ set(CPP_FILES
 )
 
 if(MITK_USE_sentry)
-  list(APPEND CPP_FILES QmitkCrashDumpDialog.cpp)
+  list(APPEND CPP_FILES
+    QmitkCrashDumpDialog.cpp
+    QmitkUiFreezeWatchdog.cpp
+  )
 endif()

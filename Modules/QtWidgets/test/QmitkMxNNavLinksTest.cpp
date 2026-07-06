@@ -21,6 +21,10 @@ found in the LICENSE file.
 #include <mitkDisplayActionEvents.h>
 #include <mitkImageGenerator.h>
 #include <mitkInteractionEvent.h>
+#include <mitkInteractionPositionEvent.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStandaloneDataStorage.h>
@@ -56,11 +60,15 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Macro_Off_RestoresIndependence);
   MITK_TEST(Macro_NewCellAutoJoins);
   MITK_TEST(SetSyncLink_ContractViolations_Throw);
+  MITK_TEST(Windowing_GroupedGesture_WritesPerRendererToMembers);
+  MITK_TEST(Windowing_UnlinkedGesture_KeepsNodeGlobalWrite);
+  MITK_TEST(Lut_SetLookupTable_PropagatesToMembersOnly);
 
   CPPUNIT_TEST_SUITE_END();
 
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::Image::Pointer m_Image;
+  mitk::DataNode::Pointer m_ImageNode;
   std::unique_ptr<QmitkMxNMultiWidget> m_Editor;
 
 public:
@@ -70,6 +78,15 @@ public:
 
     m_DataStorage = mitk::StandaloneDataStorage::New();
     m_Image = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 8, 1.0f, 1.0f, 1.0f);
+
+    // A real image node: the level-window gesture resolves its target node
+    // from the data under the pointer. Explicit layer for the
+    // node-table-model comparator workaround (see QmitkMxNSyncGroupApiTest).
+    m_ImageNode = mitk::DataNode::New();
+    m_ImageNode->SetName("image");
+    m_ImageNode->SetData(m_Image);
+    m_ImageNode->SetIntProperty("layer", 0);
+    m_DataStorage->Add(m_ImageNode);
 
     m_Editor = std::make_unique<QmitkMxNMultiWidget>();
     m_Editor->SetDataStorage(m_DataStorage);
@@ -90,6 +107,7 @@ public:
   void tearDown() override
   {
     m_Editor.reset();
+    m_ImageNode = nullptr;
     m_Image = nullptr;
     m_DataStorage = nullptr;
   }
@@ -331,6 +349,100 @@ public:
                            link.has_value());
     CPPUNIT_ASSERT_EQUAL(m_Editor->GetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice)->group,
                          link->group);
+  }
+
+  /** Fire the level-window gesture from a cell, pointing at the image center. */
+  void FireLevelWindowDelta(std::size_t senderIndex, double deltaLevel, double deltaWindow)
+  {
+    mitk::Point3D imageCenter;
+    imageCenter[0] = 8.0;
+    imageCenter[1] = 8.0;
+    imageCenter[2] = 4.0;
+    mitk::Point2D pointerPosition;
+    Renderer(senderIndex)->WorldToDisplay(imageCenter, pointerPosition);
+
+    auto positionEvent = mitk::InteractionPositionEvent::New(Renderer(senderIndex), pointerPosition);
+    m_Editor->GetInteractionEventHandler()->InvokeEvent(
+      mitk::DisplaySetLevelWindowEvent(positionEvent, deltaLevel, deltaWindow));
+  }
+
+  /** The renderer-specific 'levelwindow' property of a cell, or null. */
+  mitk::LevelWindowProperty* RendererLevelWindow(std::size_t index) const
+  {
+    return dynamic_cast<mitk::LevelWindowProperty*>(
+      m_ImageNode->GetPropertyList(Renderer(index))->GetProperty("levelwindow"));
+  }
+
+  void Windowing_GroupedGesture_WritesPerRendererToMembers()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+
+    FireLevelWindowDelta(0, 10.0, 20.0);
+
+    for (std::size_t member : { std::size_t(0), std::size_t(1) })
+    {
+      auto* property = RendererLevelWindow(member);
+      CPPUNIT_ASSERT_MESSAGE("Grouped member must get a renderer-specific levelwindow",
+                             nullptr != property);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(110.0, property->GetLevelWindow().GetLevel(), 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(220.0, property->GetLevelWindow().GetWindow(), 1e-6);
+    }
+    CPPUNIT_ASSERT_MESSAGE("A non-member must not get a renderer-specific levelwindow",
+                           nullptr == RendererLevelWindow(2));
+
+    auto* nodeGlobal = dynamic_cast<mitk::LevelWindowProperty*>(m_ImageNode->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT(nullptr != nodeGlobal);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The node-global property stays untouched for grouped cells",
+      100.0, nodeGlobal->GetLevelWindow().GetLevel(), 1e-6);
+  }
+
+  void Windowing_UnlinkedGesture_KeepsNodeGlobalWrite()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+
+    FireLevelWindowDelta(0, 10.0, 20.0);
+
+    auto* nodeGlobal = dynamic_cast<mitk::LevelWindowProperty*>(m_ImageNode->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT(nullptr != nodeGlobal);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE(
+      "An unlinked cell's gesture keeps the classic node-global write",
+      110.0, nodeGlobal->GetLevelWindow().GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_MESSAGE("No renderer-specific property appears for unlinked cells",
+                           nullptr == RendererLevelWindow(0));
+    CPPUNIT_ASSERT_MESSAGE("No renderer-specific property appears for unlinked cells",
+                           nullptr == RendererLevelWindow(1));
+  }
+
+  void Lut_SetLookupTable_PropagatesToMembersOnly()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Lut, "luts");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Lut, "luts");
+
+    // The image node carries a default node-global LookupTable (mapper
+    // default properties); the per-renderer write must leave it alone.
+    auto* nodeGlobalBefore = m_ImageNode->GetPropertyList(nullptr)->GetProperty("LookupTable");
+
+    auto lookupTable = mitk::LookupTable::New();
+    m_Editor->SetLookupTable(CellId(0), m_ImageNode, lookupTable);
+
+    for (std::size_t member : { std::size_t(0), std::size_t(1) })
+    {
+      auto* property = dynamic_cast<mitk::LookupTableProperty*>(
+        m_ImageNode->GetPropertyList(Renderer(member))->GetProperty("LookupTable"));
+      CPPUNIT_ASSERT_MESSAGE("Grouped member must get a renderer-specific LookupTable",
+                             nullptr != property);
+      CPPUNIT_ASSERT_MESSAGE("Members share the propagated lookup table instance",
+                             lookupTable.GetPointer() == property->GetLookupTable());
+    }
+    CPPUNIT_ASSERT_MESSAGE("A non-member must not get a renderer-specific LookupTable",
+      nullptr == m_ImageNode->GetPropertyList(Renderer(2))->GetProperty("LookupTable"));
+    CPPUNIT_ASSERT_MESSAGE("The node-global LookupTable stays untouched",
+      nodeGlobalBefore == m_ImageNode->GetPropertyList(nullptr)->GetProperty("LookupTable"));
   }
 
   void SetSyncLink_ContractViolations_Throw()

@@ -326,6 +326,86 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
   return actionFunction;
 }
 
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowSynchronizedAction(TargetPredicate isTarget)
+{
+  ThrowOnNullPredicate(isTarget, "SetLevelWindowSynchronizedAction");
+
+  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplaySetLevelWindowEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplaySetLevelWindowEvent* displayActionEvent = dynamic_cast<const DisplaySetLevelWindowEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+      DataStorage::Pointer storage = sendingRenderer->GetDataStorage();
+      if (storage.IsNull())
+      {
+        return;
+      }
+      const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(displayActionEvent->GetInteractionEvent());
+      if (nullptr == positionEvent)
+      {
+        return;
+      }
+
+      // Resolve the gesture's node exactly like the node-global action: the
+      // topmost image visible in the sending renderer under the pointer.
+      DataStorage::SetOfObjects::ConstPointer allImageNodes = storage->GetSubset(NodePredicateDataType::New("Image"));
+      Point3D worldposition;
+      sendingRenderer->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), worldposition);
+      const auto globalCurrentTimePoint = sendingRenderer->GetTime();
+      DataNode::Pointer node = FindTopmostVisibleNode(allImageNodes, worldposition, globalCurrentTimePoint, sendingRenderer);
+      if (node.IsNull())
+      {
+        return;
+      }
+
+      if (!isTarget(sendingRenderer, sendingRenderer))
+      {
+        // Sender not level-window-linked: the classic node-global write keeps
+        // ungrouped renderers coupled to the global level/window controls.
+        LevelWindow levelWindow;
+        node->GetLevelWindow(levelWindow);
+        levelWindow.SetLevelWindow(levelWindow.GetLevel() + displayActionEvent->GetLevel(),
+                                   levelWindow.GetWindow() + displayActionEvent->GetWindow());
+        auto* levelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
+        if (nullptr != levelWindowProperty)
+        {
+          levelWindowProperty->SetLevelWindow(levelWindow);
+          RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+        return;
+      }
+
+      auto renderingManager = RenderingManager::GetInstance();
+      auto allRenderWindows = renderingManager->GetAllRegisteredRenderWindows();
+      for (auto renderWindow : allRenderWindows)
+      {
+        auto targetRenderer = BaseRenderer::GetInstance(renderWindow);
+        if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
+            && isTarget(sendingRenderer, targetRenderer))
+        {
+          // Delta on each member's own current value (renderer-specific,
+          // falling back to node-global), written renderer-specific: members
+          // keep their relative differences and the mapper prefers the
+          // renderer-specific property from now on.
+          LevelWindow levelWindow;
+          node->GetLevelWindow(levelWindow, targetRenderer);
+          levelWindow.SetLevelWindow(levelWindow.GetLevel() + displayActionEvent->GetLevel(),
+                                     levelWindow.GetWindow() + displayActionEvent->GetWindow());
+          node->SetProperty("levelwindow", LevelWindowProperty::New(levelWindow), targetRenderer);
+          renderingManager->RequestUpdate(renderWindow);
+        }
+      }
+    }
+  };
+
+  return actionFunction;
+}
+
 mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(TargetPredicate isTarget)
 {
   ThrowOnNullPredicate(isTarget, "ScrollSliceStepperSynchronizedAction");

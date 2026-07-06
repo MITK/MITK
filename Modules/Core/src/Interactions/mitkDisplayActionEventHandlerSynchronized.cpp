@@ -43,5 +43,6 @@ void mitk::DisplayActionEventHandlerSynchronized::InitActionsImpl(const std::str
                        : ScrollSliceStepperAction(prefixFilter));
 
   ConnectDisplayActionEvent(DisplaySetLevelWindowEvent(nullptr, ScalarType(), ScalarType()),
-    SetLevelWindowAction(prefixFilter));
+    m_Predicates.levelWindow ? SetLevelWindowSynchronizedAction(m_Predicates.levelWindow)
+                             : SetLevelWindowAction(prefixFilter));
 }

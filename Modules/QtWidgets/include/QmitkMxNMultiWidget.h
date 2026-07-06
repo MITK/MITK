@@ -40,6 +40,7 @@ class QSplitter;
 namespace mitk
 {
   class BaseRenderer;
+  class LookupTable;
 }
 
 /**
@@ -283,6 +284,22 @@ public:
   *         the standard anatomical planes).
   */
   void SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection);
+
+  /**
+  * \brief Set a node's lookup table as a renderer-specific property on the
+  *        cell and on every member of the cell's `Lut` group.
+  *
+  *   Members share the given lookup table instance as their
+  *   renderer-specific "LookupTable" property; renderers outside the group
+  *   (and the node-global property) stay untouched. The mapper prefers the
+  *   renderer-specific property, so grouped cells detach from node-global
+  *   colormap changes by design. An unlinked cell gets only its own
+  *   renderer's property set.
+  *
+  * \throws mitk::Exception on an unknown window, a null node, or a null
+  *         lookup table.
+  */
+  void SetLookupTable(const QString& windowId, mitk::DataNode* node, mitk::LookupTable* lookupTable);
 
   /**
   * \brief Re-initialize the geometry of the cell's geometry-authority
@@ -686,6 +703,16 @@ private:
   bool IsNavTarget(QmitkMxNSyncDimension dimension,
                    const mitk::BaseRenderer* sender,
                    const mitk::BaseRenderer* target) const;
+
+  /**
+  * \brief Membership predicate for the level-window gesture. Unlike the
+  *        navigation predicate there is no singleton fallback: an unlinked
+  *        sender is rejected outright (`isTarget(sender, sender)` false),
+  *        which makes the synchronized level-window action fall back to the
+  *        classic node-global write, keeping ungrouped cells coupled to the
+  *        global level/window controls.
+  */
+  bool IsWindowingTarget(const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target) const;
 
   /**
   * \brief The group's seed cell for a dimension: the pre-order first cell

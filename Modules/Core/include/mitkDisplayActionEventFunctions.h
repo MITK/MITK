@@ -164,6 +164,27 @@ namespace mitk
      */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(TargetPredicate isTarget);
 
+    /**
+     * \brief Create an action that adjusts the level-window of the topmost visible
+     *        image as a renderer-specific property on a set of renderers.
+     *
+     * Reacts to DisplaySetLevelWindowEvent. The predicate carries a double
+     * contract: `isTarget(sender, sender)` decides the write path - false means
+     * the sender is not level-window-linked and the action falls back to the
+     * classic node-global property write (staying coupled to the global
+     * level/window controls); true switches to renderer-specific writes, where
+     * every admitted target renderer gets the gesture's delta applied to its
+     * own current value (renderer-specific, falling back to the node-global
+     * value). Renderer-specific values take precedence over the node-global
+     * property in the mapper, so grouped renderers detach from the global
+     * level/window controls by design.
+     *
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
+     * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
+     */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowSynchronizedAction(TargetPredicate isTarget);
+
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk
 

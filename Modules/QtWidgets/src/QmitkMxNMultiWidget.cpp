@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
@@ -415,10 +416,16 @@ void QmitkMxNMultiWidget::InstallSynchronizedHandler()
         return this->IsNavTarget(dimension, sender, target);
       });
   };
-  handler->SetPredicates({ navPredicate(QmitkMxNSyncDimension::Pan),
-                           navPredicate(QmitkMxNSyncDimension::Zoom),
-                           navPredicate(QmitkMxNSyncDimension::Slice),
-                           navPredicate(QmitkMxNSyncDimension::Crosshair) });
+  mitk::DisplayActionEventHandlerSynchronized::Predicates predicates;
+  predicates.pan = navPredicate(QmitkMxNSyncDimension::Pan);
+  predicates.zoom = navPredicate(QmitkMxNSyncDimension::Zoom);
+  predicates.slice = navPredicate(QmitkMxNSyncDimension::Slice);
+  predicates.crosshair = navPredicate(QmitkMxNSyncDimension::Crosshair);
+  predicates.levelWindow = [this](const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target)
+  {
+    return this->IsWindowingTarget(sender, target);
+  };
+  handler->SetPredicates(predicates);
   SetDisplayActionEventHandler(std::move(handler));
 
   auto displayActionEventHandler = GetDisplayActionEventHandler();
@@ -459,6 +466,28 @@ bool QmitkMxNMultiWidget::IsNavTarget(QmitkMxNSyncDimension dimension,
   }
   const auto& senderGroup = senderLinks->second.groups[DimensionIndex(dimension)];
   const auto& targetGroup = targetLinks->second.groups[DimensionIndex(dimension)];
+  return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
+}
+
+bool QmitkMxNMultiWidget::IsWindowingTarget(const mitk::BaseRenderer* sender,
+                                            const mitk::BaseRenderer* target) const
+{
+  const auto editorPrefix = this->GetMultiWidgetName() + NAMESPACE_DELIMITER;
+  const auto senderId = QString::fromUtf8(sender->GetName());
+  const auto targetId = QString::fromUtf8(target->GetName());
+  if (!senderId.startsWith(editorPrefix) || !targetId.startsWith(editorPrefix))
+  {
+    return false;
+  }
+
+  const auto senderLinks = m_CellSyncLinks.find(senderId);
+  const auto targetLinks = m_CellSyncLinks.find(targetId);
+  if (senderLinks == m_CellSyncLinks.end() || targetLinks == m_CellSyncLinks.end())
+  {
+    return false;
+  }
+  const auto& senderGroup = senderLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)];
+  const auto& targetGroup = targetLinks->second.groups[DimensionIndex(QmitkMxNSyncDimension::Windowing)];
   return senderGroup.has_value() && targetGroup.has_value() && *senderGroup == *targetGroup;
 }
 
@@ -2324,7 +2353,8 @@ void QmitkMxNMultiWidget::RefreshSyncControls()
 {
   const auto navDimensions = { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
                                QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair,
-                               QmitkMxNSyncDimension::Orientation };
+                               QmitkMxNSyncDimension::Orientation, QmitkMxNSyncDimension::Windowing,
+                               QmitkMxNSyncDimension::Lut };
 
   std::map<QmitkMxNSyncDimension, QStringList> knownGroups;
   for (const auto dimension : navDimensions)
@@ -2693,4 +2723,57 @@ void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
 unsigned int QmitkMxNMultiWidget::GetOrientationApplyCount() const
 {
   return m_OrientationApplyCount;
+}
+
+void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode* node, mitk::LookupTable* lookupTable)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "SetLookupTable: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (nullptr == node)
+  {
+    mitkThrow() << "SetLookupTable: node must not be null.";
+  }
+  if (nullptr == lookupTable)
+  {
+    mitkThrow() << "SetLookupTable: lookupTable must not be null.";
+  }
+
+  std::vector<QString> targets{ windowId };
+  const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Lut);
+  if (link.has_value())
+  {
+    for (const auto& descriptor : this->ListWindowDescriptors())
+    {
+      if (descriptor.id == windowId)
+      {
+        continue;
+      }
+      const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Lut);
+      if (memberLink.has_value() && memberLink->group == link->group)
+      {
+        targets.push_back(descriptor.id);
+      }
+    }
+  }
+
+  for (const auto& targetId : targets)
+  {
+    const auto targetWidget = this->GetRenderWindowWidget(targetId);
+    if (nullptr == targetWidget)
+    {
+      continue;
+    }
+    auto* targetRenderer = mitk::BaseRenderer::GetInstance(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+    if (nullptr == targetRenderer)
+    {
+      continue;
+    }
+    node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable), targetRenderer);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+  }
 }

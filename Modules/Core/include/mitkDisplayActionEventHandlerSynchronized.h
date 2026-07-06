@@ -25,15 +25,13 @@ namespace mitk
    * \brief Handler that connects synchronized display actions across a
    *        predicate-defined set of renderers.
    *
-   * Camera moves, zooms, slice scrolls, and crosshair updates are propagated
-   * to every renderer admitted by the respective dimension's target
-   * predicate (see SetPredicates). The predicates are supplied by the editor
-   * that owns the synchronization group membership; each of the four
-   * broadcast navigation dimensions scopes independently.
-   *
-   * The level-window action is not a propagating action (it writes the
-   * node-global "levelwindow" property) and stays gated by the prefix filter
-   * passed to InitActions.
+   * Camera moves, zooms, slice scrolls, crosshair updates, and level-window
+   * changes are propagated to every renderer admitted by the respective
+   * dimension's target predicate (see SetPredicates). The predicates are
+   * supplied by the editor that owns the synchronization group membership;
+   * each dimension scopes independently. Without a levelWindow predicate the
+   * level-window action keeps its classic node-global property write, gated
+   * by the prefix filter passed to InitActions.
    *
    * \sa DisplayActionEventHandler DisplayActionEventFunctions
    */
@@ -43,12 +41,19 @@ namespace mitk
 
     /**
      * \brief Per-dimension target predicates for the synchronized broadcast
-     *        navigation actions.
+     *        actions.
      *
      * A null member means "this dimension is not synchronized": the handler
-     * wires the sender-only action for that dimension instead, so the local
-     * gesture keeps working while nothing propagates. With all members null
-     * the handler behaves like DisplayActionEventHandlerDesynchronized.
+     * wires the classic non-propagating action for that dimension instead
+     * (sender-only for the navigation dimensions, the node-global property
+     * write for levelWindow), so the local gesture keeps working while
+     * nothing propagates. With all members null the handler behaves like
+     * DisplayActionEventHandlerDesynchronized.
+     *
+     * The levelWindow predicate carries the double contract documented on
+     * SetLevelWindowSynchronizedAction: `isTarget(sender, sender)` selects
+     * between the node-global legacy write and the renderer-specific grouped
+     * write.
      */
     struct Predicates
     {
@@ -56,6 +61,7 @@ namespace mitk
       DisplayActionEventFunctions::TargetPredicate zoom;
       DisplayActionEventFunctions::TargetPredicate slice;
       DisplayActionEventFunctions::TargetPredicate crosshair;
+      DisplayActionEventFunctions::TargetPredicate levelWindow;
     };
 
     /**

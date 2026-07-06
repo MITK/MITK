@@ -37,6 +37,8 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
     { QmitkMxNSyncDimension::Slice, "Slice" },
     { QmitkMxNSyncDimension::Crosshair, "Crosshair" },
     { QmitkMxNSyncDimension::Orientation, "Orientation" },
+    { QmitkMxNSyncDimension::Windowing, "Windowing" },
+    { QmitkMxNSyncDimension::Lut, "LUT" },
   };
 
   int gridRow = 0;

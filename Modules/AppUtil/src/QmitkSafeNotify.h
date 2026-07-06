@@ -18,6 +18,8 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
+#include <cstdlib>
+
 /**
  * \brief Safely delivers a Qt event, catching and displaying any exceptions.
  *
@@ -69,8 +71,7 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   {
     case 0:
       MITK_ERROR << "The program was closed.";
-      app->closeAllWindows();
-      break;
+      std::exit(EXIT_FAILURE);
     case 1:
       MITK_ERROR
         << "The error was ignored by the user. The program may be in a corrupt state and don't behave like expected!";

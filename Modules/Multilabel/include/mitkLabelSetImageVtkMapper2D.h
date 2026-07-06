@@ -154,6 +154,12 @@ namespace mitk
       /** \brief The label value of the last active label. */
       MultiLabelSegmentation::LabelValueType m_LastActiveLabelValue = MultiLabelSegmentation::UNLABELED_VALUE;
 
+      /** \brief The "opacity factor" preference value baked into the current LUT.
+       *
+       * The factor is a global preference (no MTime), so a change is detected by
+       * comparing against this cached value to trigger a LUT rebuild. */
+      float m_LastOpacityFactor = 1.0f;
+
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default destructor of the local storage. */

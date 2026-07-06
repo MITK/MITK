@@ -46,7 +46,10 @@ public:
   explicit QmitkMxNSyncPopupWidget(QWidget* parent = nullptr);
 
   /** \brief Replace the group names offered by the dimension's selector
-   *         (preserving the current edit text). */
+   *         (preserving the current selection). The selector always offers
+   *         an explicit "(not linked)" entry first; group names share one
+   *         namespace across dimensions, so callers pass the same list to
+   *         every dimension. */
   void SetKnownGroups(QmitkMxNSyncDimension dimension, const QStringList& groups);
 
   /** \brief Display the cell's current link state for the dimension.
@@ -54,6 +57,11 @@ public:
   void SetLinkState(QmitkMxNSyncDimension dimension,
                     const QString& group,
                     const QmitkMxNMultiWidget::SyncOffset& offset);
+
+  /** \brief Surface a rejected link request (e.g. malformed group name) as
+   *         a tooltip at the dimension's selector, so the silent snap-back
+   *         to the previous state is explained. */
+  void ShowLinkError(QmitkMxNSyncDimension dimension, const QString& message);
 
 Q_SIGNALS:
 

@@ -935,7 +935,7 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   // a state refresh that snaps the popup back to reality.
   auto* syncPopup = utilityWidget->GetSyncPopup();
   connect(syncPopup, &QmitkMxNSyncPopupWidget::LinkChangeRequested, this,
-    [this, id](QmitkMxNSyncDimension dimension, const QString& group, const SyncOffset& offset)
+    [this, id, syncPopup](QmitkMxNSyncDimension dimension, const QString& group, const SyncOffset& offset)
     {
       try
       {
@@ -952,6 +952,9 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
       {
         MITK_WARN << "Ignoring sync-link change for '" << id.toStdString()
                   << "': " << e.GetDescription();
+        // The refresh below snaps the popup back to the engine state; the
+        // tooltip explains why the input was not accepted.
+        syncPopup->ShowLinkError(dimension, QString::fromUtf8(e.GetDescription()));
       }
       this->RefreshSyncControls();
     });
@@ -2356,15 +2359,26 @@ void QmitkMxNMultiWidget::RefreshSyncControls()
                                QmitkMxNSyncDimension::Orientation, QmitkMxNSyncDimension::Windowing,
                                QmitkMxNSyncDimension::Lut };
 
-  std::map<QmitkMxNSyncDimension, QStringList> knownGroups;
+  // Group names share one namespace across all dimensions, so every selector
+  // offers the same list: the union of every dimension's live groups plus
+  // the selection-group registry (a slice link may deliberately reuse a
+  // selection group's name).
+  std::set<std::string> allGroups;
   for (const auto dimension : navDimensions)
   {
-    QStringList groups;
     for (const auto& group : this->GetSyncGroupNames(dimension))
     {
-      groups.append(QString::fromStdString(group));
+      allGroups.insert(group);
     }
-    knownGroups[dimension] = groups;
+  }
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    allGroups.insert(name);
+  }
+  QStringList knownGroups;
+  for (const auto& group : allGroups)
+  {
+    knownGroups.append(QString::fromStdString(group));
   }
 
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
@@ -2381,7 +2395,7 @@ void QmitkMxNMultiWidget::RefreshSyncControls()
     }
     for (const auto dimension : navDimensions)
     {
-      syncPopup->SetKnownGroups(dimension, knownGroups[dimension]);
+      syncPopup->SetKnownGroups(dimension, knownGroups);
       const auto link = this->GetSyncLink(windowId, dimension);
       syncPopup->SetLinkState(dimension,
                               link.has_value() ? QString::fromStdString(link->group) : QString(),

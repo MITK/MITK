@@ -20,6 +20,15 @@ found in the LICENSE file.
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QToolButton>
+#include <QToolTip>
+
+namespace
+{
+  QString NotLinkedEntry()
+  {
+    return QmitkMxNSyncPopupWidget::tr("(not linked)");
+  }
+}
 
 QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
   : QWidget(parent)
@@ -53,7 +62,11 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
     row.groupSelector->setEditable(true);
     row.groupSelector->setMinimumContentsLength(8);
     row.groupSelector->setInsertPolicy(QComboBox::NoInsert);
-    row.groupSelector->lineEdit()->setPlaceholderText(tr("not linked"));
+    row.groupSelector->addItem(NotLinkedEntry());
+    row.groupSelector->setToolTip(
+      tr("Pick a group to link this cell, or type a new group name to create one.\n"
+         "Group names use letters, digits, and _ . - (no spaces).\n"
+         "Pick \"(not linked)\" to unlink."));
     grid->addWidget(row.groupSelector, gridRow, 1);
 
     switch (spec.dimension)
@@ -140,7 +153,7 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
       connect(row.reconvergeButton, &QToolButton::clicked, this, [this, &row]()
       {
         const auto group = row.groupSelector->currentText().trimmed();
-        if (!group.isEmpty())
+        if (!group.isEmpty() && group != NotLinkedEntry())
         {
           emit ReconvergeRequested(row.dimension, group);
         }
@@ -159,6 +172,7 @@ void QmitkMxNSyncPopupWidget::SetKnownGroups(QmitkMxNSyncDimension dimension, co
   const QSignalBlocker blocker(row->groupSelector);
   const auto currentText = row->groupSelector->currentText();
   row->groupSelector->clear();
+  row->groupSelector->addItem(NotLinkedEntry());
   row->groupSelector->addItems(groups);
   row->groupSelector->setCurrentText(currentText);
 }
@@ -175,7 +189,14 @@ void QmitkMxNSyncPopupWidget::SetLinkState(QmitkMxNSyncDimension dimension,
 
   {
     const QSignalBlocker blocker(row->groupSelector);
-    row->groupSelector->setCurrentText(group);
+    if (group.isEmpty())
+    {
+      row->groupSelector->setCurrentIndex(0); // the "(not linked)" entry
+    }
+    else
+    {
+      row->groupSelector->setCurrentText(group);
+    }
   }
   if (nullptr != row->sliceOffset)
   {
@@ -232,6 +253,21 @@ QmitkMxNMultiWidget::SyncOffset QmitkMxNSyncPopupWidget::CurrentOffset(const Row
 
 void QmitkMxNSyncPopupWidget::EmitLinkChange(Row& row)
 {
-  emit LinkChangeRequested(row.dimension, row.groupSelector->currentText().trimmed(),
-                           this->CurrentOffset(row));
+  auto group = row.groupSelector->currentText().trimmed();
+  if (group == NotLinkedEntry())
+  {
+    group.clear();
+  }
+  emit LinkChangeRequested(row.dimension, group, this->CurrentOffset(row));
+}
+
+void QmitkMxNSyncPopupWidget::ShowLinkError(QmitkMxNSyncDimension dimension, const QString& message)
+{
+  auto* row = this->FindRow(dimension);
+  if (nullptr == row)
+  {
+    return;
+  }
+  QToolTip::showText(row->groupSelector->mapToGlobal(QPoint(0, row->groupSelector->height())),
+                     message, row->groupSelector);
 }

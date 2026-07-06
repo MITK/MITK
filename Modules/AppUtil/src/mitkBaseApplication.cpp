@@ -685,6 +685,14 @@ namespace mitk
     // override.
     if (qEnvironmentVariableIsEmpty("QT_FONT_DPI"))
       qputenv("QT_FONT_DPI", "96");
+
+    // Force the Fusion style on macOS. The native macOS style uses larger
+    // toolbar icons and layout spacing and does not fully honor our style
+    // sheet, so the Workbench looks inconsistent with Windows and Linux.
+    // Fusion is built into Qt Widgets, so no style plugin has to be deployed.
+    // A -style command-line argument still takes precedence.
+    if (qEnvironmentVariableIsEmpty("QT_STYLE_OVERRIDE"))
+      qputenv("QT_STYLE_OVERRIDE", "Fusion");
 #endif
 
     // Prevent conflicts between native OpenGL applications and QWebEngine

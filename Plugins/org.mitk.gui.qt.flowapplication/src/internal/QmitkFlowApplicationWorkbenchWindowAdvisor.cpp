@@ -414,14 +414,17 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
     // factory); correctly clears the menu bar and notch.
     mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
 #else
-    // Borderless windowed rather than true full-screen: the render views are
-    // OpenGL widgets, so Qt composites the whole window through OpenGL. A GL
-    // window that exactly fills the screen makes Windows bypass DWM composition
-    // (exclusive full-screen), throttling Qt widget repaints to a few FPS.
-    // Overflowing the screen edges by one pixel keeps the window composited
-    // while still appearing full-screen.
-    mainWindow->setWindowFlag(Qt::FramelessWindowHint, true);
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry().adjusted(-1, -1, 1, 1));
+    // Borderless windowed rather than true full-screen (see the same rationale
+    // in QmitkExtWorkbenchWindowAdvisor). Replace the flags so no title bar
+    // survives on X11; overflow the screen by one pixel on Windows to avoid
+    // exclusive full-screen, which would bypass composition and throttle
+    // Qt widget repaints.
+    mainWindow->setWindowFlags(Qt::FramelessWindowHint);
+    QRect bounds = QApplication::primaryScreen()->geometry();
+#ifdef Q_OS_WIN
+    bounds.adjust(-1, -1, 1, 1);
+#endif
+    mainWindow->setGeometry(bounds);
 #endif
   }
 

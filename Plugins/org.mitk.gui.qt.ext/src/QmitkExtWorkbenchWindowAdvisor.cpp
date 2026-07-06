@@ -604,6 +604,30 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const QString& wndIcon)
   windowIcon = wndIcon;
 }
 
+namespace
+{
+#ifndef __APPLE__
+  // Off macOS, use a borderless window instead of true full-screen. The render
+  // views are OpenGL widgets, so Qt composites the whole window through OpenGL;
+  // on Windows a GL window that exactly fills the screen makes the OS bypass
+  // desktop composition (exclusive full-screen), throttling Qt widget repaints
+  // to a few FPS. A frameless window covering the screen keeps composition
+  // active. Replace the flags (do not just add the frameless hint) so no title
+  // bar survives on X11, and overflow the screen by one pixel on Windows to
+  // avoid the exclusive path; the overflow is clamped by X11 window managers,
+  // so it is applied on Windows only.
+  void SetBorderlessFullScreen(QMainWindow* window)
+  {
+    window->setWindowFlags(Qt::FramelessWindowHint);
+    QRect bounds = window->screen()->geometry();
+#ifdef Q_OS_WIN
+    bounds.adjust(-1, -1, 1, 1);
+#endif
+    window->setGeometry(bounds);
+  }
+#endif
+}
+
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
@@ -632,14 +656,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     // factory); correctly clears the menu bar and notch.
     mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
 #else
-    // Borderless windowed rather than true full-screen: the render views are
-    // OpenGL widgets, so Qt composites the whole window through OpenGL. A GL
-    // window that exactly fills the screen makes Windows bypass DWM composition
-    // (exclusive full-screen), throttling Qt widget repaints to a few FPS.
-    // Overflowing the screen edges by one pixel keeps the window composited
-    // while still appearing full-screen.
-    mainWindow->setWindowFlag(Qt::FramelessWindowHint, true);
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry().adjusted(-1, -1, 1, 1));
+    SetBorderlessFullScreen(mainWindow);
 #endif
   }
 
@@ -1266,23 +1283,24 @@ void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
 #ifdef __APPLE__
   mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
 #else
-  // Toggle borderless full-screen. See QmitkExtWorkbenchWindowAdvisor::PostWindowCreate
-  // for why true full-screen is avoided off macOS.
+  // Toggle borderless full-screen. See SetBorderlessFullScreen for why true
+  // full-screen is avoided off macOS. The original flags are saved so the
+  // decorations can be restored on exit.
   if (mainWindow->property("mitkBorderlessFullScreen").toBool())
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", false);
-    mainWindow->setWindowFlag(Qt::FramelessWindowHint, false);
+    mainWindow->setWindowFlags(Qt::WindowFlags(mainWindow->property("mitkWindowedFlags").toInt()));
     mainWindow->setGeometry(mainWindow->property("mitkWindowedGeometry").toRect());
   }
   else
   {
     mainWindow->setProperty("mitkBorderlessFullScreen", true);
+    mainWindow->setProperty("mitkWindowedFlags", static_cast<int>(mainWindow->windowFlags()));
     mainWindow->setProperty("mitkWindowedGeometry", mainWindow->geometry());
-    mainWindow->setWindowFlag(Qt::FramelessWindowHint, true);
-    mainWindow->setGeometry(mainWindow->screen()->geometry().adjusted(-1, -1, 1, 1));
+    SetBorderlessFullScreen(mainWindow);
   }
 
-  mainWindow->show(); // setWindowFlag() hides the window
+  mainWindow->show(); // setWindowFlags() hides the window
 #endif
 }
 

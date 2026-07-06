@@ -188,7 +188,6 @@ private:
   std::vector<double> AIFinputFunction;
 
   mitk::NodePredicateBase::Pointer m_IsNoMaskImagePredicate;
-  mitk::NodePredicateBase::Pointer m_IsMaskPredicate;
   mitk::NodePredicateBase::Pointer m_isValidPDWImagePredicate;
   mitk::NodePredicateBase::Pointer m_isValidTimeSeriesImagePredicate;
 

@@ -34,6 +34,8 @@ found in the LICENSE file.
 #include <vtkPropAssembly.h>
 #include <vtkSmartPointer.h>
 
+#include <algorithm>
+
 namespace
 {
   bool PropertyTimeStampIsNewer(const mitk::IPropertyProvider* provider, mitk::BaseRenderer* renderer, const std::string& propName, itk::ModifiedTimeType refMT)
@@ -45,6 +47,11 @@ namespace
       return prop->GetTimeStamp() > refMT;
     }
     return false;
+  }
+
+  float GetOpacityFactor(mitk::IPreferences* prefs)
+  {
+    return prefs != nullptr ? prefs->GetFloat("opacity factor", 1.0f) : 1.0f;
   }
 }
 
@@ -131,6 +138,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   float nodeOpacity = 1.0f;
   node->GetFloatProperty("opacity", nodeOpacity);
 
+  const float opacityFactor = GetOpacityFactor(localStorage->m_SegPreferences);
+
   // Clear only the entries we populated last time. Labels that disappeared since
   // the previous update are reset to fully transparent without touching the
   // ~65k entries that have always been zero.
@@ -142,34 +151,46 @@ void mitk::MultiLabelSegmentationVtkMapper3D::UpdateLookupTable(LocalStorage* lo
   localStorage->m_PopulatedLabelEntries.clear();
   localStorage->m_PopulatedLabelEntries.reserve(labelValues.size());
 
+  // Node-level "opacity" and the global "opacity factor" preference define the base
+  // (normal) opacity. The actor's own opacity is fixed at 1.0 so the LUT alpha is the
+  // sole source of transparency.
+  const double base = static_cast<double>(nodeOpacity) * opacityFactor;
+
   double rgba[4];
   for (const auto& value : labelValues)
   {
     sourceLookUpTable->GetTableValue(value, rgba);
 
+    // The segmentation LUT stores each label's own opacity in alpha (0 = hidden).
+    const double labelOpacity = rgba[3];
+    const double normalOpacity = labelOpacity * base;
+
     if (highlightingActive)
     {
       const bool isHighlightedValue = highlightEnd != std::find(highlightedLabelValues.begin(), highlightedLabelValues.end(), value);
-      if (!isHighlightedValue)
-      { //make all none highlighted values more transparent
-        rgba[3] *= 0.3;
+      if (isHighlightedValue)
+      {
+        // Spotlight the hovered label at full opacity, decoupled from the base so it
+        // pops regardless of how transparent the segmentation is. A hidden label is
+        // only revealed when explicitly requested (Shift-highlight of invisible labels).
+        rgba[3] = (labelOpacity != 0.0 || highlightInvisibleLabels) ? HIGHLIGHTED_LABEL_OPACITY : 0.0;
       }
       else
       {
-        if (rgba[3] != 0 || highlightInvisibleLabels)
-        {
-          rgba[3] = 1.0;
-        }
+        // Fade the other labels to a low floor, but never above their normal appearance.
+        rgba[3] = std::min(FADED_LABEL_OPACITY, normalOpacity);
       }
     }
-
-    // Node-level "opacity" multiplies into the per-label alpha. The actor's own
-    // opacity is fixed at 1.0 so the LUT alpha is the sole source of transparency.
-    rgba[3] *= nodeOpacity;
+    else
+    {
+      rgba[3] = normalOpacity;
+    }
 
     lut->SetTableValue(value, rgba);
     localStorage->m_PopulatedLabelEntries.push_back(static_cast<vtkIdType>(value));
   }
+
+  localStorage->m_LastOpacityFactor = opacityFactor;
 
   localStorage->m_LabelLookupTable->Modified();
   lut->Modified();
@@ -335,7 +356,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::GenerateDataForRenderer(mitk::Base
     (localStorage->m_LabelLookupTable->GetMTime() < image->GetLookupTable()->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, LabelHighlightGuard::PROPERTY_NAME_LABELS_HIGHLIGHTED(), localStorage->m_LabelLookupTable->GetMTime()) ||
     PropertyTimeStampIsNewer(node, renderer, LabelHighlightGuard::PROPERTY_NAME_HIGHLIGHT_INVISIBLE(), localStorage->m_LabelLookupTable->GetMTime()) ||
-    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime());
+    PropertyTimeStampIsNewer(node, renderer, "opacity", localStorage->m_LabelLookupTable->GetMTime()) ||
+    GetOpacityFactor(localStorage->m_SegPreferences) != localStorage->m_LastOpacityFactor;
 
   const auto oldUseFadedPipeline = localStorage->m_UseFadedPipeline;
   if (isLookupModified)
@@ -398,6 +420,12 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
   const auto changed3DRendering = pref3DRendering != localStorage->m_3DRenderingPreference;
   localStorage->m_3DRenderingPreference = pref3DRendering;
 
+  // The "opacity factor" is a global preference (no MTime), so detect a change by
+  // comparing against the value baked into the current LUT. m_LastOpacityFactor is
+  // refreshed in UpdateLookupTable, which the matching isLookupModified check in
+  // GenerateDataForRenderer forces to run once this flag opens the regeneration gate.
+  const auto changedOpacityFactor = GetOpacityFactor(localStorage->m_SegPreferences) != localStorage->m_LastOpacityFactor;
+
   // Detect a change in the resolved smoothing state so a preference flip
   // (without any per-node property change) still triggers re-extraction.
   // m_LastSmoothed reflects the smoothing of the cached polydata, so it is only
@@ -449,7 +477,8 @@ void mitk::MultiLabelSegmentationVtkMapper3D::Update(mitk::BaseRenderer *rendere
       (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
       (localStorage->m_LastPropertyUpdateTime < segmentation->GetPropertyList()->GetMTime()) ||
       changed3DRendering ||
-      changedSmoothed)
+      changedSmoothed ||
+      changedOpacityFactor)
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastPropertyUpdateTime.Modified();
@@ -490,6 +519,7 @@ mitk::MultiLabelSegmentationVtkMapper3D::LocalStorage::LocalStorage() : m_LastUp
   m_SegPreferences = nullptr;
   m_3DRenderingPreference = true;
   m_LastSmoothed = true;
+  m_LastOpacityFactor = 1.0f;
 
   auto prefService = mitk::CoreServices::GetPreferencesService();
   if (nullptr != prefService)

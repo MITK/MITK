@@ -2,6 +2,7 @@ set(H_FILES
   QmitkCustomVariants.h
   QmitkDataStorageInspectorProviderBase.h
   QmitkEnums.h
+  QmitkMxNSyncDimension.h
 )
 
 set(CPP_FILES
@@ -68,6 +69,7 @@ set(CPP_FILES
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
   QmitkMxNMultiWidget.cpp
+  QmitkMxNSyncPopupWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkPropertyItem.cpp

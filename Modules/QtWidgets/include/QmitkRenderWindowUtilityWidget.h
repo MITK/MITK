@@ -33,6 +33,7 @@ namespace mitk
   class DataStorage;
 }
 
+class QmitkMxNSyncPopupWidget;
 class QmitkRenderWindow;
 class QToolButton;
 
@@ -90,6 +91,13 @@ public:
   void SetGeometry(const itk::EventObject& event);
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
+  /**
+  * \brief The cell's navigation-synchronization popup (hosted in the "Sync"
+  *        menu). The owning multi widget connects its request signals and
+  *        pushes link state into it.
+  */
+  QmitkMxNSyncPopupWidget* GetSyncPopup() const;
+
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
   void OnSyncGroupAdded(const GroupSyncIndexType index);
@@ -114,6 +122,7 @@ private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
+  QmitkMxNSyncPopupWidget* m_SyncPopup;
   QComboBox* m_SyncGroupSelector;
   QToolButton* m_NewSyncGroupButton;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;

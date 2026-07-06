@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkRenderingManager.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkStepper.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkVtkPropRenderer.h>
 
 #include <mitkTestFixture.h>
@@ -49,6 +50,8 @@ class mitkDisplayActionEventFunctionsTestSuite : public mitk::TestFixture
 
   MITK_TEST(Scroll_PredicateScopesTargets);
   MITK_TEST(Scroll_UnadmittedSender_NoOp);
+  MITK_TEST(Scroll_GroupedSingleSliceMember_DoesNotMoveTime);
+  MITK_TEST(Scroll_DirectGestureOnSingleSliceWindow_MovesTime);
   MITK_TEST(Pan_PredicateScopesTargets);
   MITK_TEST(Zoom_PredicateScopesTargets);
   MITK_TEST(Crosshair_PredicateScopesTargets);
@@ -92,14 +95,15 @@ public:
     m_Image = nullptr;
   }
 
-  Window MakeWindow(const char* name)
+  Window MakeWindow(const char* name, const mitk::Image* image = nullptr)
   {
     Window window;
     window.vtkWindow = vtkRenderWindow::New();
     window.renderer = mitk::VtkPropRenderer::New(name, window.vtkWindow);
     mitk::BaseRenderer::AddInstance(window.vtkWindow, window.renderer);
     mitk::RenderingManager::GetInstance()->AddRenderWindow(window.vtkWindow);
-    mitk::RenderingManager::GetInstance()->InitializeView(window.vtkWindow, m_Image->GetTimeGeometry());
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      window.vtkWindow, (nullptr != image ? image : m_Image.GetPointer())->GetTimeGeometry());
     return window;
   }
 
@@ -173,6 +177,88 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Unadmitted sender must not scroll anything", 2u, SlicePos(m_A1));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Unadmitted sender must not scroll anything - not even itself",
                                  2u, SlicePos(m_B0));
+  }
+
+  /** RAII wrapper so a mid-test assertion failure cannot leak an extra
+   *  registered render window into subsequent tests. */
+  struct ScopedWindow
+  {
+    mitkDisplayActionEventFunctionsTestSuite* suite;
+    Window window;
+
+    ScopedWindow(mitkDisplayActionEventFunctionsTestSuite* owner, const char* name, const mitk::Image* image)
+      : suite(owner), window(owner->MakeWindow(name, image))
+    {
+    }
+    ~ScopedWindow() { DestroyWindow(window); }
+  };
+
+  /** RAII backup of the global time stepper so tests can arm it with a
+   *  multi-step range and always restore the previous state. */
+  struct ScopedTimeStepper
+  {
+    mitk::Stepper* stepper;
+    unsigned int steps;
+    unsigned int pos;
+
+    ScopedTimeStepper()
+      : stepper(mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper())
+      , steps(stepper->GetSteps())
+      , pos(stepper->GetPos())
+    {
+    }
+    ~ScopedTimeStepper()
+    {
+      stepper->SetSteps(steps);
+      stepper->SetPos(pos);
+    }
+  };
+
+  void Scroll_GroupedSingleSliceMember_DoesNotMoveTime()
+  {
+    const auto singleSliceImage = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 1, 1.0f, 1.0f, 1.0f);
+    const ScopedWindow a2(this, "editorA__w2", singleSliceImage);
+
+    const ScopedTimeStepper timeStepper;
+    timeStepper.stepper->SetSteps(5);
+    timeStepper.stepper->SetPos(2);
+
+    auto action = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(
+      SameEditorPredicate("editorA__"));
+
+    auto interactionEvent = mitk::InteractionEvent::New(m_A0.renderer);
+    action(mitk::DisplayScrollEvent(interactionEvent, 1, false));
+
+    CPPUNIT_ASSERT_EQUAL(3u, SlicePos(m_A0));
+    CPPUNIT_ASSERT_EQUAL(3u, SlicePos(m_A1));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A single-slice group member must not be scrolled at all",
+      0u, a2.window.renderer->GetSliceNavigationController()->GetStepper()->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "Grouped slice propagation must never leak into application-global time",
+      2u, timeStepper.stepper->GetPos());
+  }
+
+  void Scroll_DirectGestureOnSingleSliceWindow_MovesTime()
+  {
+    const auto singleSliceImage = mitk::ImageGenerator::GenerateGradientImage<short>(16, 16, 1, 1.0f, 1.0f, 1.0f);
+    const ScopedWindow a2(this, "editorA__w2", singleSliceImage);
+
+    const ScopedTimeStepper timeStepper;
+    timeStepper.stepper->SetSteps(5);
+    timeStepper.stepper->SetPos(2);
+
+    auto action = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(
+      SameEditorPredicate("editorA__"));
+
+    auto interactionEvent = mitk::InteractionEvent::New(a2.window.renderer);
+    action(mitk::DisplayScrollEvent(interactionEvent, 1, false));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "A direct gesture on a single-slice window keeps its wheel-drives-time behavior",
+      3u, timeStepper.stepper->GetPos());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Multi-slice members still receive the scroll", 3u, SlicePos(m_A0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Multi-slice members still receive the scroll", 3u, SlicePos(m_A1));
   }
 
   void Pan_PredicateScopesTargets()

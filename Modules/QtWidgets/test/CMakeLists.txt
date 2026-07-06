@@ -16,6 +16,14 @@ mitkAddCustomModuleTest(QmitkMxNLayoutV2Test QmitkMxNLayoutV2Test
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNLayoutV3Test QmitkMxNLayoutV3Test
+  -platform minimal
+)
+
+mitkAddCustomModuleTest(QmitkMxNNavLinksTest QmitkMxNNavLinksTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
   -platform minimal
 )

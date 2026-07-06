@@ -348,24 +348,33 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
         if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
             && isTarget(sendingRenderer, targetRenderer))
         {
+          // A member that cannot take this scroll is skipped; the rest of the
+          // group still receives the event.
           SliceNavigationController* sliceNavigationController = targetRenderer->GetSliceNavigationController();
           if (nullptr == sliceNavigationController)
           {
-            return;
+            continue;
           }
           if (sliceNavigationController->GetSliceLocked())
           {
-            return;
+            continue;
           }
           mitk::Stepper* stepper = sliceNavigationController->GetStepper();
           if (nullptr == stepper)
           {
-            return;
+            continue;
           }
 
-          // if only a single slice image was loaded, scrolling will affect the time steps
           if (stepper->GetSteps() <= 1)
           {
+            // Group propagation must never leak into application-global time,
+            // so a single-slice member is simply not scrolled. Only the
+            // sender's own gesture keeps the classic single-slice behavior of
+            // scrolling the time steps instead.
+            if (targetRenderer != sendingRenderer)
+            {
+              continue;
+            }
             auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
             stepper = timeNavigationController->GetStepper();
           }

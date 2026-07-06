@@ -17,18 +17,30 @@ found in the LICENSE file.
 
 // qt widgets module
 #include <QmitkAbstractMultiWidget.h>
+#include <QmitkMxNSyncDimension.h>
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 
+// mitk core
+#include <mitkVector.h>
+
 #include <nlohmann/json.hpp>
 
+#include <array>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 class QSplitter;
+
+namespace mitk
+{
+  class BaseRenderer;
+}
 
 /**
 * \brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
@@ -59,10 +71,15 @@ public:
   * \brief Editor-scoped synchronization macro over the four broadcast
   *        navigation dimensions (pan, zoom, slice, crosshair).
   *
-  *   When enabled, all cells of this editor are coupled for those four
-  *   dimensions; render windows of other editors are unaffected in both
-  *   directions. Level-window stays node-global (couples every cell showing
-  *   the node, across editors) and time stays application-global.
+  *   Enabling links every cell of this editor into one shared group per
+  *   navigation dimension (cells created later join automatically while the
+  *   macro is active); disabling removes every cell's link for those four
+  *   dimensions. The macro rewrites the per-cell links only - unlike
+  *   'SetSyncLink' it never converges cell states, preserving the classic
+  *   toggle behavior of coupling views in place. Render windows of other
+  *   editors are unaffected in both directions. Level-window stays
+  *   node-global (couples every cell showing the node, across editors) and
+  *   time stays application-global.
   */
   void Synchronize(bool synchronized) override;
 
@@ -176,6 +193,82 @@ public:
   GroupSyncIndexType NextFreeSyncGroupIndex() const;
 
   /**
+  * \brief Offset modifier of a synchronization link, typed per dimension:
+  *        `int` slice steps for `Slice`, a multiplicative factor (`double`,
+  *        > 0) for `Zoom`, an in-plane world-mm vector for `Pan`.
+  *        `std::monostate` means "no offset" (the dimension's identity).
+  */
+  using SyncOffset = std::variant<std::monostate, int, double, mitk::Vector2D>;
+
+  /** \brief Group membership and offset of one cell for one dimension. */
+  struct SyncLinkState
+  {
+    std::string group;
+    SyncOffset offset;
+  };
+
+  /**
+  * \brief Link a cell to a named synchronization group for one dimension.
+  *
+  *   Cells linked to the same group for the same dimension are synchronized
+  *   on that dimension only. On joining, the cell is converged to the
+  *   group's reference - the live state of the group's seed cell (the
+  *   pre-order first member) - combined with the given offset; the seed
+  *   itself is never converged. Convergence is skipped while the involved
+  *   render windows have no world geometry yet; use 'ReconvergeSyncGroup'
+  *   once they do. `Crosshair` links carry no convergence bookkeeping
+  *   (propagation is absolute). `Orientation` / `Windowing` / `Lut` links
+  *   are stored and serialized, but no synchronization engine drives them
+  *   yet.
+  *
+  * \param windowId   Canonical window id of the cell. Must name an existing cell.
+  * \param dimension  The synchronization dimension to link.
+  * \param group      Group name (URL-segment-safe pattern, shared namespace
+  *                   across all dimensions).
+  * \param offset     Offset modifier; must match the dimension's offset type
+  *                   (or `std::monostate` for the identity offset). Only
+  *                   `Slice`, `Zoom`, and `Pan` accept an offset.
+  *
+  * \throws mitk::Exception on an unknown window, a malformed group name, or
+  *         an offset that the dimension does not accept.
+  */
+  void SetSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension,
+                   const std::string& group, const SyncOffset& offset = {});
+
+  /**
+  * \brief Remove a cell's link for one dimension (back to the unsynced
+  *        singleton default). No-op if the cell is not linked.
+  *
+  * \throws mitk::Exception on an unknown window.
+  */
+  void ClearSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension);
+
+  /**
+  * \brief The cell's link state for one dimension; empty if unlinked.
+  *        For linked `Slice` / `Zoom` / `Pan` the offset always carries the
+  *        dimension's typed value (identity when never set).
+  */
+  std::optional<SyncLinkState> GetSyncLink(const QString& windowId, QmitkMxNSyncDimension dimension) const;
+
+  /** \brief Sorted names of all groups any live cell links for the dimension. */
+  std::vector<std::string> GetSyncGroupNames(QmitkMxNSyncDimension dimension) const;
+
+  /**
+  * \brief Re-establish `reference + offset` for every member of the group on
+  *        the given dimension, where the reference is the live state of the
+  *        group's pre-order first member (the seed).
+  *
+  *   The safety net for delta drift: boundary clamping, missed events, and
+  *   the pan-offset perturbation under zoom all desync members from their
+  *   declared offsets; re-converging restores them.
+  *
+  * \throws mitk::Exception if the dimension carries no convergence
+  *         bookkeeping (only `Slice`, `Zoom`, and `Pan` do), or if no cell
+  *         links the group for this dimension.
+  */
+  void ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, const std::string& group);
+
+  /**
   * \brief Construct a render-window widget with a caller-supplied id.
   *
   *   The id is the canonical, fully-qualified window name in the form
@@ -206,7 +299,7 @@ public:
   RenderWindowWidgetPointer CreateRenderWindowWidget(const QString& id);
 
   /**
-  * \brief Serialize the current layout tree to a v2.0 JSON document
+  * \brief Serialize the current layout tree to a v3.0 JSON document
   *        (always strict mode).
   *
   *   Group naming convention: engine-internal sync-group index 1 maps to the
@@ -214,7 +307,14 @@ public:
   *   assigned by pre-order encounter order over the cell list. Same engine
   *   state in produces the same group names out (round-trip stable).
   *
-  *   See 'mxn-layout-v2.schema.json' for the document shape this method emits.
+  *   Per-cell synchronization links are emitted for every linked dimension;
+  *   `slice` / `zoom` / `pan` links carrying a non-identity offset use the
+  *   object form (`{"target": ..., "offset": ...}`), all other links the
+  *   string shorthand. Every referenced group is declared in the top-level
+  *   `groups` dict (groups referenced only by navigation dimensions as empty
+  *   entries - they carry no persisted per-group state).
+  *
+  *   See 'mxn-layout-v3.schema.json' for the document shape this method emits.
   *
   * \pre  Must be called on the UI thread.
   * \pre  The root layout contains exactly one QSplitter (canonical post-load
@@ -275,13 +375,19 @@ public:
   std::vector<WindowDescriptor> ListWindowDescriptors() const;
 
   /**
-  * \brief Apply a v2.0 JSON document.
+  * \brief Apply a v2.0 or v3.0 JSON document.
   *
   *   Tears down all existing render windows and rebuilds from scratch (no
   *   positional reuse). On failure during construction, rolls back to a
   *   single default cell and rethrows.
   *
-  *   See 'mxn-layout-v2.schema.json' for the accepted document shape.
+  *   See 'mxn-layout-v3.schema.json' for the accepted document shape. A
+  *   v2.0 document is the compatible subset: missing `links` keys default to
+  *   unsynced per-cell singletons, and unknown link keys stay tolerated
+  *   (silently ignored) so existing v2 files load unchanged. For a v3.0
+  *   document the `links` object is closed: an unknown link key, an unknown
+  *   modifier, or an `offset` on a dimension that does not accept it (or of
+  *   the wrong type) is rejected.
   *
   *   Id contract: every window's `id` MUST already be in the canonical
   *   fully-qualified form `<multiWidgetName>__<bareSegment>` matching this
@@ -296,13 +402,15 @@ public:
   *   names that group; remaining members are normalised to the seed. See
   *   the canonical rule on the schema's `groups` description.
   *
-  * \param doc  A parsed v2.0 layout document.
+  * \param doc  A parsed v2.0 or v3.0 layout document.
   *
   * \pre  Must be called on the UI thread.
   *
-  * \throws mitk::Exception on: version != "2.0"; structural shape violation;
-  *         id not starting with `<multiWidgetName>__`; duplicate window ids;
-  *         unknown view_direction; missing group reference in strict mode;
+  * \throws mitk::Exception on: version neither "2.0" nor "3.0"; structural
+  *         shape violation; id not starting with `<multiWidgetName>__`;
+  *         duplicate window ids; unknown view_direction; missing group
+  *         reference in strict mode; v3 links-closure violation (unknown
+  *         link key / modifier, misplaced or mistyped offset);
   *         nlohmann parse / type errors (rewrapped from
   *         'nlohmann::json::exception' subtypes).
   */
@@ -316,8 +424,8 @@ public Q_SLOTS:
   void moveEvent(QMoveEvent* e) override;
 
   /**
-  * \brief Slot wrapper around 'ApplyLayout'. Loads a v2.0 layout document
-  *        (replaces the current cell tree).
+  * \brief Slot wrapper around 'ApplyLayout'. Loads a v2.0 or v3.0 layout
+  *        document (replaces the current cell tree).
   *
   * \param jsonData  Pointer to a parsed layout document. Must not be null
   *                  and must not represent a JSON null value.
@@ -326,16 +434,13 @@ public Q_SLOTS:
   * \pre   !jsonData->is_null()                           (otherwise mitk::Exception)
   *
   * \throws mitk::Exception (rethrown from 'ApplyLayout') on null pointer,
-  *         JSON null value, version != "2.0", structural shape violation,
-  *         id not starting with `<multiWidgetName>__`, duplicate window ids,
-  *         unknown view_direction, missing group reference in strict mode,
-  *         or wrapped 'nlohmann::json::exception' subtypes.
+  *         JSON null value, or any of the 'ApplyLayout' failure conditions.
   */
   void LoadLayout(const nlohmann::json* jsonData);
 
   /**
   * \brief Slot wrapper around 'SerializeLayout'. Writes the current layout
-  *        as a v2.0 JSON document (pretty-printed) to 'outStream'.
+  *        as a v3.0 JSON document (pretty-printed) to 'outStream'.
   *
   *   No-op if 'outStream' is null. Otherwise emits the JSON returned by
   *   'SerializeLayout' followed by a newline.
@@ -450,16 +555,16 @@ private:
   WindowDescriptor MakeWindowDescriptor(const QmitkRenderWindowWidget* cell) const;
 
   /**
-  * \brief Recursive constructor for a v2 'split' subtree. Returns a freshly
+  * \brief Recursive constructor for a 'split' subtree. Returns a freshly
   *        allocated QSplitter with the cell tree below.
   *
   *   Window leaves are created via 'CreateRenderWindowWidget(id)' using the
   *   document's id verbatim, then re-parented to the new splitter and moved
   *   into their target sync group via 'SetSynchronizationGroup'.
   */
-  QSplitter* BuildSplitterFromJsonV2(const nlohmann::json& splitNode,
-                                     const std::map<std::string, GroupSyncIndexType>& nameToInt,
-                                     QSplitter* parentSplitter);
+  QSplitter* BuildSplitterFromJson(const nlohmann::json& splitNode,
+                                   const std::map<std::string, GroupSyncIndexType>& nameToInt,
+                                   QSplitter* parentSplitter);
 
   /**
   * \brief Group seeding pass for ApplyLayout.
@@ -513,6 +618,69 @@ private:
   *        subsequent 'SerializeLayout' emits no top-level 'name' field.
   */
   void RollBackToSingleDefaultCell();
+
+  /**
+  * \brief Install the synchronized display-action handler with one
+  *        membership predicate per broadcast navigation dimension.
+  *
+  *   The predicates read 'm_CellSyncLinks' live at event time, so link
+  *   changes take effect without re-wiring. An unlinked cell degenerates to
+  *   a singleton: it still receives its own gestures (the synchronized
+  *   action is the handler for the sender itself), but nothing propagates.
+  */
+  void InstallSynchronizedHandler();
+
+  /**
+  * \brief Membership predicate: should the synchronized action for
+  *        'dimension' propagate from 'sender' to 'target'?
+  *
+  *   Both renderers must be cells of this editor (qualified-name prefix);
+  *   foreign senders and targets are always rejected, which keeps several
+  *   editors' broadcasts (each observes every interaction event
+  *   application-wide) from double-handling each other's windows.
+  */
+  bool IsNavTarget(QmitkMxNSyncDimension dimension,
+                   const mitk::BaseRenderer* sender,
+                   const mitk::BaseRenderer* target) const;
+
+  /**
+  * \brief The group's seed cell for a dimension: the pre-order first cell
+  *        linking the group. Empty string if no cell links it.
+  */
+  QString FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const;
+
+  /** \brief Push current link state and known group names into every cell's sync popup. */
+  void RefreshSyncControls();
+
+  /**
+  * \brief Absolute-set one member to the seed's live state combined with the
+  *        member's declared offset (dimension-typed, see SetSyncLink).
+  *
+  *   Skips silently while an involved render window has no world geometry
+  *   yet (unrealized); re-converge covers the deferred case. The seed
+  *   itself is never converged - its live state is the reference.
+  */
+  void ConvergeMemberToSeed(QmitkMxNSyncDimension dimension, const QString& seedId, const QString& memberId);
+
+  /**
+  * \brief Per-cell synchronization links (all dimensions except selection,
+  *        which lives in the connector registry). Groups indexed by the
+  *        dimension's position in 'QmitkMxNAllSyncDimensions'; the typed
+  *        offsets are meaningful only while the matching dimension is
+  *        linked.
+  */
+  struct CellSyncLinks
+  {
+    std::array<std::optional<std::string>, QmitkMxNAllSyncDimensions.size()> groups;
+    int sliceOffset = 0;
+    double zoomOffset = 1.0;
+    mitk::Vector2D panOffset = mitk::Vector2D(0.0);
+  };
+
+  std::map<QString, CellSyncLinks> m_CellSyncLinks;
+
+  /** \brief While active, cells created later auto-join the macro group (see Synchronize). */
+  bool m_SynchronizeMacroActive = false;
 
   std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 

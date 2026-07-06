@@ -160,7 +160,9 @@ public:
 
     const auto doc = editor->SerializeLayout();
 
-    CPPUNIT_ASSERT_EQUAL(std::string("2.0"), doc.at("version").get<std::string>());
+    // The writer always emits the current format version, even for state
+    // that a v2.0 document could express.
+    CPPUNIT_ASSERT_EQUAL(std::string("3.0"), doc.at("version").get<std::string>());
     CPPUNIT_ASSERT(doc.contains("groups"));
     CPPUNIT_ASSERT(doc.at("groups").contains("main"));
     CPPUNIT_ASSERT_EQUAL(true, doc.at("groups").at("main").at("select_all").get<bool>());
@@ -208,7 +210,9 @@ public:
 
     const auto roundTrip = editor->SerializeLayout();
 
-    CPPUNIT_ASSERT_EQUAL(fixture.at("version"),       roundTrip.at("version"));
+    // A loaded v2.0 document re-serializes as v3.0 (v2 is a strict subset;
+    // the content below stays identical).
+    CPPUNIT_ASSERT_EQUAL(std::string("3.0"),          roundTrip.at("version").get<std::string>());
     CPPUNIT_ASSERT_EQUAL(fixture.at("groups"),        roundTrip.at("groups"));
     // Compare the root subtree without splitter sizes (Qt may redistribute).
     CPPUNIT_ASSERT_EQUAL(fixture.at("root").at("orientation"),
@@ -486,7 +490,7 @@ public:
   void Version_RejectsAllNonV2()
   {
     auto editor = MakeEditor();
-    for (const auto& bad : { "1.0", "1.1", "100", "1abc", "3.0", "abc" })
+    for (const auto& bad : { "1.0", "1.1", "100", "1abc", "3.1", "4.0", "abc" })
     {
       auto fixture = nlohmann::json::parse(R"json({
         "version": "PLACEHOLDER",

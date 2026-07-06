@@ -11,6 +11,8 @@ set(MODULE_CUSTOM_TESTS
   QmitkAbstractNodeSelectionWidgetTest.cpp
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNLayoutV2Test.cpp
+  QmitkMxNLayoutV3Test.cpp
+  QmitkMxNNavLinksTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp

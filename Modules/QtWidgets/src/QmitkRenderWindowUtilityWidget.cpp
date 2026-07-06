@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 
 // mitk qt widgets
+#include <QmitkMxNSyncPopupWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkStyleManager.h>
 
@@ -33,6 +34,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QmitkRenderWindow* renderWindow/* = nullptr */,
   mitk::DataStorage* dataStorage/* = nullptr */)
   : m_NodeSelectionWidget(nullptr)
+  , m_SyncPopup(nullptr)
   , m_SyncGroupSelector(nullptr)
   , m_NewSyncGroupButton(nullptr)
   , m_SliceNavigationWidget(nullptr)
@@ -66,6 +68,13 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QWidgetAction* dataAction = new QWidgetAction(dataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
   dataMenu->addAction(dataAction);
+
+  m_SyncPopup = new QmitkMxNSyncPopupWidget(parent);
+  auto syncMenu = menuBar->addMenu("Sync");
+  QWidgetAction* syncAction = new QWidgetAction(syncMenu);
+  syncAction->setDefaultWidget(m_SyncPopup);
+  syncMenu->addAction(syncAction);
+
   layout->addWidget(menuBar);
 
   m_SyncGroupSelector = new QComboBox(this);
@@ -262,6 +271,11 @@ void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()
 QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSelectionWidget() const
 {
   return m_NodeSelectionWidget;
+}
+
+QmitkMxNSyncPopupWidget* QmitkRenderWindowUtilityWidget::GetSyncPopup() const
+{
+  return m_SyncPopup;
 }
 
 void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index)

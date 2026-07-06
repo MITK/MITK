@@ -939,6 +939,11 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
   cellOverlay->SetCleanView(m_CleanView);
 
+  // The utility row auto-hides into a top-edge strip; approaching the top
+  // reveals it as a floating panel, so the render window never resizes.
+  renderWindowWidget->SetUtilityWidgetAutoHide(true);
+  proximity->AddEventSource(utilityWidget);
+
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CleanViewToggled,
           this, &QmitkMxNMultiWidget::SetCleanView);
   connect(this, &QmitkMxNMultiWidget::CleanViewChanged,

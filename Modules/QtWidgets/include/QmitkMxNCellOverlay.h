@@ -58,6 +58,15 @@ class vtkRenderWindow;
  * proximity controller as an event source, keeping reveal state alive while
  * the pointer is over the furniture itself.
  *
+ * Slice/time breadcrumbs share the overlay: a `slice/steps` readout bottom
+ * right, a bottom hairline with a position tick (a second, dashed hairline
+ * appears only for time-resolved data), and, on proximity to the bottom
+ * edge, the standard slice-navigation slider hosted over the image. The top
+ * edge shows a thin strip for the auto-hidden utility toolbar and reveals it
+ * on approach. A right-click (without drag - the zoom/windowing gestures
+ * stay untouched) opens the cell's context menu: per-renderer data
+ * visibility, view direction, and the cell's sync actions.
+ *
  * Values refresh on the cell's VTK render-end events, coalesced to the next
  * event-loop cycle - not on a timer.
  *
@@ -111,6 +120,10 @@ protected:
   void mouseReleaseEvent(QMouseEvent* event) override;
   void mouseDoubleClickEvent(QMouseEvent* event) override;
 
+  /** \brief Adds render-window context-menu handling to the base's
+   *         parent-resize tracking. */
+  bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
 
   enum class DragMode
@@ -132,6 +145,19 @@ private:
 
   /** \brief The colormap chip beside the readout (active layer only). */
   QRect ColormapChipRect() const;
+
+  /** \brief Slice `pos/steps` readout, bottom right (left of the ribbon). */
+  QRect SliceReadoutRect() const;
+
+  /** \brief Hot region along the bottom edge revealing the slice slider. */
+  QRect BottomStripRect() const;
+
+  /** \brief Hot region along the cell's top edge revealing the toolbar. */
+  QRect TopStripRect() const;
+
+  void UpdateSliceSlider();
+
+  void OpenContextMenu(const QPoint& globalPosition);
 
   bool IsRevealed(QmitkRenderWindowProximity::State state, bool alwaysOn) const;
 
@@ -174,8 +200,12 @@ private:
 
   QmitkRenderWindowProximity::RegionId m_RibbonRegion = -1;
   QmitkRenderWindowProximity::RegionId m_ReadoutRegion = -1;
+  QmitkRenderWindowProximity::RegionId m_BottomRegion = -1;
+  QmitkRenderWindowProximity::RegionId m_TopRegion = -1;
   QmitkRenderWindowProximity::State m_RibbonState = QmitkRenderWindowProximity::State::Idle;
   QmitkRenderWindowProximity::State m_ReadoutState = QmitkRenderWindowProximity::State::Idle;
+  QmitkRenderWindowProximity::State m_BottomState = QmitkRenderWindowProximity::State::Idle;
+  QmitkRenderWindowProximity::State m_TopState = QmitkRenderWindowProximity::State::Idle;
 
   bool m_ReadoutVisible = true;
   bool m_CleanView = false;
@@ -190,6 +220,14 @@ private:
   DragMode m_DragMode = DragMode::None;
   QPoint m_LastDragPosition;
   double m_DragScale = 1.0;
+
+  unsigned int m_SlicePosition = 0;
+  unsigned int m_SliceSteps = 0;
+  unsigned int m_TimePosition = 0;
+  unsigned int m_TimeSteps = 0;
+
+  QWidget* m_SliceSlider = nullptr;        // lazily created breadcrumb slider
+  QPoint m_RightPressPosition;             // context-menu drag suppression
 
 };
 

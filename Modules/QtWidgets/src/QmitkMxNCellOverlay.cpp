@@ -15,19 +15,29 @@ found in the LICENSE file.
 #include <QmitkMxNMultiWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkRenderWindowWidget.h>
+#include <QmitkSliceNavigationWidget.h>
+#include <QmitkStepperAdapter.h>
 
+#include <mitkAnatomicalPlanes.h>
 #include <mitkBaseRenderer.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImage.h>
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkLookupTable.h>
 #include <vtkRenderWindow.h>
 
+#include <QApplication>
+#include <QContextMenuEvent>
 #include <QDoubleSpinBox>
 #include <QFontMetrics>
 #include <QFormLayout>
@@ -40,6 +50,7 @@ found in the LICENSE file.
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 namespace
 {
@@ -49,6 +60,10 @@ namespace
   constexpr int ReadoutMargin = 8;
   constexpr int HueDotDiameter = 8;
   constexpr int ChipSize = 14;
+  constexpr int EdgeStripThickness = 20;
+  constexpr int EdgeActivationDistance = 16;
+  constexpr int TopStripHeight = 4;
+  constexpr int SliceTickHeight = 8;
 
   const QColor IdleText(255, 255, 255, 140);    // 55 % white
   const QColor ActiveText(255, 255, 255, 216);  // 85 % white
@@ -110,8 +125,16 @@ QmitkMxNCellOverlay::QmitkMxNCellOverlay(QmitkRenderWindowWidget* cell,
 
   m_RibbonRegion = proximity->RegisterRegion([this]() { return this->RibbonRect(true); });
   m_ReadoutRegion = proximity->RegisterRegion([this]() { return this->ReadoutRect(); });
+  m_BottomRegion = proximity->RegisterRegion([this]() { return this->BottomStripRect(); },
+                                             EdgeActivationDistance);
+  m_TopRegion = proximity->RegisterRegion([this]() { return this->TopStripRect(); },
+                                          EdgeActivationDistance);
   connect(proximity, &QmitkRenderWindowProximity::StateChanged,
           this, &QmitkMxNCellOverlay::OnProximityStateChanged);
+
+  // Context-menu handling needs the render window's own mouse stream (the
+  // overlay is transparent there); the base class already filters the cell.
+  cell->GetRenderWindow()->installEventFilter(this);
 
   // Keep a reference of our own: the observer must be removable in the
   // destructor regardless of the Qt child destruction order.
@@ -204,6 +227,43 @@ QRect QmitkMxNCellOverlay::ColormapChipRect() const
                readout.center().y() - ChipSize / 2, ChipSize, ChipSize);
 }
 
+QRect QmitkMxNCellOverlay::SliceReadoutRect() const
+{
+  const QRect area = this->RenderWindowRect();
+  if (!area.isValid() || m_SliceSteps == 0)
+  {
+    return QRect();
+  }
+
+  const QFontMetrics metrics(ReadoutFont(this->font()));
+  const QString text = QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps);
+  const int width = metrics.horizontalAdvance(text) + ReadoutMargin;
+  const int height = metrics.height() + 4;
+
+  return QRect(area.right() - ActiveRibbonWidth - ReadoutMargin - width,
+               area.bottom() - ReadoutMargin - height, width, height);
+}
+
+QRect QmitkMxNCellOverlay::BottomStripRect() const
+{
+  const QRect area = this->RenderWindowRect();
+  if (!area.isValid())
+  {
+    return QRect();
+  }
+
+  // Leaves the W/L readout corner to its own region and the ribbon its edge.
+  const QRect readout = this->ReadoutRect();
+  const int left = (readout.isValid() ? readout.right() : area.left()) + 2 * ReadoutMargin;
+  return QRect(left, area.bottom() - EdgeStripThickness,
+               area.right() - ActiveRibbonWidth - left, EdgeStripThickness);
+}
+
+QRect QmitkMxNCellOverlay::TopStripRect() const
+{
+  return QRect(0, 0, this->width(), EdgeStripThickness);
+}
+
 bool QmitkMxNCellOverlay::IsRevealed(QmitkRenderWindowProximity::State state, bool alwaysOn) const
 {
   if (m_CleanView)
@@ -224,6 +284,16 @@ void QmitkMxNCellOverlay::OnProximityStateChanged(QmitkRenderWindowProximity::Re
   {
     m_ReadoutState = state;
   }
+  else if (id == m_BottomRegion)
+  {
+    m_BottomState = state;
+    this->UpdateSliceSlider();
+  }
+  else if (id == m_TopRegion)
+  {
+    m_TopState = state;
+    m_Cell->ShowUtilityWidget(state == QmitkRenderWindowProximity::State::Active);
+  }
   else
   {
     return;
@@ -231,6 +301,50 @@ void QmitkMxNCellOverlay::OnProximityStateChanged(QmitkRenderWindowProximity::Re
 
   this->UpdateInteractivity();
   this->update();
+}
+
+void QmitkMxNCellOverlay::UpdateSliceSlider()
+{
+  const bool show = !m_CleanView
+    && m_BottomState == QmitkRenderWindowProximity::State::Active && m_SliceSteps > 1;
+
+  if (show && nullptr == m_SliceSlider)
+  {
+    auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+    if (nullptr == renderer || nullptr == renderer->GetSliceNavigationController())
+    {
+      return;
+    }
+    // The standard slider, floating over the image (a child of the cell,
+    // not of this overlay, so the overlay's input mask does not apply).
+    auto* slider = new QmitkSliceNavigationWidget(m_Cell);
+    new QmitkStepperAdapter(slider, renderer->GetSliceNavigationController()->GetStepper());
+    m_SliceSlider = slider;
+    if (!m_Proximity.isNull())
+    {
+      m_Proximity->AddEventSource(m_SliceSlider);
+    }
+  }
+
+  if (nullptr == m_SliceSlider)
+  {
+    return;
+  }
+
+  if (show)
+  {
+    const QRect area = this->RenderWindowRect();
+    const int height = m_SliceSlider->sizeHint().height();
+    m_SliceSlider->setGeometry(area.left() + ReadoutMargin,
+                               area.bottom() - EdgeStripThickness - height,
+                               area.width() - 2 * ReadoutMargin - ActiveRibbonWidth, height);
+    m_SliceSlider->show();
+    m_SliceSlider->raise();
+  }
+  else
+  {
+    m_SliceSlider->hide();
+  }
 }
 
 void QmitkMxNCellOverlay::UpdateInteractivity()
@@ -257,6 +371,15 @@ void QmitkMxNCellOverlay::UpdateInteractivity()
     mask += this->ReadoutRect();
     mask += this->ColormapChipRect();
   }
+  // Paint-only furniture (breadcrumbs, edge strips) still needs mask
+  // coverage or it would vanish while another region is interactive.
+  mask += this->SliceReadoutRect();
+  const QRect area = this->RenderWindowRect();
+  if (area.isValid())
+  {
+    mask += QRect(area.left(), area.bottom() - SliceTickHeight, area.width(), SliceTickHeight);
+  }
+  mask += QRect(0, 0, this->width(), TopStripHeight);
 
   this->setMask(mask);
   this->setTransparentForMouseEvents(false);
@@ -371,6 +494,49 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
       painter.setPen(QPen(m_ReadoutState == State::Active ? ActiveText : IdleText, 1));
       painter.drawRect(chip.adjusted(0, 0, -1, -1));
     }
+  }
+
+  // Slice/time breadcrumbs: whisper-quiet, revealed with the pointer in the
+  // cell (all regions leave Idle together while the pointer is inside).
+  const bool pointerInCell = m_BottomState != State::Idle;
+  if (pointerInCell && m_SliceSteps > 0)
+  {
+    painter.setFont(ReadoutFont(this->font()));
+    painter.setPen(m_BottomState == State::Active ? ActiveText : IdleText);
+    painter.drawText(this->SliceReadoutRect(), Qt::AlignRight | Qt::AlignVCenter,
+                     QStringLiteral("%1/%2").arg(m_SlicePosition + 1).arg(m_SliceSteps));
+
+    // Bottom hairline with the slice position tick.
+    const int hairlineY = area.bottom() - 1;
+    painter.fillRect(QRect(area.left(), hairlineY, area.width(), 1), QColor(255, 255, 255, 40));
+    if (m_SliceSteps > 1)
+    {
+      const int tickX = area.left()
+        + static_cast<int>((static_cast<double>(m_SlicePosition) / (m_SliceSteps - 1))
+                           * (area.width() - 2));
+      painter.fillRect(QRect(tickX, area.bottom() - SliceTickHeight, 2, SliceTickHeight),
+                       IdleText);
+    }
+
+    // The dashed time hairline exists only for time-resolved data.
+    if (m_TimeSteps > 1)
+    {
+      QPen dashed(QColor(255, 255, 255, 40), 1, Qt::DashLine);
+      painter.setPen(dashed);
+      const int timeY = area.bottom() - SliceTickHeight - 3;
+      painter.drawLine(area.left(), timeY, area.right(), timeY);
+      const int tickX = area.left()
+        + static_cast<int>((static_cast<double>(m_TimePosition) / (m_TimeSteps - 1))
+                           * (area.width() - 2));
+      painter.fillRect(QRect(tickX, timeY - 2, 2, 5), IdleText);
+    }
+  }
+
+  // Collapsed utility toolbar strip along the cell's top edge.
+  if (m_TopState != State::Active)
+  {
+    painter.fillRect(QRect(0, 0, this->width(), TopStripHeight),
+                     QColor(255, 255, 255, pointerInCell ? 76 : 40));
   }
 }
 
@@ -644,8 +810,28 @@ void QmitkMxNCellOverlay::RefreshValues()
     }
   }
 
+  unsigned int slicePosition = 0;
+  unsigned int sliceSteps = 0;
+  if (auto* sliceStepper = renderer->GetSliceNavigationController()->GetStepper())
+  {
+    slicePosition = sliceStepper->GetPos();
+    sliceSteps = sliceStepper->GetSteps();
+  }
+  unsigned int timePosition = 0;
+  unsigned int timeSteps = 0;
+  if (auto* timeNavigation = mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+  {
+    if (auto* timeStepper = timeNavigation->GetStepper())
+    {
+      timePosition = timeStepper->GetPos();
+      timeSteps = timeStepper->GetSteps();
+    }
+  }
+
   const bool changed = node != m_TopNode || hasLevelWindow != m_HasLevelWindow
     || lutMTime != m_LutMTime
+    || slicePosition != m_SlicePosition || sliceSteps != m_SliceSteps
+    || timePosition != m_TimePosition || timeSteps != m_TimeSteps
     || (hasLevelWindow
         && (levelWindow.GetLevel() != m_LevelWindow.GetLevel()
             || levelWindow.GetWindow() != m_LevelWindow.GetWindow()));
@@ -662,6 +848,10 @@ void QmitkMxNCellOverlay::RefreshValues()
     m_LevelWindow = levelWindow;
   }
   m_LutMTime = lutMTime;
+  m_SlicePosition = slicePosition;
+  m_SliceSteps = sliceSteps;
+  m_TimePosition = timePosition;
+  m_TimeSteps = timeSteps;
 
   this->RebuildLutStrip();
   this->UpdateInteractivity();
@@ -740,4 +930,162 @@ void QmitkMxNCellOverlay::RebuildLutStrip()
   }
 
   m_LutStrip = strip;
+}
+
+bool QmitkMxNCellOverlay::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched == m_Cell->GetRenderWindow())
+  {
+    if (event->type() == QEvent::MouseButtonPress
+        && static_cast<QMouseEvent*>(event)->button() == Qt::RightButton)
+    {
+      m_RightPressPosition = static_cast<QMouseEvent*>(event)->pos();
+    }
+    else if (event->type() == QEvent::ContextMenu)
+    {
+      // The right button doubles as the zoom / windowing gesture; only a
+      // click without drag is a context-menu request. Consuming the event in
+      // both cases keeps a gesture's release from popping the menu.
+      auto* contextEvent = static_cast<QContextMenuEvent*>(event);
+      if (!m_CleanView
+          && (contextEvent->pos() - m_RightPressPosition).manhattanLength()
+               < QApplication::startDragDistance())
+      {
+        this->OpenContextMenu(contextEvent->globalPos());
+      }
+      return true;
+    }
+  }
+
+  return QmitkOverlayWidget::eventFilter(watched, event);
+}
+
+void QmitkMxNCellOverlay::OpenContextMenu(const QPoint& globalPosition)
+{
+  auto* renderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+  if (nullptr == renderer)
+  {
+    return;
+  }
+  const auto windowId = m_Cell->GetWidgetName();
+
+  QMenu menu(this);
+
+  // Per-renderer data visibility: toggles affect only this cell.
+  if (auto dataStorage = renderer->GetDataStorage(); dataStorage.IsNotNull())
+  {
+    const auto noHelperObjects = mitk::NodePredicateAnd::New();
+    noHelperObjects->AddPredicate(
+      mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+    noHelperObjects->AddPredicate(
+      mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+
+    auto* visibilityMenu = menu.addMenu(tr("Shown data"));
+    for (const auto& node : *dataStorage->GetSubset(noHelperObjects))
+    {
+      if (node.IsNull())
+      {
+        continue;
+      }
+      auto* action = visibilityMenu->addAction(QString::fromStdString(node->GetName()));
+      action->setCheckable(true);
+      action->setChecked(node->IsVisible(renderer));
+      mitk::DataNode::Pointer heldNode = node;
+      connect(action, &QAction::toggled, this, [this, heldNode](bool visible)
+      {
+        auto* localRenderer = mitk::BaseRenderer::GetInstance(m_VtkRenderWindow);
+        if (nullptr != localRenderer)
+        {
+          heldNode->SetVisibility(visible, localRenderer);
+          mitk::RenderingManager::GetInstance()->RequestUpdate(m_VtkRenderWindow);
+        }
+      });
+    }
+    visibilityMenu->setEnabled(!visibilityMenu->isEmpty());
+  }
+
+  auto* directionMenu = menu.addMenu(tr("View direction"));
+  const std::pair<const char*, mitk::AnatomicalPlane> planes[] = {
+    { "Axial", mitk::AnatomicalPlane::Axial },
+    { "Coronal", mitk::AnatomicalPlane::Coronal },
+    { "Sagittal", mitk::AnatomicalPlane::Sagittal },
+  };
+  for (const auto& [label, plane] : planes)
+  {
+    auto* action = directionMenu->addAction(tr(label));
+    const auto planeValue = plane;
+    connect(action, &QAction::triggered, this, [this, windowId, planeValue]()
+    {
+      try
+      {
+        m_Editor->SetViewDirection(windowId, planeValue);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Context menu: view direction ignored: " << e.GetDescription();
+      }
+    });
+  }
+
+  menu.addSeparator();
+
+  auto* reinitAction = menu.addAction(tr("Reinit group geometry"));
+  connect(reinitAction, &QAction::triggered, this, [this, windowId]()
+  {
+    try
+    {
+      m_Editor->ReinitSyncGroupGeometry(windowId);
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_WARN << "Context menu: geometry reinit ignored: " << e.GetDescription();
+    }
+  });
+
+  auto* reconvergeAction = menu.addAction(tr("Re-converge sync groups"));
+  bool hasOffsetLink = false;
+  for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
+                                QmitkMxNSyncDimension::Pan })
+  {
+    hasOffsetLink = hasOffsetLink || m_Editor->GetSyncLink(windowId, dimension).has_value();
+  }
+  reconvergeAction->setEnabled(hasOffsetLink);
+  connect(reconvergeAction, &QAction::triggered, this, [this, windowId]()
+  {
+    for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Pan })
+    {
+      const auto link = m_Editor->GetSyncLink(windowId, dimension);
+      if (!link.has_value())
+      {
+        continue;
+      }
+      try
+      {
+        m_Editor->ReconvergeSyncGroup(dimension, link->group);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Context menu: re-converge ignored: " << e.GetDescription();
+      }
+    }
+  });
+
+  menu.addSeparator();
+
+  auto* editorAction = menu.addAction(tr("Open layout editor"));
+  connect(editorAction, &QAction::triggered, this, [this]()
+  {
+    m_Editor->RequestLayoutEditor();
+  });
+
+  auto* cleanViewAction = menu.addAction(tr("Clean view"));
+  cleanViewAction->setCheckable(true);
+  cleanViewAction->setChecked(m_Editor->IsCleanView());
+  connect(cleanViewAction, &QAction::toggled, this, [this](bool cleanView)
+  {
+    m_Editor->SetCleanView(cleanView);
+  });
+
+  menu.exec(globalPosition);
 }

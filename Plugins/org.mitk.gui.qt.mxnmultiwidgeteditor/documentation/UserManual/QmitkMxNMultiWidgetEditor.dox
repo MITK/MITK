@@ -112,15 +112,33 @@
 	</ul>
 
 \subsection org_mitk_editors_mxnmultiwidget_Utility Utility Menu
-	Each window view has a utility menu at the top with four UI elements that allow to perform the following actions:
+	Each window view has a utility menu along its top edge. It is collapsed to a thin
+	strip by default to leave the image unobstructed; moving the pointer to the top
+	edge slides it in without resizing the render window. Its elements:
 	<ul>
 		<li> Data selection button: Select which data should be selected and visible inside the window view
+		<li> Sync button: Open the MxN Layout Editor (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor)
 		<li> Sync Group drop down menu: Select the current sync group to synchronize with other windows
 		<li> Slice slider: Navigate along the view direction of this window
 		<li> View direction drop down menu: Select the current anatomical view plane / view direction
+		<li> Clean button: Toggle the clean view (see \ref org_mitk_editors_mxnmultiwidget_CleanView)
 	</ul>
 
 	\imageMacro{utilityMenu.png, "Utility menu", 8.00}
+
+\subsubsection org_mitk_editors_mxnmultiwidget_Breadcrumbs Slice and time breadcrumbs
+	While the pointer is inside a window view, the current slice is shown as a
+	<tt>slice/total</tt> readout in the bottom right corner and as a position tick on a
+	thin line along the bottom edge; time-resolved data adds a second, dashed line for
+	the current time step. Approaching the bottom edge reveals the standard slice
+	slider floating over the image.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_ContextMenu Context menu
+	A right click into a window view (without dragging - the right-button gestures
+	keep working) opens a context menu with per-window data visibility toggles, the
+	view direction, the sync actions (re-converge, reinit group geometry), the layout
+	editor, and the clean view toggle. Visibility changes affect only the clicked
+	window.
 
 \subsubsection org_mitk_editors_mxnmultiwidget_Data_Selection Data node selection
 	Using the data selection button of a window view you can open a data node selection dialog which shows the currently

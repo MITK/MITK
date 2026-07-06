@@ -94,6 +94,17 @@ public:
   QmitkRenderWindowUtilityWidget* GetUtilityWidget();
   const QmitkRenderWindowUtilityWidget* GetUtilityWidget() const;
 
+  /**
+  * \brief Auto-hide mode for the utility widget: instead of occupying a
+  *        layout row, it floats over the render window's top edge and is
+  *        shown/hidden via 'ShowUtilityWidget' (typically on pointer
+  *        proximity), so revealing it never resizes the render window.
+  */
+  void SetUtilityWidgetAutoHide(bool autoHide);
+
+  /** \brief Reveal/collapse the utility widget while in auto-hide mode. */
+  void ShowUtilityWidget(bool show);
+
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
   std::pair<mitk::Color, mitk::Color> GetGradientBackgroundColors() const { return m_GradientBackgroundColors; };
@@ -129,15 +140,22 @@ public Q_SLOTS:
 
   void OnResetGeometry();
 
+protected:
+
+  void resizeEvent(QResizeEvent* event) override;
+
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
+  void UpdateUtilityWidgetGeometry();
 
   QString m_WidgetName;
   QString m_DisplayName;
   QVBoxLayout* m_Layout;
+  QWidget* m_UtilityWidget = nullptr;
+  bool m_UtilityWidgetAutoHide = false;
 
   mitk::DataStorage* m_DataStorage;
 

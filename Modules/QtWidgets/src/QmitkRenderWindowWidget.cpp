@@ -71,28 +71,75 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
 
 void QmitkRenderWindowWidget::AddUtilityWidget(QWidget* utilityWidget)
 {
+  m_UtilityWidget = utilityWidget;
   m_Layout->insertWidget(0, utilityWidget);
 }
 
 QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget()
 {
-  auto layoutItem = m_Layout->itemAt(0)->widget();
-  auto utilityWidget = dynamic_cast<QmitkRenderWindowUtilityWidget*>(layoutItem);
-  if (utilityWidget != nullptr)
-  {
-    return utilityWidget;
-  }
-  return nullptr;
+  return dynamic_cast<QmitkRenderWindowUtilityWidget*>(m_UtilityWidget);
 }
 
 const QmitkRenderWindowUtilityWidget* QmitkRenderWindowWidget::GetUtilityWidget() const
 {
-  if (m_Layout == nullptr)
-    return nullptr;
-  auto* const item = m_Layout->itemAt(0);
-  if (item == nullptr)
-    return nullptr;
-  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(item->widget());
+  return dynamic_cast<const QmitkRenderWindowUtilityWidget*>(m_UtilityWidget);
+}
+
+void QmitkRenderWindowWidget::SetUtilityWidgetAutoHide(bool autoHide)
+{
+  if (nullptr == m_UtilityWidget || autoHide == m_UtilityWidgetAutoHide)
+  {
+    return;
+  }
+
+  m_UtilityWidgetAutoHide = autoHide;
+  if (autoHide)
+  {
+    // Overlay mode: the row's layout slot is given back to the render
+    // window (the reveal must never resize it); the widget floats on top.
+    m_Layout->removeWidget(m_UtilityWidget);
+    m_UtilityWidget->hide();
+    m_UtilityWidget->raise();
+    this->UpdateUtilityWidgetGeometry();
+  }
+  else
+  {
+    m_Layout->insertWidget(0, m_UtilityWidget);
+    m_UtilityWidget->show();
+  }
+}
+
+void QmitkRenderWindowWidget::ShowUtilityWidget(bool show)
+{
+  if (nullptr == m_UtilityWidget || !m_UtilityWidgetAutoHide)
+  {
+    return;
+  }
+
+  if (show)
+  {
+    this->UpdateUtilityWidgetGeometry();
+    m_UtilityWidget->show();
+    m_UtilityWidget->raise();
+  }
+  else
+  {
+    m_UtilityWidget->hide();
+  }
+}
+
+void QmitkRenderWindowWidget::UpdateUtilityWidgetGeometry()
+{
+  if (nullptr != m_UtilityWidget && m_UtilityWidgetAutoHide)
+  {
+    m_UtilityWidget->setGeometry(0, 0, this->width(), m_UtilityWidget->sizeHint().height());
+  }
+}
+
+void QmitkRenderWindowWidget::resizeEvent(QResizeEvent* event)
+{
+  QFrame::resizeEvent(event);
+  this->UpdateUtilityWidgetGeometry();
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)

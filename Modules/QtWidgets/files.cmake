@@ -56,6 +56,7 @@ set(CPP_FILES
   QmitkRenderingManagerFactory.cpp
   QmitkRenderWindow.cpp
   QmitkRenderWindowMenu.cpp
+  QmitkRenderWindowProximity.cpp
   QmitkRenderWindowUtilityWidget.cpp
   QmitkRenderWindowWidget.cpp
   QmitkRenderWindowContextDataStorageInspector.cpp

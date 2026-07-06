@@ -40,6 +40,10 @@ mitkAddCustomModuleTest(QmitkMxNDataBasedLayoutTest QmitkMxNDataBasedLayoutTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkRenderWindowProximityTest QmitkRenderWindowProximityTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkSynchronizedWidgetConnectorTest QmitkSynchronizedWidgetConnectorTest
   -platform minimal
 )

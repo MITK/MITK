@@ -17,5 +17,6 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp
+  QmitkRenderWindowProximityTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
 )

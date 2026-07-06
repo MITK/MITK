@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindowUtilityWidget.h>
 
-#include <QMenuBar>
+#include <QMenu>
 #include <QToolButton>
 #include <QWidgetAction>
 
@@ -61,15 +61,19 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   connect(m_NodeSelectionWidget, &QmitkSynchronizedNodeSelectionWidget::SyncGroupIndexChanged,
     this, &QmitkRenderWindowUtilityWidget::OnNodeSelectionWidgetSyncGroupChanged);
 
-  auto menuBar = new QMenuBar(this);
-  menuBar->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-  menuBar->setNativeMenuBar(false);
-  auto dataMenu = menuBar->addMenu("Data");
-  QWidgetAction* dataAction = new QWidgetAction(dataMenu);
+  // A plain tool button, not a QMenuBar entry: a menu bar collapses its
+  // entries behind an extension popup once the utility row gets narrow,
+  // which costs an extra click to reach the data selection.
+  auto* dataButton = new QToolButton(this);
+  dataButton->setText("Data");
+  dataButton->setToolTip(tr("Select the data shown in this render window"));
+  dataButton->setPopupMode(QToolButton::InstantPopup);
+  auto* dataMenu = new QMenu(dataButton);
+  auto* dataAction = new QWidgetAction(dataMenu);
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
   dataMenu->addAction(dataAction);
-
-  layout->addWidget(menuBar);
+  dataButton->setMenu(dataMenu);
+  layout->addWidget(dataButton);
 
   auto* layoutEditorButton = new QToolButton(this);
   layoutEditorButton->setText("Sync");

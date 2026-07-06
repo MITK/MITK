@@ -22,6 +22,8 @@ found in the LICENSE file.
 #include <mitkLabelSetImageHelper.h>
 #include <mitkSegChangeOperationApplier.h>
 
+#include <QSignalBlocker>
+
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage, QWidget* parent)
   : QWidget(parent)
@@ -70,9 +72,17 @@ QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
 void QmitkBooleanOperationsWidget::OnSegSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList /*nodes*/)
 {
   auto node = m_Controls->segNodeSelector->GetSelectedNode();
-  m_Controls->labelInspector->SetMultiLabelNode(node);
-  m_Controls->line1stLabel->SetMultiLabelNode(node);
-  m_Controls->lineOtherLabels->SetMultiLabelNode(node);
+
+  // Setting the node on the inspector emits CurrentSelectionChanged synchronously while it recovers
+  // a selection during the model reset. If that reaches ConfigureWidgets before line1stLabel /
+  // lineOtherLabels have their segmentation, they receive a selection with no segmentation set. Assign
+  // all three nodes with the inspector's signals blocked, then configure once from the settled state.
+  {
+    QSignalBlocker blockInspectorSignals(m_Controls->labelInspector);
+    m_Controls->labelInspector->SetMultiLabelNode(node);
+    m_Controls->line1stLabel->SetMultiLabelNode(node);
+    m_Controls->lineOtherLabels->SetMultiLabelNode(node);
+  }
 
   this->ConfigureWidgets();
 }

@@ -4,4 +4,5 @@ set(MODULE_TESTS
 
 set(MODULE_CUSTOM_TESTS
   QmitkMultiLabelTreeModelTest.cpp
+  QmitkMultiLabelSelectionLabelTest.cpp
 )

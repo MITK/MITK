@@ -69,6 +69,13 @@ Q_SIGNALS:
   /** \brief The user requested re-converging the dimension's current group. */
   void ReconvergeRequested(QmitkMxNSyncDimension dimension, const QString& group);
 
+  /**
+  * \brief The user requested re-initializing the geometry of this cell's
+  *        geometry-authority component (its slice/orientation link
+  *        neighborhood).
+  */
+  void ReinitGeometryRequested();
+
 private:
 
   struct Row

@@ -269,6 +269,40 @@ public:
   void ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, const std::string& group);
 
   /**
+  * \brief Set a cell's view direction and relay it to the cell's
+  *        `Orientation` group (if linked).
+  *
+  *   Members receive the plane through the silent programmatic path, so a
+  *   relayed change never re-triggers propagation. After the relay, the
+  *   geometry-relative offsets of the affected cells' `Slice` / `Zoom` /
+  *   `Pan` groups are re-converged (the plane flip re-initializes each
+  *   member's stepper and camera).
+  *
+  * \throws mitk::Exception on an unknown window or a plane other than
+  *         Axial / Coronal / Sagittal (interactive orientation sync targets
+  *         the standard anatomical planes).
+  */
+  void SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection);
+
+  /**
+  * \brief Re-initialize the geometry of the cell's geometry-authority
+  *        component: every cell reachable from `windowId` over shared
+  *        `Slice` or `Orientation` groups (the connected component of the
+  *        slice/orientation link graph).
+  *
+  *   All component members are initialized to one shared geometry - the
+  *   bounding geometry of the data storage's nodes as visible in the
+  *   triggering cell ("last reinit wins") - via per-window initialization;
+  *   cells outside the component (and other editors) are untouched, unlike
+  *   the application-global Data Manager reinit. Afterwards the component's
+  *   geometry-relative offsets (`Slice` / `Zoom` / `Pan` groups touching
+  *   the component) are re-converged.
+  *
+  * \throws mitk::Exception on an unknown window or when no data storage is set.
+  */
+  void ReinitSyncGroupGeometry(const QString& windowId);
+
+  /**
   * \brief Construct a render-window widget with a caller-supplied id.
   *
   *   The id is the canonical, fully-qualified window name in the form
@@ -488,6 +522,16 @@ protected:
   /** \brief Number of currently registered synchronization groups. */
   std::size_t GetSyncGroupCount() const;
 
+  /**
+  * \brief Number of member applications performed by orientation
+  *        propagation since construction.
+  *
+  *   Test seam (surfaced by a test-only subclass, like
+  *   'GetSyncGroupConnector'): one plane change relayed to N group members
+  *   increments this by exactly N; a propagation cycle would inflate it.
+  */
+  unsigned int GetOrientationApplyCount() const;
+
 private:
 
   void SetLayoutImpl() override;
@@ -653,6 +697,40 @@ private:
   void RefreshSyncControls();
 
   /**
+  * \brief Relay a plane change of 'sourceId' to its `Orientation` group and
+  *        re-converge the affected geometry-relative offsets.
+  *
+  *   Members are set through the silent utility-widget path (no signal
+  *   re-emission); the depth guard additionally drops any change that
+  *   arrives while a relay is in flight, so propagation can never cycle.
+  */
+  void PropagateOrientation(const QString& sourceId, mitk::AnatomicalPlane viewDirection);
+
+  /**
+  * \brief Cells reachable from 'windowId' over shared `Slice` or
+  *        `Orientation` groups (the geometry-authority component, always
+  *        including 'windowId' itself), in pre-order.
+  */
+  std::vector<QString> ComputeGeometryComponent(const QString& windowId) const;
+
+  /**
+  * \brief Align every component member's reference geometry to the
+  *        component seed's (pre-order first member). Members whose geometry
+  *        already matches are left alone; without a realized seed geometry
+  *        nothing happens (deferred to the next reinit / re-converge).
+  *
+  * \return The ids of the members that were re-initialized; the caller
+  *         re-converges the groups these touch.
+  */
+  std::vector<QString> EnforceComponentGeometry(const QString& windowId);
+
+  /**
+  * \brief Re-converge every `Slice` / `Zoom` / `Pan` group that has at least
+  *        one member among 'windowIds' (after their geometry changed).
+  */
+  void ReconvergeGeometryRelativeGroups(const std::vector<QString>& windowIds);
+
+  /**
   * \brief Absolute-set one member to the seed's live state combined with the
   *        member's declared offset (dimension-typed, see SetSyncLink).
   *
@@ -681,6 +759,11 @@ private:
 
   /** \brief While active, cells created later auto-join the macro group (see Synchronize). */
   bool m_SynchronizeMacroActive = false;
+
+  /** \brief Re-entrancy guard for orientation propagation (see PropagateOrientation). */
+  unsigned int m_OrientationPropagationDepth = 0;
+
+  unsigned int m_OrientationApplyCount = 0;
 
   std::map < GroupSyncIndexType, std::unique_ptr<QmitkSynchronizedWidgetConnector> > m_SynchronizedWidgetConnectors;
 

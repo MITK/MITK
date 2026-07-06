@@ -246,6 +246,39 @@ void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
 void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDirection)
 {
   m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString());
+
+  if ("axial" == viewDirection)
+  {
+    emit ViewDirectionChanged(mitk::AnatomicalPlane::Axial);
+  }
+  else if ("coronal" == viewDirection)
+  {
+    emit ViewDirectionChanged(mitk::AnatomicalPlane::Coronal);
+  }
+  else if ("sagittal" == viewDirection)
+  {
+    emit ViewDirectionChanged(mitk::AnatomicalPlane::Sagittal);
+  }
+}
+
+void QmitkRenderWindowUtilityWidget::SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection)
+{
+  QString text;
+  switch (viewDirection)
+  {
+    case mitk::AnatomicalPlane::Axial:    text = QStringLiteral("axial"); break;
+    case mitk::AnatomicalPlane::Coronal:  text = QStringLiteral("coronal"); break;
+    case mitk::AnatomicalPlane::Sagittal: text = QStringLiteral("sagittal"); break;
+    default:
+      return;  // 'Original' has no selector entry and no propagation semantics
+  }
+
+  // Mirror silently; the renderer change below is the single application.
+  // Going through the selector's change signal instead would re-emit
+  // 'ViewDirectionChanged' and turn a relayed change back into a source.
+  const QSignalBlocker blocker(m_ViewDirectionSelector);
+  m_ViewDirectionSelector->setCurrentText(text);
+  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection, m_BaseRenderer);
 }
 
 void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()

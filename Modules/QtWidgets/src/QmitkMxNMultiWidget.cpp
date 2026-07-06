@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 // vtk
 #include <vtkCamera.h>
@@ -936,6 +937,24 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
       {
         MITK_WARN << "Ignoring re-converge request: " << e.GetDescription();
       }
+    });
+  connect(syncPopup, &QmitkMxNSyncPopupWidget::ReinitGeometryRequested, this,
+    [this, id]()
+    {
+      try
+      {
+        this->ReinitSyncGroupGeometry(id);
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_WARN << "Ignoring group-reinit request for '" << id.toStdString()
+                  << "': " << e.GetDescription();
+      }
+    });
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::ViewDirectionChanged, this,
+    [this, id](mitk::AnatomicalPlane viewDirection)
+    {
+      this->PropagateOrientation(id, viewDirection);
     });
 
   // The Synchronize macro covers every cell of the editor, including cells
@@ -2158,10 +2177,39 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
   }
   links.groups[DimensionIndex(dimension)] = group;
 
+  // An orientation link aligns the joining cell's plane to the seed's
+  // (absolute state; joining means adopting the group's plane).
+  if (QmitkMxNSyncDimension::Orientation == dimension)
+  {
+    const auto seedId = this->FindSyncGroupSeed(dimension, group);
+    if (!seedId.isEmpty() && seedId != windowId)
+    {
+      const auto seedWidget = this->GetRenderWindowWidget(seedId);
+      const auto memberWidget = this->GetRenderWindowWidget(windowId);
+      if (nullptr != seedWidget && nullptr != memberWidget && nullptr != memberWidget->GetUtilityWidget())
+      {
+        // Silent path: adopting the group plane is a relayed change, not a
+        // new orientation gesture.
+        memberWidget->GetUtilityWidget()->SetViewDirectionSelection(
+          seedWidget->GetSliceNavigationController()->GetDefaultViewDirection());
+      }
+    }
+  }
+
+  // Slice and orientation need a shared reference geometry (a step index or
+  // a plane name means different physical locations across divergent
+  // geometries); align the cell's geometry-authority component to its seed
+  // and restore offsets that the alignment reset.
+  if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Orientation == dimension)
+  {
+    const auto reinitialized = this->EnforceComponentGeometry(windowId);
+    this->ReconvergeGeometryRelativeGroups(reinitialized);
+  }
+
   // Converge the joining cell to the group's reference. The pre-order first
   // member is the seed and defines the reference, so it is never converged
   // itself. Crosshair propagation is absolute (no state to converge);
-  // orientation / windowing / lut have no engine yet.
+  // windowing / lut have no engine yet.
   if (QmitkMxNSyncDimension::Slice == dimension || QmitkMxNSyncDimension::Zoom == dimension
       || QmitkMxNSyncDimension::Pan == dimension)
   {
@@ -2275,7 +2323,8 @@ void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, c
 void QmitkMxNMultiWidget::RefreshSyncControls()
 {
   const auto navDimensions = { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
-                               QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair };
+                               QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair,
+                               QmitkMxNSyncDimension::Orientation };
 
   std::map<QmitkMxNSyncDimension, QStringList> knownGroups;
   for (const auto dimension : navDimensions)
@@ -2408,4 +2457,240 @@ void QmitkMxNMultiWidget::ConvergeMemberToSeed(QmitkMxNSyncDimension dimension,
     default:
       break;
   }
+}
+
+void QmitkMxNMultiWidget::SetViewDirection(const QString& windowId, mitk::AnatomicalPlane viewDirection)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "SetViewDirection: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (mitk::AnatomicalPlane::Axial != viewDirection && mitk::AnatomicalPlane::Coronal != viewDirection
+      && mitk::AnatomicalPlane::Sagittal != viewDirection)
+  {
+    mitkThrow() << "SetViewDirection: only the standard anatomical planes "
+                << "(axial, coronal, sagittal) are supported.";
+  }
+  auto* utilityWidget = widget->GetUtilityWidget();
+  if (nullptr == utilityWidget)
+  {
+    mitkThrow() << "SetViewDirection: cell '" << windowId.toStdString()
+                << "' has no utility widget.";
+  }
+
+  utilityWidget->SetViewDirectionSelection(viewDirection);
+  this->PropagateOrientation(windowId, viewDirection);
+}
+
+void QmitkMxNMultiWidget::PropagateOrientation(const QString& sourceId, mitk::AnatomicalPlane viewDirection)
+{
+  // A change that arrives while a relay is in flight is itself a relayed
+  // change; dropping it here is what makes orientation sync cycle-free.
+  if (m_OrientationPropagationDepth > 0)
+  {
+    return;
+  }
+  if (mitk::AnatomicalPlane::Axial != viewDirection && mitk::AnatomicalPlane::Coronal != viewDirection
+      && mitk::AnatomicalPlane::Sagittal != viewDirection)
+  {
+    return;
+  }
+  const auto sourceLink = this->GetSyncLink(sourceId, QmitkMxNSyncDimension::Orientation);
+  if (!sourceLink.has_value())
+  {
+    return;
+  }
+
+  struct DepthGuard
+  {
+    unsigned int& depth;
+    explicit DepthGuard(unsigned int& d) : depth(d) { ++depth; }
+    ~DepthGuard() { --depth; }
+  } guard(m_OrientationPropagationDepth);
+
+  std::vector<QString> affected{ sourceId };
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == sourceId)
+    {
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Orientation);
+    if (!memberLink.has_value() || memberLink->group != sourceLink->group)
+    {
+      continue;
+    }
+    const auto memberWidget = this->GetRenderWindowWidget(descriptor.id);
+    auto* memberUtility = (nullptr != memberWidget) ? memberWidget->GetUtilityWidget() : nullptr;
+    if (nullptr == memberUtility)
+    {
+      continue;
+    }
+    memberUtility->SetViewDirectionSelection(viewDirection);
+    ++m_OrientationApplyCount;
+    affected.push_back(descriptor.id);
+  }
+
+  // A plane flip re-initializes each member's stepper and camera; restore
+  // the component's shared geometry and the declared offsets.
+  auto reinitialized = this->EnforceComponentGeometry(sourceId);
+  affected.insert(affected.end(), reinitialized.begin(), reinitialized.end());
+  this->ReconvergeGeometryRelativeGroups(affected);
+}
+
+std::vector<QString> QmitkMxNMultiWidget::ComputeGeometryComponent(const QString& windowId) const
+{
+  const auto descriptors = this->ListWindowDescriptors();
+
+  auto sharesGeometryGroup = [this](const QString& a, const QString& b)
+  {
+    for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Orientation })
+    {
+      const auto linkA = this->GetSyncLink(a, dimension);
+      const auto linkB = this->GetSyncLink(b, dimension);
+      if (linkA.has_value() && linkB.has_value() && linkA->group == linkB->group)
+      {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  std::set<QString> component{ windowId };
+  bool grew = true;
+  while (grew)
+  {
+    grew = false;
+    for (const auto& descriptor : descriptors)
+    {
+      if (component.count(descriptor.id) > 0)
+      {
+        continue;
+      }
+      for (const auto& member : component)
+      {
+        if (sharesGeometryGroup(descriptor.id, member))
+        {
+          component.insert(descriptor.id);
+          grew = true;
+          break;
+        }
+      }
+    }
+  }
+
+  std::vector<QString> preOrder;
+  for (const auto& descriptor : descriptors)
+  {
+    if (component.count(descriptor.id) > 0)
+    {
+      preOrder.push_back(descriptor.id);
+    }
+  }
+  return preOrder;
+}
+
+std::vector<QString> QmitkMxNMultiWidget::EnforceComponentGeometry(const QString& windowId)
+{
+  std::vector<QString> reinitialized;
+  const auto component = this->ComputeGeometryComponent(windowId);
+  if (component.size() < 2)
+  {
+    return reinitialized;
+  }
+
+  const auto seedWidget = this->GetRenderWindowWidget(component.front());
+  if (nullptr == seedWidget)
+  {
+    return reinitialized;
+  }
+  const auto* referenceGeometry = seedWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+  if (nullptr == referenceGeometry)
+  {
+    return reinitialized;
+  }
+
+  for (std::size_t i = 1; i < component.size(); ++i)
+  {
+    const auto memberWidget = this->GetRenderWindowWidget(component[i]);
+    if (nullptr == memberWidget)
+    {
+      continue;
+    }
+    const auto* memberGeometry = memberWidget->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+    if (nullptr != memberGeometry && mitk::Equal(*memberGeometry, *referenceGeometry, mitk::eps, false))
+    {
+      continue;
+    }
+    mitk::RenderingManager::GetInstance()->InitializeView(
+      memberWidget->GetRenderWindow()->GetVtkRenderWindow(), referenceGeometry);
+    reinitialized.push_back(component[i]);
+  }
+  return reinitialized;
+}
+
+void QmitkMxNMultiWidget::ReconvergeGeometryRelativeGroups(const std::vector<QString>& windowIds)
+{
+  std::set<std::pair<QmitkMxNSyncDimension, std::string>> groups;
+  for (const auto& windowId : windowIds)
+  {
+    for (const auto dimension : { QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Zoom,
+                                  QmitkMxNSyncDimension::Pan })
+    {
+      const auto link = this->GetSyncLink(windowId, dimension);
+      if (link.has_value())
+      {
+        groups.emplace(dimension, link->group);
+      }
+    }
+  }
+  for (const auto& [dimension, group] : groups)
+  {
+    this->ReconvergeSyncGroup(dimension, group);
+  }
+}
+
+void QmitkMxNMultiWidget::ReinitSyncGroupGeometry(const QString& windowId)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "ReinitSyncGroupGeometry: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  const auto dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    mitkThrow() << "ReinitSyncGroupGeometry: no data storage set on the multi widget.";
+  }
+  auto* triggerRenderer = mitk::BaseRenderer::GetInstance(widget->GetRenderWindow()->GetVtkRenderWindow());
+
+  // The bounding geometry a single-cell reinit would compute (nodes not
+  // excluded from the bounding box, non-helper), evaluated with the
+  // triggering cell's visibility - "last reinit wins" for the component.
+  const auto includeInBoundingBox =
+    mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false));
+  const auto helperObject =
+    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  const auto predicate = mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(includeInBoundingBox), mitk::NodePredicateNot::New(helperObject));
+  const auto filteredNodes = dataStorage->GetSubset(predicate);
+  const auto bounds = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", triggerRenderer);
+
+  const auto component = this->ComputeGeometryComponent(windowId);
+  for (const auto& memberId : component)
+  {
+    const auto memberWidget = this->GetRenderWindowWidget(memberId);
+    if (nullptr != memberWidget)
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(
+        memberWidget->GetRenderWindow()->GetVtkRenderWindow(), bounds);
+    }
+  }
+  this->ReconvergeGeometryRelativeGroups(component);
+}
+
+unsigned int QmitkMxNMultiWidget::GetOrientationApplyCount() const
+{
+  return m_OrientationApplyCount;
 }

@@ -98,6 +98,18 @@ public:
   */
   QmitkMxNSyncPopupWidget* GetSyncPopup() const;
 
+  /**
+  * \brief Programmatically set the cell's view direction: applies the plane
+  *        to the renderer and mirrors it in the selector WITHOUT emitting
+  *        'ViewDirectionChanged'.
+  *
+  *   This is the propagation path: the owning multi widget uses it to relay
+  *   an orientation-group change to member cells, so a relayed change can
+  *   never re-trigger propagation. Only 'AnatomicalPlane::Axial' /
+  *   'Coronal' / 'Sagittal' are supported; other planes are ignored.
+  */
+  void SetViewDirectionSelection(mitk::AnatomicalPlane viewDirection);
+
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
   void OnSyncGroupAdded(const GroupSyncIndexType index);
@@ -112,6 +124,14 @@ Q_SIGNALS:
   */
   void CreateNewSyncGroupRequested(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
   void SetDataSelection(const QList<mitk::DataNode::Pointer>& newSelection);
+
+  /**
+  * \brief Emitted after the cell's view direction changed through this
+  *        widget's selector. The programmatic 'SetViewDirectionSelection'
+  *        path stays silent, so listeners (the multi widget's orientation
+  *        propagation) only see user-driven changes.
+  */
+  void ViewDirectionChanged(mitk::AnatomicalPlane viewDirection);
 
 private Q_SLOTS:
 

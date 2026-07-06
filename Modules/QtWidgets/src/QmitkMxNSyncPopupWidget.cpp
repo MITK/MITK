@@ -36,6 +36,7 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
     { QmitkMxNSyncDimension::Zoom, "Zoom" },
     { QmitkMxNSyncDimension::Slice, "Slice" },
     { QmitkMxNSyncDimension::Crosshair, "Crosshair" },
+    { QmitkMxNSyncDimension::Orientation, "Orientation" },
   };
 
   int gridRow = 0;
@@ -87,7 +88,9 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
         break;
     }
 
-    if (QmitkMxNSyncDimension::Crosshair != spec.dimension)
+    // Only the offset dimensions carry convergence bookkeeping.
+    if (QmitkMxNSyncDimension::Pan == spec.dimension || QmitkMxNSyncDimension::Zoom == spec.dimension
+        || QmitkMxNSyncDimension::Slice == spec.dimension)
     {
       row.reconvergeButton = new QToolButton(this);
       row.reconvergeButton->setText(tr("Re-converge"));
@@ -99,6 +102,13 @@ QmitkMxNSyncPopupWidget::QmitkMxNSyncPopupWidget(QWidget* parent)
     m_Rows.push_back(row);
     ++gridRow;
   }
+
+  auto* reinitButton = new QToolButton(this);
+  reinitButton->setText(tr("Reinit group geometry"));
+  reinitButton->setToolTip(
+    tr("Re-initialize this cell's slice/orientation link neighborhood to one shared geometry"));
+  connect(reinitButton, &QToolButton::clicked, this, [this]() { emit ReinitGeometryRequested(); });
+  grid->addWidget(reinitButton, gridRow, 0, 1, 2);
 
   // Wire after all rows exist; m_Rows is stable from here on, so capturing
   // element references stays valid.

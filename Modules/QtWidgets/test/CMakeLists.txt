@@ -16,6 +16,10 @@ mitkAddCustomModuleTest(QmitkMxNLayoutV2Test QmitkMxNLayoutV2Test
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNGeometryAuthorityTest QmitkMxNGeometryAuthorityTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNLayoutV3Test QmitkMxNLayoutV3Test
   -platform minimal
 )

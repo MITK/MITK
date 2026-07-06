@@ -1421,14 +1421,27 @@ MenuManager *WorkbenchWindow::GetMenuManager() const
   return this->GetMenuBarManager();
 }
 
+namespace
+{
+  // A frameless or full-screen shell (kiosk / borderless full-screen) has no
+  // meaningful windowed bounds or maximized state to persist and restore.
+  bool HasNoRestorableState(QWidget* control)
+  {
+    return control != nullptr
+      && (control->isFullScreen() || control->windowFlags().testFlag(Qt::FramelessWindowHint));
+  }
+}
+
 bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
 {
   //  MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
   //        WorkbenchMessages.WorkbenchWindow_problemsSavingWindow, null);
   bool result = true;
 
-  // Save the window's state and bounds.
-  if (GetShell()->GetMaximized() || asMaximizedState)
+  // Save the window's state and bounds. A frameless / full-screen shell has no
+  // restorable state, so it must not persist a maximized flag or bounds.
+  const bool hasNoRestorableState = HasNoRestorableState(GetShell()->GetControl());
+  if (!hasNoRestorableState && (GetShell()->GetMaximized() || asMaximizedState))
   {
     memento->PutString(WorkbenchConstants::TAG_MAXIMIZED, "true");
   }
@@ -1436,16 +1449,9 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   {
     memento->PutString(WorkbenchConstants::TAG_MINIMIZED, "true");
   }
-  if (normalBounds.isEmpty())
+  if (normalBounds.isEmpty() && !hasNoRestorableState)
   {
-    // Only fall back to the current bounds if they are a real windowed
-    // geometry; frameless / full-screen bounds are not valid normal bounds.
-    QWidget* control = GetShell()->GetControl();
-    if (control != nullptr && !control->isFullScreen()
-        && !control->windowFlags().testFlag(Qt::FramelessWindowHint))
-    {
-      normalBounds = GetShell()->GetBounds();
-    }
+    normalBounds = GetShell()->GetBounds();
   }
 
   //  IMemento fastViewBarMem = memento
@@ -1898,6 +1904,12 @@ void WorkbenchWindow::ShellEventFilter::SaveBounds(const QRect& newBounds)
   //  {
   //    return;
   //  }
+  // A frameless or full-screen shell (borderless full-screen / kiosk mode) has
+  // no restorable windowed state; do not record its bounds or maximized flag.
+  if (HasNoRestorableState(shell->GetControl()))
+  {
+    return;
+  }
   if (shell->GetMinimized())
   {
     return;
@@ -1905,14 +1917,6 @@ void WorkbenchWindow::ShellEventFilter::SaveBounds(const QRect& newBounds)
   if (shell->GetMaximized())
   {
     window->asMaximizedState = true;
-    return;
-  }
-  // A frameless or full-screen window (borderless full-screen / kiosk mode)
-  // has no valid windowed geometry; recording it as the normal bounds would
-  // restore a decorated window off-screen on the next launch.
-  if (QWidget* control = shell->GetControl();
-      control != nullptr && (control->isFullScreen() || control->windowFlags().testFlag(Qt::FramelessWindowHint)))
-  {
     return;
   }
   window->asMaximizedState = false;

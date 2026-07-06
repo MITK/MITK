@@ -55,6 +55,12 @@ protected:
   ///
   void SavePreferences();
 
+  ///
+  /// Persists and restores the dialog's geometry and last selected page.
+  ///
+  void SaveDialogState();
+  void RestoreDialogState();
+
   QScopedPointer<QmitkPreferencesDialogPrivate> d;
 
 };

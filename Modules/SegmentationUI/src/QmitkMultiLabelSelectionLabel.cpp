@@ -136,7 +136,10 @@ void QmitkMultiLabelSelectionLabel::SetSelectedLabels(const LabelValueVectorType
 
 void QmitkMultiLabelSelectionLabel::UpdateWidget()
 {
-  if (m_LastValidSelectedLabels.empty())
+  // A selection may briefly be non-empty while no segmentation is set: a dependent widget can be
+  // reconfigured before its segmentation has been assigned. Without a segmentation there is nothing
+  // meaningful to render, so fall back to the empty info instead of dereferencing a null segmentation.
+  if (m_LastValidSelectedLabels.empty() || nullptr == this->GetMultiLabelSegmentation())
   {
     m_Controls->labelText->setHtml(m_EmptyInfo);
   }

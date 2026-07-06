@@ -22,9 +22,15 @@ found in the LICENSE file.
 
 #include <QCheckBox>
 #include <QColor>
+#include <QFont>
+#include <QFrame>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPalette>
 #include <QPixmap>
 #include <QPushButton>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -73,6 +79,35 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Ui->setupUi(m_Control);
 
   auto* groupLayout = new QVBoxLayout(m_Ui->m_ColorGroup);
+
+  // The previews look static, so users miss that they are clickable. Announce it
+  // up front; the per-interaction detail stays in each preview's tooltip.
+  auto* hintFrame = new QFrame(m_Ui->m_ColorGroup);
+  hintFrame->setFrameShape(QFrame::StyledPanel);
+  hintFrame->setAutoFillBackground(true);
+  hintFrame->setBackgroundRole(QPalette::Base);
+
+  auto* hintLayout = new QHBoxLayout(hintFrame);
+
+  constexpr int iconSize = 22;
+  auto* hintIcon = new QLabel(hintFrame);
+  hintIcon->setPixmap(hintFrame->style()->standardIcon(QStyle::SP_MessageBoxInformation).pixmap(iconSize));
+
+  auto* hintText = new QLabel(
+    "<small>The previews below are interactive. Click a preview's background, frame, "
+    "corner annotation, or logo to change it. Hover a preview for details. Note that "
+    "the background colors of the 2D windows are synced by default.</small>",
+    hintFrame);
+  hintText->setWordWrap(true);
+
+  QFont hintFont = hintText->font();
+  hintFont.setItalic(true);
+  hintText->setFont(hintFont);
+
+  hintLayout->addWidget(hintIcon, 0, Qt::AlignVCenter);
+  hintLayout->addWidget(hintText, 1);
+
+  groupLayout->addWidget(hintFrame);
 
   m_SyncCheckBox = new QCheckBox("Sync 2D window background colors", m_Ui->m_ColorGroup);
   m_SyncCheckBox->setToolTip("Apply a background color or gradient change in one 2D window to the other 2D windows.");

@@ -124,11 +124,9 @@ QtStyleManager::~QtStyleManager()
 
 void QtStyleManager::AddDefaultStyle()
 {
-#ifndef _APPLE_
   AddStyle(":/org.blueberry.ui.qt/darkstyle.qss", "Dark");
   AddStyle(":/org.blueberry.ui.qt/lightstyle.qss", "Light");
   defaultStyle = styles[":/org.blueberry.ui.qt/darkstyle.qss"];
-#endif
 }
 
 void QtStyleManager::AddDefaultFonts()

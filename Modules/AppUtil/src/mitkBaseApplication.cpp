@@ -678,6 +678,23 @@ namespace mitk
     // qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
 #endif
 
+#ifdef Q_OS_MACOS
+    // macOS reports 72 logical DPI, so point-based font sizes render about
+    // 25% smaller than on Windows and Linux (96 DPI). Pin the font DPI to 96
+    // for a consistent cross-platform text size. Respect an explicit user
+    // override.
+    if (qEnvironmentVariableIsEmpty("QT_FONT_DPI"))
+      qputenv("QT_FONT_DPI", "96");
+
+    // Force the Fusion style on macOS. The native macOS style uses larger
+    // toolbar icons and layout spacing and does not fully honor our style
+    // sheet, so the Workbench looks inconsistent with Windows and Linux.
+    // Fusion is built into Qt Widgets, so no style plugin has to be deployed.
+    // A -style command-line argument still takes precedence.
+    if (qEnvironmentVariableIsEmpty("QT_STYLE_OVERRIDE"))
+      qputenv("QT_STYLE_OVERRIDE", "Fusion");
+#endif
+
     // Prevent conflicts between native OpenGL applications and QWebEngine
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))

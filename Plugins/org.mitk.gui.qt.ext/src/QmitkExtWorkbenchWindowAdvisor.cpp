@@ -623,13 +623,24 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // Style icons of Qt's standard message boxes
   QApplication::setStyle(new QmitkThemedStyle(QApplication::style()));
 
-  // Enable full screen support
-  if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
+  // Start in full-screen (kiosk) mode when requested on the command line.
+  const bool fullScreenMode = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance())->getFullScreenMode();
+  if (fullScreenMode)
   {
-    mainWindow->setWindowFlags(Qt::FramelessWindowHint);
-    // Used that way as mainWindow->showFullscreen() renders the application very
-    // unresponsive with around 5 FPS.
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+#ifdef __APPLE__
+    // Native full-screen (uses the full-screen button hint set in the shell
+    // factory); correctly clears the menu bar and notch.
+    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
+#else
+    // Borderless windowed rather than true full-screen: the render views are
+    // OpenGL widgets, so Qt composites the whole window through OpenGL. A GL
+    // window that exactly fills the screen makes Windows bypass DWM composition
+    // (exclusive full-screen), throttling Qt widget repaints to a few FPS.
+    // Overflowing the screen edges by one pixel keeps the window composited
+    // while still appearing full-screen.
+    mainWindow->setWindowFlag(Qt::FramelessWindowHint, true);
+    mainWindow->setGeometry(QApplication::primaryScreen()->geometry().adjusted(-1, -1, 1, 1));
+#endif
   }
 
   // ==== Application menu ============================
@@ -742,6 +753,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     if (showNewWindowMenuItem)
     {
       windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+      windowMenu->addSeparator();
+    }
+
+    if (!fullScreenMode)
+    {
+      windowMenu->addAction("&Full Screen", QKeySequence(QKeySequence::FullScreen),
+        QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onFullScreen()));
       windowMenu->addSeparator();
     }
 
@@ -1236,6 +1254,36 @@ void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
 void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 {
   berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(nullptr);
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onFullScreen()
+{
+  auto window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  auto* mainWindow = qobject_cast<QMainWindow*>(window->GetShell()->GetControl());
+  if (nullptr == mainWindow)
+    return;
+
+#ifdef __APPLE__
+  mainWindow->isFullScreen() ? mainWindow->showNormal() : mainWindow->showFullScreen();
+#else
+  // Toggle borderless full-screen. See QmitkExtWorkbenchWindowAdvisor::PostWindowCreate
+  // for why true full-screen is avoided off macOS.
+  if (mainWindow->property("mitkBorderlessFullScreen").toBool())
+  {
+    mainWindow->setProperty("mitkBorderlessFullScreen", false);
+    mainWindow->setWindowFlag(Qt::FramelessWindowHint, false);
+    mainWindow->setGeometry(mainWindow->property("mitkWindowedGeometry").toRect());
+  }
+  else
+  {
+    mainWindow->setProperty("mitkBorderlessFullScreen", true);
+    mainWindow->setProperty("mitkWindowedGeometry", mainWindow->geometry());
+    mainWindow->setWindowFlag(Qt::FramelessWindowHint, true);
+    mainWindow->setGeometry(mainWindow->screen()->geometry().adjusted(-1, -1, 1, 1));
+  }
+
+  mainWindow->show(); // setWindowFlag() hides the window
+#endif
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()

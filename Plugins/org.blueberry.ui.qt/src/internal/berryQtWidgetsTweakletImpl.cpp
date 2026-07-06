@@ -334,6 +334,13 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
   if (style & Constants::TOOL)
     qtFlags |= Qt::Tool;
 
+  // On macOS, Qt::CustomizeWindowHint suppresses the native full-screen button
+  // unless Qt::WindowFullscreenButtonHint is set explicitly. Enable it for
+  // top-level main windows (parentless and maximizable); dialogs and detached
+  // view windows are excluded. Documented no-op on Windows and Linux.
+  if (parent.IsNull() && (style & Constants::MAX))
+    qtFlags |= Qt::WindowFullscreenButtonHint;
+
   QWidget* parentWidget = nullptr;
   if (parent != 0)
     parentWidget = static_cast<QWidget*>(parent->GetControl());

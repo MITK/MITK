@@ -409,10 +409,23 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
   // Enable full screen support
   if (auto application = static_cast<mitk::BaseApplication*>(&mitk::BaseApplication::instance()); application->getFullScreenMode())
   {
+#ifdef __APPLE__
+    // Native full-screen (uses the full-screen button hint set in the shell
+    // factory); correctly clears the menu bar and notch.
+    mainWindow->setWindowState(mainWindow->windowState() | Qt::WindowFullScreen);
+#else
+    // Borderless windowed rather than true full-screen (see the same rationale
+    // in QmitkExtWorkbenchWindowAdvisor). Replace the flags so no title bar
+    // survives on X11; overflow the screen by one pixel on Windows to avoid
+    // exclusive full-screen, which would bypass composition and throttle
+    // Qt widget repaints.
     mainWindow->setWindowFlags(Qt::FramelessWindowHint);
-    // Used that way as mainWindow->showFullscreen() renders the application very
-    // unresponsive with around 5 FPS.
-    mainWindow->setGeometry(QApplication::primaryScreen()->geometry());
+    QRect bounds = QApplication::primaryScreen()->geometry();
+#ifdef Q_OS_WIN
+    bounds.adjust(-1, -1, 1, 1);
+#endif
+    mainWindow->setGeometry(bounds);
+#endif
   }
 
   // ==== Application menu ============================

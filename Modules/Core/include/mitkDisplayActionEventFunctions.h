@@ -17,8 +17,12 @@ found in the LICENSE file.
 
 #include <mitkStdFunctionCommand.h>
 
+#include <functional>
+
 namespace mitk
 {
+  class BaseRenderer;
+
   /**
    * \brief Factory functions that create std::function callbacks for display action events.
    *
@@ -30,6 +34,18 @@ namespace mitk
    */
   namespace DisplayActionEventFunctions
   {
+    /**
+     * \brief Decides whether a synchronized display action propagates from the
+     *        sending renderer to a candidate target renderer.
+     *
+     * Supplied by the editor that owns the synchronization group membership
+     * (e.g. the MxN multi widget). The predicate is the sole scoping
+     * authority of a synchronized action: it gates the sender (return false
+     * for every target to ignore a foreign sender) as well as each target.
+     * Both renderers are non-null when the predicate is evaluated.
+     */
+    using TargetPredicate =
+      std::function<bool(const BaseRenderer* sender, const BaseRenderer* target)>;
     /**
      * \brief Create an action that moves the sending renderer's camera.
      *
@@ -86,15 +102,17 @@ namespace mitk
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction(const std::string& prefixFilter = "");
 
     /**
-     * \brief Create an action that moves the camera of all renderers synchronously.
+     * \brief Create an action that moves the camera of a set of 2D renderers synchronously.
      *
      * Reacts to DisplayMoveEvent. The renderers must be managed by the same
-     * RenderingManager.
+     * RenderingManager. The target set is decided per event by the given
+     * predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction(TargetPredicate isTarget);
 
     /**
      * \brief Create a synchronized action that sets the crosshair position.
@@ -110,24 +128,41 @@ namespace mitk
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction(const std::string& prefixFilter = "");
 
     /**
-     * \brief Create an action that zooms the camera of all 2D renderers synchronously.
+     * \brief Create a synchronized action that sets the crosshair position for
+     *        a set of 2D renderers.
      *
-     * Reacts to DisplayZoomEvent.
+     * Reacts to DisplaySetCrosshairEvent. The target set is decided per event
+     * by the given predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction(TargetPredicate isTarget);
 
     /**
-     * \brief Create an action that scrolls the slice stepper of all 2D renderers synchronously.
+     * \brief Create an action that zooms the camera of a set of 2D renderers synchronously.
      *
-     * Reacts to DisplayScrollEvent.
+     * Reacts to DisplayZoomEvent. The target set is decided per event by the
+     * given predicate.
      *
-     * \param prefixFilter Only react to / send changes to renderers whose name starts with this prefix.
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
      * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
      */
-    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(const std::string& prefixFilter = "");
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction(TargetPredicate isTarget);
+
+    /**
+     * \brief Create an action that scrolls the slice stepper of a set of 2D renderers synchronously.
+     *
+     * Reacts to DisplayScrollEvent. The target set is decided per event by the
+     * given predicate.
+     *
+     * \param isTarget Scoping predicate; see TargetPredicate. Must not be null.
+     * \return An action function for use with DisplayActionEventHandler.
+     * \throws mitk::Exception if isTarget is null.
+     */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction(TargetPredicate isTarget);
 
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk

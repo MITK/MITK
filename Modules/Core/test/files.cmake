@@ -26,6 +26,7 @@ set(MODULE_TESTS
   mitkMaterialTest.cpp
   mitkActionTest.cpp
   mitkDispatcherTest.cpp
+  mitkDisplayActionEventFunctionsTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkFileReaderRegistryTest.cpp
   #mitkFileWriterRegistryTest.cpp

@@ -12,6 +12,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNExplicitNameTest.cpp
   QmitkMxNLayoutV2Test.cpp
   QmitkMxNSyncGroupApiTest.cpp
+  QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp
   QmitkSynchronizedWidgetConnectorTest.cpp
 )

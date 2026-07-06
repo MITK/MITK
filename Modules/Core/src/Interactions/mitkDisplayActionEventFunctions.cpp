@@ -22,6 +22,20 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkTimeNavigationController.h>
 
+namespace
+{
+  void ThrowOnNullPredicate(const mitk::DisplayActionEventFunctions::TargetPredicate& isTarget,
+                            const char* factoryName)
+  {
+    if (!isTarget)
+    {
+      mitkThrow() << factoryName << ": the target predicate must not be null. A dimension "
+                  << "that is not synchronized is expressed by wiring the sender-only "
+                  << "action instead (see DisplayActionEventHandlerSynchronized::Predicates).";
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 // STANDARD FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -183,15 +197,17 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetL
 //////////////////////////////////////////////////////////////////////////
 // SYNCHRONIZED FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction(const std::string& prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction(TargetPredicate isTarget)
 {
-  auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
+  ThrowOnNullPredicate(isTarget, "MoveCameraSynchronizedAction");
+
+  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
   {
     if (DisplayMoveEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayMoveEvent* displayActionEvent = dynamic_cast<const DisplayMoveEvent*>(&displayInteractorEvent);
       const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
-      if (nullptr == sendingRenderer || std::string(sendingRenderer->GetName()).rfind(prefixFilter, 0) != 0)
+      if (nullptr == sendingRenderer)
       {
         return;
       }
@@ -202,7 +218,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
       {
         auto targetRenderer = BaseRenderer::GetInstance(renderWindow);
         if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
-            && std::string(targetRenderer->GetName()).rfind(prefixFilter, 0) == 0)
+            && isTarget(sendingRenderer, targetRenderer))
         {
           targetRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
           renderingManager->RequestUpdate(renderWindow);
@@ -243,15 +259,48 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction(const std::string& prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction(TargetPredicate isTarget)
 {
-  auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
+  ThrowOnNullPredicate(isTarget, "SetCrosshairSynchronizedAction");
+
+  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplaySetCrosshairEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplaySetCrosshairEvent* displayActionEvent = dynamic_cast<const DisplaySetCrosshairEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      auto allRenderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+      for (auto renderWindow : allRenderWindows)
+      {
+        auto targetRenderer = BaseRenderer::GetInstance(renderWindow);
+        if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
+            && isTarget(sendingRenderer, targetRenderer))
+        {
+          targetRenderer->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
+        }
+      }
+    }
+  };
+
+  return actionFunction;
+}
+
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction(TargetPredicate isTarget)
+{
+  ThrowOnNullPredicate(isTarget, "ZoomCameraSynchronizedAction");
+
+  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
   {
     if (DisplayZoomEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayZoomEvent* displayActionEvent = dynamic_cast<const DisplayZoomEvent*>(&displayInteractorEvent);
       const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
-      if (nullptr == sendingRenderer || std::string(sendingRenderer->GetName()).rfind(prefixFilter, 0) != 0)
+      if (nullptr == sendingRenderer)
       {
         return;
       }
@@ -264,7 +313,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
         {
           auto targetRenderer = BaseRenderer::GetInstance(renderWindow);
           if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
-              && std::string(targetRenderer->GetName()).rfind(prefixFilter, 0) == 0)
+              && isTarget(sendingRenderer, targetRenderer))
           {
             targetRenderer->GetCameraController()->Zoom(displayActionEvent->GetZoomFactor(), displayActionEvent->GetStartCoordinate());
             renderingManager->RequestUpdate(renderWindow);
@@ -277,15 +326,17 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
   return actionFunction;
 }
 
-mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(const std::string& prefixFilter)
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(TargetPredicate isTarget)
 {
-  auto actionFunction = [prefixFilter](const itk::EventObject& displayInteractorEvent)
+  ThrowOnNullPredicate(isTarget, "ScrollSliceStepperSynchronizedAction");
+
+  auto actionFunction = [isTarget](const itk::EventObject& displayInteractorEvent)
   {
     if (DisplayScrollEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayScrollEvent* displayActionEvent = dynamic_cast<const DisplayScrollEvent*>(&displayInteractorEvent);
       const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
-      if (nullptr == sendingRenderer || std::string(sendingRenderer->GetName()).rfind(prefixFilter, 0) != 0)
+      if (nullptr == sendingRenderer)
       {
         return;
       }
@@ -295,7 +346,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       {
         auto targetRenderer = BaseRenderer::GetInstance(renderWindow);
         if (targetRenderer->GetMapperID() == BaseRenderer::Standard2D
-            && std::string(targetRenderer->GetName()).rfind(prefixFilter, 0) == 0)
+            && isTarget(sendingRenderer, targetRenderer))
         {
           SliceNavigationController* sliceNavigationController = targetRenderer->GetSliceNavigationController();
           if (nullptr == sliceNavigationController)

@@ -12,26 +12,36 @@ found in the LICENSE file.
 
 #include <mitkDisplayActionEventHandlerSynchronized.h>
 
-// mitk core
-#include <mitkDisplayActionEventFunctions.h>
-
 // itk
 #include <itkEventObject.h>
 
+void mitk::DisplayActionEventHandlerSynchronized::SetPredicates(const Predicates& predicates)
+{
+  m_Predicates = predicates;
+}
+
 void mitk::DisplayActionEventHandlerSynchronized::InitActionsImpl(const std::string& prefixFilter /* = "" */)
 {
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::MoveCameraSynchronizedAction(prefixFilter);
-  ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);
+  using namespace DisplayActionEventFunctions;
 
-  actionFunction = DisplayActionEventFunctions::SetCrosshairSynchronizedAction(prefixFilter);
-  ConnectDisplayActionEvent(DisplaySetCrosshairEvent(nullptr, Point3D()), actionFunction);
+  // A null predicate marks the dimension as not synchronized; the sender-only
+  // action keeps the local gesture working without propagation (see Predicates).
+  ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()),
+    m_Predicates.pan ? MoveCameraSynchronizedAction(m_Predicates.pan)
+                     : MoveSenderCameraAction(prefixFilter));
 
-  actionFunction = DisplayActionEventFunctions::ZoomCameraSynchronizedAction(prefixFilter);
-  ConnectDisplayActionEvent(DisplayZoomEvent(nullptr, 0.0, Point2D()), actionFunction);
+  ConnectDisplayActionEvent(DisplaySetCrosshairEvent(nullptr, Point3D()),
+    m_Predicates.crosshair ? SetCrosshairSynchronizedAction(m_Predicates.crosshair)
+                           : SetCrosshairAction(prefixFilter));
 
-  actionFunction = DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction(prefixFilter);
-  ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0, true), actionFunction);
+  ConnectDisplayActionEvent(DisplayZoomEvent(nullptr, 0.0, Point2D()),
+    m_Predicates.zoom ? ZoomCameraSynchronizedAction(m_Predicates.zoom)
+                      : ZoomSenderCameraAction(prefixFilter));
 
-  actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction(prefixFilter);
-  ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
+  ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0, true),
+    m_Predicates.slice ? ScrollSliceStepperSynchronizedAction(m_Predicates.slice)
+                       : ScrollSliceStepperAction(prefixFilter));
+
+  ConnectDisplayActionEvent(DisplaySetLevelWindowEvent(nullptr, ScalarType(), ScalarType()),
+    SetLevelWindowAction(prefixFilter));
 }

@@ -55,6 +55,15 @@ public:
 
   void InitializeMultiWidget() override;
 
+  /**
+  * \brief Editor-scoped synchronization macro over the four broadcast
+  *        navigation dimensions (pan, zoom, slice, crosshair).
+  *
+  *   When enabled, all cells of this editor are coupled for those four
+  *   dimensions; render windows of other editors are unaffected in both
+  *   directions. Level-window stays node-global (couples every cell showing
+  *   the node, across editors) and time stays application-global.
+  */
   void Synchronize(bool synchronized) override;
 
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;

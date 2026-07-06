@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include <QmitkMxNMultiWidget.h>
 
 // mitk core
+#include <mitkBaseRenderer.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerDesynchronized.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
@@ -237,18 +238,34 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
 {
   if (synchronized)
   {
-    SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerSynchronized>());
+    // Editor-scoped synchronization macro: every cell of this editor forms
+    // one shared group per broadcast navigation dimension. The predicate
+    // admits only renderers whose name carries this editor's qualified
+    // prefix (`<multiWidgetName>__`), on the sender side as well as the
+    // target side - windows of other editors neither receive nor drive
+    // this editor's synchronized navigation.
+    const auto editorPrefix = (this->GetMultiWidgetName() + NAMESPACE_DELIMITER).toStdString();
+    mitk::DisplayActionEventFunctions::TargetPredicate belongsToThisEditor =
+      [editorPrefix](const mitk::BaseRenderer* sender, const mitk::BaseRenderer* target)
+      {
+        return 0 == std::string(sender->GetName()).rfind(editorPrefix, 0)
+            && 0 == std::string(target->GetName()).rfind(editorPrefix, 0);
+      };
+
+    auto handler = std::make_unique<mitk::DisplayActionEventHandlerSynchronized>();
+    handler->SetPredicates({ belongsToThisEditor, belongsToThisEditor,
+                             belongsToThisEditor, belongsToThisEditor });
+    SetDisplayActionEventHandler(std::move(handler));
   }
   else
   {
     SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   }
 
-  std::string prefixFilter = synchronized ? "" : this->GetMultiWidgetName().toStdString();
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
-    displayActionEventHandler->InitActions(prefixFilter);
+    displayActionEventHandler->InitActions(this->GetMultiWidgetName().toStdString());
   }
 }
 

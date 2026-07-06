@@ -65,6 +65,7 @@ bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
   auto* prefs = GetPreferences();
 
   prefs->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  prefs->PutBool("Show level/window readout", m_Ui->m_ShowLevelWindowReadout->isChecked());
   prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   prefs->PutInt("Render window widget colormap", m_Ui->m_ColormapComboBox->currentIndex());
   prefs->PutBool("Render window individual decorations", m_Ui->m_IndividualDecorations->isChecked());
@@ -84,6 +85,7 @@ void QmitkMxNMultiWidgetEditorPreferencePage::Update()
   auto* prefs = GetPreferences();
 
   m_Ui->m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
+  m_Ui->m_ShowLevelWindowReadout->setChecked(prefs->GetBool("Show level/window readout", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
 
   int colormap = prefs->GetInt("Render window widget colormap", 0);

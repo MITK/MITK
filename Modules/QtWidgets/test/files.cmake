@@ -14,6 +14,7 @@ set(MODULE_CUSTOM_TESTS
   QmitkMxNLayoutV2Test.cpp
   QmitkMxNLayoutV3Test.cpp
   QmitkMxNNavLinksTest.cpp
+  QmitkMxNLayoutEditorWidgetTest.cpp
   QmitkMxNSyncGroupApiTest.cpp
   QmitkMxNSynchronizeScopeTest.cpp
   QmitkMxNDataBasedLayoutTest.cpp

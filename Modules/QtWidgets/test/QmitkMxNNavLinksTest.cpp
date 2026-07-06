@@ -36,6 +36,8 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 
+#include <QColor>
+
 /**
  * Behavior tests for the MxN per-dimension navigation links: predicate
  * scoping through the editor's group map, converge-on-link with the
@@ -63,6 +65,11 @@ class QmitkMxNNavLinksTestSuite : public mitk::TestFixture
   MITK_TEST(Windowing_GroupedGesture_WritesPerRendererToMembers);
   MITK_TEST(Windowing_UnlinkedGesture_KeepsNodeGlobalWrite);
   MITK_TEST(Lut_SetLookupTable_PropagatesToMembersOnly);
+  MITK_TEST(SetLevelWindow_Grouped_SetsMembersByValue);
+  MITK_TEST(SetLevelWindow_Unlinked_WritesNodeGlobal);
+  MITK_TEST(AdjustLevelWindow_Grouped_PreservesMemberDifferences);
+  MITK_TEST(LevelWindow_ContractViolations_Throw);
+  MITK_TEST(GroupColor_AssignedByRegistrationOrder);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -443,6 +450,97 @@ public:
       nullptr == m_ImageNode->GetPropertyList(Renderer(2))->GetProperty("LookupTable"));
     CPPUNIT_ASSERT_MESSAGE("The node-global LookupTable stays untouched",
       nodeGlobalBefore == m_ImageNode->GetPropertyList(nullptr)->GetProperty("LookupTable"));
+  }
+
+  void SetLevelWindow_Grouped_SetsMembersByValue()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+
+    m_Editor->SetLevelWindow(CellId(0), m_ImageNode, mitk::LevelWindow(42.0, 84.0));
+
+    for (std::size_t member : { std::size_t(0), std::size_t(1) })
+    {
+      auto* property = RendererLevelWindow(member);
+      CPPUNIT_ASSERT_MESSAGE("Grouped member must get a renderer-specific levelwindow",
+                             nullptr != property);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(42.0, property->GetLevelWindow().GetLevel(), 1e-6);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(84.0, property->GetLevelWindow().GetWindow(), 1e-6);
+    }
+    CPPUNIT_ASSERT_MESSAGE("A non-member must not get a renderer-specific levelwindow",
+                           nullptr == RendererLevelWindow(2));
+
+    auto* nodeGlobal = dynamic_cast<mitk::LevelWindowProperty*>(m_ImageNode->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT(nullptr != nodeGlobal);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The node-global property stays untouched for grouped cells",
+      100.0, nodeGlobal->GetLevelWindow().GetLevel(), 1e-6);
+  }
+
+  void SetLevelWindow_Unlinked_WritesNodeGlobal()
+  {
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)));
+
+    m_Editor->SetLevelWindow(CellId(0), m_ImageNode, mitk::LevelWindow(42.0, 84.0));
+
+    auto* nodeGlobal = dynamic_cast<mitk::LevelWindowProperty*>(m_ImageNode->GetProperty("levelwindow"));
+    CPPUNIT_ASSERT(nullptr != nodeGlobal);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("An unlinked cell's by-value set keeps the node-global write",
+      42.0, nodeGlobal->GetLevelWindow().GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_MESSAGE("No renderer-specific property appears for unlinked cells",
+                           nullptr == RendererLevelWindow(0));
+  }
+
+  void AdjustLevelWindow_Grouped_PreservesMemberDifferences()
+  {
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(100.0, 200.0)), Renderer(0));
+    m_ImageNode->SetProperty("levelwindow",
+      mitk::LevelWindowProperty::New(mitk::LevelWindow(150.0, 300.0)), Renderer(1));
+
+    m_Editor->AdjustLevelWindow(CellId(0), m_ImageNode, 10.0, 20.0);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(110.0, RendererLevelWindow(0)->GetLevelWindow().GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(220.0, RendererLevelWindow(0)->GetLevelWindow().GetWindow(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Deltas apply to each member's own value",
+      160.0, RendererLevelWindow(1)->GetLevelWindow().GetLevel(), 1e-6);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(320.0, RendererLevelWindow(1)->GetLevelWindow().GetWindow(), 1e-6);
+  }
+
+  void LevelWindow_ContractViolations_Throw()
+  {
+    CPPUNIT_ASSERT_THROW(
+      m_Editor->SetLevelWindow("mxn__nosuch", m_ImageNode, mitk::LevelWindow(1.0, 2.0)),
+      mitk::Exception);
+    CPPUNIT_ASSERT_THROW(
+      m_Editor->SetLevelWindow(CellId(0), nullptr, mitk::LevelWindow(1.0, 2.0)), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(
+      m_Editor->AdjustLevelWindow("mxn__nosuch", m_ImageNode, 1.0, 2.0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(
+      m_Editor->AdjustLevelWindow(CellId(0), nullptr, 1.0, 2.0), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(m_Editor->GetSyncGroupColor("never-registered"), mitk::Exception);
+  }
+
+  void GroupColor_AssignedByRegistrationOrder()
+  {
+    // Slot 0 is taken by the default selection group "main" (created by
+    // InitializeMultiWidget), so the first linked group lands on slot 1.
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Windowing, "wl");
+    m_Editor->SetSyncLink(CellId(0), QmitkMxNSyncDimension::Slice, "nav");
+
+    CPPUNIT_ASSERT(QColor("#E1707A") == m_Editor->GetSyncGroupColor("main"));
+    CPPUNIT_ASSERT(QColor("#6FA8DC") == m_Editor->GetSyncGroupColor("wl"));
+    CPPUNIT_ASSERT(QColor("#93C47D") == m_Editor->GetSyncGroupColor("nav"));
+
+    // Re-linking an already known group must not re-order the assignment.
+    m_Editor->SetSyncLink(CellId(1), QmitkMxNSyncDimension::Windowing, "wl");
+    CPPUNIT_ASSERT(QColor("#6FA8DC") == m_Editor->GetSyncGroupColor("wl"));
   }
 
   void SetSyncLink_ContractViolations_Throw()

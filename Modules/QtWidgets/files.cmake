@@ -69,8 +69,10 @@ set(CPP_FILES
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
+  QmitkMxNCellMapWidget.cpp
+  QmitkMxNCellOverlay.cpp
+  QmitkMxNLayoutEditorWidget.cpp
   QmitkMxNMultiWidget.cpp
-  QmitkMxNSyncPopupWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkPropertyItem.cpp

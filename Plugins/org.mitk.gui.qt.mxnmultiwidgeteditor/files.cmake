@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
+  QmitkMxNLayoutEditorView.cpp
   QmitkMxNMultiWidgetEditorPreferencePage.cpp
 )
 
@@ -15,6 +16,7 @@ set(MOC_H_FILES
   src/QmitkMxNMultiWidgetEditor.h
   
   src/internal/mitkPluginActivator.h
+  src/internal/QmitkMxNLayoutEditorView.h
   src/internal/QmitkMxNMultiWidgetEditorPreferencePage.h
 )
 

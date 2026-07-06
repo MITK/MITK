@@ -63,6 +63,10 @@ private Q_SLOTS:
 
   void OnLayoutChanged();
 
+  /** \brief Toggle the dockable MxN layout editor view (cell "Sync" button,
+   *         toolbar layout button). */
+  void OnLayoutEditorRequested();
+
 private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor

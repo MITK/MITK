@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+#include <mitkLog.h>
 
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchPartConstants.h>
@@ -185,6 +186,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     SetMultiWidget(multiWidget);
     connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutChanged,
       this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
+    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutEditorRequested,
+      this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
   }
 
   layout->addWidget(multiWidget);
@@ -193,22 +196,17 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   if (nullptr == m_Impl->m_ConfigurationToolBar)
   {
     m_Impl->m_ConfigurationToolBar = new QmitkMultiWidgetConfigurationToolBar(multiWidget);
-    m_Impl->m_ConfigurationToolBar->SetDataStorage(GetDataStorage());
     layout->addWidget(m_Impl->m_ConfigurationToolBar);
   }
 
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutSet,
-          this, &QmitkMxNMultiWidgetEditor::OnLayoutSet);
+  // The layout-shape controls live in the layout editor view; the toolbar
+  // button only summons it.
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutEditorRequested,
+          this, &QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized,
           this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
           this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SetDataBasedLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SetDataBasedLayout);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SaveLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SaveLayout, Qt::DirectConnection);
-  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LoadLayout,
-    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::LoadLayout);
 
   GetSite()->GetPage()->AddPartListener(this);
 
@@ -229,6 +227,12 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
   int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
   multiWidget->SetCrosshairGap(crosshairGapSize);
 
+  if (auto* mxnMultiWidget = dynamic_cast<QmitkMxNMultiWidget*>(multiWidget))
+  {
+    mxnMultiWidget->SetLevelWindowReadoutVisible(
+      preferences->GetBool("Show level/window readout", true));
+  }
+
   bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
   OnInteractionSchemeChanged(PACSInteractionScheme ?
     mitk::InteractionSchemeSwitcher::PACSStandard :
@@ -240,4 +244,32 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
 void QmitkMxNMultiWidgetEditor::OnLayoutChanged()
 {
   FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
+}
+
+void QmitkMxNMultiWidgetEditor::OnLayoutEditorRequested()
+{
+  // Toggle: a second press on the requesting button hides an already-visible
+  // layout editor instead of re-activating it.
+  auto page = this->GetSite()->GetPage();
+  if (page.IsNull())
+  {
+    return;
+  }
+
+  const QString viewId = QStringLiteral("org.mitk.views.mxnlayouteditor");
+  auto view = page->FindView(viewId);
+  if (view.IsNotNull() && page->IsPartVisible(view))
+  {
+    page->HideView(view);
+    return;
+  }
+
+  try
+  {
+    page->ShowView(viewId);
+  }
+  catch (const berry::PartInitException& e)
+  {
+    MITK_ERROR << "Could not open the MxN layout editor view: " << e.what();
+  }
 }

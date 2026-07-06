@@ -33,7 +33,7 @@
 	</table>
 
 	<ul>
-		<li> Layout button: Choose a layout from presets or select a custom number of available window views and their layout in a grid
+		<li> Layout button: Open the MxN Layout Editor view (see \ref org_mitk_editors_mxnmultiwidget_LayoutEditor), which holds the grid/preset/save/load controls and the synchronization groups
 		<li> Synchronization button: Enable or disable synchronized interaction across the window views
 		<li> Interaction mode button: Switch between the MITK interaction mouse mode and the PACS interaction mouse mode
 	</ul>
@@ -41,7 +41,8 @@
 \subsubsection org_mitk_editors_mxnmultiwidget_Layout MxN display layout
 	There are several options to customize the MxN display layout.
 
-	Using the layout button from the configuration toolbar allows to customize the layout the following way:
+	The "Layout" section of the MxN Layout Editor (opened via the toolbar's layout button)
+	allows to customize the layout the following way:
 	<ul>
 		<li> By choosing the desired amount of windows and confirming via "Set multi widget layout". The window views are arranged in a rectangular grid, as specified.
 			Depending on the selected number of window views, existing window views will be removed or additional window views will be added.
@@ -53,9 +54,11 @@
 	\imageMacro{layoutWidget.png, "Layout widget" , 16.00}
 
 \subsubsection org_mitk_editors_mxnmultiwidget_LayoutFile Layout file format
-	Saved layouts are persisted as v2.0 JSON documents. The canonical reference for fields,
-	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v2.schema.json</tt>;
+	Saved layouts are persisted as v3.0 JSON documents. The canonical reference for fields,
+	accepted values and structural constraints is <tt>Modules/QtWidgets/resource/mxn-layout-v3.schema.json</tt>;
 	both the in-tree presets and any file produced by "Save layout" follow this schema.
+	v2.0 documents remain loadable unchanged; per-dimension synchronization links and
+	per-group display names and colors are v3.0 additions.
 
 	Files written by older MITK releases use the v1.x format. The current editor does <b>not</b>
 	load v1.x files directly; loading one surfaces an error message that points at a one-shot
@@ -158,5 +161,88 @@
 	You can change the view direction by switching to another anatomical plane in the view direction drop down menu.
 	Changing the view direction will reset the camera to its default for the new view direction, meaning default zoom and
 	centered camera position.
+
+\subsection org_mitk_editors_mxnmultiwidget_DimSync Per-dimension synchronization
+	Beyond the editor-wide synchronize toggle, window views can be coupled per dimension:
+	pan, zoom, slice, crosshair, orientation, windowing (level/window), and LUT (colormap).
+	Cells that share a named group for a dimension follow each other on exactly that
+	dimension. Slice, zoom, and pan links can additionally carry an offset relative to the
+	group (e.g. a movie-frame layout showing slices -1 / 0 / +1, or a detail view kept
+	twice as zoomed).
+
+\subsubsection org_mitk_editors_mxnmultiwidget_LayoutEditor The MxN Layout Editor
+	The MxN Layout Editor is the authoritative view of the whole layout document: the
+	window arrangement and all synchronization groups. Open it with the toolbar's
+	layout button or the "Sync" button in any window view's utility menu (a second
+	press hides it again), or via <i>Window &rarr; Show View</i>. As a dockable view it
+	stays open during review sessions and doubles as a live legend of the current
+	coupling.
+
+	The <b>Layout</b> section holds the grid/preset/save/load controls described in
+	\ref org_mitk_editors_mxnmultiwidget_Layout.
+
+	Below it, the <b>window map</b> mirrors the current layout: one tile per render
+	window, filled with its navigation group's color (a neutral fill marks windows
+	whose navigation dimensions belong to different groups). The stripe at each tile's
+	bottom is the window's <b>sync barcode</b>: one slot per dimension in a fixed order
+	(pan, zoom, slice, crosshair, orientation, windowing, LUT), colored with the linked
+	group's hue, left empty when the dimension is not synchronized, with a small notch
+	when the link carries an offset.
+
+	Windows are selected in the map by click, Ctrl-click, or dragging a rubber band.
+	To assign them to a group, click the group's "Assign selection" button, drag the
+	tiles onto the group's card, or drag the group's color swatch onto a tile.
+	"Remove selection" takes the selected windows out of the group again.
+
+	Each group card offers:
+	<ul>
+		<li> The color swatch sets the group's hue - the color that identifies the group
+			on all synchronization surfaces. It is saved with the layout.
+		<li> The name field sets the group's display name, shown identically everywhere
+			(including the utility menu's sync-group selector).
+		<li> The dimension checkboxes control which dimensions the group synchronizes
+			for all of its member windows. Windows joining a group that does not
+			synchronize anything yet get the navigation bundle (pan, zoom, slice,
+			crosshair) as the common-case default; "Link navigation" applies the same
+			bundle explicitly.
+		<li> "Re-converge" re-establishes reference + offset for the group's
+			slice/zoom/pan members after drift (e.g. from boundary clamping).
+		<li> "Reinit geometry" re-initializes the shared reference geometry of the
+			group's slice/orientation neighborhood; only these windows are affected,
+			unlike the application-wide reinit of the Data Manager.
+	</ul>
+
+	The <b>Advanced</b> toggle switches to the power-user face: every window as a row,
+	every dimension as a column. Each entry selects the group the window links for that
+	dimension (typing a new name creates the group) and, for slice/zoom/pan, edits the
+	offset. This face exposes the complete layout-file link model, including couplings
+	between windows that are not adjacent on screen; everyday assignment is expected to
+	happen in the map instead.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_WindowingOverlay Level/window and colormap overlay
+	Each window view carries quiet furniture at its edges:
+	<ul>
+		<li> Bottom left, a <tt>W &lt;window&gt; L &lt;level&gt;</tt> readout of the topmost
+			visible image. It is always visible by default; the preference
+			"Show level/window readout in render windows" switches it to
+			proximity-revealed instead. A colored dot beside the readout names the
+			window's windowing/LUT group when linked.
+		<li> Along the right edge, a thin ribbon showing the image's actual colormap.
+			Moving the pointer near it widens the ribbon: dragging its body shifts the
+			level, dragging its ends moves the window bounds, and the labels show the
+			current bounds. Double-clicking the readout opens numeric level/window entry;
+			the small chip beside the readout opens a colormap menu.
+	</ul>
+	For a window in a windowing or LUT group these controls drive every group member
+	(each keeping its relative difference during drags) and leave other windows and the
+	node-global values untouched; the global level/window slider intentionally does not
+	affect grouped windows. For an unlinked window they behave like the classic global
+	controls.
+
+\subsubsection org_mitk_editors_mxnmultiwidget_CleanView Clean view
+	The "Clean" toggle in a window view's utility menu hides all viewport furniture in
+	every window of the editor (readouts, ribbons, and other overlays), e.g. for taking
+	clean screenshots with external tools. The mode is sticky until toggled off and
+	applies to windows added later as well.
 
 */

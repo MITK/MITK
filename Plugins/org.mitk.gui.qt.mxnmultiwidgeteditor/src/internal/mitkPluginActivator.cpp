@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
+#include "QmitkMxNLayoutEditorView.h"
 #include "QmitkMxNMultiWidgetEditor.h"
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 
@@ -29,6 +30,7 @@ namespace mitk
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkMxNMultiWidgetEditor, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkMxNMultiWidgetEditorPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkMxNLayoutEditorView, context)
   }
 
   void MxNMultiWidgetActivator::stop(ctkPluginContext* context)

@@ -38,13 +38,23 @@
 
     "group_entry": {
       "type": "object",
-      "description": "Properties shared across cells linked to this group. v3.0 knows one property (`select_all`, the selection bundle's UX-mode); groups referenced only by navigation dimensions have no persisted state and use an empty entry. Schema is closed - unknown properties are rejected.",
+      "description": "Properties shared across cells linked to this group. `select_all` is the selection bundle's UX-mode; `color` and `name` are optional cosmetic fields for the sync furniture. Groups referenced only by navigation dimensions and without cosmetics use an empty entry. Schema is closed - unknown properties are rejected at authoring time (the C++ loader tolerates unknown entry keys for compatibility).",
       "additionalProperties": false,
       "properties": {
         "select_all": {
           "type": "boolean",
           "default": true,
           "description": "Whether cells in this group display all data nodes (true) or a curated subset (false). Persisted state for the selection bundle's UX-mode. Optional; defaults to true. Dormant unless a cell references this group via `links.selection`."
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Optional group hue as a hex RGB string. Honored verbatim by the sync furniture (hardcoded, not themed), so a designed layout looks the same in dark and light styles. When absent, a session-stable default hue is assigned by group creation order. The loader ignores a malformed value (default hue applies); it never rejects the document over it."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional human-readable display name, shown identically on every surface (sync editor, group selectors, seams). Free text, distinct from the URL-segment-safe group id used as the dict key. When absent, surfaces display the group id."
         }
       }
     },

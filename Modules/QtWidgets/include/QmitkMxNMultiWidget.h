@@ -26,7 +26,10 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <QColor>
+
 #include <array>
+#include <functional>
 #include <map>
 #include <optional>
 #include <set>
@@ -40,6 +43,7 @@ class QSplitter;
 namespace mitk
 {
   class BaseRenderer;
+  class LevelWindow;
   class LookupTable;
 }
 
@@ -302,6 +306,118 @@ public:
   void SetLookupTable(const QString& windowId, mitk::DataNode* node, mitk::LookupTable* lookupTable);
 
   /**
+  * \brief Set a node's level/window by value on the cell and on every member
+  *        of the cell's `Windowing` group.
+  *
+  *   Grouped cells receive the value as their renderer-specific "levelwindow"
+  *   property (all members end up on the same absolute value); renderers
+  *   outside the group and the node-global property stay untouched. An
+  *   unlinked cell falls back to the classic node-global write, keeping it
+  *   coupled to the global level/window controls.
+  *
+  *   This is the absolute-set companion of the gesture-driven synchronized
+  *   level-window path; use 'AdjustLevelWindow' for deltas that must preserve
+  *   the members' relative differences.
+  *
+  * \throws mitk::Exception on an unknown window or a null node.
+  */
+  void SetLevelWindow(const QString& windowId, mitk::DataNode* node, const mitk::LevelWindow& levelWindow);
+
+  /**
+  * \brief Apply a level/window delta on the cell and on every member of the
+  *        cell's `Windowing` group.
+  *
+  *   Mirrors the synchronized gesture semantics: the delta is applied to each
+  *   member's own current value (renderer-specific, falling back to
+  *   node-global) and written renderer-specific, so members keep their
+  *   relative differences. An unlinked cell falls back to the classic
+  *   node-global write.
+  *
+  * \throws mitk::Exception on an unknown window or a null node.
+  */
+  void AdjustLevelWindow(const QString& windowId, mitk::DataNode* node,
+                         mitk::ScalarType levelDelta, mitk::ScalarType windowDelta);
+
+  /**
+  * \brief The hue that identifies the group across all furniture surfaces.
+  *
+  *   Assigned from a fixed palette by first-registration order (creation of a
+  *   selection group or first link of a navigation/windowing/lut group), so
+  *   the assignment is stable for the lifetime of the current layout and
+  *   identical for every cell. The palette wraps when more groups exist than
+  *   palette entries.
+  *
+  * \throws mitk::Exception on a group that was never registered.
+  */
+  QColor GetSyncGroupColor(const std::string& group) const;
+
+  /**
+  * \brief Read-only description of one synchronization group, for the sync
+  *        editor and other furniture surfaces to render.
+  */
+  struct SyncGroupInfo
+  {
+    std::string id;           // URL-safe group id (the `groups` dict key)
+    std::string displayName;  // groups.<id>.name; equals the id when unset
+    QColor color;             // explicit groups.<id>.color, or the default hue
+    bool hasExplicitColor = false;
+    std::vector<QString> selectionMembers;  // cells whose links.selection names this group
+    std::map<QmitkMxNSyncDimension, std::vector<QString>> members;  // per-dimension membership
+  };
+
+  /**
+  * \brief The editor's current groups: every registered selection group plus
+  *        every group a live cell links on any dimension, in stable
+  *        first-registration order. Member lists are in cell pre-order.
+  */
+  std::vector<SyncGroupInfo> GetSyncGroupInfos() const;
+
+  /**
+  * \brief The group's display name (`groups.<id>.name`), falling back to the
+  *        id when none is set. The id itself never changes in-app; the
+  *        display name carries all human-facing identity.
+  */
+  std::string GetSyncGroupDisplayName(const std::string& id) const;
+
+  /** \brief Display name of the selection group with the given engine index. */
+  QString GetSyncGroupDisplayName(GroupSyncIndexType index) const;
+
+  /**
+  * \brief Set the group's display name (cosmetic write to `groups.<id>.name`
+  *        only; links, engine indices, and the id itself stay untouched).
+  *        An empty name reverts the display name to the id.
+  *
+  * \throws mitk::Exception on a group that was never registered.
+  */
+  void SetSyncGroupDisplayName(const std::string& id, const std::string& displayName);
+
+  /**
+  * \brief Set the group's hue (cosmetic write to `groups.<id>.color` only).
+  *        The color is persisted with the layout and honored verbatim.
+  *
+  * \throws mitk::Exception on a group that was never registered or an
+  *         invalid color.
+  */
+  void SetSyncGroupColor(const std::string& id, const QColor& color);
+
+  /**
+  * \brief Clean-view mode: suppress all viewport furniture in every cell
+  *        (readouts, ribbons, proximity reveals), e.g. for taking clean
+  *        screenshots with external tools. Sticky until switched off;
+  *        applies to cells created later as well. Emits 'CleanViewChanged'
+  *        so per-cell toggles can mirror the state.
+  */
+  void SetCleanView(bool cleanView);
+  bool IsCleanView() const;
+
+  /**
+  * \brief Default visibility of the per-cell level/window corner readout
+  *        (preference-controlled). When off, the readout follows the
+  *        proximity reveal instead of being always-on.
+  */
+  void SetLevelWindowReadoutVisible(bool visible);
+
+  /**
   * \brief Re-initialize the geometry of the cell's geometry-authority
   *        component: every cell reachable from `windowId` over shared
   *        `Slice` or `Orientation` groups (the connected component of the
@@ -519,7 +635,28 @@ Q_SIGNALS:
   void Moved();
   void UpdateUtilityWidgetViewPlanes();
   void LayoutChanged();
-  void SyncGroupAdded(const GroupSyncIndexType index);
+  void SyncGroupAdded(const GroupSyncIndexType index, const QString& label);
+  void CleanViewChanged(bool cleanView);
+
+  /**
+  * \brief A selection group's display label changed (cosmetic rename);
+  *        per-cell group selectors update their row text.
+  */
+  void SyncGroupLabelChanged(const GroupSyncIndexType index, const QString& label);
+
+  /**
+  * \brief Something about the per-dimension links or the group cosmetics
+  *        changed; structural furniture (sync editor, seams) re-reads the
+  *        engine state.
+  */
+  void SyncLinksChanged();
+
+  /**
+  * \brief A cell's "Sync" button asked for the layout editor. The hosting
+  *        layer (the BlueBerry editor part) shows/toggles the view; the
+  *        module only relays the request.
+  */
+  void LayoutEditorRequested();
 
 protected:
 
@@ -720,8 +857,23 @@ private:
   */
   QString FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const;
 
-  /** \brief Push current link state and known group names into every cell's sync popup. */
+  /** \brief Notify structural sync furniture (sync editor, seams) of a link-state change. */
   void RefreshSyncControls();
+
+  /**
+  * \brief Record 'group' in the hue-assignment order if it is new
+  *        (see GetSyncGroupColor).
+  */
+  void RegisterGroupForHue(const std::string& group);
+
+  /**
+  * \brief Shared member loop of 'SetLevelWindow' / 'AdjustLevelWindow':
+  *        validate, resolve the cell's `Windowing` group, and run 'modify'
+  *        on the level window of every target (renderer-specific for group
+  *        members, node-global for an unlinked cell).
+  */
+  void ApplyLevelWindow(const QString& windowId, mitk::DataNode* node,
+                        const std::function<void(mitk::LevelWindow&)>& modify);
 
   /**
   * \brief Relay a plane change of 'sourceId' to its `Orientation` group and
@@ -809,6 +961,30 @@ private:
   *        'alpha', not the convention default 'main').
   */
   std::map<GroupSyncIndexType, std::string> m_GroupNameByIndex;
+
+  /**
+  * \brief Group names in first-registration order; positions index the
+  *        default hue palette (see GetSyncGroupColor). Cleared by
+  *        'TearDownAllCells' together with the group registry.
+  */
+  std::vector<std::string> m_GroupHueOrder;
+
+  /**
+  * \brief Cosmetic per-group state from the layout document's `groups` dict:
+  *        display names (`name`) and hues (`color`, kept as the verbatim hex
+  *        string for byte-stable round-trips). Populated by ApplyLayout and
+  *        the set-display-name / set-color writes; cleared by
+  *        'TearDownAllCells'. Only groups present here emit the fields on
+  *        serialization, so documents stay minimal.
+  */
+  std::map<std::string, std::string> m_GroupDisplayNames;
+  std::map<std::string, std::string> m_GroupColors;
+
+  /** \brief Sticky clean-view state; applied to cells created later, too. */
+  bool m_CleanView = false;
+
+  /** \brief Preference-backed default for the per-cell W/L corner readout. */
+  bool m_LevelWindowReadoutVisible = true;
 
   /**
   * \brief Stashed layout-document `name` so it survives a load -> save

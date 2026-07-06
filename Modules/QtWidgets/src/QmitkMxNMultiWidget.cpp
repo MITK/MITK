@@ -17,6 +17,8 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -29,7 +31,8 @@ found in the LICENSE file.
 
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
-#include <QmitkMxNSyncPopupWidget.h>
+#include <QmitkMxNCellOverlay.h>
+#include <QmitkRenderWindowProximity.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
 
@@ -62,6 +65,11 @@ namespace
   const QRegularExpression GROUP_NAME_PATTERN(
     QStringLiteral("^[A-Za-z0-9_.-]+$"));
 
+  // Persisted group hue (`groups.<id>.color`). A cosmetic field: a value
+  // failing this pattern is ignored with a warning, never a load failure.
+  const QRegularExpression GROUP_COLOR_PATTERN(
+    QStringLiteral("^#[0-9A-Fa-f]{6}$"));
+
 
   // Translation helpers for the v2 layout's `view_direction` enum. Closed
   // mapping (axial/sagittal/coronal/original); throws on anything else.
@@ -92,6 +100,20 @@ namespace
   // every respect (shared namespace, serialized like any other); the constant
   // only pins the label the macro rewrites.
   const std::string SYNCHRONIZE_MACRO_GROUP = "sync";
+
+  // Default group hues, handed out by first-registration order (wrapping).
+  // Colorblind-aware and desaturated enough to stay legible on the dark
+  // Workbench style; the only saturated colors the viewport furniture uses.
+  constexpr std::array<const char*, 8> GROUP_HUE_PALETTE{
+    "#E1707A",  // rose
+    "#6FA8DC",  // sky
+    "#93C47D",  // moss
+    "#F0B26B",  // amber
+    "#B08FD9",  // violet
+    "#76C7C0",  // teal
+    "#C9C97A",  // olive
+    "#D08FB8"   // orchid
+  };
 
   std::size_t DimensionIndex(QmitkMxNSyncDimension dimension)
   {
@@ -497,6 +519,10 @@ void QmitkMxNMultiWidget::Synchronize(bool synchronized)
   // read the link map live, so no re-wiring is needed. Deliberately no
   // convergence (unlike SetSyncLink) - the toggle couples views in place.
   m_SynchronizeMacroActive = synchronized;
+  if (synchronized)
+  {
+    this->RegisterGroupForHue(SYNCHRONIZE_MACRO_GROUP);
+  }
   for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
   {
     auto& links = m_CellSyncLinks[windowId];
@@ -821,6 +847,10 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   }
 
   this->GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
+
+  // Layout-tracking furniture (layout editor, seams) follows this signal;
+  // without it a shrink leaves them rendering removed cells.
+  emit LayoutChanged();
 }
 
 QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
@@ -884,6 +914,22 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, this->GetDataStorage());
   renderWindowWidget->AddUtilityWidget(utilityWidget);
 
+  // Viewport furniture: one proximity controller and one composite overlay
+  // per cell, both children of the cell (they die with it; the editor
+  // reaches them via findChild, so no pointer bookkeeping can go stale).
+  auto* proximity = new QmitkRenderWindowProximity(renderWindowWidget.get(), renderWindowWidget.get());
+  proximity->AddEventSource(renderWindow);
+  proximity->SetSuppressed(m_CleanView);
+  auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
+  cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
+  cellOverlay->SetCleanView(m_CleanView);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CleanViewToggled,
+          this, &QmitkMxNMultiWidget::SetCleanView);
+  connect(this, &QmitkMxNMultiWidget::CleanViewChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::SetCleanViewChecked);
+  utilityWidget->SetCleanViewChecked(m_CleanView);
+
   connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
     utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
   // 'SyncGroupChanged' is wired through a lambda that catches 'mitk::Exception',
@@ -906,13 +952,15 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::CreateNewSyncGroupRequested,
     this, &QmitkMxNMultiWidget::OnCreateNewSyncGroupRequested);
   connect(this, &QmitkMxNMultiWidget::SyncGroupAdded, utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupAdded);
+  connect(this, &QmitkMxNMultiWidget::SyncGroupLabelChanged,
+          utilityWidget, &QmitkRenderWindowUtilityWidget::OnSyncGroupLabelChanged);
 
   // Replay existing groups so the freshly-created utility widget's combobox
   // reflects the current set of registered groups (rather than relying on a
   // contiguous 1..N seed inside the utility widget's constructor).
   for (const auto& entry : m_SynchronizedWidgetConnectors)
   {
-    utilityWidget->OnSyncGroupAdded(entry.first);
+    utilityWidget->OnSyncGroupAdded(entry.first, this->GetSyncGroupDisplayName(entry.first));
   }
 
   // Initialize the node selection widget with all nodes. The cell is left
@@ -929,60 +977,10 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
 
-  // Navigation-link requests from the cell's sync popup. Qt slots must not
-  // let exceptions escape into the event dispatcher, so engine-contract
-  // violations (bad group name, wrong offset type) degrade to a warning and
-  // a state refresh that snaps the popup back to reality.
-  auto* syncPopup = utilityWidget->GetSyncPopup();
-  connect(syncPopup, &QmitkMxNSyncPopupWidget::LinkChangeRequested, this,
-    [this, id, syncPopup](QmitkMxNSyncDimension dimension, const QString& group, const SyncOffset& offset)
-    {
-      try
-      {
-        if (group.isEmpty())
-        {
-          this->ClearSyncLink(id, dimension);
-        }
-        else
-        {
-          this->SetSyncLink(id, dimension, group.toStdString(), offset);
-        }
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Ignoring sync-link change for '" << id.toStdString()
-                  << "': " << e.GetDescription();
-        // The refresh below snaps the popup back to the engine state; the
-        // tooltip explains why the input was not accepted.
-        syncPopup->ShowLinkError(dimension, QString::fromUtf8(e.GetDescription()));
-      }
-      this->RefreshSyncControls();
-    });
-  connect(syncPopup, &QmitkMxNSyncPopupWidget::ReconvergeRequested, this,
-    [this](QmitkMxNSyncDimension dimension, const QString& group)
-    {
-      try
-      {
-        this->ReconvergeSyncGroup(dimension, group.toStdString());
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Ignoring re-converge request: " << e.GetDescription();
-      }
-    });
-  connect(syncPopup, &QmitkMxNSyncPopupWidget::ReinitGeometryRequested, this,
-    [this, id]()
-    {
-      try
-      {
-        this->ReinitSyncGroupGeometry(id);
-      }
-      catch (const mitk::Exception& e)
-      {
-        MITK_WARN << "Ignoring group-reinit request for '" << id.toStdString()
-                  << "': " << e.GetDescription();
-      }
-    });
+  // The cell's "Sync" button opens the editor-wide layout editor; the view
+  // hosting it lives above this module, so the request is only relayed.
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::LayoutEditorRequested,
+          this, &QmitkMxNMultiWidget::LayoutEditorRequested);
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::ViewDirectionChanged, this,
     [this, id](mitk::AnatomicalPlane viewDirection)
     {
@@ -1124,6 +1122,21 @@ nlohmann::json QmitkMxNMultiWidget::SerializeLayout() const
       {
         groupsJson[navGroup] = nlohmann::json::object();
       }
+    }
+  }
+  // Cosmetic per-group fields, emitted only when set so a document that
+  // never carried them stays shaped as before.
+  for (auto& [name, entry] : groupsJson.items())
+  {
+    const auto color = m_GroupColors.find(name);
+    if (color != m_GroupColors.end())
+    {
+      entry["color"] = color->second;
+    }
+    const auto displayName = m_GroupDisplayNames.find(name);
+    if (displayName != m_GroupDisplayNames.end() && !displayName->second.empty())
+    {
+      entry["name"] = displayName->second;
     }
   }
 
@@ -1609,6 +1622,9 @@ void QmitkMxNMultiWidget::TearDownAllCells()
   // needs from the document.
   m_SynchronizedWidgetConnectors.clear();
   m_GroupNameByIndex.clear();
+  m_GroupHueOrder.clear();
+  m_GroupDisplayNames.clear();
+  m_GroupColors.clear();
 
   // Per-cell synchronization links die with their cells; the document (or
   // the user) defines the links of the next cell set. The macro state does
@@ -1757,6 +1773,8 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     // cell references via links.selection - it is dormant otherwise.
     const bool strictMode = doc.contains("groups");
     std::map<std::string, bool> groupSelectAll;
+    std::map<std::string, std::string> groupColors;
+    std::map<std::string, std::string> groupDisplayNames;
     if (strictMode)
     {
       const auto& groupsDict = doc.at("groups");
@@ -1774,6 +1792,40 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
                       << "' which does not match the required pattern '"
                       << GROUP_NAME_PATTERN.pattern().toStdString()
                       << "' (URL-segment-safe).";
+        }
+        // Cosmetic per-group fields. Purely presentational, so malformed
+        // values are ignored with a warning - a color must never make a
+        // layout unloadable.
+        if (it.value().is_object())
+        {
+          const auto& entry = it.value();
+          if (entry.contains("color"))
+          {
+            const auto& color = entry.at("color");
+            if (color.is_string()
+                && GROUP_COLOR_PATTERN.match(QString::fromStdString(color.get<std::string>())).hasMatch())
+            {
+              groupColors[it.key()] = color.get<std::string>();
+            }
+            else
+            {
+              MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                        << ".color' (expected '#RRGGBB'); using the default hue.";
+            }
+          }
+          if (entry.contains("name"))
+          {
+            const auto& displayName = entry.at("name");
+            if (displayName.is_string() && !displayName.get<std::string>().empty())
+            {
+              groupDisplayNames[it.key()] = displayName.get<std::string>();
+            }
+            else
+            {
+              MITK_WARN << "Ignoring malformed 'groups." << it.key()
+                        << ".name' (expected a non-empty string); using the group id.";
+            }
+          }
         }
       }
       for (const auto& g : prewalk.selectionGroups)
@@ -1828,6 +1880,10 @@ void QmitkMxNMultiWidget::ApplyLayout(const nlohmann::json& doc)
     this->ResetGridState();
     this->TearDownAllCells();
     m_LayoutName = stashedName;
+    // Install the cosmetic group state before any group is allocated, so
+    // 'SyncGroupAdded' already carries the document's display names.
+    m_GroupColors = std::move(groupColors);
+    m_GroupDisplayNames = std::move(groupDisplayNames);
     didMutate = true;
 
     // ----- Allocate engine-internal sync groups -----
@@ -2046,8 +2102,9 @@ void QmitkMxNMultiWidget::AddSynchronizationGroup(const GroupSyncIndexType index
   m_GroupNameByIndex[index] = name.empty()
     ? ((index == 1) ? std::string("main") : ("g_" + std::to_string(index)))
     : name;
+  this->RegisterGroupForHue(m_GroupNameByIndex[index]);
 
-  emit SyncGroupAdded(index);
+  emit SyncGroupAdded(index, QString::fromStdString(this->GetSyncGroupDisplayName(m_GroupNameByIndex[index])));
 }
 
 void QmitkMxNMultiWidget::SetSynchronizationGroup(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget, const GroupSyncIndexType index)
@@ -2208,6 +2265,7 @@ void QmitkMxNMultiWidget::SetSyncLink(const QString& windowId,
       break;
   }
   links.groups[DimensionIndex(dimension)] = group;
+  this->RegisterGroupForHue(group);
 
   // An orientation link aligns the joining cell's plane to the seed's
   // (absolute state; joining means adopting the group's plane).
@@ -2354,54 +2412,7 @@ void QmitkMxNMultiWidget::ReconvergeSyncGroup(QmitkMxNSyncDimension dimension, c
 
 void QmitkMxNMultiWidget::RefreshSyncControls()
 {
-  const auto navDimensions = { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
-                               QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair,
-                               QmitkMxNSyncDimension::Orientation, QmitkMxNSyncDimension::Windowing,
-                               QmitkMxNSyncDimension::Lut };
-
-  // Group names share one namespace across all dimensions, so every selector
-  // offers the same list: the union of every dimension's live groups plus
-  // the selection-group registry (a slice link may deliberately reuse a
-  // selection group's name).
-  std::set<std::string> allGroups;
-  for (const auto dimension : navDimensions)
-  {
-    for (const auto& group : this->GetSyncGroupNames(dimension))
-    {
-      allGroups.insert(group);
-    }
-  }
-  for (const auto& [index, name] : m_GroupNameByIndex)
-  {
-    allGroups.insert(name);
-  }
-  QStringList knownGroups;
-  for (const auto& group : allGroups)
-  {
-    knownGroups.append(QString::fromStdString(group));
-  }
-
-  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
-  {
-    auto* utilityWidget = renderWindowWidget->GetUtilityWidget();
-    if (nullptr == utilityWidget)
-    {
-      continue;
-    }
-    auto* syncPopup = utilityWidget->GetSyncPopup();
-    if (nullptr == syncPopup)
-    {
-      continue;
-    }
-    for (const auto dimension : navDimensions)
-    {
-      syncPopup->SetKnownGroups(dimension, knownGroups);
-      const auto link = this->GetSyncLink(windowId, dimension);
-      syncPopup->SetLinkState(dimension,
-                              link.has_value() ? QString::fromStdString(link->group) : QString(),
-                              link.has_value() ? link->offset : SyncOffset{});
-    }
-  }
+  emit SyncLinksChanged();
 }
 
 QString QmitkMxNMultiWidget::FindSyncGroupSeed(QmitkMxNSyncDimension dimension, const std::string& group) const
@@ -2789,5 +2800,266 @@ void QmitkMxNMultiWidget::SetLookupTable(const QString& windowId, mitk::DataNode
     node->SetProperty("LookupTable", mitk::LookupTableProperty::New(lookupTable), targetRenderer);
     mitk::RenderingManager::GetInstance()->RequestUpdate(
       targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+void QmitkMxNMultiWidget::SetLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                         const mitk::LevelWindow& levelWindow)
+{
+  this->ApplyLevelWindow(windowId, node,
+    [&levelWindow](mitk::LevelWindow& value) { value = levelWindow; });
+}
+
+void QmitkMxNMultiWidget::AdjustLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                            mitk::ScalarType levelDelta, mitk::ScalarType windowDelta)
+{
+  this->ApplyLevelWindow(windowId, node,
+    [levelDelta, windowDelta](mitk::LevelWindow& value)
+    {
+      value.SetLevelWindow(value.GetLevel() + levelDelta, value.GetWindow() + windowDelta);
+    });
+}
+
+void QmitkMxNMultiWidget::ApplyLevelWindow(const QString& windowId, mitk::DataNode* node,
+                                           const std::function<void(mitk::LevelWindow&)>& modify)
+{
+  const auto widget = this->GetRenderWindowWidget(windowId);
+  if (nullptr == widget)
+  {
+    mitkThrow() << "ApplyLevelWindow: unknown render window '" << windowId.toStdString() << "'.";
+  }
+  if (nullptr == node)
+  {
+    mitkThrow() << "ApplyLevelWindow: node must not be null.";
+  }
+
+  const auto link = this->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
+  if (!link.has_value())
+  {
+    // Unlinked cells keep the classic node-global write, staying coupled to
+    // the global level/window controls like the gesture path's fallback.
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow);
+    modify(levelWindow);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
+  }
+
+  std::vector<QString> targets{ windowId };
+  for (const auto& descriptor : this->ListWindowDescriptors())
+  {
+    if (descriptor.id == windowId)
+    {
+      continue;
+    }
+    const auto memberLink = this->GetSyncLink(descriptor.id, QmitkMxNSyncDimension::Windowing);
+    if (memberLink.has_value() && memberLink->group == link->group)
+    {
+      targets.push_back(descriptor.id);
+    }
+  }
+
+  for (const auto& targetId : targets)
+  {
+    const auto targetWidget = this->GetRenderWindowWidget(targetId);
+    if (nullptr == targetWidget)
+    {
+      continue;
+    }
+    auto* targetRenderer = mitk::BaseRenderer::GetInstance(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+    if (nullptr == targetRenderer)
+    {
+      continue;
+    }
+    // Read renderer-specific with node-global fallback, write renderer-
+    // specific: same per-member semantics as the synchronized gesture, so the
+    // mapper prefers the member's own value from now on.
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow, targetRenderer);
+    modify(levelWindow);
+    node->SetProperty("levelwindow", mitk::LevelWindowProperty::New(levelWindow), targetRenderer);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(
+      targetWidget->GetRenderWindow()->GetVtkRenderWindow());
+  }
+}
+
+void QmitkMxNMultiWidget::SetCleanView(bool cleanView)
+{
+  if (cleanView == m_CleanView)
+  {
+    return;
+  }
+
+  m_CleanView = cleanView;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* proximity = renderWindowWidget->findChild<QmitkRenderWindowProximity*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      proximity->SetSuppressed(cleanView);
+    }
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetCleanView(cleanView);
+    }
+  }
+
+  emit CleanViewChanged(cleanView);
+}
+
+bool QmitkMxNMultiWidget::IsCleanView() const
+{
+  return m_CleanView;
+}
+
+void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
+{
+  m_LevelWindowReadoutVisible = visible;
+  for (const auto& [windowId, renderWindowWidget] : this->GetRenderWindowWidgets())
+  {
+    if (auto* cellOverlay = renderWindowWidget->findChild<QmitkMxNCellOverlay*>(
+          QString(), Qt::FindDirectChildrenOnly))
+    {
+      cellOverlay->SetReadoutVisible(visible);
+    }
+  }
+}
+
+QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const
+{
+  // A layout-designer-set color wins over the default hue and is honored
+  // verbatim (not themed), so a designed layout looks the same in dark and
+  // light styles.
+  const auto explicitColor = m_GroupColors.find(group);
+  if (explicitColor != m_GroupColors.end())
+  {
+    return QColor(QString::fromStdString(explicitColor->second));
+  }
+
+  const auto it = std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), group);
+  if (it == m_GroupHueOrder.end())
+  {
+    mitkThrow() << "GetSyncGroupColor: unknown group '" << group << "'.";
+  }
+
+  const auto position = static_cast<std::size_t>(std::distance(m_GroupHueOrder.begin(), it));
+  return QColor(GROUP_HUE_PALETTE[position % GROUP_HUE_PALETTE.size()]);
+}
+
+std::vector<QmitkMxNMultiWidget::SyncGroupInfo> QmitkMxNMultiWidget::GetSyncGroupInfos() const
+{
+  // Registered selection groups appear even while empty (a freshly created
+  // "+" group must be assignable from the editor); link groups exist exactly
+  // as long as a live cell links them.
+  std::set<std::string> selectionGroupIds;
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    selectionGroupIds.insert(name);
+  }
+
+  const auto descriptors = this->ListWindowDescriptors();
+
+  std::vector<SyncGroupInfo> infos;
+  for (const auto& id : m_GroupHueOrder)
+  {
+    SyncGroupInfo info;
+    info.id = id;
+    info.displayName = this->GetSyncGroupDisplayName(id);
+    info.color = this->GetSyncGroupColor(id);
+    info.hasExplicitColor = m_GroupColors.find(id) != m_GroupColors.end();
+
+    for (const auto& descriptor : descriptors)
+    {
+      if (descriptor.selectionGroup.toStdString() == id)
+      {
+        info.selectionMembers.push_back(descriptor.id);
+      }
+      for (const auto dimension : QmitkMxNAllSyncDimensions)
+      {
+        const auto link = this->GetSyncLink(descriptor.id, dimension);
+        if (link.has_value() && link->group == id)
+        {
+          info.members[dimension].push_back(descriptor.id);
+        }
+      }
+    }
+
+    if (info.selectionMembers.empty() && info.members.empty()
+        && selectionGroupIds.find(id) == selectionGroupIds.end())
+    {
+      continue;
+    }
+    infos.push_back(std::move(info));
+  }
+
+  return infos;
+}
+
+std::string QmitkMxNMultiWidget::GetSyncGroupDisplayName(const std::string& id) const
+{
+  const auto it = m_GroupDisplayNames.find(id);
+  return (it != m_GroupDisplayNames.end() && !it->second.empty()) ? it->second : id;
+}
+
+QString QmitkMxNMultiWidget::GetSyncGroupDisplayName(GroupSyncIndexType index) const
+{
+  const auto it = m_GroupNameByIndex.find(index);
+  if (it == m_GroupNameByIndex.end())
+  {
+    mitkThrow() << "GetSyncGroupDisplayName: no group with engine index " << index << ".";
+  }
+  return QString::fromStdString(this->GetSyncGroupDisplayName(it->second));
+}
+
+void QmitkMxNMultiWidget::SetSyncGroupDisplayName(const std::string& id, const std::string& displayName)
+{
+  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), id) == m_GroupHueOrder.end())
+  {
+    mitkThrow() << "SetSyncGroupDisplayName: unknown group '" << id << "'.";
+  }
+
+  if (displayName.empty())
+  {
+    m_GroupDisplayNames.erase(id);
+  }
+  else
+  {
+    m_GroupDisplayNames[id] = displayName;
+  }
+
+  // Selection groups surface the label in every cell's group selector.
+  for (const auto& [index, name] : m_GroupNameByIndex)
+  {
+    if (name == id)
+    {
+      emit SyncGroupLabelChanged(index, QString::fromStdString(this->GetSyncGroupDisplayName(id)));
+    }
+  }
+  emit SyncLinksChanged();
+}
+
+void QmitkMxNMultiWidget::SetSyncGroupColor(const std::string& id, const QColor& color)
+{
+  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), id) == m_GroupHueOrder.end())
+  {
+    mitkThrow() << "SetSyncGroupColor: unknown group '" << id << "'.";
+  }
+  if (!color.isValid())
+  {
+    mitkThrow() << "SetSyncGroupColor: invalid color for group '" << id << "'.";
+  }
+
+  m_GroupColors[id] = color.name(QColor::HexRgb).toStdString();
+  emit SyncLinksChanged();
+}
+
+void QmitkMxNMultiWidget::RegisterGroupForHue(const std::string& group)
+{
+  if (std::find(m_GroupHueOrder.begin(), m_GroupHueOrder.end(), group) == m_GroupHueOrder.end())
+  {
+    m_GroupHueOrder.push_back(group);
   }
 }

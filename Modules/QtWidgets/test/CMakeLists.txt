@@ -28,6 +28,10 @@ mitkAddCustomModuleTest(QmitkMxNNavLinksTest QmitkMxNNavLinksTest
   -platform minimal
 )
 
+mitkAddCustomModuleTest(QmitkMxNLayoutEditorWidgetTest QmitkMxNLayoutEditorWidgetTest
+  -platform minimal
+)
+
 mitkAddCustomModuleTest(QmitkMxNSyncGroupApiTest QmitkMxNSyncGroupApiTest
   -platform minimal
 )

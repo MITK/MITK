@@ -25,7 +25,6 @@ found in the LICENSE file.
 // qt
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QMenuBar>
 #include <QComboBox>
 
 namespace mitk
@@ -33,7 +32,6 @@ namespace mitk
   class DataStorage;
 }
 
-class QmitkMxNSyncPopupWidget;
 class QmitkRenderWindow;
 class QToolButton;
 
@@ -92,13 +90,6 @@ public:
   QmitkSynchronizedNodeSelectionWidget* GetNodeSelectionWidget() const;
 
   /**
-  * \brief The cell's navigation-synchronization popup (hosted in the "Sync"
-  *        menu). The owning multi widget connects its request signals and
-  *        pushes link state into it.
-  */
-  QmitkMxNSyncPopupWidget* GetSyncPopup() const;
-
-  /**
   * \brief Programmatically set the cell's view direction: applies the plane
   *        to the renderer and mirrors it in the selector WITHOUT emitting
   *        'ViewDirectionChanged'.
@@ -112,7 +103,22 @@ public:
 
 public Q_SLOTS:
   void UpdateViewPlaneSelection();
-  void OnSyncGroupAdded(const GroupSyncIndexType index);
+
+  /**
+  * \brief Register a group row in the selector, labeled with the group's
+  *        display name ("one vocabulary": the same label every surface
+  *        shows, never a synthesized "Group N").
+  */
+  void OnSyncGroupAdded(const GroupSyncIndexType index, const QString& label);
+
+  /** \brief Update a registered group row's label after a cosmetic rename. */
+  void OnSyncGroupLabelChanged(const GroupSyncIndexType index, const QString& label);
+
+  /**
+  * \brief Mirror the editor-wide clean-view state into this cell's toggle
+  *        button without re-emitting 'CleanViewToggled'.
+  */
+  void SetCleanViewChecked(bool checked);
 
 Q_SIGNALS:
 
@@ -133,6 +139,20 @@ Q_SIGNALS:
   */
   void ViewDirectionChanged(mitk::AnatomicalPlane viewDirection);
 
+  /**
+  * \brief Emitted when the user toggles clean-view mode in this cell. The
+  *        mode is editor-wide; the owning multi widget applies it to every
+  *        cell and mirrors it back via 'SetCleanViewChecked'.
+  */
+  void CleanViewToggled(bool cleanView);
+
+  /**
+  * \brief Emitted when the user asks for the editor-wide layout editor from
+  *        this cell's "Sync" button; the owning multi widget relays it to
+  *        whoever hosts the view.
+  */
+  void LayoutEditorRequested();
+
 private Q_SLOTS:
 
   void OnSyncGroupSelectionChanged(int index);
@@ -142,9 +162,9 @@ private:
 
   mitk::BaseRenderer* m_BaseRenderer;
   QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
-  QmitkMxNSyncPopupWidget* m_SyncPopup;
   QComboBox* m_SyncGroupSelector;
   QToolButton* m_NewSyncGroupButton;
+  QToolButton* m_CleanViewButton;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;

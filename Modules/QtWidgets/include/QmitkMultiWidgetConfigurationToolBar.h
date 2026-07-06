@@ -16,26 +16,22 @@ found in the LICENSE file.
 #include <MitkQtWidgetsExports.h>
 
 #include <mitkInteractionSchemeSwitcher.h>
-#include <mitkDataStorage.h>
-
-#include <nlohmann/json.hpp>
 
 // qt
 #include <QToolBar>
 
 class QmitkAbstractMultiWidget;
-class QmitkMultiWidgetLayoutSelectionWidget;
 
 /**
  * \brief Toolbar for configuring a QmitkAbstractMultiWidget layout and interaction scheme.
  *
- * Provides buttons for setting the multi-widget layout (row/column grid),
- * toggling synchronized scrolling, and switching the interaction scheme
- * (e.g., MITK default vs. PACS mode). A popup widget allows custom layout
- * selection and data-based layout configuration.
+ * Provides buttons for opening the layout editor, toggling synchronized
+ * scrolling, and switching the interaction scheme (e.g., MITK default vs.
+ * PACS mode). The layout-shape controls themselves (grid, presets,
+ * save/load) live in the layout editor view; the layout button only
+ * requests it.
  *
  * \sa QmitkAbstractMultiWidget
- * \sa QmitkMultiWidgetLayoutSelectionWidget
  * \sa QmitkInteractionSchemeToolBar
  */
 class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBar
@@ -51,38 +47,13 @@ public:
   QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
-  /**
-   * \brief Sets the data storage for data-based layout operations.
-   * \param[in] dataStorage The data storage to use.
-   */
-  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
-
 Q_SIGNALS:
 
   /**
-   * \brief Emitted when a grid layout is selected.
-   * \param[in] row    The number of rows.
-   * \param[in] column The number of columns.
+   * \brief Emitted when the user presses the layout button; the hosting
+   *        editor part shows/toggles the layout editor view.
    */
-  void LayoutSet(int row, int column);
-
-  /**
-   * \brief Emitted when the user requests to save the current layout.
-   * \param[in] outStream The output stream to write the layout to.
-   */
-  void SaveLayout(std::ostream* outStream);
-
-  /**
-   * \brief Emitted when the user requests to load a layout from JSON.
-   * \param[in] jsonData The JSON data to load from.
-   */
-  void LoadLayout(const nlohmann::json* jsonData);
-
-  /**
-   * \brief Emitted when a data-based layout is requested.
-   * \param[in] nodes The selected data nodes for the layout.
-   */
-  void SetDataBasedLayout(const QList<mitk::DataNode::Pointer>& nodes);
+  void LayoutEditorRequested();
 
   /**
    * \brief Emitted when the synchronization state changes.
@@ -98,21 +69,17 @@ Q_SIGNALS:
 
 protected Q_SLOTS:
 
-  void OnSetLayout();
   void OnSynchronize();
   void OnInteractionSchemeChanged();
 
 private:
 
-  void InitializeToolBar();;
   void AddButtons();
 
   QmitkAbstractMultiWidget* m_MultiWidget;
 
   QAction* m_SynchronizeAction;
   QAction* m_InteractionSchemeChangeAction;
-
-  QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelectionPopup;
 
 };
 

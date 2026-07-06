@@ -21,6 +21,8 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
+#include <QColor>
+
 /**
  * Tests the v3 layout format on QmitkMxNMultiWidget:
  *   - The loader accepts "2.0" and "3.0" in one code path; a v2 document
@@ -46,6 +48,11 @@ class QmitkMxNLayoutV3TestSuite : public mitk::TestFixture
   MITK_TEST(V3_RoundTrip_AllDimensionsAndOffsets);
   MITK_TEST(V3_StrictMode_NavGroupUndeclared_Throws);
   MITK_TEST(V3_LazyMode_NavLinks_OK);
+  MITK_TEST(GroupCosmetics_RoundTripVerbatim);
+  MITK_TEST(GroupCosmetics_AbsentStaysAbsent);
+  MITK_TEST(GroupCosmetics_MalformedColorIgnored);
+  MITK_TEST(GroupCosmetics_UnknownEntryKeyTolerated);
+  MITK_TEST(GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -262,6 +269,123 @@ public:
     const auto link = editor->GetSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
     CPPUNIT_ASSERT(link.has_value());
     CPPUNIT_ASSERT_EQUAL(std::string("nav"), link->group);
+  }
+
+  /** Document with a selection group and a nav group, both carrying cosmetics. */
+  static nlohmann::json CosmeticsDoc()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true }, { "color", "#6FA8DC" }, { "name", "Navigation" } } },
+      { "nav", { { "color", "#E1707A" } } }
+    };
+    WindowLinks(doc)["slice"] = "nav";
+    return doc;
+  }
+
+  void GroupCosmetics_RoundTripVerbatim()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(CosmeticsDoc());
+
+    CPPUNIT_ASSERT_EQUAL(std::string("Navigation"), editor->GetSyncGroupDisplayName("main"));
+    CPPUNIT_ASSERT(QColor("#6FA8DC") == editor->GetSyncGroupColor("main"));
+    CPPUNIT_ASSERT_EQUAL(std::string("nav"), editor->GetSyncGroupDisplayName("nav"));
+    CPPUNIT_ASSERT(QColor("#E1707A") == editor->GetSyncGroupColor("nav"));
+
+    const auto roundTrip = editor->SerializeLayout();
+    // Verbatim: the hex string survives byte-for-byte, including case.
+    CPPUNIT_ASSERT_EQUAL(std::string("#6FA8DC"),
+      roundTrip.at("groups").at("main").at("color").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("Navigation"),
+      roundTrip.at("groups").at("main").at("name").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("#E1707A"),
+      roundTrip.at("groups").at("nav").at("color").get<std::string>());
+    CPPUNIT_ASSERT_MESSAGE("No display name was set for 'nav'; none may be emitted",
+      !roundTrip.at("groups").at("nav").contains("name"));
+  }
+
+  void GroupCosmetics_AbsentStaysAbsent()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{ { "main", { { "select_all", true } } } };
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), editor->GetSyncGroupDisplayName("main"));
+    CPPUNIT_ASSERT_MESSAGE("Default hue must be assigned without a persisted color",
+      editor->GetSyncGroupColor("main").isValid());
+
+    const auto roundTrip = editor->SerializeLayout();
+    CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("color"));
+    CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("name"));
+  }
+
+  void GroupCosmetics_MalformedColorIgnored()
+  {
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true }, { "color", "red" }, { "name", 42 } } }
+    };
+
+    auto editor = MakeEditor();
+    // A cosmetic field must never make a layout unloadable.
+    editor->ApplyLayout(doc);
+
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+    CPPUNIT_ASSERT_MESSAGE("Malformed color falls back to the default hue",
+      editor->GetSyncGroupColor("main").isValid());
+    CPPUNIT_ASSERT_EQUAL(std::string("main"), editor->GetSyncGroupDisplayName("main"));
+
+    const auto roundTrip = editor->SerializeLayout();
+    CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("color"));
+    CPPUNIT_ASSERT(!roundTrip.at("groups").at("main").contains("name"));
+  }
+
+  void GroupCosmetics_UnknownEntryKeyTolerated()
+  {
+    // The loader stays lenient on group-entry keys (unlike the closed v3
+    // 'links' object); the schema documents the shape for authors.
+    auto doc = SingleWindowDoc();
+    doc["groups"] = nlohmann::json{
+      { "main", { { "select_all", true }, { "frobnicate", 1 } } }
+    };
+
+    auto editor = MakeEditor();
+    editor->ApplyLayout(doc);
+    CPPUNIT_ASSERT_EQUAL(1u, editor->GetNumberOfRenderWindowWidgets());
+  }
+
+  void GroupCosmetics_SetWritesRoundTripAndLeaveLinksAlone()
+  {
+    auto editor = MakeEditor();
+    editor->ApplyLayout(CosmeticsDoc());
+
+    const auto linkBefore = editor->GetSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+
+    editor->SetSyncGroupDisplayName("nav", "Detail");
+    editor->SetSyncGroupColor("nav", QColor("#93C47D"));
+
+    const auto linkAfter = editor->GetSyncLink("mxn__w0", QmitkMxNSyncDimension::Slice);
+    CPPUNIT_ASSERT_MESSAGE("Cosmetic writes must not touch links",
+      linkAfter.has_value() && linkAfter->group == linkBefore->group);
+
+    const auto roundTrip = editor->SerializeLayout();
+    CPPUNIT_ASSERT_EQUAL(std::string("Detail"),
+      roundTrip.at("groups").at("nav").at("name").get<std::string>());
+    CPPUNIT_ASSERT_EQUAL(std::string("#93c47d"),
+      roundTrip.at("groups").at("nav").at("color").get<std::string>());
+    CPPUNIT_ASSERT_MESSAGE("The URL-safe id itself never changes",
+      roundTrip.at("groups").contains("nav"));
+
+    // Empty display name reverts to the id.
+    editor->SetSyncGroupDisplayName("nav", "");
+    CPPUNIT_ASSERT_EQUAL(std::string("nav"), editor->GetSyncGroupDisplayName("nav"));
+
+    CPPUNIT_ASSERT_THROW(editor->SetSyncGroupDisplayName("no-such-group", "x"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(editor->SetSyncGroupColor("no-such-group", QColor("#000000")), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(editor->SetSyncGroupColor("nav", QColor()), mitk::Exception);
   }
 };
 

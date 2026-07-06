@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <QmitkRenderWindowUtilityWidget.h>
 
+#include <QMenuBar>
 #include <QToolButton>
 #include <QWidgetAction>
 
@@ -22,7 +23,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 
 // mitk qt widgets
-#include <QmitkMxNSyncPopupWidget.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkStyleManager.h>
 
@@ -34,9 +34,9 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QmitkRenderWindow* renderWindow/* = nullptr */,
   mitk::DataStorage* dataStorage/* = nullptr */)
   : m_NodeSelectionWidget(nullptr)
-  , m_SyncPopup(nullptr)
   , m_SyncGroupSelector(nullptr)
   , m_NewSyncGroupButton(nullptr)
+  , m_CleanViewButton(nullptr)
   , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
   , m_ViewDirectionSelector(nullptr)
@@ -69,13 +69,15 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   dataAction->setDefaultWidget(m_NodeSelectionWidget);
   dataMenu->addAction(dataAction);
 
-  m_SyncPopup = new QmitkMxNSyncPopupWidget(parent);
-  auto syncMenu = menuBar->addMenu("Sync");
-  QWidgetAction* syncAction = new QWidgetAction(syncMenu);
-  syncAction->setDefaultWidget(m_SyncPopup);
-  syncMenu->addAction(syncAction);
-
   layout->addWidget(menuBar);
+
+  auto* layoutEditorButton = new QToolButton(this);
+  layoutEditorButton->setText("Sync");
+  layoutEditorButton->setToolTip(tr("Open the MxN layout editor (groups, synchronization, layout)"));
+  connect(layoutEditorButton, &QToolButton::clicked, this, [this]() {
+    emit LayoutEditorRequested();
+  });
+  layout->addWidget(layoutEditorButton);
 
   m_SyncGroupSelector = new QComboBox(this);
   // The combobox starts empty and is populated reactively via 'OnSyncGroupAdded'.
@@ -116,6 +118,16 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   UpdateViewPlaneSelection();
 
   layout->addWidget(m_ViewDirectionSelector);
+
+  m_CleanViewButton = new QToolButton(this);
+  m_CleanViewButton->setText("Clean");
+  m_CleanViewButton->setCheckable(true);
+  m_CleanViewButton->setToolTip(tr("Clean view: hide all viewport furniture in every render window "
+                                   "(readouts, ribbons), e.g. for screenshots"));
+  connect(m_CleanViewButton, &QToolButton::toggled, this, [this](bool checked) {
+    emit CleanViewToggled(checked);
+  });
+  layout->addWidget(m_CleanViewButton);
 
   // finally add observer, after all relevant objects have been created / initialized
   sliceNavigationController->ConnectGeometrySendEvent(this);
@@ -306,12 +318,15 @@ QmitkSynchronizedNodeSelectionWidget* QmitkRenderWindowUtilityWidget::GetNodeSel
   return m_NodeSelectionWidget;
 }
 
-QmitkMxNSyncPopupWidget* QmitkRenderWindowUtilityWidget::GetSyncPopup() const
+void QmitkRenderWindowUtilityWidget::SetCleanViewChecked(bool checked)
 {
-  return m_SyncPopup;
+  // Follower path: the editor-wide state is authoritative; blocking the
+  // signal terminates the toggle -> editor -> mirror round-trip.
+  const QSignalBlocker blocker(m_CleanViewButton);
+  m_CleanViewButton->setChecked(checked);
 }
 
-void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index)
+void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType index, const QString& label)
 {
   // Reactive growth: append a row carrying this group index as userData. We
   // de-dupe by data (not by position) so sparse / non-monotonic group indices
@@ -328,5 +343,15 @@ void QmitkRenderWindowUtilityWidget::OnSyncGroupAdded(const GroupSyncIndexType i
   // places it. Block the combobox's signals so the authoritative assignment
   // via SetSynchronizationGroup remains the only path that changes the group.
   const QSignalBlocker blocker(m_SyncGroupSelector);
-  m_SyncGroupSelector->addItem(QString("Group %1").arg(index), QVariant(index));
+  m_SyncGroupSelector->addItem(label, QVariant(index));
+}
+
+void QmitkRenderWindowUtilityWidget::OnSyncGroupLabelChanged(const GroupSyncIndexType index, const QString& label)
+{
+  const int row = m_SyncGroupSelector->findData(QVariant(index));
+  if (row < 0)
+  {
+    return;
+  }
+  m_SyncGroupSelector->setItemText(row, label);
 }

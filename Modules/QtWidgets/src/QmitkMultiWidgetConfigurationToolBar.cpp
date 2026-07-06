@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 // mitk qt widgets module
 #include <QmitkAbstractMultiWidget.h>
-#include <QmitkMultiWidgetLayoutSelectionWidget.h>
 
 QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget)
   : QToolBar(multiWidget)
@@ -23,7 +22,7 @@ QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(Qmitk
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
 
-  InitializeToolBar();
+  AddButtons();
 }
 
 QmitkMultiWidgetConfigurationToolBar::~QmitkMultiWidgetConfigurationToolBar()
@@ -31,24 +30,11 @@ QmitkMultiWidgetConfigurationToolBar::~QmitkMultiWidgetConfigurationToolBar()
   // nothing here
 }
 
-void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
-{
-  // create popup to show a widget to modify the multi widget layout
-  m_LayoutSelectionPopup = new QmitkMultiWidgetLayoutSelectionWidget(this);
-  m_LayoutSelectionPopup->hide();
-
-  AddButtons();
-
-  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet, this, &QmitkMultiWidgetConfigurationToolBar::LayoutSet);
-  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::SetDataBasedLayout, this, &QmitkMultiWidgetConfigurationToolBar::SetDataBasedLayout);
-  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::SaveLayout, this, &QmitkMultiWidgetConfigurationToolBar::SaveLayout);
-  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LoadLayout, this, &QmitkMultiWidgetConfigurationToolBar::LoadLayout);
-}
-
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
-  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Set multi widget layout"), this);
-  connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
+  QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/mwLayout.png"), tr("Open the layout editor"), this);
+  connect(setLayoutAction, &QAction::triggered,
+          this, &QmitkMultiWidgetConfigurationToolBar::LayoutEditorRequested);
   QToolBar::addAction(setLayoutAction);
 
   m_SynchronizeAction = new QAction(QIcon(":/Qmitk/mwDesynchronized.png"), tr("Synchronize render windows"), this);
@@ -62,23 +48,6 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
   m_InteractionSchemeChangeAction->setChecked(false);
   connect(m_InteractionSchemeChangeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnInteractionSchemeChanged);
   QToolBar::addAction(m_InteractionSchemeChangeAction);
-}
-
-void QmitkMultiWidgetConfigurationToolBar::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
-{
-  if (m_LayoutSelectionPopup == nullptr)
-    return;
-  m_LayoutSelectionPopup->SetDataStorage(dataStorage);
-}
-
-void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
-{
-  if (nullptr != m_MultiWidget)
-  {
-    m_LayoutSelectionPopup->setWindowFlags(Qt::Popup);
-    m_LayoutSelectionPopup->move(this->cursor().pos().x() - m_LayoutSelectionPopup->width(), this->cursor().pos().y());
-    m_LayoutSelectionPopup->show();
-  }
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()

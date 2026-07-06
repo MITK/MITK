@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <variant>
 #include <vector>
 
+class QmitkRenderWindowProximity;
 class QSplitter;
 
 namespace mitk
@@ -416,6 +417,22 @@ public:
   *        proximity reveal instead of being always-on.
   */
   void SetLevelWindowReadoutVisible(bool visible);
+
+  /**
+  * \brief Ask the hosting layer for the layout editor (emits
+  *        'LayoutEditorRequested'). Entry point for furniture that cannot
+  *        emit the editor's signal itself (e.g. the seams' editor hook).
+  */
+  void RequestLayoutEditor();
+
+  /**
+  * \brief A navigation group of the cell that no seam can show: the cell
+  *        links it on a navigation dimension, but no within-splitter
+  *        neighbor shares it there. Empty when every navigation link is
+  *        seam-visible (or none exists). Feeds the corner hue dot that
+  *        points the user to the layout editor.
+  */
+  std::optional<std::string> GetNonAdjacentNavGroup(const QString& windowId) const;
 
   /**
   * \brief Re-initialize the geometry of the cell's geometry-authority
@@ -808,6 +825,13 @@ private:
   void TearDownAllCells();
 
   /**
+  * \brief Recreate the link-seam widgets for the current splitter tree
+  *        (one per handle whose both neighbors are cells). Connected to
+  *        'LayoutChanged' so every layout mutation path refreshes them.
+  */
+  void RebuildSeams();
+
+  /**
   * \brief Recovery path when 'ApplyLayout' construction fails part-way.
   *        Drains whatever was partially built and re-runs the default
   *        single-cell initialisation so the editor stays in a usable state.
@@ -982,6 +1006,13 @@ private:
 
   /** \brief Sticky clean-view state; applied to cells created later, too. */
   bool m_CleanView = false;
+
+  /**
+  * \brief Editor-level proximity controller driving the seam reveals (the
+  *        per-cell controllers cannot see across cell borders). Parented to
+  *        this widget; created with the first cell.
+  */
+  QmitkRenderWindowProximity* m_SeamProximity = nullptr;
 
   /** \brief Preference-backed default for the per-cell W/L corner readout. */
   bool m_LevelWindowReadoutVisible = true;

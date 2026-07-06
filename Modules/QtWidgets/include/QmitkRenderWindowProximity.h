@@ -119,14 +119,21 @@ public:
    *                            region never reaches Active but still gets
    *                            Hint while the pointer is in the cell.
    *                            Must not be null.
+   * \param activationDistance  Pointer-to-rectangle distance (px) below
+   *                            which the region goes Active. Surfaces with
+   *                            a tighter reveal (e.g. seams between cells)
+   *                            pass a smaller value; timing and hysteresis
+   *                            stay uniform. Must be positive.
    *
    * \return  Id used in the StateChanged signal and the query/unregister
    *          calls. The region starts in the state matching the current
    *          pointer; a change away from Idle is emitted immediately.
    *
-   * \throws mitk::Exception if the callback is null.
+   * \throws mitk::Exception if the callback is null or the distance is not
+   *         positive.
    */
-  RegionId RegisterRegion(std::function<QRect()> regionInCellCoords);
+  RegionId RegisterRegion(std::function<QRect()> regionInCellCoords,
+                          int activationDistance = ActivationDistance);
 
   /**
    * \brief Remove a region; no further StateChanged is emitted for its id.
@@ -175,6 +182,7 @@ private:
   struct Region
   {
     std::function<QRect()> rectQuery;
+    int activationDistance = ActivationDistance;
     State state = State::Idle;
     QTimer* collapseTimer = nullptr;
   };

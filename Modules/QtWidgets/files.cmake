@@ -72,6 +72,7 @@ set(CPP_FILES
   QmitkMxNCellMapWidget.cpp
   QmitkMxNCellOverlay.cpp
   QmitkMxNLayoutEditorWidget.cpp
+  QmitkMxNLinkSeamWidget.cpp
   QmitkMxNMultiWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp

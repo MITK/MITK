@@ -320,9 +320,11 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
       .arg(FormatValue(m_LevelWindow.GetWindow()), FormatValue(m_LevelWindow.GetLevel()));
     painter.drawText(readout, Qt::AlignLeft | Qt::AlignVCenter, text);
 
-    // Hue dot: the cell's windowing/LUT group identity (windowing wins when
-    // both are linked; the dot lives beside the W/L readout).
+    // Hue dot: the cell's windowing/LUT group identity wins the single dot
+    // slot (it lives beside the W/L readout); otherwise a navigation link
+    // no seam can show claims it, as the pointer to the layout editor.
     const auto windowId = m_Cell->GetWidgetName();
+    std::optional<std::string> dotGroup;
     auto link = m_Editor->GetSyncLink(windowId, QmitkMxNSyncDimension::Windowing);
     if (!link.has_value())
     {
@@ -330,9 +332,24 @@ void QmitkMxNCellOverlay::paintEvent(QPaintEvent* /*event*/)
     }
     if (link.has_value())
     {
+      dotGroup = link->group;
+    }
+    else
+    {
+      try
+      {
+        dotGroup = m_Editor->GetNonAdjacentNavGroup(windowId);
+      }
+      catch (const mitk::Exception&)
+      {
+        // Transient mid-layout-change state; the next refresh repaints.
+      }
+    }
+    if (dotGroup.has_value())
+    {
       painter.setRenderHint(QPainter::Antialiasing, true);
       painter.setPen(Qt::NoPen);
-      painter.setBrush(m_Editor->GetSyncGroupColor(link->group));
+      painter.setBrush(m_Editor->GetSyncGroupColor(*dotGroup));
       const int dotX = readout.right() - HueDotDiameter;
       const int dotY = readout.center().y() - HueDotDiameter / 2;
       painter.drawEllipse(dotX, dotY, HueDotDiameter, HueDotDiameter);

@@ -32,6 +32,7 @@ found in the LICENSE file.
 // mitk qt widget
 #include <QmitkMultiWidgetLayoutManager.h>
 #include <QmitkMxNCellOverlay.h>
+#include <QmitkMxNLinkSeamWidget.h>
 #include <QmitkRenderWindowProximity.h>
 #include <QmitkRenderWindowUtilityWidget.h>
 #include <QmitkRenderWindowWidget.h>
@@ -412,6 +413,10 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                 << "'. Editor names must start with a letter, contain no '_', "
                 << "and use only the alphabet [A-Za-z0-9.-].";
   }
+
+  // Every layout mutation path (grid resize, document load) announces itself
+  // through LayoutChanged; the seams mirror whatever cell adjacency results.
+  connect(this, &QmitkMxNMultiWidget::LayoutChanged, this, &QmitkMxNMultiWidget::RebuildSeams);
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
@@ -920,6 +925,16 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   auto* proximity = new QmitkRenderWindowProximity(renderWindowWidget.get(), renderWindowWidget.get());
   proximity->AddEventSource(renderWindow);
   proximity->SetSuppressed(m_CleanView);
+
+  // The editor-level controller behind the seams: per-cell controllers stop
+  // at their cell border, but a seam reveal must react to the pointer in
+  // either neighbor, so every render window also feeds this one.
+  if (nullptr == m_SeamProximity)
+  {
+    m_SeamProximity = new QmitkRenderWindowProximity(this, this);
+    m_SeamProximity->SetSuppressed(m_CleanView);
+  }
+  m_SeamProximity->AddEventSource(renderWindow);
   auto* cellOverlay = new QmitkMxNCellOverlay(renderWindowWidget.get(), this, proximity);
   cellOverlay->SetReadoutVisible(m_LevelWindowReadoutVisible);
   cellOverlay->SetCleanView(m_CleanView);
@@ -2906,6 +2921,14 @@ void QmitkMxNMultiWidget::SetCleanView(bool cleanView)
       cellOverlay->SetCleanView(cleanView);
     }
   }
+  if (nullptr != m_SeamProximity)
+  {
+    m_SeamProximity->SetSuppressed(cleanView);
+  }
+  for (auto* seam : this->findChildren<QmitkMxNLinkSeamWidget*>(QString(), Qt::FindDirectChildrenOnly))
+  {
+    seam->setVisible(!cleanView);
+  }
 
   emit CleanViewChanged(cleanView);
 }
@@ -2926,6 +2949,106 @@ void QmitkMxNMultiWidget::SetLevelWindowReadoutVisible(bool visible)
       cellOverlay->SetReadoutVisible(visible);
     }
   }
+}
+
+void QmitkMxNMultiWidget::RequestLayoutEditor()
+{
+  emit LayoutEditorRequested();
+}
+
+std::optional<std::string> QmitkMxNMultiWidget::GetNonAdjacentNavGroup(const QString& windowId) const
+{
+  const auto cell = this->GetRenderWindowWidget(windowId);
+  if (nullptr == cell)
+  {
+    mitkThrow() << "GetNonAdjacentNavGroup: unknown render window '"
+                << windowId.toStdString() << "'.";
+  }
+
+  auto* splitter = qobject_cast<QSplitter*>(cell->parentWidget());
+
+  // Within-splitter siblings are the only pairs a seam can express.
+  std::vector<const QmitkRenderWindowWidget*> neighbors;
+  if (nullptr != splitter)
+  {
+    const int index = splitter->indexOf(cell.get());
+    for (const int neighborIndex : { index - 1, index + 1 })
+    {
+      if (neighborIndex < 0 || neighborIndex >= splitter->count())
+      {
+        continue;
+      }
+      if (auto* neighbor = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(neighborIndex)))
+      {
+        neighbors.push_back(neighbor);
+      }
+    }
+  }
+
+  for (const auto dimension : { QmitkMxNSyncDimension::Pan, QmitkMxNSyncDimension::Zoom,
+                                QmitkMxNSyncDimension::Slice, QmitkMxNSyncDimension::Crosshair })
+  {
+    const auto link = this->GetSyncLink(windowId, dimension);
+    if (!link.has_value())
+    {
+      continue;
+    }
+    const bool seamVisible = std::any_of(neighbors.begin(), neighbors.end(),
+      [this, dimension, &link](const QmitkRenderWindowWidget* neighbor)
+      {
+        const auto neighborLink = this->GetSyncLink(neighbor->GetWidgetName(), dimension);
+        return neighborLink.has_value() && neighborLink->group == link->group;
+      });
+    if (!seamVisible)
+    {
+      return link->group;
+    }
+  }
+
+  return std::nullopt;
+}
+
+void QmitkMxNMultiWidget::RebuildSeams()
+{
+  for (auto* seam : this->findChildren<QmitkMxNLinkSeamWidget*>(QString(), Qt::FindDirectChildrenOnly))
+  {
+    delete seam;
+  }
+
+  if (nullptr == m_SeamProximity || nullptr == this->layout() || this->layout()->count() == 0)
+  {
+    return;
+  }
+  auto* rootSplitter = dynamic_cast<QSplitter*>(this->layout()->itemAt(0)->widget());
+  if (nullptr == rootSplitter)
+  {
+    return;
+  }
+
+  std::function<void(QSplitter*)> walk = [this, &walk](QSplitter* splitter)
+  {
+    for (int i = 0; i < splitter->count(); ++i)
+    {
+      if (auto* sub = dynamic_cast<QSplitter*>(splitter->widget(i)))
+      {
+        walk(sub);
+      }
+      if (i == 0)
+      {
+        continue;
+      }
+      auto* first = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(i - 1));
+      auto* second = dynamic_cast<QmitkRenderWindowWidget*>(splitter->widget(i));
+      if (nullptr != first && nullptr != second)
+      {
+        auto* seam = new QmitkMxNLinkSeamWidget(this, splitter->handle(i),
+                                                first->GetWidgetName(), second->GetWidgetName(),
+                                                m_SeamProximity);
+        seam->setVisible(!m_CleanView);
+      }
+    }
+  };
+  walk(rootSplitter);
 }
 
 QColor QmitkMxNMultiWidget::GetSyncGroupColor(const std::string& group) const

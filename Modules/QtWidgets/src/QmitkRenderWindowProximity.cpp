@@ -60,17 +60,23 @@ void QmitkRenderWindowProximity::AddEventSource(QWidget* source)
 }
 
 QmitkRenderWindowProximity::RegionId QmitkRenderWindowProximity::RegisterRegion(
-  std::function<QRect()> regionInCellCoords)
+  std::function<QRect()> regionInCellCoords, int activationDistance)
 {
   if (!regionInCellCoords)
   {
     mitkThrow() << "Cannot register a proximity region without a rectangle callback.";
+  }
+  if (activationDistance <= 0)
+  {
+    mitkThrow() << "Proximity activation distance must be positive (got "
+                << activationDistance << ").";
   }
 
   const RegionId id = m_NextRegionId++;
 
   Region region;
   region.rectQuery = std::move(regionInCellCoords);
+  region.activationDistance = activationDistance;
   region.collapseTimer = new QTimer(this);
   region.collapseTimer->setSingleShot(true);
   region.collapseTimer->setInterval(CollapseDelayMs);
@@ -222,8 +228,9 @@ QmitkRenderWindowProximity::State QmitkRenderWindowProximity::ComputeState(const
   {
     // Once active, the region stays active through the hysteresis band, so a
     // pointer resting near the threshold cannot flap the state.
-    const int threshold =
-      region.state == State::Active ? ActivationDistance + HysteresisBand : ActivationDistance;
+    const int threshold = region.state == State::Active
+      ? region.activationDistance + HysteresisBand
+      : region.activationDistance;
 
     if (SquaredDistanceToRect(m_PointerPosition, rect) <= threshold * threshold)
     {

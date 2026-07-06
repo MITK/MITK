@@ -219,6 +219,23 @@
 	between windows that are not adjacent on screen; everyday assignment is expected to
 	happen in the map instead.
 
+\subsubsection org_mitk_editors_mxnmultiwidget_LinkSeams Link seams
+	The border between two adjacent render windows shows their coupling: at rest, one
+	short colored segment per group the two windows share (windows with no shared group
+	show nothing at all). Moving the pointer onto the border expands the segment into a
+	row of chips, one per dimension: a filled chip means the pair is coupled on that
+	dimension (click to uncouple), a hollow chip means it is not (click to couple - the
+	unlinked window joins its neighbor's group, or a new group is created for the pair).
+	A dashed chip marks dimensions where the two windows belong to different groups;
+	such mixed pairs are resolved in the layout editor, which the "..." chip opens
+	directly. The "Nav" chip couples or uncouples the whole navigation bundle for the
+	pair. Splitter resizing keeps working on the border outside the chip row.
+
+	Seams exist only between windows that are direct neighbors in the same splitter.
+	Couplings to windows elsewhere in the layout are indicated by the colored dot next
+	to the W/L readout (when the window is not windowing/LUT-linked) and are managed in
+	the layout editor.
+
 \subsubsection org_mitk_editors_mxnmultiwidget_WindowingOverlay Level/window and colormap overlay
 	Each window view carries quiet furniture at its edges:
 	<ul>

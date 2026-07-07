@@ -87,7 +87,7 @@ Useful links
 [build]: https://docs.mitk.org/nightly/BuildInstructionsPage.html
 [dkfz]: https://www.dkfz.de
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
-[download]: https://www.mitk.org/Download
+[download]: https://www.mitk.org/#downloads
 [releases]: https://github.com/MITK/MITK/releases
 [git_repo]: https://github.com/MITK/MITK
 [contribute]: https://github.com/MITK/MITK/blob/master/CONTRIBUTING.md

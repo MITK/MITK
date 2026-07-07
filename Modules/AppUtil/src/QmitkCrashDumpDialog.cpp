@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QFileInfo>
 #include <QLabel>
 #include <QListWidget>
 #include <QLocale>
@@ -25,15 +26,11 @@ found in the LICENSE file.
 #include <QUrl>
 #include <QVBoxLayout>
 
-#include <chrono>
-
 namespace
 {
   QString FormatDump(const mitk::CrashDumpInfo& dump)
   {
-    const auto systemTime = std::chrono::clock_cast<std::chrono::system_clock>(dump.LastWriteTime);
-    const auto dateTime = QDateTime::fromSecsSinceEpoch(
-      std::chrono::duration_cast<std::chrono::seconds>(systemTime.time_since_epoch()).count());
+    const auto dateTime = QFileInfo(QString::fromStdWString(dump.Path.wstring())).lastModified();
 
     return QString("%1  (%2, %3)")
       .arg(QString::fromStdWString(dump.Path.filename().wstring()))

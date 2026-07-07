@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 #include <QDateTime>
 #include <QDesktopServices>
+#include <QFileInfo>
 #include <QLocale>
 #include <QTimer>
 #include <QTreeWidgetItem>
@@ -132,9 +133,7 @@ void QmitkCrashTestView::OnRefreshDumpList()
 
   for (const auto& [dump, kind] : rows)
   {
-    const auto systemTime = std::chrono::clock_cast<std::chrono::system_clock>(dump.LastWriteTime);
-    const auto dateTime = QDateTime::fromSecsSinceEpoch(
-      std::chrono::duration_cast<std::chrono::seconds>(systemTime.time_since_epoch()).count());
+    const auto dateTime = QFileInfo(QString::fromStdWString(dump.Path.wstring())).lastModified();
 
     auto* item = new QTreeWidgetItem(m_Controls->dumpTreeWidget);
     item->setText(0, kind);

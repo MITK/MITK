@@ -139,7 +139,11 @@ std::optional<std::filesystem::file_time_type> mitk::ReadLastAcknowledgedTime(
 {
   std::ifstream file(GetAcknowledgedMarkerFilePath(databaseDirectory));
 
-  std::filesystem::file_time_type::rep ticks = 0;
+  // file_time_type::rep is __int128 on some standard libraries (libc++), for
+  // which the stream operators have no overload. The value is nanoseconds
+  // since the epoch and fits a 64-bit integer for any realistic date, so
+  // round-trip it as long long.
+  long long ticks = 0;
   if (!(file >> ticks))
     return std::nullopt;
 
@@ -153,7 +157,7 @@ bool mitk::WriteLastAcknowledgedTime(const std::filesystem::path& databaseDirect
   std::filesystem::create_directories(databaseDirectory, error);
 
   std::ofstream file(GetAcknowledgedMarkerFilePath(databaseDirectory), std::ios::trunc);
-  file << time.time_since_epoch().count();
+  file << static_cast<long long>(time.time_since_epoch().count());
 
   return file.good();
 }

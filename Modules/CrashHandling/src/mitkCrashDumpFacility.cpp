@@ -266,7 +266,8 @@ std::filesystem::path mitk::CrashDumpFacility::GetDatabaseDirectory()
   return s_State.DatabaseDirectory;
 }
 
-std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(SnapshotKind kind)
+std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(
+  [[maybe_unused]] SnapshotKind kind)
 {
   std::lock_guard<std::mutex> lock(s_SnapshotMutex);
 
@@ -276,6 +277,14 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(Sn
     return std::nullopt;
   }
 
+#if defined(__APPLE__)
+  // Crashpad's macOS client has no DumpWithoutCrash (macOS drives dumps only
+  // through a Mach exception server, on an actual crash), so on-demand and
+  // watchdog snapshots cannot be taken there. Hard-crash capture is
+  // unaffected.
+  MITK_WARN << "On-demand diagnostic snapshots are not available on macOS.";
+  return std::nullopt;
+#else
   const auto& database = s_State.DatabaseDirectory;
 
   // DumpWithoutCrash writes into Crashpad's report area; diff it against the
@@ -340,6 +349,7 @@ std::optional<std::filesystem::path> mitk::CrashDumpFacility::CaptureSnapshot(Sn
   PruneCrashDumps(destinationDir, kMaxRetainedDumps);
 
   return destination;
+#endif
 }
 
 void mitk::CrashDumpFacility::PurgeProvisionalSnapshots()

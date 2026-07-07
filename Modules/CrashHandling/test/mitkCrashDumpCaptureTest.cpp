@@ -91,9 +91,13 @@ class mitkCrashDumpCaptureTestSuite : public mitk::TestFixture
   MITK_TEST(CrashByStackOverflowLeavesDump);
   MITK_TEST(DumpsSurviveReinitialization);
   MITK_TEST(FacilityQueryAcknowledgeDeleteCycle);
+  // On-demand and watchdog snapshots rely on Crashpad's DumpWithoutCrash,
+  // which its macOS client does not provide.
+#ifndef __APPLE__
   MITK_TEST(OnDemandSnapshotIsCapturedButNotSurfaced);
   MITK_TEST(HardKilledFreezeLeavesProvisionalDump);
   MITK_TEST(RecoveredFreezeLeavesNoDump);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
   std::filesystem::path m_DatabaseDirectory;
@@ -243,6 +247,7 @@ public:
     CPPUNIT_ASSERT(!mitk::CrashDumpFacility::IsActive());
   }
 
+#ifndef __APPLE__
   /** On-demand snapshot: the helper captures one without crashing (exits
    *  cleanly) and it is filed where the next-start dialog never surfaces it. */
   void OnDemandSnapshotIsCapturedButNotSurfaced()
@@ -311,6 +316,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("a recovered freeze must leave no dump",
       mitk::ScanCrashDumps(m_DatabaseDirectory).empty());
   }
+#endif
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkCrashDumpCapture)

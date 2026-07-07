@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 /// forward declarations
 struct QmitkMeasurementViewData;
+class QAction;
 namespace mitk
 {
   class PlanarFigure;
@@ -84,6 +85,8 @@ private:
     void UpdateMeasurementText();
     void AddAllInteractors();
     void PlanarFigureInitialized();
+    void CancelPlacement();
+    bool BeginDrawAction(QAction* action, bool checked);
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;
